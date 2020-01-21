@@ -185,7 +185,10 @@ do-install:
 		${STAGEDIR}${PREFIX}/www/api/v1/firewall/rules/delete
 
 	# SERVICE API ENDPOINTS----------------------------------------
+	# Services base
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services
 	# Unbound base
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/unbound/index.php \
