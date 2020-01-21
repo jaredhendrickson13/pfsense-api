@@ -87,17 +87,17 @@
 /usr/local/www/api/v1/firewall/rules/add/index.php
 /usr/local/www/api/v1/firewall/rules/delete/index.php
 
-@dir /usr/local/www/api/v1/unbound
-@dir /usr/local/www/api/v1/unbound/add
-@dir /usr/local/www/api/v1/unbound/delete
-@dir /usr/local/www/api/v1/unbound/modify
-@dir /usr/local/www/api/v1/unbound/add/hosts
-@dir /usr/local/www/api/v1/unbound/delete/hosts
-@dir /usr/local/www/api/v1/unbound/modify/hosts
-/usr/local/www/api/v1/unbound/index.php
-/usr/local/www/api/v1/unbound/add/hosts/index.php
-/usr/local/www/api/v1/unbound/delete/hosts/index.php
-/usr/local/www/api/v1/unbound/modify/hosts/index.php
+@dir /usr/local/www/api/v1/services/unbound
+@dir /usr/local/www/api/v1/services/unbound/add
+@dir /usr/local/www/api/v1/services/unbound/delete
+@dir /usr/local/www/api/v1/services/unbound/modify
+@dir /usr/local/www/api/v1/services/unbound/add/hosts
+@dir /usr/local/www/api/v1/services/unbound/delete/hosts
+@dir /usr/local/www/api/v1/services/unbound/modify/hosts
+/usr/local/www/api/v1/services/unbound/index.php
+/usr/local/www/api/v1/services/unbound/add/hosts/index.php
+/usr/local/www/api/v1/services/unbound/delete/hosts/index.php
+/usr/local/www/api/v1/services/unbound/modify/hosts/index.php
 
 
 %%DATADIR%%/info.xml

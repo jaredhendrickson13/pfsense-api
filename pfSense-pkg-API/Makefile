@@ -184,26 +184,27 @@ do-install:
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/rules/delete/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/firewall/rules/delete
 
-	# UNBOUND API ENDPOINTS----------------------------------------
+	# SERVICE API ENDPOINTS----------------------------------------
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services
 	# Unbound base
-	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/unbound
-	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/unbound/index.php \
-		${STAGEDIR}${PREFIX}/www/api/v1/unbound
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/unbound/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/unbound
 	# Unbound add
-	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/unbound/add
-	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/unbound/add/hosts
-	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/unbound/add/hosts/index.php \
-		${STAGEDIR}${PREFIX}/www/api/v1/unbound/add/hosts
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/add
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/add/hosts
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/unbound/add/hosts/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/add/hosts
 	# Unbound delete
-	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/unbound/delete
-	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/unbound/delete/hosts
-	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/unbound/delete/hosts/index.php \
-		${STAGEDIR}${PREFIX}/www/api/v1/unbound/delete/hosts
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/delete/hosts
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/unbound/delete/hosts/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/delete/hosts
 	# Unbound modify
-	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/unbound/modify
-	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/unbound/modify/hosts
-	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/unbound/modify/hosts/index.php \
-		${STAGEDIR}${PREFIX}/www/api/v1/unbound/modify/hosts
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/modify
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/modify/hosts
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/unbound/modify/hosts/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/modify/hosts
 
 	# INSTALL OUR PKG INFO
 	${MKDIR} ${STAGEDIR}${DATADIR}
