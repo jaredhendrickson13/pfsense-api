@@ -1,0 +1,103 @@
+@dir /etc/inc
+/etc/inc/api.inc
+
+@dir /usr/local/pkg
+/usr/local/pkg/api.xml
+
+@dir /usr/local/www/api
+@dir /usr/local/www/api/v1
+/usr/local/www/api/index.php
+
+@dir /usr/local/www/api/v1/users
+@dir /usr/local/www/api/v1/users/add
+@dir /usr/local/www/api/v1/users/delete
+@dir /usr/local/www/api/v1/users/modify
+@dir /usr/local/www/api/v1/users/add/privs
+@dir /usr/local/www/api/v1/users/delete/privs
+@dir /usr/local/www/api/v1/users/add/groups
+@dir /usr/local/www/api/v1/users/delete/groups
+/usr/local/www/api/v1/users/index.php
+/usr/local/www/api/v1/users/add/index.php
+/usr/local/www/api/v1/users/delete/index.php
+/usr/local/www/api/v1/users/modify/index.php
+/usr/local/www/api/v1/users/add/privs/index.php
+/usr/local/www/api/v1/users/delete/privs/index.php
+/usr/local/www/api/v1/users/add/groups/index.php
+/usr/local/www/api/v1/users/delete/groups/index.php
+
+@dir /usr/local/www/api/v1/system/version
+/usr/local/www/api/v1/system/version/index.php
+
+@dir /usr/local/www/api/v1/system/arp
+@dir /usr/local/www/api/v1/system/arp/delete
+/usr/local/www/api/v1/system/arp/index.php
+/usr/local/www/api/v1/system/arp/delete/index.php
+
+@dir /usr/local/www/api/v1/system/config
+/usr/local/www/api/v1/system/config/index.php
+
+@dir /usr/local/www/api/v1/status
+@dir /usr/local/www/api/v1/status/carp
+@dir /usr/local/www/api/v1/status/carp/modify
+/usr/local/www/api/v1/status/carp/index.php
+/usr/local/www/api/v1/status/carp/modify/index.php
+
+@dir /usr/local/www/api/v1/routing
+@dir /usr/local/www/api/v1/routing/gateways
+/usr/local/www/api/v1/routing/gateways/index.php
+
+@dir /usr/local/www/api/v1/interfaces
+@dir /usr/local/www/api/v1/interfaces/add
+@dir /usr/local/www/api/v1/interfaces/vlans
+@dir /usr/local/www/api/v1/interfaces/vlans/add
+@dir /usr/local/www/api/v1/interfaces/vlans/delete
+@dir /usr/local/www/api/v1/interfaces/vlans/modify
+/usr/local/www/api/v1/interfaces/index.php
+/usr/local/www/api/v1/interfaces/add/index.php
+/usr/local/www/api/v1/interfaces/vlans/index.php
+/usr/local/www/api/v1/interfaces/vlans/add/index.php
+/usr/local/www/api/v1/interfaces/vlans/delete/index.php
+/usr/local/www/api/v1/interfaces/vlans/modify/index.php
+
+@dir /usr/local/www/api/v1/firewall
+@dir /usr/local/www/api/v1/firewall/virtualips
+@dir /usr/local/www/api/v1/firewall/virtualips/add
+@dir /usr/local/www/api/v1/firewall/virtualips/delete
+/usr/local/www/api/v1/firewall/virtualips/index.php
+/usr/local/www/api/v1/firewall/virtualips/add/index.php
+/usr/local/www/api/v1/firewall/virtualips/delete/index.php
+
+@dir /usr/local/www/api/v1/firewall/aliases
+@dir /usr/local/www/api/v1/firewall/aliases/add
+@dir /usr/local/www/api/v1/firewall/aliases/delete
+@dir /usr/local/www/api/v1/firewall/aliases/modify
+@dir /usr/local/www/api/v1/firewall/aliases/add/address
+@dir /usr/local/www/api/v1/firewall/aliases/delete/address
+/usr/local/www/api/v1/firewall/aliases/index.php
+/usr/local/www/api/v1/firewall/aliases/add/index.php
+/usr/local/www/api/v1/firewall/aliases/delete/index.php
+/usr/local/www/api/v1/firewall/aliases/modify/index.php
+/usr/local/www/api/v1/firewall/aliases/add/address/index.php
+/usr/local/www/api/v1/firewall/aliases/delete/address/index.php
+
+@dir /usr/local/www/api/v1/firewall/rules
+@dir /usr/local/www/api/v1/firewall/rules/add
+@dir /usr/local/www/api/v1/firewall/rules/delete
+/usr/local/www/api/v1/firewall/rules/index.php
+/usr/local/www/api/v1/firewall/rules/add/index.php
+/usr/local/www/api/v1/firewall/rules/delete/index.php
+
+@dir /usr/local/www/api/v1/unbound
+@dir /usr/local/www/api/v1/unbound/add
+@dir /usr/local/www/api/v1/unbound/delete
+@dir /usr/local/www/api/v1/unbound/modify
+@dir /usr/local/www/api/v1/unbound/add/hosts
+@dir /usr/local/www/api/v1/unbound/delete/hosts
+@dir /usr/local/www/api/v1/unbound/modify/hosts
+/usr/local/www/api/v1/unbound/index.php
+/usr/local/www/api/v1/unbound/add/hosts/index.php
+/usr/local/www/api/v1/unbound/delete/hosts/index.php
+/usr/local/www/api/v1/unbound/modify/hosts/index.php
+
+
+%%DATADIR%%/info.xml

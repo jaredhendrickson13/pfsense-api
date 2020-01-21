@@ -1,0 +1,215 @@
+# $FreeBSD$
+
+PORTNAME=	pfSense-pkg-API
+PORTVERSION=	0.0
+PORTREVISION=	1
+CATEGORIES=	sysutils
+MASTER_SITES=	# empty
+DISTFILES=	# empty
+EXTRACT_ONLY=	# empty
+MAINTAINER=	jaredhendrickson13@gmail.com
+COMMENT=	pfSense API package
+LICENSE=	APACHE20
+NO_BUILD=	yes
+NO_MTREE=	yes
+SUB_FILES=	pkg-install pkg-deinstall
+SUB_LIST=	PORTNAME=${PORTNAME}
+
+do-extract:
+	${MKDIR} ${WRKSRC}
+
+do-install:
+	# INSTALL OUR API INCLUDE FILE
+	${MKDIR} ${STAGEDIR}/etc/inc
+	${INSTALL_DATA} ${FILESDIR}/etc/inc/api.inc \
+		${STAGEDIR}/etc/inc
+
+	# INSTALL OUR PFSENSE PKG
+	${MKDIR} ${STAGEDIR}${PREFIX}/pkg
+	${INSTALL_DATA} -m 0644 ${FILESDIR}${PREFIX}/pkg/api.xml \
+		${STAGEDIR}${PREFIX}/pkg
+
+    # INSTALL OUR API ENDPOINTS
+	# API Base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/index.php \
+    	${STAGEDIR}${PREFIX}/www/api
+    # API version
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1
+	# USERS API ENDPOINTS------------------------------------------
+	# Users base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/users
+	# Users add
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/add
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/add/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/users/add
+	# Users priv add
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/add/privs
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/add/privs/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/users/add/privs
+	# Users group add
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/add/groups
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/add/groups/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/users/add/groups
+	# Users delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/delete
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/delete/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/users/delete
+	# Users priv delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/delete/privs
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/delete/privs/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/users/delete/privs
+	# Users group delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/delete/groups
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/delete/groups/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/users/delete/groups
+	# Users modify
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/modify
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/modify/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/users/modify
+
+	# SYSTEM API ENDPOINTS----------------------------------------
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/
+	# Version base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/version
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/version/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/system/version
+	# ARP base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/arp
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/arp/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/system/arp
+	# ARP delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/arp/delete
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/arp/delete/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/system/arp/delete
+	# Config base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/config
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/config/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/system/config
+
+	# STATUS API ENDPOINTS----------------------------------------
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/status/
+	# CARP base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/status/carp
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/status/carp/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/status/carp
+	# CARP base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/status/carp/modify
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/status/carp/modify/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/status/carp/modify
+
+	# INTERFACES API ENDPOINTS----------------------------------------
+	# Interfaces base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/interfaces
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/interfaces/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/interfaces
+	# Interfaces add
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/interfaces/add
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/interfaces/add/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/interfaces/add
+	# Vlans base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/interfaces/vlans
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/interfaces/vlans/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/interfaces/vlans
+	# Vlans add
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/interfaces/vlans/add
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/interfaces/vlans/add/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/interfaces/vlans/add
+	# Vlans delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/interfaces/vlans/delete
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/interfaces/vlans/delete/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/interfaces/vlans/delete
+	# Vlans modify
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/interfaces/vlans/modify
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/interfaces/vlans/modify/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/interfaces/vlans/modify
+
+	# ROUTING API endpoints----------------------------------------
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/routing
+	# Gateways base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/routing/gateways
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/routing/gateways/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/routing/gateways
+
+	# FIREWALL API ENPOINTS
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall
+	# Virtual IP base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/virtualips
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/virtualips/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/virtualips
+	# Virtual IP add
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/virtualips/add
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/virtualips/add/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/virtualips/add
+	# Virtual IP delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/virtualips/delete
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/virtualips/delete/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/virtualips/delete
+	# Alias base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/aliases
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/aliases/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/aliases
+	# Alias add
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/aliases/add
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/aliases/add/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/aliases/add
+	# Alias add address
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/aliases/add/address
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/aliases/add/address/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/aliases/add/address
+	# Alias delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/aliases/delete
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/aliases/delete/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/aliases/delete
+	# Alias delete address
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/aliases/delete/address
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/aliases/delete/address/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/aliases/delete/address
+	# Alias modify
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/aliases/modify
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/aliases/modify/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/aliases/modify
+	# Rules base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/rules
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/rules/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/rules
+	# Rules add
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/rules/add
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/rules/add/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/rules/add
+	# Rules delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/rules/delete
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/rules/delete/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/rules/delete
+
+	# UNBOUND API ENDPOINTS----------------------------------------
+	# Unbound base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/unbound
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/unbound/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/unbound
+	# Unbound add
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/unbound/add
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/unbound/add/hosts
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/unbound/add/hosts/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/unbound/add/hosts
+	# Unbound delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/unbound/delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/unbound/delete/hosts
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/unbound/delete/hosts/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/unbound/delete/hosts
+	# Unbound modify
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/unbound/modify
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/unbound/modify/hosts
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/unbound/modify/hosts/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/unbound/modify/hosts
+
+	# INSTALL OUR PKG INFO
+	${MKDIR} ${STAGEDIR}${DATADIR}
+	${INSTALL_DATA} ${FILESDIR}${DATADIR}/info.xml \
+		${STAGEDIR}${DATADIR}
+	@${REINPLACE_CMD} -i '' -e "s|%%PKGVERSION%%|${PKGVERSION}|" \
+		${STAGEDIR}${DATADIR}/info.xml
+
+.include <bsd.port.mk>

@@ -1,0 +1,2 @@
+#!/bin/sh
+/usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% ${2}

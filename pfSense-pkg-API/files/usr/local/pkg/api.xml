@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+    <copyright>
+        <![CDATA[
+/**
+ * API
+ *  - A REST API for pfSense
+ *
+ * Copyright 2020 Jared Hendrickson
+ */
+	]]>
+    </copyright>
+    <description>A REST API for pfSense</description>
+    <name>API</name>
+    <title>System: API</title>
+    <menu>
+        <name>API</name>
+        <tooltiptext>A REST API for pfSense.</tooltiptext>
+        <section>System</section>
+        <url>/api/</url>
+    </menu>
+    <tabs>
+        <tab>
+            <text>API Settings</text>
+            <url>/api/</url>
+            <active/>
+        </tab>
+    </tabs>
+</packagegui>

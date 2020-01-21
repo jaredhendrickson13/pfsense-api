@@ -1,0 +1,106 @@
+API RETURN CODES
+0: Success
+1: Server error
+2: Invalid HTTP method
+3: Authentication failure
+4: Authorization failure
+5: Search attribute not found
+6: File not found
+7: Invalid IPv4 or IPv6 address
+8: Port out of range
+9: Subnet out of range
+10: Invalid input type
+11: invalid interface
+12: invalid gateway
+13: invalid subnet
+14: ip or subnet in use
+15: forbidden
+16: invalid mac address
+
+20: Username required
+21: Password required
+22: User already exists
+23: User does not exist
+24: Search must be list
+25: priv required
+26: priv must be list or string
+27: unknown priv
+28: group required
+29: group must be list or string
+30: unknown group
+40: hostname required
+41: domain required
+42: ip required
+43: host override already exists
+44: host override does not exist
+45: host override deletion criteria not met
+60: alias name required
+61: alias type required
+62: alias value requried
+63: alias must be valid cidr
+64: unknown alias type
+65: alias already exists
+66: alias in use
+67: alias does not exist
+80: rule type required
+81: rule ip protocol required
+82: rule protocol required
+83: rule source required
+84: rule dest required
+85: invalid rule type
+86: invalid ip protocol type
+87: invalid protocol type
+88: invalid source or destination
+89: invalid icmp subtype
+90: rule ID is required
+91: rule id does not exist
+100: virtual ip mode required
+101: virtual ip mode invalid
+102: vhid already exists
+103: carp advertisement out of range
+104: vhid out of range
+105: virtual ip id required
+106: virtual ip id does not exist
+110: vlan tag required
+111: vlan tag out of range
+112: vlan priority out of range
+113: vlan already in use
+114: vlan id required
+115: vlan does not exist
+120: interface not found
+121: interface already in use
+122: mtu out of range
+123: mtu greater than parent interface
+124: mss out of range
+125: interface description name already exists
+126: invalid speed/duplex
+127: invalid ipv4 configuration type
+128: invalid ipv6 configuration type
+129: interface type static4 requires valid ipv4 address
+130: interface ip address already in use
+131: interface type static4 requires subnet bitmask
+132: invalid dhcp alias address
+133: invalid dhcp reject from address
+134: invalid dhcp timeout value
+135: invalid dhcp retry value
+136: invalid dhcp select timeout value
+137: invalid dhcp reboot value
+138: invalid dhcp backoff cutoff value
+139: invalid dhcp initial interval value
+140: invalid dhcp vlan priority value
+141: invalid dhcp conf file
+142: interface type staticv6 requires valid ipv6 address
+143: interface type staticv6 requires subnet bitmask
+144: invalid dhcp6 vlan priority value
+145: invalid dhcp6 prefix delegation size
+146: invalid dhcp6 configuration file
+
+
+
+
+
+
+
+
+
+
