@@ -190,6 +190,18 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/unbound/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/services/unbound
+	# Unbound start
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/start
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/unbound/start/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/start
+	# Unbound stop
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/stop
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/unbound/stop/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/stop
+	# Unbound restart
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/restart
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/unbound/restart/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/restart
 	# Unbound add
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/add
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/add/hosts
