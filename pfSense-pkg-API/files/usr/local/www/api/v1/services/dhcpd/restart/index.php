@@ -14,7 +14,7 @@ header("Referer: no-referrer");
 // VARIABLES------------------------------------------------------------------------------------------------------------
 global $config, $api_resp, $client_params;
 $read_only_action = true;    // Set whether this action requires read only access
-$req_privs = array("page-all", "page-services-dnsresolver");    // Array of privs allowed
+$req_privs = array("page-all", "page-services-dhcp");    // Array of privs allowed
 $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
 
 // RUN TIME-------------------------------------------------------------------------------------------------------------
@@ -22,9 +22,9 @@ $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
 if (api_authorized($req_privs, $read_only_action)) {
     // Check that our HTTP method is POST (UPDATE)
     if ($http_method === 'POST') {
-        $stop_serv = service_control_start("unbound", []);    // Start our service
+        $stop_serv = service_control_restart("dhcpd", []);    // Restart our service
         // Print our JSON response
-        $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "service unbound has been started");
+        $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "service dhcpd has been restarted");
         http_response_code(200);
         echo json_encode($api_resp) . PHP_EOL;
         die();

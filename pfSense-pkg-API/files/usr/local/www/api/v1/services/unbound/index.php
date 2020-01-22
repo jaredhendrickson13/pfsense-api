@@ -16,7 +16,6 @@ global $config, $api_resp, $client_params;
 $read_only_action = true;    // Set whether this action requires read only access
 $req_privs = array("page-all", "page-services-dnsresolver");    // Array of privs allowed
 $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
-$unbound_array = array();    // Init our return array
 
 // RUN TIME-------------------------------------------------------------------------------------------------------------
 // Check that client is authenticated and authorized

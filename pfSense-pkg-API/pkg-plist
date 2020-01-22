@@ -88,6 +88,14 @@
 /usr/local/www/api/v1/firewall/rules/delete/index.php
 
 @dir /usr/local/www/api/v1/services
+@dir /usr/local/www/api/v1/services/dhcpd
+@dir /usr/local/www/api/v1/services/dhcpd/start
+@dir /usr/local/www/api/v1/services/dhcpd/stop
+@dir /usr/local/www/api/v1/services/dhcpd/restart
+@dir /usr/local/www/api/v1/services/sshd
+@dir /usr/local/www/api/v1/services/sshd/start
+@dir /usr/local/www/api/v1/services/sshd/stop
+@dir /usr/local/www/api/v1/services/sshd/restart
 @dir /usr/local/www/api/v1/services/unbound
 @dir /usr/local/www/api/v1/services/unbound/add
 @dir /usr/local/www/api/v1/services/unbound/delete
@@ -99,6 +107,12 @@
 @dir /usr/local/www/api/v1/services/unbound/delete/hosts
 @dir /usr/local/www/api/v1/services/unbound/modify/hosts
 /usr/local/www/api/v1/services/index.php
+/usr/local/www/api/v1/services/dhcpd/start/index.php
+/usr/local/www/api/v1/services/dhcpd/stop/index.php
+/usr/local/www/api/v1/services/dhcpd/restart/index.php
+/usr/local/www/api/v1/services/sshd/start/index.php
+/usr/local/www/api/v1/services/sshd/stop/index.php
+/usr/local/www/api/v1/services/sshd/restart/index.php
 /usr/local/www/api/v1/services/unbound/index.php
 /usr/local/www/api/v1/services/unbound/start/index.php
 /usr/local/www/api/v1/services/unbound/stop/index.php

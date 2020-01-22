@@ -16,14 +16,13 @@ global $config, $api_resp, $client_params;
 $read_only_action = true;    // Set whether this action requires read only access
 $req_privs = array("page-all", "page-services-dnsresolver");    // Array of privs allowed
 $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
-$unbound_array = array();    // Init our return array
 
 // RUN TIME-------------------------------------------------------------------------------------------------------------
 // Check that client is authenticated and authorized
 if (api_authorized($req_privs, $read_only_action)) {
     // Check that our HTTP method is POST (UPDATE)
     if ($http_method === 'POST') {
-        $stop_serv = service_control_restart("unbound", []);    // Stop our service
+        $stop_serv = service_control_restart("unbound", []);    // Restart our service
         // Print our JSON response
         $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "service unbound has been restarted");
         http_response_code(200);

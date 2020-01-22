@@ -189,6 +189,34 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/services
+	# DHCPD base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/dhcpd
+	# DHCPD start
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/dhcpd/start
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/dhcpd/start/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/dhcpd/start
+	# DHCPD stop
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/dhcpd/stop
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/dhcpd/stop/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/dhcpd/stop
+	# DHCPD restart
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/dhcpd/restart
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/dhcpd/restart/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/dhcpd/restart
+	# SSHD base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/sshd
+	# SSHD start
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/sshd/start
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/sshd/start/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/sshd/start
+	# SSHD stop
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/sshd/stop
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/sshd/stop/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/sshd/stop
+	# SSHD restart
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/sshd/restart
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/sshd/restart/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/sshd/restart
 	# Unbound base
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/unbound/index.php \
