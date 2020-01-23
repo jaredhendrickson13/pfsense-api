@@ -189,6 +189,18 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/services
+	# Base start
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/start
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/start/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/start
+	# Base stop
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/stop
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/stop/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/stop
+	# Base restart
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/restart
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/restart/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/restart
 	# DHCPD base
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/dhcpd
 	# DHCPD start
@@ -203,6 +215,34 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/dhcpd/restart
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/dhcpd/restart/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/services/dhcpd/restart
+	# DPINGER base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/dpinger
+	# DPINGER start
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/dpinger/start
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/dpinger/start/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/dpinger/start
+	# DPINGER stop
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/dpinger/stop
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/dpinger/stop/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/dpinger/stop
+	# DPINGER restart
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/dpinger/restart
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/dpinger/restart/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/dpinger/restart
+	# NTPD base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/ntpd
+	# NTPD start
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/ntpd/start
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/ntpd/start/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/ntpd/start
+	# NTPD stop
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/ntpd/stop
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/ntpd/stop/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/ntpd/stop
+	# NTPD restart
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/ntpd/restart
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/ntpd/restart/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/ntpd/restart
 	# SSHD base
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/sshd
 	# SSHD start
@@ -217,6 +257,20 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/sshd/restart
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/sshd/restart/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/services/sshd/restart
+	# SYSLOGD base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/syslogd
+	# SYSLOGD start
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/syslogd/start
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/syslogd/start/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/syslogd/start
+	# SYSLOGD stop
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/syslogd/stop
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/syslogd/stop/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/syslogd/stop
+	# SYSLOGD restart
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/syslogd/restart
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/syslogd/restart/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/syslogd/restart
 	# Unbound base
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/unbound/index.php \
