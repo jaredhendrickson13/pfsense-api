@@ -883,6 +883,28 @@ function get_next_pfsense_if_id() {
     }
 }
 
+// Returns a list of dynamically configured IPv6 interfaces. Modified from interfaces.php function.
+function get_ipv6_if_list() {
+	global $config, $section;
+	$list = array('' => '');
+	$interfaces = get_configured_interface_with_descr(true);
+	$dyn_v6_ifs = array();
+	foreach ($interfaces as $iface => $ifacename) {
+		switch ($config['interfaces'][$iface]['ipaddrv6']) {
+			case "6to4":
+			case "6rd":
+			case "dhcp6":
+				$dyn_v6_ifs[$iface] = array(
+					'name' => $ifacename,
+					'ipv6_num_prefix_ids' => pow(2, (int) calculate_ipv6_delegation_length($iface)) - 1);
+				break;
+			default:
+				continue 2;
+		}
+	}
+	return($dyn_v6_ifs);
+}
+
 // Apply a new interface configuration
 function apply_interface_config($if_conf) {
     // Local variables

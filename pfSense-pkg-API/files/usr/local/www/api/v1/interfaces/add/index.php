@@ -19,7 +19,7 @@ $read_only_action = false;    // Set whether this action requires read only acce
 $req_privs = array("page-all", "page-interfaces");    // Array of privileges allowing this action
 $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
 $if_list = get_all_avail_interfaces();    // Save all our available interfaces
-$allowed_ip4_types = array("staticv4", "dhcp", "ppp", "pppoe", "pptp", "lt2p");    // List of allowed IPv4 if types
+$allowed_ip4_types = array("staticv4", "dhcp");    // List of allowed IPv4 if types
 $allowed_ip6_types = array("staticv6", "dhcp6", "slaac", "6rd", "6to4", "track6");    // List of allowed IPv6 if types
 $next_if = get_next_pfsense_if_id();
 $if_ent = array($next_if => []);
@@ -424,7 +424,7 @@ if (api_authorized($req_privs, $read_only_action)) {
                     if (!$err_found and isset($client_params["ipv6usev4iface"])) {
                         $if_ent[$next_if]["ipv6usev4iface"] = "";
                     }
-                    // IPv6 DHCP6 TYPE
+                // IPv6 DHCP6 TYPE
                 } elseif ($type6 === "dhcp6") {
                     $if_ent[$next_if]["ipaddrv6"] = $type6;    // Set our ipaddrv6 value to dhcp6
                     // Check if user set ipv6usev4iface value
@@ -531,10 +531,79 @@ if (api_authorized($req_privs, $read_only_action)) {
                             }
                         }
                     }
-                    // IPv6 SLAAC TYPE
+                // IPv6 SLAAC TYPE
                 } elseif ($type6 === "slaac") {
                     $if_ent[$next_if]["ipaddrv6"] = $type6;    // Set our ipaddrv6 value to slaac
-                    // IPv6 6-to-4 TYPE
+                // IPv6 6RD TYPE
+                } elseif ($type6 === "6rd") {
+                    $if_ent[$next_if]["ipaddrv6"] = $type6;    // Set our ipaddrv6 value to 6rd
+                    $if_ent[$next_if]["prefix-6rd-v4plen"] = $client_params["prefix-6rd-v4plen"];    // Default prefix len
+                    // Check for a 6RD border relay
+                    if (!$err_found and isset($client_params["gateway-6rd"])) {
+                        $gw6rd = $client_params["gateway-6rd"];
+                        // Check that our gateway is a valid IPv4 address
+                        if (is_ipaddrv4($gw6rd)) {
+                            $if_ent[$next_if]["gateway-6rd"] = $client_params["gateway-6rd"];
+                        } else {
+                            $err_found = true;
+                            $api_resp["message"] = "invalid 6rd gateway address";
+                            $api_resp["return"] = 148;
+                        }
+                    } else {
+                        $err_found = true;
+                        $api_resp["message"] = "6rd gateway address required";
+                        $api_resp["return"] = 147;
+                    }
+                    // Check for a 6RD prefix
+                    if (!$err_found and isset($client_params["prefix-6rd"])) {
+                        $if_ent[$next_if]["prefix-6rd"] = $client_params["prefix-6rd"];
+                    }
+                    // Check for a 6RD prefix length
+                    if (!$err_found and isset($client_params["prefix-6rd-v4plen"])) {
+                        $prefix_len = $client_params["prefix-6rd-v4plen"];
+                        // Check if our prefix length is within range
+                        if (is_numeric($prefix_len) and (0 <= intval($prefix_len) and intval($prefix_len) <= 32)) {
+                            $if_ent[$next_if]["prefix-6rd-v4plen"] = $client_params["prefix-6rd-v4plen"];
+                        } else {
+                            $err_found = true;
+                            $api_resp["message"] = "invalid 6rd prefix length";
+                            $api_resp["return"] = 149;
+                        }
+                    }
+                // IPv6 TRACK TYPE
+                } elseif ($type6 === "track6") {
+                    $if_ent[$next_if]["ipaddrv6"] = $type6;    // Set our ipaddrv6 value to track6
+                    // Check for track 6 interface
+                    if (!$err_found and isset($client_params["track6-interface"])) {
+                        $track_if = $client_params["track6-interface"];
+                        $track_if = get_pfsense_if_id($track_if);
+                        // Check that our gateway is a valid IPv4 address
+                        if (array_key_exists($track_if, get_ipv6_if_list())) {
+                            $if_ent[$next_if]["track6-interface"] = $client_params["track6-interface"];
+                        } else {
+                            $err_found = true;
+                            $api_resp["message"] = "invalid ipv6 track interface";
+                            $api_resp["return"] = 150;
+                        }
+                    } else {
+                        $err_found = true;
+                        $api_resp["message"] = "ipv6 track interface required";
+                        $api_resp["return"] = 151;
+                    }
+                    // Check for track 6 prefix ID
+                    $track_prefix = 0;    // Default our prefix value
+                    if (!$err_found and isset($client_params["track6-prefix-id-hex"])) {
+                        $track_prefix = $client_params["track6-prefix-id-hex"];
+                        // Check that our gateway is a valid IPv4 address
+                        if (is_numeric($track_prefix) and ctype_xdigit(strval($track_prefix))) {
+                            $if_ent[$next_if]["track6-prefix-id--hex"] = intval($track_prefix);
+                        } else {
+                            $err_found = true;
+                            $api_resp["message"] = "invalid ipv6 track prefix hex value";
+                            $api_resp["return"] = 152;
+                        }
+                    }
+                // IPv6 6-to-4 TYPE
                 } elseif ($type6 === "6to4") {
                     $if_ent[$next_if]["ipaddrv6"] = $type6;    // Set our ipaddrv6 value to 6to4
                 }

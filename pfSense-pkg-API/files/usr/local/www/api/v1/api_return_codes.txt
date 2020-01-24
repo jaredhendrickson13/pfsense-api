@@ -94,6 +94,13 @@ API RETURN CODES
 144: invalid dhcp6 vlan priority value
 145: invalid dhcp6 prefix delegation size
 146: invalid dhcp6 configuration file
+147: 6rd gateway address required
+148: invalid 6rd gateway address
+149: invalid 6rd prefix length
+150: invalid ipv6 track interface
+151: ipv6 track interface required
+152: invalid ipv6 track prefix hex value
+
 
 
 
