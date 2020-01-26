@@ -40,14 +40,14 @@ function api_status_carp() {
             }
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $carp_status);
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
 
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -96,13 +96,13 @@ function api_status_carp_modify() {
             interfaces_carp_set_maintenancemode($mm_enable);    // Set our maintenance mode value
             enable_carp($enable);    // Set our CARP enable value
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "success", "data" => $carp_stat_arr);
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -128,13 +128,13 @@ function api_firewall_virtualips() {
             }
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $vip_array);
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -155,7 +155,7 @@ function api_firewall_virtualips_delete() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 105);
                 $api_resp["message"] = "virtual ip id required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
@@ -174,18 +174,18 @@ function api_firewall_virtualips_delete() {
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = "virtual ip deleted";
                 $api_resp["data"] = $del_vip;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 106);
                 $api_resp["message"] = "virtual ip id does not exist";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -207,7 +207,7 @@ function api_firewall_virtualips_add() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 100);
                 $api_resp["message"] = "virtual ip mode required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['interface'])) {
                 $interface = $client_params['interface'];
@@ -215,7 +215,7 @@ function api_firewall_virtualips_add() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 11);
                 $api_resp["message"] = "interface required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['subnet'])) {
                 $subnet = $client_params['subnet'];
@@ -228,7 +228,7 @@ function api_firewall_virtualips_add() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 83);
                 $api_resp["message"] = "virtual ip subnet required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['descr'])) {
                 $descr = $client_params['descr'];
@@ -257,7 +257,7 @@ function api_firewall_virtualips_add() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 21);
                 $api_resp["message"] = "carp password required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
@@ -338,7 +338,7 @@ function api_firewall_virtualips_add() {
             }
             // Return error if an error was found during input validation
             if ($input_err) {
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Initialize our virtual IP configuration array
             if (!is_array($config["virtualip"]["vip"])) {
@@ -373,13 +373,13 @@ function api_firewall_virtualips_add() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
             $api_resp["message"] = "virtual ip added";
             $api_resp["data"] = $vip_ent;
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -405,13 +405,13 @@ function api_firewall_rules() {
             }
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $rule_array);
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -432,7 +432,7 @@ function api_firewall_rules_delete() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 90);
                 $api_resp["message"] = "rule id required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
@@ -452,18 +452,18 @@ function api_firewall_rules_delete() {
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = "firewall rule deleted";
                 $api_resp["data"] = $del_rule;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 91);
                 $api_resp["message"] = "rule id does not exist";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -532,7 +532,7 @@ function api_firewall_rules_add() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 80);
                 $api_resp["message"] = "rule type required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['interface'])) {
                 $interface = $client_params['interface'];
@@ -540,14 +540,14 @@ function api_firewall_rules_add() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 11);
                 $api_resp["message"] = "interface required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['ipprotocol'])) {
                 $ipprotocol = $client_params['ipprotocol'];
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 81);
                 $api_resp["message"] = "rule ip protocol required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['protocol'])) {
                 $protocol = $client_params['protocol'];
@@ -555,7 +555,7 @@ function api_firewall_rules_add() {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 82);
                 $api_resp["message"] = "rule protocol required";
 
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
 
             }
             if (isset($client_params['src'])) {
@@ -563,7 +563,7 @@ function api_firewall_rules_add() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 83);
                 $api_resp["message"] = "rule source required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['srcport'])) {
                 $srcport = $client_params['srcport'];
@@ -573,7 +573,7 @@ function api_firewall_rules_add() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 84);
                 $api_resp["message"] = "rule destination required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['dstport'])) {
                 $dstport = $client_params['dstport'];
@@ -734,7 +734,7 @@ function api_firewall_rules_add() {
             // Return error if an error was found during input validation
             if ($input_err) {
 
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
 
             }
             $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
@@ -748,17 +748,17 @@ function api_firewall_rules_add() {
             $api_resp["message"] = "firewall rule added";
             $api_resp["data"] = $rule_ent;
 
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
 
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
 
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
 
         }
     } else {
 
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
 
     }
 }
@@ -785,13 +785,13 @@ function api_firewall_aliases() {
             }
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $alias_array);
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -812,7 +812,7 @@ function api_firewall_aliases_delete() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 60);
                 $api_resp["message"] = "alias name required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
@@ -844,23 +844,23 @@ function api_firewall_aliases_delete() {
                 foreach ($config["aliases"]["alias"] as $se) {
                     if ($se["name"] === $name) {
                         $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
-                        return json_encode($api_resp) . PHP_EOL;
+                        return $api_resp;
                     }
                 }
                 // Return success if we did not find our deleted alias in configuration during loop
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = "alias deleted";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 66, "message" => "alias in use");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -883,7 +883,7 @@ function api_firewall_aliases_delete_address() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 60);
                 $api_resp["message"] = "alias name required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['address'])) {
                 $address = $client_params['address'];
@@ -894,7 +894,7 @@ function api_firewall_aliases_delete_address() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 61);
                 $api_resp["message"] = "alias address required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
@@ -931,7 +931,7 @@ function api_firewall_aliases_delete_address() {
             if (isset($type_err)) {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => $err_code);
                 $api_resp["message"] = $type_err;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Loop through our existing configuration and remove alias address values on match
             $r_count = 0;
@@ -952,13 +952,13 @@ function api_firewall_aliases_delete_address() {
             // Loop through each alias and see if our alias was added successfully
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
             $api_resp["message"] = "alias address deleted";
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -980,7 +980,7 @@ function api_firewall_aliases_modify() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 60);
                 $api_resp["message"] = "alias name required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params["new_name"])) {
                 $new_name = $client_params['new_name'];
@@ -1071,7 +1071,7 @@ function api_firewall_aliases_modify() {
             if ($input_err) {
                 $api_resp["code"] = 400;
                 $api_resp["status"] = "bad request";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Save our alias ID
             $c_count = 0;
@@ -1108,13 +1108,13 @@ function api_firewall_aliases_modify() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
             $api_resp["message"] = "alias address modified";
             $api_resp["data"] = $config["aliases"]["alias"][$a_index];
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -1136,7 +1136,7 @@ function api_firewall_aliases_add() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 60);
                 $api_resp["message"] = "alias name required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['type'])) {
                 $type = $client_params['type'];
@@ -1144,7 +1144,7 @@ function api_firewall_aliases_add() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 61);
                 $api_resp["message"] = "alias type required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['address'])) {
                 $address = $client_params['address'];
@@ -1155,7 +1155,7 @@ function api_firewall_aliases_add() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 61);
                 $api_resp["message"] = "alias address required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['descr'])) {
                 $descr = $client_params['descr'];
@@ -1283,7 +1283,7 @@ function api_firewall_aliases_add() {
             if (isset($type_err)) {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => $err_code);
                 $api_resp["message"] = $type_err;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Check our existing aliases
             if (is_array($config["aliases"])) {
@@ -1293,7 +1293,7 @@ function api_firewall_aliases_add() {
                     if ($ce["name"] === $name) {
                         $api_resp = array("status" => "bad request", "code" => 400, "return" => 65);
                         $api_resp["message"] = "alias already exists";
-                        return json_encode($api_resp) . PHP_EOL;
+                        return $api_resp;
                     }
                 }
             }
@@ -1316,18 +1316,18 @@ function api_firewall_aliases_add() {
                     $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                     $api_resp["message"] = "alias added";
                     $api_resp["data"] = $se;
-                    return json_encode($api_resp) . PHP_EOL;
+                    return $api_resp;
                 }
             }
             // Return error response if our loop did not find a match
             $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -1350,7 +1350,7 @@ function api_firewall_aliases_add_address() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 60);
                 $api_resp["message"] = "alias name required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['address'])) {
                 $address = $client_params['address'];
@@ -1361,7 +1361,7 @@ function api_firewall_aliases_add_address() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 61);
                 $api_resp["message"] = "alias address required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['detail'])) {
                 $detail = $client_params['detail'];
@@ -1492,7 +1492,7 @@ function api_firewall_aliases_add_address() {
             if (isset($type_err)) {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => $err_code);
                 $api_resp["message"] = $type_err;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Add our alias
             $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
@@ -1507,13 +1507,13 @@ function api_firewall_aliases_add_address() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
             $api_resp["message"] = "alias address added";
             $api_resp["data"] = $config["aliases"]["alias"][$a_index];
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -1539,13 +1539,13 @@ function api_system_config() {
             }
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $config_array);
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -1598,17 +1598,17 @@ function api_system_version() {
             if ($ver_fail !== false) {
                 // Print our JSON response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $ver_data);
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 $api_resp = array("status" => "not found", "code" => 404, "return" => 6, "message" => "file not found");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -1639,13 +1639,13 @@ function api_system_arp() {
             }
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $arp_data);
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -1668,18 +1668,18 @@ function api_system_arp_delete() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 20);
                 $api_resp["message"] = "ip required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             exec($arp_cmd.$ip, $arp_del);    // Delete our ARP address
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "arp entry deleted");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -1735,12 +1735,12 @@ function api_users() {
                     if ($search_failed === true) {
                         $api_resp = array("status" => "not found", "code" => 404, "return" => 5);
                         $api_resp["message"] = "search attribute not found";
-                        return json_encode($api_resp) . PHP_EOL;
+                        return $api_resp;
                     }
                 } else {
                     $api_resp = array("status" => "bad request", "code" => 400, "return" => 24);
                     $api_resp["message"] = "search must be array";
-                    return json_encode($api_resp) . PHP_EOL;
+                    return $api_resp;
                 }
             }
             // Add debug data if requested
@@ -1750,13 +1750,13 @@ function api_users() {
             }
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $base_data);
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -1781,13 +1781,13 @@ function api_users_delete() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 20);
                 $api_resp["message"] = "username required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Check if our user already exists, if not exit on non-zero
             if (!array_key_exists($username, $userindex)) {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 23);
                 $api_resp["message"] = "user does not exist";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
@@ -1806,17 +1806,17 @@ function api_users_delete() {
             $userindex = index_users();    // Update our user index
             if (!array_key_exists($username, $userindex)) {
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "user deleted");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process fail");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -1838,14 +1838,14 @@ function api_users_delete_privs() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 20);
                 $api_resp["message"] = "username required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['priv'])) {
                 $del_priv = $client_params['priv'];
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 25);
                 $api_resp["message"] = "priv required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Check if our user already exists, if so exit on non-zero
             $user_config =& getUserEntry($username);
@@ -1853,7 +1853,7 @@ function api_users_delete_privs() {
             if (!array_key_exists("uid", $user_config)) {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 23);
                 $api_resp["message"] = "user does not exist";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Ensure our new priv is array, if it is a string create an array containing the string
             if (is_string($del_priv)) {
@@ -1865,7 +1865,7 @@ function api_users_delete_privs() {
                     if (!array_key_exists($dp, $priv_list)) {
                         $api_resp = array("status" => "bad request", "code" => 400, "return" => 27);
                         $api_resp["message"] = "unknown priv `" . $dp . "`";
-                        return json_encode($api_resp) . PHP_EOL;
+                        return $api_resp;
                     }
                     if (in_array($dp, $user_config["priv"])) {
                         $user_config["priv"] = \array_diff($user_config["priv"], array($dp));
@@ -1874,7 +1874,7 @@ function api_users_delete_privs() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 26);
                 $api_resp["message"] = "priv must be list or string";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
@@ -1900,17 +1900,17 @@ function api_users_delete_privs() {
             if ($user_config["priv"] === $user_privs) {
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "priv deleted");
                 $api_resp["data"] = $user_config["priv"];
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -1933,20 +1933,20 @@ function api_users_delete_groups() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 20);
                 $api_resp["message"] = "username required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['group'])) {
                 $del_groups = $client_params['group'];
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 25);
                 $api_resp["message"] = "group required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Check if our user already exists, if so exit on non-zero
             if (!array_key_exists($username, $userindex)) {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 23);
                 $api_resp["message"] = "user does not exist";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Ensure our new priv is array, if it is a string create an array containing the string
             if (is_string($del_groups)) {
@@ -1961,7 +1961,7 @@ function api_users_delete_groups() {
                     if (!array_key_exists($dg, $groupindex)) {
                         $api_resp = array("status" => "bad request", "code" => 400, "return" => 30);
                         $api_resp["message"] = "unknown group `" . $dg . "`";
-                        return json_encode($api_resp) . PHP_EOL;
+                        return $api_resp;
                     }
                     if (in_array($dg, $user_groups)) {
                         $new_groups = \array_diff($user_groups, array($dg));
@@ -1970,7 +1970,7 @@ function api_users_delete_groups() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 29);
                 $api_resp["message"] = "group must be list or string";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
@@ -1993,17 +1993,17 @@ function api_users_delete_groups() {
             $user_groups = local_user_get_groups($user_config, true);
             if (array_diff($del_groups, $user_groups)) {
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "groups deleted");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process fail");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2024,7 +2024,7 @@ function api_users_modify() {
                 $username = trim($username);
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 20, "message" => "username required");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['password'])) {
                 $password = $client_params['password'];
@@ -2054,7 +2054,7 @@ function api_users_modify() {
             $user_config =& getUserEntry($username);
             if (!array_key_exists("uid", $user_config)) {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 23, "message" => "user does not exist");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
@@ -2109,17 +2109,17 @@ function api_users_modify() {
             if ($user_config !== $prev_config) {
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "user modified");
                 $api_resp["data"] = $user_config;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process fail");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2142,7 +2142,7 @@ function api_users_add() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 20);
                 $api_resp["message"] = "username required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['password'])) {
                 $password = $client_params['password'];
@@ -2150,7 +2150,7 @@ function api_users_add() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 21);
                 $api_resp["message"] = "password required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (array_key_exists("disabled", $client_params)) {
                 $disabled = true;
@@ -2178,7 +2178,7 @@ function api_users_add() {
             if (array_key_exists("uid", $user_config)) {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 22);
                 $api_resp["message"] = "user already exists";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
@@ -2231,17 +2231,17 @@ function api_users_add() {
             if (array_key_exists("uid", $user_config)) {
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "user added");
                 $api_resp["data"] = $user_config;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2263,14 +2263,14 @@ function api_users_add_privs() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 20);
                 $api_resp["message"] = "username required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['priv'])) {
                 $new_priv = $client_params['priv'];
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 25);
                 $api_resp["message"] = "priv required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Check if our user already exists, if so exit on non-zero
             $user_config =& getUserEntry($username);
@@ -2278,7 +2278,7 @@ function api_users_add_privs() {
             if (!array_key_exists("uid", $user_config)) {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 23);
                 $api_resp["message"] = "user does not exist";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Ensure our new priv is array, if it is a string create an array containing the string
             if (is_string($new_priv)) {
@@ -2290,7 +2290,7 @@ function api_users_add_privs() {
                     if (!array_key_exists($np, $priv_list)) {
                         $api_resp = array("status" => "bad request", "code" => 400, "return" => 27);
                         $api_resp["message"] = "unknown priv `" . $np . "`";
-                        return json_encode($api_resp) . PHP_EOL;
+                        return $api_resp;
                     }
                     if (in_array($np, $user_privs)) {
                         $new_priv = \array_diff($new_priv, array($np));
@@ -2299,7 +2299,7 @@ function api_users_add_privs() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 26);
                 $api_resp["message"] = "priv must be list or string";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
@@ -2326,17 +2326,17 @@ function api_users_add_privs() {
             if ($user_config["priv"] === $user_privs) {
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "priv added");
                 $api_resp["data"] = $user_privs;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process fail");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2359,7 +2359,7 @@ function api_users_add_groups() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 20);
                 $api_resp["message"] = "username required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['group'])) {
                 $new_groups = $client_params['group'];
@@ -2367,14 +2367,14 @@ function api_users_add_groups() {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 25);
                 $api_resp["message"] = "group required";
 
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
 
             }
             // Check if our user already exists, if so exit on non-zero
             if (!array_key_exists($username, $userindex)) {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 23);
                 $api_resp["message"] = "user does not exist";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Ensure our new priv is array, if it is a string create an array containing the string
             if (is_string($new_groups)) {
@@ -2389,7 +2389,7 @@ function api_users_add_groups() {
                     if (!array_key_exists($ng, $groupindex)) {
                         $api_resp = array("status" => "bad request", "code" => 400, "return" => 30);
                         $api_resp["message"] = "unknown group `" . $ng . "`";
-                        return json_encode($api_resp) . PHP_EOL;
+                        return $api_resp;
                     }
                     if (in_array($ng, $user_groups)) {
                         $new_groups = \array_diff($new_groups, array($ng));
@@ -2400,7 +2400,7 @@ function api_users_add_groups() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 29);
                 $api_resp["message"] = "group must be list or string";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
@@ -2424,17 +2424,17 @@ function api_users_add_groups() {
             $user_groups = local_user_get_groups($user_config, true);
             if (!array_diff($new_groups, $user_groups)) {
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "groups added");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process fail");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2460,13 +2460,13 @@ function api_routing_gateways() {
             }
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $gw_array);
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2502,18 +2502,18 @@ function api_services_ntpd_start() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2549,18 +2549,18 @@ function api_services_ntpd_stop() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2596,18 +2596,18 @@ function api_services_ntpd_restart() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2644,13 +2644,13 @@ function api_services() {
             }
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $service_list);
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2686,18 +2686,18 @@ function api_services_sshd_start() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2733,18 +2733,18 @@ function api_services_sshd_stop() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2780,18 +2780,18 @@ function api_services_sshd_restart() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2827,18 +2827,18 @@ function api_services_syslogd_start() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2874,18 +2874,18 @@ function api_services_syslogd_stop() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2921,18 +2921,18 @@ function api_services_syslogd_restart() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -2964,13 +2964,13 @@ function api_services_start() {
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "services have been started");
             $api_resp["data"] = $services_set;
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -3002,13 +3002,13 @@ function api_services_stop() {
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "services have been stopped");
             $api_resp["data"] = $services_set;
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -3040,13 +3040,13 @@ function api_services_restart() {
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "services have been restarted");
             $api_resp["data"] = $services_set;
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -3082,18 +3082,18 @@ function api_services_dhcpd_start() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -3129,18 +3129,18 @@ function api_services_dhcpd_stop() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -3176,18 +3176,18 @@ function api_services_dhcpd_restart() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -3223,18 +3223,18 @@ function api_services_dpinger_start() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -3270,18 +3270,18 @@ function api_services_dpinger_stop() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -3317,18 +3317,18 @@ function api_services_dpinger_restart() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -3353,13 +3353,13 @@ function api_services_unbound() {
             }
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $unbound_array);
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -3415,7 +3415,7 @@ function api_services_unbound_delete_hosts() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 45);
                 $api_resp["message"] = "host override deletion criteria not met";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
@@ -3519,10 +3519,10 @@ function api_services_unbound_delete_hosts() {
                     $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                     $api_resp["message"] = "host override deleted";
                     $api_resp["data"] = $del_list;
-                    return json_encode($api_resp) . PHP_EOL;
+                    return $api_resp;
                 } else {
                     $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
-                    return json_encode($api_resp) . PHP_EOL;
+                    return $api_resp;
                 }
             } else {
                 //to do
@@ -3530,10 +3530,10 @@ function api_services_unbound_delete_hosts() {
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -3567,7 +3567,7 @@ function api_services_unbound_modify_hosts() {
             } elseif ($h_mode) {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 41);
                 $api_resp["message"] = "domain required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['new_domain'])) {
                 $new_domain = $client_params['new_domain'];
@@ -3584,7 +3584,7 @@ function api_services_unbound_modify_hosts() {
             } elseif ($i_mode) {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 7);
                 $api_resp["message"] = "new ip required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['descr'])) {
                 $descr = $client_params['descr'];
@@ -3631,7 +3631,7 @@ function api_services_unbound_modify_hosts() {
                     } else {
                         $api_resp = array("status" => "bad request", "code" => 400, "return" => 7);
                         $api_resp["message"] = "invalid ip address";
-                        return json_encode($api_resp) . PHP_EOL;
+                        return $api_resp;
                     }
                 } elseif ($h_mode) {
                     foreach ($hosts_conf as $he) {
@@ -3646,7 +3646,7 @@ function api_services_unbound_modify_hosts() {
                                 } else {
                                     $api_resp = array("status" => "bad request", "code" => 400, "return" => 43);
                                     $api_resp["message"] = "host override already exists";
-                                    return json_encode($api_resp) . PHP_EOL;
+                                    return $api_resp;
                                 }
                             }
                         } elseif (isset($new_hostname)) {
@@ -3657,7 +3657,7 @@ function api_services_unbound_modify_hosts() {
                                 } else {
                                     $api_resp = array("status" => "bad request", "code" => 400, "return" => 43);
                                     $api_resp["message"] = "host override already exists";
-                                    return json_encode($api_resp) . PHP_EOL;
+                                    return $api_resp;
                                 }
                             }
                         } elseif (isset($new_domain)) {
@@ -3668,7 +3668,7 @@ function api_services_unbound_modify_hosts() {
                                 } else {
                                     $api_resp = array("status" => "bad request", "code" => 400, "return" => 43);
                                     $api_resp["message"] = "host override already exists";
-                                    return json_encode($api_resp) . PHP_EOL;
+                                    return $api_resp;
                                 }
                             }
                         }
@@ -3681,7 +3681,7 @@ function api_services_unbound_modify_hosts() {
                             } else {
                                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 7);
                                 $api_resp["message"] = "invalid ip address";
-                                return json_encode($api_resp) . PHP_EOL;
+                                return $api_resp;
                             }
                         }
                         if (isset($descr)) {
@@ -3719,22 +3719,22 @@ function api_services_unbound_modify_hosts() {
                     $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                     $api_resp["message"] = "host override updated";
                     $api_resp["data"] = $update_list;
-                    return json_encode($api_resp) . PHP_EOL;
+                    return $api_resp;
                 } else {
                     $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
-                    return json_encode($api_resp) . PHP_EOL;
+                    return $api_resp;
                 }
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 44);
                 $api_resp["message"] = "host override does not exist";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -3770,18 +3770,18 @@ function api_services_unbound_start() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -3817,18 +3817,18 @@ function api_services_unbound_stop() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -3864,19 +3864,19 @@ function api_services_unbound_restart() {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                 $api_resp["message"] = $service." has been ".$act_str;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
 
             } else {
                 // Print our fail response
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -3901,7 +3901,7 @@ function api_services_unbound_add_hosts() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 40);
                 $api_resp["message"] = "hostname required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['domain'])) {
                 $domain = $client_params['domain'];
@@ -3909,7 +3909,7 @@ function api_services_unbound_add_hosts() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 41);
                 $api_resp["message"] = "domain required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['ip'])) {
                 $ipaddr = $client_params['ip'];
@@ -3917,7 +3917,7 @@ function api_services_unbound_add_hosts() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 42);
                 $api_resp["message"] = "ip required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['descr'])) {
                 $descr = $client_params['descr'];
@@ -3962,28 +3962,28 @@ function api_services_unbound_add_hosts() {
                         $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                         $api_resp["message"] = "host override added";
                         $api_resp["data"] = $host_ent;
-                        return json_encode($api_resp) . PHP_EOL;
+                        return $api_resp;
                     } else {
                         $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
-                        return json_encode($api_resp) . PHP_EOL;
+                        return $api_resp;
                     }
                 } else {
                     $api_resp = array("status" => "bad request", "code" => 400, "return" => 7);
                     $api_resp["message"] = "invalid ip address";
-                    return json_encode($api_resp) . PHP_EOL;
+                    return $api_resp;
                 }
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 43);
                 $api_resp["message"] = "host override already exists";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
 
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -4005,13 +4005,13 @@ function api_interfaces_vlans() {
             }
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $vlan_array);
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -4048,7 +4048,7 @@ function api_interfaces_vlans_delete() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 11);
                 $api_resp["message"] = "vlan id required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Ensure we have a vlanif and id regardless of which input selector was provided
             if (isset($vlan_if)) {
@@ -4071,7 +4071,7 @@ function api_interfaces_vlans_delete() {
             // Check that our interface is not in use currently
             if (convert_real_interface_to_friendly_interface_name($vlan_if)) {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 11, "message" => "interface in use");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Check that we have both our ID and VLAN interface
             if (isset($id) and isset($vlan_if)) {
@@ -4086,13 +4086,13 @@ function api_interfaces_vlans_delete() {
             // Return our success data
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "vlan deleted");
             $api_resp["data"] = $del_ent;
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -4128,7 +4128,7 @@ function api_interfaces_vlans_modify() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 11);
                 $api_resp["message"] = "vlan id required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['if'])) {
                 $interface = $client_params['if'];
@@ -4203,7 +4203,7 @@ function api_interfaces_vlans_modify() {
             }
             // Return error if input validation failed
             if ($err_found) {
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Modify our VLAN
             $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
@@ -4244,13 +4244,13 @@ function api_interfaces_vlans_modify() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
             $api_resp["message"] = "vlan modified";
             $api_resp["data"] = $vlan_ent;
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -4283,7 +4283,7 @@ function api_interfaces_vlans_add() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 11);
                 $api_resp["message"] = "parent interface required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['tag'])) {
                 $tag = $client_params['tag'];
@@ -4292,7 +4292,7 @@ function api_interfaces_vlans_add() {
             } else {
                 $api_resp = array("status" => "bad request", "code" => 400, "return" => 110);
                 $api_resp["message"] = "vlan tag required";
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             if (isset($client_params['pcp'])) {
                 $pcp = $client_params['pcp'];
@@ -4343,7 +4343,7 @@ function api_interfaces_vlans_add() {
             }
             // Return error if input validation failed
             if ($err_found) {
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Add our VLAN
             $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
@@ -4364,18 +4364,18 @@ function api_interfaces_vlans_add() {
                     $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                     $api_resp["message"] = "vlan added";
                     $api_resp["data"] = $se;
-                    return json_encode($api_resp) . PHP_EOL;
+                    return $api_resp;
                 }
             }
             // Return error response if our loop did not find a match
             $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -4397,13 +4397,13 @@ function api_interfaces() {
             }
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $interface_array);
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 
@@ -5029,7 +5029,7 @@ function api_interfaces_add() {
             }
             // Check if we encountered an error
             if ($err_found === true) {
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
             // Apply our configuration
             $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
@@ -5040,18 +5040,18 @@ function api_interfaces_add() {
             if ($apply_if) {
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "interface added");
                 $api_resp["data"] = $if_ent;
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             } else {
                 // Return error response if our loop did not find a match
                 $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
-                return json_encode($api_resp) . PHP_EOL;
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return json_encode($api_resp) . PHP_EOL;
+            return $api_resp;
         }
     } else {
-        return json_encode($api_resp) . PHP_EOL;
+        return $api_resp;
     }
 }
 

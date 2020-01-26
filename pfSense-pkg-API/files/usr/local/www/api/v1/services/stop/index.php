@@ -6,5 +6,5 @@ require_once("apicalls.inc");
 # RUN API CALL
 $resp = api_services_stop();
 http_response_code($resp["code"]);
-echo $resp;
+echo json_encode($resp) . PHP_EOL;
 exit();
