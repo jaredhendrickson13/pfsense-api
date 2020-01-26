@@ -1,5 +1,6 @@
 @dir /etc/inc
 /etc/inc/api.inc
+/etc/inc/apicalls.inc
 
 @dir /usr/local/pkg
 /usr/local/pkg/api.xml

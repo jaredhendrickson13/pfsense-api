@@ -23,6 +23,8 @@ do-install:
 	${MKDIR} ${STAGEDIR}/etc/inc
 	${INSTALL_DATA} ${FILESDIR}/etc/inc/api.inc \
 		${STAGEDIR}/etc/inc
+	${INSTALL_DATA} ${FILESDIR}/etc/inc/apicalls.inc \
+		${STAGEDIR}/etc/inc
 
 	# INSTALL OUR PFSENSE PKG
 	${MKDIR} ${STAGEDIR}${PREFIX}/pkg
