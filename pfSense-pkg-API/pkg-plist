@@ -68,6 +68,15 @@
 /usr/local/www/api/v1/firewall/virtualips/add/index.php
 /usr/local/www/api/v1/firewall/virtualips/delete/index.php
 
+@dir /usr/local/www/api/v1/firewall/nat
+@dir /usr/local/www/api/v1/firewall/nat/portforwards
+@dir /usr/local/www/api/v1/firewall/nat/portforwards/add
+@dir /usr/local/www/api/v1/firewall/nat/portforwards/delete
+/usr/local/www/api/v1/firewall/nat/index.php
+/usr/local/www/api/v1/firewall/nat/portforwards/index.php
+/usr/local/www/api/v1/firewall/nat/portforwards/add/index.php
+/usr/local/www/api/v1/firewall/nat/portforwards/delete/index.php
+
 @dir /usr/local/www/api/v1/firewall/aliases
 @dir /usr/local/www/api/v1/firewall/aliases/add
 @dir /usr/local/www/api/v1/firewall/aliases/delete

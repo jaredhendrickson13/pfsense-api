@@ -13,9 +13,9 @@ require_once("util.inc");
 require_once("interfaces.inc");
 
 // HEADERS--------------------------------------------------------------------------------------------------------------
-api_runtime_allowed();    // Check that our configuration allows this API call to run first
 header('Content-Type: application/json');
 header("Referer: no-referrer");
+api_runtime_allowed();    // Check that our configuration allows this API call to run first
 session_start();    // Start our session. This is only used for tracking user name
 
 function api_status_carp() {
@@ -97,6 +97,367 @@ function api_status_carp_modify() {
             enable_carp($enable);    // Set our CARP enable value
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "success", "data" => $carp_stat_arr);
             return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_firewall_nat() {
+    # VARIABLES
+    global $config, $api_resp, $client_params;
+    $read_only_action = true;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-firewall-virtualipaddresses");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $nat_array = array();    // Init our array
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is GET (READ)
+        if ($http_method === 'GET') {
+            // Check that we have a virtual IP configuration
+            if (!empty($config["nat"])) {
+                $nat_array = $config["nat"];
+            }
+            if (isset($client_params['search'])) {
+                $search = $client_params['search'];
+                $nat_array = api_extended_search($nat_array, $search);
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $nat_array);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_firewall_nat_portforwards() {
+    # VARIABLES
+    global $config, $api_resp, $client_params;
+    $read_only_action = true;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-firewall-nat-portforward");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $nat_array = array();    // Init our array
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is GET (READ)
+        if ($http_method === 'GET') {
+            // Check that we have a virtual IP configuration
+            if (!empty($config["nat"]["rule"])) {
+                $nat_array = $config["nat"]["rule"];
+            }
+            if (isset($client_params['search'])) {
+                $search = $client_params['search'];
+                $nat_array = api_extended_search($nat_array, $search);
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $nat_array);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_firewall_nat_portforwards_add() {
+    # VARIABLES
+    global $g, $config, $tracker, $api_resp, $client_id, $client_params;
+    $user_created_msg = $_SESSION["Username"]."@".$_SERVER["REMOTE_ADDR"]." (API)";    // Save the username and ip of client
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-firewall-nat-portforward-edit");    // Array of privileges allowing this action
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $next_rule_id = count($config["nat"]["rule"]);    // Save our next rule ID
+    $allowed_nat_ref = array("enable", "disable", "purenat");    // Save our allow NAT reflection types
+    // Array of supported protocols
+    $allowed_prot = array(
+        "tcp",
+        "udp",
+        "tcp/udp",
+        "icmp",
+        "esp",
+        "ah",
+        "gre",
+        "ipv6",
+        "igmp",
+        "pim",
+        "ospf"
+    );
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is POST (CREATE)
+        if ($http_method === 'POST') {
+            if (isset($client_params['interface'])) {
+                $interface = $client_params['interface'];
+                $interface = get_pfsense_if_id($interface);
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 11);
+                $api_resp["message"] = "interface required";
+                return $api_resp;
+            }
+            if (isset($client_params['protocol'])) {
+                $protocol = $client_params['protocol'];
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 82);
+                $api_resp["message"] = "rule protocol required";
+                return $api_resp;
+            }
+            if (isset($client_params['target'])) {
+                $localip = $client_params['target'];
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 161);
+                $api_resp["message"] = "redirect ip required";
+                return $api_resp;
+            }
+            if (isset($client_params['local-port'])) {
+                $localport = $client_params['local-port'];
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 162);
+                $api_resp["message"] = "redirect port required";
+                return $api_resp;
+            }
+            if (isset($client_params['src'])) {
+                $src = $client_params['src'];
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 83);
+                $api_resp["message"] = "rule source required";
+                return $api_resp;
+            }
+            if (isset($client_params['srcport'])) {
+                $srcport = $client_params['srcport'];
+            }
+            if (isset($client_params['dst'])) {
+                $dst = $client_params['dst'];
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 84);
+                $api_resp["message"] = "rule destination required";
+                return $api_resp;
+            }
+            if (isset($client_params['dstport'])) {
+                $dstport = $client_params['dstport'];
+            }
+            if (isset($client_params['disabled'])) {
+                if ($client_params['disabled']) {
+                    $disabled = true;
+                }
+            }
+            if (isset($client_params['nordr'])) {
+                if ($client_params['nordr']) {
+                    $nordr = true;
+                }
+            }
+            if (isset($client_params['nosync'])) {
+                if ($client_params['nosync']) {
+                    $nosync = true;
+                }
+            }
+            if (isset($client_params['top'])) {
+                if ($client_params['top']) {
+                    $top = "top";
+                }
+            }
+            if (isset($client_params['descr'])) {
+                $descr = $client_params['descr'];
+            }
+            if (isset($client_params['natreflection'])) {
+                $natreflection = $client_params['natreflection'];
+            }
+
+            // Add debug data if requested
+            if (array_key_exists("debug", $client_params)) {
+                echo "INTERFACE:" . PHP_EOL;
+                echo var_dump($interface) . PHP_EOL;
+                echo "PROTOCOL:" . PHP_EOL;
+                echo var_dump($protocol) . PHP_EOL;
+                echo "REDIRECT IP:" . PHP_EOL;
+                echo var_dump($localip) . PHP_EOL;
+                echo "REDIRECT PORT:" . PHP_EOL;
+                echo var_dump($localport) . PHP_EOL;
+                echo "SOURCE:" . PHP_EOL;
+                echo var_dump($src) . PHP_EOL;
+                echo "SOURCE PORT:" . PHP_EOL;
+                echo var_dump($srcport) . PHP_EOL;
+                echo "DESTINATION:" . PHP_EOL;
+                echo var_dump($dst) . PHP_EOL;
+                echo "DESTINATION PORT:" . PHP_EOL;
+                echo var_dump($dstport) . PHP_EOL;
+                echo "NO RDR:" . PHP_EOL;
+                echo var_dump($nordr) . PHP_EOL;
+                echo "DISABLED:" . PHP_EOL;
+                echo var_dump($disabled) . PHP_EOL;
+                echo "NO SYNC:" . PHP_EOL;
+                echo var_dump($nosync) . PHP_EOL;
+                echo "DESCRIPTION:" . PHP_EOL;
+                echo var_dump($descr) . PHP_EOL;
+                echo "NAT REFLECTION:".PHP_EOL;
+                echo var_dump($natreflection).PHP_EOL;
+                echo "ADD TO TOP:" . PHP_EOL;
+                echo var_dump($top) . PHP_EOL;
+                echo "NEXT RULE ID:" . PHP_EOL;
+                echo var_dump($next_rule_id) . PHP_EOL;
+            }
+            // INPUT VALIDATION/FORMATTING
+            $api_resp = array("status" => "bad request", "code" => 400);
+            // Check that our required array/interface values are valid
+            if (!is_string($interface)) {
+                $input_err = true;
+                $api_resp["message"] = "unknown interface";
+                $api_resp["return"] = 11;
+            } elseif (!in_array($protocol, $allowed_prot)) {
+                $input_err = true;
+                $api_resp["message"] = "invalid protocol";
+                $api_resp["return"] = 87;
+            } elseif (isset($natreflection) and !in_array($natreflection, $allowed_nat_ref)) {
+                $input_err = true;
+                $api_resp["message"] = "invalid nat reflection value";
+                $api_resp["return"] = 160;
+            } elseif (!is_ipaddrv4($localip) and !alias_in_use($localip)) {
+                $input_err = true;
+                $api_resp["message"] = "invalid redirect ip address";
+                $api_resp["return"] = 163;
+            } elseif (!is_port_or_range($localport)) {
+                $input_err = true;
+                $api_resp["message"] = "invalid redirect port";
+                $api_resp["return"] = 164;
+            }
+            $rule_ent = array();
+            // Check if rule is disabled
+            if ($disabled) {
+                $rule_ent["disabled"] = "";
+            }
+            // Check if pfsync is disabled
+            if ($nosync) {
+                $rule_ent["nosync"] = "";
+            }
+            // Check if RDR is disabled is disabled
+            if ($nordr) {
+                $rule_ent["nordr"] = "";
+            }
+            // Check if user specified NAT reflection
+            if ($natreflection) {
+                $rule_ent["natreflection"] = $natreflection;
+            }
+            $rule_ent["interface"] = $interface;
+            $rule_ent["protocol"] = $protocol;
+            $rule_ent["source"] = array();
+            $rule_ent["destination"] = array();
+            $rule_ent["target"] = $localip;
+            $rule_ent["local-port"] = $localport;
+            $rule_ent["descr"] = $descr;
+            $rule_ent["associated-rule-id"] = "pass";
+            $rule_ent["created"] = array("time" => time(), "username" => $user_created_msg);
+            $rule_ent["updated"] = $rule_ent["created"];
+            // Check if our source and destination values are valid
+            foreach (array("source" => $src, "destination" => $dst) as $dir => $val) {
+                $dir_check = is_valid_rule_addr($val, $dir);
+                if (!$dir_check["valid"] === true) {
+                    $input_err = true;
+                    $api_resp["message"] = $dir_check["message"];
+                    $api_resp["return"] = $dir_check["return"];
+                } else {
+                    $rule_ent = array_merge($rule_ent, $dir_check["data"]);
+                }
+            }
+            // Check if protocol calls for additional specifications
+            if (in_array($protocol, array("tcp", "udp", "tcp/udp"))) {
+                $port_req = true;
+            }
+            // Check our src and dst port values if ports are required
+            if (!$input_err and $port_req) {
+                if (!isset($srcport) or !isset($dstport)) {
+                    $input_err = true;
+                    $api_resp["message"] = "source and destination port required";
+                    $api_resp["return"] = 8;
+                }
+                foreach (array("source" => $srcport, "destination" => $dstport) as $dir => $val) {
+                    $val = str_replace("-", ":", $val);
+                    if (!is_port_or_range($val) and $val !== "any") {
+                        $input_err = true;
+                        $api_resp["message"] = "invalid ".$dir." port";
+                        $api_resp["return"] = 8;
+                    } elseif ($val !== "any") {
+                        $rule_ent[$dir]["port"] = str_replace(":", "-", $val);
+                    }
+                }
+            }
+            // Return error if an error was found during input validation
+            if ($input_err) {
+                return $api_resp;
+            }
+            $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
+            $change_note = " Added NAT rule via API";    // Add a change note
+            $config["nat"]["rule"][] = $rule_ent;    // Write to our master config
+            sort_nat_rules($top, $next_rule_id);    // Sort our nat rules
+            write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+            filter_configure();    // Ensure our firewall filter is reloaded
+            // Loop through each alias and see if our alias was added successfully
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+            $api_resp["message"] = "nat rule added";
+            $api_resp["data"] = $rule_ent;
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_firewall_nat_portforwards_delete() {
+    # VARIABLES
+    global $g, $config, $tracker, $api_resp, $client_id, $client_params;
+    $user_created_msg = $_SESSION["Username"]."@".$_SERVER["REMOTE_ADDR"]." (API)";    // Save the username and ip of client
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-nat-portforward-edit");    // Array of privileges allowing this action
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is POST (DELETE)
+        if ($http_method === 'POST') {
+            if (isset($client_params['id'])) {
+                $rule_id = $client_params['id'];
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 90);
+                $api_resp["message"] = "rule id required";
+                return $api_resp;
+            }
+            // Add debug data if requested
+            if (array_key_exists("debug", $client_params)) {
+                echo "RULE ID TO DELETE:" . PHP_EOL;
+                echo var_dump($rule_id) . PHP_EOL;
+            }
+            // Check that our rule ID exists
+            if (array_key_exists($rule_id, $config["nat"]["rule"])) {
+                $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
+                $change_note = " Deleted NAT rule via API";    // Add a change note
+                $del_rule = $config["nat"]["rule"][$rule_id];    // Save the rule we are deleting
+                unset($config["nat"]["rule"][$rule_id]);    // Remove rule from our config
+                sort_nat_rules();    // Sort our NAT rules
+                write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+                filter_configure();    // Ensure our firewall filter is reloaded
+                // Loop through each alias and see if our alias was added successfully
+                $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+                $api_resp["message"] = "nat rule deleted";
+                $api_resp["data"] = $del_rule;
+                return $api_resp;
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 91);
+                $api_resp["message"] = "rule id does not exist";
+                return $api_resp;
+            }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
             return $api_resp;
@@ -722,20 +1083,19 @@ function api_firewall_rules_add() {
                     $api_resp["return"] = 8;
                 }
                 foreach (array("source" => $srcport, "destination" => $dstport) as $dir => $val) {
+                    $val = str_replace("-", ":", $val);
                     if (!is_port_or_range($val) and $val !== "any") {
                         $input_err = true;
-                        $api_resp["message"] = "invalid ".$val." port";
+                        $api_resp["message"] = "invalid ".$dir." port";
                         $api_resp["return"] = 8;
                     } elseif ($val !== "any") {
-                        $rule_ent[$dir]["port"] = $val;
+                        $rule_ent[$dir]["port"] = str_replace(":", "-", $val);;
                     }
                 }
             }
             // Return error if an error was found during input validation
             if ($input_err) {
-
                 return $api_resp;
-
             }
             $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
             $change_note = " Added firewall rule via API";    // Add a change note
@@ -747,19 +1107,13 @@ function api_firewall_rules_add() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
             $api_resp["message"] = "firewall rule added";
             $api_resp["data"] = $rule_ent;
-
             return $api_resp;
-
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-
             return $api_resp;
-
         }
     } else {
-
         return $api_resp;
-
     }
 }
 
@@ -1652,7 +2006,7 @@ function api_system_arp() {
 function api_system_arp_delete() {
     # VARIABLES
     global $g, $config, $argv, $userindex, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-diagnostics-arptable");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $arp_cmd = "arp -d ";    // Assign the command which reads our ARP table
@@ -2473,7 +2827,7 @@ function api_routing_gateways() {
 function api_services_ntpd_start() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -2520,7 +2874,7 @@ function api_services_ntpd_start() {
 function api_services_ntpd_stop() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -2567,7 +2921,7 @@ function api_services_ntpd_stop() {
 function api_services_ntpd_restart() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -2657,7 +3011,7 @@ function api_services() {
 function api_services_sshd_start() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -2704,7 +3058,7 @@ function api_services_sshd_start() {
 function api_services_sshd_stop() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -2751,7 +3105,7 @@ function api_services_sshd_stop() {
 function api_services_sshd_restart() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -2798,7 +3152,7 @@ function api_services_sshd_restart() {
 function api_services_syslogd_start() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -2845,7 +3199,7 @@ function api_services_syslogd_start() {
 function api_services_syslogd_stop() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -2892,7 +3246,7 @@ function api_services_syslogd_stop() {
 function api_services_syslogd_restart() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -2939,7 +3293,7 @@ function api_services_syslogd_restart() {
 function api_services_start() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     # RUN TIME
@@ -2977,7 +3331,7 @@ function api_services_start() {
 function api_services_stop() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     # RUN TIME
@@ -3015,7 +3369,7 @@ function api_services_stop() {
 function api_services_restart() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     # RUN TIME
@@ -3053,7 +3407,7 @@ function api_services_restart() {
 function api_services_dhcpd_start() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -3100,7 +3454,7 @@ function api_services_dhcpd_start() {
 function api_services_dhcpd_stop() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -3147,7 +3501,7 @@ function api_services_dhcpd_stop() {
 function api_services_dhcpd_restart() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -3194,7 +3548,7 @@ function api_services_dhcpd_restart() {
 function api_services_dpinger_start() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -3241,7 +3595,7 @@ function api_services_dpinger_start() {
 function api_services_dpinger_stop() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -3288,7 +3642,7 @@ function api_services_dpinger_stop() {
 function api_services_dpinger_restart() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -3741,7 +4095,7 @@ function api_services_unbound_modify_hosts() {
 function api_services_unbound_start() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
@@ -3835,7 +4189,7 @@ function api_services_unbound_stop() {
 function api_services_unbound_restart() {
     # VARIABLES
     global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
+    $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI

@@ -14,8 +14,8 @@ $user = $_SESSION["Username"];    // Save our username
 $sec_client_id = bin2hex($user);    // Save our secure username client ID (token mode)
 $b64_client_id = base64_encode($user);    // Save a base64 encoded version of our username
 $pkg_config = get_api_configuration();    // Save our entire pkg config
-$pkg_index = $pkg_config[0];    // Save our api configuration from our pkg config
-$api_config = $pkg_config[1];    // Save our pkg configurations index value
+$pkg_index = $pkg_config[0];    // Save our pkg configurations index value
+$api_config = $pkg_config[1];    // Save our api configuration from our pkg config
 $available_auth_modes = array("local" => "Local Database", "base64" => "Base64", "token" => "API Token");
 $available_hash_algos = array("md5" => "MD5", "sha256" => "SHA256", "sha384" => "SHA384");
 $available_key_bytes = array("16", "32", "64");    // Save our allowed key bitlengths
@@ -56,6 +56,12 @@ if (isset($_POST["save"])) {
     // Save key bit strength to config
     if (isset($_POST["keybytes"])) {
         $api_config["keybytes"] = $_POST["keybytes"];
+    }
+    // Save key bit strength to config
+    if (isset($_POST["readonly"])) {
+        $api_config["readonly"] = "";
+    } else {
+        unset($api_config["readonly"]);
     }
     // Write and apply our changes, leave a session variable indicating save, then reload the page
     $config["installedpackages"]["package"][$pkg_index] = $api_config;
@@ -162,6 +168,21 @@ if (isset($_POST["save"])) {
                                 ?>
                             </select>
                             <span class="help-block">Bit strength used when generating API keys</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">
+                            <span>Read-only</span>
+                        </label>
+                        <div class="checkbox col-sm-10">
+                            <?
+                            if (isset($api_config["readonly"])) {
+                                echo "<label class=\"chkboxlbl\"><input name=\"readonly\" id=\"readonly\" type=\"checkbox\" value=\"yes\" checked=\"checked\"> Enable read-only access</label>";
+                            } else {
+                                echo "<label class=\"chkboxlbl\"><input name=\"readonly\" id=\"readonly\" type=\"checkbox\" value=\"yes\"> Enable read-only access</label>";
+                            }
+                            ?>
+                            <span class="help-block">Only allow API calls with read access. Leave unchecked for read/write access</span>
                         </div>
                     </div>
                 </div>

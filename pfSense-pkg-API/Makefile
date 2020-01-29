@@ -137,6 +137,22 @@ do-install:
 
 	# FIREWALL API ENPOINTS
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall
+	# NAT base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/nat
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/nat/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/nat
+	# NAT port forwards base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/nat/portforwards
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/nat/portforwards/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/nat/portforwards
+	# NAT port forwards add
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/nat/portforwards/add
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/nat/portforwards/add/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/nat/portforwards/add
+	# NAT port forwards add
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/nat/portforwards/delete
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/nat/portforwards/delete/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/nat/portforwards/delete
 	# Virtual IP base
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/virtualips
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/virtualips/index.php \

@@ -100,6 +100,12 @@ API RETURN CODES
 150: invalid ipv6 track interface
 151: ipv6 track interface required
 152: invalid ipv6 track prefix hex value
+160: invalid nat reflection value
+161: redirect ip required
+162: redirect port required
+163: invalid redirect ip address
+164: invalid redirect port
+164: invalid rule association value
 
 
 

@@ -169,18 +169,21 @@ function api_authorized($req_privs, $read_only=false) {
     if (api_authenticate() === true) {
         $client_config =& getUserEntry($client_id);;
         $client_privs = get_user_privileges($client_config);
-        // Loop through each of our req privs and ensure the client has them, also check if access is read only
-        foreach ($req_privs as &$priv) {
-            // Check if action is not read only
-            if ($read_only === false) {
-                if (array_diff($read_priv, $client_privs) and in_array($priv, $client_privs, true)) {
-                    $authorized = true;
-                    break;
-                }
-            } else {
-                if (in_array($priv, $client_privs)) {
-                    $authorized = true;
-                    break;
+        // Check if API is in read-only mode
+        if (is_api_read_only() === $read_only or $read_only) {
+            // Loop through each of our req privs and ensure the client has them, also check if access is read only
+            foreach ($req_privs as &$priv) {
+                // Check if action is not read only
+                if ($read_only === false) {
+                    if (array_diff($read_priv, $client_privs) and in_array($priv, $client_privs, true)) {
+                        $authorized = true;
+                        break;
+                    }
+                } else {
+                    if (in_array($priv, $client_privs)) {
+                        $authorized = true;
+                        break;
+                    }
                 }
             }
         }
@@ -228,6 +231,17 @@ function api_enabled() {
     if (!isset($api_config["enable"])) {
         header("Location: /");
         die();
+    }
+}
+
+// Check if the API is in read-only mode
+function is_api_read_only() {
+    // Local variables
+    $api_config = get_api_configuration()[1];    // Save our current API config
+    if (array_key_exists("readonly", $api_config)) {
+        return true;
+    } else {
+        return false;
     }
 }
 
@@ -592,6 +606,33 @@ function sort_firewall_rules($mode=null, $data=null) {
         }
     }
     $config["filter"]["rule"] = $master_arr;
+}
+
+// Sorts nat rules by specified criteria and reloads the filter
+function sort_nat_rules($mode=null, $data=null) {
+    // Variables
+    global $config;
+    $sort_arr = [];
+    $master_arr = [];
+    foreach ($config["nat"]["rule"] as $idx => $fre) {
+        $curr_iface = $fre["interface"];    // Save our current entries interface
+        // Create our interface array if does not exist
+        if (!isset($sort_arr[$curr_iface])) {
+            $sort_arr[$curr_iface] = [];
+        }
+        // Check if user requested this rule to be placed at the top of array
+        if ($mode === "top" and $idx === $data) {
+            array_unshift($sort_arr[$curr_iface], $fre);
+        } else {
+            $sort_arr[$curr_iface][] = $fre;
+        }
+    }
+    foreach ($sort_arr as $if) {
+        foreach ($if as $rule) {
+            $master_arr[] = $rule;
+        }
+    }
+    $config["nat"]["rule"] = $master_arr;
 }
 
 // Checks if inputted routing gateway exists
