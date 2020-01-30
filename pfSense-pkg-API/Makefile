@@ -90,7 +90,14 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/config
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/config/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/system/config
-
+	# Hostname base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/hostname
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/hostname/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/system/hostname
+	# Hostname modify
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/hostname/modify
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/hostname/modify/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/system/hostname/modify
 	# STATUS API ENDPOINTS----------------------------------------
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/status/
 	# CARP base
@@ -263,6 +270,12 @@ do-install:
 		${STAGEDIR}${PREFIX}/www/api/v1/services/ntpd/restart
 	# SSHD base
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/sshd
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/sshd/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/sshd
+	# SSHD modify
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/sshd/modify
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/sshd/modify/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/sshd/modify
 	# SSHD start
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/sshd/start
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/sshd/start/index.php \

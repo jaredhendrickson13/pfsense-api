@@ -1966,6 +1966,106 @@ function api_system_version() {
     }
 }
 
+function api_system_hostname() {
+    # VARIABLES
+    global $config, $api_resp, $client_params;
+    $read_only_action = true;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system");    // Allowed privs
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $host_array = array("hostname" => "", "domain" => "");    // Init our return array
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is GET (READ)
+        if ($http_method === 'GET') {
+            // Check that we have a hostname configuration
+            if (!empty($config["system"]["hostname"])) {
+                $host_array["hostname"] = $config["system"]["hostname"];
+            }
+            // Check that we have a domain configuration
+            if (!empty($config["system"]["domain"])) {
+                $host_array["domain"] = $config["system"]["domain"];
+            }
+            if (isset($client_params['search'])) {
+                $search = $client_params['search'];
+                $host_array = api_extended_search($host_array, $search);
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $host_array);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_system_hostname_modify() {
+    # VARIABLES
+    global $config, $api_resp, $client_params, $client_id;
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is POST (DELETE)
+        if ($http_method === 'POST') {
+            if (isset($client_params['hostname'])) {
+                $hostname = $client_params['hostname'];
+                $hostname = trim($hostname);
+                // Check if our hostname is valid
+                if (!is_hostname($hostname) or !is_unqualified_hostname($hostname)) {
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 170);
+                    $api_resp["message"] = "invalid hostname";
+                    return $api_resp;
+                } else {
+                    $config["system"]["hostname"] = $hostname;
+                }
+            }
+            if (isset($client_params['domain'])) {
+                $domain = $client_params['domain'];
+                $domain = trim($domain);
+                // Check if our hostname is valid
+                if (!is_domain($domain)) {
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 171);
+                    $api_resp["message"] = "invalid domain";
+                    return $api_resp;
+                } else {
+                    $config["system"]["domain"] = $domain;
+                }
+            }
+            // Write our new hostname
+            $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
+            $change_note = " Modified system hostname via API";    // Add a change note
+            write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+            // Update a slew of backend services
+            if (isset($hostname) or isset($domain)) {
+                system_hostname_configure();
+                system_hosts_generate();
+                system_resolvconf_generate();
+                if (isset($config['dnsmasq']['enable'])) {
+                    services_dnsmasq_configure();
+                } elseif (isset($config['unbound']['enable'])) {
+                    services_unbound_configure();
+                }
+                filter_configure();
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "system hostname modified");
+            $api_resp["data"] = array("hostname" => $config["system"]["hostname"], "domain" => $config["system"]["domain"]);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
 function api_system_arp() {
     # VARIABLES
     global $g, $config, $argv, $userindex, $api_resp, $client_params;
@@ -2998,6 +3098,145 @@ function api_services() {
             }
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $service_list);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_services_sshd() {
+    # VARIABLES
+    global $config, $api_resp, $client_params;
+    $read_only_action = true;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system-advanced-admin");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $ssh_array = array();    // Init our return array
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is GET (READ)
+        if ($http_method === 'GET') {
+            // Check that we have a configuration
+            if (!empty($config["system"]["ssh"])) {
+                $ssh_array = $config["system"]["ssh"];
+            }
+            if (isset($client_params['search'])) {
+                $search = $client_params['search'];
+                $ssh_array = api_extended_search($ssh_array, $search);
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $ssh_array);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_services_sshd_modify() {
+    # VARIABLES
+    global $config, $api_resp, $client_id, $client_params;
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system-advanced-admin");    // Array of privileges allowing this action
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $allowed_auth_types = array("disabled", "enabled", "both");    // Array of allowed auth types
+    $err_found = false;    // Track errors
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        $api_resp = array("status" => "bad request", "code" => 400);
+        // Check that our HTTP method is POST (UPDATE)
+        if ($http_method === 'POST') {
+            if (isset($client_params['enable'])) {
+                $enable = $client_params['enable'];
+                if ($enable === true) {
+                    $config["system"]["ssh"]["enable"] = "enabled";
+                } elseif ($enable === false) {
+                    unset($config["system"]["ssh"]["enable"]);
+                } else {
+                    $api_resp["message"] = "invalid sshd enable value";
+                    $api_resp["return"] = 165;
+                }
+            }
+            if (isset($client_params["sshdkeyonly"])) {
+                $sshdkeyonly = $client_params["sshdkeyonly"];
+                // Check if our auth type is valid
+                if (in_array($sshdkeyonly, $allowed_auth_types)) {
+                    if ($sshdkeyonly === "disabled") {
+                        unset($config["system"]["ssh"]["sshdkeyonly"]);
+                    } else {
+                        $config["system"]["ssh"]["sshdkeyonly"] = $sshdkeyonly;
+                    }
+                } else {
+                    $err_found = true;
+                    $api_resp["message"] = "invalid sshd key only type";
+                    $api_resp["return"] = 166;
+                }
+            }
+            if (isset($client_params['sshdagentforwarding'])) {
+                $sshdagentforwarding = $client_params['sshdagentforwarding'];
+                if ($sshdagentforwarding === true) {
+                    $config["system"]["ssh"]["sshdagentforwarding"] = "enabled";
+                } elseif ($sshdagentforwarding === false) {
+                    unset($config["system"]["ssh"]["sshdagentforwarding"]);
+                } else {
+                    $err_found = true;
+                    $api_resp["message"] = "invalid sshd agent forwarding value";
+                    $api_resp["return"] = 167;
+                }
+            }
+            if (isset($client_params['port'])) {
+                $port = strval($client_params['port']);
+                // Convert string to array
+                if (is_port($port)) {
+                    $config["system"]["ssh"]["port"] = $port;
+                } else {
+                    $err_found = true;
+                    $api_resp["message"] = "invalid sshd port value";
+                    $api_resp["return"] = 168;
+                }
+            }
+            // Add debug data if requested
+            if (array_key_exists("debug", $client_params)) {
+                echo "ENABLE SSHD:" . PHP_EOL;
+                echo var_dump($enable) . PHP_EOL;
+                echo "SSHD KEY ONLY:" . PHP_EOL;
+                echo var_dump($sshdkeyonly) . PHP_EOL;
+                echo "SSHD AGENT FORWARDING:" . PHP_EOL;
+                echo var_dump($sshdagentforwarding) . PHP_EOL;
+                echo "SSHD PORT:" . PHP_EOL;
+                echo var_dump($port) . PHP_EOL;
+
+            }
+            // Check if we found an error, if so, quit
+            if ($err_found) {
+                http_response_code(400);
+                echo json_encode($api_resp);
+                die();
+            }
+            $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
+            $change_note = " Modified SSHD configuration via API";    // Add a change note
+            write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+            // Check that something was changed before altering service
+            if (isset($enable) or isset($port) or isset($sshdagentforwarding) or isset($sshdkeyonly)) {
+                killbyname("sshd");    // Kill SSHD
+                log_error(gettext("secure shell configuration has changed. Stopping sshd."));
+                if ($config['system']['ssh']['enable']) {
+                    log_error(gettext("secure shell configuration has changed. Restarting sshd."));
+                    send_event("service restart sshd");
+                }
+            }
+            // Loop through each alias and see if our alias was added successfully
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+            $api_resp["message"] = "sshd configuration modified";
+            $api_resp["data"] = $config["system"]["ssh"];
             return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");

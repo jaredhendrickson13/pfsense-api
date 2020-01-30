@@ -37,6 +37,11 @@
 @dir /usr/local/www/api/v1/system/config
 /usr/local/www/api/v1/system/config/index.php
 
+@dir /usr/local/www/api/v1/system/hostname
+@dir /usr/local/www/api/v1/system/hostname/modify
+/usr/local/www/api/v1/system/hostname/index.php
+/usr/local/www/api/v1/system/hostname/modify/index.php
+
 @dir /usr/local/www/api/v1/status
 @dir /usr/local/www/api/v1/status/carp
 @dir /usr/local/www/api/v1/status/carp/modify
@@ -114,6 +119,7 @@
 @dir /usr/local/www/api/v1/services/ntpd/stop
 @dir /usr/local/www/api/v1/services/ntpd/restart
 @dir /usr/local/www/api/v1/services/sshd
+@dir /usr/local/www/api/v1/services/sshd/modify
 @dir /usr/local/www/api/v1/services/sshd/start
 @dir /usr/local/www/api/v1/services/sshd/stop
 @dir /usr/local/www/api/v1/services/sshd/restart
@@ -144,6 +150,8 @@
 /usr/local/www/api/v1/services/ntpd/start/index.php
 /usr/local/www/api/v1/services/ntpd/stop/index.php
 /usr/local/www/api/v1/services/ntpd/restart/index.php
+/usr/local/www/api/v1/services/sshd/index.php
+/usr/local/www/api/v1/services/sshd/modify/index.php
 /usr/local/www/api/v1/services/sshd/start/index.php
 /usr/local/www/api/v1/services/sshd/stop/index.php
 /usr/local/www/api/v1/services/sshd/restart/index.php

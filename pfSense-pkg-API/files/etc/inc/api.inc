@@ -204,6 +204,7 @@ function api_authorized($req_privs, $read_only=false) {
 
 // Run our pre-runtime checks
 function api_runtime_allowed() {
+    api_version_check();    // Die if incompatible pfSense version
     api_enabled();    // Die if API is disabled in configuration
     api_whitelist_check();    // Die if server address is not whitelisted
 }
@@ -242,6 +243,21 @@ function is_api_read_only() {
         return true;
     } else {
         return false;
+    }
+}
+
+// Check if our pfSense version is allowed to run this version of API
+function api_version_check() {
+    # Local variables
+    $curr_ver = str_replace(".", "", explode("-", get_pfsense_version()["version"])[0]);
+    $min_ver = 244;
+    $curr_ver = is_numeric($curr_ver) ? intval($curr_ver) : 0;
+    $valid_ver = false;
+    if ($curr_ver < $min_ver) {
+        http_response_code(501);
+        $api_resp = array("status" => "not implemented", "code" => 501, "return" => 17, "message" => "incompatible pfsense version");
+        echo json_encode($api_resp) . PHP_EOL;
+        die();
     }
 }
 
@@ -340,6 +356,39 @@ function api_extended_search($base_data, $search_data) {
         die();
     }
     return $base_data;
+}
+
+// Check our local pfSense version
+function get_pfsense_version() {
+    # VARIABLES
+    $ver_path = "/etc/version";    // Assign the path to our version file
+    $ver_patch_path = "/etc/version.patch";    // Assign the path to our version patch file
+    $ver_bt_path = "/etc/version.buildtime";    // Assign the path to our version build time file
+    $ver_lc_path = "/etc/version.lastcommit";    // Assign the path to our version last commit file
+    $ver_data = array();    // Init an empty array for our version data
+    # RUN TIME
+    // Check that our files exist, if so read the files. Otherwise return error
+    if (file_exists($ver_path)) {
+        $ver_file = fopen($ver_path, "r");    // Open our file
+        $ver = str_replace(PHP_EOL, "", fread($ver_file, filesize($ver_path)));    // Save our version data
+        $ver_data["version"] = $ver;    // Save to array
+    }
+    if (file_exists($ver_patch_path)) {
+        $ver_patch_file = fopen($ver_patch_path, "r");    // Open our file
+        $ver_patch = str_replace(PHP_EOL, "", fread($ver_patch_file, filesize($ver_patch_path)));    // Save patch
+        $ver_data["patch"] = $ver_patch;    // Save to array
+    }
+    if (file_exists($ver_bt_path)) {
+        $ver_bt_file = fopen($ver_bt_path, "r");    // Open our file
+        $ver_bt = str_replace(PHP_EOL, "", fread($ver_bt_file, filesize($ver_bt_path)));    // Save bt data
+        $ver_data["buildtime"] = $ver_bt;    // Save to array
+    }
+    if (file_exists($ver_lc_path)) {
+        $ver_lc_file = fopen($ver_lc_path, "r");    // Open our file
+        $ver_lc = str_replace(PHP_EOL, "", fread($ver_lc_file, filesize($ver_lc_path)));    // Save bt data
+        $ver_data["lastcommit"] = $ver_lc;    // Save to array
+    }
+    return $ver_data;
 }
 
 // Check if a DNS Resolver (Unbound) host override already exists

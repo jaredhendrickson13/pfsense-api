@@ -16,7 +16,7 @@ API RETURN CODES
 14: ip or subnet in use
 15: forbidden
 16: invalid mac address
-
+17: incompatible pfsense version
 20: Username required
 21: Password required
 22: User already exists
@@ -106,6 +106,12 @@ API RETURN CODES
 163: invalid redirect ip address
 164: invalid redirect port
 164: invalid rule association value
+165: invalid sshd enable value
+166: invalid sshd key only type
+167: invalid sshd agent forwarding value
+168: invalid sshd port value
+170: invalid hostname
+171: invalid domain
 
 
 
