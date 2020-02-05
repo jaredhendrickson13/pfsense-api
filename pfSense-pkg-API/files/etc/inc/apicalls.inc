@@ -2011,7 +2011,7 @@ function api_system_hostname_modify() {
     # RUN TIME
     // Check that client is authenticated and authorized
     if (api_authorized($req_privs, $read_only_action)) {
-        // Check that our HTTP method is POST (DELETE)
+        // Check that our HTTP method is POST (UPDATE)
         if ($http_method === 'POST') {
             if (isset($client_params['hostname'])) {
                 $hostname = $client_params['hostname'];
@@ -2056,6 +2056,177 @@ function api_system_hostname_modify() {
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "system hostname modified");
             $api_resp["data"] = array("hostname" => $config["system"]["hostname"], "domain" => $config["system"]["domain"]);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_system_certificates() {
+    # VARIABLES
+    global $config, $api_resp, $client_params;
+    $read_only_action = true;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system-certmanager");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $crt_array = array();    // Init our array
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is GET (READ)
+        if ($http_method === 'GET') {
+            // Check that we have a virtual IP configuration
+            if (!empty($config["cert"])) {
+                $crt_array = $config["cert"];
+            }
+            if (isset($client_params['search'])) {
+                $search = $client_params['search'];
+                $crt_array = api_extended_search($crt_array, $search);
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $crt_array);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_system_certificates_add() {
+    # VARIABLES
+    global $config, $api_resp, $client_params, $client_id;
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system-certmanager");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $cert_ent = [];    // Init our configuration array
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is POST (UPDATE)
+        if ($http_method === 'POST') {
+            if (isset($client_params['descr'])) {
+                $descr = $client_params['descr'];
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 182);
+                $api_resp["message"] = "certificate description required";
+                return $api_resp;
+            }
+            if (isset($client_params['method'])) {
+                $method = $client_params['method'];
+                // Check what method was picked
+                if ($method === "import") {
+                    $cert = base64_decode($client_params["cert"]);
+                    $key = base64_decode($client_params["key"]);
+                    $active = $client_params["active"];
+                    // Check if our certificate and key are valid
+                    if (empty($cert)) {
+                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 180);
+                        $api_resp["message"] = "invalid certificate";
+                        return $api_resp;
+                    } elseif (empty($key)) {
+                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 181);
+                        $api_resp["message"] = "invalid certificate key";
+                        return $api_resp;
+                    } elseif (!strstr($cert, "BEGIN CERTIFICATE") || !strstr($cert, "END CERTIFICATE")) {
+                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 180);
+                        $api_resp["message"] = "invalid certificate";
+                        return $api_resp;
+                    } elseif (cert_get_publickey($cert, false) != cert_get_publickey($key, false, 'prv')) {
+                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 181);
+                        $api_resp["message"] = "invalid certificate key";
+                        return $api_resp;
+                    }
+                    // Populate our configuration array
+                    $cert_ent["refid"] = uniqid();
+                    $cert_ent["type"] = "server";
+                    $cert_ent["descr"] = $descr;
+                    cert_import($cert_ent, $cert, $key);
+                    // If user requests this cert to be active, configure it as the wc cert
+                    if ($active === true) {
+                        $config["system"]["webgui"]["ssl-certref"] = $cert_ent["refid"];
+                    }
+                }
+            }
+            // Write our new certificate
+            $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
+            $change_note = " Added certificate via API";    // Add a change note
+            $config["cert"][] = $cert_ent;    // Add our configuration
+            write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+            // Restart our webgui if user set this cert as active
+            if ($active === true) {
+                restart_webconfigurator();
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "certificate added");
+            $api_resp["data"] = $cert_ent;
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_system_certificates_delete() {
+    # VARIABLES
+    global $config, $api_resp, $client_params, $client_id;
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system-certmanager");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $cert_del = [];    // Init our configuration array
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is POST (UPDATE)
+        if ($http_method === 'POST') {
+            if (isset($client_params['refid'])) {
+                $refid = $client_params['refid'];
+                // Loop through our certificates and find a match
+                foreach ($config["cert"] as $i => $c) {
+                    if ($c["refid"] === $refid) {
+                        $del_id = $i;
+                        break;
+                    }
+                }
+            } elseif (isset($client_params['descr'])) {
+                $descr = $client_params['descr'];
+                // Loop through our certificates and find a match
+                foreach ($config["cert"] as $i => $c) {
+                    if ($c["descr"] === $descr) {
+                        $del_id = $i;
+                        break;
+                    }
+                }
+            } elseif (isset($client_params['id'])) {
+                $del_id = $client_params['id'];
+            }
+            // Write our new certificate
+            $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
+            $change_note = " Deleted certificate via API";    // Add a change note
+            // Check if our del_id is in our array
+            if (array_key_exists($del_id, $config["cert"])) {
+                $cert_del = $config["cert"][$del_id];    // Save our cert we are deleting
+                // Check if our certificate is currently in use
+                if ($config["system"]["webgui"]["ssl-certref"] !== $cert_del["refid"]) {
+                    unset($config["cert"][$del_id]);    // Delete our cert
+                    write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+                } else {
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 184);
+                    $api_resp["message"] = "certificate id in use";
+                    return $api_resp;
+                }
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "certificate deleted");
+            $api_resp["data"] = $cert_del;
             return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
@@ -2889,6 +3060,152 @@ function api_users_add_groups() {
         }
     } else {
         return $api_resp;
+    }
+}
+
+function api_users_authservers() {
+    # VARIABLES
+    global $config, $api_resp, $client_params;
+    $read_only_action = true;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system-authservers");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $as_array = array();    // Init our return array
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is GET (READ)
+        if ($http_method === 'GET') {
+            // Check that we have a configuration
+            if (!empty($config["system"]["authserver"])) {
+                $as_array = $config["system"]["authserver"];
+            }
+            if (isset($client_params['search'])) {
+                $search = $client_params['search'];
+                $as_array = api_extended_search($as_array, $search);
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $as_array);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_users_authservers_ldap() {
+    # VARIABLES
+    global $config, $api_resp, $client_params;
+    $read_only_action = true;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system-authservers");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $as_array = array();    // Init our return array
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is GET (READ)
+        if ($http_method === 'GET') {
+            // Check that we have a configuration
+            if (!empty($config["system"]["authserver"])) {
+                foreach ($config["system"]["authserver"] as $a) {
+                    if ($a["type"] === "ldap") {
+                        $as_array[] = $a;
+                    }
+                }
+            }
+            if (isset($client_params['search'])) {
+                $search = $client_params['search'];
+                $as_array = api_extended_search($as_array, $search);
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $as_array);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_users_authservers_radius() {
+    # VARIABLES
+    global $config, $api_resp, $client_params;
+    $read_only_action = true;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system-authservers");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $as_array = array();    // Init our return array
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is GET (READ)
+        if ($http_method === 'GET') {
+            // Check that we have a configuration
+            if (!empty($config["system"]["authserver"])) {
+                foreach ($config["system"]["authserver"] as $a) {
+                    if ($a["type"] === "radius") {
+                        $as_array[] = $a;
+                    }
+                }
+            }
+            if (isset($client_params['search'])) {
+                $search = $client_params['search'];
+                $as_array = api_extended_search($as_array, $search);
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $as_array);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_users_authservers_ldap_add() {
+    # VARIABLES
+    global $config, $api_resp, $client_id, $client_params;
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system-user-authserver");    // Array of privileges allowing this action
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $ldap_count = count($config["system"]["authserver"]);    // Save our total number of auth servers
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is POST (CREATE)
+        if ($http_method === 'POST') {
+            if (isset($client_params['name'])) {
+                $name = sanitize_str($client_params['name']);
+            } else {
+                $name = "LDAP_AUTHSERVER_" . strval($ldap_count);
+            }
+            if (isset($client_params['hostname'])) {
+                $hostname = $client_params['hostname'];
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 41);
+                $api_resp["message"] = "domain required";
+                return $api_resp;
+            }
+            if (isset($client_params['ip'])) {
+                $ipaddr = $client_params['ip'];
+                $ipaddr = trim($ipaddr);
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 42);
+                $api_resp["message"] = "ip required";
+                return $api_resp;
+            }
+            if (isset($client_params['descr'])) {
+                $descr = $client_params['descr'];
+            }
+            if (isset($client_params['aliases'])) {
+                $aliases = $client_params['aliases'];
+            }
+        }
     }
 }
 
@@ -4475,7 +4792,7 @@ function api_services_unbound_restart() {
 
 function api_services_unbound_add_hosts() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_id, $client_params;
+    global $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-services-dnsresolver-edithost");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4586,15 +4903,18 @@ function api_interfaces_vlans() {
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-interfaces-vlan");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $vlan_array = array();
     # RUN TIME
     // Check that client is authenticated and authorized
     if (api_authorized($req_privs, $read_only_action)) {
         // Check that our HTTP method is GET (READ)
         if ($http_method === 'GET') {
-            $vlan_array = $config["vlans"]["vlan"];
             if (isset($client_params['search'])) {
                 $search = $client_params['search'];
                 $vlan_array = api_extended_search($vlan_array, $search);
+            }
+            if (!empty($config["vlans"]["vlan"])) {
+                $vlan_array = $config["vlans"]["vlan"];
             }
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $vlan_array);
@@ -4972,9 +5292,59 @@ function api_interfaces_vlans_add() {
     }
 }
 
+function api_interfaces_delete() {
+    # VARIABLES
+    global $config, $api_resp, $client_id, $client_params;
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-interfaces-assignnetworkports");    // Array of privileges allowing this action
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is POST (CREATE)
+        if ($http_method === 'POST') {
+            if (isset($client_params['if'])) {
+                $interface = $client_params['if'];
+                $interface = get_pfsense_if_id($interface);
+                if (empty($interface)) {
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 120);
+                    $api_resp["message"] = "interface does not exist";
+                    return $api_resp;
+                }
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 11);
+                $api_resp["message"] = "interface required";
+                return $api_resp;
+            }
+            // Add debug data if requested
+            if (array_key_exists("debug", $client_params)) {
+                echo "INTERFACE TO DELETE:" . PHP_EOL;
+                echo var_dump($interface) . PHP_EOL;
+            }
+            // Add our VLAN
+            $curr_config = $config["interfaces"][$interface];    // Save our interface to delete
+            $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
+            $del_stat = destroy_interface($interface);    // Destroy our interface
+            if ($del_stat["status"] === true) {
+                $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "interface deleted");
+                $api_resp["data"] = $curr_config;
+                return $api_resp;
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 121, "message" => $del_stat["msg"]);
+                return $api_resp;
+            }
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
 function api_interfaces() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_params;
+    global $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-interfaces-assignnetworkports");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method

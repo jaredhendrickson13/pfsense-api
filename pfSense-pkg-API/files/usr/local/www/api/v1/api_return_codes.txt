@@ -112,9 +112,11 @@ API RETURN CODES
 168: invalid sshd port value
 170: invalid hostname
 171: invalid domain
-
-
-
+180: invalid certificate
+181: invalid certificate key
+182: certificate description required
+183: certificate id required
+184: certificate id in use
 
 
 

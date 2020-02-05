@@ -17,7 +17,7 @@ $pkg_config = get_api_configuration();    // Save our entire pkg config
 $pkg_index = $pkg_config[0];    // Save our pkg configurations index value
 $api_config = $pkg_config[1];    // Save our api configuration from our pkg config
 $available_auth_modes = array("local" => "Local Database", "base64" => "Base64", "token" => "API Token");
-$available_hash_algos = array("md5" => "MD5", "sha256" => "SHA256", "sha384" => "SHA384");
+$available_hash_algos = array("sha256" => "SHA256", "sha384" => "SHA384", "sha512" => "SHA512", "md5" => "MD5");
 $available_key_bytes = array("16", "32", "64");    // Save our allowed key bitlengths
 $non_config_ifs = array("any" => "Any", "localhost" => "Link-local");    // Save non-configurable interface ids
 $availabe_api_if = array_merge($non_config_ifs, get_configured_interface_with_descr(true));    // Combine if arrays

@@ -71,7 +71,18 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/modify
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/modify/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/users/modify
-
+	# Authservers base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/authservers
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/authservers/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/users/authservers
+	# Authservers ldap
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/ldap
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/authservers/ldap/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/ldap
+	# Authservers radius
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/radius
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/authservers/radius/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/radius
 	# SYSTEM API ENDPOINTS----------------------------------------
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/
 	# Version base
@@ -98,6 +109,18 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/hostname/modify
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/hostname/modify/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/system/hostname/modify
+	# Certificates base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/certificates
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/certificates/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/system/certificates
+	# Certificates add
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/certificates/add
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/certificates/add/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/system/certificates/add
+	# Certificates delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/certificates/delete
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/certificates/delete/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/system/certificates/delete
 	# STATUS API ENDPOINTS----------------------------------------
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/status/
 	# CARP base
@@ -118,6 +141,10 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/interfaces/add
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/interfaces/add/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/interfaces/add
+	# Interfaces delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/interfaces/delete
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/interfaces/delete/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/interfaces/delete
 	# Vlans base
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/interfaces/vlans
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/interfaces/vlans/index.php \

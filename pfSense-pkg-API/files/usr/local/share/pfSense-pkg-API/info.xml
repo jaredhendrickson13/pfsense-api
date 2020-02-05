@@ -12,7 +12,7 @@
         <enable></enable>
         <allowed_interfaces>any</allowed_interfaces>
         <content_type>json</content_type>
-        <keyhash>md5</keyhash>
+        <keyhash>sha256</keyhash>
         <keybytes>16</keybytes>
         <keys></keys>
     </package>

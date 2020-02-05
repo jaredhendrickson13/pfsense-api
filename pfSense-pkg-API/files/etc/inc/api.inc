@@ -47,6 +47,14 @@ function str_starts_with($needle, $haystack) {
     return (substr($haystack, 0, $length) === $needle);
 }
 
+// Restarts the pfSense webConfigurator
+function restart_webconfigurator() {
+    ob_flush();
+    flush();
+    log_error(gettext("webConfigurator configuration has changed. Restarting webConfigurator."));
+    send_event("service restart webgui");
+}
+
 // API authentication debug function
 function api_auth_debug($req_privs=array()) {
     global $client_id, $client_params, $read_priv;
@@ -129,9 +137,10 @@ function api_authenticate_token($cid, $ctoken) {
 // Check if user authenticates successfully
 function api_authenticate() {
     // Local variables
-    global $client_id, $client_token;
+    global $config, $client_id, $client_token;
     $authenticated = false;
     $api_config = get_api_configuration()[1];
+    $users = index_users();
     // Format our client ID and token based on our configured auth mode
     if ($api_config["authmode"] === "base64") {
         $client_id = base64_decode($client_id);
@@ -148,13 +157,17 @@ function api_authenticate() {
             $authenticated = true;
         }
     } else {
-        // Check AUTHENTICATION-------------------------------------------------------------------
+        // Check local auth
         $local_auth = authenticate_user($client_id, $client_token);    // Test auth locally
         if ($local_auth === true) {
             unset($_SESSION["Username"]);
             $_SESSION["Username"] = $client_id;
             $authenticated = true;
         }
+    }
+    // Check if user is disabled
+    if (array_key_exists("disabled", $config["system"]["user"][$users[$client_id]])) {
+        $authenticated = false;
     }
     return $authenticated;
 }
@@ -1044,6 +1057,69 @@ function apply_interface_config($if_conf) {
     system_routing_configure();
     // Return true or false if configuration was successful
     return true;
+}
+
+// Delete an interface
+function destroy_interface($id) {
+    // Local variables
+    global $config;
+    $err_msg = "";
+    $success = false;
+    if ($id === "wan") {
+        $err_msg = "wan interface cannot be deleted";
+    } elseif (link_interface_to_group($id)) {
+        $err_msg = "interface member of group";
+    } elseif (link_interface_to_bridge($id)) {
+        $err_msg = "interface member of bridge";
+    } elseif (link_interface_to_gre($id)) {
+        $err_msg = "interface member of gre tunnel";
+    } elseif (link_interface_to_gif($id)) {
+        $err_msg = "interface member of gif tunnel";
+    } elseif (interface_has_queue($id)) {
+        $err_msg = "interface traffic shaper configured";
+    } else {
+        unset($config['interfaces'][$id]['enable']);
+        $realid = get_real_interface($id);
+        interface_bring_down($id);   // Bring down interface
+        unset($config['interfaces'][$id]);	// Delete our interface from configuration
+        // Remove DHCP config for interface
+        if (is_array($config['dhcpd']) && is_array($config['dhcpd'][$id])) {
+            unset($config['dhcpd'][$id]);
+            services_dhcpd_configure('inet');
+        }
+        // Removed interface config for dhcp6
+        if (is_array($config['dhcpdv6']) && is_array($config['dhcpdv6'][$id])) {
+            unset($config['dhcpdv6'][$id]);
+            services_dhcpd_configure('inet6');
+        }
+        // Remove ACL for interface
+        if (count($config['filter']['rule']) > 0) {
+            foreach ($config['filter']['rule'] as $x => $rule) {
+                if ($rule['interface'] == $id) {
+                    unset($config['filter']['rule'][$x]);
+                }
+            }
+        }
+        // Remove NAT config for interface
+        if (is_array($config['nat']['rule']) && count($config['nat']['rule']) > 0) {
+            foreach ($config['nat']['rule'] as $x => $rule) {
+                if ($rule['interface'] == $id) {
+                    unset($config['nat']['rule'][$x]['interface']);
+                }
+            }
+        }
+        $change_note = " Deleted interface via API";    // Add a change note
+        write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+        // Disable DHCP if last interface
+        if ($config['interfaces']['lan'] && $config['dhcpd']['wan']) {
+            unset($config['dhcpd']['wan']);
+        }
+        // Update VLAN assignments
+        link_interface_to_vlans($realid, "update");
+        // Write success return
+        $success = true;
+    }
+    return array("status" => $success, "msg" => $err_msg);
 }
 
 // Check if CARP is enabled for disabled

@@ -17,6 +17,9 @@
 @dir /usr/local/www/api/v1/users/delete/privs
 @dir /usr/local/www/api/v1/users/add/groups
 @dir /usr/local/www/api/v1/users/delete/groups
+@dir /usr/local/www/api/v1/users/authservers
+@dir /usr/local/www/api/v1/users/authservers/ldap
+@dir /usr/local/www/api/v1/users/authservers/radius
 /usr/local/www/api/v1/users/index.php
 /usr/local/www/api/v1/users/add/index.php
 /usr/local/www/api/v1/users/delete/index.php
@@ -25,6 +28,9 @@
 /usr/local/www/api/v1/users/delete/privs/index.php
 /usr/local/www/api/v1/users/add/groups/index.php
 /usr/local/www/api/v1/users/delete/groups/index.php
+/usr/local/www/api/v1/users/authservers/index.php
+/usr/local/www/api/v1/users/authservers/ldap/index.php
+/usr/local/www/api/v1/users/authservers/radius/index.php
 
 @dir /usr/local/www/api/v1/system/version
 /usr/local/www/api/v1/system/version/index.php
@@ -42,6 +48,13 @@
 /usr/local/www/api/v1/system/hostname/index.php
 /usr/local/www/api/v1/system/hostname/modify/index.php
 
+@dir /usr/local/www/api/v1/system/certificates
+@dir /usr/local/www/api/v1/system/certificates/add
+@dir /usr/local/www/api/v1/system/certificates/delete
+/usr/local/www/api/v1/system/certificates/index.php
+/usr/local/www/api/v1/system/certificates/add/index.php
+/usr/local/www/api/v1/system/certificates/delete/index.php
+
 @dir /usr/local/www/api/v1/status
 @dir /usr/local/www/api/v1/status/carp
 @dir /usr/local/www/api/v1/status/carp/modify
@@ -54,12 +67,14 @@
 
 @dir /usr/local/www/api/v1/interfaces
 @dir /usr/local/www/api/v1/interfaces/add
+@dir /usr/local/www/api/v1/interfaces/delete
 @dir /usr/local/www/api/v1/interfaces/vlans
 @dir /usr/local/www/api/v1/interfaces/vlans/add
 @dir /usr/local/www/api/v1/interfaces/vlans/delete
 @dir /usr/local/www/api/v1/interfaces/vlans/modify
 /usr/local/www/api/v1/interfaces/index.php
 /usr/local/www/api/v1/interfaces/add/index.php
+/usr/local/www/api/v1/interfaces/delete/index.php
 /usr/local/www/api/v1/interfaces/vlans/index.php
 /usr/local/www/api/v1/interfaces/vlans/add/index.php
 /usr/local/www/api/v1/interfaces/vlans/delete/index.php
