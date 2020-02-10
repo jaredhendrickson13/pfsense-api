@@ -18,8 +18,12 @@
 @dir /usr/local/www/api/v1/users/add/groups
 @dir /usr/local/www/api/v1/users/delete/groups
 @dir /usr/local/www/api/v1/users/authservers
+@dir /usr/local/www/api/v1/users/authservers/delete
 @dir /usr/local/www/api/v1/users/authservers/ldap
+@dir /usr/local/www/api/v1/users/authservers/ldap/add
+@dir /usr/local/www/api/v1/users/authservers/ldap/delete
 @dir /usr/local/www/api/v1/users/authservers/radius
+@dir /usr/local/www/api/v1/users/authservers/radius/delete
 /usr/local/www/api/v1/users/index.php
 /usr/local/www/api/v1/users/add/index.php
 /usr/local/www/api/v1/users/delete/index.php
@@ -29,8 +33,12 @@
 /usr/local/www/api/v1/users/add/groups/index.php
 /usr/local/www/api/v1/users/delete/groups/index.php
 /usr/local/www/api/v1/users/authservers/index.php
+/usr/local/www/api/v1/users/authservers/delete/index.php
 /usr/local/www/api/v1/users/authservers/ldap/index.php
+/usr/local/www/api/v1/users/authservers/ldap/add/index.php
+/usr/local/www/api/v1/users/authservers/ldap/delete/index.php
 /usr/local/www/api/v1/users/authservers/radius/index.php
+/usr/local/www/api/v1/users/authservers/radius/delete/index.php
 
 @dir /usr/local/www/api/v1/system/version
 /usr/local/www/api/v1/system/version/index.php

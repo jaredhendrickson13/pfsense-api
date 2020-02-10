@@ -17,6 +17,7 @@ header('Content-Type: application/json');
 header("Referer: no-referrer");
 api_runtime_allowed();    // Check that our configuration allows this API call to run first
 session_start();    // Start our session. This is only used for tracking user name
+$pf_ver_num = get_pfsense_version()["program"];    // Pull our full pfSense version
 
 function api_status_carp() {
     # VARIABLES
@@ -2310,7 +2311,7 @@ function api_system_arp_delete() {
 
 function api_users() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_params;
+    global $config, $userindex, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-usermanager");    // Array of privileges allowing this action
     $userindex = index_users();    // Index our users
@@ -3095,32 +3096,47 @@ function api_users_authservers() {
     }
 }
 
-function api_users_authservers_ldap() {
+function api_users_authservers_delete() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
-    $req_privs = array("page-all", "page-system-authservers");    // Array of privs allowed
+    global $config, $api_resp, $client_id, $client_params;
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system-user-authserver");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
-    $as_array = array();    // Init our return array
+    $del_server = array();    // Init our deleted auth server config
     # RUN TIME
     // Check that client is authenticated and authorized
     if (api_authorized($req_privs, $read_only_action)) {
-        // Check that our HTTP method is GET (READ)
-        if ($http_method === 'GET') {
-            // Check that we have a configuration
-            if (!empty($config["system"]["authserver"])) {
-                foreach ($config["system"]["authserver"] as $a) {
-                    if ($a["type"] === "ldap") {
-                        $as_array[] = $a;
+        // Check that our HTTP method is POST (DELETE)
+        if ($http_method === 'POST') {
+            if (isset($client_params['name'])) {
+                $name = $client_params['name'];
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 190);
+                $api_resp["message"] = "authentication server name required";
+                return $api_resp;
+            }
+            // Add debug data if requested
+            if (array_key_exists("debug", $client_params)) {
+                echo "AUTH SERVER NAME TO DELETE:" . PHP_EOL;
+                echo var_dump($name) . PHP_EOL;
+            }
+            // Loop through our servers and check that this server exists
+            foreach ($config["system"]["authserver"] as $asid => $asc) {
+                if ($name === $asc["name"]) {
+                    $del_server = $config["system"]["authserver"][$asid];    // Save our config before deleting
+                    unset($config["system"]["authserver"][$asid]);    // Remove our config
+                    // Check if this auth server is our default, if so revert to local database
+                    if ($name === $config["system"]["webgui"]["authmode"]) {
+                        unset($config["system"]["webgui"]["authmode"]);
                     }
                 }
             }
-            if (isset($client_params['search'])) {
-                $search = $client_params['search'];
-                $as_array = api_extended_search($as_array, $search);
-            }
-            // Print our JSON response
-            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $as_array);
+            // Add our auth server
+            $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
+            $change_note = " Deleted authentication server via API";    // Add a change note
+            write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "data" => $del_server);
+            $api_resp["message"] = "authentication server deleted";
             return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
@@ -3167,45 +3183,387 @@ function api_users_authservers_radius() {
     }
 }
 
-function api_users_authservers_ldap_add() {
+function api_users_authservers_radius_delete() {
     # VARIABLES
     global $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-user-authserver");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $del_server = array();    // Init our deleted auth server config
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is POST (DELETE)
+        if ($http_method === 'POST') {
+            if (isset($client_params['name'])) {
+                $name = $client_params['name'];
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 190);
+                $api_resp["message"] = "authentication server name required";
+                return $api_resp;
+            }
+            // Add debug data if requested
+            if (array_key_exists("debug", $client_params)) {
+                echo "AUTH SERVER NAME TO DELETE:" . PHP_EOL;
+                echo var_dump($name) . PHP_EOL;
+            }
+            // Loop through our servers and check that this server exists and is a RADIUS server
+            foreach ($config["system"]["authserver"] as $asid => $asc) {
+                if ($name === $asc["name"] and $asc["type"] === "radius") {
+                    $del_server = $config["system"]["authserver"][$asid];    // Save our config before deleting
+                    unset($config["system"]["authserver"][$asid]);    // Remove our config
+                    // Check if this auth server is our default, if so revert to local database
+                    if ($name === $config["system"]["webgui"]["authmode"]) {
+                        unset($config["system"]["webgui"]["authmode"]);
+                    }
+                }
+            }
+            // Add our auth server
+            $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
+            $change_note = " Deleted authentication server via API";    // Add a change note
+            write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "data" => $del_server);
+            $api_resp["message"] = "radius authentication server deleted";
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_users_authservers_ldap() {
+    # VARIABLES
+    global $config, $api_resp, $client_params;
+    $read_only_action = true;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system-authservers");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $as_array = array();    // Init our return array
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is GET (READ)
+        if ($http_method === 'GET') {
+            // Check that we have a configuration
+            if (!empty($config["system"]["authserver"])) {
+                foreach ($config["system"]["authserver"] as $a) {
+                    if ($a["type"] === "ldap") {
+                        $as_array[] = $a;
+                    }
+                }
+            }
+            if (isset($client_params['search'])) {
+                $search = $client_params['search'];
+                $as_array = api_extended_search($as_array, $search);
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $as_array);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_users_authservers_ldap_add() {
+    # VARIABLES
+    global $config, $api_resp, $client_id, $client_params, $pf_ver_num;
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system-user-authserver");    // Array of privileges allowing this action
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $ldap_count = count($config["system"]["authserver"]);    // Save our total number of auth servers
+    $ldap_ent = ["refid" => uniqid(), "type" => "ldap"];    // Init our new LDAP config
     # RUN TIME
     // Check that client is authenticated and authorized
     if (api_authorized($req_privs, $read_only_action)) {
         // Check that our HTTP method is POST (CREATE)
         if ($http_method === 'POST') {
             if (isset($client_params['name'])) {
-                $name = sanitize_str($client_params['name']);
+                $ldap_ent["name"] = sanitize_str($client_params['name']);
+                if (is_authentication_server($ldap_ent["name"])) {
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 190);
+                    $api_resp["message"] = "authentication server already exists";
+                    return $api_resp;
+                }
             } else {
-                $name = "LDAP_AUTHSERVER_" . strval($ldap_count);
+                while (true) {
+                    $ldap_ent["name"] = "LDAP_AUTHSERVER_" . strval($ldap_count);
+                    // Check if auto name is already used
+                    if (is_authentication_server($ldap_ent["name"])) {
+                        $ldap_count++;
+                    } else {
+                        break;
+                    }
+                }
             }
-            if (isset($client_params['hostname'])) {
-                $hostname = $client_params['hostname'];
+            if (isset($client_params['host'])) {
+                $ldap_ent["host"] = $client_params['host'];
+                // Check if our hostname is valid
+                if (!is_hostname($ldap_ent["host"]) and !is_ipaddrv4($ldap_ent["host"])) {
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 191);
+                    $api_resp["message"] = "invalid ldap hostname or ip";
+                    return $api_resp;
+                }
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 41);
-                $api_resp["message"] = "domain required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 190);
+                $api_resp["message"] = "ldap hostname or ip required";
                 return $api_resp;
             }
-            if (isset($client_params['ip'])) {
-                $ipaddr = $client_params['ip'];
-                $ipaddr = trim($ipaddr);
+            if (($client_params['ldap_port'])) {
+                $ldap_ent["ldap_port"] = strval($client_params['ldap_port']);
+                // Check if our hostname is valid
+                if (!is_port($ldap_ent["ldap_port"])) {
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 193);
+                    $api_resp["message"] = "ldap port out of range";
+                    return $api_resp;
+                }
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 42);
-                $api_resp["message"] = "ip required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 192);
+                $api_resp["message"] = "ldap port required";
                 return $api_resp;
             }
-            if (isset($client_params['descr'])) {
-                $descr = $client_params['descr'];
+            if (isset($client_params['ldap_urltype'])) {
+                // Assign default config values
+                $allowed_url_types = array(
+                    "standard" => "TCP - Standard",
+                    "starttls" => "TCP - STARTTLS",
+                    "encrypted" => "SSL - Encrypted"
+                );
+                // Accommodate config value changes for pfSense 2.5_
+                if ($pf_ver_num >= 250) {
+                    $allowed_url_types = array(
+                        "standard" => "Standard TCP",
+                        "starttls" => "STARTTLS Encrypted",
+                        "encrypted" => "SSL/TLS Encrypted"
+                    );
+                }
+                // Check if our URL type is allowed
+                if (!array_key_exists($client_params["ldap_urltype"], $allowed_url_types)) {
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 195);
+                    $api_resp["message"] = "invalid ldap url type";
+                    return $api_resp;
+                }
+                $ldap_ent["ldap_urltype"] = $allowed_url_types[$client_params['ldap_urltype']];
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 194);
+                $api_resp["message"] = "ldap url type required";
+                return $api_resp;
             }
-            if (isset($client_params['aliases'])) {
-                $aliases = $client_params['aliases'];
+            if (isset($client_params['ldap_protver'])) {
+                $ldap_ent["ldap_protver"] = intval($client_params['ldap_protver']);
+                // Check if our LDAP version is valid
+                $allowed_ldap_ver = array(2, 3);    // Array of allowed LDAP protocol versions
+                if (!in_array($ldap_ent["ldap_protver"], $allowed_ldap_ver)) {
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 196);
+                    $api_resp["message"] = "invalid ldap protocol version";
+                    return $api_resp;
+                }
+            } else {
+                $ldap_ent["ldap_protver"] = 3;
             }
+            if (isset($client_params['ldap_timeout'])) {
+                $ldap_ent["ldap_timeout"] = intval($client_params['ldap_timeout']);
+            } else {
+                $ldap_ent["ldap_timeout"] = 25;    // Assign default if not specified
+            }
+            if (isset($client_params['ldap_scope'])) {
+                $ldap_ent["ldap_scope"] = $client_params['ldap_scope'];
+                // Check if our LDAP scope is valid
+                $allowed_ldap_scopes = array("one", "subtree");    // Array of allowed LDAP scopes
+                if (!in_array($ldap_ent["ldap_scope"], $allowed_ldap_scopes)) {
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 198);
+                    $api_resp["message"] = "invalid ldap search scope";
+                    return $api_resp;
+                }
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 197);
+                $api_resp["message"] = "ldap search scope required";
+                return $api_resp;
+            }
+            if (isset($client_params['ldap_basedn'])) {
+                $ldap_ent["ldap_basedn"] = strval($client_params['ldap_basedn']);
+            } else {
+                $ldap_ent["ldap_basedn"] = "";
+            }
+            if (isset($client_params['ldap_authcn'])) {
+                $ldap_ent["ldap_authcn"] = strval($client_params['ldap_authcn']);
+            } else {
+                $ldap_ent["ldap_authcn"] = "";
+            }
+            if (isset($client_params['ldap_extended_query'])) {
+                $ldap_ent["ldap_extended_enabled"] = "yes";
+                $ldap_ent["ldap_extended_query"] = strval($client_params['ldap_extended_query']);
+            }
+            if (!isset($client_params['ldap_binddn']) and !isset($client_params['ldap_bindpw'])) {
+                $bind_anon = true;
+            }
+            if (!$bind_anon) {
+                if (isset($client_params['ldap_binddn'])) {
+                    $ldap_ent["ldap_binddn"] = strval($client_params['ldap_binddn']);
+                } else {
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 199);
+                    $api_resp["message"] = "ldap bind dn required";
+                    return $api_resp;
+                }
+                if (isset($client_params['ldap_bindpw'])) {
+                    $ldap_ent["ldap_bindpw"] = strval($client_params['ldap_bindpw']);
+                } else {
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 200);
+                    $api_resp["message"] = "ldap bind password required";
+                    return $api_resp;
+                }
+            }
+            if (isset($client_params['ldap_attr_user'])) {
+                $ldap_ent["ldap_attr_user"] = strval($client_params['ldap_attr_user']);
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 201);
+                $api_resp["message"] = "ldap user naming attribute required";
+                return $api_resp;
+            }
+            if (isset($client_params['ldap_attr_group'])) {
+                $ldap_ent["ldap_attr_group"] = strval($client_params['ldap_attr_group']);
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 202);
+                $api_resp["message"] = "ldap group naming attribute required";
+                return $api_resp;
+            }
+            if (isset($client_params['ldap_attr_member'])) {
+                $ldap_ent["ldap_attr_member"] = strval($client_params['ldap_attr_member']);
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 203);
+                $api_resp["message"] = "ldap group member attribute required";
+                return $api_resp;
+            }
+            if (isset($client_params['ldap_attr_groupobj'])) {
+                $ldap_ent["ldap_rfc2307"] = "";    // Enable RFC2307 mode
+                $ldap_ent["ldap_attr_groupobj"] = strval($client_params['ldap_attr_groupobj']);
+            }
+            if ($client_params['ldap_utf8'] === true) {
+                $ldap_ent["ldap_utf8"] = "";    // Enable UTF8 LDAP parameters
+            }
+            if ($client_params['ldap_nostrip_at'] === true) {
+                $ldap_ent["ldap_nostrip_at"] = "";    // Disable LDAP username alterations (@)
+            }
+            if ($client_params['active'] === true) {
+                $set_as_default = true;
+            }
+            // Add debug data if requested
+            if (array_key_exists("debug", $client_params)) {
+                echo "NAME:" . PHP_EOL;
+                echo var_dump($ldap_ent["name"]) . PHP_EOL;
+                echo "HOSTNAME OR IP:" . PHP_EOL;
+                echo var_dump($ldap_ent["host"]) . PHP_EOL;
+                echo "REMOTE LDAP PORT:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_port"]) . PHP_EOL;
+                echo "TRANSPORT METHOD:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_urltype"]) . PHP_EOL;
+                echo "LDAP PROTOCOL VERSION:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_protver"]) . PHP_EOL;
+                echo "LDAP TIMEOUT:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_timeout"]) . PHP_EOL;
+                echo "LDAP SEARCH SCOPE:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_scope"]) . PHP_EOL;
+                echo "BIND ANONYMOUSLY:" . PHP_EOL;
+                echo var_dump($bind_anon) . PHP_EOL;
+                echo "LDAP BASE DN:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_basedn"]) . PHP_EOL;
+                echo "LDAP AUTH CONTAINER:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_authcn"]) . PHP_EOL;
+                echo "LDAP EXTENDED QUERY:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_extended_query"]) . PHP_EOL;
+                echo "LDAP BIND DN:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_binddn"]) . PHP_EOL;
+                echo "LDAP BIND PASSWORD:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_bindpw"]) . PHP_EOL;
+                echo "LDAP USER ATTRITBUTE:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_attr_user"]) . PHP_EOL;
+                echo "LDAP GROUP ATTRITBUTE:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_attr_group"]) . PHP_EOL;
+                echo "LDAP MEMBER ATTRIBUTE:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_attr_member"]) . PHP_EOL;
+                echo "LDAP GROUP OBJECT:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_attr_groupobj"]) . PHP_EOL;
+                echo "ENABLE RFC2307:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_rfc2307"]) . PHP_EOL;
+                echo "ENABLE UTF-8 ENCODING:" . PHP_EOL;
+                echo var_dump($ldap_ent["ldap_utf8"]) . PHP_EOL;
+            }
+            // Add our auth server
+            $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
+            $change_note = " Added authentication server via API";    // Add a change note
+            $config["system"]["authserver"][] = $ldap_ent;    // Add our new configuration
+            write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+            // Check if clients wants to set this as default auth server
+            if ($set_as_default) {
+                $change_note = " Added authentication server via API";    // Add a change note
+                $config['system']['webgui']['authmode'] = $ldap_ent["name"];    // Add default auth server
+                write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+            }
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $ldap_ent);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
         }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_users_authservers_ldap_delete() {
+    # VARIABLES
+    global $config, $api_resp, $client_id, $client_params;
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system-user-authserver");    // Array of privileges allowing this action
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $del_server = array();    // Init our deleted auth server config
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is POST (DELETE)
+        if ($http_method === 'POST') {
+            if (isset($client_params['name'])) {
+                $name = $client_params['name'];
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 190);
+                $api_resp["message"] = "authentication server name required";
+                return $api_resp;
+            }
+            // Add debug data if requested
+            if (array_key_exists("debug", $client_params)) {
+                echo "AUTH SERVER NAME TO DELETE:" . PHP_EOL;
+                echo var_dump($name) . PHP_EOL;
+            }
+            // Loop through our servers and check that this server exists and is an LDAP server
+            foreach ($config["system"]["authserver"] as $asid => $asc) {
+                if ($name === $asc["name"] and $asc["type"] === "ldap") {
+                    $del_server = $config["system"]["authserver"][$asid];    // Save our config before deleting
+                    unset($config["system"]["authserver"][$asid]);    // Remove our config
+                    // Check if this auth server is our default, if so revert to local database
+                    if ($name === $config["system"]["webgui"]["authmode"]) {
+                        unset($config["system"]["webgui"]["authmode"]);
+                    }
+                }
+            }
+            // Add our auth server
+            $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
+            $change_note = " Deleted authentication server via API";    // Add a change note
+            write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+            $api_resp["message"] = "ldap authentication server deleted";
+            $api_resp["data"] = $del_server;
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
     }
 }
 
@@ -3530,7 +3888,6 @@ function api_services_sshd_modify() {
                 echo var_dump($sshdagentforwarding) . PHP_EOL;
                 echo "SSHD PORT:" . PHP_EOL;
                 echo var_dump($port) . PHP_EOL;
-
             }
             // Check if we found an error, if so, quit
             if ($err_found) {

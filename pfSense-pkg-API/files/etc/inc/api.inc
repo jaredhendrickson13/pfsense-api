@@ -401,6 +401,7 @@ function get_pfsense_version() {
         $ver_lc = str_replace(PHP_EOL, "", fread($ver_lc_file, filesize($ver_lc_path)));    // Save bt data
         $ver_data["lastcommit"] = $ver_lc;    // Save to array
     }
+    $ver_data["program"] = floatval(str_replace(".", "", explode("-", $ver)[0]).".".$ver_patch);
     return $ver_data;
 }
 
@@ -1195,4 +1196,16 @@ function enable_carp($enable) {
         interfaces_sync_setup();
         set_single_sysctl('net.inet.carp.allow', '1');
     }
+}
+
+// Checks if an authentication server exists by name
+function is_authentication_server($name) {
+    global $config;
+    foreach ($config["system"]["authserver"] as $as) {
+        $reserved_names = [$as["name"], "Local_Database", "local", "LOCAL", "Local"];
+        if (in_array($name, $reserved_names)) {
+            return true;
+        }
+    }
+    return false;
 }

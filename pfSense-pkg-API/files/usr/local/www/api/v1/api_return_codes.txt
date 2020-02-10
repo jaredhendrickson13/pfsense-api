@@ -117,6 +117,21 @@ API RETURN CODES
 182: certificate description required
 183: certificate id required
 184: certificate id in use
+189: authentication server already exists
+190: ldap hostname or ip required
+191: invalid ldap hostname or ip
+192: ldap port required
+193: ldap port out of range
+194: ldap url type required
+195: invalid ldap url type
+196: invalid ldap protocol version
+197: ldap search scope required
+198: invalid ldap search scope
+199: ldap bind dn required
+200: ldap bind password required
+201: ldap user naming attribute required
+202: ldap group naming attribute required
+203: ldap group member attribute required
 
 
 

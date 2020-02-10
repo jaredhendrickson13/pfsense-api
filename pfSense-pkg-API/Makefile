@@ -75,14 +75,30 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/authservers
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/authservers/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/users/authservers
+	# Authservers delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/delete
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/authservers/delete/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/delete
 	# Authservers ldap
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/ldap
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/authservers/ldap/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/ldap
+	# Authservers ldap add
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/ldap/add
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/authservers/ldap/add/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/ldap/add
+	# Authservers ldap delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/ldap/delete
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/authservers/ldap/delete/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/ldap/delete
 	# Authservers radius
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/radius
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/authservers/radius/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/radius
+	# Authservers radius delete
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/radius/delete
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/users/authservers/radius/delete/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/users/authservers/radius/delete
 	# SYSTEM API ENDPOINTS----------------------------------------
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/
 	# Version base
