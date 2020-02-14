@@ -1,6 +1,7 @@
 @dir /etc/inc
 /etc/inc/api.inc
 /etc/inc/apicalls.inc
+/etc/inc/apiresp.inc
 
 @dir /usr/local/pkg
 /usr/local/pkg/api.xml
@@ -42,6 +43,11 @@
 
 @dir /usr/local/www/api/v1/system/version
 /usr/local/www/api/v1/system/version/index.php
+
+@dir /usr/local/www/api/v1/system/api
+@dir /usr/local/www/api/v1/system/api/errors
+/usr/local/www/api/v1/system/api/index.php
+/usr/local/www/api/v1/system/api/errors/index.php
 
 @dir /usr/local/www/api/v1/system/arp
 @dir /usr/local/www/api/v1/system/arp/delete
@@ -88,7 +94,17 @@
 /usr/local/www/api/v1/interfaces/vlans/delete/index.php
 /usr/local/www/api/v1/interfaces/vlans/modify/index.php
 
+
+
 @dir /usr/local/www/api/v1/firewall
+
+@dir /usr/local/www/api/v1/firewall/states
+@dir /usr/local/www/api/v1/firewall/states/size
+@dir /usr/local/www/api/v1/firewall/states/size/modify
+/usr/local/www/api/v1/firewall/states/index.php
+/usr/local/www/api/v1/firewall/states/size/index.php
+/usr/local/www/api/v1/firewall/states/size/modify/index.php
+
 @dir /usr/local/www/api/v1/firewall/virtualips
 @dir /usr/local/www/api/v1/firewall/virtualips/add
 @dir /usr/local/www/api/v1/firewall/virtualips/delete

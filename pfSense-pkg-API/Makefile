@@ -25,6 +25,8 @@ do-install:
 		${STAGEDIR}/etc/inc
 	${INSTALL_DATA} ${FILESDIR}/etc/inc/apicalls.inc \
 		${STAGEDIR}/etc/inc
+	${INSTALL_DATA} ${FILESDIR}/etc/inc/apiresp.inc \
+		${STAGEDIR}/etc/inc
 
 	# INSTALL OUR PFSENSE PKG
 	${MKDIR} ${STAGEDIR}${PREFIX}/pkg
@@ -105,6 +107,14 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/version
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/version/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/system/version
+	# API base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/api
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/api/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/system/api
+	# API errors base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/api/errors
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/api/errors/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/system/api/errors
 	# ARP base
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/arp
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/arp/index.php \
@@ -187,6 +197,18 @@ do-install:
 
 	# FIREWALL API ENPOINTS
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall
+	# STATES base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/states
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/states/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/states
+	# STATES size
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/states/size
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/states/size/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/states/size
+	# STATES size modify
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/states/size/modify
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/states/size/modify/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/firewall/states/size/modify
 	# NAT base
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/firewall/nat
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/firewall/nat/index.php \

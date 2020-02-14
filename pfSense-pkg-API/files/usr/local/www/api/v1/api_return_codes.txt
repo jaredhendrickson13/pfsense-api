@@ -132,7 +132,8 @@ API RETURN CODES
 201: ldap user naming attribute required
 202: ldap group naming attribute required
 203: ldap group member attribute required
-
+210: maximum firewall state size required
+211: invalid firewall state table size
 
 
 

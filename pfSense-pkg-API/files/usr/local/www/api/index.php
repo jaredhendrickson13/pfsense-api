@@ -29,7 +29,7 @@ if ($_POST["gen"] === "1") {
 }
 if (isset($_POST["del"]) and is_numeric($_POST["del"])) {
     $del_key = $_POST["del"];
-    unset($config["installedpackages"]["package"][$pkg_index]["keys"]["key"][$del_key]);
+    unset($config["installedpackages"]["package"][$pkg_index]["conf"]["keys"]["key"][$del_key]);
     $change_note = " Deleted API key";
     write_config(sprintf(gettext($change_note)));
     print_apply_result_box(0);
@@ -64,7 +64,7 @@ if (isset($_POST["save"])) {
         unset($api_config["readonly"]);
     }
     // Write and apply our changes, leave a session variable indicating save, then reload the page
-    $config["installedpackages"]["package"][$pkg_index] = $api_config;
+    $config["installedpackages"]["package"][$pkg_index]["conf"] = $api_config;
     $change_note = " Updated API settings";
     write_config(sprintf(gettext($change_note)));
     print_apply_result_box(0);

@@ -21,7 +21,7 @@ $pf_ver_num = get_pfsense_version()["program"];    // Pull our full pfSense vers
 
 function api_status_carp() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-carp");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -43,9 +43,9 @@ function api_status_carp() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $carp_status);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
-
         }
     } else {
         return $api_resp;
@@ -54,7 +54,7 @@ function api_status_carp() {
 
 function api_status_carp_modify() {
     # VARIABLES
-    global $g, $config, $api_resp, $client_id, $client_params;
+    global $err_lib, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-carp");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -93,13 +93,15 @@ function api_status_carp_modify() {
             }
             // Add our CARP settings
             $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
-            $change_note = " Modified CARP status via API";    // Add a change note
             interfaces_carp_set_maintenancemode($mm_enable);    // Set our maintenance mode value
             enable_carp($enable);    // Set our CARP enable value
-            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "success", "data" => $carp_stat_arr);
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $carp_stat_arr);
+            $api_resp["message"] = "Successfully modified CARP settings";
+            $api_resp["data"] = $carp_stat_arr;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -109,7 +111,7 @@ function api_status_carp_modify() {
 
 function api_firewall_nat() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-virtualipaddresses");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -131,7 +133,8 @@ function api_firewall_nat() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $nat_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -141,7 +144,7 @@ function api_firewall_nat() {
 
 function api_firewall_nat_portforwards() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-nat-portforward");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -163,7 +166,8 @@ function api_firewall_nat_portforwards() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $nat_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -173,7 +177,7 @@ function api_firewall_nat_portforwards() {
 
 function api_firewall_nat_portforwards_add() {
     # VARIABLES
-    global $g, $config, $tracker, $api_resp, $client_id, $client_params;
+    global $err_lib, $g, $config, $tracker, $api_resp, $client_id, $client_params;
     $user_created_msg = $_SESSION["Username"]."@".$_SERVER["REMOTE_ADDR"]." (API)";    // Save the username and ip of client
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-nat-portforward-edit");    // Array of privileges allowing this action
@@ -203,36 +207,36 @@ function api_firewall_nat_portforwards_add() {
                 $interface = $client_params['interface'];
                 $interface = get_pfsense_if_id($interface);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 11);
-                $api_resp["message"] = "interface required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4000);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['protocol'])) {
                 $protocol = $client_params['protocol'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 82);
-                $api_resp["message"] = "rule protocol required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4001);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['target'])) {
                 $localip = $client_params['target'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 161);
-                $api_resp["message"] = "redirect ip required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4002);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['local-port'])) {
                 $localport = $client_params['local-port'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 162);
-                $api_resp["message"] = "redirect port required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4003);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['src'])) {
                 $src = $client_params['src'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 83);
-                $api_resp["message"] = "rule source required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4004);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['srcport'])) {
@@ -241,8 +245,8 @@ function api_firewall_nat_portforwards_add() {
             if (isset($client_params['dst'])) {
                 $dst = $client_params['dst'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 84);
-                $api_resp["message"] = "rule destination required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4005);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['dstport'])) {
@@ -259,7 +263,7 @@ function api_firewall_nat_portforwards_add() {
                 }
             }
             if (isset($client_params['nosync'])) {
-                if ($client_params['nosync']) {
+                if ($client_params['nosync'] === true) {
                     $nosync = true;
                 }
             }
@@ -312,25 +316,25 @@ function api_firewall_nat_portforwards_add() {
             $api_resp = array("status" => "bad request", "code" => 400);
             // Check that our required array/interface values are valid
             if (!is_string($interface)) {
-                $input_err = true;
-                $api_resp["message"] = "unknown interface";
-                $api_resp["return"] = 11;
+                $api_resp["return"] = 4006;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (!in_array($protocol, $allowed_prot)) {
-                $input_err = true;
-                $api_resp["message"] = "invalid protocol";
-                $api_resp["return"] = 87;
+                $api_resp["return"] = 4007;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (isset($natreflection) and !in_array($natreflection, $allowed_nat_ref)) {
-                $input_err = true;
-                $api_resp["message"] = "invalid nat reflection value";
-                $api_resp["return"] = 160;
+                $api_resp["return"] = 4008;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (!is_ipaddrv4($localip) and !alias_in_use($localip)) {
-                $input_err = true;
-                $api_resp["message"] = "invalid redirect ip address";
-                $api_resp["return"] = 163;
+                $api_resp["return"] = 4009;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (!is_port_or_range($localport)) {
-                $input_err = true;
-                $api_resp["message"] = "invalid redirect port";
-                $api_resp["return"] = 164;
+                $api_resp["return"] = 4010;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             }
             $rule_ent = array();
             // Check if rule is disabled
@@ -362,10 +366,16 @@ function api_firewall_nat_portforwards_add() {
             // Check if our source and destination values are valid
             foreach (array("source" => $src, "destination" => $dst) as $dir => $val) {
                 $dir_check = is_valid_rule_addr($val, $dir);
-                if (!$dir_check["valid"] === true) {
-                    $input_err = true;
-                    $api_resp["message"] = $dir_check["message"];
-                    $api_resp["return"] = $dir_check["return"];
+                if (!$dir_check["valid"]) {
+                    if ($dir === "source") {
+                        $api_resp["return"] = 4011;
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                        return $api_resp;
+                    } else {
+                        $api_resp["return"] = 4012;
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                        return $api_resp;
+                    }
                 } else {
                     $rule_ent = array_merge($rule_ent, $dir_check["data"]);
                 }
@@ -375,27 +385,25 @@ function api_firewall_nat_portforwards_add() {
                 $port_req = true;
             }
             // Check our src and dst port values if ports are required
-            if (!$input_err and $port_req) {
-                if (!isset($srcport) or !isset($dstport)) {
-                    $input_err = true;
-                    $api_resp["message"] = "source and destination port required";
-                    $api_resp["return"] = 8;
-                }
+            if ($port_req) {
                 foreach (array("source" => $srcport, "destination" => $dstport) as $dir => $val) {
                     $val = str_replace("-", ":", $val);
                     if (!is_port_or_range($val) and $val !== "any") {
-                        $input_err = true;
-                        $api_resp["message"] = "invalid ".$dir." port";
-                        $api_resp["return"] = 8;
+                        if ($dir === "source") {
+                            $api_resp["return"] = 4013;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
+                            return $api_resp;
+                        } else {
+                            $api_resp["return"] = 4014;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
+                            return $api_resp;
+                        }
                     } elseif ($val !== "any") {
                         $rule_ent[$dir]["port"] = str_replace(":", "-", $val);
                     }
                 }
             }
-            // Return error if an error was found during input validation
-            if ($input_err) {
-                return $api_resp;
-            }
+            // Add our port forward
             $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
             $change_note = " Added NAT rule via API";    // Add a change note
             $config["nat"]["rule"][] = $rule_ent;    // Write to our master config
@@ -404,11 +412,12 @@ function api_firewall_nat_portforwards_add() {
             filter_configure();    // Ensure our firewall filter is reloaded
             // Loop through each alias and see if our alias was added successfully
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-            $api_resp["message"] = "nat rule added";
+            $api_resp["message"] = "Successfully added port forward";
             $api_resp["data"] = $rule_ent;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -418,7 +427,7 @@ function api_firewall_nat_portforwards_add() {
 
 function api_firewall_nat_portforwards_delete() {
     # VARIABLES
-    global $g, $config, $tracker, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $user_created_msg = $_SESSION["Username"]."@".$_SERVER["REMOTE_ADDR"]." (API)";    // Save the username and ip of client
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-nat-portforward-edit");    // Array of privileges allowing this action
@@ -431,8 +440,8 @@ function api_firewall_nat_portforwards_delete() {
             if (isset($client_params['id'])) {
                 $rule_id = $client_params['id'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 90);
-                $api_resp["message"] = "rule id required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4015);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -451,16 +460,17 @@ function api_firewall_nat_portforwards_delete() {
                 filter_configure();    // Ensure our firewall filter is reloaded
                 // Loop through each alias and see if our alias was added successfully
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = "nat rule deleted";
+                $api_resp["message"] = "Successfully deleted port forward";
                 $api_resp["data"] = $del_rule;
                 return $api_resp;
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 91);
-                $api_resp["message"] = "rule id does not exist";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4016);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -470,7 +480,7 @@ function api_firewall_nat_portforwards_delete() {
 
 function api_firewall_virtualips() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-virtualipaddresses");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -492,7 +502,8 @@ function api_firewall_virtualips() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $vip_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -502,7 +513,7 @@ function api_firewall_virtualips() {
 
 function api_firewall_virtualips_delete() {
     # VARIABLES
-    global $g, $config, $tracker, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $user_created_msg = $_SESSION["Username"]."@".$_SERVER["REMOTE_ADDR"]." (API)";    // Save the username and ip of client
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-virtualipaddress-edit");    // Array of privileges allowing this action
@@ -515,8 +526,8 @@ function api_firewall_virtualips_delete() {
             if (isset($client_params['id'])) {
                 $vip_id = $client_params['id'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 105);
-                $api_resp["message"] = "virtual ip id required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4017);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -534,16 +545,17 @@ function api_firewall_virtualips_delete() {
                 send_event("filter reload");    // Ensure our firewall filter is reloaded
                 // Loop through each alias and see if our alias was added successfully
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = "virtual ip deleted";
+                $api_resp["message"] = "Successfully deleted virtual IP";
                 $api_resp["data"] = $del_vip;
                 return $api_resp;
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 106);
-                $api_resp["message"] = "virtual ip id does not exist";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4018);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -553,7 +565,7 @@ function api_firewall_virtualips_delete() {
 
 function api_firewall_virtualips_add() {
     # VARIABLES
-    global $g, $config, $tracker, $api_resp, $client_id, $client_params;
+    global $err_lib, $g, $config, $tracker, $api_resp, $client_id, $client_params;
     $user_created_msg = $_SESSION["Username"]."@".$_SERVER["REMOTE_ADDR"]." (API)";    // Save the username and ip of client
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-virtualipaddress-edit");    // Array of privileges allowing this action
@@ -562,21 +574,22 @@ function api_firewall_virtualips_add() {
     # RUN TIME
     // Check that client is authenticated and authorized
     if (api_authorized($req_privs, $read_only_action)) {
+        $api_resp = array("status" => "bad request", "code" => 400);
         // Check that our HTTP method is POST (CREATE)
         if ($http_method === 'POST') {
             if (isset($client_params['mode'])) {
                 $mode = strtolower($client_params['mode']);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 100);
-                $api_resp["message"] = "virtual ip mode required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4019);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['interface'])) {
                 $interface = $client_params['interface'];
                 $interface = get_pfsense_if_id($interface);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 11);
-                $api_resp["message"] = "interface required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4020);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['subnet'])) {
@@ -588,8 +601,8 @@ function api_firewall_virtualips_add() {
                     $subnet = $subnet."/128";
                 }
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 83);
-                $api_resp["message"] = "virtual ip subnet required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4021);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['descr'])) {
@@ -599,6 +612,11 @@ function api_firewall_virtualips_add() {
             }
             if (isset($client_params['noexpand'])) {
                 $noexpand = true;
+            }
+            if (!in_array($mode, $allowed_vip_modes)) {
+                $api_resp["return"] = 4023;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             }
             // CARP required attributes
             if ($mode === "carp" and isset($client_params['vhid'])) {
@@ -617,8 +635,8 @@ function api_firewall_virtualips_add() {
             if ($mode === "carp" and isset($client_params['password'])) {
                 $password = $client_params['password'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 21);
-                $api_resp["message"] = "carp password required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4022);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -645,39 +663,35 @@ function api_firewall_virtualips_add() {
             // INPUT VALIDATION/FORMATTING
             $api_resp = array("status" => "bad request", "code" => 400);
             // Check that our required array/interface values are valid
-            if (!in_array($mode, $allowed_vip_modes)) {
-                $input_err = true;
-                $api_resp["message"] = "invalid virtual ip mode";
-                $api_resp["return"] = 101;
-            } elseif (!is_string($interface)) {
-                $input_err = true;
-                $api_resp["message"] = "unknown interface";
-                $api_resp["return"] = 11;
+            if (!is_string($interface)) {
+                $api_resp["return"] = 4024;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (!is_subnet($subnet)) {
-                $input_err = true;
-                $api_resp["message"] = "invalid subnet";
-                $api_resp["return"] = 13;
+                $api_resp["return"] = 4025;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             }
             // Split our subnet into an address and subnet mask
             $subnet_split = explode("/", $subnet);
             $subnet = $subnet_split[0];
             $subnet_bits = $subnet_split[1];
             // Check that our subnet is not used elsewhere
-            if (!$input_err and is_ip_in_use($subnet)) {
-                $input_err = true;
-                $api_resp["message"] = "subnet already in use";
-                $api_resp["return"] = 14;
+            if (is_ip_in_use($subnet)) {
+                $api_resp["return"] = 4026;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             }
             // Check if VHID was specified
-            if (!$input_err and isset($vhid)) {
+            if (isset($vhid)) {
                 if (vhid_exists($vhid)) {
-                    $input_err = true;
-                    $api_resp["message"] = "vhid already exists";
-                    $api_resp["return"] = 102;
+                    $api_resp["return"] = 4027;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 } elseif (1 > $vhid or $vhid > 255) {
-                    $input_err = true;
-                    $api_resp["message"] = "vhid out of range";
-                    $api_resp["return"] = 104;
+                    $api_resp["return"] = 4028;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 }
             } elseif ($mode === "carp" and !isset($vhid)) {
                 $vhid = next_vhid();    // Pull our next available VHID
@@ -685,22 +699,18 @@ function api_firewall_virtualips_add() {
             // Check if advertisement base was specified
             if (isset($advbase)) {
                 if (1 > $advbase or $advbase > 254) {
-                    $input_err = true;
-                    $api_resp["message"] = "carp advertisement out of range";
-                    $api_resp["return"] = 103;
+                    $api_resp["return"] = 4029;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 }
             }
             // Check if advertisement skew was specified
             if (isset($advskew)) {
                 if (0 > $advskew or $advskew > 254) {
-                    $input_err = true;
-                    $api_resp["message"] = "carp advertisement out of range";
-                    $api_resp["return"] = 103;
+                    $api_resp["return"] = 4030;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 }
-            }
-            // Return error if an error was found during input validation
-            if ($input_err) {
-                return $api_resp;
             }
             // Initialize our virtual IP configuration array
             if (!is_array($config["virtualip"]["vip"])) {
@@ -733,11 +743,12 @@ function api_firewall_virtualips_add() {
             apply_virtual_ip($vip_ent);    // Apply our backend changes with our new configuration
             // Loop through each alias and see if our alias was added successfully
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-            $api_resp["message"] = "virtual ip added";
+            $api_resp["message"] = "Successfully added virtual IP";
             $api_resp["data"] = $vip_ent;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -747,7 +758,7 @@ function api_firewall_virtualips_add() {
 
 function api_firewall_rules() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-rules");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -769,7 +780,8 @@ function api_firewall_rules() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $rule_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -779,7 +791,7 @@ function api_firewall_rules() {
 
 function api_firewall_rules_delete() {
     # VARIABLES
-    global $g, $config, $tracker, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $user_created_msg = $_SESSION["Username"]."@".$_SERVER["REMOTE_ADDR"]." (API)";    // Save the username and ip of client
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-rules-edit");    // Array of privileges allowing this action
@@ -792,8 +804,8 @@ function api_firewall_rules_delete() {
             if (isset($client_params['id'])) {
                 $rule_id = $client_params['id'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 90);
-                $api_resp["message"] = "rule id required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4031);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -812,16 +824,17 @@ function api_firewall_rules_delete() {
                 send_event("filter reload");    // Ensure our firewall filter is reloaded
                 // Loop through each alias and see if our alias was added successfully
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = "firewall rule deleted";
+                $api_resp["message"] = "Successfully deleted firewall rule";
                 $api_resp["data"] = $del_rule;
                 return $api_resp;
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 91);
-                $api_resp["message"] = "rule id does not exist";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4032);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -831,7 +844,7 @@ function api_firewall_rules_delete() {
 
 function api_firewall_rules_add() {
     # VARIABLES
-    global $g, $config, $tracker, $api_resp, $client_id, $client_params;
+    global $err_lib, $g, $config, $tracker, $api_resp, $client_id, $client_params;
     $user_created_msg = $_SESSION["Username"]."@".$_SERVER["REMOTE_ADDR"]." (API)";    // Save the username and ip of client
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-rules-edit");    // Array of privileges allowing this action
@@ -892,39 +905,38 @@ function api_firewall_rules_add() {
             if (isset($client_params['type'])) {
                 $type = $client_params['type'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 80);
-                $api_resp["message"] = "rule type required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4033);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['interface'])) {
                 $interface = $client_params['interface'];
                 $interface = get_pfsense_if_id($interface);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 11);
-                $api_resp["message"] = "interface required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4034);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['ipprotocol'])) {
                 $ipprotocol = $client_params['ipprotocol'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 81);
-                $api_resp["message"] = "rule ip protocol required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4035);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['protocol'])) {
                 $protocol = $client_params['protocol'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 82);
-                $api_resp["message"] = "rule protocol required";
-
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4036);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
 
             }
             if (isset($client_params['src'])) {
                 $src = $client_params['src'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 83);
-                $api_resp["message"] = "rule source required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4037);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['srcport'])) {
@@ -933,8 +945,8 @@ function api_firewall_rules_add() {
             if (isset($client_params['dst'])) {
                 $dst = $client_params['dst'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 84);
-                $api_resp["message"] = "rule destination required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4038);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['dstport'])) {
@@ -999,24 +1011,24 @@ function api_firewall_rules_add() {
             // Check that our required array/interface values are valid
             if (!in_array($type, $allowed_rule_types)) {
                 $input_err = true;
-                $api_resp["message"] = "invalid rule type";
-                $api_resp["return"] = 85;
+                $api_resp["return"] = 4039;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
             } elseif (!is_string($interface)) {
                 $input_err = true;
-                $api_resp["message"] = "unknown interface";
-                $api_resp["return"] = 11;
+                $api_resp["return"] = 4040;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
             } elseif (!in_array($ipprotocol, $allowed_ip_prot)) {
                 $input_err = true;
-                $api_resp["message"] = "invalid ip protocol";
-                $api_resp["return"] = 86;
+                $api_resp["return"] = 4041;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
             } elseif (!in_array($protocol, $allowed_prot)) {
                 $input_err = true;
-                $api_resp["message"] = "invalid protocol";
-                $api_resp["return"] = 87;
+                $api_resp["return"] = 4042;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
             } elseif (isset($gateway) and !is_gateway($gateway)) {
                 $input_err = true;
-                $api_resp["message"] = "invalid gateway";
-                $api_resp["return"] = 12;
+                $api_resp["return"] = 4043;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
             }
             $rule_ent = array();
             // Check if rule is not disabled
@@ -1052,8 +1064,12 @@ function api_firewall_rules_add() {
                 $dir_check = is_valid_rule_addr($val, $dir);
                 if (!$dir_check["valid"] === true) {
                     $input_err = true;
-                    $api_resp["message"] = $dir_check["message"];
-                    $api_resp["return"] = $dir_check["return"];
+                    if ($dir === "source") {
+                        $api_resp["return"] = 4044;
+                    } else {
+                        $api_resp["return"] = 4045;
+                    }
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                 } else {
                     $rule_ent = array_merge($rule_ent, $dir_check["data"]);
                 }
@@ -1068,8 +1084,8 @@ function api_firewall_rules_add() {
                     foreach ($icmp_type as $ict) {
                         if (!in_array($ict, $icmp_subtypes)) {
                             $input_err = true;
-                            $api_resp["message"] = "invalid icmp subtype";
-                            $api_resp["return"] = 89;
+                            $api_resp["return"] = 4046;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
                         }
                     }
                     // Write our ICMP subtype config
@@ -1080,15 +1096,19 @@ function api_firewall_rules_add() {
             if (!$input_err and $port_req) {
                 if (!isset($srcport) or !isset($dstport)) {
                     $input_err = true;
-                    $api_resp["message"] = "source and destination port required";
-                    $api_resp["return"] = 8;
+                    $api_resp["return"] = 4047;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                 }
                 foreach (array("source" => $srcport, "destination" => $dstport) as $dir => $val) {
                     $val = str_replace("-", ":", $val);
                     if (!is_port_or_range($val) and $val !== "any") {
                         $input_err = true;
-                        $api_resp["message"] = "invalid ".$dir." port";
-                        $api_resp["return"] = 8;
+                        if ($dir === "source") {
+                            $api_resp["return"] = 4048;
+                        } else {
+                            $api_resp["return"] = 4049;
+                        }
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
                     } elseif ($val !== "any") {
                         $rule_ent[$dir]["port"] = str_replace(":", "-", $val);;
                     }
@@ -1106,11 +1126,12 @@ function api_firewall_rules_add() {
             send_event("filter reload");    // Ensure our firewall filter is reloaded
             // Loop through each alias and see if our alias was added successfully
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-            $api_resp["message"] = "firewall rule added";
+            $api_resp["message"] = "Successfully added firewall rule";
             $api_resp["data"] = $rule_ent;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -1120,7 +1141,7 @@ function api_firewall_rules_add() {
 
 function api_firewall_aliases() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-aliases");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -1142,7 +1163,8 @@ function api_firewall_aliases() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $alias_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -1152,7 +1174,7 @@ function api_firewall_aliases() {
 
 function api_firewall_aliases_delete() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-aliases-edit");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -1165,8 +1187,8 @@ function api_firewall_aliases_delete() {
                 $name = $client_params['name'];
                 $name = sanitize_str($name);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 60);
-                $api_resp["message"] = "alias name required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4050);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -1187,9 +1209,11 @@ function api_firewall_aliases_delete() {
                     $c_count++;    // Increase our counter
                 }
                 // Delete our alias if we found a match,
+                $del_conf = [];
                 if (is_numeric($del_index)) {
                     $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
                     $change_note = " Deleted firewall alias via API";    // Add a change note
+                    $del_conf = $config["aliases"]["alias"][$del_index];    // Save our alias config before deleting
                     unset($config["aliases"]["alias"][$del_index]);    // Remove this alias from our configuration
                     $config["aliases"]["alias"] = array_values($config["aliases"]["alias"]);    // Reindex array
                     write_config(sprintf(gettext($change_note)));    // Apply our configuration change
@@ -1198,20 +1222,23 @@ function api_firewall_aliases_delete() {
                 // Check if our alias is still in the configuration, if so return error response
                 foreach ($config["aliases"]["alias"] as $se) {
                     if ($se["name"] === $name) {
-                        $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
+                        $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
                         return $api_resp;
                     }
                 }
                 // Return success if we did not find our deleted alias in configuration during loop
-                $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = "alias deleted";
+                $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "data" => $del_conf);
+                $api_resp["message"] = "Successfully deleted firewall alias";
                 return $api_resp;
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 66, "message" => "alias in use");
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4051);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -1221,7 +1248,7 @@ function api_firewall_aliases_delete() {
 
 function api_firewall_aliases_delete_address() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-aliases-edit");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -1230,14 +1257,15 @@ function api_firewall_aliases_delete_address() {
     # RUN TIME
     // Check that client is authenticated and authorized
     if (api_authorized($req_privs, $read_only_action)) {
+        $api_resp = array("status" => "bad request", "code" => 400);
         // Check that our HTTP method is POST (DELETE)
         if ($http_method === 'POST') {
             if (isset($client_params['name'])) {
                 $name = $client_params['name'];
                 $name = sanitize_str($name);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 60);
-                $api_resp["message"] = "alias name required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4050);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['address'])) {
@@ -1247,8 +1275,8 @@ function api_firewall_aliases_delete_address() {
                     $address = array($address);
                 }
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 61);
-                $api_resp["message"] = "alias address required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4052);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -1259,12 +1287,14 @@ function api_firewall_aliases_delete_address() {
                 echo var_dump($address).PHP_EOL;
             }
             // Check that our input is valid
-            $err_code = 10;    // Default our error code to 10 as this applies to most checks
             if (!is_string($name)) {
-                $type_err = "alias name must be type string";
+                $type_err = true;
+                $api_resp["return"] = 4053;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
             } elseif (!is_array($address)) {
-                $type_err = "alias address must be type array";
-            }
+                $type_err = true;
+                $api_resp["return"] = 4054;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];            }
             // Loop through our existing firewall entries and check for our requested alias
             $c_count = 0;
             foreach ($config["aliases"]["alias"] as $ce) {
@@ -1279,13 +1309,12 @@ function api_firewall_aliases_delete_address() {
             }
             // If we could not find an alias, return error
             if ($alias_found !== true) {
-                $type_err = "alias does not exist";
-                $err_code = 67;
+                $type_err = true;
+                $api_resp["return"] = 4055;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
             }
             // Return bad request if error
             if (isset($type_err)) {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => $err_code);
-                $api_resp["message"] = $type_err;
                 return $api_resp;
             }
             // Loop through our existing configuration and remove alias address values on match
@@ -1306,10 +1335,11 @@ function api_firewall_aliases_delete_address() {
             send_event("filter reload");    // Ensure our firewall filter is reloaded
             // Loop through each alias and see if our alias was added successfully
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-            $api_resp["message"] = "alias address deleted";
+            $api_resp["message"] = "Successfully deleted firewall alias address";
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -1319,7 +1349,7 @@ function api_firewall_aliases_delete_address() {
 
 function api_firewall_aliases_modify() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-aliases-edit");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -1333,8 +1363,8 @@ function api_firewall_aliases_modify() {
                 $name = $client_params['name'];
                 $name = sanitize_str($name);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 60);
-                $api_resp["message"] = "alias name required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4050);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params["new_name"])) {
@@ -1383,40 +1413,40 @@ function api_firewall_aliases_modify() {
             // INPUT VALIDATION
             if (!is_alias($name)) {
                 $input_err = true;
-                $api_resp["message"] = "alias does not exist";
-                $api_resp["return"] = 67;
+                $api_resp["return"] = 4055;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
             } elseif (isset($new_name) and is_alias($new_name)) {
                 $input_err = true;
-                $api_resp["message"] = "alias already exists";
-                $api_resp["return"] = 65;
+                $api_resp["return"] = 4056;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
             } elseif (isset($type) and !in_array($type, $allowed_alias_types)) {
                 $input_err = true;
-                $api_resp["message"] = "unknown alias type";
-                $api_resp["return"] = 64;
+                $api_resp["return"] = 4057;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
             }
             if (!$input_err and isset($address)) {
                 foreach ($address as $nae) {
                     if ($type === "host") {
                         if (!is_ipaddr($nae) and !is_hostname($nae)) {
                             $input_err = true;
-                            $api_resp["message"] = "invalid ip address or hostname";
-                            $api_resp["return"] = 7;
+                            $api_resp["return"] = 4058;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
                             break;
                         }
                     }
                     if ($type === "network") {
                         if (!is_subnet($nae) and !is_hostname($nae)) {
                             $input_err = true;
-                            $api_resp["message"] = "invalid subnet";
-                            $api_resp["return"] = 9;
+                            $api_resp["return"] = 4059;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
                             break;
                         }
                     }
                     if ($type === "port") {
                         if (!is_port_or_range($nae)) {
                             $input_err = true;
-                            $api_resp["message"] = "invalid port";
-                            $api_resp["return"] = 8;
+                            $api_resp["return"] = 4060;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
                             break;
                         }
                     }
@@ -1461,11 +1491,12 @@ function api_firewall_aliases_modify() {
             send_event("filter reload");    // Ensure our firewall filter is reloaded
             // Loop through each alias and see if our alias was added successfully
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-            $api_resp["message"] = "alias address modified";
+            $api_resp["message"] = "Successfully modified firewall alias";
             $api_resp["data"] = $config["aliases"]["alias"][$a_index];
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -1475,7 +1506,7 @@ function api_firewall_aliases_modify() {
 
 function api_firewall_aliases_add() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-aliases-edit");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -1483,22 +1514,23 @@ function api_firewall_aliases_add() {
     # RUN TIME
     // Check that client is authenticated and authorized
     if (api_authorized($req_privs, $read_only_action)) {
+        $api_resp = array("status" => "bad request", "code" => 400);
         // Check that our HTTP method is POST (CREATE)
         if ($http_method === 'POST') {
             if (isset($client_params['name'])) {
                 $name = $client_params['name'];
                 $name = sanitize_str($name);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 60);
-                $api_resp["message"] = "alias name required";
+                $api_resp["return"] = 4050;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['type'])) {
                 $type = $client_params['type'];
                 $type = trim($type);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 61);
-                $api_resp["message"] = "alias type required";
+                $api_resp["return"] = 4061;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['address'])) {
@@ -1508,8 +1540,8 @@ function api_firewall_aliases_add() {
                     $address = array($address);
                 }
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 61);
-                $api_resp["message"] = "alias address required";
+                $api_resp["return"] = 4052;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['descr'])) {
@@ -1536,20 +1568,30 @@ function api_firewall_aliases_add() {
                 echo var_dump($detail) . PHP_EOL;
             }
             // Check that our input is valid
-            $err_code = 10;    // Default our error code to 10 as this applies to most checks
             if (!is_string($name)) {
-                $type_err = "alias name must be type string";
+                $api_resp["return"] = 4053;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (!is_string($type)) {
-                $type_err = "alias type must be type string";
+                $api_resp["return"] = 4062;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (!in_array($type, $allowed_alias_types)) {
-                $type_err = "unknown alias type";
-                $err_code = 64;
+                $api_resp["return"] = 4057;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (isset($descr) and !is_string($descr)) {
-                $type_err = "alias descr must be type string";
+                $api_resp["return"] = 4063;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (!is_array($address)) {
-                $type_err = "alias address must be type array";
+                $api_resp["return"] = 4054;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (isset($detail) and !is_array($detail)) {
-                $type_err = "alias detail must be type array";
+                $api_resp["return"] = 4063;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             }
             if (!isset($type_err)) {
                 // Loop through our arrays and ensure the values are valid
@@ -1562,13 +1604,14 @@ function api_firewall_aliases_add() {
                             if (1 <= intval($ae) and intval($ae) <= 65535) {
                                 $address[$a_count] = strval($ae);
                             } else {
-                                $type_err = "port out of range";
-                                $err_code = 8;
-                                break;
+                                $api_resp["return"] = 4065;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             }
                         } else {
-                            $type_err = "alias address contents must be numeric string";
-                            break;
+                            $api_resp["return"] = 4066;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
+                            return $api_resp;
                         }
                     }
                     // Conditionals for alias type 'network'
@@ -1585,32 +1628,33 @@ function api_firewall_aliases_add() {
                                 } elseif (is_ipaddrv6($net_ip)) {
                                     $max_bits = 128;    // Assign our maximum IPv4 bitmask
                                 } else {
-                                    $type_err = "invalid ipv4 or ipv6 network address";
-                                    $err_code = 7;
-                                    break;
+                                    $api_resp["return"] = 4067;
+                                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                    return $api_resp;
                                 }
                                 // Check if our bitmask is numeric and in range
                                 if (is_numeric($bit_mask)) {
                                     if (1 <= intval($bit_mask) and intval($bit_mask) <= $max_bits) {
                                         continue;
                                     } else {
-                                        $type_err = "subnet out of range";
-                                        $err_code = 9;
-                                        break;
+                                        $api_resp["return"] = 4068;
+                                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                        return $api_resp;
                                     }
                                 } else {
-                                    $type_err = "alias address contents must be valid cidr";
-                                    $err_code = 63;
-                                    break;
+                                    $api_resp["return"] = 4069;
+                                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                    return $api_resp;
                                 }
                             } else {
-                                $type_err = "alias address contents must be valid cidr";
-                                $err_code = 63;
-                                break;
+                                $api_resp["return"] = 4069;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             }
                         } else {
-                            $type_err = "alias address contents must be type string";
-                            break;
+                            $api_resp["return"] = 4070;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
+                            return $api_resp;
                         }
                     }
                     // Conditions for alias type 'host'
@@ -1619,8 +1663,9 @@ function api_firewall_aliases_add() {
                         if (is_string($ae)) {
                             $address[$a_count] = sanitize_str($ae);
                         } else {
-                            $type_err = "alias address contents must be type string";
-                            break;
+                            $api_resp["return"] = 4070;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
+                            return $api_resp;
                         }
                     }
                     // Increase our counter
@@ -1629,16 +1674,11 @@ function api_firewall_aliases_add() {
                 // Check each of our alias details
                 foreach ($detail as $de) {
                     if (!is_string($de)) {
-                        $type_err = "alias detail contents must be type string";
-                        break;
+                        $api_resp["return"] = 4071;
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                        return $api_resp;
                     }
                 }
-            }
-            // Return bad request if error
-            if (isset($type_err)) {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => $err_code);
-                $api_resp["message"] = $type_err;
-                return $api_resp;
             }
             // Check our existing aliases
             if (is_array($config["aliases"])) {
@@ -1646,8 +1686,8 @@ function api_firewall_aliases_add() {
                 // Loop through each alias and see if alias already exists
                 foreach ($config["aliases"]["alias"] as $ce) {
                     if ($ce["name"] === $name) {
-                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 65);
-                        $api_resp["message"] = "alias already exists";
+                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 4056);
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
                         return $api_resp;
                     }
                 }
@@ -1669,16 +1709,18 @@ function api_firewall_aliases_add() {
             foreach ($config["aliases"]["alias"] as $se) {
                 if ($se["name"] === $name) {
                     $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                    $api_resp["message"] = "alias added";
+                    $api_resp["message"] = "Successfully added firewall alias";
                     $api_resp["data"] = $se;
                     return $api_resp;
                 }
             }
             // Return error response if our loop did not find a match
-            $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
+            $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -1688,7 +1730,7 @@ function api_firewall_aliases_add() {
 
 function api_firewall_aliases_add_address() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-aliases-edit");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -1699,12 +1741,13 @@ function api_firewall_aliases_add_address() {
     if (api_authorized($req_privs, $read_only_action)) {
         // Check that our HTTP method is POST (CREATE)
         if ($http_method === 'POST') {
+            $api_resp = array("status" => "bad request", "code" => 400);
             if (isset($client_params['name'])) {
                 $name = $client_params['name'];
                 $name = sanitize_str($name);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 60);
-                $api_resp["message"] = "alias name required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4050);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['address'])) {
@@ -1714,8 +1757,8 @@ function api_firewall_aliases_add_address() {
                     $address = array($address);
                 }
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 61);
-                $api_resp["message"] = "alias address required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4052);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['detail'])) {
@@ -1735,13 +1778,18 @@ function api_firewall_aliases_add_address() {
                 echo var_dump($detail) . PHP_EOL;
             }
             // Check that our input is valid
-            $err_code = 10;    // Default our error code to 10 as this applies to most checks
             if (!is_string($name)) {
-                $type_err = "alias name must be type string";
+                $api_resp["return"] = 4053;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (!is_array($address)) {
-                $type_err = "alias address must be type array";
+                $api_resp["return"] = 4054;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (isset($detail) and !is_array($detail)) {
-                $type_err = "alias detail must be type array";
+                $api_resp["return"] = 4064;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             }
             // Loop through our existing firewall entries and check for our requested alias
             $c_count = 0;
@@ -1757,8 +1805,9 @@ function api_firewall_aliases_add_address() {
             }
             // If we could not find an alias, return error
             if (!isset($type)) {
-                $type_err = "alias does not exist";
-                $err_code = 67;
+                $api_resp["return"] = 4055;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             }
             if (!isset($type_err)) {
                 // Loop through our arrays and ensure the values are valid
@@ -1771,13 +1820,14 @@ function api_firewall_aliases_add_address() {
                             if (1 <= intval($ae) and intval($ae) <= 65535) {
                                 $address[$a_count] = strval($ae);
                             } else {
-                                $type_err = "port out of range";
-                                $err_code = 8;
-                                break;
+                                $api_resp["return"] = 4065;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             }
                         } else {
-                            $type_err = "alias address contents must be numeric string";
-                            break;
+                            $api_resp["return"] = 4066;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
+                            return $api_resp;
                         }
                     }
                     // Conditionals for alias type 'network'
@@ -1794,32 +1844,33 @@ function api_firewall_aliases_add_address() {
                                 } elseif (is_ipaddrv6($net_ip)) {
                                     $max_bits = 128;    // Assign our maximum IPv4 bitmask
                                 } else {
-                                    $type_err = "invalid ipv4 or ipv6 network address";
-                                    $err_code = 7;
-                                    break;
+                                    $api_resp["return"] = 4067;
+                                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                    return $api_resp;
                                 }
                                 // Check if our bitmask is numeric and in range
                                 if (is_numeric($bit_mask)) {
                                     if (1 <= intval($bit_mask) and intval($bit_mask) <= $max_bits) {
                                         continue;
                                     } else {
-                                        $type_err = "subnet out of range";
-                                        $err_code = 9;
-                                        break;
+                                        $api_resp["return"] = 4068;
+                                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                        return $api_resp;
                                     }
                                 } else {
-                                    $type_err = "alias address contents must be valid cidr";
-                                    $err_code = 63;
-                                    break;
+                                    $api_resp["return"] = 4069;
+                                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                    return $api_resp;
                                 }
                             } else {
-                                $type_err = "alias address contents must be valid cidr";
-                                $err_code = 63;
-                                break;
+                                $api_resp["return"] = 4069;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             }
                         } else {
-                            $type_err = "alias address contents must be type string";
-                            break;
+                            $api_resp["return"] = 4070;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
+                            return $api_resp;
                         }
                     }
                     // Conditions for alias type 'host'
@@ -1828,8 +1879,9 @@ function api_firewall_aliases_add_address() {
                         if (is_string($ae)) {
                             $address[$a_count] = sanitize_str($ae);
                         } else {
-                            $type_err = "alias address contents must be type string";
-                            break;
+                            $api_resp["return"] = 4070;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
+                            return $api_resp;
                         }
                     }
                     // Increase our counter
@@ -1838,16 +1890,11 @@ function api_firewall_aliases_add_address() {
                 // Check each of our alias details
                 foreach ($detail as $de) {
                     if (!is_string($de)) {
-                        $type_err = "alias detail contents must be type string";
-                        break;
+                        $api_resp["return"] = 4071;
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                        return $api_resp;
                     }
                 }
-            }
-            // Return bad request if error
-            if (isset($type_err)) {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => $err_code);
-                $api_resp["message"] = $type_err;
-                return $api_resp;
             }
             // Add our alias
             $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
@@ -1860,11 +1907,128 @@ function api_firewall_aliases_add_address() {
             send_event("filter reload");    // Ensure our firewall filter is reloaded
             // Loop through each alias and see if our alias was added successfully
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-            $api_resp["message"] = "alias address added";
+            $api_resp["message"] = "Successfully added firewall alias address";
             $api_resp["data"] = $config["aliases"]["alias"][$a_index];
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_firewall_states() {
+    # VARIABLES
+    global $err_lib, $api_resp, $client_params;
+    $read_only_action = true;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-diagnostics-statessummary");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is GET (READ)
+        if ($http_method === 'GET') {
+            $state_array = sort_state_table();
+            if (isset($client_params['search'])) {
+                $search = $client_params['search'];
+                $state_array = api_extended_search($state_array, $search);
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $state_array);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_firewall_states_size() {
+    # VARIABLES
+    global $err_lib, $config, $api_resp, $client_params;
+    $read_only_action = true;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-diagnostics-statessummary");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is GET (READ)
+        if ($http_method === 'GET') {
+            // Check our maximum state table size
+            if (isset($config["system"]["maximumstates"])) {
+                $size_array["maximumstates"] = intval($config["system"]["maximumstates"]);
+            } else {
+                $size_array["maximumstates"] = intval(pfsense_default_state_size());
+            }
+            // Check our current state table size
+            $size_array["currentstates"] = count(sort_state_table());
+            // Check our default state table size
+            $size_array["defaultmaximumstates"] = intval(pfsense_default_state_size());
+            // Allow extended search
+            if (isset($client_params['search'])) {
+                $search = $client_params['search'];
+                $size_array = api_extended_search($size_array, $search);
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $size_array);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_firewall_states_size_modify() {
+    # VARIABLES
+    global $err_lib, $config, $api_resp, $client_params, $client_id;
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system-advanced-firewall");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is GET (READ)
+        if ($http_method === 'POST') {
+            // Check if we set a maximumstates size
+            if (isset($client_params["maximumstates"])) {
+                $maxsize = $client_params["maximumstates"];
+                // Check that our state size is valid
+                if (is_numeric($maxsize) and (10 <= intval($maxsize))) {
+                    $config["system"]["maximumstates"] = $maxsize;
+                } elseif ($maxsize === "default") {
+                    unset($config["system"]["maximumstates"]);
+                } else {
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 4073);
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
+                }
+            } else {
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 4072);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
+            }
+            // Write our state table size
+            $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
+            $change_note = " Modified firewall state table size via API";    // Add a change note
+            write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+            filter_configure();    // Update our firewall filter
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+            $api_resp["message"] = "Successfully modified firewall state table size";
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -1874,7 +2038,7 @@ function api_firewall_aliases_add_address() {
 
 function api_system_config() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-diagnostics-backup-restore", "page-diagnostics-command");    // Allowed privs
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -1896,7 +2060,39 @@ function api_system_config() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $config_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_system_api() {
+    # VARIABLES
+    global $err_lib, $api_resp, $client_params;
+    $read_only_action = true;    // Set whether this action requires read only access
+    $req_privs = array("page-all");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $api_array = array();    // Init our return array
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is GET (READ)
+        if ($http_method === 'GET') {
+            // Check that we have a configuration
+            $api_array = get_api_configuration()[1];
+            if (isset($client_params['search'])) {
+                $search = $client_params['search'];
+                $api_array = api_extended_search($api_array, $search);
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $api_array);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -1906,7 +2102,7 @@ function api_system_config() {
 
 function api_system_version() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-dashboard-widgets", "page-diagnostics-command");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -1955,11 +2151,13 @@ function api_system_version() {
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $ver_data);
                 return $api_resp;
             } else {
-                $api_resp = array("status" => "not found", "code" => 404, "return" => 6, "message" => "file not found");
+                $api_resp = array("status" => "not found", "code" => 404, "return" => 8);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -1969,7 +2167,7 @@ function api_system_version() {
 
 function api_system_hostname() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system");    // Allowed privs
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -1995,7 +2193,8 @@ function api_system_hostname() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $host_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -2005,7 +2204,7 @@ function api_system_hostname() {
 
 function api_system_hostname_modify() {
     # VARIABLES
-    global $config, $api_resp, $client_params, $client_id;
+    global $err_lib, $config, $api_resp, $client_params, $client_id;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -2019,8 +2218,8 @@ function api_system_hostname_modify() {
                 $hostname = trim($hostname);
                 // Check if our hostname is valid
                 if (!is_hostname($hostname) or !is_unqualified_hostname($hostname)) {
-                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 170);
-                    $api_resp["message"] = "invalid hostname";
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 1000);
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                     return $api_resp;
                 } else {
                     $config["system"]["hostname"] = $hostname;
@@ -2031,8 +2230,8 @@ function api_system_hostname_modify() {
                 $domain = trim($domain);
                 // Check if our hostname is valid
                 if (!is_domain($domain)) {
-                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 171);
-                    $api_resp["message"] = "invalid domain";
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 1001);
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                     return $api_resp;
                 } else {
                     $config["system"]["domain"] = $domain;
@@ -2055,11 +2254,13 @@ function api_system_hostname_modify() {
                 filter_configure();
             }
             // Print our JSON response
-            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "system hostname modified");
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+            $api_resp["message"] = "Successfully modified system hostname";
             $api_resp["data"] = array("hostname" => $config["system"]["hostname"], "domain" => $config["system"]["domain"]);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -2069,7 +2270,7 @@ function api_system_hostname_modify() {
 
 function api_system_certificates() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-certmanager");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -2091,7 +2292,8 @@ function api_system_certificates() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $crt_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -2101,7 +2303,7 @@ function api_system_certificates() {
 
 function api_system_certificates_add() {
     # VARIABLES
-    global $config, $api_resp, $client_params, $client_id;
+    global $err_lib, $config, $api_resp, $client_params, $client_id;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-certmanager");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -2114,8 +2316,8 @@ function api_system_certificates_add() {
             if (isset($client_params['descr'])) {
                 $descr = $client_params['descr'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 182);
-                $api_resp["message"] = "certificate description required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 1002);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['method'])) {
@@ -2126,21 +2328,13 @@ function api_system_certificates_add() {
                     $key = base64_decode($client_params["key"]);
                     $active = $client_params["active"];
                     // Check if our certificate and key are valid
-                    if (empty($cert)) {
-                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 180);
-                        $api_resp["message"] = "invalid certificate";
-                        return $api_resp;
-                    } elseif (empty($key)) {
-                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 181);
-                        $api_resp["message"] = "invalid certificate key";
-                        return $api_resp;
-                    } elseif (!strstr($cert, "BEGIN CERTIFICATE") || !strstr($cert, "END CERTIFICATE")) {
-                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 180);
-                        $api_resp["message"] = "invalid certificate";
+                    if (!strstr($cert, "BEGIN CERTIFICATE") || !strstr($cert, "END CERTIFICATE")) {
+                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 1003);
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
                         return $api_resp;
                     } elseif (cert_get_publickey($cert, false) != cert_get_publickey($key, false, 'prv')) {
-                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 181);
-                        $api_resp["message"] = "invalid certificate key";
+                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 1004);
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
                         return $api_resp;
                     }
                     // Populate our configuration array
@@ -2164,11 +2358,13 @@ function api_system_certificates_add() {
                 restart_webconfigurator();
             }
             // Print our JSON response
-            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "certificate added");
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+            $api_resp["message"] = "Successfully added system certificate";
             $api_resp["data"] = $cert_ent;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -2178,7 +2374,7 @@ function api_system_certificates_add() {
 
 function api_system_certificates_delete() {
     # VARIABLES
-    global $config, $api_resp, $client_params, $client_id;
+    global $err_lib, $config, $api_resp, $client_params, $client_id;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-certmanager");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -2220,17 +2416,19 @@ function api_system_certificates_delete() {
                     unset($config["cert"][$del_id]);    // Delete our cert
                     write_config(sprintf(gettext($change_note)));    // Apply our configuration change
                 } else {
-                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 184);
-                    $api_resp["message"] = "certificate id in use";
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 1005);
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                     return $api_resp;
                 }
             }
             // Print our JSON response
-            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "certificate deleted");
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+            $api_resp["message"] = "Successfully deleted system certificate";
             $api_resp["data"] = $cert_del;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -2240,34 +2438,22 @@ function api_system_certificates_delete() {
 
 function api_system_arp() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-diagnostics-arptable");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
-    $arp_cmd = "arp -an";    // Assign the command which reads our ARP table
-    $arp_array = array();    // Init our ARP array
     # RUN TIME
     // Check that client is authenticated and authorized
     if (api_authorized($req_privs, $read_only_action)) {
         // Check that our HTTP method is GET (READ)
         if ($http_method === 'GET') {
-            exec($arp_cmd, $arp_array);    // Output our ARP table into an array
-            $arp_data = array();
-            foreach ($arp_array as $arp_line) {
-                $elements = explode(' ', $arp_line, 7);
-                $arp_entry = array();
-                $arp_entry['ip'] = trim(str_replace(array('(', ')'), '', $elements[1]));
-                $arp_entry['mac'] = trim($elements[3]);
-                $arp_entry['interface'] = trim($elements[5]);
-                $arp_entry['status'] = trim(substr($elements[6], 0, strrpos($elements[6], ' ')));
-                $arp_entry['linktype'] = trim(str_replace(array('[', ']'), '', strrchr($elements[6], ' ')));
-                $arp_data[] = $arp_entry;
-            }
+            $arp_data = get_arp_table();
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $arp_data);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -2277,12 +2463,11 @@ function api_system_arp() {
 
 function api_system_arp_delete() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_params;
+    global $err_lib, $api_resp, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-diagnostics-arptable");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
-    $arp_cmd = "arp -d ";    // Assign the command which reads our ARP table
-    $arp_array = array();    // Init our ARP array
+    $arp_cmd = "arp -d ";    // Assign the command which deletes our ARP table value
     # RUN TIME
     // Check that client is authenticated and authorized
     if (api_authorized($req_privs, $read_only_action)) {
@@ -2292,16 +2477,20 @@ function api_system_arp_delete() {
                 $ip = $client_params['ip'];
                 $ip = trim($ip);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 20);
-                $api_resp["message"] = "ip required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 1006);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
+            $del_ent = get_arp_entry("ip", $ip);    // Save our deleted ARP config
             exec($arp_cmd.$ip, $arp_del);    // Delete our ARP address
             // Print our JSON response
-            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "arp entry deleted");
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+            $api_resp["message"] = "Successfully deleted system ARP entry";
+            $api_resp["data"] = $del_ent;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -2311,7 +2500,7 @@ function api_system_arp_delete() {
 
 function api_users() {
     # VARIABLES
-    global $config, $userindex, $api_resp, $client_params;
+    global $err_lib, $config, $userindex, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-usermanager");    // Array of privileges allowing this action
     $userindex = index_users();    // Index our users
@@ -2330,44 +2519,7 @@ function api_users() {
             $search_failed = false;
             // If client requests an extended search
             if (isset($search)) {
-                if (is_array($search)) {
-                    $target_item = end($search);    // Save our last array item
-                    // Loop through each attribute in the search list and check if it exists
-                    foreach ($search as &$df) {
-                        if (array_key_exists($df, $base_data)) {
-                            // If this attribute is our target item, format and return the value
-                            if ($df === $target_item) {
-                                if (!is_array($base_data[$df])) {
-                                    $base_data = array($df => $base_data[$df]);
-                                } else {
-                                    $base_data = $base_data[$df];
-                                }
-                                break;
-                            } else {
-                                // Check if this item is an array, if so search the nested array. Otherwise failed
-                                if (is_array($base_data[$df])) {
-                                    $base_data = $base_data[$df];
-                                } else {
-                                    $search_failed = true;
-                                    break;
-                                }
-                            }
-                        } else {
-                            $search_failed = true;
-                            break;
-                        }
-                    }
-                    // Check if we failed to find our search attributes
-                    if ($search_failed === true) {
-                        $api_resp = array("status" => "not found", "code" => 404, "return" => 5);
-                        $api_resp["message"] = "search attribute not found";
-                        return $api_resp;
-                    }
-                } else {
-                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 24);
-                    $api_resp["message"] = "search must be array";
-                    return $api_resp;
-                }
+                $base_data = api_extended_search($base_data, $search);
             }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
@@ -2378,7 +2530,8 @@ function api_users() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $base_data);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -2388,13 +2541,14 @@ function api_users() {
 
 function api_users_delete() {
     # VARIABLES
-    global $g, $config, $userindex, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $userindex, $api_resp, $client_id, $client_params;
     $logging_level = LOG_WARNING;    // Set our log level
     $logging_prefix = gettext("Local User Database");    // Set our logging prefix
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-usermanager");    // Array of privileges allowing this action
     $userindex = index_users();    // Index our users
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $del_user = [];    // Init our deleted user config array
     # RUN TIME
     // Check that client is authenticated and authorized
     if (api_authorized($req_privs, $read_only_action)) {
@@ -2405,14 +2559,14 @@ function api_users_delete() {
                 $username = $client_params['username'];
                 $username = trim($username);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 20);
-                $api_resp["message"] = "username required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5000);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Check if our user already exists, if not exit on non-zero
             if (!array_key_exists($username, $userindex)) {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 23);
-                $api_resp["message"] = "user does not exist";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5001);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -2425,20 +2579,25 @@ function api_users_delete() {
             $change_note = " Deleted user `" . $username . "' via API";    // Add a change note
             $index_id = $userindex[$username];    // Save our user's index ID number
             local_user_del($config["system"]["user"][$index_id]);    // Delete our user on the backend
+            $del_user = $config['system']['user'][$index_id];    // Save our deleted user config
             unset($config['system']['user'][$index_id]);    // Unset our user from config
             $config['system']['user'] = array_values($config['system']['user']);    // Reindex our users
             write_config(sprintf(gettext($change_note)));    // Write our new config
             //--Check that our changes were successful-----------
             $userindex = index_users();    // Update our user index
             if (!array_key_exists($username, $userindex)) {
-                $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "user deleted");
+                $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+                $api_resp["message"] = "Successfully deleted user";
+                $api_resp["data"] = $del_user;
                 return $api_resp;
             } else {
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process fail");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -2448,7 +2607,7 @@ function api_users_delete() {
 
 function api_users_delete_privs() {
     # VARIABLES
-    global $g, $config, $priv_list, $userindex, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $priv_list, $userindex, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set if function requires read only access
     $userindex = index_users();    // Index our users
     $req_privs = array("page-all", "page-system-usermanager-addprivs");    // Array of privileges allowing this action
@@ -2462,23 +2621,23 @@ function api_users_delete_privs() {
                 $username = $client_params['username'];
                 $username = trim($username);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 20);
-                $api_resp["message"] = "username required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5000);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['priv'])) {
                 $del_priv = $client_params['priv'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 25);
-                $api_resp["message"] = "priv required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5004);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Check if our user already exists, if so exit on non-zero
             $user_config =& getUserEntry($username);
             $user_privs = get_user_privileges($user_config);
             if (!array_key_exists("uid", $user_config)) {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 23);
-                $api_resp["message"] = "user does not exist";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5001);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Ensure our new priv is array, if it is a string create an array containing the string
@@ -2489,8 +2648,8 @@ function api_users_delete_privs() {
                 // Loop through our new priv list and check that the privs are valid
                 foreach ($del_priv as $dp) {
                     if (!array_key_exists($dp, $priv_list)) {
-                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 27);
-                        $api_resp["message"] = "unknown priv `" . $dp . "`";
+                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 5006);
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
                         return $api_resp;
                     }
                     if (in_array($dp, $user_config["priv"])) {
@@ -2498,8 +2657,8 @@ function api_users_delete_privs() {
                     }
                 }
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 26);
-                $api_resp["message"] = "priv must be list or string";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5005);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -2523,16 +2682,20 @@ function api_users_delete_privs() {
             $userindex = index_users();    // Update our user index
             $user_config =& getUserEntry($username);    // Update our user config
             $user_privs = get_user_privileges($user_config);    // Update our user privs
+            // Check if our output is expected
             if ($user_config["priv"] === $user_privs) {
-                $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "priv deleted");
-                $api_resp["data"] = $user_config["priv"];
+                $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+                $api_resp["message"] = "Successfully deleted user privilege";
+                $api_resp["data"] = $del_priv;
                 return $api_resp;
             } else {
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -2542,7 +2705,7 @@ function api_users_delete_privs() {
 
 function api_users_delete_groups() {
     # VARIABLES
-    global $g, $config, $userindex, $groupindex, $api_resp, $client_id, $client_params;
+    global $err_lib, $userindex, $groupindex, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-usermanager-addprivs", "page-system-groupmanager-");   // Allowed privs
     $userindex = index_users();    // Index our users
@@ -2557,21 +2720,21 @@ function api_users_delete_groups() {
                 $username = $client_params['username'];
                 $username = trim($username);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 20);
-                $api_resp["message"] = "username required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5000);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['group'])) {
                 $del_groups = $client_params['group'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 25);
-                $api_resp["message"] = "group required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5007);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Check if our user already exists, if so exit on non-zero
             if (!array_key_exists($username, $userindex)) {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 23);
-                $api_resp["message"] = "user does not exist";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5001);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Ensure our new priv is array, if it is a string create an array containing the string
@@ -2585,8 +2748,8 @@ function api_users_delete_groups() {
                 // Loop through our del group list and ensure it is valid
                 foreach ($del_groups as $dg) {
                     if (!array_key_exists($dg, $groupindex)) {
-                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 30);
-                        $api_resp["message"] = "unknown group `" . $dg . "`";
+                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 5008);
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
                         return $api_resp;
                     }
                     if (in_array($dg, $user_groups)) {
@@ -2594,8 +2757,8 @@ function api_users_delete_groups() {
                     }
                 }
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 29);
-                $api_resp["message"] = "group must be list or string";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5009);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -2618,14 +2781,18 @@ function api_users_delete_groups() {
             $user_config = getUserEntry($username);
             $user_groups = local_user_get_groups($user_config, true);
             if (array_diff($del_groups, $user_groups)) {
-                $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "groups deleted");
+                $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+                $api_resp["message"] = "Successfully deleted group membership";
+                $api_resp["data"] = $del_groups;
                 return $api_resp;
             } else {
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process fail");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -2635,7 +2802,7 @@ function api_users_delete_groups() {
 
 function api_users_modify() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_id, $client_params;
+    global $err_lib, $userindex, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-usermanager");    // Array of privileges allowing this action
     $userindex = index_users();    // Index our users
@@ -2649,7 +2816,8 @@ function api_users_modify() {
                 $username = $client_params['username'];
                 $username = trim($username);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 20, "message" => "username required");
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5000);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['password'])) {
@@ -2679,7 +2847,8 @@ function api_users_modify() {
             // Check that our user already exists
             $user_config =& getUserEntry($username);
             if (!array_key_exists("uid", $user_config)) {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 23, "message" => "user does not exist");
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5001);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -2733,15 +2902,18 @@ function api_users_modify() {
             $userindex = index_users();    // Update our user index
             $user_config =& getUserEntry($username);    // Update our user config
             if ($user_config !== $prev_config) {
-                $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "user modified");
+                $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+                $api_resp["message"] = "Successfully modified user";
                 $api_resp["data"] = $user_config;
                 return $api_resp;
             } else {
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process fail");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -2751,7 +2923,7 @@ function api_users_modify() {
 
 function api_users_add() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $userindex, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-usermanager");    // Array of privileges allowing this action
     $userindex = index_users();    // Index our users
@@ -2766,19 +2938,19 @@ function api_users_add() {
                 $username = $client_params['username'];
                 $username = trim($username);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 20);
-                $api_resp["message"] = "username required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5000);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['password'])) {
                 $password = $client_params['password'];
                 $password = trim($password);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 21);
-                $api_resp["message"] = "password required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5003);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
-            if (array_key_exists("disabled", $client_params)) {
+            if ($client_params["disabled"] === true) {
                 $disabled = true;
             }
             if (isset($client_params['descr'])) {
@@ -2802,8 +2974,8 @@ function api_users_add() {
             // Check if our user already exists, if so exit on non-zero
             $user_config =& getUserEntry($username);
             if (array_key_exists("uid", $user_config)) {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 22);
-                $api_resp["message"] = "user already exists";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5002);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -2855,15 +3027,18 @@ function api_users_add() {
             $user_config =& getUserEntry($username);    // Update our user config
             // Check that our user is now in the user configuration
             if (array_key_exists("uid", $user_config)) {
-                $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "user added");
+                $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+                $api_resp["message"] = "Successfully added user";
                 $api_resp["data"] = $user_config;
                 return $api_resp;
             } else {
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -2873,7 +3048,7 @@ function api_users_add() {
 
 function api_users_add_privs() {
     # VARIABLES
-    global $g, $config, $priv_list, $userindex, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $priv_list, $userindex, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-usermanager-addprivs");    // Array of privileges allowing this action
     $userindex = index_users();    // Index our users
@@ -2887,23 +3062,23 @@ function api_users_add_privs() {
                 $username = $client_params['username'];
                 $username = trim($username);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 20);
-                $api_resp["message"] = "username required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5000);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['priv'])) {
                 $new_priv = $client_params['priv'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 25);
-                $api_resp["message"] = "priv required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5004);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Check if our user already exists, if so exit on non-zero
             $user_config =& getUserEntry($username);
             $user_privs = get_user_privileges($user_config);
             if (!array_key_exists("uid", $user_config)) {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 23);
-                $api_resp["message"] = "user does not exist";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5001);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Ensure our new priv is array, if it is a string create an array containing the string
@@ -2914,8 +3089,8 @@ function api_users_add_privs() {
                 // Loop through our new priv list and check that the privs are valid
                 foreach ($new_priv as $np) {
                     if (!array_key_exists($np, $priv_list)) {
-                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 27);
-                        $api_resp["message"] = "unknown priv `" . $np . "`";
+                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 5006);
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
                         return $api_resp;
                     }
                     if (in_array($np, $user_privs)) {
@@ -2923,8 +3098,8 @@ function api_users_add_privs() {
                     }
                 }
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 26);
-                $api_resp["message"] = "priv must be list or string";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5005);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -2950,15 +3125,18 @@ function api_users_add_privs() {
             $user_config =& getUserEntry($username);    // Update our user config
             $user_privs = get_user_privileges($user_config);    // Update our user privs
             if ($user_config["priv"] === $user_privs) {
-                $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "priv added");
-                $api_resp["data"] = $user_privs;
+                $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+                $api_resp["message"] = "Successfully added user privilege";
+                $api_resp["data"] = $new_priv;
                 return $api_resp;
             } else {
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process fail");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -2968,7 +3146,7 @@ function api_users_add_privs() {
 
 function api_users_add_groups() {
     # VARIABLES
-    global $g, $config, $userindex, $groupindex, $api_resp, $client_id, $client_params;
+    global $err_lib, $userindex, $groupindex, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-usermanager-addprivs", "page-system-groupmanager-");   // Allowed privs
     $userindex = index_users();    // Index our users
@@ -2983,23 +3161,22 @@ function api_users_add_groups() {
                 $username = $client_params['username'];
                 $username = trim($username);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 20);
-                $api_resp["message"] = "username required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5000);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['group'])) {
                 $new_groups = $client_params['group'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 25);
-                $api_resp["message"] = "group required";
-
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5007);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
 
             }
             // Check if our user already exists, if so exit on non-zero
             if (!array_key_exists($username, $userindex)) {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 23);
-                $api_resp["message"] = "user does not exist";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5001);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Ensure our new priv is array, if it is a string create an array containing the string
@@ -3013,8 +3190,8 @@ function api_users_add_groups() {
                 // Loop through our new priv list and check that the privs are valid
                 foreach ($new_groups as $ng) {
                     if (!array_key_exists($ng, $groupindex)) {
-                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 30);
-                        $api_resp["message"] = "unknown group `" . $ng . "`";
+                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 5008);
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
                         return $api_resp;
                     }
                     if (in_array($ng, $user_groups)) {
@@ -3024,8 +3201,8 @@ function api_users_add_groups() {
                 // Add our new groups to our existing groups
                 $new_groups = array_merge($user_groups, $new_groups);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 29);
-                $api_resp["message"] = "group must be list or string";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5009);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -3049,14 +3226,18 @@ function api_users_add_groups() {
             $user_config = getUserEntry($username);
             $user_groups = local_user_get_groups($user_config, true);
             if (!array_diff($new_groups, $user_groups)) {
-                $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "groups added");
+                $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+                $api_resp["message"] = "Successfully added group memberships";
+                $api_resp["data"] = $new_groups;
                 return $api_resp;
             } else {
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process fail");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3066,7 +3247,7 @@ function api_users_add_groups() {
 
 function api_users_authservers() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-authservers");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3088,7 +3269,8 @@ function api_users_authservers() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $as_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3098,7 +3280,7 @@ function api_users_authservers() {
 
 function api_users_authservers_delete() {
     # VARIABLES
-    global $config, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-user-authserver");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3111,8 +3293,8 @@ function api_users_authservers_delete() {
             if (isset($client_params['name'])) {
                 $name = $client_params['name'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 190);
-                $api_resp["message"] = "authentication server name required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5010);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -3135,11 +3317,13 @@ function api_users_authservers_delete() {
             $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
             $change_note = " Deleted authentication server via API";    // Add a change note
             write_config(sprintf(gettext($change_note)));    // Apply our configuration change
-            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "data" => $del_server);
-            $api_resp["message"] = "authentication server deleted";
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+            $api_resp["message"] = "Successfully deleted user authentication server";
+            $api_resp["data"] = $del_server;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3149,7 +3333,7 @@ function api_users_authservers_delete() {
 
 function api_users_authservers_radius() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-authservers");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3175,7 +3359,8 @@ function api_users_authservers_radius() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $as_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3185,7 +3370,7 @@ function api_users_authservers_radius() {
 
 function api_users_authservers_radius_delete() {
     # VARIABLES
-    global $config, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-user-authserver");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3198,8 +3383,8 @@ function api_users_authservers_radius_delete() {
             if (isset($client_params['name'])) {
                 $name = $client_params['name'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 190);
-                $api_resp["message"] = "authentication server name required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5010);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -3222,11 +3407,13 @@ function api_users_authservers_radius_delete() {
             $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
             $change_note = " Deleted authentication server via API";    // Add a change note
             write_config(sprintf(gettext($change_note)));    // Apply our configuration change
-            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "data" => $del_server);
-            $api_resp["message"] = "radius authentication server deleted";
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+            $api_resp["message"] = "Successfully deleted RADIUS authentication server";
+            $api_resp["data"] = $del_server;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3236,7 +3423,7 @@ function api_users_authservers_radius_delete() {
 
 function api_users_authservers_ldap() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-authservers");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3262,7 +3449,8 @@ function api_users_authservers_ldap() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $as_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3272,7 +3460,7 @@ function api_users_authservers_ldap() {
 
 function api_users_authservers_ldap_add() {
     # VARIABLES
-    global $config, $api_resp, $client_id, $client_params, $pf_ver_num;
+    global $err_lib, $config, $api_resp, $client_id, $client_params, $pf_ver_num;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-user-authserver");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3286,8 +3474,8 @@ function api_users_authservers_ldap_add() {
             if (isset($client_params['name'])) {
                 $ldap_ent["name"] = sanitize_str($client_params['name']);
                 if (is_authentication_server($ldap_ent["name"])) {
-                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 190);
-                    $api_resp["message"] = "authentication server already exists";
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 5010);
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                     return $api_resp;
                 }
             } else {
@@ -3305,26 +3493,26 @@ function api_users_authservers_ldap_add() {
                 $ldap_ent["host"] = $client_params['host'];
                 // Check if our hostname is valid
                 if (!is_hostname($ldap_ent["host"]) and !is_ipaddrv4($ldap_ent["host"])) {
-                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 191);
-                    $api_resp["message"] = "invalid ldap hostname or ip";
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 5012);
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                     return $api_resp;
                 }
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 190);
-                $api_resp["message"] = "ldap hostname or ip required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5011);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (($client_params['ldap_port'])) {
                 $ldap_ent["ldap_port"] = strval($client_params['ldap_port']);
                 // Check if our hostname is valid
                 if (!is_port($ldap_ent["ldap_port"])) {
-                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 193);
-                    $api_resp["message"] = "ldap port out of range";
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 5014);
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                     return $api_resp;
                 }
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 192);
-                $api_resp["message"] = "ldap port required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5013);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['ldap_urltype'])) {
@@ -3344,14 +3532,14 @@ function api_users_authservers_ldap_add() {
                 }
                 // Check if our URL type is allowed
                 if (!array_key_exists($client_params["ldap_urltype"], $allowed_url_types)) {
-                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 195);
-                    $api_resp["message"] = "invalid ldap url type";
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 5016);
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                     return $api_resp;
                 }
                 $ldap_ent["ldap_urltype"] = $allowed_url_types[$client_params['ldap_urltype']];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 194);
-                $api_resp["message"] = "ldap url type required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5015);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['ldap_protver'])) {
@@ -3359,8 +3547,8 @@ function api_users_authservers_ldap_add() {
                 // Check if our LDAP version is valid
                 $allowed_ldap_ver = array(2, 3);    // Array of allowed LDAP protocol versions
                 if (!in_array($ldap_ent["ldap_protver"], $allowed_ldap_ver)) {
-                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 196);
-                    $api_resp["message"] = "invalid ldap protocol version";
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 5017);
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                     return $api_resp;
                 }
             } else {
@@ -3376,13 +3564,13 @@ function api_users_authservers_ldap_add() {
                 // Check if our LDAP scope is valid
                 $allowed_ldap_scopes = array("one", "subtree");    // Array of allowed LDAP scopes
                 if (!in_array($ldap_ent["ldap_scope"], $allowed_ldap_scopes)) {
-                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 198);
-                    $api_resp["message"] = "invalid ldap search scope";
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 5019);
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                     return $api_resp;
                 }
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 197);
-                $api_resp["message"] = "ldap search scope required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5018);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['ldap_basedn'])) {
@@ -3406,37 +3594,37 @@ function api_users_authservers_ldap_add() {
                 if (isset($client_params['ldap_binddn'])) {
                     $ldap_ent["ldap_binddn"] = strval($client_params['ldap_binddn']);
                 } else {
-                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 199);
-                    $api_resp["message"] = "ldap bind dn required";
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 5020);
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                     return $api_resp;
                 }
                 if (isset($client_params['ldap_bindpw'])) {
                     $ldap_ent["ldap_bindpw"] = strval($client_params['ldap_bindpw']);
                 } else {
-                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 200);
-                    $api_resp["message"] = "ldap bind password required";
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 5021);
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                     return $api_resp;
                 }
             }
             if (isset($client_params['ldap_attr_user'])) {
                 $ldap_ent["ldap_attr_user"] = strval($client_params['ldap_attr_user']);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 201);
-                $api_resp["message"] = "ldap user naming attribute required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5022);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['ldap_attr_group'])) {
                 $ldap_ent["ldap_attr_group"] = strval($client_params['ldap_attr_group']);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 202);
-                $api_resp["message"] = "ldap group naming attribute required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5023);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['ldap_attr_member'])) {
                 $ldap_ent["ldap_attr_member"] = strval($client_params['ldap_attr_member']);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 203);
-                $api_resp["message"] = "ldap group member attribute required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5024);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['ldap_attr_groupobj'])) {
@@ -3504,10 +3692,13 @@ function api_users_authservers_ldap_add() {
                 $config['system']['webgui']['authmode'] = $ldap_ent["name"];    // Add default auth server
                 write_config(sprintf(gettext($change_note)));    // Apply our configuration change
             }
-            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $ldap_ent);
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "");
+            $api_resp["message"] = "Successfully added LDAP authentication server";
+            $api_resp["data"] = $ldap_ent;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3517,7 +3708,7 @@ function api_users_authservers_ldap_add() {
 
 function api_users_authservers_ldap_delete() {
     # VARIABLES
-    global $config, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-user-authserver");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3530,8 +3721,8 @@ function api_users_authservers_ldap_delete() {
             if (isset($client_params['name'])) {
                 $name = $client_params['name'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 190);
-                $api_resp["message"] = "authentication server name required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 5011);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -3555,11 +3746,12 @@ function api_users_authservers_ldap_delete() {
             $change_note = " Deleted authentication server via API";    // Add a change note
             write_config(sprintf(gettext($change_note)));    // Apply our configuration change
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-            $api_resp["message"] = "ldap authentication server deleted";
+            $api_resp["message"] = "Successfully deleted LDAP authentication server";
             $api_resp["data"] = $del_server;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3569,7 +3761,7 @@ function api_users_authservers_ldap_delete() {
 
 function api_routing_gateways() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-gateways");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3591,7 +3783,8 @@ function api_routing_gateways() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $gw_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3601,7 +3794,7 @@ function api_routing_gateways() {
 
 function api_services_ntpd_start() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3630,15 +3823,17 @@ function api_services_ntpd_start() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3648,7 +3843,7 @@ function api_services_ntpd_start() {
 
 function api_services_ntpd_stop() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3677,15 +3872,17 @@ function api_services_ntpd_stop() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3695,7 +3892,7 @@ function api_services_ntpd_stop() {
 
 function api_services_ntpd_restart() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3724,15 +3921,17 @@ function api_services_ntpd_restart() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3742,7 +3941,7 @@ function api_services_ntpd_restart() {
 
 function api_services() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3775,7 +3974,8 @@ function api_services() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $service_list);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3785,7 +3985,7 @@ function api_services() {
 
 function api_services_sshd() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-advanced-admin");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3807,7 +4007,8 @@ function api_services_sshd() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $ssh_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3817,7 +4018,7 @@ function api_services_sshd() {
 
 function api_services_sshd_modify() {
     # VARIABLES
-    global $config, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-advanced-admin");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3836,8 +4037,9 @@ function api_services_sshd_modify() {
                 } elseif ($enable === false) {
                     unset($config["system"]["ssh"]["enable"]);
                 } else {
-                    $api_resp["message"] = "invalid sshd enable value";
-                    $api_resp["return"] = 165;
+                    $api_resp["return"] = 2000;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 }
             }
             if (isset($client_params["sshdkeyonly"])) {
@@ -3850,9 +4052,9 @@ function api_services_sshd_modify() {
                         $config["system"]["ssh"]["sshdkeyonly"] = $sshdkeyonly;
                     }
                 } else {
-                    $err_found = true;
-                    $api_resp["message"] = "invalid sshd key only type";
-                    $api_resp["return"] = 166;
+                    $api_resp["return"] = 2001;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 }
             }
             if (isset($client_params['sshdagentforwarding'])) {
@@ -3862,9 +4064,9 @@ function api_services_sshd_modify() {
                 } elseif ($sshdagentforwarding === false) {
                     unset($config["system"]["ssh"]["sshdagentforwarding"]);
                 } else {
-                    $err_found = true;
-                    $api_resp["message"] = "invalid sshd agent forwarding value";
-                    $api_resp["return"] = 167;
+                    $api_resp["return"] = 2002;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 }
             }
             if (isset($client_params['port'])) {
@@ -3873,9 +4075,9 @@ function api_services_sshd_modify() {
                 if (is_port($port)) {
                     $config["system"]["ssh"]["port"] = $port;
                 } else {
-                    $err_found = true;
-                    $api_resp["message"] = "invalid sshd port value";
-                    $api_resp["return"] = 168;
+                    $api_resp["return"] = 2003;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 }
             }
             // Add debug data if requested
@@ -3889,14 +4091,9 @@ function api_services_sshd_modify() {
                 echo "SSHD PORT:" . PHP_EOL;
                 echo var_dump($port) . PHP_EOL;
             }
-            // Check if we found an error, if so, quit
-            if ($err_found) {
-                http_response_code(400);
-                echo json_encode($api_resp);
-                die();
-            }
+            // Modify our SSHD config
             $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
-            $change_note = " Modified SSHD configuration via API";    // Add a change note
+            $change_note = " Modified sshd configuration via API";    // Add a change note
             write_config(sprintf(gettext($change_note)));    // Apply our configuration change
             // Check that something was changed before altering service
             if (isset($enable) or isset($port) or isset($sshdagentforwarding) or isset($sshdkeyonly)) {
@@ -3909,11 +4106,12 @@ function api_services_sshd_modify() {
             }
             // Loop through each alias and see if our alias was added successfully
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-            $api_resp["message"] = "sshd configuration modified";
+            $api_resp["message"] = "Successfully modified sshd configuration";
             $api_resp["data"] = $config["system"]["ssh"];
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3923,7 +4121,7 @@ function api_services_sshd_modify() {
 
 function api_services_sshd_start() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3952,15 +4150,17 @@ function api_services_sshd_start() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -3970,7 +4170,7 @@ function api_services_sshd_start() {
 
 function api_services_sshd_stop() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3999,15 +4199,17 @@ function api_services_sshd_stop() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4017,7 +4219,7 @@ function api_services_sshd_stop() {
 
 function api_services_sshd_restart() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4046,15 +4248,17 @@ function api_services_sshd_restart() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4064,7 +4268,7 @@ function api_services_sshd_restart() {
 
 function api_services_syslogd_start() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4093,15 +4297,17 @@ function api_services_syslogd_start() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4111,7 +4317,7 @@ function api_services_syslogd_start() {
 
 function api_services_syslogd_stop() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4140,15 +4346,17 @@ function api_services_syslogd_stop() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4158,7 +4366,7 @@ function api_services_syslogd_stop() {
 
 function api_services_syslogd_restart() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4187,15 +4395,17 @@ function api_services_syslogd_restart() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4205,7 +4415,7 @@ function api_services_syslogd_restart() {
 
 function api_services_start() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4229,11 +4439,12 @@ function api_services_start() {
                 }
             }
             // Print our JSON response
-            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "services have been started");
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "Successfully started all services");
             $api_resp["data"] = $services_set;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4243,7 +4454,7 @@ function api_services_start() {
 
 function api_services_stop() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4267,11 +4478,12 @@ function api_services_stop() {
                 }
             }
             // Print our JSON response
-            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "services have been stopped");
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "Successfully stopped all services");
             $api_resp["data"] = $services_set;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4281,7 +4493,7 @@ function api_services_stop() {
 
 function api_services_restart() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4305,11 +4517,12 @@ function api_services_restart() {
                 }
             }
             // Print our JSON response
-            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "services have been restarted");
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "Successfully restarted all services");
             $api_resp["data"] = $services_set;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4319,7 +4532,7 @@ function api_services_restart() {
 
 function api_services_dhcpd_start() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4348,15 +4561,17 @@ function api_services_dhcpd_start() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4366,7 +4581,7 @@ function api_services_dhcpd_start() {
 
 function api_services_dhcpd_stop() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4395,15 +4610,17 @@ function api_services_dhcpd_stop() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4413,7 +4630,7 @@ function api_services_dhcpd_stop() {
 
 function api_services_dhcpd_restart() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4442,15 +4659,17 @@ function api_services_dhcpd_restart() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4460,7 +4679,7 @@ function api_services_dhcpd_restart() {
 
 function api_services_dpinger_start() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4489,15 +4708,17 @@ function api_services_dpinger_start() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4507,7 +4728,7 @@ function api_services_dpinger_start() {
 
 function api_services_dpinger_stop() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4536,15 +4757,17 @@ function api_services_dpinger_stop() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4554,7 +4777,7 @@ function api_services_dpinger_stop() {
 
 function api_services_dpinger_restart() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4583,15 +4806,17 @@ function api_services_dpinger_restart() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4601,7 +4826,7 @@ function api_services_dpinger_restart() {
 
 function api_services_unbound() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-services-dnsresolver");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4622,7 +4847,8 @@ function api_services_unbound() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $unbound_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4632,7 +4858,7 @@ function api_services_unbound() {
 
 function api_services_unbound_delete_hosts() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-services-dnsresolver-edithost");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4796,7 +5022,8 @@ function api_services_unbound_delete_hosts() {
                 return;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -4806,7 +5033,7 @@ function api_services_unbound_delete_hosts() {
 
 function api_services_unbound_modify_hosts() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-services-dnsresolver-edithost");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4832,8 +5059,8 @@ function api_services_unbound_modify_hosts() {
                 $domain = $client_params['domain'];
                 $domain = trim($domain);
             } elseif ($h_mode) {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 41);
-                $api_resp["message"] = "domain required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 2005);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['new_domain'])) {
@@ -4849,8 +5076,8 @@ function api_services_unbound_modify_hosts() {
                 $new_ipaddr = $client_params['new_ip'];
                 $new_ipaddr = trim($new_ipaddr);
             } elseif ($i_mode) {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 7);
-                $api_resp["message"] = "new ip required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 2012);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['descr'])) {
@@ -4896,8 +5123,8 @@ function api_services_unbound_modify_hosts() {
                             $h_count++;
                         }
                     } else {
-                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 7);
-                        $api_resp["message"] = "invalid ip address";
+                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 2011);
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
                         return $api_resp;
                     }
                 } elseif ($h_mode) {
@@ -4911,8 +5138,8 @@ function api_services_unbound_modify_hosts() {
                                     $hosts_conf[$h_count]["domain"] = $new_domain;
                                     $he_updated = true;
                                 } else {
-                                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 43);
-                                    $api_resp["message"] = "host override already exists";
+                                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 2010);
+                                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                                     return $api_resp;
                                 }
                             }
@@ -4922,19 +5149,19 @@ function api_services_unbound_modify_hosts() {
                                     $hosts_conf[$h_count]["host"] = $new_hostname;
                                     $he_updated = true;
                                 } else {
-                                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 43);
-                                    $api_resp["message"] = "host override already exists";
+                                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 2010);
+                                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                                     return $api_resp;
                                 }
                             }
                         } elseif (isset($new_domain)) {
                             if ($hostname === $he["host"] and $domain === $he["domain"]) {
                                 if (!unbound_host_override_exists($he["host"], $new_domain)) {
-                                    $hosts_conf[$h_count]["host"] = $new_hostname;
+                                    $hosts_conf[$h_count]["domain"] = $new_domain;
                                     $he_updated = true;
                                 } else {
-                                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 43);
-                                    $api_resp["message"] = "host override already exists";
+                                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 2010);
+                                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                                     return $api_resp;
                                 }
                             }
@@ -4946,8 +5173,8 @@ function api_services_unbound_modify_hosts() {
                                     $he_updated = true;
                                 }
                             } else {
-                                $api_resp = array("status" => "bad request", "code" => 400, "return" => 7);
-                                $api_resp["message"] = "invalid ip address";
+                                $api_resp = array("status" => "bad request", "code" => 400, "return" => 2011);
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
                                 return $api_resp;
                             }
                         }
@@ -4958,10 +5185,13 @@ function api_services_unbound_modify_hosts() {
                             }
                         }
                         if (isset($aliases)) {
-                            $aliases_fin = unbound_parse_aliases($aliases);    // Parse our aliases
-                            if ($aliases_fin !== "") {
-                                $hosts_conf[$h_count]["aliases"] = $aliases_fin;
-                                $he_updated = true;
+                            // Check if we have more than one
+                            if (count($update_list) <= 1) {
+                                $aliases_fin = unbound_parse_aliases($aliases);    // Parse our aliases
+                                if ($aliases_fin !== "") {
+                                    $hosts_conf[$h_count]["aliases"] = $aliases_fin;
+                                    $he_updated = true;
+                                }
                             }
                         }
                         // Check if our entry was updated, if so add it to our update list
@@ -4984,20 +5214,22 @@ function api_services_unbound_modify_hosts() {
                     system_resolvconf_generate();    // Update resolveconf
                     system_dhcpleases_configure();    // Update DHCPD
                     $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                    $api_resp["message"] = "host override updated";
+                    $api_resp["message"] = "Successfully updated unbound host override";
                     $api_resp["data"] = $update_list;
                     return $api_resp;
                 } else {
-                    $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
+                    $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                     return $api_resp;
                 }
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 44);
-                $api_resp["message"] = "host override does not exist";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 2013);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -5007,7 +5239,7 @@ function api_services_unbound_modify_hosts() {
 
 function api_services_unbound_start() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -5036,15 +5268,17 @@ function api_services_unbound_start() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -5054,54 +5288,7 @@ function api_services_unbound_start() {
 
 function api_services_unbound_stop() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
-    $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
-    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
-    $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
-    $service = $uri_parse[4];    // Save our service name
-    $action = $uri_parse[5];    // Save our action (start, stop, restart)
-    # RUN TIME
-    // Check that client is authenticated and authorized
-    if (api_authorized($req_privs, $read_only_action)) {
-        // Check that our HTTP method is POST (UPDATE)
-        if ($http_method === 'POST') {
-            # Check our aciton
-            if ($action === "start") {
-                $set_service = service_control_start($service, []);    // Start our service
-                $act_str = "started";
-            } elseif ($action === "stop") {
-                $set_service = service_control_stop($service, []);    // Stop our service
-                $act_str = "stopped";
-            } elseif ($action === "restart") {
-                $set_service = service_control_restart($service, []);    // Restart our service
-                $act_str = "restarted";
-            } else {
-                $act_failed = true;
-            }
-            // Check if our action succeeded or failed
-            if (!$act_failed) {
-                // Print our success response
-                $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
-                return $api_resp;
-            } else {
-                // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
-                return $api_resp;
-            }
-        } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
-            return $api_resp;
-        }
-    } else {
-        return $api_resp;
-    }
-}
-
-function api_services_unbound_restart() {
-    # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $api_resp;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -5130,16 +5317,66 @@ function api_services_unbound_restart() {
             if (!$act_failed) {
                 // Print our success response
                 $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                $api_resp["message"] = $service." has been ".$act_str;
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
                 return $api_resp;
-
             } else {
                 // Print our fail response
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 1, "message" => "process failed");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_services_unbound_restart() {
+    # VARIABLES
+    global $err_lib, $api_resp;
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-status-services");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $uri_parse = explode("/", $_SERVER["REQUEST_URI"]);    // Save our URI
+    $service = $uri_parse[4];    // Save our service name
+    $action = $uri_parse[5];    // Save our action (start, stop, restart)
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is POST (UPDATE)
+        if ($http_method === 'POST') {
+            # Check our aciton
+            if ($action === "start") {
+                $set_service = service_control_start($service, []);    // Start our service
+                $act_str = "started";
+            } elseif ($action === "stop") {
+                $set_service = service_control_stop($service, []);    // Stop our service
+                $act_str = "stopped";
+            } elseif ($action === "restart") {
+                $set_service = service_control_restart($service, []);    // Restart our service
+                $act_str = "restarted";
+            } else {
+                $act_failed = true;
+            }
+            // Check if our action succeeded or failed
+            if (!$act_failed) {
+                // Print our success response
+                $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+                $api_resp["message"] = "Successfully ".$act_str." service ".$service;
+                return $api_resp;
+            } else {
+                // Print our fail response
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
+            }
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -5149,7 +5386,7 @@ function api_services_unbound_restart() {
 
 function api_services_unbound_add_hosts() {
     # VARIABLES
-    global $config, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-services-dnsresolver-edithost");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -5166,24 +5403,24 @@ function api_services_unbound_add_hosts() {
                 $hostname = $client_params['host'];
                 $hostname = trim($hostname);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 40);
-                $api_resp["message"] = "hostname required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 2004);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['domain'])) {
                 $domain = $client_params['domain'];
                 $domain = trim($domain);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 41);
-                $api_resp["message"] = "domain required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 2005);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['ip'])) {
                 $ipaddr = $client_params['ip'];
                 $ipaddr = trim($ipaddr);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 42);
-                $api_resp["message"] = "ip required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 2006);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['descr'])) {
@@ -5227,26 +5464,28 @@ function api_services_unbound_add_hosts() {
                         system_resolvconf_generate();    // Update resolveconf
                         system_dhcpleases_configure();    // Update DHCPD
                         $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                        $api_resp["message"] = "host override added";
+                        $api_resp["message"] = "Successfully added unbound host override";
                         $api_resp["data"] = $host_ent;
                         return $api_resp;
                     } else {
-                        $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
+                        $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
                         return $api_resp;
                     }
                 } else {
-                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 7);
-                    $api_resp["message"] = "invalid ip address";
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 2011);
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                     return $api_resp;
                 }
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 43);
-                $api_resp["message"] = "host override already exists";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 2010);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
 
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -5256,7 +5495,7 @@ function api_services_unbound_add_hosts() {
 
 function api_interfaces_vlans() {
     # VARIABLES
-    global $g, $config, $argv, $userindex, $api_resp, $client_params;
+    global $err_lib, $g, $config, $argv, $userindex, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-interfaces-vlan");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -5277,7 +5516,8 @@ function api_interfaces_vlans() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $vlan_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -5287,7 +5527,7 @@ function api_interfaces_vlans() {
 
 function api_interfaces_vlans_delete() {
     # VARIABLES
-    global $g, $config, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-interfaces-vlan-edit");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -5316,8 +5556,8 @@ function api_interfaces_vlans_delete() {
             elseif (isset($client_params['id'])) {
                 $id = $client_params['id'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 11);
-                $api_resp["message"] = "vlan id required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 3048);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Ensure we have a vlanif and id regardless of which input selector was provided
@@ -5340,7 +5580,8 @@ function api_interfaces_vlans_delete() {
             }
             // Check that our interface is not in use currently
             if (convert_real_interface_to_friendly_interface_name($vlan_if)) {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 11, "message" => "interface in use");
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 3049);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Check that we have both our ID and VLAN interface
@@ -5354,11 +5595,13 @@ function api_interfaces_vlans_delete() {
                 write_config(sprintf(gettext($change_note)));    // Apply our configuration change
             }
             // Return our success data
-            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "vlan deleted");
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+            $api_resp["message"] = "Successfully deleted interface VLAN";
             $api_resp["data"] = $del_ent;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -5368,7 +5611,7 @@ function api_interfaces_vlans_delete() {
 
 function api_interfaces_vlans_modify() {
     # VARIABLES
-    global $g, $config, $api_resp, $client_id, $client_params;
+    global $err_lib, $g, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-interfaces-vlan-edit");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -5396,8 +5639,8 @@ function api_interfaces_vlans_modify() {
             elseif (isset($client_params['id'])) {
                 $id = $client_params['id'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 11);
-                $api_resp["message"] = "vlan id required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 3048);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['if'])) {
@@ -5439,41 +5682,35 @@ function api_interfaces_vlans_modify() {
             }
             // Input validation
             $api_resp = array("status" => "bad request", "code" => 400);
-            $err_found = false;
             // Check if our parent interface exists
             if (!array_key_exists($id, $curr_vlans)) {
-                $err_found = true;
-                $api_resp["message"] = "vlan does not exist";
-                $api_resp["return"] = 115;
+                $api_resp["return"] = 3050;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (isset($interface) and !does_interface_exist($interface)) {
-                $err_found = true;
-                $api_resp["message"] = "parent interface does not exist";
-                $api_resp["return"] = 11;
+                $api_resp["return"] = 3051;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (isset($tag) and (1 > $tag or $tag > 4096)) {
-                $err_found = true;
-                $api_resp["message"] = "vlan tag out of range";
-                $api_resp["return"] = 111;
+                $api_resp["return"] = 3052;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (isset($pcp) and (0 > $pcp or $pcp > 7)) {
-                $err_found = true;
-                $api_resp["message"] = "vlan priority out of range";
-                $api_resp["return"] = 112;
+                $api_resp["return"] = 3053;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             }
             // Check if our VLAN is already in use
-            if (!$err_found and is_array($curr_vlans)) {
+            if (is_array($curr_vlans)) {
                 if (isset($interface) and isset($tag)) {
                     foreach ($curr_vlans as $vle) {
                         if ($interface === $vle["if"] and $str_tag === $vle["tag"]) {
-                            $err_found = true;
-                            $api_resp["message"] = "vlan already exists for this interface";
-                            $api_resp["return"] = 113;
-                            break;
+                            $api_resp["return"] = 3054;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
+                            return $api_resp;
                         }
                     }
                 }
-            }
-            // Return error if input validation failed
-            if ($err_found) {
-                return $api_resp;
             }
             // Modify our VLAN
             $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
@@ -5512,11 +5749,12 @@ function api_interfaces_vlans_modify() {
             }
             // Return success
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-            $api_resp["message"] = "vlan modified";
+            $api_resp["message"] = "Successfully modified interface VLAN";
             $api_resp["data"] = $vlan_ent;
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -5526,7 +5764,7 @@ function api_interfaces_vlans_modify() {
 
 function api_interfaces_vlans_add() {
     # VARIABLES
-    global $g, $config, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-interfaces-vlan-edit");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -5551,8 +5789,8 @@ function api_interfaces_vlans_add() {
             if (isset($client_params['if'])) {
                 $interface = $client_params['if'];
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 11);
-                $api_resp["message"] = "parent interface required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 3055);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['tag'])) {
@@ -5560,8 +5798,8 @@ function api_interfaces_vlans_add() {
                 $tag = intval(trim($tag));
                 $str_tag = strval($tag);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 110);
-                $api_resp["message"] = "vlan tag required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 3048);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             if (isset($client_params['pcp'])) {
@@ -5585,35 +5823,29 @@ function api_interfaces_vlans_add() {
             }
             // Input validation
             $api_resp = array("status" => "bad request", "code" => 400);
-            $err_found = false;
             // Check if our parent interface exists
             if (!does_interface_exist($interface)) {
-                $err_found = true;
-                $api_resp["message"] = "parent interface does not exist";
-                $api_resp["return"] = 11;
+                $api_resp["return"] = 3051;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (1 > $tag or $tag > 4096) {
-                $err_found = true;
-                $api_resp["message"] = "vlan tag out of range";
-                $api_resp["return"] = 111;
+                $api_resp["return"] = 3052;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             } elseif (0 > $pcp or $pcp > 7) {
-                $err_found = true;
-                $api_resp["message"] = "vlan priority out of range";
-                $api_resp["return"] = 112;
+                $api_resp["return"] = 3053;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             }
             // Check if our VLAN is already in use
-            if (!$err_found and is_array($curr_vlans)) {
+            if (is_array($curr_vlans)) {
                 foreach ($curr_vlans as $vle) {
                     if ($interface === $vle["if"] and $str_tag === $vle["tag"]) {
-                        $err_found = true;
-                        $api_resp["message"] = "vlan already exists for this interface";
-                        $api_resp["return"] = 113;
-                        break;
+                        $api_resp["return"] = 3054;
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                        return $api_resp;
                     }
                 }
-            }
-            // Return error if input validation failed
-            if ($err_found) {
-                return $api_resp;
             }
             // Add our VLAN
             $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
@@ -5632,16 +5864,18 @@ function api_interfaces_vlans_add() {
             foreach ($config["vlans"]["vlan"] as $se) {
                 if ($interface === $se["if"] and $str_tag === $se["tag"]) {
                     $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
-                    $api_resp["message"] = "vlan added";
+                    $api_resp["message"] = "Successfully added interface VLAN";
                     $api_resp["data"] = $se;
                     return $api_resp;
                 }
             }
             // Return error response if our loop did not find a match
-            $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
+            $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -5651,7 +5885,7 @@ function api_interfaces_vlans_add() {
 
 function api_interfaces_delete() {
     # VARIABLES
-    global $config, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-interfaces-assignnetworkports");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -5664,13 +5898,13 @@ function api_interfaces_delete() {
                 $interface = $client_params['if'];
                 $interface = get_pfsense_if_id($interface);
                 if (empty($interface)) {
-                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 120);
-                    $api_resp["message"] = "interface does not exist";
+                    $api_resp = array("status" => "bad request", "code" => 400, "return" => 3000);
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
                     return $api_resp;
                 }
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 11);
-                $api_resp["message"] = "interface required";
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 3002);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
             // Add debug data if requested
@@ -5687,11 +5921,13 @@ function api_interfaces_delete() {
                 $api_resp["data"] = $curr_config;
                 return $api_resp;
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 121, "message" => $del_stat["msg"]);
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => $del_stat["msg"]);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -5701,7 +5937,7 @@ function api_interfaces_delete() {
 
 function api_interfaces() {
     # VARIABLES
-    global $config, $api_resp, $client_params;
+    global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-interfaces-assignnetworkports");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -5719,7 +5955,8 @@ function api_interfaces() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $interface_array);
             return $api_resp;
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
@@ -5729,7 +5966,7 @@ function api_interfaces() {
 
 function api_interfaces_add() {
     # VARIABLES
-    global $g, $config, $api_resp, $client_id, $client_params;
+    global $err_lib, $g, $config, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-interfaces");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -5743,71 +5980,77 @@ function api_interfaces_add() {
     if (api_authorized($req_privs, $read_only_action)) {
         // Check that our HTTP method is POST (CREATE)
         if ($http_method === 'POST') {
-            $err_found = false;
             $api_resp = array("status" => "bad request", "code" => 400);
             // Get our requested physical interface
             if (isset($client_params["if"])) {
                 $interface = trim($client_params["if"]);
                 // Check that our interface exists and is not in use
                 if (!array_key_exists($interface, $if_list)) {
-                    $err_found = true;
-                    $api_resp = $api_resp + array("return" => 120, "message" => "interface does not exist");
+                    $api_resp["return"] = 3000;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 } elseif (isset($if_list[$interface]["in_use"])) {
-                    $err_found = true;
-                    $api_resp = $api_resp + array("return" => 121, "message" => "interface already in use");
+                    $api_resp["return"] = 3001;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 }
                 $if_ent[$next_if]["if"] = $interface;
             } else {
-                $err_found = true;
-                $api_resp = $api_resp + array("return" => 11, "message" => "interface id required");
+                $api_resp["return"] = 3002;
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             }
             // Check for our enable value
-            if (!$err_found and isset($client_params["enable"])) {
+            if (isset($client_params["enable"])) {
                 $enable = true;
                 $if_ent[$next_if]["enable"] = "";
             }
             // Check for our MAC address value
-            if (!$err_found and isset($client_params["spoofmac"])) {
+            if (isset($client_params["spoofmac"])) {
                 $mac_addr = $client_params["spoofmac"];
                 // Check if mac addr is valid
                 if (is_macaddr($mac_addr)) {
                     $if_ent[$next_if]["spoofmac"] = $mac_addr;
                 } else {
-                    $err_found = true;
-                    $api_resp = $api_resp + array("return" => 16, "message" => "invalid mac address");
+                    $api_resp["return"] = 3003;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 }
             }
             // Check for our MTU value
-            if (!$err_found and isset($client_params["mtu"])) {
+            if (isset($client_params["mtu"])) {
                 $mtu = intval($client_params["mtu"]);
                 // Check if MTU is within range
                 if (1280 > $mtu or $mtu > 8192) {
-                    $err_found = true;
-                    $api_resp = $api_resp + array("return" => 122, "message" => "mtu out of range");
+                    $api_resp["return"] = 3004;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 } elseif ($if_list[$interface]["is_vlan"]) {
                     // Check if interface is VLAN and that it's MTU is lower than it's parent interface
                     $parent_if = $if_list[$interface]["if"];
                     if ($mtu > $parent_if["mtu"]) {
-                        $err_found = true;
-                        $api_resp = $api_resp + array("return" => 123, "message" => "mtu greater than parent interface");
+                        $api_resp["return"] = 3006;
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                        return $api_resp;
                     }
                 } else {
                     $if_ent[$next_if]["mtu"] = $mtu;
                 }
             }
             // Check for our MSS value
-            if (!$err_found and isset($client_params["mss"])) {
+            if (isset($client_params["mss"])) {
                 $mss = intval($client_params["mss"]);
                 // Check if MSS is within range
                 if (576 > $mss or $mss > 65535) {
-                    $err_found = true;
-                    $api_resp = $api_resp + array("return" => 124, "message" => "mss out of range");
+                    $api_resp["return"] = 3005;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 } else {
                     $if_ent[$next_if]["mss"] = $mss;
                 }
             }
             // Check for our SPEED/DUPLEX value
-            if (!$err_found and isset($client_params["media"])) {
+            if (isset($client_params["media"])) {
                 $media = $client_params["media"];
                 $avail_media = get_if_media_options($interface, true);
                 // Loop each of our media options and see if our input matches
@@ -5822,93 +6065,90 @@ function api_interfaces_add() {
                 }
                 // If we did not find a match return error
                 if (!$media_found) {
-                    $err_found = true;
-                    $api_resp = $api_resp + array("return" => 126, "message" => "invalid speed/duplex");
+                    $api_resp["return"] = 3007;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 }
             }
             // Check for our description value
-            if (!$err_found and isset($client_params["descr"])) {
+            if (isset($client_params["descr"])) {
                 $descr = sanitize_str($client_params["descr"]);
                 // Check that is interface descriptive name does not alrady exist
                 if (!get_pfsense_if_id($descr)) {
                     $if_ent[$next_if]["descr"] = $descr;
                 } else {
-                    $err_found = true;
-                    $api_resp = $api_resp + array("return" => 125, "message" => "interface descriptive name already exists");
+                    $api_resp["return"] = 3008;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 }
             } else {
                 $descr = strtoupper($next_if);
                 $if_ent[$next_if]["descr"] = $descr;
             }
             // Check for our block private IP value
-            if (!$err_found and isset($client_params["blockpriv"])) {
+            if (isset($client_params["blockpriv"])) {
                 $block_priv = true;
                 $if_ent[$next_if]["blockpriv"] = "";
+                return $api_resp;
             }
             // Check for our block private IP value
-            if (!$err_found and isset($client_params["blockbogons"])) {
+            if (isset($client_params["blockbogons"])) {
                 $block_bogons = true;
                 $if_ent[$next_if]["blockbogons"] = "";
             }
             // Check if we have an IPv4 configuration
-            if (!$err_found and isset($client_params["type"])) {
+            if (isset($client_params["type"])) {
                 $type = $client_params["type"];
                 // Check if our IPv4 config type is allowed
                 if (in_array($type, $allowed_ip4_types)) {
-                    $err_found = false;
                     // Gather input for our various IPv4 interface configuration types
                     // IPv4 STATICV4 TYPE
                     if ($type === "staticv4") {
                         // Check if our IP is set
-                        if (!$err_found and isset($client_params["ipaddr"])) {
+                        if (isset($client_params["ipaddr"])) {
                             $ipaddr = $client_params["ipaddr"];
                             // Check if IP address is valid
                             if (!is_ipaddrv4($ipaddr)) {
-                                $err_found = true;
-                                $api_resp["message"] = "invalid ip address";
-                                $api_resp["return"] = 7;
+                                $api_resp["return"] = 3010;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             } elseif (is_ip_in_use($ipaddr)) {
-                                $err_found = true;
-                                $api_resp["message"] = "interface ip address already in use";
-                                $api_resp["return"] = 130;
+                                $api_resp["return"] = 3009;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             } else {
                                 $if_ent[$next_if]["ipaddr"] = $ipaddr;
                             }
                         } else {
-                            // Update our message if we did not already encounter an error
-                            if (!$err_found) {
-                                $err_found = true;
-                                $api_resp["message"] = "interface type static4 requires ipv4 address";
-                                $api_resp["return"] = 129;
-                            }
+                            $api_resp["return"] = 3011;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
+                            return $api_resp;
                         }
                         // Check if our subnet is valid
-                        if (!$err_found and isset($client_params["subnet"])) {
+                        if (isset($client_params["subnet"])) {
                             $subnet = strval($client_params["subnet"]);
                             // Check if our subnet is within range
                             if (!is_subnet($ipaddr."/".$subnet)) {
-                                $err_found = true;
-                                $api_resp["message"] = "invalid subnet";
-                                $api_resp["return"] = 9;
+                                $api_resp["return"] = 3012;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             } else {
                                 $if_ent[$next_if]["subnet"] = $subnet;
                             }
                         } else {
                             // Update our message if we did not already encounter an error
-                            if (!$err_found) {
-                                $err_found = true;
-                                $api_resp["message"] = "interface type static4 requires subnet bitmask";
-                                $api_resp["return"] = 131;
-                            }
+                            $api_resp["return"] = 3013;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
+                            return $api_resp;
                         }
                         // Check if user specified a network gateway, if so check if it's valid
-                        if (!$err_found and isset($client_params["gateway"])) {
+                        if (isset($client_params["gateway"])) {
                             $gateway = $client_params["gateway"];
                             // Check if this gateway exists
                             if (!is_gateway($gateway)) {
-                                $err_found = true;
-                                $api_resp["message"] = "invalid gateway";
-                                $api_resp["return"] = 12;
+                                $api_resp["return"] = 3014;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             } else {
                                 $if_ent[$next_if]["gateway"] = $gateway;
                             }
@@ -5917,11 +6157,11 @@ function api_interfaces_add() {
                     } elseif ($type === "dhcp") {
                         $if_ent[$next_if]["ipaddr"] = $type;    // Set our ipaddr value to dhcp
                         // Check if we have a dhcphostname value
-                        if (!$err_found and isset($client_params["dhcphostname"])) {
+                        if (isset($client_params["dhcphostname"])) {
                             $if_ent[$next_if]["dhcphostname"] = strval($client_params["dhcphostname"]);
                         }
                         // Check if we have a alias-address value
-                        if (!$err_found and isset($client_params["alias-address"])) {
+                        if (isset($client_params["alias-address"])) {
                             if (is_ipaddrv4($client_params["alias-address"])) {
                                 $if_ent[$next_if]["alias-address"] = strval($client_params["alias-address"]);
                                 if (isset($client_params["alias-subnet"])) {
@@ -5933,13 +6173,13 @@ function api_interfaces_add() {
                                     $if_ent[$next_if]["alias-subnet"] = 32;
                                 }
                             } else {
-                                $err_found = true;
-                                $api_resp["message"] = "invalid dhcp alias address";
-                                $api_resp["return"] = 132;
+                                $api_resp["return"] = 3015;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             }
                         }
                         // Check if we have a dhcprejectfrom value
-                        if (!$err_found and isset($client_params["dhcprejectfrom"])) {
+                        if (isset($client_params["dhcprejectfrom"])) {
                             $dhcpreject = $client_params["dhcprejectfrom"];
                             // Check what data type was passed in
                             if (is_string($dhcpreject)) {
@@ -5964,9 +6204,9 @@ function api_interfaces_add() {
                             }
                             // Check for bad IPs
                             if ($bad_reject) {
-                                $err_found = true;
-                                $api_resp["message"] = "invalid dhcp reject from address";
-                                $api_resp["return"] = 133;
+                                $api_resp["return"] = 3016;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             } else {
                                 $if_ent[$next_if]["dhcprejectfrom"] = $dhcpreject;
                             }
@@ -5982,22 +6222,43 @@ function api_interfaces_add() {
                         );
                         // Loop through each timing attribute and see if it's valid
                         foreach ($timing_protocols as $tp => $data) {
-                            if (!$err_found and isset($client_params[$tp])) {
+                            if (isset($client_params[$tp])) {
                                 // Check that value is in range
                                 $dhcp_attr = intval($client_params[$tp]);
                                 if ($dhcp_attr >= $data["min"]) {
                                     $if_ent[$next_if][$tp] = $dhcp_attr;
                                     $if_ent[$next_if]["adv_dhcp_pt_values"] = "SavedCfg";
                                 } else {
-                                    $err_found = true;
-                                    $api_resp["message"] = "invalid ".$data["keyword"]." value";
-                                    $api_resp["return"] = $data["return"];
-                                    break;
+                                    if ($data["keyword"] === "timeout") {
+                                        $api_resp["return"] = 3017;
+                                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                        return $api_resp;
+                                    } elseif ($data["keyword"] === "retry") {
+                                        $api_resp["return"] = 3018;
+                                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                        return $api_resp;
+                                    } elseif ($data["keyword"] === "select timeout") {
+                                        $api_resp["return"] = 3019;
+                                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                        return $api_resp;
+                                    } elseif ($data["keyword"] === "reboot") {
+                                        $api_resp["return"] = 3020;
+                                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                        return $api_resp;
+                                    } elseif ($data["keyword"] === "backoff cutoff") {
+                                        $api_resp["return"] = 3021;
+                                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                        return $api_resp;
+                                    } elseif ($data["keyword"] === "initial interval") {
+                                        $api_resp["return"] = 3022;
+                                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                        return $api_resp;
+                                    }
                                 }
                             }
                         }
                         // Check for advance DHCP config
-                        if (!$err_found and isset($client_params["adv_dhcp_config_advanced"])) {
+                        if (isset($client_params["adv_dhcp_config_advanced"])) {
                             $if_ent[$next_if]["adv_dhcp_config_advanced"] = "yes";
                             // Check for our DHCP options
                             $dhcp_opts = array(
@@ -6008,13 +6269,13 @@ function api_interfaces_add() {
                             );
                             foreach ($dhcp_opts as $do) {
                                 // Check if option exists
-                                if (!$err_found and isset($client_params[$do])) {
+                                if (isset($client_params[$do])) {
                                     $if_ent[$next_if][$do] = strval($client_params[$do]);
                                 }
                             }
                         }
                         // Check for DHCP configuration file override option
-                        if (!$err_found and isset($client_params["adv_dhcp_config_file_override"])) {
+                        if (isset($client_params["adv_dhcp_config_file_override"])) {
                             $if_ent[$next_if]["adv_dhcp_config_file_override"] = "";
                             // Check if a file path was given
                             if (isset($client_params["adv_dhcp_config_file_override_path"])) {
@@ -6023,9 +6284,9 @@ function api_interfaces_add() {
                                 if (is_file($dhcp_conf_file)) {
                                     $if_ent[$next_if]["adv_dhcp_config_file_override"] = $dhcp_conf_file;
                                 } else {
-                                    $err_found = true;
-                                    $api_resp["message"] = "invalid dhcp configuration file";
-                                    $api_resp["return"] = 141;
+                                    $api_resp["return"] = 3023;
+                                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                    return $api_resp;
                                 }
                             }
                         }
@@ -6040,7 +6301,7 @@ function api_interfaces_add() {
                             6 => "ic",
                             7 => "nc"
                         );
-                        if (!$err_found and isset($client_params["dhcpvlanenable"])) {
+                        if (isset($client_params["dhcpvlanenable"])) {
                             $if_ent[$next_if]["dhcpvlanenable"] = "";
                             if (isset($client_params["dhcpcvpt"])) {
                                 $vlan_prio = strtolower($client_params["dhcpcvpt"]);
@@ -6058,21 +6319,22 @@ function api_interfaces_add() {
                                     }
                                     // Check that we found a value in our loop
                                     if (!$vlan_prio_found) {
-                                        $err_found = true;
-                                        $api_resp["message"] = "invalid dhcp vlan priority value";
-                                        $api_resp["return"] = 140;
+                                        $api_resp["return"] = 3024;
+                                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                        return $api_resp;
                                     }
                                 }
                             }
                         }
                     }
                 } else {
-                    $err_found = true;
-                    $api_resp = $api_resp + array("return" => 126, "message" => "invalid ipv4 configuration type");
+                    $api_resp["return"] = 3025;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 }
             }
             // Check if we have an IPv6 configuration
-            if (!$err_found and isset($client_params["type6"])) {
+            if (isset($client_params["type6"])) {
                 $type6 = $client_params["type6"];
                 // Check if our IPv6 config type is allowed
                 if (in_array($type6, $allowed_ip6_types)) {
@@ -6080,96 +6342,90 @@ function api_interfaces_add() {
                     // IPv6 STATICV6 TYPE
                     if ($type6 === "staticv6") {
                         // Check if our IP is set
-                        if (!$err_found and isset($client_params["ipaddrv6"])) {
+                        if (isset($client_params["ipaddrv6"])) {
                             $ipaddrv6 = $client_params["ipaddrv6"];
                             // Check if IP address is valid
                             if (!is_ipaddrv6($ipaddrv6)) {
-                                $err_found = true;
-                                $api_resp["message"] = "invalid ip address";
-                                $api_resp["return"] = 7;
+                                $api_resp["return"] = 3026;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             } elseif (is_ip_in_use($ipaddrv6)) {
-                                $err_found = true;
-                                $api_resp["message"] = "interface ip address already in use";
-                                $api_resp["return"] = 130;
+                                $api_resp["return"] = 3027;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             } else {
                                 $if_ent[$next_if]["ipaddrv6"] = $ipaddrv6;
                             }
                         } else {
-                            // Update our message if we did not already encounter an error
-                            if (!$err_found) {
-                                $err_found = true;
-                                $api_resp["message"] = "interface type staticv6 requires ipv6 address";
-                                $api_resp["return"] = 142;
-                            }
+                            $api_resp["return"] = 3028;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
+                            return $api_resp;
                         }
                         // Check if our subnet is valid
-                        if (!$err_found and isset($client_params["subnetv6"])) {
+                        if (isset($client_params["subnetv6"])) {
                             $subnetv6 = strval($client_params["subnetv6"]);
                             // Check if our subnet is within range
                             if (!is_subnet($ipaddrv6 . "/" . $subnetv6)) {
-                                $err_found = true;
-                                $api_resp["message"] = "invalid subnet";
-                                $api_resp["return"] = 9;
+                                $api_resp["return"] = 3029;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             } else {
                                 $if_ent[$next_if]["subnetv6"] = $subnetv6;
                             }
                         } else {
-                            // Update our message if we did not already encounter an error
-                            if (!$err_found) {
-                                $err_found = true;
-                                $api_resp["message"] = "interface type staticv6 requires subnet bitmask";
-                                $api_resp["return"] = 143;
-                            }
+                            $api_resp["return"] = 3030;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
+                            return $api_resp;
                         }
                         // Check if user specified a network gateway, if so check if it's valid
-                        if (!$err_found and isset($client_params["gatewayv6"])) {
+                        if (isset($client_params["gatewayv6"])) {
                             $gatewayv6 = $client_params["gatewayv6"];
                             // Check if this gateway exists
                             if (!is_gateway($gatewayv6)) {
-                                $err_found = true;
-                                $api_resp["message"] = "invalid gateway";
-                                $api_resp["return"] = 12;
+                                $api_resp["return"] = 3031;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             } else {
                                 $if_ent[$next_if]["gatewayv6"] = $gatewayv6;
                             }
                         }
                         // Check if user set ipv6usev4iface value
-                        if (!$err_found and isset($client_params["ipv6usev4iface"])) {
+                        if (isset($client_params["ipv6usev4iface"])) {
                             $if_ent[$next_if]["ipv6usev4iface"] = "";
                         }
                         // IPv6 DHCP6 TYPE
                     } elseif ($type6 === "dhcp6") {
                         $if_ent[$next_if]["ipaddrv6"] = $type6;    // Set our ipaddrv6 value to dhcp6
                         // Check if user set ipv6usev4iface value
-                        if (!$err_found and isset($client_params["ipv6usev4iface"])) {
+                        if (isset($client_params["ipv6usev4iface"])) {
                             $if_ent[$next_if]["ipv6usev4iface"] = "";
                         }
                         // Check if user set dhcp6prefixonly value
-                        if (!$err_found and isset($client_params["dhcp6prefixonly"])) {
+                        if (isset($client_params["dhcp6prefixonly"])) {
                             $if_ent[$next_if]["dhcp6prefixonly"] = "";
                         }
                         // Check if user set dhcp6-ia-pd-send-hint value
-                        if (!$err_found and isset($client_params["dhcp6-ia-pd-send-hint"])) {
+                        if (isset($client_params["dhcp6-ia-pd-send-hint"])) {
                             $if_ent[$next_if]["dhcp6-ia-pd-send-hint"] = "";
                         }
                         // Check if user set dhcp6debug value
-                        if (!$err_found and isset($client_params["dhcp6debug"])) {
+                        if (isset($client_params["dhcp6debug"])) {
                             $if_ent[$next_if]["dhcp6debug"] = "";
                         }
                         // Check if user set dhcp6withoutra value
-                        if (!$err_found and isset($client_params["dhcp6withoutra"])) {
+                        if (isset($client_params["dhcp6withoutra"])) {
                             $if_ent[$next_if]["dhcp6withoutra"] = "";
                         }
                         // Check if user set dhcp6norelease value
-                        if (!$err_found and isset($client_params["dhcp6norelease"])) {
+                        if (isset($client_params["dhcp6norelease"])) {
                             $if_ent[$next_if]["dhcp6norelease"] = "";
                         }
                         // Check if user set dhcp6vlanenable value
-                        if (!$err_found and isset($client_params["dhcp6vlanenable"])) {
+                        if (isset($client_params["dhcp6vlanenable"])) {
                             $if_ent[$next_if]["dhcp6vlanenable"] = "";
                         }
                         // Check if user set dhcp6-ia-pd-len value
-                        if (!$err_found and isset($client_params["dhcp6-ia-pd-len"])) {
+                        if (isset($client_params["dhcp6-ia-pd-len"])) {
                             // Set array of allowed prefix delegation sizes and their config translation
                             $dhcp6_del_size = intval($client_params["dhcp6-ia-pd-len"]);
                             $allowed_size = array(
@@ -6186,9 +6442,9 @@ function api_interfaces_add() {
                             if (array_key_exists($dhcp6_del_size, $allowed_size)) {
                                 $if_ent[$next_if]["dhcp6-ia-pd-len"] = $allowed_size[$dhcp6_del_size];
                             } else {
-                                $err_found = true;
-                                $api_resp["message"] = "invalid dhcp6 prefix delegation size";
-                                $api_resp["return"] = 145;
+                                $api_resp["return"] = 3032;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             }
                         }
                         // Check for DHCP VLAN priority
@@ -6202,7 +6458,7 @@ function api_interfaces_add() {
                             6 => "ic",
                             7 => "nc"
                         );
-                        if (!$err_found and isset($client_params["dhcp6vlanenable"])) {
+                        if (isset($client_params["dhcp6vlanenable"])) {
                             $if_ent[$next_if]["dhcp6vlanenable"] = "";
                             if (isset($client_params["dhcp6cvpt"])) {
                                 $vlan_prio = strtolower($client_params["dhcp6cvpt"]);
@@ -6220,15 +6476,15 @@ function api_interfaces_add() {
                                     }
                                     // Check that we found a value in our loop
                                     if (!$vlan_prio_found) {
-                                        $err_found = true;
-                                        $api_resp["message"] = "invalid dhcp6 vlan priority value";
-                                        $api_resp["return"] = 144;
+                                        $api_resp["return"] = 3033;
+                                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                        return $api_resp;
                                     }
                                 }
                             }
                         }
                         // Check for DHCP configuration file override option
-                        if (!$err_found and isset($client_params["adv_dhcp6_config_file_override"])) {
+                        if (isset($client_params["adv_dhcp6_config_file_override"])) {
                             $if_ent[$next_if]["adv_dhcp6_config_file_override"] = "";
                             // Check if a file path was given
                             if (isset($client_params["adv_dhcp6_config_file_override_path"])) {
@@ -6237,9 +6493,9 @@ function api_interfaces_add() {
                                 if (is_file($dhcp_conf_file)) {
                                     $if_ent[$next_if]["adv_dhcp6_config_file_override_path"] = $dhcp_conf_file;
                                 } else {
-                                    $err_found = true;
-                                    $api_resp["message"] = "invalid dhcp6 configuration file";
-                                    $api_resp["return"] = 146;
+                                    $api_resp["return"] = 3034;
+                                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                    return $api_resp;
                                 }
                             }
                         }
@@ -6251,68 +6507,68 @@ function api_interfaces_add() {
                         $if_ent[$next_if]["ipaddrv6"] = $type6;    // Set our ipaddrv6 value to 6rd
                         $if_ent[$next_if]["prefix-6rd-v4plen"] = $client_params["prefix-6rd-v4plen"];    // Default prefix len
                         // Check for a 6RD border relay
-                        if (!$err_found and isset($client_params["gateway-6rd"])) {
+                        if (isset($client_params["gateway-6rd"])) {
                             $gw6rd = $client_params["gateway-6rd"];
                             // Check that our gateway is a valid IPv4 address
                             if (is_ipaddrv4($gw6rd)) {
                                 $if_ent[$next_if]["gateway-6rd"] = $client_params["gateway-6rd"];
                             } else {
-                                $err_found = true;
-                                $api_resp["message"] = "invalid 6rd gateway address";
-                                $api_resp["return"] = 148;
+                                $api_resp["return"] = 3035;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             }
                         } else {
-                            $err_found = true;
-                            $api_resp["message"] = "6rd gateway address required";
-                            $api_resp["return"] = 147;
+                            $api_resp["return"] = 3036;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
+                            return $api_resp;
                         }
                         // Check for a 6RD prefix
-                        if (!$err_found and isset($client_params["prefix-6rd"])) {
+                        if (isset($client_params["prefix-6rd"])) {
                             $if_ent[$next_if]["prefix-6rd"] = $client_params["prefix-6rd"];
                         }
                         // Check for a 6RD prefix length
-                        if (!$err_found and isset($client_params["prefix-6rd-v4plen"])) {
+                        if (isset($client_params["prefix-6rd-v4plen"])) {
                             $prefix_len = $client_params["prefix-6rd-v4plen"];
                             // Check if our prefix length is within range
                             if (is_numeric($prefix_len) and (0 <= intval($prefix_len) and intval($prefix_len) <= 32)) {
                                 $if_ent[$next_if]["prefix-6rd-v4plen"] = $client_params["prefix-6rd-v4plen"];
                             } else {
-                                $err_found = true;
-                                $api_resp["message"] = "invalid 6rd prefix length";
-                                $api_resp["return"] = 149;
+                                $api_resp["return"] = 3037;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             }
                         }
                         // IPv6 TRACK TYPE
                     } elseif ($type6 === "track6") {
                         $if_ent[$next_if]["ipaddrv6"] = $type6;    // Set our ipaddrv6 value to track6
                         // Check for track 6 interface
-                        if (!$err_found and isset($client_params["track6-interface"])) {
+                        if (isset($client_params["track6-interface"])) {
                             $track_if = $client_params["track6-interface"];
                             $track_if = get_pfsense_if_id($track_if);
                             // Check that our gateway is a valid IPv4 address
                             if (array_key_exists($track_if, get_ipv6_if_list())) {
                                 $if_ent[$next_if]["track6-interface"] = $client_params["track6-interface"];
                             } else {
-                                $err_found = true;
-                                $api_resp["message"] = "invalid ipv6 track interface";
-                                $api_resp["return"] = 150;
+                                $api_resp["return"] = 3038;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             }
                         } else {
-                            $err_found = true;
-                            $api_resp["message"] = "ipv6 track interface required";
-                            $api_resp["return"] = 151;
+                            $api_resp["return"] = 3039;
+                            $api_resp["message"] = $err_lib[$api_resp["return"]];
+                            return $api_resp;
                         }
                         // Check for track 6 prefix ID
                         $track_prefix = 0;    // Default our prefix value
-                        if (!$err_found and isset($client_params["track6-prefix-id-hex"])) {
+                        if (isset($client_params["track6-prefix-id-hex"])) {
                             $track_prefix = $client_params["track6-prefix-id-hex"];
                             // Check that our gateway is a valid IPv4 address
                             if (is_numeric($track_prefix) and ctype_xdigit(strval($track_prefix))) {
                                 $if_ent[$next_if]["track6-prefix-id--hex"] = intval($track_prefix);
                             } else {
-                                $err_found = true;
-                                $api_resp["message"] = "invalid ipv6 track prefix hex value";
-                                $api_resp["return"] = 152;
+                                $api_resp["return"] = 3040;
+                                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                                return $api_resp;
                             }
                         }
                         // IPv6 6-to-4 TYPE
@@ -6320,8 +6576,9 @@ function api_interfaces_add() {
                         $if_ent[$next_if]["ipaddrv6"] = $type6;    // Set our ipaddrv6 value to 6to4
                     }
                 } else {
-                    $err_found = true;
-                    $api_resp = $api_resp + array("return" => 127, "message" => "invalid ipv6 configuration type");
+                    $api_resp["return"] = 3041;
+                    $api_resp["message"] = $err_lib[$api_resp["return"]];
+                    return $api_resp;
                 }
             }
             // Add debug data if requested
@@ -6347,10 +6604,6 @@ function api_interfaces_add() {
                 echo "IP CONFIGURATION".PHP_EOL;
                 echo var_dump($if_ent).PHP_EOL;
             }
-            // Check if we encountered an error
-            if ($err_found === true) {
-                return $api_resp;
-            }
             // Apply our configuration
             $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
             $change_note = " Added interface via API";    // Add a change note
@@ -6363,11 +6616,13 @@ function api_interfaces_add() {
                 return $api_resp;
             } else {
                 // Return error response if our loop did not find a match
-                $api_resp = array("status" => "server error", "code" => 500, "return" => 4, "message" => "process fail");
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
                 return $api_resp;
             }
         } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2, "message" => "invalid http method");
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
             return $api_resp;
         }
     } else {
