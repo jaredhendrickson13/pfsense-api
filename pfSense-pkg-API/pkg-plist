@@ -64,8 +64,11 @@
 
 @dir /usr/local/www/api/v1/system/dns
 @dir /usr/local/www/api/v1/system/dns/modify
+@dir /usr/local/www/api/v1/system/dns/delete
+@dir /usr/local/www/api/v1/system/dns/delete/servers
 /usr/local/www/api/v1/system/dns/index.php
 /usr/local/www/api/v1/system/dns/modify/index.php
+/usr/local/www/api/v1/system/dns/delete/servers/index.php
 
 @dir /usr/local/www/api/v1/system/certificates
 @dir /usr/local/www/api/v1/system/certificates/add

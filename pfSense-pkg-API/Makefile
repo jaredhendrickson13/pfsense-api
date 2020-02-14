@@ -143,6 +143,12 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/dns/modify
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/dns/modify/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/system/dns/modify
+	# DNS delete servers
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/dns/delete
+	# DNS delete servers
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/dns/delete/servers
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/dns/delete/servers/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/system/dns/delete/servers
 	# Certificates base
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/certificates
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/certificates/index.php \

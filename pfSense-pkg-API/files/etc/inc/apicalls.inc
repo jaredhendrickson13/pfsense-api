@@ -2275,6 +2275,64 @@ function api_system_dns_modify() {
     }
 }
 
+function api_system_dns_delete_servers() {
+    # VARIABLES
+    global $err_lib, $config, $api_resp, $client_params, $client_id;
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $del_ent = [];
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is POST (UPDATE)
+        if ($http_method === 'POST') {
+            if (isset($client_params['dnsserver'])) {
+                $del_server = $client_params['dnsserver'];
+                $curr_servers = $config["system"]["dnsserver"];
+                $del_server = (!is_array($del_server)) ? array($del_server) : $del_server;
+                foreach ($del_server as $ds) {
+                    // Ensure our config is array
+                    if (!is_array($curr_servers)) {
+                        $curr_servers = array($config["system"]["dnsserver"]);
+                    }
+                    // Loop through each server and check for matches, delete on match
+                    foreach ($curr_servers as $id => $cs) {
+                        if ($ds === $cs) {
+                            $del_ent[] = $ds;
+                            unset($config["system"]["dnsserver"][$id]);
+                        }
+                    }
+                }
+            }
+            // Write our new hostname
+            $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
+            $change_note = " Deleted system DNS servers via API";    // Add a change note
+            write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+            // Update a slew of backend services
+            system_resolvconf_generate();
+            if (isset($config['dnsmasq']['enable'])) {
+                services_dnsmasq_configure();
+            } elseif (isset($config['unbound']['enable'])) {
+                services_unbound_configure();
+            }
+            send_event("service reload dns");
+            filter_configure();
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+            $api_resp["message"] = "Successfully deleted system DNS servers";
+            $api_resp["data"] = $del_ent;
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
 function api_system_hostname_modify() {
     # VARIABLES
     global $err_lib, $config, $api_resp, $client_params, $client_id;

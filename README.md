@@ -17,7 +17,7 @@ _Note: if you do not have shell access to pfSense, you can still install via the
 - While not an enforced requirement, it is STRONGLY recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit
 
 # Authentication
-By default, pfSense API uses the same credentials as the webConfigurator. Alternatively, you can configure pfSense API to create secure API client IDs and tokens for API users. To generate, or delete API keys you can navigate to `System > API` in the UI after installation, and change the authentication mode to `API Token`.
+By default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense from the API out of the box, and user passwords may be changed from the API to immediately add additional security if needed. Alternatively, you can configure pfSense API to create secure API client IDs and tokens for API users. To generate, or delete API keys you can navigate to `System > API` in the UI after installation, and change the authentication mode to `API Token`.
 
 # Response Codes
 `200 (OK)` : API call succeeded<br>
@@ -26,6 +26,9 @@ By default, pfSense API uses the same credentials as the webConfigurator. Altern
 `403 (Forbidden)` : The API endpoint has refused your call. Commonly due to your access settings found in `System > API`<br>
 `404 (Not found)` : Either the API endpoint or requested data was not found<br>
 `500 (Server error)` : The API endpoint encountered an unexpected error processing your API request<br>
+
+# Error Codes
+A full list of error codes can be found by navigating to /api/v1/system/api/errors/ after installation. This will return JSON data containing each error code and their corresponding error message. No authentication is required to view the error code library. This also makes API integration with third-party software easy as the API error codes and messages are always just an HTTP call away!
 
 # Rate limit
 There is no limit to API calls at this time
