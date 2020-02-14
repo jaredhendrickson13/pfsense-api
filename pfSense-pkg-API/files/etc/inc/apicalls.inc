@@ -2202,6 +2202,79 @@ function api_system_hostname() {
     }
 }
 
+function api_system_dns_modify() {
+    # VARIABLES
+    global $err_lib, $config, $api_resp, $client_params, $client_id;
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system");    // Array of privs allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $dns_ent = [];
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is POST (UPDATE)
+        if ($http_method === 'POST') {
+            if (isset($client_params['dnsserver'])) {
+                $dns_servers = $client_params['dnsserver'];
+                // If value is not an array, convert it
+                if (!is_array($dns_servers)) {
+                    $dns_servers = array($dns_servers);
+                }
+                // Loop through our DNS servers and check that entry is valid
+                foreach ($dns_servers as $ds) {
+                    // Check if our DNS server is valid
+                    if (!is_ipaddrv4($ds) and !is_ipaddrv6($ds)) {
+                        $api_resp = array("status" => "bad request", "code" => 400, "return" => 1007);
+                        $api_resp["message"] = $err_lib[$api_resp["return"]];
+                        return $api_resp;
+                    }
+                }
+                // Add our system DNS values to config and track the change
+                $config["system"]["dnsserver"] = $dns_servers;
+                $dns_ent["dnsserver"] = $dns_servers;
+            }
+            if ($client_params['dnsallowoverride'] === true) {
+                $config["system"]["dnsallowoverride"] = "";
+                $dns_ent["dnsallowoverride"] = $client_params['dnsallowoverride'];
+            } elseif ($client_params['dnsallowoverride'] === false) {
+                $dns_ent["dnsallowoverride"] = $client_params['dnsallowoverride'];
+                unset($config["system"]["dnsallowoverride"]);
+            }
+            if ($client_params['dnslocalhost'] === true) {
+                $config["system"]["dnslocalhost"] = "";
+                $dns_ent["dnslocalhost"] = $client_params['dnslocalhost'];
+            } elseif ($client_params['dnslocalhost'] === false) {
+                $dns_ent["dnslocalhost"] = $client_params['dnslocalhost'];
+                unset($config["system"]["dnslocalhost"]);
+            }
+            // Write our new hostname
+            $_SESSION["Username"] = $client_id;    // Save our CLIENT ID to session data for logging
+            $change_note = " Modified system DNS servers via API";    // Add a change note
+            write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+            // Update a slew of backend services
+            system_resolvconf_generate();
+            if (isset($config['dnsmasq']['enable'])) {
+                services_dnsmasq_configure();
+            } elseif (isset($config['unbound']['enable'])) {
+                services_unbound_configure();
+            }
+            send_event("service reload dns");
+            filter_configure();
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+            $api_resp["message"] = "Successfully modified system DNS servers";
+            $api_resp["data"] = $dns_ent;
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
 function api_system_hostname_modify() {
     # VARIABLES
     global $err_lib, $config, $api_resp, $client_params, $client_id;
@@ -2257,6 +2330,44 @@ function api_system_hostname_modify() {
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
             $api_resp["message"] = "Successfully modified system hostname";
             $api_resp["data"] = array("hostname" => $config["system"]["hostname"], "domain" => $config["system"]["domain"]);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+function api_system_dns() {
+    # VARIABLES
+    global $err_lib, $config, $api_resp, $client_params;
+    $read_only_action = true;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-system");    // Allowed privs
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    $dns_array = array();    // Init our return array
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is GET (READ)
+        if ($http_method === 'GET') {
+            // Check that we have a configuration
+            if (!empty($config["system"])) {
+                $dns_keys = ["dnsserver", "dnsallowoverride", "dnslocalhost"];
+                foreach ($config["system"] as $key => $sv) {
+                    if (in_array($key, $dns_keys)) {
+                        $dns_array[$key] = $sv;
+                    }
+                }
+            }
+            if (isset($client_params['search'])) {
+                $search = $client_params['search'];
+                $dns_array = api_extended_search($dns_array, $search);
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $dns_array);
             return $api_resp;
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);

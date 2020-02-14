@@ -135,6 +135,14 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/hostname/modify
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/hostname/modify/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/system/hostname/modify
+	# DNS base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/dns
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/dns/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/system/dns
+	# DNS modify
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/dns/modify
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/dns/modify/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/system/dns/modify
 	# Certificates base
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/certificates
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/certificates/index.php \

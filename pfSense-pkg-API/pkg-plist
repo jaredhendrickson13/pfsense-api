@@ -62,6 +62,11 @@
 /usr/local/www/api/v1/system/hostname/index.php
 /usr/local/www/api/v1/system/hostname/modify/index.php
 
+@dir /usr/local/www/api/v1/system/dns
+@dir /usr/local/www/api/v1/system/dns/modify
+/usr/local/www/api/v1/system/dns/index.php
+/usr/local/www/api/v1/system/dns/modify/index.php
+
 @dir /usr/local/www/api/v1/system/certificates
 @dir /usr/local/www/api/v1/system/certificates/add
 @dir /usr/local/www/api/v1/system/certificates/delete

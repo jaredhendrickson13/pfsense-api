@@ -20,6 +20,7 @@ function api_error_lib() {
         1004 => "Invalid system certificate key",
         1005 => "System certificate in use",
         1006 => "ARP IP required",
+        1007 => "Invalid system DNS IP address",
         // 2000-2999 reserved for /services API calls
         2000 => "Invalid sshd enable value",
         2001 => "Invalid sshd key only mode",
