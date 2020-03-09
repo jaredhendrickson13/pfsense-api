@@ -16,7 +16,7 @@ API RETURN CODES
 14: ip or subnet in use
 15: forbidden
 16: invalid mac address
-
+17: incompatible pfsense version
 20: Username required
 21: Password required
 22: User already exists
@@ -94,9 +94,46 @@ API RETURN CODES
 144: invalid dhcp6 vlan priority value
 145: invalid dhcp6 prefix delegation size
 146: invalid dhcp6 configuration file
-
-
-
+147: 6rd gateway address required
+148: invalid 6rd gateway address
+149: invalid 6rd prefix length
+150: invalid ipv6 track interface
+151: ipv6 track interface required
+152: invalid ipv6 track prefix hex value
+160: invalid nat reflection value
+161: redirect ip required
+162: redirect port required
+163: invalid redirect ip address
+164: invalid redirect port
+164: invalid rule association value
+165: invalid sshd enable value
+166: invalid sshd key only type
+167: invalid sshd agent forwarding value
+168: invalid sshd port value
+170: invalid hostname
+171: invalid domain
+180: invalid certificate
+181: invalid certificate key
+182: certificate description required
+183: certificate id required
+184: certificate id in use
+189: authentication server already exists
+190: ldap hostname or ip required
+191: invalid ldap hostname or ip
+192: ldap port required
+193: ldap port out of range
+194: ldap url type required
+195: invalid ldap url type
+196: invalid ldap protocol version
+197: ldap search scope required
+198: invalid ldap search scope
+199: ldap bind dn required
+200: ldap bind password required
+201: ldap user naming attribute required
+202: ldap group naming attribute required
+203: ldap group member attribute required
+210: maximum firewall state size required
+211: invalid firewall state table size
 
 
 

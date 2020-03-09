@@ -1,5 +1,7 @@
 @dir /etc/inc
 /etc/inc/api.inc
+/etc/inc/apicalls.inc
+/etc/inc/apiresp.inc
 
 @dir /usr/local/pkg
 /usr/local/pkg/api.xml
@@ -16,6 +18,13 @@
 @dir /usr/local/www/api/v1/users/delete/privs
 @dir /usr/local/www/api/v1/users/add/groups
 @dir /usr/local/www/api/v1/users/delete/groups
+@dir /usr/local/www/api/v1/users/authservers
+@dir /usr/local/www/api/v1/users/authservers/delete
+@dir /usr/local/www/api/v1/users/authservers/ldap
+@dir /usr/local/www/api/v1/users/authservers/ldap/add
+@dir /usr/local/www/api/v1/users/authservers/ldap/delete
+@dir /usr/local/www/api/v1/users/authservers/radius
+@dir /usr/local/www/api/v1/users/authservers/radius/delete
 /usr/local/www/api/v1/users/index.php
 /usr/local/www/api/v1/users/add/index.php
 /usr/local/www/api/v1/users/delete/index.php
@@ -24,9 +33,21 @@
 /usr/local/www/api/v1/users/delete/privs/index.php
 /usr/local/www/api/v1/users/add/groups/index.php
 /usr/local/www/api/v1/users/delete/groups/index.php
+/usr/local/www/api/v1/users/authservers/index.php
+/usr/local/www/api/v1/users/authservers/delete/index.php
+/usr/local/www/api/v1/users/authservers/ldap/index.php
+/usr/local/www/api/v1/users/authservers/ldap/add/index.php
+/usr/local/www/api/v1/users/authservers/ldap/delete/index.php
+/usr/local/www/api/v1/users/authservers/radius/index.php
+/usr/local/www/api/v1/users/authservers/radius/delete/index.php
 
 @dir /usr/local/www/api/v1/system/version
 /usr/local/www/api/v1/system/version/index.php
+
+@dir /usr/local/www/api/v1/system/api
+@dir /usr/local/www/api/v1/system/api/errors
+/usr/local/www/api/v1/system/api/index.php
+/usr/local/www/api/v1/system/api/errors/index.php
 
 @dir /usr/local/www/api/v1/system/arp
 @dir /usr/local/www/api/v1/system/arp/delete
@@ -35,6 +56,26 @@
 
 @dir /usr/local/www/api/v1/system/config
 /usr/local/www/api/v1/system/config/index.php
+
+@dir /usr/local/www/api/v1/system/hostname
+@dir /usr/local/www/api/v1/system/hostname/modify
+/usr/local/www/api/v1/system/hostname/index.php
+/usr/local/www/api/v1/system/hostname/modify/index.php
+
+@dir /usr/local/www/api/v1/system/dns
+@dir /usr/local/www/api/v1/system/dns/modify
+@dir /usr/local/www/api/v1/system/dns/delete
+@dir /usr/local/www/api/v1/system/dns/delete/servers
+/usr/local/www/api/v1/system/dns/index.php
+/usr/local/www/api/v1/system/dns/modify/index.php
+/usr/local/www/api/v1/system/dns/delete/servers/index.php
+
+@dir /usr/local/www/api/v1/system/certificates
+@dir /usr/local/www/api/v1/system/certificates/add
+@dir /usr/local/www/api/v1/system/certificates/delete
+/usr/local/www/api/v1/system/certificates/index.php
+/usr/local/www/api/v1/system/certificates/add/index.php
+/usr/local/www/api/v1/system/certificates/delete/index.php
 
 @dir /usr/local/www/api/v1/status
 @dir /usr/local/www/api/v1/status/carp
@@ -48,24 +89,45 @@
 
 @dir /usr/local/www/api/v1/interfaces
 @dir /usr/local/www/api/v1/interfaces/add
+@dir /usr/local/www/api/v1/interfaces/delete
 @dir /usr/local/www/api/v1/interfaces/vlans
 @dir /usr/local/www/api/v1/interfaces/vlans/add
 @dir /usr/local/www/api/v1/interfaces/vlans/delete
 @dir /usr/local/www/api/v1/interfaces/vlans/modify
 /usr/local/www/api/v1/interfaces/index.php
 /usr/local/www/api/v1/interfaces/add/index.php
+/usr/local/www/api/v1/interfaces/delete/index.php
 /usr/local/www/api/v1/interfaces/vlans/index.php
 /usr/local/www/api/v1/interfaces/vlans/add/index.php
 /usr/local/www/api/v1/interfaces/vlans/delete/index.php
 /usr/local/www/api/v1/interfaces/vlans/modify/index.php
 
+
+
 @dir /usr/local/www/api/v1/firewall
+
+@dir /usr/local/www/api/v1/firewall/states
+@dir /usr/local/www/api/v1/firewall/states/size
+@dir /usr/local/www/api/v1/firewall/states/size/modify
+/usr/local/www/api/v1/firewall/states/index.php
+/usr/local/www/api/v1/firewall/states/size/index.php
+/usr/local/www/api/v1/firewall/states/size/modify/index.php
+
 @dir /usr/local/www/api/v1/firewall/virtualips
 @dir /usr/local/www/api/v1/firewall/virtualips/add
 @dir /usr/local/www/api/v1/firewall/virtualips/delete
 /usr/local/www/api/v1/firewall/virtualips/index.php
 /usr/local/www/api/v1/firewall/virtualips/add/index.php
 /usr/local/www/api/v1/firewall/virtualips/delete/index.php
+
+@dir /usr/local/www/api/v1/firewall/nat
+@dir /usr/local/www/api/v1/firewall/nat/portforwards
+@dir /usr/local/www/api/v1/firewall/nat/portforwards/add
+@dir /usr/local/www/api/v1/firewall/nat/portforwards/delete
+/usr/local/www/api/v1/firewall/nat/index.php
+/usr/local/www/api/v1/firewall/nat/portforwards/index.php
+/usr/local/www/api/v1/firewall/nat/portforwards/add/index.php
+/usr/local/www/api/v1/firewall/nat/portforwards/delete/index.php
 
 @dir /usr/local/www/api/v1/firewall/aliases
 @dir /usr/local/www/api/v1/firewall/aliases/add
@@ -87,17 +149,69 @@
 /usr/local/www/api/v1/firewall/rules/add/index.php
 /usr/local/www/api/v1/firewall/rules/delete/index.php
 
-@dir /usr/local/www/api/v1/unbound
-@dir /usr/local/www/api/v1/unbound/add
-@dir /usr/local/www/api/v1/unbound/delete
-@dir /usr/local/www/api/v1/unbound/modify
-@dir /usr/local/www/api/v1/unbound/add/hosts
-@dir /usr/local/www/api/v1/unbound/delete/hosts
-@dir /usr/local/www/api/v1/unbound/modify/hosts
-/usr/local/www/api/v1/unbound/index.php
-/usr/local/www/api/v1/unbound/add/hosts/index.php
-/usr/local/www/api/v1/unbound/delete/hosts/index.php
-/usr/local/www/api/v1/unbound/modify/hosts/index.php
+@dir /usr/local/www/api/v1/services
+@dir /usr/local/www/api/v1/services/start
+@dir /usr/local/www/api/v1/services/stop
+@dir /usr/local/www/api/v1/services/restart
+@dir /usr/local/www/api/v1/services/dhcpd
+@dir /usr/local/www/api/v1/services/dhcpd/start
+@dir /usr/local/www/api/v1/services/dhcpd/stop
+@dir /usr/local/www/api/v1/services/dhcpd/restart
+@dir /usr/local/www/api/v1/services/dpinger
+@dir /usr/local/www/api/v1/services/dpinger/start
+@dir /usr/local/www/api/v1/services/dpinger/stop
+@dir /usr/local/www/api/v1/services/dpinger/restart
+@dir /usr/local/www/api/v1/services/ntpd
+@dir /usr/local/www/api/v1/services/ntpd/start
+@dir /usr/local/www/api/v1/services/ntpd/stop
+@dir /usr/local/www/api/v1/services/ntpd/restart
+@dir /usr/local/www/api/v1/services/sshd
+@dir /usr/local/www/api/v1/services/sshd/modify
+@dir /usr/local/www/api/v1/services/sshd/start
+@dir /usr/local/www/api/v1/services/sshd/stop
+@dir /usr/local/www/api/v1/services/sshd/restart
+@dir /usr/local/www/api/v1/services/syslogd
+@dir /usr/local/www/api/v1/services/syslogd/start
+@dir /usr/local/www/api/v1/services/syslogd/stop
+@dir /usr/local/www/api/v1/services/syslogd/restart
+@dir /usr/local/www/api/v1/services/unbound
+@dir /usr/local/www/api/v1/services/unbound/add
+@dir /usr/local/www/api/v1/services/unbound/delete
+@dir /usr/local/www/api/v1/services/unbound/modify
+@dir /usr/local/www/api/v1/services/unbound/start
+@dir /usr/local/www/api/v1/services/unbound/stop
+@dir /usr/local/www/api/v1/services/unbound/restart
+@dir /usr/local/www/api/v1/services/unbound/add/hosts
+@dir /usr/local/www/api/v1/services/unbound/delete/hosts
+@dir /usr/local/www/api/v1/services/unbound/modify/hosts
+/usr/local/www/api/v1/services/index.php
+/usr/local/www/api/v1/services/start/index.php
+/usr/local/www/api/v1/services/stop/index.php
+/usr/local/www/api/v1/services/restart/index.php
+/usr/local/www/api/v1/services/dhcpd/start/index.php
+/usr/local/www/api/v1/services/dhcpd/stop/index.php
+/usr/local/www/api/v1/services/dhcpd/restart/index.php
+/usr/local/www/api/v1/services/dpinger/start/index.php
+/usr/local/www/api/v1/services/dpinger/stop/index.php
+/usr/local/www/api/v1/services/dpinger/restart/index.php
+/usr/local/www/api/v1/services/ntpd/start/index.php
+/usr/local/www/api/v1/services/ntpd/stop/index.php
+/usr/local/www/api/v1/services/ntpd/restart/index.php
+/usr/local/www/api/v1/services/sshd/index.php
+/usr/local/www/api/v1/services/sshd/modify/index.php
+/usr/local/www/api/v1/services/sshd/start/index.php
+/usr/local/www/api/v1/services/sshd/stop/index.php
+/usr/local/www/api/v1/services/sshd/restart/index.php
+/usr/local/www/api/v1/services/syslogd/start/index.php
+/usr/local/www/api/v1/services/syslogd/stop/index.php
+/usr/local/www/api/v1/services/syslogd/restart/index.php
+/usr/local/www/api/v1/services/unbound/index.php
+/usr/local/www/api/v1/services/unbound/start/index.php
+/usr/local/www/api/v1/services/unbound/stop/index.php
+/usr/local/www/api/v1/services/unbound/restart/index.php
+/usr/local/www/api/v1/services/unbound/add/hosts/index.php
+/usr/local/www/api/v1/services/unbound/delete/hosts/index.php
+/usr/local/www/api/v1/services/unbound/modify/hosts/index.php
 
 
 %%DATADIR%%/info.xml

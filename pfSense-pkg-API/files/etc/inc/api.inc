@@ -1,8 +1,10 @@
 <?php
+require_once("apiresp.inc");
 require_once("config.inc");
 require_once("util.inc");
 require_once("interfaces.inc");
 require_once("interfaces_fast.inc");
+require_once("service-utils.inc");
 require_once("filter.inc");
 require_once("shaper.inc");
 require_once("auth.inc");
@@ -16,8 +18,9 @@ header("Referer: no-referrer");
 error_reporting(E_ERROR);    // Suppress warnings and notices for the time being
 global $g, $config, $userindex;
 $client_params = $_GET;    // Accept HTTP requests in URL encoded format
-$api_resp = array("status" => "unauthorized", "code" => 401, "return" => 3, "message" => "");  // JSON array
 $read_priv = array("user-config-readonly");    // Read only privileges
+$err_lib = api_error_lib();    // Pull our error library from apiresp.inc
+$api_resp = array("status" => "unauthorized", "code" => 401, "return" => 3, "message" => $err_lib[3]);  // JSON array
 
 // Check if our URL encoded parameters are empty, if so try JSON encoded parameters
 if (empty($client_params)) {
@@ -46,9 +49,17 @@ function str_starts_with($needle, $haystack) {
     return (substr($haystack, 0, $length) === $needle);
 }
 
+// Restarts the pfSense webConfigurator
+function restart_webconfigurator() {
+    ob_flush();
+    flush();
+    log_error(gettext("webConfigurator configuration has changed. Restarting webConfigurator."));
+    send_event("service restart webgui");
+}
+
 // API authentication debug function
 function api_auth_debug($req_privs=array()) {
-    global $client_id, $client_params, $read_priv;
+    global $err_lib, $client_id, $client_params, $read_priv;
     // Before doing anything, check that debug mode is set
     if (array_key_exists("debug", $client_params)) {
         // Local variables
@@ -75,7 +86,7 @@ function api_auth_debug($req_privs=array()) {
 // Generate new API tokens for token auth mode
 function api_generate_token($username) {
     // Local variables
-    global $config;
+    global $err_lib, $config;
     $pkg_index = get_api_configuration()[0];    // Save our current API configs pkg index
     $api_config = get_api_configuration()[1];    // Save our current API config
     $key_hash_algo = $api_config["keyhash"];    // Pull our configured key hash algorithm
@@ -87,7 +98,7 @@ function api_generate_token($username) {
     $api_config["keys"] = !is_array($api_config["keys"]) ? array("key" => []) : $api_config["keys"];
     $api_config["keys"]["key"][] = array("client_id" => $key_user, "client_token" => $key_hash, "algo" => $key_hash_algo);
     // Write our changes
-    $config["installedpackages"]["package"][$pkg_index] = $api_config;    // Write change to config
+    $config["installedpackages"]["package"][$pkg_index]["conf"] = $api_config;    // Write change to config
     $change_note = " Generated API key";    // Add a change note
     write_config(sprintf(gettext($change_note)));    // Apply our configuration change
     return $key_new;
@@ -128,9 +139,10 @@ function api_authenticate_token($cid, $ctoken) {
 // Check if user authenticates successfully
 function api_authenticate() {
     // Local variables
-    global $client_id, $client_token;
+    global $err_lib, $config, $client_id, $client_token;
     $authenticated = false;
     $api_config = get_api_configuration()[1];
+    $users = index_users();
     // Format our client ID and token based on our configured auth mode
     if ($api_config["authmode"] === "base64") {
         $client_id = base64_decode($client_id);
@@ -147,7 +159,7 @@ function api_authenticate() {
             $authenticated = true;
         }
     } else {
-        // Check AUTHENTICATION-------------------------------------------------------------------
+        // Check local auth
         $local_auth = authenticate_user($client_id, $client_token);    // Test auth locally
         if ($local_auth === true) {
             unset($_SESSION["Username"]);
@@ -155,31 +167,38 @@ function api_authenticate() {
             $authenticated = true;
         }
     }
+    // Check if user is disabled
+    if (array_key_exists("disabled", $config["system"]["user"][$users[$client_id]])) {
+        $authenticated = false;
+    }
     return $authenticated;
 }
 
 // Check if user is authorized to run API function
 function api_authorized($req_privs, $read_only=false) {
     // Local variables
-    global $read_priv, $client_id, $api_resp;
+    global $err_lib, $read_priv, $client_id, $api_resp;
     $authorized = false;
     api_auth_debug($req_privs);
     // Check that we can successfully authenticate
     if (api_authenticate() === true) {
         $client_config =& getUserEntry($client_id);;
         $client_privs = get_user_privileges($client_config);
-        // Loop through each of our req privs and ensure the client has them, also check if access is read only
-        foreach ($req_privs as &$priv) {
-            // Check if action is not read only
-            if ($read_only === false) {
-                if (array_diff($read_priv, $client_privs) and in_array($priv, $client_privs, true)) {
-                    $authorized = true;
-                    break;
-                }
-            } else {
-                if (in_array($priv, $client_privs)) {
-                    $authorized = true;
-                    break;
+        // Check if API is in read-only mode
+        if (is_api_read_only() === $read_only or $read_only) {
+            // Loop through each of our req privs and ensure the client has them, also check if access is read only
+            foreach ($req_privs as &$priv) {
+                // Check if action is not read only
+                if ($read_only === false) {
+                    if (array_diff($read_priv, $client_privs) and in_array($priv, $client_privs, true)) {
+                        $authorized = true;
+                        break;
+                    }
+                } else {
+                    if (in_array($priv, $client_privs)) {
+                        $authorized = true;
+                        break;
+                    }
                 }
             }
         }
@@ -192,6 +211,7 @@ function api_authorized($req_privs, $read_only=false) {
     if ($authorized !== true) {
         http_response_code(401);
         $api_resp["return"] = 4;
+        $api_resp["message"] = $err_lib[$api_resp["return"]];
         echo json_encode($api_resp) . PHP_EOL;
         die();
     }
@@ -200,6 +220,7 @@ function api_authorized($req_privs, $read_only=false) {
 
 // Run our pre-runtime checks
 function api_runtime_allowed() {
+    api_version_check();    // Die if incompatible pfSense version
     api_enabled();    // Die if API is disabled in configuration
     api_whitelist_check();    // Die if server address is not whitelisted
 }
@@ -214,7 +235,7 @@ function get_api_configuration() {
         // Loop through our packages and find our API package config
         foreach ($pkg_conf as $id => $pkg) {
             if ($pkg["name"] === $api_pkg_name) {
-                return array($id, $pkg);
+                return array($id, $pkg["conf"]);
             }
         }
     }
@@ -222,7 +243,6 @@ function get_api_configuration() {
 
 // Check if the API is enabled before answering calls, if not, redirect to wc login
 function api_enabled() {
-    global $config;
     $api_config = get_api_configuration()[1];
     if (!isset($api_config["enable"])) {
         header("Location: /");
@@ -230,9 +250,37 @@ function api_enabled() {
     }
 }
 
+// Check if the API is in read-only mode
+function is_api_read_only() {
+    // Local variables
+    $api_config = get_api_configuration()[1];    // Save our current API config
+    if (array_key_exists("readonly", $api_config)) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// Check if our pfSense version is allowed to run this version of API
+function api_version_check() {
+    # Local variables
+    global $err_lib;
+    $curr_ver = str_replace(".", "", explode("-", get_pfsense_version()["version"])[0]);
+    $min_ver = 244;
+    $curr_ver = is_numeric($curr_ver) ? intval($curr_ver) : 0;
+    $valid_ver = false;
+    if ($curr_ver < $min_ver) {
+        http_response_code(501);
+        $api_resp = array("status" => "not implemented", "code" => 501, "return" => 5);
+        $api_resp["message"] = $err_lib[$api_resp["return"]];
+        echo json_encode($api_resp) . PHP_EOL;
+        die();
+    }
+}
+
 // Check if server IP is allowed to answer API calls. Redirects to login if not
 function api_whitelist_check() {
-    global $config;
+    global $err_lib, $config;
     $allowed = false;
     $pkg_data = get_api_configuration();
     $pkg_id = $pkg_data[0];
@@ -275,7 +323,8 @@ function api_whitelist_check() {
     }
     if (!$allowed) {
         unset($_SESSION);
-        $api_resp = array("status" => "forbidden", "code" => 403, "return" => 15, "message" => "");
+        $api_resp = array("status" => "forbidden", "code" => 403, "return" => 6);
+        $api_resp["message"] = $err_lib[$api_resp["return"]];
         http_response_code(403);
         echo json_encode($api_resp);
         die;
@@ -284,6 +333,7 @@ function api_whitelist_check() {
 
 // Search JSON response for specific fields
 function api_extended_search($base_data, $search_data) {
+    global $err_lib;
     $search_failed = false;
     // If client requests an extended search
     if (is_array($base_data) and is_array($search_data)) {
@@ -318,8 +368,8 @@ function api_extended_search($base_data, $search_data) {
     }
     // Check if we failed to find our search attributes
     if ($search_failed === true) {
-        $api_resp = array("status" => "not found", "code" => 404, "return" => 5);
-        $api_resp["message"] = "search attribute not found";
+        $api_resp = array("status" => "not found", "code" => 404, "return" => 7);
+        $api_resp["message"] = $err_lib[$api_resp["return"]];
         http_response_code(404);
         echo json_encode($api_resp) . PHP_EOL;
         die();
@@ -327,10 +377,78 @@ function api_extended_search($base_data, $search_data) {
     return $base_data;
 }
 
+// Check our local pfSense version
+function get_pfsense_version() {
+    # VARIABLES
+    $ver_path = "/etc/version";    // Assign the path to our version file
+    $ver_patch_path = "/etc/version.patch";    // Assign the path to our version patch file
+    $ver_bt_path = "/etc/version.buildtime";    // Assign the path to our version build time file
+    $ver_lc_path = "/etc/version.lastcommit";    // Assign the path to our version last commit file
+    $ver_data = array();    // Init an empty array for our version data
+    # RUN TIME
+    // Check that our files exist, if so read the files. Otherwise return error
+    if (file_exists($ver_path)) {
+        $ver_file = fopen($ver_path, "r");    // Open our file
+        $ver = str_replace(PHP_EOL, "", fread($ver_file, filesize($ver_path)));    // Save our version data
+        $ver_data["version"] = $ver;    // Save to array
+    }
+    if (file_exists($ver_patch_path)) {
+        $ver_patch_file = fopen($ver_patch_path, "r");    // Open our file
+        $ver_patch = str_replace(PHP_EOL, "", fread($ver_patch_file, filesize($ver_patch_path)));    // Save patch
+        $ver_data["patch"] = $ver_patch;    // Save to array
+    }
+    if (file_exists($ver_bt_path)) {
+        $ver_bt_file = fopen($ver_bt_path, "r");    // Open our file
+        $ver_bt = str_replace(PHP_EOL, "", fread($ver_bt_file, filesize($ver_bt_path)));    // Save bt data
+        $ver_data["buildtime"] = $ver_bt;    // Save to array
+    }
+    if (file_exists($ver_lc_path)) {
+        $ver_lc_file = fopen($ver_lc_path, "r");    // Open our file
+        $ver_lc = str_replace(PHP_EOL, "", fread($ver_lc_file, filesize($ver_lc_path)));    // Save bt data
+        $ver_data["lastcommit"] = $ver_lc;    // Save to array
+    }
+    $ver_data["program"] = floatval(str_replace(".", "", explode("-", $ver)[0]).".".$ver_patch);
+    return $ver_data;
+}
+
+// Parse our ARP table into an array
+function get_arp_table() {
+    // Local variables
+    $arp_cmd = "arp -an";    // Assign the command which reads our ARP table
+    exec($arp_cmd, $arp_data);    // Output our ARP table into a string
+    $arp_table = array();    // Init our ARP table array
+    // Loop through each line of our ARP data and parse into our array
+    foreach ($arp_data as $arp_line) {
+        $elements = explode(' ', $arp_line, 7);
+        $arp_entry = array();
+        $arp_entry['ip'] = trim(str_replace(array('(', ')'), '', $elements[1]));
+        $arp_entry['mac'] = trim($elements[3]);
+        $arp_entry['interface'] = trim($elements[5]);
+        $arp_entry['status'] = trim(substr($elements[6], 0, strrpos($elements[6], ' ')));
+        $arp_entry['linktype'] = trim(str_replace(array('[', ']'), '', strrchr($elements[6], ' ')));
+        $arp_table[] = $arp_entry;
+    }
+    return $arp_table;
+}
+
+// Pull a single ARP entry value from our ARP table
+function get_arp_entry($search, $value) {
+    // Local variables
+    $arp_table = get_arp_table();   // Pull our ARP table
+    $arp_match = [];    // Init our match array
+    // Loop through ARP table and look for matches
+    foreach ($arp_table as $arp_ent) {
+        if ($arp_ent[$search] === $value) {
+            $arp_match = $arp_ent;
+        }
+    }
+    return $arp_match;
+}
+
 // Check if a DNS Resolver (Unbound) host override already exists
 function unbound_host_override_exists($hostname, $domain) {
     // Local variables
-    global $config;
+    global $err_lib, $config;
     $curr_hosts = array();
     $host_exists = false;
     // Check if host override already exists
@@ -356,6 +474,7 @@ function unbound_host_override_exists($hostname, $domain) {
 
 // Check user's DNS Resolver (Unbound) host override alias input for errors
 function unbound_parse_aliases($aliases) {
+    global $err_lib;
     $aliases_fin = "";    // Default our alias value to blank string
     if (is_array($aliases)) {
         $a_count = 0;
@@ -365,9 +484,9 @@ function unbound_parse_aliases($aliases) {
             if (array_key_exists("host", $alias_ent) and is_string($alias_ent["host"])) {
                 $aliases_fin[$a_count] = array("host" => trim($alias_ent["host"]));
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 40);
-                $api_resp["message"] = "alias hostname required";
-                http_response_code(400);
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 2007);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                http_response_code($api_resp["code"]);
                 echo json_encode($api_resp) . PHP_EOL;
                 die();
             }
@@ -375,9 +494,9 @@ function unbound_parse_aliases($aliases) {
             if (array_key_exists("domain", $alias_ent) and is_string($alias_ent["domain"])) {
                 $aliases_fin[$a_count]["domain"] = trim($alias_ent["domain"]);
             } else {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 41);
-                $api_resp["message"] = "alias domain required";
-                http_response_code(400);
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 2008);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                http_response_code($api_resp["code"]);
                 echo json_encode($api_resp) . PHP_EOL;
                 die();
             }
@@ -399,9 +518,9 @@ function unbound_parse_aliases($aliases) {
         // Check if our aliases already exist
         foreach ($aliases_fin as $af) {
             if (unbound_host_override_exists($af["host"], $af["domain"])) {
-                $api_resp = array("status" => "bad request", "code" => 400, "return" => 43);
-                $api_resp["message"] = "host override already exists";
-                http_response_code(400);
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 2009);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                http_response_code($api_resp["code"]);
                 echo json_encode($api_resp) . PHP_EOL;
                 die();
             }
@@ -415,7 +534,7 @@ function unbound_parse_aliases($aliases) {
 
 // Duplicate function from /firewall_aliases.php: accept input and check if alias exists
 function alias_find_references($section, $field, $origname, &$is_alias_referenced, &$referenced_by) {
-    global $config;
+    global $err_lib, $config;
     if (!$origname || $is_alias_referenced) {
         return;
     }
@@ -489,7 +608,7 @@ function alias_in_use($alias_name) {
 // Input a physical interface ID, or a descriptive interface name, and return the pfSense interface ID (lan,wan,optx)
 function get_pfsense_if_id($interface) {
     // Variables
-    global $config;
+    global $err_lib, $config;
     // Loop through our config and check each interface for a physical ID match
     foreach ($config["interfaces"] as $ifid => $ife) {
         // Check that we have a configured interface ID first
@@ -521,7 +640,7 @@ function get_pfsense_if_id($interface) {
 function is_valid_rule_addr($addr, $direction) {
     // Variables
     $addr_types = array("any", "pppoe", "l2tp");   // Array of special src/dst types
-    $ret_val = array("valid" => true, "message" => "", "return" => 0, "data" => array());
+    $ret_val = array("valid" => true, "data" => array());
     // Check if our source values are valid
     if (is_string($addr)) {
         // Check src/dst is negated
@@ -551,8 +670,6 @@ function is_valid_rule_addr($addr, $direction) {
             }
         } else {
             $ret_val["valid"] = false;
-            $ret_val["message"] = "invalid rule ".$direction;
-            $ret_val["return"] = 88;
         }
         // If source is negated, add not to our array
         if ($addr_not) {
@@ -560,8 +677,6 @@ function is_valid_rule_addr($addr, $direction) {
         }
     } else {
         $ret_val["valid"] = false;
-        $ret_val["message"] = $direction." value must be type string";
-        $ret_val["return"] = 10;
     }
     return $ret_val;
 }
@@ -569,7 +684,7 @@ function is_valid_rule_addr($addr, $direction) {
 // Sorts filter rules by specified criteria and reloads the filter
 function sort_firewall_rules($mode=null, $data=null) {
     // Variables
-    global $config;
+    global $err_lib, $config;
     $sort_arr = [];
     $master_arr = [];
     foreach ($config["filter"]["rule"] as $idx => $fre) {
@@ -593,10 +708,59 @@ function sort_firewall_rules($mode=null, $data=null) {
     $config["filter"]["rule"] = $master_arr;
 }
 
+// Sorts nat rules by specified criteria and reloads the filter
+function sort_nat_rules($mode=null, $data=null) {
+    // Variables
+    global $err_lib, $config;
+    $sort_arr = [];
+    $master_arr = [];
+    foreach ($config["nat"]["rule"] as $idx => $fre) {
+        $curr_iface = $fre["interface"];    // Save our current entries interface
+        // Create our interface array if does not exist
+        if (!isset($sort_arr[$curr_iface])) {
+            $sort_arr[$curr_iface] = [];
+        }
+        // Check if user requested this rule to be placed at the top of array
+        if ($mode === "top" and $idx === $data) {
+            array_unshift($sort_arr[$curr_iface], $fre);
+        } else {
+            $sort_arr[$curr_iface][] = $fre;
+        }
+    }
+    foreach ($sort_arr as $if) {
+        foreach ($if as $rule) {
+            $master_arr[] = $rule;
+        }
+    }
+    $config["nat"]["rule"] = $master_arr;
+}
+
+// Sort our state table
+function sort_state_table() {
+    // Local variables
+    $states = shell_exec("/sbin/pfctl -s state");
+    $state_table = array();
+    // Parse our output
+    $state_rows = explode("\n", $states);
+    foreach ($state_rows as $id => $data) {
+        $data = preg_replace('!\s+!', ' ', $data);    // Remove extra whitespace
+        $data_fields = explode(" ", $data);    // Split on whitespace
+        if (count($data_fields) > 1) {
+            $state_table[$id] = array();
+            $state_table[$id]["interface"] = $data_fields[0];
+            $state_table[$id]["protocol"] = $data_fields[1];
+            $state_table[$id]["source"] = ($data_fields[3] === "->") ? $data_fields[2] : $data_fields[4];
+            $state_table[$id]["destination"] = ($data_fields[3] === "->") ? $data_fields[4] : $data_fields[2];
+            $state_table[$id]["status"] = $data_fields[5];
+        }
+    }
+    return $state_table;
+}
+
 // Checks if inputted routing gateway exists
 function is_gateway($gw) {
     // Local variables
-    global $config;
+    global $err_lib, $config;
     $gw_config = $config["gateways"]["gateway_item"];
     $gw_exists = false;
     // Check that we have gateways configured
@@ -614,7 +778,7 @@ function is_gateway($gw) {
 
 // Checks if an IP is in use elsewhere in our configuration
 function is_ip_in_use($ip) {
-    global $config;
+    global $err_lib, $config;
     $vip_conf = $config["virtualip"]["vip"];
     $if_conf = $config["interfaces"];
     // Check if IP is used in our virtual IP configuration
@@ -636,7 +800,7 @@ function is_ip_in_use($ip) {
 
 // Check if a VHID already exists
 function vhid_exists($vhid) {
-    global $config;
+    global $err_lib, $config;
     $vhid_config = $config["virtualip"]["vip"];
     $vhid_exists = false;
     # Loop through our virutal IPs and check if this VHID already exists
@@ -650,7 +814,7 @@ function vhid_exists($vhid) {
 
 // Find an available virtual IP vhid
 function next_vhid() {
-    global $config;
+    global $err_lib, $config;
     $vhid_config = $config["virtualip"]["vip"];
     $ret_vhid = null;
     # Loop through our range of valid VHID ids
@@ -706,7 +870,7 @@ function apply_virtual_ip($vip_ent) {
 
 // Remove virtual IP and bring down virtual interface
 function bring_down_virtual_ip($vip_ent, $id) {
-    global $config;
+    global $err_lib, $config;
     if ($vip_ent['mode'] == "proxyarp") {
         $viface = $vip_ent['interface'];
         unset($config["virtualip"]["vip"][$id]);
@@ -723,7 +887,7 @@ function bring_down_virtual_ip($vip_ent, $id) {
 // Get a complete config list of ALL interfaces. Based off interfaces_assign.php
 function get_all_avail_interfaces() {
     // Local variables
-    global $config;
+    global $err_lib, $config;
     $base_ifs = get_interface_list();    // Get our base interface list, this will be populated with all ifs
     // Add wireless ifs to our array
     if (is_array($config['wireless']['clone']) && count($config['wireless']['clone'])) {
@@ -823,7 +987,7 @@ function get_all_avail_interfaces() {
         }
     }
     // Add IPsec descriptions to our array
-    global $ipsec_descrs;
+    global $err_lib, $ipsec_descrs;
     $ipsec_descrs = interface_ipsec_vti_list_all();
     foreach ($ipsec_descrs as $ifname => $ifdescr) {
         $base_ifs[$ifname] = array('descr' => $ifdescr);
@@ -842,7 +1006,7 @@ function get_all_avail_interfaces() {
 // Get available media options for a given interface. Modified from interfaces.php
 function get_if_media_options($interface, $physical_if=false) {
     // Local variables
-    global $config;
+    global $err_lib, $config;
     $interface = ($physical_if !== true) ? get_pfsense_if_id($interface) : $interface;
     $interface = ($physical_if !== true) ? $config['interfaces'][$interface]['if'] : $interface;
     $mediaopts_list = array();
@@ -863,7 +1027,7 @@ function get_if_media_options($interface, $physical_if=false) {
 // Get our next available pfSense interface ID
 function get_next_pfsense_if_id() {
     // Local variables
-    global $config;
+    global $err_lib, $config;
     $curr_ifs = $config["interfaces"];
     // Check if we have our `wan` or `lan` pf IDs in use, if so, find the next OPTx id
     if (!array_key_exists("wan", $curr_ifs)) {
@@ -882,10 +1046,32 @@ function get_next_pfsense_if_id() {
     }
 }
 
+// Returns a list of dynamically configured IPv6 interfaces. Modified from interfaces.php function.
+function get_ipv6_if_list() {
+	global $err_lib, $config, $section;
+	$list = array('' => '');
+	$interfaces = get_configured_interface_with_descr(true);
+	$dyn_v6_ifs = array();
+	foreach ($interfaces as $iface => $ifacename) {
+		switch ($config['interfaces'][$iface]['ipaddrv6']) {
+			case "6to4":
+			case "6rd":
+			case "dhcp6":
+				$dyn_v6_ifs[$iface] = array(
+					'name' => $ifacename,
+					'ipv6_num_prefix_ids' => pow(2, (int) calculate_ipv6_delegation_length($iface)) - 1);
+				break;
+			default:
+				continue 2;
+		}
+	}
+	return($dyn_v6_ifs);
+}
+
 // Apply a new interface configuration
 function apply_interface_config($if_conf) {
     // Local variables
-    global $config;
+    global $err_lib, $config;
     $vlan_redo = false;
     // Check that our if configuration is an array
     if (is_array($if_conf)) {
@@ -933,6 +1119,69 @@ function apply_interface_config($if_conf) {
     return true;
 }
 
+// Delete an interface
+function destroy_interface($id) {
+    // Local variables
+    global $err_lib, $config;
+    $err_msg = "";
+    $success = false;
+    if ($id === "wan") {
+        $err_msg = 3042;
+    } elseif (link_interface_to_group($id)) {
+        $err_msg = 3043;
+    } elseif (link_interface_to_bridge($id)) {
+        $err_msg = 3044;
+    } elseif (link_interface_to_gre($id)) {
+        $err_msg = 3045;
+    } elseif (link_interface_to_gif($id)) {
+        $err_msg = 3046;
+    } elseif (interface_has_queue($id)) {
+        $err_msg = 3047;
+    } else {
+        unset($config['interfaces'][$id]['enable']);
+        $realid = get_real_interface($id);
+        interface_bring_down($id);   // Bring down interface
+        unset($config['interfaces'][$id]);	// Delete our interface from configuration
+        // Remove DHCP config for interface
+        if (is_array($config['dhcpd']) && is_array($config['dhcpd'][$id])) {
+            unset($config['dhcpd'][$id]);
+            services_dhcpd_configure('inet');
+        }
+        // Removed interface config for dhcp6
+        if (is_array($config['dhcpdv6']) && is_array($config['dhcpdv6'][$id])) {
+            unset($config['dhcpdv6'][$id]);
+            services_dhcpd_configure('inet6');
+        }
+        // Remove ACL for interface
+        if (count($config['filter']['rule']) > 0) {
+            foreach ($config['filter']['rule'] as $x => $rule) {
+                if ($rule['interface'] == $id) {
+                    unset($config['filter']['rule'][$x]);
+                }
+            }
+        }
+        // Remove NAT config for interface
+        if (is_array($config['nat']['rule']) && count($config['nat']['rule']) > 0) {
+            foreach ($config['nat']['rule'] as $x => $rule) {
+                if ($rule['interface'] == $id) {
+                    unset($config['nat']['rule'][$x]['interface']);
+                }
+            }
+        }
+        $change_note = " Deleted interface via API";    // Add a change note
+        write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+        // Disable DHCP if last interface
+        if ($config['interfaces']['lan'] && $config['dhcpd']['wan']) {
+            unset($config['dhcpd']['wan']);
+        }
+        // Update VLAN assignments
+        link_interface_to_vlans($realid, "update");
+        // Write success return
+        $success = true;
+    }
+    return array("status" => $success, "msg" => $err_msg);
+}
+
 // Check if CARP is enabled for disabled
 function is_carp_enabled() {
     // Check current CARP status
@@ -944,7 +1193,7 @@ function is_carp_enabled() {
 // Check each CARP interface's status
 function get_carp_if_status() {
     // Local variables
-    global $config;
+    global $err_lib, $config;
     $carp_if_stats = [];
     $carp_enabled = is_carp_enabled();
     foreach ($config['virtualip']['vip'] as $carp) {
@@ -977,7 +1226,7 @@ function get_carp_if_status() {
 // Enables CARP interfaces
 function enable_carp($enable) {
     // Local variables
-    global $config;
+    global $err_lib, $config;
     $vip_arr = $config['virtualip']['vip'];
     $no_action = (is_carp_enabled() === $enable) ? true : false;    // Check if a change is even requried
     // Disable if $enable is false, enable if $enable is true
@@ -1006,4 +1255,16 @@ function enable_carp($enable) {
         interfaces_sync_setup();
         set_single_sysctl('net.inet.carp.allow', '1');
     }
+}
+
+// Checks if an authentication server exists by name
+function is_authentication_server($name) {
+    global $err_lib, $config;
+    foreach ($config["system"]["authserver"] as $as) {
+        $reserved_names = [$as["name"], "Local_Database", "local", "LOCAL", "Local"];
+        if (in_array($name, $reserved_names)) {
+            return true;
+        }
+    }
+    return false;
 }

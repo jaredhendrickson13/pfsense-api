@@ -3,17 +3,19 @@
     <package>
         <name>API</name>
         <internal_name>api</internal_name>
-        <descr><![CDATA[A REST API for pfSense]]></descr>
+        <descr><![CDATA[A full API for pfSense]]></descr>
         <website>https://github.com/jaredhendrickson13</website>
         <category>System</category>
         <version>%%PKGVERSION%%</version>
         <configurationfile>api.xml</configurationfile>
         <maintainer>jaredhendrickson13@gmail.com</maintainer>
-        <enable></enable>
-        <allowed_interfaces>any</allowed_interfaces>
-        <content_type>json</content_type>
-        <keyhash>md5</keyhash>
-        <keybytes>16</keybytes>
-        <keys></keys>
+        <conf>
+				<enable></enable>
+				<allowed_interfaces>any</allowed_interfaces>
+				<content_type>json</content_type>
+				<keyhash>sha256</keyhash>
+				<keybytes>16</keybytes>
+				<keys></keys>
+        </conf>
     </package>
 </pfsensepkgs>
