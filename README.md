@@ -1,10 +1,10 @@
 ---
 # Introduction
-pfSense API is a fast, safe, full-fledged API based on REST architecture. This works by leveraging the same PHP functions and processes used by pfSense's webConfigurator into API endpoints to create, read, update and delete pfSense configurations. All API endpoints enforce input validation to prevent invalid configurations from being made. Configurations made via API are properly written to the master XML configuration and the correct backend configurations are made preventing the need for a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!
+pfSense API is a fast, safe, full-fledged HTTP API. This works by leveraging the same PHP functions and processes used by pfSense's webConfigurator into API endpoints to create, read, update and delete pfSense configurations. All API endpoints enforce input validation to prevent invalid configurations from being made. Configurations made via API are properly written to the master XML configuration and the correct backend configurations are made preventing the need for a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!
 
 # Installation
 To install pfSense API, simply run the following command from the pfSense shell:<br>
-`pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/v0.0.1/pfSense-pkg-API-0.0_1.txz`<br>
+`pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/v0.0.2/pfSense-2-4-pkg-API-0.0_2.txz`<br>
 
 To uninstall, run the following command:<br>
 `pkg delete pfSense-pkg-API`<br>

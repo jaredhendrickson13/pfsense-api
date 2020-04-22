@@ -2,7 +2,7 @@
 
 PORTNAME=	pfSense-pkg-API
 PORTVERSION=	0.0
-PORTREVISION=	1
+PORTREVISION=	2
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
 DISTFILES=	# empty
@@ -412,6 +412,10 @@ do-install:
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/modify/hosts
 	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/unbound/modify/hosts/index.php \
 		${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/modify/hosts
+	# Unbound apply
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/apply
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/services/unbound/apply/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/services/unbound/apply
 
 	# INSTALL OUR PKG INFO
 	${MKDIR} ${STAGEDIR}${DATADIR}

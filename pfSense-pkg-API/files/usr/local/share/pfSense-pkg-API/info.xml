@@ -4,7 +4,7 @@
         <name>API</name>
         <internal_name>api</internal_name>
         <descr><![CDATA[A full API for pfSense]]></descr>
-        <website>https://github.com/jaredhendrickson13</website>
+        <website>pfsense-api.jaredhendrickson.com</website>
         <category>System</category>
         <version>%%PKGVERSION%%</version>
         <configurationfile>api.xml</configurationfile>
