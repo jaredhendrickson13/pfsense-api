@@ -181,6 +181,7 @@
 @dir /usr/local/www/api/v1/services/unbound/start
 @dir /usr/local/www/api/v1/services/unbound/stop
 @dir /usr/local/www/api/v1/services/unbound/restart
+@dir /usr/local/www/api/v1/services/unbound/apply
 @dir /usr/local/www/api/v1/services/unbound/add/hosts
 @dir /usr/local/www/api/v1/services/unbound/delete/hosts
 @dir /usr/local/www/api/v1/services/unbound/modify/hosts
@@ -209,6 +210,7 @@
 /usr/local/www/api/v1/services/unbound/start/index.php
 /usr/local/www/api/v1/services/unbound/stop/index.php
 /usr/local/www/api/v1/services/unbound/restart/index.php
+/usr/local/www/api/v1/services/unbound/apply/index.php
 /usr/local/www/api/v1/services/unbound/add/hosts/index.php
 /usr/local/www/api/v1/services/unbound/delete/hosts/index.php
 /usr/local/www/api/v1/services/unbound/modify/hosts/index.php

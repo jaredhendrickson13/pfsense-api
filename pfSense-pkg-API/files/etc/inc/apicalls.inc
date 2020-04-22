@@ -5059,6 +5059,9 @@ function api_services_unbound_delete_hosts() {
             if ($client_params['aliases'] === true) {
                 $a_mode = true;
             }
+            if ($client_params['apply'] === true) {
+                $apply = $client_params['apply'];
+            }
             // Determine criteria for deletion
             if ($h_mode and !$d_mode and !$i_mode) {
                 $del_mode = "h";
@@ -5091,6 +5094,8 @@ function api_services_unbound_delete_hosts() {
                 echo var_dump($a_mode) . PHP_EOL;
                 echo "MODE:" . PHP_EOL;
                 echo var_dump($del_mode) . PHP_EOL;
+                echo "APPLY:" . PHP_EOL;
+                echo var_dump($apply) . PHP_EOL;
             }
             // Check that our configuration is a list and loop through each item, otherwise return ok resp
             if (array_key_exists("hosts", $config["unbound"]) and is_array($config["unbound"]["hosts"])) {
@@ -5173,11 +5178,13 @@ function api_services_unbound_delete_hosts() {
                 usort($hosts_conf, "strcmp");
                 $config["unbound"]["hosts"] = $hosts_conf;
                 write_config(sprintf(gettext($change_note)));
-                $reload_unbound = 0;
-                $reload_unbound |= services_unbound_configure();
-                if ($reload_unbound == 0) {
-                    system_resolvconf_generate();    // Update resolveconf
-                    system_dhcpleases_configure();    // Update DHCPD
+                mark_subsystem_dirty("unbound");
+                # If user requests immediately application
+                if ($apply === true) {
+                    $applied = unbound_reload_config();
+                }
+                // Return success if our function was successful
+                if ($applied === true or $apply !== true) {
                     $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                     $api_resp["message"] = "host override deleted";
                     $api_resp["data"] = $del_list;
@@ -5255,6 +5262,9 @@ function api_services_unbound_modify_hosts() {
             if (isset($client_params['aliases'])) {
                 $aliases = $client_params['aliases'];
             }
+            if ($client_params['apply'] === true) {
+                $apply = $client_params['apply'];
+            }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
                 echo "HOSTNAME:" . PHP_EOL;
@@ -5272,6 +5282,8 @@ function api_services_unbound_modify_hosts() {
                 echo "DESCRIPTION:" . PHP_EOL;
                 echo var_dump($descr) . PHP_EOL;
                 echo "ALIASES:" . PHP_EOL;
+                echo var_dump($aliases) . PHP_EOL;
+                echo "APPLY:" . PHP_EOL;
                 echo var_dump($aliases) . PHP_EOL;
             }
             // Validate our input against our exist configuration
@@ -5377,11 +5389,13 @@ function api_services_unbound_modify_hosts() {
                 usort($hosts_conf, "strcmp");
                 $config["unbound"]["hosts"] = $hosts_conf;
                 write_config(sprintf(gettext($change_note)));
-                $reload_unbound = 0;
-                $reload_unbound |= services_unbound_configure();
-                if ($reload_unbound == 0) {
-                    system_resolvconf_generate();    // Update resolveconf
-                    system_dhcpleases_configure();    // Update DHCPD
+                mark_subsystem_dirty("unbound");
+                # If user requests immediately application
+                if ($apply === true) {
+                    $applied = unbound_reload_config();
+                }
+                // Return success if our function was successful
+                if ($applied === true or $apply !== true) {
                     $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                     $api_resp["message"] = "Successfully updated unbound host override";
                     $api_resp["data"] = $update_list;
@@ -5598,6 +5612,9 @@ function api_services_unbound_add_hosts() {
             if (isset($client_params['aliases'])) {
                 $aliases = $client_params['aliases'];
             }
+            if ($client_params['apply'] === true) {
+                $apply = $client_params['apply'];
+            }
             // Add debug data if requested
             if (array_key_exists("debug", $client_params)) {
                 echo "HOSTNAME:" . PHP_EOL;
@@ -5610,6 +5627,8 @@ function api_services_unbound_add_hosts() {
                 echo var_dump($descr) . PHP_EOL;
                 echo "ALIASES:" . PHP_EOL;
                 echo var_dump($aliases) . PHP_EOL;
+                echo "APPLY:" . PHP_EOL;
+                echo var_dump($apply) . PHP_EOL;
             }
             // Validate our input against our exist configuration
             if (!unbound_host_override_exists($hostname, $domain)) {
@@ -5627,11 +5646,13 @@ function api_services_unbound_add_hosts() {
                     $config["unbound"]["hosts"][] = $host_ent;
                     usort($config["unbound"]["hosts"], "host_cmp");
                     write_config(sprintf(gettext($change_note)));
-                    $reload_unbound = 0;
-                    $reload_unbound |= services_unbound_configure();
-                    if ($reload_unbound == 0) {
-                        system_resolvconf_generate();    // Update resolveconf
-                        system_dhcpleases_configure();    // Update DHCPD
+                    mark_subsystem_dirty("unbound");
+                    # If user requests immediately application
+                    if ($apply === true) {
+                        $applied = unbound_reload_config();
+                    }
+                    // Return success if our function was successful
+                    if ($applied === true or $apply !== true) {
                         $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
                         $api_resp["message"] = "Successfully added unbound host override";
                         $api_resp["data"] = $host_ent;
@@ -5661,6 +5682,33 @@ function api_services_unbound_add_hosts() {
         return $api_resp;
     }
 }
+
+function api_services_unbound_apply() {
+    # VARIABLES;
+    global $err_lib;
+    $read_only_action = false;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-services-dnsresolver-edithost");    // Array of privileges allowing this action
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is POST (CREATE)
+        if ($http_method === 'POST') {
+            // Check if application was successful
+            if (unbound_reload_config() === true) {
+                $api_resp = array("status" => "ok", "code" => 200, "return" => 0);
+                $api_resp["message"] = "Successfully applied unbound configuration";
+                $api_resp["data"] = "";
+                return $api_resp;
+            } else {
+                $api_resp = array("status" => "server error", "code" => 500, "return" => 1);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
+            }
+        }
+    }
+}
+
 
 function api_interfaces_vlans() {
     # VARIABLES
