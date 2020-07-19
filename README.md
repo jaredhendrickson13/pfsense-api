@@ -4,7 +4,7 @@ pfSense API is a fast, safe, full-fledged HTTP API. This works by leveraging the
 
 # Installation
 To install pfSense API, simply run the following command from the pfSense shell:<br>
-`pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/v0.0.2/pfSense-2-4-pkg-API-0.0_2.txz`<br>
+`pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/download/v0.0.2/pfSense-2-4-pkg-API-0.0_2.txz`<br>
 
 To uninstall, run the following command:<br>
 `pkg delete pfSense-pkg-API`<br>
