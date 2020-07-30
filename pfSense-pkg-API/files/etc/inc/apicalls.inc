@@ -24,7 +24,7 @@ function api_system_tables() {
     # VARIABLES
     global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
-    $req_privs = array("page-all");    // Array of privs allowed
+    $req_privs = array("page-all", "page-diagnostics-tables");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
 
     # RUN TIME
@@ -37,7 +37,7 @@ function api_system_tables() {
 
             if (isset($client_params['search'])) {
                 $search = $client_params['search'];
-                $carp_status = api_extended_search($carp_status, $search);
+                $table_status = api_extended_search($table_status, $search);
             }
             // Print our JSON response
             $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $table_status);
