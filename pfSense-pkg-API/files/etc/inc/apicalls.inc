@@ -19,6 +19,42 @@ api_runtime_allowed();    // Check that our configuration allows this API call t
 session_start();    // Start our session. This is only used for tracking user name
 $pf_ver_num = get_pfsense_version()["program"];    // Pull our full pfSense version
 
+<<<<<<< Updated upstream
+=======
+
+function api_system_tables() {
+    # VARIABLES
+    global $err_lib, $config, $api_resp, $client_params;
+    $read_only_action = true;    // Set whether this action requires read only access
+    $req_privs = array("page-all", "page-diagnostics-tables");    // Array of page permissions allowed
+    $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
+
+    # RUN TIME
+    // Check that client is authenticated and authorized
+    if (api_authorized($req_privs, $read_only_action)) {
+        // Check that our HTTP method is GET (READ)
+        if ($http_method === 'GET') {
+            $table_status = [];
+            $table_status["tables"] = get_table_status();
+
+            if (isset($client_params['search'])) {
+                $search = $client_params['search'];
+                $table_status = api_extended_search($table_status, $search);
+            }
+            // Print our JSON response
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => $table_status);
+            return $api_resp;
+        } else {
+            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
+            $api_resp["message"] = $err_lib[$api_resp["return"]];
+            return $api_resp;
+        }
+    } else {
+        return $api_resp;
+    }
+}
+
+>>>>>>> Stashed changes
 function api_status_carp() {
     # VARIABLES
     global $err_lib, $config, $api_resp, $client_params;

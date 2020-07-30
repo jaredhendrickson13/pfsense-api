@@ -411,6 +411,47 @@ function get_pfsense_version() {
     return $ver_data;
 }
 
+<<<<<<< Updated upstream
+=======
+// Parse our IP tables into an array
+function get_table_status() {
+    $ip_tables = array();
+    exec("/sbin/pfctl -sT", $tables);   // Returns a list of all tables.
+
+    foreach ($tables as $tablename) {
+        // Skip bogon tables
+        if (($tablename == "bogons") || ($tablename == "bogonsv6")) {
+           continue;
+        }
+
+        // Retreive the list of IP's that have been resolved.
+        $entries = array();
+        exec("/sbin/pfctl -t " . escapeshellarg($tablename) . " -T show", $entries);
+
+        if (empty($entries)) {
+            continue;   // Skip to next table as there is no records here.
+        }
+
+        $ip_table = array();    // Init our IP table array
+
+        // Loop through each line of our data and parse into our array
+        foreach ($entries as $ip_line) {
+            $elements = explode(' ', $ip_line, 2);
+
+            // Array set with some defaults to be safe.
+            $ip_entry = array();
+            $ip_entry['ip'] = trim(str_replace(array('(', ')'), '', $elements[1]));
+            // $ip_entry['host_name'] = '';    // This should be the alias line item. Useful when using a hostname.
+            $ip_table[] = $ip_entry;
+
+        }
+        $ip_tables[$tablename] = $ip_table;
+    }
+    //echo var_dump($ip_tables);
+    return $ip_tables;
+}
+
+>>>>>>> Stashed changes
 // Parse our ARP table into an array
 function get_arp_table() {
     // Local variables
