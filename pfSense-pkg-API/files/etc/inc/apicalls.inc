@@ -5194,8 +5194,9 @@ function api_services_unbound_delete_hosts() {
                     return $api_resp;
                 }
             } else {
-                //to do
-                return;
+                $api_resp = array("status" => "bad request", "code" => 400, "return" => 2013);
+                $api_resp["message"] = $err_lib[$api_resp["return"]];
+                return $api_resp;
             }
         } else {
             $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
