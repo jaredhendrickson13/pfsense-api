@@ -12,6 +12,8 @@ function api_error_lib() {
         6 => "Forbidden",
         7 => "Search attribute not found",
         8 => "Could not locate pfSense version",
+        9 => "Authentication mode must be set to JWT to enable access token authentication",
+
         // 1000-1999 reserved for /system API calls
         1000 => "Invalid system hostname",
         1001 => "Invalid system hostname domain",

@@ -2,7 +2,7 @@
 
 PORTNAME=	pfSense-pkg-API
 PORTVERSION=	0.0
-PORTREVISION=	2
+PORTREVISION=	3
 CATEGORIES=	sysutils
 MASTER_SITES=	# empty
 DISTFILES=	# empty
@@ -19,6 +19,8 @@ do-extract:
 	${MKDIR} ${WRKSRC}
 
 do-install:
+
+
 	# INSTALL OUR API INCLUDE FILE
 	${MKDIR} ${STAGEDIR}/etc/inc
 	${INSTALL_DATA} ${FILESDIR}/etc/inc/api.inc \
@@ -27,6 +29,25 @@ do-install:
 		${STAGEDIR}/etc/inc
 	${INSTALL_DATA} ${FILESDIR}/etc/inc/apiresp.inc \
 		${STAGEDIR}/etc/inc
+	# INSTALL STATIC PHP-JWT FILES (static files are required as pfSense does not allow composer installations)
+	${MKDIR} ${STAGEDIR}/etc/inc/php-jwt
+	${INSTALL_DATA} ${FILESDIR}/etc/inc/php-jwt/README.md \
+		${STAGEDIR}/etc/inc/php-jwt
+	${INSTALL_DATA} ${FILESDIR}/etc/inc/php-jwt/LICENSE \
+		${STAGEDIR}/etc/inc/php-jwt
+	${INSTALL_DATA} ${FILESDIR}/etc/inc/php-jwt/composer.json \
+		${STAGEDIR}/etc/inc/php-jwt
+	${MKDIR} ${STAGEDIR}/etc/inc/php-jwt/src
+	${INSTALL_DATA} ${FILESDIR}/etc/inc/php-jwt/src/JWT.php \
+		${STAGEDIR}/etc/inc/php-jwt/src
+	${INSTALL_DATA} ${FILESDIR}/etc/inc/php-jwt/src/JWK.php \
+		${STAGEDIR}/etc/inc/php-jwt/src
+	${INSTALL_DATA} ${FILESDIR}/etc/inc/php-jwt/src/SignatureInvalidException.php \
+		${STAGEDIR}/etc/inc/php-jwt/src
+	${INSTALL_DATA} ${FILESDIR}/etc/inc/php-jwt/src/ExpiredException.php \
+		${STAGEDIR}/etc/inc/php-jwt/src
+	${INSTALL_DATA} ${FILESDIR}/etc/inc/php-jwt/src/BeforeValidException.php \
+		${STAGEDIR}/etc/inc/php-jwt/src
 
 	# INSTALL OUR PFSENSE PKG
 	${MKDIR} ${STAGEDIR}${PREFIX}/pkg
@@ -40,6 +61,11 @@ do-install:
     	${STAGEDIR}${PREFIX}/www/api
     # API version
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1
+	# ACCESS TOKEN API ENDPOINTS
+	# Access Token base
+	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/access_token
+	${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/access_token/index.php \
+		${STAGEDIR}${PREFIX}/www/api/v1/access_token
 	# USERS API ENDPOINTS------------------------------------------
 	# Users base
 	${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/users

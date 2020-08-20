@@ -19,6 +19,21 @@ api_runtime_allowed();    // Check that our configuration allows this API call t
 session_start();    // Start our session. This is only used for tracking user name
 $pf_ver_num = get_pfsense_version()["program"];    // Pull our full pfSense version
 
+function api_access_token() {
+    global $api_resp, $client_params, $err_lib;
+    # Check that auth mode is set to JWT before creating token
+    if (get_api_configuration()[1]["authmode"] === "jwt") {
+        # Return our JWT if user is authenticated
+        if (authenticate_user($client_params["username"], $client_params["password"])) {
+            $jwt = api_create_jwt($client_params["username"]);
+            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => ["token" => $jwt]);
+        }
+    } else {
+        $api_resp = array("status" => "forbidden", "code" => 403, "return" => 9, "message" => $err_lib[9], "data" => []);
+    }
+    return $api_resp;
+}
+
 function api_status_carp() {
     # VARIABLES
     global $err_lib, $config, $api_resp, $client_params;

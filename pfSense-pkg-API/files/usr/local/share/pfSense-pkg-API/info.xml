@@ -13,6 +13,8 @@
 				<enable></enable>
 				<allowed_interfaces>any</allowed_interfaces>
 				<content_type>json</content_type>
+                <server_key></server_key>
+                <jwt_exp>3600</jwt_exp>
 				<keyhash>sha256</keyhash>
 				<keybytes>16</keybytes>
 				<keys></keys>

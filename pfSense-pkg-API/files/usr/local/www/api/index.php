@@ -16,7 +16,7 @@ $b64_client_id = base64_encode($user);    // Save a base64 encoded version of ou
 $pkg_config = get_api_configuration();    // Save our entire pkg config
 $pkg_index = $pkg_config[0];    // Save our pkg configurations index value
 $api_config = $pkg_config[1];    // Save our api configuration from our pkg config
-$available_auth_modes = array("local" => "Local Database", "base64" => "Base64", "token" => "API Token");
+$available_auth_modes = array("local" => "Local Database", "base64" => "Base64", "token" => "API Token", "jwt" => "JWT");
 $available_hash_algos = array("sha256" => "SHA256", "sha384" => "SHA384", "sha512" => "SHA512", "md5" => "MD5");
 $available_key_bytes = array("16", "32", "64");    // Save our allowed key bitlengths
 $non_config_ifs = array("any" => "Any", "localhost" => "Link-local");    // Save non-configurable interface ids
@@ -27,6 +27,12 @@ if ($_POST["gen"] === "1") {
     $new_key = api_generate_token($user);
     print_apply_result_box(0, "\nSave this API key somewhere safe, it cannot be viewed again: \n".$new_key);
 }
+// Rotate JWT server key requested
+if ($_POST["rotate_server_key"] === "1") {
+    api_create_jwt_server_key(true);
+    print_apply_result_box(0, "\nRotated JWT server key.\n");
+}
+
 if (isset($_POST["del"]) and is_numeric($_POST["del"])) {
     $del_key = $_POST["del"];
     unset($config["installedpackages"]["package"][$pkg_index]["conf"]["keys"]["key"][$del_key]);
@@ -48,6 +54,10 @@ if (isset($_POST["save"])) {
     // Save authentication mode to config
     if (isset($_POST["authmode"])) {
         $api_config["authmode"] = $_POST["authmode"];
+    }
+    // Save JWT expiration value to coonfig
+    if (isset($_POST["jwt_exp"])) {
+        $api_config["jwt_exp"] = $_POST["jwt_exp"];
     }
     // Save key hash algos to config
     if (isset($_POST["keyhash"])) {
@@ -129,45 +139,7 @@ if (isset($_POST["save"])) {
                                 }
                                 ?>
                             </select>
-                            <span class="help-block">Authentication method API uses to authenticate during API calls. `Local Database` uses basic authentication using your pfSense user/password, `Base 64` uses base64 encoded pfSense user/password, `API Token` generates specific API tokens for API access</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">
-                            <span class="element-required">API Key Hash Algorithm</span>
-                        </label>
-                        <div class="col-sm-10">
-                            <select class="form-control" name="keyhash" id="keyhash">
-                                <?
-                                foreach ($available_hash_algos as $hty => $dhty) {
-                                    if ($api_config["keyhash"] === $hty) {
-                                        echo "<option value=\"".$hty."\" selected>".$dhty."</option>";
-                                    } else {
-                                        echo "<option value=\"".$hty."\">".$dhty."</option>";
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <span class="help-block">Hashing algorithm used to store API keys</span>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-2 control-label">
-                            <span class="element-required">API Key Bytes</span>
-                        </label>
-                        <div class="col-sm-10">
-                            <select class="form-control" name="keybytes" id="keybytes">
-                                <?
-                                foreach ($available_key_bytes as $bty) {
-                                    if ($api_config["keybytes"] === $bty) {
-                                        echo "<option value=\"".$bty."\" selected>".$bty."</option>";
-                                    } else {
-                                        echo "<option value=\"".$bty."\">".$bty."</option>";
-                                    }
-                                }
-                                ?>
-                            </select>
-                            <span class="help-block">Bit strength used when generating API keys</span>
+                            <span class="help-block">Authentication method API uses to authenticate during API calls. `Local Database` uses basic authentication using your pfSense user/password, `Base 64` uses base64 encoded pfSense user/password, `API Token` generates specific API tokens for API access. `JWT` allows user to obtain a token via <a href="/api/v1/access_token/">access token endpoint.</a>.</span>
                         </div>
                     </div>
                     <div class="form-group">
@@ -186,14 +158,69 @@ if (isset($_POST["save"])) {
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-10 col-sm-offset-2"><button class="btn btn-primary" type="submit" value="Save" name="save" id="save"><i class="fa fa-save icon-embed-btn"> </i>Save</button></div>
-        </form>
-    </div>
     <?
-        // Pull credentials if configured
-        $user_creds = api_get_existing_tokens($user);
         // Print HTML depending on authmode
+        if ($api_config["authmode"] === "jwt") {
+            $jwt_exp = $api_config["jwt_exp"];
+            echo "<div class='form-group'>".PHP_EOL;
+            echo "            <label class='col-sm-2 control-label'>";
+            echo "                <span class='element-required'>JWT Expiration</span>".PHP_EOL;
+            echo "            </label>".PHP_EOL;
+            echo "            <div class='col-sm-10'>".PHP_EOL;
+            echo "                <input type='number' min='600' max='86400' class='form-control' name='jwt_exp' id='jwt_exp' value='".strval($jwt_exp)."'>".PHP_EOL;
+            echo "                <span class='help-block'>How long (in seconds) the JWT is valid for. Allows a minimum is 600 seconds (5 minutes) and maximum of 86400 seconds (1 day).</span>".PHP_EOL;
+            echo "            </div>".PHP_EOL;
+            echo "        </div>".PHP_EOL;
+            echo "      </div>".PHP_EOL;
+            echo "    <button type='submit' id='rotate_server_key' name='rotate_server_key' class='btn btn-sm btn-success' value='1' title='Rotate JWT server key' onclick='return confirm(\"Rotating the JWT server key will void any existng JWTs. Proceed?\");'><i class='fa fa-level-up icon-embed-btn'></i>Rotate Server Key</button>".PHP_EOL;
+        } elseif ($api_config["authmode"] === "token") {
+            echo "<div class='form-group'>".PHP_EOL;
+            echo "            <label class='col-sm-2 control-label'>".PHP_EOL;
+            echo "                <span class='element-required'>API Key Hash Algorithm</span>".PHP_EOL;
+            echo "            </label>".PHP_EOL;
+            echo "            <div class='col-sm-10'>".PHP_EOL;
+            echo "                <select class='form-control' name='keyhash' id='keyhash'>".PHP_EOL;
+            foreach ($available_hash_algos as $hty => $dhty) {
+                if ($api_config["keyhash"] === $hty) {
+                    echo "<option value='" . $hty . "' selected>" . $dhty . "</option>".PHP_EOL;
+                } else {
+                    echo "<option value='" . $hty . "'>" . $dhty . "</option>".PHP_EOL;
+                }
+            }
+            echo "                </select>".PHP_EOL;
+            echo "                <span class='help-block'>Hashing algorithm used to store API keys</span>".PHP_EOL;
+            echo "            </div>".PHP_EOL;
+            echo "        </div>".PHP_EOL;
+            echo "        <div class='form-group'>".PHP_EOL;
+            echo "            <label class='col-sm-2 control-label'>".PHP_EOL;
+            echo "                <span class='element-required'>API Key Bytes</span>".PHP_EOL;
+            echo "            </label>".PHP_EOL;
+            echo "            <div class='col-sm-10'>".PHP_EOL;
+            echo "                <select class='form-control' name='keybytes' id='keybytes'>".PHP_EOL;
+            foreach ($available_key_bytes as $bty) {
+                if ($api_config['keybytes'] === $bty) {
+                    echo '<option value=\'' . $bty . '\' selected>' . $bty . '</option>'.PHP_EOL;
+                } else {
+                    echo '<option value=\'' . $bty . '\'>' . $bty . '</option>'.PHP_EOL;
+                }
+            }
+            echo "               </select>".PHP_EOL;
+            echo "                <span class='help-block'>Bit strength used when generating API keys</span>".PHP_EOL;
+            echo "            </div>".PHP_EOL;
+            echo "        </div>".PHP_EOL;
+            echo "    </div>".PHP_EOL;
+        } else {
+            echo "    </div>".PHP_EOL;
+        }
+    ?>
+        <button type="submit" id="save" name="save" class="btn btn-sm btn-primary" value="Save" title="Save API configuration"><i class="fa fa-save icon-embed-btn"></i>Save</button>
+        </form>
+<!--    <nav class="action-buttons">-->
+<!--    </nav>-->
+<?php
         if ($api_config["authmode"] === "token") {
+            // Pull credentials if configured
+            $user_creds = api_get_existing_tokens($user);
             echo "<div class=\"panel panel-default\">".PHP_EOL;
             echo "    <div class=\"panel-heading\">".PHP_EOL;
             echo "        <h2 class=\"panel-title\">API Credentials</h2>".PHP_EOL;
@@ -227,17 +254,11 @@ if (isset($_POST["save"])) {
             echo "        </div>".PHP_EOL;
             echo "    </div>".PHP_EOL;
             echo "</div>".PHP_EOL;
-        }
-    ?>
-    <?
-        if ($api_config["authmode"] === "token") {
             echo "<nav class=\"action-buttons\">";
             echo "    <a class=\"btn btn-sm btn-success\" href=\"/api/?gen=1\" usepost>";
             echo "        <i class=\"fa fa-plus icon-embed-btn\"></i>";
             echo "        Generate	</a>";
             echo "</nav>";
         }
-    ?>
-<?php
-include('foot.inc');
+        include('foot.inc');
 ?>

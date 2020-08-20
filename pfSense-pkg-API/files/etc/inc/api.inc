@@ -1,5 +1,9 @@
 <?php
 require_once("apiresp.inc");
+require_once("php-jwt/src/JWT.php");
+require_once("php-jwt/src/ExpiredException.php");
+require_once("php-jwt/src/SignatureInvalidException.php");
+require_once("php-jwt/src/BeforeValidException.php");
 require_once("config.inc");
 require_once("util.inc");
 require_once("interfaces.inc");
@@ -9,6 +13,11 @@ require_once("filter.inc");
 require_once("shaper.inc");
 require_once("auth.inc");
 require_once("functions.inc");
+use Firebase\JWT\JWT;
+use Firebase\JWT\ExpiredException;
+use Firebase\JWT\SignatureInvalidException;
+use Firebase\JWT\BeforeValidException;
+
 
 // HEADERS--------------------------------------------------------------------------------------------------------------
 header("Content-Type: application/json", true);
@@ -104,6 +113,44 @@ function api_generate_token($username) {
     return $key_new;
 }
 
+// Creates JWT server key if one does not exist, or optionally allows rotation of the JWT server key
+function api_create_jwt_server_key($rotate=false) {
+    global $config;
+    $pkg_index = get_api_configuration()[0];    // Save our current API configs pkg index
+    $api_config = get_api_configuration()[1];    // Save our current API config
+    # Create a new server key if one is not set
+    if (empty($api_config["server_key"]) or $rotate === true) {
+        $config["installedpackages"]["package"][$pkg_index]["conf"]["server_key"] = bin2hex(random_bytes(32));
+        write_config();
+    }
+}
+
+// Creates a JWT to use for JWT authentication
+function api_create_jwt($data) {
+    global $config;
+    $api_config = get_api_configuration()[1];    // Save our current API config
+    $token_exp = $api_config["jwt_exp"];    // Expire token in one hours
+    api_create_jwt_server_key();    // Ensure we have a JWT server key
+    $payload = array(
+        "iss" => $config["system"]["hostname"],
+        "exp" => time() + $token_exp,
+        "nbf" => time(),
+        "data" => $data
+    );
+    return JWT::encode($payload, $api_config["server_key"]);
+}
+
+// Decodes a JWT
+function api_decode_jwt($token) {
+    $key = get_api_configuration()[1]["server_key"];    // Save our current server key
+    try {
+        $decoded = (array) JWT::decode($token, $key, array('HS256'));
+    } catch (Exception $e) {
+        $decoded = false;
+    }
+    return $decoded;
+}
+
 // Get our API token ID for a given username
 function api_get_existing_tokens($username) {
     // Local variables
@@ -143,6 +190,23 @@ function api_authenticate() {
     $authenticated = false;
     $api_config = get_api_configuration()[1];
     $users = index_users();
+
+    // Check for JWT in Authorization header if authmode is set to JWT
+    if ($api_config["authmode"] === "jwt") {
+        $auth_header = explode(" ", $_SERVER["HTTP_AUTHORIZATION"]);
+        $token_type = $auth_header[0];
+        $token = $auth_header[1];
+        $decoded_jwt = api_decode_jwt($token);
+
+        // Check that our JWT from our Authorization header is valid
+        if ($token_type === "Bearer" and $decoded_jwt !== false) {
+            unset($_SESSION["Username"]);
+            $client_id = $decoded_jwt["data"];
+            $_SESSION["Username"] = $client_id;
+            $authenticated = true;
+        }
+    }
+
     // Format our client ID and token based on our configured auth mode
     if ($api_config["authmode"] === "base64") {
         $client_id = base64_decode($client_id);
@@ -312,7 +376,7 @@ function api_whitelist_check() {
             } elseif ($srv_ip === $if_info["ipaddrv6"]) {
                 $allowed = true;
                 break;
-            } elseif ($srv_ip === "127.0.0.1" and $wif === "localhost") {
+            } elseif (in_array($srv_ip, ["::1", "127.0.0.1", "localhost"]) and $wif === "localhost") {
                 $allowed = true;
                 break;
             }elseif ($wif === "any") {
@@ -326,7 +390,7 @@ function api_whitelist_check() {
         $api_resp = array("status" => "forbidden", "code" => 403, "return" => 6);
         $api_resp["message"] = $err_lib[$api_resp["return"]];
         http_response_code(403);
-        echo json_encode($api_resp);
+        echo json_encode($api_resp).PHP_EOL;
         die;
     }
 }
