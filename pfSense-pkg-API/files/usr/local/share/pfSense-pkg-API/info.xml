@@ -12,6 +12,7 @@
         <conf>
 				<enable></enable>
 				<allowed_interfaces>any</allowed_interfaces>
+                <authmode>local</authmode>
 				<content_type>json</content_type>
                 <server_key></server_key>
                 <jwt_exp>3600</jwt_exp>
