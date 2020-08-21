@@ -1,7 +1,7 @@
 <?php
 include_once("util.inc");
 include_once("guiconfig.inc");
-require_once("api.inc");
+require_once("api/framework/APITools.inc");
 
 // Variables
 global $config;    // Define our config globally
@@ -12,11 +12,10 @@ $tab_array[] = array(gettext("Settings"), true, "/api/");    // Define our page 
 display_top_tabs($tab_array, true);    // Ensure the tabs are written to the top of page
 $user = $_SESSION["Username"];    // Save our username
 $sec_client_id = bin2hex($user);    // Save our secure username client ID (token mode)
-$b64_client_id = base64_encode($user);    // Save a base64 encoded version of our username
-$pkg_config = get_api_configuration();    // Save our entire pkg config
+$pkg_config = APITools\get_api_config();    // Save our entire pkg config
 $pkg_index = $pkg_config[0];    // Save our pkg configurations index value
 $api_config = $pkg_config[1];    // Save our api configuration from our pkg config
-$available_auth_modes = array("local" => "Local Database", "base64" => "Base64", "token" => "API Token", "jwt" => "JWT");
+$available_auth_modes = array("local" => "Local Database", "token" => "API Token", "jwt" => "JWT");
 $available_hash_algos = array("sha256" => "SHA256", "sha384" => "SHA384", "sha512" => "SHA512", "md5" => "MD5");
 $available_key_bytes = array("16", "32", "64");    // Save our allowed key bitlengths
 $non_config_ifs = array("any" => "Any", "localhost" => "Link-local");    // Save non-configurable interface ids
@@ -24,12 +23,12 @@ $availabe_api_if = array_merge($non_config_ifs, get_configured_interface_with_de
 
 // UPON POST
 if ($_POST["gen"] === "1") {
-    $new_key = api_generate_token($user);
+    $new_key = APITools\generate_token($user);
     print_apply_result_box(0, "\nSave this API key somewhere safe, it cannot be viewed again: \n".$new_key);
 }
 // Rotate JWT server key requested
 if ($_POST["rotate_server_key"] === "1") {
-    api_create_jwt_server_key(true);
+    APITools\create_jwt_server_key(true);
     print_apply_result_box(0, "\nRotated JWT server key.\n");
 }
 
@@ -220,7 +219,7 @@ if (isset($_POST["save"])) {
 <?php
         if ($api_config["authmode"] === "token") {
             // Pull credentials if configured
-            $user_creds = api_get_existing_tokens($user);
+            $user_creds = APITools\get_existing_tokens($user);
             echo "<div class=\"panel panel-default\">".PHP_EOL;
             echo "    <div class=\"panel-heading\">".PHP_EOL;
             echo "        <h2 class=\"panel-title\">API Credentials</h2>".PHP_EOL;

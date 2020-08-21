@@ -1,6 +1,5 @@
 <?php
 namespace APITools;
-require_once("apiresp.inc");
 require_once("php-jwt/src/JWT.php");
 require_once("php-jwt/src/ExpiredException.php");
 require_once("php-jwt/src/SignatureInvalidException.php");
@@ -27,6 +26,40 @@ function get_request_data() {
         $data = json_decode(file_get_contents('php://input'), true);
     }
     return $data;
+}
+
+# Check our local pfSense version
+function get_pfsense_version() {
+    # VARIABLES
+    $ver_path = "/etc/version";    // Assign the path to our version file
+    $ver_patch_path = "/etc/version.patch";    // Assign the path to our version patch file
+    $ver_bt_path = "/etc/version.buildtime";    // Assign the path to our version build time file
+    $ver_lc_path = "/etc/version.lastcommit";    // Assign the path to our version last commit file
+    $ver_data = array();    // Init an empty array for our version data
+
+    // Check that our files exist, if so read the files. Otherwise return error
+    if (file_exists($ver_path)) {
+        $ver_file = fopen($ver_path, "r");    // Open our file
+        $ver = str_replace(PHP_EOL, "", fread($ver_file, filesize($ver_path)));    // Save our version data
+        $ver_data["version"] = $ver;    // Save to array
+    }
+    if (file_exists($ver_patch_path)) {
+        $ver_patch_file = fopen($ver_patch_path, "r");    // Open our file
+        $ver_patch = str_replace(PHP_EOL, "", fread($ver_patch_file, filesize($ver_patch_path)));    // Save patch
+        $ver_data["patch"] = $ver_patch;    // Save to array
+    }
+    if (file_exists($ver_bt_path)) {
+        $ver_bt_file = fopen($ver_bt_path, "r");    // Open our file
+        $ver_bt = str_replace(PHP_EOL, "", fread($ver_bt_file, filesize($ver_bt_path)));    // Save bt data
+        $ver_data["buildtime"] = $ver_bt;    // Save to array
+    }
+    if (file_exists($ver_lc_path)) {
+        $ver_lc_file = fopen($ver_lc_path, "r");    // Open our file
+        $ver_lc = str_replace(PHP_EOL, "", fread($ver_lc_file, filesize($ver_lc_path)));    // Save bt data
+        $ver_data["lastcommit"] = $ver_lc;    // Save to array
+    }
+    $ver_data["program"] = floatval(str_replace(".", "", explode("-", $ver)[0]).".".$ver_patch);
+    return $ver_data;
 }
 
 # Locates our API configuration from pfSense's XML configuration. Returns
@@ -58,8 +91,8 @@ function is_user_disabled($username) {
 # Creates JWT server key if one does not exist, or optionally allows rotation of the JWT server key
 function create_jwt_server_key($rotate=false) {
     global $config;
-    $pkg_index = get_api_configuration()[0];    // Save our current API configs pkg index
-    $api_config = get_api_configuration()[1];    // Save our current API config
+    $pkg_index = get_api_config()[0];    // Save our current API configs pkg index
+    $api_config = get_api_config()[1];    // Save our current API config
     # Create a new server key if one is not set
     if (empty($api_config["server_key"]) or $rotate === true) {
         $config["installedpackages"]["package"][$pkg_index]["conf"]["server_key"] = bin2hex(random_bytes(32));
@@ -84,6 +117,7 @@ function create_jwt($data) {
 
 # Decodes a JWT using our store server key
 function decode_jwt($token) {
+    $token = (is_string($token)) ? $token : "";
     $key = get_api_config()[1]["server_key"];    // Save our current server key
     try {
         $decoded = (array) JWT::decode($token, $key, array('HS256'));
@@ -123,4 +157,27 @@ function authenticate_token($cid, $ctoken) {
         }
     }
     return $authenticated;
+}
+
+// Generate new API tokens for token auth mode
+function generate_token($username) {
+    // Local variables
+    global $config;
+    $pkg_index = get_api_config()[0];    // Save our current API configs pkg index
+    $api_config = get_api_config()[1];    // Save our current API config
+    $key_hash_algo = $api_config["keyhash"];    // Pull our configured key hash algorithm
+    $key_bit_strength = $api_config["keybytes"];    // Pull our configured key bit strength
+    $key_user = bin2hex($username);    // Save our user's dedicated API client-ID
+    $key_new = bin2hex(random_bytes(intval($key_bit_strength)));    // Generate a new key
+    $key_hash = hash($key_hash_algo, $key_new);    // Hash our key using our configured algos
+
+    // Loop through our existing keys to see
+    $api_config["keys"] = !is_array($api_config["keys"]) ? array("key" => []) : $api_config["keys"];
+    $api_config["keys"]["key"][] = array("client_id" => $key_user, "client_token" => $key_hash, "algo" => $key_hash_algo);
+
+    // Write our changes
+    $config["installedpackages"]["package"][$pkg_index]["conf"] = $api_config;    // Write change to config
+    $change_note = " Generated API key";    // Add a change note
+    write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+    return $key_new;
 }

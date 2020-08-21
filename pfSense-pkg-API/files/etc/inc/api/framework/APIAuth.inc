@@ -1,7 +1,6 @@
 <?php
 require_once("api/framework/APITools.inc");
 
-
 # Creates an object capable of verifying authentication and authorization based on the configuration
 class APIAuth {
     private $api_config;
@@ -14,9 +13,9 @@ class APIAuth {
     public $is_authorized;
 
     # Create our method constructor
-    public function __construct($req_privs){
+    public function __construct($req_privs, $enforce_auth_mode=null){
         $this->api_config = APITools\get_api_config()[1];
-        $this->auth_mode = $this->api_config["authmode"];
+        $this->auth_mode = (is_null($enforce_auth_mode)) ? $this->api_config["authmode"] : $enforce_auth_mode;
         $this->request = APITools\get_request_data();
         $this->req_privs = $req_privs;
         $this->privs = [];

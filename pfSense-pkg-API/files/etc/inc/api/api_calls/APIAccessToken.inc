@@ -1,15 +1,16 @@
 <?php
-require_once("api/framework/APITools.inc");
 require_once("api/framework/APIBaseModel.inc");
 require_once("api/framework/APIResponse.inc");
-require_once("api/framework/APIAuth.inc");
 
 class APIAccessToken extends APIBaseModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->methods = ["GET"];
-        $this->validators = ["validateAuthMode"];
+        $this->set_auth_mode = "local";
+        $this->methods = ["POST"];
+        $this->validators = [
+            $this->validateAuthMode()
+        ];
     }
 
     # Validate our API configurations auth mode (must be JWT)
@@ -18,13 +19,13 @@ class APIAccessToken extends APIBaseModel {
 
         # Add error if our auth mode is invalid
         if ($api_config["authmode"] !== "jwt") {
-            $this->errors[] = APIResponse\get(9);
+            return APIResponse\get(9);
         }
     }
 
     # Override action subclass to create a JWT and return it to the user
     public function action() {
-        $jwt = api_create_jwt($this->client->username);
+        $jwt = APITools\create_jwt($this->client->username);
         return APIResponse\get(0, ["token" => $jwt]);
     }
 }

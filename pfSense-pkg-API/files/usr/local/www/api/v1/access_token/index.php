@@ -1,10 +1,7 @@
 <?php
 # Copyright 2020 - Jared Hendrickson
 # IMPORTS
-require_once("apicalls.inc");
+require_once("api/api_calls/APIAccessToken.inc");
 
 # RUN API CALL
-$resp = api_access_token();
-http_response_code($resp["code"]);
-echo json_encode($resp) . PHP_EOL;
-exit();
+(new APIAccessToken())->listen();

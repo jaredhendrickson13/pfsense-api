@@ -352,6 +352,7 @@ function api_whitelist_check() {
     $if_conf = $config["interfaces"];
     $whitelist = array("any");
     $srv_ip = $_SERVER["SERVER_ADDR"];
+
     // Check that we have a package configuration
     if (is_numeric($pkg_id)) {
         // Override defaults with user specified config
