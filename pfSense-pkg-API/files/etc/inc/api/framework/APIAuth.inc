@@ -1,5 +1,5 @@
 <?php
-require_once("api/APITools.inc");
+require_once("api/framework/APITools.inc");
 
 
 # Creates an object capable of verifying authentication and authorization based on the configuration
@@ -26,9 +26,8 @@ class APIAuth {
 
     # AUTHENTICATION #
     # Attempts to authenticate using local database authentication
-    private function authenticateLocalDatabase() {
+    private function authenticate_local_database() {
         $this->username = $this->request["client-id"];
-        var_dump(authenticate_user("admin", "pfsense"));
         // Authenticate against local database
         if (authenticate_user($this->username, $this->request["client-token"])) {
             // Ensure user is not disabled
@@ -42,7 +41,7 @@ class APIAuth {
     }
 
     # Attempts to authenticate using JWT authentication
-    private function authenticateJWT() {
+    private function authenticate_jwt() {
         $auth_header = explode(" ", $_SERVER["HTTP_AUTHORIZATION"]);
         $token_type = $auth_header[0];
         $token = $auth_header[1];
@@ -62,7 +61,7 @@ class APIAuth {
     }
 
     # Attempts to authenticate using API token authentication
-    private function authenticateToken() {
+    private function authenticate_token() {
         if (APITools\authenticate_token($this->request["client-id"], $this->request["client-id"]) === true) {
             $this->username = pack("H*", $this->request["client-id"]);
             // Ensure user is not disabled
@@ -79,13 +78,13 @@ class APIAuth {
     public function authenticate() {
         # Attempt to authenticate
         if ($this->auth_mode === "local") {
-            $resp = $this->authenticateLocalDatabase();
+            $resp = $this->authenticate_local_database();
         }
         elseif ($this->auth_mode === "jwt") {
-            $resp = $this->authenticateJWT();
+            $resp = $this->authenticate_jwt();
         }
         elseif ($this->auth_mode === "token") {
-            $resp = $this->authenticateToken();
+            $resp = $this->authenticate_token();
         }
         else {
             $resp = false;

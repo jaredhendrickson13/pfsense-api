@@ -1,7 +1,7 @@
 <?php
-require_once("api/APITools.inc");
-require_once("api/APIResponse.inc");
-require_once("api/APIAuth.inc");
+require_once("api/framework/APITools.inc");
+require_once("api/framework/APIResponse.inc");
+require_once("api/framework/APIAuth.inc");
 
 class APIBaseModel {
     public $client;
@@ -13,10 +13,9 @@ class APIBaseModel {
     public $methods;
     public $requires_auth;
 
-
     public function __construct() {
-        $this->methods = ["POST"];
-        $this->privileges = ["pages-all"];
+        $this->methods = ["GET", "POST"];
+        $this->privileges = ["page-all"];
         $this->client = new APIAuth($this->privileges);
         $this->requires_auth = true;
         $this->validators = [];
@@ -26,34 +25,62 @@ class APIBaseModel {
 
     }
 
-    # Validate our request
-    public function validate() {
-        # Validate authentication
+    private function check_authentication() {
         if ($this->requires_auth === true) {
-            # Add error if user is not authenticated
             if (!$this->client->is_authenticated) {
                 $this->errors[] = APIResponse\get(3);
             }
-            # Add error if user is not authorized
-            if (!$this->client->is_authorized) {
-                $this->errors[] = APIResponse\get(4);
-            }
         }
+    }
 
-        # Validate HTTP method
+    private function check_authorization() {
+        if (!$this->client->is_authorized) {
+            $this->errors[] = APIResponse\get(4);
+        }
+    }
+
+    private function check_method() {
         if (!in_array($_SERVER["REQUEST_METHOD"], $this->methods)) {
-
+            $this->errors[] = APIResponse\get(2);
         }
+    }
 
-        # Run our field/conditional validators
-        $this->validateAuthMode();
+    public function action() {
+        # This function is intended to be overridden by an API model extended class
+        # Any configuration writes, system configurations, etc should be added when overriding this base class
+        # If this class is not overridden a 500 unexpected error is returned
+        return APIResponse\get(1);
+    }
 
-        # Check if we have errors in our error array
+    public function validate() {
+        $this->check_method();
+        if ($this->requires_auth) {
+            $this->check_authentication();
+            $this->check_authorization();
+        }
+        $this->errors = array_merge($this->errors, $this->validators);
+
+
         if (count($this->errors) === 0) {
             return true;
         } else {
             return false;
         }
+    }
+
+    public function call() {
+        if ($this->validate()) {
+            return $this->action();
+        } else {
+            return $this->errors[0];
+        }
+    }
+
+    public function listen() {
+        $resp = $this->call();
+        http_response_code($resp["code"]);
+        echo json_encode($resp) . PHP_EOL;
+        exit();
     }
 
 }
