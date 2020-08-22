@@ -105,7 +105,8 @@ not specified, the default values are assumed:
  
 - `$this->privileges` : Allows you to set what pfSense permissions are required for clients to access this model. This
 utilizes the same permissions as the pfSense webConfigurator. Specify the privileges internal config value in array
-format. Defaults to `["page-all"]` which requires client to have the 'WebCfg - All Pages' permission.
+format. Defaults to `["page-all"]` which requires client to have the 'WebCfg - All Pages' permission. A list of pfSense
+privileges can be found here: https://github.com/pfsense/pfsense/blob/master/src/etc/inc/priv.defs.inc
 
 - `$this->requires_auth` : Specify whether authentication and authorization is required for the API model. If set to 
 `false` clients will not have to authenticate or have privilege to access. Defaults to `true`.
@@ -114,9 +115,6 @@ format. Defaults to `["page-all"]` which requires client to have the 'WebCfg - A
 writing a model that tests user's local database credentials and do not want the model to assume the API's configured
 auth mode you would specify `$this->set_auth_mode = "local";` to always force local authentication. Defaults to the 
 API's configured auth mode in the /api/ webConfigurator page.
-
-- `$this->validators` : Allows you to specify function calls that validate the API payload data. More information on
-writing model validators is included below. Defaults to `[]` which does not provide any validation. 
 
 
 #### Other Base Model Properties ####
@@ -128,11 +126,11 @@ custom API model:
 - `$this->validated_data` : An array for validators to use to populate data that has been validated
 - `$this->errors` : An array to populate any errors encountered. Should be an array of APIResponse values.
 
-#### Writing API Model Validators ####
-By default, API models do not provide any sort of validation. You are responsible for writing the class methods to 
-validate the request. Validator methods are essentially class methods that check specific field(s) in our 
-`$this->initial_data` property and either adds them to our `$this->validated_data` property, or adds an error response 
-to `$this->errors`.
+#### Overriding API Model Validation ####
+By default, API models do not provide any sort of validation. You are responsible for overriding the class method to 
+validate the request. To validate requests, you must override the `validate_payload()` method to check specific field(s)
+in the `$this->initial_data` property and either add them to our `$this->validated_data` property if they are valid, or 
+appends an error response to the `$this->errors` property.
 
 For example:
 ```php
@@ -145,15 +143,10 @@ class NewAPIModel extends APIBaseModel {
         $this->methods = ["POST"];
         $this->privileges = ["page-all", "page-diagnostics-arptable"];
         $this->requires_auth = false;
-        
-        # CALL YOUR VALIDATOR METHODS HERE. This must be an array of function calls!
-        $this->validators = [
-            $this->validateTest()
-        ];   
     }
 
-    # Create a new validator method that validates our payloads 'test' value.
-    private function validateTest() {
+    # Overrides our APIBaseModel validate_payload method to validate data within our initial_data property
+    public function validate_payload() {
         # Check if we have a test value in our payload, if so add the value to validated_data array
         if (array_key_exists("test", $this->initial_data)) {
             $this->validated_data["test"] = $this->initial_data["test"];
@@ -186,11 +179,11 @@ class NewAPIModel extends APIBaseModel {
         
         # CALL YOUR VALIDATOR METHODS HERE. This must be an array of function calls!
         $this->validators = [
-            $this->validateTest()
+            $this->validate_payload()
         ];   
     }
 
-    private function validateTest() {
+    public function validate_payload() {
         if (array_key_exists("test", $this->initial_data)) {
             $this->validated_data["test"] = $this->initial_data["test"];
         } 

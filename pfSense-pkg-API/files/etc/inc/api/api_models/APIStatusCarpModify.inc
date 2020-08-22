@@ -9,10 +9,9 @@ class APIStatusCarpModify extends APIBaseModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-status-carp"];
         $this->methods = ["POST"];
-        $this->validators = [$this->validate_payload()];
     }
 
-    private function validate_payload() {
+    public function validate_payload() {
         // Check if user specified enable value
         if (isset($this->initial_data['enable'])) {
             // Check if value is true or false

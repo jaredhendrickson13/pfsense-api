@@ -253,3 +253,207 @@ function enable_carp($enable) {
         set_single_sysctl('net.inet.carp.allow', '1');
     }
 }
+
+// Sorts nat rules by specified criteria and reloads the filter
+function sort_nat_rules($mode=null, $data=null) {
+    // Variables
+    global $config;
+    $sort_arr = [];
+    $master_arr = [];
+    foreach ($config["nat"]["rule"] as $idx => $fre) {
+        $curr_iface = $fre["interface"];    // Save our current entries interface
+        // Create our interface array if does not exist
+        if (!isset($sort_arr[$curr_iface])) {
+            $sort_arr[$curr_iface] = [];
+        }
+        // Check if user requested this rule to be placed at the top of array
+        if ($mode === "top" and $idx === $data) {
+            array_unshift($sort_arr[$curr_iface], $fre);
+        } else {
+            $sort_arr[$curr_iface][] = $fre;
+        }
+    }
+    foreach ($sort_arr as $if) {
+        foreach ($if as $rule) {
+            $master_arr[] = $rule;
+        }
+    }
+    $config["nat"]["rule"] = $master_arr;
+}
+
+// Input a physical interface ID, or a descriptive interface name, and return the pfSense interface ID (lan,wan,optx)
+function get_pfsense_if_id($interface)
+{
+    // Variables
+    global $err_lib, $config;
+    // Loop through our config and check each interface for a physical ID match
+    foreach ($config["interfaces"] as $ifid => $ife) {
+        // Check that we have a configured interface ID first
+        if (array_key_exists("if", $ife)) {
+            // Check if the interface id matches
+            if ($interface === $ife["if"]) {
+                return $ifid;    // Return our pfSense interface ID
+                break;    // Break loop just in case
+            }
+        }
+        // Check that we have a configured interface descr first
+        if (array_key_exists("descr", $ife)) {
+            // Check if the interface descr matches
+            if ($interface === $ife["descr"]) {
+                return $ifid;    // Return our pfSense interface ID
+                break;    // Break loop just in case
+            }
+        } else {
+            // Check if the pfSense interface ID matches
+            if (strtolower($interface) === $ifid) {
+                return $ifid;    // Return our pfSense interface ID
+                break;    // Break loop just in case
+            }
+        }
+    }
+}
+
+// Check if input is valid for rule source and destination
+function is_valid_rule_addr($addr, $direction) {
+    // Variables
+    $addr_types = array("any", "pppoe", "l2tp");   // Array of special src/dst types
+    $ret_val = array("valid" => true, "data" => array());
+    // Check if our source values are valid
+    if (is_string($addr)) {
+        // Check src/dst is negated
+        if (str_starts_with("!", $addr)) {
+            $addr_not = true;
+            $addr = str_replace("!", "", $addr);
+        }
+        // Check if our source data is valid
+        $addr_if = str_replace("ip", "", $addr);    // Save seperate variable to check for interface sourcees
+        if (is_ipaddr($addr) or is_subnet($addr)) {
+            $ret_val["data"] = array($direction => array("address" => $addr));
+        } elseif (is_alias($addr)) {
+            $ret_val["data"] = array($direction => array("address" => $addr));
+        } elseif (get_pfsense_if_id($addr_if)) {
+            $addr_pfif = get_pfsense_if_id($addr_if);    // Save our interface pfid
+            // If source was interface address (ending in ip), otherwise assume entire subnet
+            if (str_replace($addr_if, "", $addr) === "ip") {
+                $ret_val["data"] = array($direction => array("network" => $addr_pfif . "ip"));
+            } else {
+                $ret_val["data"] = array($direction => array("network" => $addr_pfif));
+            }
+        } elseif (in_array($addr, $addr_types)) {
+            if ($addr === "any") {
+                $ret_val["data"] = array($direction => array("any" => ""));
+            } else {
+                $ret_val["data"] = array($direction => array("network" => $addr));
+            }
+        } else {
+            $ret_val["valid"] = false;
+        }
+        // If source is negated, add not to our array
+        if ($addr_not) {
+            $ret_val["data"][$direction]["not"] = "";
+        }
+    } else {
+        $ret_val["valid"] = false;
+    }
+    return $ret_val;
+}
+
+// Checks if a given string starts with another given string
+function str_starts_with($needle, $haystack) {
+    $length = strlen($needle);
+    return (substr($haystack, 0, $length) === $needle);
+}
+
+// Remove virtual IP and bring down virtual interface
+function bring_down_virtual_ip($vip_ent, $id) {
+    global $err_lib, $config;
+    if ($vip_ent['mode'] == "proxyarp") {
+        $viface = $vip_ent['interface'];
+        unset($config["virtualip"]["vip"][$id]);
+        interface_proxyarp_configure($viface);
+    } else {
+        interface_vip_bring_down($vip_ent);
+        unset($config["virtualip"]["vip"][$id]);
+    }
+    if (count($config['virtualip']['vip']) == 0) {
+        unset($config['virtualip']['vip']);
+    }
+}
+
+// Apply changes to virtual IPs
+function apply_virtual_ip($vip_ent) {
+    $check_carp = false;
+    if (is_array($vip_ent)) {
+        foreach ($vip_ent as $vid => $ovip) {
+            if (!empty($ovip)) {
+                interface_vip_bring_down($ovip);
+            }
+            if ($vip_ent) {
+                switch ($vip_ent['mode']) {
+                    case "ipalias":
+                        interface_ipalias_configure($vip_ent);
+                        break;
+                    case "proxyarp":
+                        interface_proxyarp_configure($vip_ent['interface']);
+                        break;
+                    case "carp":
+                        $check_carp = true;
+                        interface_carp_configure($vip_ent);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+    /* Before changing check #4633 */
+    if ($check_carp === true && !get_carp_status()) {
+        set_single_sysctl("net.inet.carp.allow", "1");
+    }
+    filter_configure();
+}
+
+// Find an available virtual IP vhid
+function next_vhid() {
+    global $err_lib, $config;
+    $vhid_config = $config["virtualip"]["vip"];
+    $ret_vhid = null;
+    # Loop through our range of valid VHID ids
+    foreach (range(1, 255) as $idx) {
+        $vhid_exists = false;
+        # Loop through our virutal IPs and check if this VHID already exists
+        foreach ($vhid_config as $vip) {
+            if (intval($vip["vhid"]) === intval($idx)) {
+                $vhid_exists = true;
+            }
+        }
+        // Check if our VHID was already used
+        if (!$vhid_exists) {
+            $ret_vhid = $idx;
+            break;
+        }
+    }
+    return $ret_vhid;
+}
+
+// Checks if an IP is in use elsewhere in our configuration
+function is_ip_in_use($ip) {
+    global $err_lib, $config;
+    $vip_conf = $config["virtualip"]["vip"];
+    $if_conf = $config["interfaces"];
+    // Check if IP is used in our virtual IP configuration
+    foreach ($vip_conf as $vip) {
+        if ($ip === $vip["subnet"]) {
+            return true;
+        }
+    }
+    // Check if IP is used in our interface configuration
+    foreach ($if_conf as $iface) {
+        if ($ip === $iface["ipaddr"]) {
+            return true;
+        } elseif ($ip === $iface["ipaddrv6"]) {
+            return true;
+        }
+    }
+    return false;
+}

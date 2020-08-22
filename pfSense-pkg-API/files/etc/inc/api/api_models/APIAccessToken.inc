@@ -8,18 +8,15 @@ class APIAccessToken extends APIBaseModel {
         parent::__construct();
         $this->set_auth_mode = "local";
         $this->methods = ["POST"];
-        $this->validators = [
-            $this->validateAuthMode()
-        ];
     }
 
     # Validate our API configurations auth mode (must be JWT)
-    private function validateAuthMode() {
+    public function validate_payload() {
         $api_config = APITools\get_api_config()[1];
 
         # Add error if our auth mode is invalid
         if ($api_config["authmode"] !== "jwt") {
-            return APIResponse\get(9);
+            $this->errors[] = APIResponse\get(9);
         }
     }
 

@@ -192,7 +192,7 @@ function api_firewall_nat_portforwards() {
 
 function api_firewall_nat_portforwards_add() {
     # VARIABLES
-    global $err_lib, $g, $config, $tracker, $api_resp, $client_id, $client_params;
+    global $err_lib, $config, $api_resp, $client_id, $client_params;
     $user_created_msg = $_SESSION["Username"]."@".$_SERVER["REMOTE_ADDR"]." (API)";    // Save the username and ip of client
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-firewall-nat-portforward-edit");    // Array of privileges allowing this action

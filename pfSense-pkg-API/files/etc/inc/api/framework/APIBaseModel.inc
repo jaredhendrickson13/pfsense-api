@@ -6,7 +6,6 @@ require_once("api/framework/APIAuth.inc");
 class APIBaseModel {
     public $client;
     public $privileges;
-    public $validators;
     public $initial_data;
     public $validated_data;
     public $errors;
@@ -20,7 +19,6 @@ class APIBaseModel {
         $this->client = null;
         $this->requires_auth = true;
         $this->set_auth_mode = null;
-        $this->validators = [];
         $this->initial_data = APITools\get_request_data();
         $this->validated_data = [];
         $this->errors = [];
@@ -34,6 +32,12 @@ class APIBaseModel {
         return APIResponse\get(10);
     }
 
+    public function validate_payload() {
+        # This function is intended to be overridden by an API model extended class
+        # Any payload validation must be specified here
+        # If this class is not overridden no validation takes place
+    }
+
     public function validate() {
         $this->check_enable();
         $this->check_server_ip();
@@ -43,8 +47,7 @@ class APIBaseModel {
             $this->check_authentication();
             $this->check_authorization();
         }
-        $this->errors = array_filter(array_merge($this->errors, $this->validators));
-
+        $this->validate_payload();
 
         if (count($this->errors) === 0) {
             return true;

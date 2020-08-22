@@ -789,7 +789,7 @@ function sort_firewall_rules($mode=null, $data=null) {
 // Sorts nat rules by specified criteria and reloads the filter
 function sort_nat_rules($mode=null, $data=null) {
     // Variables
-    global $err_lib, $config;
+    global $config;
     $sort_arr = [];
     $master_arr = [];
     foreach ($config["nat"]["rule"] as $idx => $fre) {
