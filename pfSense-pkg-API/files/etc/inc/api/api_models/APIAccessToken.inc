@@ -23,7 +23,7 @@ class APIAccessToken extends APIBaseModel {
         }
     }
 
-    # Override action subclass to create a JWT and return it to the user
+    # Override action subclass to create a JWT and return it to the user after successful validation
     public function action() {
         $jwt = APITools\create_jwt($this->client->username);
         return APIResponse\get(0, ["token" => $jwt]);

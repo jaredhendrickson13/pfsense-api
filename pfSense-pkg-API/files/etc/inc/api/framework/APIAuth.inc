@@ -61,7 +61,7 @@ class APIAuth {
 
     # Attempts to authenticate using API token authentication
     private function authenticate_token() {
-        if (APITools\authenticate_token($this->request["client-id"], $this->request["client-id"]) === true) {
+        if (APITools\authenticate_token($this->request["client-id"], $this->request["client-token"]) === true) {
             $this->username = pack("H*", $this->request["client-id"]);
             // Ensure user is not disabled
             if (APITools\is_user_disabled($this->request["client-id"]) === false) {

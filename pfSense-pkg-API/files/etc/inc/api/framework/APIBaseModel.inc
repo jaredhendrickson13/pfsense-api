@@ -31,7 +31,7 @@ class APIBaseModel {
         # This function is intended to be overridden by an API model extended class
         # Any configuration writes, system configurations, etc should be added when overriding this base class
         # If this class is not overridden a 500 unexpected error is returned
-        return APIResponse\get(1);
+        return APIResponse\get(10);
     }
 
     public function validate() {

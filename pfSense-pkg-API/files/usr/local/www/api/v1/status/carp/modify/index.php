@@ -1,10 +1,5 @@
 <?php
 # Copyright 2020 - Jared Hendrickson
-# IMPORTS
-require_once("apicalls.inc");
+require_once("api/api_models/APIStatusCarpModify.inc");
+(new APIStatusCarpModify())->listen();;
 
-# RUN API CALL
-$resp = api_status_carp_modify();
-http_response_code($resp["code"]);
-echo json_encode($resp) . PHP_EOL;
-exit();

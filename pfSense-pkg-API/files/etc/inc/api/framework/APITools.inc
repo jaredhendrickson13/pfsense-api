@@ -14,9 +14,6 @@ require_once("shaper.inc");
 require_once("auth.inc");
 require_once("functions.inc");
 use Firebase\JWT\JWT;
-use Firebase\JWT\ExpiredException;
-use Firebase\JWT\SignatureInvalidException;
-use Firebase\JWT\BeforeValidException;
 
 # Gathers our URL form encoded data or JSON body data from our request and places them in a single array
 function get_request_data() {
@@ -121,7 +118,7 @@ function decode_jwt($token) {
     $key = get_api_config()[1]["server_key"];    // Save our current server key
     try {
         $decoded = (array) JWT::decode($token, $key, array('HS256'));
-    } catch (Exception $e) {
+    } catch (\Exception $e) {
         $decoded = false;
     }
     return $decoded;
@@ -180,4 +177,79 @@ function generate_token($username) {
     $change_note = " Generated API key";    // Add a change note
     write_config(sprintf(gettext($change_note)));    // Apply our configuration change
     return $key_new;
+}
+
+// Check if CARP is enabled for disabled
+function is_carp_enabled() {
+    // Check current CARP status
+    $status = get_single_sysctl('net.inet.carp.allow');
+    $enabled = boolval(intval($status) > 0);
+    return $enabled;
+}
+
+// Check each CARP interface's status
+function get_carp_if_status() {
+    // Local variables
+    global $err_lib, $config;
+    $carp_if_stats = [];
+    $carp_enabled = is_carp_enabled();
+    foreach ($config['virtualip']['vip'] as $carp) {
+        if ($carp['mode'] == "carp") {
+            $carp_if_ent = [];
+            $carp_if_ent["interface"] = $carp["interface"];
+            $carp_if_ent["vhid"] = $carp['vhid'];
+            $carp_if_ent["subnet"] = $carp['subnet'];
+            $carp_if_ent["subnet_bits"] = $carp['subnet_bits'];
+            $status = get_carp_interface_status("_vip{$carp['uniqid']}");
+            if ($carp_enabled == false) {
+                $carp_if_ent["status"] = "disabled";
+            } else {
+                if ($status == "MASTER") {
+                    $carp_if_ent["status"] = "master";
+                } else if ($status == "BACKUP") {
+                    $carp_if_ent["status"] = "backup";
+                } else if ($status == "INIT") {
+                    $carp_if_ent["status"] = "init";
+                }
+            }
+            // Add config to our array
+            $carp_if_stats[] = $carp_if_ent;
+        }
+    }
+    // Return our status
+    return $carp_if_stats;
+}
+
+// Enables CARP interfaces
+function enable_carp($enable) {
+    // Local variables
+    global $config;
+    $vip_arr = $config['virtualip']['vip'];
+    $no_action = (is_carp_enabled() === $enable) ? true : false;    // Check if a change is even requried
+    // Disable if $enable is false, enable if $enable is true
+    if (!$no_action and $enable === false) {
+        set_single_sysctl('net.inet.carp.allow', '0');
+        foreach ($vip_arr as $vip) {
+            if ($vip['mode'] != "carp" && $vip['mode'] != "ipalias")
+                continue;
+            if ($vip['mode'] == "ipalias" && substr($vip['interface'], 0, 4) != "_vip")
+                continue;
+            interface_vip_bring_down($vip);
+        }
+    } elseif (!$no_action and $enable === true) {
+        foreach ($vip_arr as $vip) {
+            switch ($vip['mode']) {
+                case "carp":
+                    interface_carp_configure($vip);
+                    break;
+                case 'ipalias':
+                    if (substr($vip['interface'], 0, 4) == "_vip") {
+                        interface_ipalias_configure($vip);
+                    }
+                    break;
+            }
+        }
+        interfaces_sync_setup();
+        set_single_sysctl('net.inet.carp.allow', '1');
+    }
 }

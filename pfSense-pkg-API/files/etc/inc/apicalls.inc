@@ -128,7 +128,7 @@ function api_firewall_nat() {
     # VARIABLES
     global $err_lib, $config, $api_resp, $client_params;
     $read_only_action = true;    // Set whether this action requires read only access
-    $req_privs = array("page-all", "page-firewall-virtualipaddresses");    // Array of privs allowed
+    $req_privs = array("page-all");    // Array of privs allowed
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
     $nat_array = array();    // Init our array
     # RUN TIME

@@ -1304,7 +1304,7 @@ function get_carp_if_status() {
 // Enables CARP interfaces
 function enable_carp($enable) {
     // Local variables
-    global $err_lib, $config;
+    global $config;
     $vip_arr = $config['virtualip']['vip'];
     $no_action = (is_carp_enabled() === $enable) ? true : false;    // Check if a change is even requried
     // Disable if $enable is false, enable if $enable is true

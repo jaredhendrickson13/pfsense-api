@@ -65,6 +65,12 @@ function get($id, $data=[]) {
             "return" => $id,
             "message" => "Authentication mode must be set to JWT to enable access token authentication",
         ],
+        10 => [
+            "status" => "server error",
+            "code" => "500",
+            "return" => $id,
+            "message" => "Your API request was valid but no actions were specified for this endpoint",
+        ]
     ];
 
     $response = $responses[$id];

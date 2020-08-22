@@ -56,134 +56,244 @@ diving into creating endpoints. To get started writing your own endpoints, pleas
     - Delete actions must be a `POST` request to an endpoint ending in `/delete/`
      (e.g. `https://localhost/api/v1/firewall/rules/delete/`)
 
-### Writing the API caller ### 
-At the core of the API endpoint is the API caller. This is a function that validates client request data, writes changes
-to the pfSense configuration file, makes any corresponding system changes, and returns the requested data as an array.
+### Writing the API model ### 
+At the core of the API endpoint is the API model. This is a class that validates client request data, writes changes
+to the pfSense configuration file, and makes any corresponding system changes. pfSense API is distributed with a 
+custom microframework to accommodate developers wanting to contribute or create their own API models and endpoints.
 
-1. Most API endpoints are designed to allow programmatic changes to configuration that is usually made in the pfSense
-webConfigurator. To get a basic understanding on what your API call will need to do, look at the PHP code of the 
-corresponding webConfigurator page (found within `/usr/local/www/` of your pfSense installation). You should be able to 
-get a good idea of what input validation is needed, and what core pfSense functions you will need to call to achieve 
-these changes. You can also use existing API call functions (found in `/files/etc/inc/apicalls.inc` within this repo) as
-a reference!
+#### Getting Started ####
+To get started creating a new API model, you first need to create a new PHP file in `/files/etc/inc/api/api_models` and
+create a new class that extends our APIBaseModel framework class:
 
-2. Write your function in `/files/etc/inc/apicalls.inc`. The function name should match the URL filepath without the 
-version. For example, for an API endpoint at URL `/api/v1/firewall/rules/delete/`, the function would be named
-`api_firewall_rules_delete`. Please also place this function next to any related functions in `apicall.inc`. For example
-if you write a new API call function for `api_firewall_rules_update`, place it next to any existing functions for the
-API firewall calls.
+```php
+<?php
+require_once("api/framework/APIBaseModel.inc");
 
-3. Ensure API callers always return the data of the action that was performed. For example, if you are writing an 
-`update` endpoint, ensure the API callers returns the updated data. Or if you are writing a `delete` endpoint, ensure
-the API caller always returns the deleted data. 
-
-4. Ensure any validation or API errors encountered when the API caller function is run returns a corresponding error
-from the `/files/etc/inc/apiresp.inc` file. You can read more about writing API error responses below.
-
-Here is an example structure of an API caller function:
+class NewAPIModel extends APIBaseModel {
+    
+}
 ```
-function api_caller_function() {
-    # VARIABLES
-    global $err_lib, $config, $api_resp, $client_params;
-    $read_only_action = true;    // Set whether this action requires read only access
-    $req_privs = array("page-all", "page-some-other-webconfigurator-permission");    // Array of privs allowed
-    $http_method = $_SERVER['REQUEST_METHOD'];    // Get our HTTP method
 
-    # RUN TIME
-    // Check that client is authenticated and authorized
-    if (api_authorized($req_privs, $read_only_action)) {
-        // Check that our HTTP method is GET (READ)
-        if ($http_method === 'GET') {
-            // ADD YOUR INPUT VALIDATION, CONFIG WRITES, AND SYSTEM CONFIGURATION
-            // Return our response
-            $api_resp = array("status" => "ok", "code" => 200, "return" => 0, "message" => "", "data" => []);
-            return $api_resp;
-        } else {
-            $api_resp = array("status" => "bad request", "code" => 400, "return" => 2);
-            $api_resp["message"] = $err_lib[$api_resp["return"]];
-            return $api_resp;
-        }
-    } else {
-        return $api_resp;    // Returns default unauthorized response
+#### Constructing the API Model ####
+In order to use the APIBaseModel framework, you must add a `__construct()` method to your new API model class and 
+initialize the APIBaseModel class as such. Additionally, you will specify your model attribute overrides within this 
+method:
+
+```php
+<?php
+require_once("api/framework/APIBaseModel.inc");
+
+class NewAPIModel extends APIBaseModel {
+    # Create our construct method
+    public function __construct() {
+        parent::__construct();    // Initializes our APIBaseModel class
+
+        # Add your API model properties here (see Overriding Base Model Properties
+        $this->methods = ["POST"];
+        $this->privileges = ["page-all", "page-diagnostics-arptable"];
+        $this->requires_auth = false;
     }
 }
 ```
 
-### Writing API responses ###
-The API uses a centralized API response array (found in `/file/etc/inc/apiresp.inc` of this repo). Each response
-corresponds with a unique code that can be used to get the response message, status, etc. This is particularly helpful
-when API response messages need to be changed as it is always in one central location. 
+#### Overriding Base Model Properties ####
+There are several class properties that you can customize to fit the needs of your API Model. If a model attribute is
+not specified, the default values are assumed:
 
-To create a new API response:
+- `$this->methods` : Allows you to set what HTTP methods are allowed in array format. Due limitations of pfSense's NGINX
+ configuration, only GET and POST requests can be used. Defaults to `["GET", "POST"]`.
+ 
+- `$this->privileges` : Allows you to set what pfSense permissions are required for clients to access this model. This
+utilizes the same permissions as the pfSense webConfigurator. Specify the privileges internal config value in array
+format. Defaults to `["page-all"]` which requires client to have the 'WebCfg - All Pages' permission.
 
-1. Pick a numeric code that is not already in use in the `$err_lib` array within the `api_error_lib()` function of 
-`/files/etc/inc/apiresp.inc`. Try to use a code that is within the reserved range of the API endpoint you are creating.
-2. Add a new array item to the `$err_lib` array within the `api_error_lib()`. The associated ID should be the numeric
-code you picked, and the value should be the descriptive message to return from the API. Some examples are:
-```
-$err_lib = array(
-     // 0-999 reserved for system API level responses
-     0 => "Success",
-     1 => "Process encountered unexpected error",
-     2 => "Invalid HTTP method",
-     3 => "Authentication failed"
-)
-```
-3. To get the response message, ensure your API caller function has `$err_lib` declared globally 
-(e.g. `global $err_lib;`), then you can pull the message corresponding with your code as such `$err_lib[<CODE>]`. Each
-API caller should return a response error similar to: 
-```
-array(
-    "status" => "unauthorized",    # Sets the descriptive HTTP response message (unauthorized, not found, ok, etc.)
-    "code" => 401,    # Sets the HTTP response code. This will be the response code PHP returns to the client.
-    "return" => 3,    # Set the unique API response code from `apiresp.inc`
-    "message" => $err_lib[3],    # Pull the message corresponding with this unique response code from `apiresp.inc`
-    "data" => []    # Set the data to return to the client in an array format
-);`
-```
+- `$this->requires_auth` : Specify whether authentication and authorization is required for the API model. If set to 
+`false` clients will not have to authenticate or have privilege to access. Defaults to `true`.
 
-### Writing API endpoint listeners ###
-Each API caller must have an API endpoint listener within the web path to listen for requests and execute the API caller 
-function. These can be found in `/files/usr/local/www/api/v1/`. To create a new endpoint:
+- `$this->set_auth_mode` : Allows you to statically specify the API authentication mode. For example, if you are 
+writing a model that tests user's local database credentials and do not want the model to assume the API's configured
+auth mode you would specify `$this->set_auth_mode = "local";` to always force local authentication. Defaults to the 
+API's configured auth mode in the /api/ webConfigurator page.
 
-1. Create a new directory in `/files/usr/local/www/api/v1/` that corresponds with the endpoint you are creating. For 
-example, if you are creating a new endpoint that deletes a firewall rule, you would create the directory 
-`/files/usr/local/www/api/v1/firewall/rules/delete/`.
-2. Create an index.php file within that directory and add the following code:
-```
+- `$this->validators` : Allows you to specify function calls that validate the API payload data. More information on
+writing model validators is included below. Defaults to `[]` which does not provide any validation. 
+
+
+#### Other Base Model Properties ####
+There are other properties inherited from APIBaseModel that are not intended (and shouldn't be) overridden by your
+custom API model:
+
+- `$this->client` : An APIAuth object that contains information about the client (for more see Accessing Client Data)
+- `$this->initial_data` : The request data as it was when the object was created
+- `$this->validated_data` : An array for validators to use to populate data that has been validated
+- `$this->errors` : An array to populate any errors encountered. Should be an array of APIResponse values.
+
+#### Writing API Model Validators ####
+By default, API models do not provide any sort of validation. You are responsible for writing the class methods to 
+validate the request. Validator methods are essentially class methods that check specific field(s) in our 
+`$this->initial_data` property and either adds them to our `$this->validated_data` property, or adds an error response 
+to `$this->errors`.
+
+For example:
+```php
 <?php
-# IMPORTS
-require_once("apicalls.inc");
+require_once("api/framework/APIBaseModel.inc");
 
-# RUN API CALL
-$resp = your_api_caller_function();    # <--- BE SURE TO CHANGE THIS TO YOUR API CALL FUNCTION
-http_response_code($resp["code"]);
-echo json_encode($resp) . PHP_EOL;
-exit();
+class NewAPIModel extends APIBaseModel {
+    public function __construct() {
+        parent::__construct();
+        $this->methods = ["POST"];
+        $this->privileges = ["page-all", "page-diagnostics-arptable"];
+        $this->requires_auth = false;
+        
+        # CALL YOUR VALIDATOR METHODS HERE. This must be an array of function calls!
+        $this->validators = [
+            $this->validateTest()
+        ];   
+    }
+
+    # Create a new validator method that validates our payloads 'test' value.
+    private function validateTest() {
+        # Check if we have a test value in our payload, if so add the value to validated_data array
+        if (array_key_exists("test", $this->initial_data)) {
+            $this->validated_data["test"] = $this->initial_data["test"];
+        } 
+        # Otherwise, append a new error response to our error list (see Writing API responses for more info)
+        else {
+            $this->errors[] = APIResponse\get(1);
+        }      
+    }
+}
 ```
-This expects the API caller function to return a associative array. This will then set the HTTP response code based on 
-the "code" value of your functions returned array. The returned array with then be serialized to JSON and returned to 
-the client.
+
+
+#### Writing API Model Action ####
+By default, the API model will return a 'Your API request was valid but no actions were specified for this endpoint' 
+error after validating input. This is because we need to tell it what to do when our request is valid! We do this by 
+overriding the APIBaseModel's `action()` method. This method should simply be a set of tasks to perform upon a 
+successful API call. If you are writing an endpoint to perform a change that is usually performed via the pfSense 
+webConfigurator, it may be helpful to look at the PHP code for the webConfigurator page. 
+
+As a basic example, if I wanted to add our validated input to our pfSense configuration:
+
+```php
+class NewAPIModel extends APIBaseModel {
+    public function __construct() {
+        parent::__construct();
+        $this->methods = ["POST"];
+        $this->privileges = ["page-all", "page-diagnostics-arptable"];
+        $this->requires_auth = false;
+        
+        # CALL YOUR VALIDATOR METHODS HERE. This must be an array of function calls!
+        $this->validators = [
+            $this->validateTest()
+        ];   
+    }
+
+    private function validateTest() {
+        if (array_key_exists("test", $this->initial_data)) {
+            $this->validated_data["test"] = $this->initial_data["test"];
+        } 
+        else {
+            $this->errors[] = APIResponse\get(1);
+        }      
+    }
+    
+    # Tell our API model what to do after successfully validating the client's request
+    public function action(){
+        $_SESSION["Username"] = $this->client->username;    // Save our user to session data for logging
+        $change_note = " Added TEST value via API";         // Add a change note
+        $config["test"][] = $this->validated_data;          // Write a new 'test' item to our master config
+        write_config(sprintf(gettext($change_note)));       // Apply our configuration change
+        return APIResponse\get(0, $this->validated_data);   // Return a success response containing our added data
+    }
+}
+```
+
+
+#### Writing API endpoints ####
+API models are not useful if we do not have an API endpoint that calls upon the model. API endpoints are the PHP scripts
+that will be placed in pfSense's web path. To create a new API endpoint, add an index.php file in 
+`/files/usr/local/www/api/v1/` wherever makes the most sense for your API call. You may also create new directories
+if none of the existing ones describe your API call well enough. For example, if I wanted to create a new API call
+that would be available at https://pfsensehost/api/v1/system/test/, I would need to create a new directory within
+/files/usr/local/www/api/v1/system/ called 'test' and add my index.php in that directory. 
+
+All that is needed for API endpoints is the following. Be sure to change the API model class name to your own:
+```php
+<?php
+require_once("api/api_models/YourAPIModel.inc");
+
+# Creates our API model object and listens for API calls
+(new YourAPIModel())->listen();    
+```
+
+
+
+#### Accessing Client Data ####
+If for any reason you need to access client data from within your API model class, you can access the `$this->client`
+property. This is an APIAuth object that contains details about the client:
+
+- `$this->client->username` : Our client's corresponding pfSense username
+- `$this->client->is_authenticated` : Whether the client successfully authenticated. Keep in mind the APIBaseModel will
+handle all authentication and authorization for you, so this is likely unneeded.
+- `$this->client->is_authorized` : Whether the client was authorized. Keep in mind the APIBaseModel will
+handle all authentication and authorization for you, so this is likely unneeded.
+- `$this->client->privs` : An array of privileges this user has
+- `$this->client->auth_mode` : The authentication mode that was used to authenticate the user
+
+### Writing API responses ###
+The API uses a centralized API response array (found in `/files/etc/inc/api/framework/APIResponse.inc` of this repo). 
+Each response corresponds with a unique ID that can be used to get the API response message, status, etc. This is 
+particularly helpful when API response messages need to be changed as it is always in one central location. To add a 
+new API response, you may add a new array item to the `$responses` variable within the `get()` function of 
+`/files/etc/inc/api/framework/APIResponse.inc`. Each response within the array should be formatted as an associative
+array with the `status`, `code`, `return`, and `message` keys. 
+
+For example, if I needed to write a new error response for API endpoint I could add:
+
+```
+620 => [
+    "status" => "bad request",     # Use this field to describe the HTTP response (not found, bad request, ok, etc.)
+    "code" => 400,                 # Use this field to set the HTTP response code that will be returned to the client
+    "return" => $id,               # This should always return the API response ID, in this case 620.
+    "message" => "Error found!"    # Set a descriptive response message
+]
+```
+
+After this response item is added to to the `$responses` variable within the `get()` function of 
+`/files/etc/inc/api/framework/APIResponse.inc`, you can get the response within your API model like this:
+
+`$this->errors[] = APIResponse\get(620);`
+
+Optionally, you can add data to the response as a parameter of the `get()` function like this:
+
+`$this->errors[] = APIResponse\get(620, $some_data);`
+
 
 ### Writing tool functions ###
 Often times you will need to create functions to condense redundant tasks. You can place any necessary tool functions in
-`/files/etc/inc/api.inc`. 
+`/files/etc/inc/api/framework/APITools.inc`. You may then access the tool function from your API model like this:
 
-### Adding endpoint to the package
-After you have written your API endpoint and have tested it's functionality, you must specify your endpoint files in
-the package makefile. Otherwise, it will not be included in the package in the next release. 
+`$some_variable = APITools\your_custom_tool_function();`
+
+### Adding Models and Endpoints to the Package
+After you have written your API models and endpoint and have tested it's functionality, you must specify your endpoint 
+files in the package makefile. Otherwise, it will not be included in the package in the next release. 
 
 1. Add the following lines to the `Makefile` located in this repo. **Be sure to change the file paths to match the files
 you have created**:
 ```
-${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/status/carp/modify
-${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/status/carp/modify/index.php \
-    ${STAGEDIR}${PREFIX}/www/api/v1/status/carp/modify
+${MKDIR} ${STAGEDIR}${PREFIX}/www/api/v1/system/test
+${INSTALL_DATA} ${FILESDIR}${PREFIX}/www/api/v1/system/test/index.php \
+    ${STAGEDIR}${PREFIX}/www/api/v1/system/test
 ```
 2. Add the following lines to the `pkg-plist` file located in this repo. Be sure to change the file paths to match the
 files you have created:
     - For each directory created, add: `@dir /usr/local/www/api/v1/status/carp/modify`
-    - For each index.php file created, add `/usr/local/www/api/v1/status/carp/modify/index.php`
+    - For each index.php endpoint created, add `/usr/local/www/api/v1/status/carp/modify/index.php`
+    - For each API model file created, add `/etc/inc/api/api_models/YourAPIModel.inc`
+
     
 Questions
 ---------
