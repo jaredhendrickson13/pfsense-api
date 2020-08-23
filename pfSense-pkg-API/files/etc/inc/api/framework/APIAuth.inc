@@ -9,6 +9,7 @@ class APIAuth {
     public $req_privs;
     public $username;
     public $privs;
+    public $ip_address;
     public $is_authenticated;
     public $is_authorized;
 
@@ -19,6 +20,7 @@ class APIAuth {
         $this->request = APITools\get_request_data();
         $this->req_privs = $req_privs;
         $this->privs = [];
+        $this->ip_address = $_SERVER["REMOTE_ADDR"];
         $this->is_authenticated = $this->authenticate();
         $this->is_authorized = $this->authorize();
     }

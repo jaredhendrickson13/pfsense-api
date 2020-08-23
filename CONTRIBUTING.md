@@ -228,6 +228,7 @@ If for any reason you need to access client data from within your API model clas
 property. This is an APIAuth object that contains details about the client:
 
 - `$this->client->username` : Our client's corresponding pfSense username
+- `$this->client->ip_address` : The IP address of our client
 - `$this->client->is_authenticated` : Whether the client successfully authenticated. Keep in mind the APIBaseModel will
 handle all authentication and authorization for you, so this is likely unneeded.
 - `$this->client->is_authorized` : Whether the client was authorized. Keep in mind the APIBaseModel will

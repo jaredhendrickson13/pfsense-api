@@ -24,8 +24,7 @@ class APIFirewallNatPortForwardsAdd extends APIBaseModel {
 
     // TODO: break this down into smaller field specific validators
     public function validate_payload() {
-        global $config;
-        $user_created_msg = $_SESSION["Username"]."@".$_SERVER["REMOTE_ADDR"]." (API)";    // Save the username and ip of client
+        $user_created_msg = $this->client->username."@".$this->client->ip_address." (API)";    // Save the username and ip of client
         $allowed_nat_ref = ["enable", "disable", "purenat"];    // Save our allow NAT reflection types
         $allowed_prot = ["tcp", "udp", "tcp/udp", "icmp", "esp", "ah", "gre", "ipv6", "igmp", "pim", "ospf"];
         if (isset($this->initial_data['interface'])) {

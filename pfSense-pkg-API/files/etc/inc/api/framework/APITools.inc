@@ -457,3 +457,129 @@ function is_ip_in_use($ip) {
     }
     return false;
 }
+
+// Sorts filter rules by specified criteria and reloads the filter
+function sort_firewall_rules($mode=null, $data=null) {
+    // Variables
+    global $config;
+    $sort_arr = [];
+    $master_arr = [];
+    foreach ($config["filter"]["rule"] as $idx => $fre) {
+        $curr_iface = $fre["interface"];    // Save our current entries interface
+        // Create our interface array if does not exist
+        if (!isset($sort_arr[$curr_iface])) {
+            $sort_arr[$curr_iface] = [];
+        }
+        // Check if user requested this rule to be placed at the top of array
+        if ($mode === "top" and $idx === $data) {
+            array_unshift($sort_arr[$curr_iface], $fre);
+        } else {
+            $sort_arr[$curr_iface][] = $fre;
+        }
+    }
+    foreach ($sort_arr as $if) {
+        foreach ($if as $rule) {
+            $master_arr[] = $rule;
+        }
+    }
+    $config["filter"]["rule"] = $master_arr;
+}
+
+// Checks if inputted routing gateway exists
+function is_gateway($gw) {
+    // Local variables
+    global $config;
+    $gw_config = $config["gateways"]["gateway_item"];
+    $gw_exists = false;
+    // Check that we have gateways configured
+    if (is_array($gw_config)) {
+        // Loop through each gateway and see if name matches
+        foreach ($gw_config as $gw_item) {
+            if ($gw === $gw_item["name"]) {
+                $gw_exists = true;
+                break;
+            }
+        }
+    }
+    return $gw_exists;
+}
+
+// Duplicate function from /firewall_aliases.php: accept input and check if alias exists
+function alias_find_references($section, $field, $origname, &$is_alias_referenced, &$referenced_by) {
+    global $err_lib, $config;
+    if (!$origname || $is_alias_referenced) {
+        return;
+    }
+    $sectionref = &$config;
+    foreach ($section as $sectionname) {
+        if (is_array($sectionref) && isset($sectionref[$sectionname])) {
+            $sectionref = &$sectionref[$sectionname];
+        } else {
+            return;
+        }
+    }
+    if (is_array($sectionref)) {
+        foreach ($sectionref as $itemkey => $item) {
+            $fieldfound = true;
+            $fieldref = &$sectionref[$itemkey];
+            foreach ($field as $fieldname) {
+                if (is_array($fieldref) && isset($fieldref[$fieldname])) {
+                    $fieldref = &$fieldref[$fieldname];
+                } else {
+                    $fieldfound = false;
+                    break;
+                }
+            }
+            if ($fieldfound && $fieldref == $origname) {
+                $is_alias_referenced = true;
+                if (is_array($item)) {
+                    $referenced_by = $item['descr'];
+                }
+                break;
+            }
+        }
+    }
+}
+
+// Input an alias name and check if the alias exists
+function alias_in_use($alias_name) {
+    $is_alias_referenced = false;
+    $referenced_by = false;
+    // Firewall rules
+    alias_find_references(array('filter', 'rule'), array('source', 'address'), $alias_name, $is_alias_referenced, $referenced_by);
+    alias_find_references(array('filter', 'rule'), array('destination', 'address'), $alias_name, $is_alias_referenced, $referenced_by);
+    alias_find_references(array('filter', 'rule'), array('source', 'port'), $alias_name, $is_alias_referenced, $referenced_by);
+    alias_find_references(array('filter', 'rule'), array('destination', 'port'), $alias_name, $is_alias_referenced, $referenced_by);
+    // NAT Rules
+    alias_find_references(array('nat', 'rule'), array('source', 'address'), $alias_name, $is_alias_referenced, $referenced_by);
+    alias_find_references(array('nat', 'rule'), array('source', 'port'), $alias_name, $is_alias_referenced, $referenced_by);
+    alias_find_references(array('nat', 'rule'), array('destination', 'address'), $alias_name, $is_alias_referenced, $referenced_by);
+    alias_find_references(array('nat', 'rule'), array('destination', 'port'), $alias_name, $is_alias_referenced, $referenced_by);
+    alias_find_references(array('nat', 'rule'), array('target'), $alias_name, $is_alias_referenced, $referenced_by);
+    alias_find_references(array('nat', 'rule'), array('local-port'), $alias_name, $is_alias_referenced, $referenced_by);
+    // NAT 1:1 Rules
+    //alias_find_references(array('nat', 'onetoone'), array('external'), $alias_name, $is_alias_referenced, $referenced_by);
+    //alias_find_references(array('nat', 'onetoone'), array('source', 'address'), $alias_name, $is_alias_referenced, $referenced_by);
+    alias_find_references(array('nat', 'onetoone'), array('destination', 'address'), $alias_name, $is_alias_referenced, $referenced_by);
+    // NAT Outbound Rules
+    alias_find_references(array('nat', 'outbound', 'rule'), array('source', 'network'), $alias_name, $is_alias_referenced, $referenced_by);
+    alias_find_references(array('nat', 'outbound', 'rule'), array('sourceport'), $alias_name, $is_alias_referenced, $referenced_by);
+    alias_find_references(array('nat', 'outbound', 'rule'), array('destination', 'address'), $alias_name, $is_alias_referenced, $referenced_by);
+    alias_find_references(array('nat', 'outbound', 'rule'), array('dstport'), $alias_name, $is_alias_referenced, $referenced_by);
+    alias_find_references(array('nat', 'outbound', 'rule'), array('target'), $alias_name, $is_alias_referenced, $referenced_by);
+    // Alias in an alias
+    alias_find_references(array('aliases', 'alias'), array('address'), $alias_name, $is_alias_referenced, $referenced_by);
+    // Load Balancer
+    alias_find_references(array('load_balancer', 'lbpool'), array('port'), $alias_name, $is_alias_referenced, $referenced_by);
+    alias_find_references(array('load_balancer', 'virtual_server'), array('port'), $alias_name, $is_alias_referenced, $referenced_by);
+    // Static routes
+    alias_find_references(array('staticroutes', 'route'), array('network'), $alias_name, $is_alias_referenced, $referenced_by);
+    return $is_alias_referenced;
+}
+
+// Strip special characters and replace whitespace with underscore
+function sanitize_str($string) {
+    $string = str_replace(' ', '_', $string);    // Replace whitespace with underscore
+    $string = preg_replace('/[^A-Za-z0-9\-_.]/', '', $string);    // Remove special characters
+    return $string;
+}
