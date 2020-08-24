@@ -13,10 +13,10 @@ class APIStatusCarp extends APIBaseModel {
     }
 
     public function action() {
-        global $config;
+        ;
         $carp_status = [];
         $carp_status["enable"] = APITools\is_carp_enabled();
-        $carp_status["maintenance_mode"] = isset($config["virtualip_carp_maintenancemode"]);
+        $carp_status["maintenance_mode"] = isset($this->config["virtualip_carp_maintenancemode"]);
         $carp_status["interfaces"] = APITools\get_carp_if_status();
         return APIResponse\get(0, $carp_status);
     }

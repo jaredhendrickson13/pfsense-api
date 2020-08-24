@@ -8,23 +8,22 @@ class APIFirewallRulesAdd extends APIBaseModel {
         parent::__construct();
         $this->methods = ["POST"];
         $this->privileges = ["page-all", "page-firewall-rules-edit"];
+        $this->change_note = "Added firewall rule via API";
     }
 
     public function action() {
-        global $config;
-        $next_rule_id = count($config["filter"]["rule"]);    // Save our next rule ID
-        $_SESSION["Username"] = $this->client->username;    // Save our CLIENT ID to session data for logging
-        $change_note = " Added firewall rule via API";    // Add a change note
-        $config["filter"]["rule"][] = $this->validated_data;    // Write to our master config
+
+        $next_rule_id = count($this->config["filter"]["rule"]);    // Save our next rule ID
+        $this->config["filter"]["rule"][] = $this->validated_data;    // Write to our master config
         APITools\sort_firewall_rules($this->initial_data["top"], $next_rule_id);    // Sort our firewall rules
-        write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+        $this->write_config();    // Apply our configuration change
         send_event("filter reload");    // Ensure our firewall filter is reloaded
         return APIResponse\get(0, $this->validated_data);
     }
 
     // TODO: break this down into smaller field specific validators
     public function validate_payload() {
-        global $config;
+
         $user_created_msg = $this->client->username."@".$this->client->ip_address." (API)";
         $allowed_rule_types = array("pass", "block", "reject");    // Array of allowed rule types
         $allowed_ip_prot = array("inet", "inet6", "inet46");    // Array of allowed IP protocols

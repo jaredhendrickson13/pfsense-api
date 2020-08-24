@@ -8,20 +8,18 @@ class APIFirewallVirtualIPsAdd extends APIBaseModel {
         parent::__construct();
         $this->methods = ["POST"];
         $this->privileges = ["page-all", "page-firewall-virtualipaddress-edit"];
+        $this->change_note = "Added virtual IP via API";
     }
 
     public function action() {
-        global $config;
-        $_SESSION["Username"] = $this->client->username;    // Save our CLIENT ID to session data for logging
-        $change_note = " Added virtual IP via API";    // Add a change note
-        $config["virtualip"]["vip"][] = $this->validated_data;    // Write to our master config
-        write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+        $this->config["virtualip"]["vip"][] = $this->validated_data;    // Write to our master config
+        $this->write_config();    // Apply our configuration change
         APITools\apply_virtual_ip($this->validated_data);    // Apply our backend changes with our new configuration
         return APIResponse\get(0, $this->validated_data);
     }
     
     public function validate_payload() {
-        global $config;
+
         $allowed_vip_modes = array("ipalias", "carp", "proxyarp", "other");    // Save our allowed vip modes in arra
         if (isset($this->initial_data['mode'])) {
             $mode = strtolower($this->initial_data['mode']);
@@ -117,8 +115,8 @@ class APIFirewallVirtualIPsAdd extends APIBaseModel {
             }
         }
         // Initialize our virtual IP configuration array
-        if (!is_array($config["virtualip"]["vip"])) {
-            $config["virtualip"] = array("vip" => []);
+        if (!is_array($this->config["virtualip"]["vip"])) {
+            $this->config["virtualip"] = array("vip" => []);
         }
         // Populate our new virtual IP entry
         $this->validated_data["mode"] = $mode;

@@ -71,7 +71,68 @@ function get($id, $data=[]) {
             "return" => $id,
             "message" => "Your API request was valid but no actions were specified for this endpoint",
         ],
-        
+        // 1000-1999 reserved for /system API calls
+        1000 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid system hostname"
+        ],
+        1001 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid system hostname domain"
+        ],
+        1002 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System certificate descriptive name required"
+        ],
+        1003 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid system certificate"
+        ],
+        1004 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid system certificate key"
+        ],
+        1005 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System certificate in use"
+        ],
+        1006 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "ARP IP required"
+        ],
+        1007 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid system DNS server IP address"
+        ],
+        1008 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System DNS server IP address required"
+        ],
+        1009 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Could not locate system certificate"
+        ],
+
         4000 => [
             "status" => "bad request",
             "code" => 400,
@@ -515,6 +576,157 @@ function get($id, $data=[]) {
             "code" => 400,
             "return" => $id,
             "message" => "Invalid firewall state table size"
+        ],
+        //5000-5999 reserved for /users API calls
+        5000 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Username required"
+        ],
+        5001 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "User does not exist"
+        ],
+        5002 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "User already exists"
+        ],
+        5003 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "User password required"
+        ],
+        5004 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "User privilege required"
+        ],
+        5005 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "User privilege must be type array or string"
+        ],
+        5006 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown user privilege"
+        ],
+        5007 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "User group name required"
+        ],
+        5008 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown group name"
+        ],
+        5009 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Group must be type array or string"
+        ],
+        5010 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "User authentication server name required"
+        ],
+        5011 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "LDAP authentication server hostname or IP required"
+        ],
+        5012 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid LDAP authentication server hostname or IP"
+        ],
+        5013 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Authentication server LDAP port required"
+        ],
+        5014 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid authentication server LDAP port"
+        ],
+        5015 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Authentication server LDAP URL type required"
+        ],
+        5016 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid authentication server LDAP URL type"
+        ],
+        5017 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid authentication server LDAP protocol version"
+        ],
+        5018 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Authentication server LDAP search scope required"
+        ],
+        5019 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid authentication server LDAP search scope"
+        ],
+        5020 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Authentication server LDAP bind DN required"
+        ],
+        5021 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Authentication server LDAP bind password required"
+        ],
+        5022 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Authentication server LDAP user naming attribute required"
+        ],
+        5023 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Authentication server LDAP group naming attribute required"
+        ],
+        5024 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Authentication server LDAP group member attribute required"
         ],
     ];
 

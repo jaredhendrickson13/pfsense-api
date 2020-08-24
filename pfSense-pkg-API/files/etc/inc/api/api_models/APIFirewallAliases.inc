@@ -12,10 +12,10 @@ class APIFirewallAliases extends APIBaseModel {
     }
 
     public function action() {
-        global $config;
+
         // Check that we have a configuration
-        if (!empty($config["aliases"]["alias"])) {
-            $alias_array = $config["aliases"]["alias"];
+        if (!empty($this->config["aliases"]["alias"])) {
+            $alias_array = $this->config["aliases"]["alias"];
         } else {
             $alias_array = [];
         }

@@ -12,10 +12,10 @@ class APIFirewallNat extends APIBaseModel {
     }
 
     public function action() {
-        global $config;
+
         // Check that we have a NAT configuration
-        if (!empty($config["nat"])) {
-            $this->validated_data = $config["nat"];
+        if (!empty($this->config["nat"])) {
+            $this->validated_data = $this->config["nat"];
         }
         return APIResponse\get(0, $this->validated_data);
     }

@@ -8,22 +8,20 @@ class APIFirewallAliasesDelete extends APIBaseModel {
         parent::__construct();
         $this->methods = ["POST"];
         $this->privileges = ["page-all", "page-firewall-aliases-edit"];
+        $this->change_note = "Deleted firewall alias via API";
     }
 
     public function action() {
-        global $config;
-        $_SESSION["Username"] = $this->client->username;    // Save our CLIENT ID to session data for logging
-        $change_note = " Deleted firewall alias via API";    // Add a change note
-        $del_conf = $config["aliases"]["alias"][$this->validated_data["id"]];    // Capture alias config before deleting
-        unset($config["aliases"]["alias"][$this->validated_data["id"]]);    // Remove this alias from our configuration
-        $config["aliases"]["alias"] = array_values($config["aliases"]["alias"]);    // Reindex array
-        write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+        $del_conf = $this->config["aliases"]["alias"][$this->validated_data["id"]];    // Capture alias config before deleting
+        unset($this->config["aliases"]["alias"][$this->validated_data["id"]]);    // Remove this alias from our configuration
+        $this->config["aliases"]["alias"] = array_values($this->config["aliases"]["alias"]);    // Reindex array
+        $this->write_config();    // Apply our configuration change
         send_event("filter reload");    // Ensure our firewall filter is reloaded
         return APIResponse\get(0, $del_conf);
     }
     
     public function validate_payload() {
-        global $config;
+
         if (isset($this->initial_data['name'])) {
             $name = $this->initial_data['name'];
             $name = APITools\sanitize_str($name);
@@ -32,7 +30,7 @@ class APIFirewallAliasesDelete extends APIBaseModel {
             if (!APITools\alias_in_use($name)) {
                 // Loop through our current config and find the index ID for our alias to delete
                 $c_count = 0;    // Init loop counter
-                foreach ($config["aliases"]["alias"] as $ce) {
+                foreach ($this->config["aliases"]["alias"] as $ce) {
                     // Check if this entry matches our requested value
                     if ($ce["name"] === $name) {
                         $del_index = $c_count;

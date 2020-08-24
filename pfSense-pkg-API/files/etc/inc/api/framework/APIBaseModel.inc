@@ -8,17 +8,22 @@ class APIBaseModel {
     public $privileges;
     public $initial_data;
     public $validated_data;
+    public $config;
     public $errors;
     public $methods;
+    public $change_note;
     public $requires_auth;
     public $set_auth_mode;
 
     public function __construct() {
+        global $config;
+        $this->config =& $config;
         $this->methods = ["GET", "POST"];
         $this->privileges = ["page-all"];
         $this->client = null;
         $this->requires_auth = true;
         $this->set_auth_mode = null;
+        $this->change_note = "Made unknown change via API";
         $this->initial_data = APITools\get_request_data();
         $this->validated_data = [];
         $this->errors = [];
@@ -30,6 +35,12 @@ class APIBaseModel {
         # Any configuration writes, system configurations, etc should be added when overriding this base class
         # If this class is not overridden a 500 unexpected error is returned
         return APIResponse\get(10);
+    }
+
+    protected function write_config() {
+        $_SESSION["Username"] = $this->client->username;    // Save our user to session data for logging
+        write_config(sprintf(gettext(" ".$this->change_note)));    // Apply our configuration change
+        unset($_SESSION);
     }
 
     public function validate_payload() {

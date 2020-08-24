@@ -12,10 +12,10 @@ class APIFirewallRules extends APIBaseModel {
     }
 
     public function action() {
-        global $config;
+
         // Check that we have a configuration
-        if (!empty($config["filter"]["rule"])) {
-            $rule_array = $config["filter"]["rule"];
+        if (!empty($this->config["filter"]["rule"])) {
+            $rule_array = $this->config["filter"]["rule"];
         } else {
             $rule_array = [];
         }

@@ -116,6 +116,10 @@ writing a model that tests user's local database credentials and do not want the
 auth mode you would specify `$this->set_auth_mode = "local";` to always force local authentication. Defaults to the 
 API's configured auth mode in the /api/ webConfigurator page.
 
+- `$this->change_note` : Sets the description of the action that occurred via API. This value will be shown in the 
+change logs found at Diagnostics > Backup & Restore > Config History. This defaults to "Made unknown change via API". 
+This is only necessary if your API model writes changes to the configuration.
+
 
 #### Other Base Model Properties ####
 There are other properties inherited from APIBaseModel that are not intended (and shouldn't be) overridden by your
@@ -125,6 +129,19 @@ custom API model:
 - `$this->initial_data` : The request data as it was when the object was created
 - `$this->validated_data` : An array for validators to use to populate data that has been validated
 - `$this->errors` : An array to populate any errors encountered. Should be an array of APIResponse values.
+- `$this->config` : Our pfSense configuration array. You may read current configuration values using this array or write
+changes to the configuration by updating it's values. If you do make changes to the configuration, you must use call
+`$this->write_config()` to apply them. 
+
+#### Reading and Writing to pfSense's XML Configuration ####
+Included in the API framework are properties and methods to read and write to pfSense's XML configuration. Please note
+that other functions are likely required to configure pfSense's backend to use the new configuration. These properties
+and methods are available anywhere within your API model:
+
+- `$this->config` : Our pfSense XML configuration in a PHP array format. You may read the current configuration from 
+this property or update/add new configuration by assigning the corresponding array key new values
+- `$this->write_config()` : This method writes any changes made to $this->config to pfSense's XML configuration file. 
+Any changes made to $this->config will not be applied until this method is executed. 
 
 #### Overriding API Model Validation ####
 By default, API models do not provide any sort of validation. You are responsible for overriding the class method to 
@@ -159,13 +176,13 @@ class NewAPIModel extends APIBaseModel {
 }
 ```
 
-
 #### Writing API Model Action ####
 By default, the API model will return a 'Your API request was valid but no actions were specified for this endpoint' 
 error after validating input. This is because we need to tell it what to do when our request is valid! We do this by 
 overriding the APIBaseModel's `action()` method. This method should simply be a set of tasks to perform upon a 
 successful API call. If you are writing an endpoint to perform a change that is usually performed via the pfSense 
-webConfigurator, it may be helpful to look at the PHP code for the webConfigurator page. 
+webConfigurator, it may be helpful to look at the PHP code for the webConfigurator page. This method must return an
+APIResponse item.
 
 As a basic example, if I wanted to add our validated input to our pfSense configuration:
 
@@ -194,15 +211,12 @@ class NewAPIModel extends APIBaseModel {
     
     # Tell our API model what to do after successfully validating the client's request
     public function action(){
-        $_SESSION["Username"] = $this->client->username;    // Save our user to session data for logging
-        $change_note = " Added TEST value via API";         // Add a change note
-        $config["test"][] = $this->validated_data;          // Write a new 'test' item to our master config
-        write_config(sprintf(gettext($change_note)));       // Apply our configuration change
+        $this->config["test"][] = $this->validated_data;          // Write a new 'test' item to our master config
+        $this->write_config();       // Apply our configuration change
         return APIResponse\get(0, $this->validated_data);   // Return a success response containing our added data
     }
 }
 ```
-
 
 #### Writing API endpoints ####
 API models are not useful if we do not have an API endpoint that calls upon the model. API endpoints are the PHP scripts

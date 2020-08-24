@@ -12,10 +12,10 @@ class APIFirewallVirtualIPs extends APIBaseModel {
     }
 
     public function action() {
-        global $config;
+
         // Check that we have a virtual IP configuration
-        if (!empty($config["virtualip"]["vip"])) {
-            $vip_array = $config["virtualip"]["vip"];
+        if (!empty($this->config["virtualip"]["vip"])) {
+            $vip_array = $this->config["virtualip"]["vip"];
         } else {
             $vip_array = [];
         }

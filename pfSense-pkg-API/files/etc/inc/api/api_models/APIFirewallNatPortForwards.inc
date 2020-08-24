@@ -11,10 +11,10 @@ class APIFirewallNatPortForwards extends APIBaseModel {
     }
 
     public function action() {
-        global $config;
+
         // Check that we have a virtual IP configuration
-        if (!empty($config["nat"]["rule"])) {
-            $this->validated_data = $config["nat"]["rule"];
+        if (!empty($this->config["nat"]["rule"])) {
+            $this->validated_data = $this->config["nat"]["rule"];
         }
         return APIResponse\get(0, $this->validated_data);
     }

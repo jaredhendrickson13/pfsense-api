@@ -8,6 +8,7 @@ require_once("config.inc");
 require_once("util.inc");
 require_once("interfaces.inc");
 require_once("interfaces_fast.inc");
+require_once("priv.defs.inc");
 require_once("service-utils.inc");
 require_once("filter.inc");
 require_once("shaper.inc");
@@ -582,4 +583,68 @@ function sanitize_str($string) {
     $string = str_replace(' ', '_', $string);    // Replace whitespace with underscore
     $string = preg_replace('/[^A-Za-z0-9\-_.]/', '', $string);    // Remove special characters
     return $string;
+}
+
+// Sort our state table
+function sort_state_table() {
+    // Local variables
+    $states = shell_exec("/sbin/pfctl -s state");
+    $state_table = array();
+    // Parse our output
+    $state_rows = explode("\n", $states);
+    foreach ($state_rows as $id => $data) {
+        $data = preg_replace('!\s+!', ' ', $data);    // Remove extra whitespace
+        $data_fields = explode(" ", $data);    // Split on whitespace
+        if (count($data_fields) > 1) {
+            $state_table[$id] = array();
+            $state_table[$id]["interface"] = $data_fields[0];
+            $state_table[$id]["protocol"] = $data_fields[1];
+            $state_table[$id]["source"] = ($data_fields[3] === "->") ? $data_fields[2] : $data_fields[4];
+            $state_table[$id]["destination"] = ($data_fields[3] === "->") ? $data_fields[4] : $data_fields[2];
+            $state_table[$id]["status"] = $data_fields[5];
+        }
+    }
+    return $state_table;
+}
+
+// Restarts the pfSense webConfigurator
+function restart_webconfigurator() {
+    ob_flush();
+    flush();
+    log_error(gettext("webConfigurator configuration has changed. Restarting webConfigurator."));
+    send_event("service restart webgui");
+}
+
+// Parse our ARP table into an array
+function get_arp_table() {
+    // Local variables
+    $arp_cmd = "arp -an";    // Assign the command which reads our ARP table
+    exec($arp_cmd, $arp_data);    // Output our ARP table into a string
+    $arp_table = array();    // Init our ARP table array
+    // Loop through each line of our ARP data and parse into our array
+    foreach ($arp_data as $arp_line) {
+        $elements = explode(' ', $arp_line, 7);
+        $arp_entry = array();
+        $arp_entry['ip'] = trim(str_replace(array('(', ')'), '', $elements[1]));
+        $arp_entry['mac'] = trim($elements[3]);
+        $arp_entry['interface'] = trim($elements[5]);
+        $arp_entry['status'] = trim(substr($elements[6], 0, strrpos($elements[6], ' ')));
+        $arp_entry['linktype'] = trim(str_replace(array('[', ']'), '', strrchr($elements[6], ' ')));
+        $arp_table[] = $arp_entry;
+    }
+    return $arp_table;
+}
+
+// Pull a single ARP entry value from our ARP table
+function get_arp_entry($search, $value) {
+    // Local variables
+    $arp_table = get_arp_table();   // Pull our ARP table
+    $arp_match = [];    // Init our match array
+    // Loop through ARP table and look for matches
+    foreach ($arp_table as $arp_ent) {
+        if ($arp_ent[$search] === $value) {
+            $arp_match = $arp_ent;
+        }
+    }
+    return $arp_match;
 }
