@@ -673,3 +673,31 @@ function unbound_reload_config() {
         return true;
     }
 }
+
+// Check if a DNS Resolver (Unbound) host override already exists
+function unbound_host_override_exists($hostname, $domain) {
+    // Local variables
+    global $err_lib, $config;
+    $curr_hosts = array();
+    $host_exists = false;
+    // Check if host override already exists
+    if (array_key_exists("hosts", $config["unbound"])) {
+        $curr_hosts = $config["unbound"]["hosts"];
+    }
+    foreach ($curr_hosts as $host_ent) {
+        if ($host_ent["host"] === $hostname and $host_ent["domain"] === $domain) {
+            $host_exists = true;
+            break;
+        }
+        if (is_array($host_ent["aliases"])) {
+            foreach ($host_ent["aliases"]["item"] as $alias_ent) {
+                if ($alias_ent["host"] === $hostname and $alias_ent["domain"] === $domain) {
+                    $host_exists = true;
+                    break;
+                }
+            }
+        }
+    }
+    return $host_exists;
+}
+
