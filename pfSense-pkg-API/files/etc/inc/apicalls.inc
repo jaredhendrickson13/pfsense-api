@@ -2891,7 +2891,7 @@ function api_users_delete_groups() {
     # VARIABLES
     global $err_lib, $userindex, $groupindex, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
-    $req_privs = array("page-all", "page-system-usermanager-addprivs", "page-system-groupmanager-");   // Allowed privs
+    $req_privs = array("page-all", "page-system-usermanager-addprivs", "page-system-groupmanager-addprivs");   // Allowed privs
     $userindex = index_users();    // Index our users
     $groupindex = index_groups();    // Index our groups
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -3332,7 +3332,7 @@ function api_users_add_groups() {
     # VARIABLES
     global $err_lib, $userindex, $groupindex, $api_resp, $client_id, $client_params;
     $read_only_action = false;    // Set whether this action requires read only access
-    $req_privs = array("page-all", "page-system-usermanager-addprivs", "page-system-groupmanager-");   // Allowed privs
+    $req_privs = array("page-all", "page-system-groupmanager");   // Allowed privs
     $userindex = index_users();    // Index our users
     $groupindex = index_groups();    // Index our groups
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
@@ -4206,8 +4206,9 @@ function api_services_sshd_modify() {
     $read_only_action = false;    // Set whether this action requires read only access
     $req_privs = array("page-all", "page-system-advanced-admin");    // Array of privileges allowing this action
     $http_method = $_SERVER['REQUEST_METHOD'];    // Save our HTTP method
-    $allowed_auth_types = array("disabled", "enabled", "both");    // Array of allowed auth types
     $err_found = false;    // Track errors
+    $allowed_auth_types = array("disabled", "enabled", "both");    // Array of allowed auth types
+
     # RUN TIME
     // Check that client is authenticated and authorized
     if (api_authorized($req_privs, $read_only_action)) {

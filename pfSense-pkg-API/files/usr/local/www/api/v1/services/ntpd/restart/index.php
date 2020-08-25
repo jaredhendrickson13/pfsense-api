@@ -1,10 +1,4 @@
 <?php
 # Copyright 2020 - Jared Hendrickson
-# IMPORTS
-require_once("apicalls.inc");
-
-# RUN API CALL
-$resp = api_services_ntpd_restart();
-http_response_code($resp["code"]);
-echo json_encode($resp) . PHP_EOL;
-exit();
+require_once("api/api_models/APIServicesNtpdRestart.inc");
+(new APIServicesNtpdRestart())->listen();

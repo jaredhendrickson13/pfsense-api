@@ -648,3 +648,15 @@ function get_arp_entry($search, $value) {
     }
     return $arp_match;
 }
+
+// Checks if an authentication server exists by name
+function is_authentication_server($name) {
+    global $err_lib, $config;
+    foreach ($config["system"]["authserver"] as $as) {
+        $reserved_names = [$as["name"], "Local_Database", "local", "LOCAL", "Local"];
+        if (in_array($name, $reserved_names)) {
+            return true;
+        }
+    }
+    return false;
+}

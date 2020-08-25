@@ -132,6 +132,91 @@ function get($id, $data=[]) {
             "return" => $id,
             "message" => "Could not locate system certificate"
         ],
+        // 2000-2999 reserved for /services API calls
+        2000 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid sshd enable value"
+        ],
+        2001 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid sshd key only mode"
+        ],
+        2002 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid sshd agent forwarding value"
+        ],
+        2003 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid sshd port"
+        ],
+        2004 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound host override hostname required"
+        ],
+        2005 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound host override domain required"
+        ],
+        2006 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound host override IP address required"
+        ],
+        2007 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound host override alias hostname required"
+        ],
+        2008 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound host override alias domain required"
+        ],
+        2009 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound host override alias already exists"
+        ],
+        2010 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound host override already exists"
+        ],
+        2011 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid unbound host override IP address"
+        ],
+        2012 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound host override new IP required"
+        ],
+        2013 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound host override does not exist"
+        ],
 
         4000 => [
             "status" => "bad request",
@@ -727,6 +812,18 @@ function get($id, $data=[]) {
             "code" => 400,
             "return" => $id,
             "message" => "Authentication server LDAP group member attribute required"
+        ],
+        5025 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Could not locate authentication server"
+        ],
+        5026 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Authentication server name already in use"
         ],
     ];
 
