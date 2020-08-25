@@ -660,3 +660,16 @@ function is_authentication_server($name) {
     }
     return false;
 }
+
+// Reload our unbound configuration, restart associated services and clear config locks
+function unbound_reload_config() {
+    $reload_unbound = 0;
+    $reload_unbound |= services_unbound_configure();
+    // Check if application was successful
+    if ($reload_unbound === 0) {
+        system_resolvconf_generate();    // Update resolveconf
+        system_dhcpleases_configure();    // Update DHCPD
+        clear_subsystem_dirty("unbound");
+        return true;
+    }
+}

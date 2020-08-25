@@ -217,7 +217,13 @@ function get($id, $data=[]) {
             "return" => $id,
             "message" => "Unbound host override does not exist"
         ],
-
+        2014 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Host override deletion criteria not met"
+        ],
+        // 4000-4999 reserved for /firewall API calls
         4000 => [
             "status" => "bad request",
             "code" => 400,
