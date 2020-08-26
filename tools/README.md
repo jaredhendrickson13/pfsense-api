@@ -19,7 +19,9 @@ Command will output the FreeBSD make command output. Outputs the following files
 
 - `pfsense-api/pfSense-pkg-API/Makefile` : The rendered Makefile
 - `pfsense-api/pfSense-pkg-API/pkg-plist`: The rendered pkg-plist
-- `pfsense-api/pfSense-pkg-API/pfSense-pkg-API-<VERSION>.txz` : The FreeBSD package distribution file
+- `pfsense-api/pfSense-pkg-API/pfSense-pkg-API-<VERSION>.txz` : The FreeBSD package distribution file. On FreeBSD 11, 
+this should be located in the `pfsense-api/pfSense-pkg-API` directory after completion. On FreeBSD 12 it should be 
+located in the `pfsense-api/pfSense-pkg-API/work/pkg` directory.
 
 ### Notes
 - This script heavily depends on it's relative filepaths. You may execute the script from any directory, but do not move

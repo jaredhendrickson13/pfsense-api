@@ -19,7 +19,7 @@ file_paths = {"dir": [], "file": []}
 excluded_files = ["pkg-deinstall.in", "pkg-install.in", "etc", "usr"]
 
 # Set Jijna2 environment and variables
-j2_env = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath=template_dir))
+j2_env = jinja2.Environment(loader=jinja2.FileSystemLoader(searchpath=str(template_dir)))
 j2_env.filters["dirname"] = dirname
 plist_template = j2_env.get_template("pkg-plist.j2")
 makefile_template = j2_env.get_template("Makefile.j2")
@@ -29,10 +29,10 @@ for root, dirs, files in os.walk(files_dir, topdown=True):
     root = pathlib.Path(str(root).replace(str(files_dir), ""))
     for dir in dirs:
         if dir not in excluded_files:
-            file_paths["dir"].append(root.joinpath(dir))
+            file_paths["dir"].append(str(root.joinpath(dir)))
     for file in files:
         if file not in excluded_files:
-            file_paths["file"].append(root.joinpath(file))
+            file_paths["file"].append(str(root.joinpath(file)))
 
 # Generate pkg-plist file
 with open(pkg_dir.joinpath("pkg-plist"), "w") as pw:
