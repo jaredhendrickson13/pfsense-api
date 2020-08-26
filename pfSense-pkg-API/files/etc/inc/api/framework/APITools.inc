@@ -701,3 +701,237 @@ function unbound_host_override_exists($hostname, $domain) {
     return $host_exists;
 }
 
+// Get a complete config list of ALL interfaces. Based off interfaces_assign.php
+function get_all_avail_interfaces() {
+    // Local variables
+    global $err_lib, $config;
+    $base_ifs = get_interface_list();    // Get our base interface list, this will be populated with all ifs
+    // Add wireless ifs to our array
+    if (is_array($config['wireless']['clone']) && count($config['wireless']['clone'])) {
+        foreach ($config['wireless']['clone'] as $clone) {
+            $base_ifs[$clone['cloneif']] = $clone;
+            $base_ifs[$clone['cloneif']]['is_wlclone'] = true;
+        }
+    }
+    // Add VLAN ifs to our array
+    if (is_array($config['vlans']['vlan']) && count($config['vlans']['vlan'])) {
+        //$timea = microtime(true);
+        foreach ($config['vlans']['vlan'] as $vlan) {
+            $base_ifs[$vlan['vlanif']] = $vlan;
+            $base_ifs[$vlan['vlanif']]['is_vlan'] = true;
+        }
+    }
+    // Add bridge ifs to our array
+    if (is_array($config['bridges']['bridged']) && count($config['bridges']['bridged'])) {
+        foreach ($config['bridges']['bridged'] as $bridge) {
+            $base_ifs[$bridge['bridgeif']] = $bridge;
+            $base_ifs[$bridge['bridgeif']]['is_bridge'] = true;
+        }
+    }
+    // Add GIF ifs to our array
+    if (is_array($config['gifs']['gif']) && count($config['gifs']['gif'])) {
+        foreach ($config['gifs']['gif'] as $gif) {
+            $base_ifs[$gif['gifif']] = $gif;
+            $base_ifs[$gif['gifif']]['is_gif'] = true;
+        }
+    }
+    // Add GRE ifs to our array
+    if (is_array($config['gres']['gre']) && count($config['gres']['gre'])) {
+        foreach ($config['gres']['gre'] as $gre) {
+            $base_ifs[$gre['greif']] = $gre;
+            $base_ifs[$gre['greif']]['is_gre'] = true;
+        }
+    }
+    // Add LAGG ifs to our array
+    if (is_array($config['laggs']['lagg']) && count($config['laggs']['lagg'])) {
+        foreach ($config['laggs']['lagg'] as $lagg) {
+            $base_ifs[$lagg['laggif']] = $lagg;
+            $base_ifs[$lagg['laggif']]['is_lagg'] = true;
+            /* LAGG members cannot be assigned */
+            $lagifs = explode(',', $lagg['members']);
+            foreach ($lagifs as $lagif) {
+                if (isset($base_ifs[$lagif])) {
+                    unset($base_ifs[$lagif]);
+                }
+            }
+        }
+    }
+    // Add QinQ ifs to our array
+    if (is_array($config['qinqs']['qinqentry']) && count($config['qinqs']['qinqentry'])) {
+        foreach ($config['qinqs']['qinqentry'] as $qinq) {
+            $base_ifs["{$qinq['vlanif']}"]['descr'] = "VLAN {$qinq['tag']} on {$qinq['if']}";
+            $base_ifs["{$qinq['vlanif']}"]['is_qinq'] = true;
+            /* QinQ members */
+            $qinqifs = explode(' ', $qinq['members']);
+            foreach ($qinqifs as $qinqif) {
+                $base_ifs["{$qinq['vlanif']}.{$qinqif}"]['descr'] = "QinQ {$qinqif} on VLAN {$qinq['tag']} on {$qinq['if']}";
+                $base_ifs["{$qinq['vlanif']}.{$qinqif}"]['is_qinq'] = true;
+            }
+        }
+    }
+    // Add PPP ifs to our array
+    if (is_array($config['ppps']['ppp']) && count($config['ppps']['ppp'])) {
+        foreach ($config['ppps']['ppp'] as $pppid => $ppp) {
+            $if_name = $ppp['if'];
+            $base_ifs[$if_name] = $ppp;
+            $base_ifs[$if_name]['is_ppp'] = true;
+            $ports_base = basename($ppp['ports']);
+            if (isset($ppp['descr'])) {
+                $base_ifs[$if_name]['descr'] = strtoupper($ppp['if']). "({$ports_base}) - {$ppp['descr']}";
+            } else if (isset($ppp['username'])) {
+                $base_ifs[$if_name]['descr'] = strtoupper($ppp['if']). "({$ports_base}) - {$ppp['username']}";
+            } else {
+                $base_ifs[$if_name]['descr'] = strtoupper($ppp['if']). "({$ports_base})";
+            }
+        }
+    }
+    // Add OpenVPN descriptions to our array
+    $ovpn_descrs = array();
+    if (is_array($config['openvpn'])) {
+        if (is_array($config['openvpn']['openvpn-server'])) {
+            foreach ($config['openvpn']['openvpn-server'] as $s) {
+                $if_name = "ovpns{$s['vpnid']}";
+                $base_ifs[$if_name] = $s;
+                $ovpn_descrs[$s['vpnid']] = $s['description'];
+            }
+        }
+        if (is_array($config['openvpn']['openvpn-client'])) {
+            foreach ($config['openvpn']['openvpn-client'] as $c) {
+                $if_name = "ovpnc{$c['vpnid']}";
+                $base_ifs[$if_name] = $c;
+                $ovpn_descrs[$c['vpnid']] = $c['description'];
+            }
+        }
+    }
+    // Add IPsec descriptions to our array
+    global $err_lib, $ipsec_descrs;
+    $ipsec_descrs = interface_ipsec_vti_list_all();
+    foreach ($ipsec_descrs as $ifname => $ifdescr) {
+        $base_ifs[$ifname] = array('descr' => $ifdescr);
+    }
+    // Loop through our array and check if interface is in use
+    foreach ($base_ifs as $pid => $conf) {
+        $pf_id = get_pfsense_if_id($pid);    // Try to convert to pfSense interface ID
+        // Check if our pfSense ID was found
+        if (get_pfsense_if_id($pid)) {
+            $base_ifs[$pid]["in_use"] = $pf_id;
+        }
+    }
+    return $base_ifs;
+}
+
+// Get available media options for a given interface. Modified from interfaces.php
+function get_if_media_options($interface, $physical_if=false) {
+    // Local variables
+    global $err_lib, $config;
+    $interface = ($physical_if !== true) ? get_pfsense_if_id($interface) : $interface;
+    $interface = ($physical_if !== true) ? $config['interfaces'][$interface]['if'] : $interface;
+    $mediaopts_list = array();
+    exec("/sbin/ifconfig -m $interface | grep \"media \"", $mediaopts);
+    foreach ($mediaopts as $mediaopt) {
+        preg_match("/media (.*)/", $mediaopt, $matches);
+        if (preg_match("/(.*) mediaopt (.*)/", $matches[1], $matches1)) {
+            // there is media + mediaopt like "media 1000baseT mediaopt full-duplex"
+            array_push($mediaopts_list, $matches1[1] . " " . $matches1[2]);
+        } else {
+            // there is only media like "media 1000baseT"
+            array_push($mediaopts_list, $matches[1]);
+        }
+    }
+    return $mediaopts_list;
+}
+
+// Get our next available pfSense interface ID
+function get_next_pfsense_if_id() {
+    // Local variables
+    global $err_lib, $config;
+    $curr_ifs = $config["interfaces"];
+    // Check if we have our `wan` or `lan` pf IDs in use, if so, find the next OPTx id
+    if (!array_key_exists("wan", $curr_ifs)) {
+        return "wan";
+    } elseif (!array_key_exists("lan", $curr_ifs)) {
+        return "lan";
+    } else {
+        // Loop until we find an unused OPTx interface
+        foreach (range(1, 2000) as $count) {
+            // Check if this OPTx ID exists
+            $optx = "opt".strval($count);
+            if (!array_key_exists($optx, $curr_ifs)) {
+                return $optx;
+            }
+        }
+    }
+}
+
+// Returns a list of dynamically configured IPv6 interfaces. Modified from interfaces.php function.
+function get_ipv6_if_list() {
+    global $err_lib, $config, $section;
+    $list = array('' => '');
+    $interfaces = get_configured_interface_with_descr(true);
+    $dyn_v6_ifs = array();
+    foreach ($interfaces as $iface => $ifacename) {
+        switch ($config['interfaces'][$iface]['ipaddrv6']) {
+            case "6to4":
+            case "6rd":
+            case "dhcp6":
+                $dyn_v6_ifs[$iface] = array(
+                    'name' => $ifacename,
+                    'ipv6_num_prefix_ids' => pow(2, (int) calculate_ipv6_delegation_length($iface)) - 1);
+                break;
+            default:
+                continue 2;
+        }
+    }
+    return($dyn_v6_ifs);
+}
+
+// Apply a new interface configuration
+function apply_interface_config($if_conf) {
+    // Local variables
+    global $err_lib, $config;
+    $vlan_redo = false;
+    // Check that our if configuration is an array
+    if (is_array($if_conf)) {
+        foreach ($if_conf as $if_apply => $if_go) {
+            if (isset($config['interfaces'][$if_apply]['enable'])) {
+                interface_bring_down($if_apply, false, $if_go);
+                interface_configure($if_apply, true);
+                if ($config['interfaces'][$if_apply]['ipaddrv6'] == "track6") {
+                    // Configure IPv6 track6 type if present
+                    $wan_cfg = $config['interfaces'][$if_apply];
+                    interface_track6_configure($if_apply, $wan_cfg, true);
+                }
+            } else {
+                interface_bring_down($if_apply, true, $if_go);
+                // Restart DHCPD if enabled
+                if (isset($config['dhcpd'][$if_apply]['enable']) ||
+                    isset($config['dhcpdv6'][$if_apply]['enable'])) {
+                    services_dhcpd_configure();
+                }
+            }
+            // Check if VLANs are configured for this interface, if so, reapply them
+            if (interface_has_clones(get_real_interface($if_apply))) {
+                $vlan_redo = true;
+            }
+        }
+    }
+    // Check if DHCP needs to be reloaded
+    if ($if_conf['ipaddr'] == "dhcp") {
+        kill_dhclient_process($if_conf['if']);
+    }
+    if ($if_conf['ipaddrv6'] == "dhcp6") {
+        kill_dhcp6client_process($if_conf['if'],true);
+    }
+    // Reapply VLANs if necessary
+    if ($vlan_redo) {
+        interfaces_vlan_configure();
+    }
+    // Restart services that may reference IP
+    services_snmpd_configure();
+    setup_gateways_monitor();
+    filter_configure();
+    enable_rrd_graphing();
+    system_routing_configure();
+    // Return true or false if configuration was successful
+    return true;
+}

@@ -2,7 +2,7 @@
 namespace APIResponse;
 
 # Pulls a assoc array API response from our response library. Optionally formats descriptive data into messages.
-function get($id, $data=[]) {
+function get($id, $data=[], $all=false) {
     $responses = [
         // 0-999 reserved for system API level responses
         0 => [
@@ -223,6 +223,345 @@ function get($id, $data=[]) {
             "return" => $id,
             "message" => "Host override deletion criteria not met"
         ],
+
+        // 3000-3999 reserved for /interfaces API calls
+        3000 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown interface ID"
+        ],
+        3001 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface ID in use"
+        ],
+        3002 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface ID required"
+        ],
+        3003 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface MAC address"
+        ],
+        3004 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface MTU value"
+        ],
+        3005 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface MSS value"
+        ],
+        3006 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface MSS value greater than parent interface"
+        ],
+        3007 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface speed and duplex"
+        ],
+        3008 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface descriptive name already in use"
+        ],
+        3009 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface IPv4 address already in use"
+        ],
+        3010 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface IPv4 address"
+        ],
+        3011 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface type staticv4 requires IPv4 address"
+        ],
+        3012 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface IPv4 subnet"
+        ],
+        3013 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface type staticv4 requires subnet bitmask"
+        ],
+        3014 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface IPv4 gateway"
+        ],
+        3015 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface DHCP alias address"
+        ],
+        3016 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface DHCP reject from address"
+        ],
+        3017 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface DHCP timeout value"
+        ],
+        3018 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface DHCP retry value"
+        ],
+        3019 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface DHCP timeout value"
+        ],
+        3020 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface DHCP reboot value"
+        ],
+        3021 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface DHCP backoff cutoff value"
+        ],
+        3022 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface DHCP initial interval value"
+        ],
+        3023 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface DHCP configuration file"
+        ],
+        3024 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface DHCP VLAN priority value"
+        ],
+        3025 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface IPv4 configuration type"
+        ],
+        3026 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface IPv6 address"
+        ],
+        3027 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface IPv6 address already in use"
+        ],
+        3028 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface staticv6 requires IPv6 address"
+        ],
+        3029 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface IPv6 subnet"
+        ],
+        3030 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface type staticv6 requires subnet bitmask"
+        ],
+        3031 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface IPv6 gateway"
+        ],
+        3032 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface IPv6 prefix delegation size"
+        ],
+        3033 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface DHCP6 VLAN priority value"
+        ],
+        3034 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface DHCP6 configuration file"
+        ],
+        3035 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface 6RD gateway address"
+        ],
+        3036 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface 6RD gateway address required"
+        ],
+        3037 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface 6RD prefix length"
+        ],
+        3038 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface IPv6 track interface"
+        ],
+        3039 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface IPv6 track interface required"
+        ],
+        3040 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface IPv6 track prefix hex value"
+        ],
+        3041 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface IPv6 configuration type"
+        ],
+        3042 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface WAN cannot be deleted"
+        ],
+        3043 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface cannot be deleted while member of interface group"
+        ],
+        3044 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface cannot be deleted while member of bridge interface"
+        ],
+        3045 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface cannot be deleted while member of GRE tunnel"
+        ],
+        3046 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface cannot be deleted while member of GIF tunnel"
+        ],
+        3047 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface cannot be deleted with existing traffic shaper configuration"
+        ],
+        3048 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface VLAN tag required"
+        ],
+        3049 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface VLAN tag in use"
+        ],
+        3050 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface VLAN does not exist"
+        ],
+        3051 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface VLAN parent does not exist"
+        ],
+        3052 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface VLAN tag"
+        ],
+        3053 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid interface VLAN priority value"
+        ],
+        3054 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface VLAN already exists on parent"
+        ],
+        3055 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface VLAN parent required"
+        ],
+
         // 4000-4999 reserved for /firewall API calls
         4000 => [
             "status" => "bad request",
@@ -835,5 +1174,8 @@ function get($id, $data=[]) {
 
     $response = $responses[$id];
     $response["data"] = $data;
+    if ($all === true) {
+        $response = $responses;
+    }
     return $response;
 }

@@ -1,10 +1,4 @@
 <?php
 # Copyright 2020 - Jared Hendrickson
-# IMPORTS
-require_once("apicalls.inc");
-
-# RUN API CALL
-$resp = api_interfaces_vlans_delete();
-http_response_code($resp["code"]);
-echo json_encode($resp) . PHP_EOL;
-exit();
+require_once("api/api_models/APIInterfacesVLANsDelete.inc");
+(new APIInterfacesVLANsDelete())->listen();
