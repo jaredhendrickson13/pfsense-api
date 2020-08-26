@@ -1,10 +1,4 @@
 <?php
 # Copyright 2020 - Jared Hendrickson
-# IMPORTS
-require_once("apicalls.inc");
-
-# RUN API CALL
-$resp = api_system_hostname();
-http_response_code($resp["code"]);
-echo json_encode($resp) . PHP_EOL;
-exit();
+require_once("api/api_models/APISystemHostname.inc");
+(new APISystemHostname())->listen();
