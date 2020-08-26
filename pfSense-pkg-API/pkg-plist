@@ -1,213 +1,172 @@
-@dir /etc/inc
-@dir /etc/inc/php-jwt
-@dir /etc/inc/php-jwt/src
-/etc/inc/api.inc
-/etc/inc/apicalls.inc
-/etc/inc/apiresp.inc
-/etc/inc/php-jwt/README.md
-/etc/inc/php-jwt/LICENSE
-/etc/inc/php-jwt/composer.json
-/etc/inc/php-jwt/src/JWK.php
-/etc/inc/php-jwt/src/JWT.php
-/etc/inc/php-jwt/src/SignatureInvalidException.php
-/etc/inc/php-jwt/src/ExpiredException.php
-/etc/inc/php-jwt/src/BeforeValidException.php
-
+@dir /usr/local
+@dir /usr/local/www
 @dir /usr/local/pkg
-/usr/local/pkg/api.xml
-
+@dir /usr/local/share
 @dir /usr/local/www/api
 @dir /usr/local/www/api/v1
-/usr/local/www/api/index.php
-
-@dir /usr/local/www/api/v1/access_token
-/usr/local/www/api/v1/access_token/index.php
-
-@dir /usr/local/www/api/v1/users
-@dir /usr/local/www/api/v1/users/add
-@dir /usr/local/www/api/v1/users/delete
-@dir /usr/local/www/api/v1/users/modify
-@dir /usr/local/www/api/v1/users/add/privs
-@dir /usr/local/www/api/v1/users/delete/privs
-@dir /usr/local/www/api/v1/users/add/groups
-@dir /usr/local/www/api/v1/users/delete/groups
-@dir /usr/local/www/api/v1/users/authservers
-@dir /usr/local/www/api/v1/users/authservers/delete
-@dir /usr/local/www/api/v1/users/authservers/ldap
-@dir /usr/local/www/api/v1/users/authservers/ldap/add
-@dir /usr/local/www/api/v1/users/authservers/ldap/delete
-@dir /usr/local/www/api/v1/users/authservers/radius
-@dir /usr/local/www/api/v1/users/authservers/radius/delete
-/usr/local/www/api/v1/users/index.php
-/usr/local/www/api/v1/users/add/index.php
-/usr/local/www/api/v1/users/delete/index.php
-/usr/local/www/api/v1/users/modify/index.php
-/usr/local/www/api/v1/users/add/privs/index.php
-/usr/local/www/api/v1/users/delete/privs/index.php
-/usr/local/www/api/v1/users/add/groups/index.php
-/usr/local/www/api/v1/users/delete/groups/index.php
-/usr/local/www/api/v1/users/authservers/index.php
-/usr/local/www/api/v1/users/authservers/delete/index.php
-/usr/local/www/api/v1/users/authservers/ldap/index.php
-/usr/local/www/api/v1/users/authservers/ldap/add/index.php
-/usr/local/www/api/v1/users/authservers/ldap/delete/index.php
-/usr/local/www/api/v1/users/authservers/radius/index.php
-/usr/local/www/api/v1/users/authservers/radius/delete/index.php
-
-@dir /usr/local/www/api/v1/system/version
-/usr/local/www/api/v1/system/version/index.php
-
-@dir /usr/local/www/api/v1/system/api
-@dir /usr/local/www/api/v1/system/api/errors
-/usr/local/www/api/v1/system/api/index.php
-/usr/local/www/api/v1/system/api/errors/index.php
-
-@dir /usr/local/www/api/v1/system/arp
-@dir /usr/local/www/api/v1/system/arp/delete
-/usr/local/www/api/v1/system/arp/index.php
-/usr/local/www/api/v1/system/arp/delete/index.php
-
-@dir /usr/local/www/api/v1/system/config
-/usr/local/www/api/v1/system/config/index.php
-
-@dir /usr/local/www/api/v1/system/hostname
-@dir /usr/local/www/api/v1/system/hostname/modify
-/usr/local/www/api/v1/system/hostname/index.php
-/usr/local/www/api/v1/system/hostname/modify/index.php
-
-@dir /usr/local/www/api/v1/system/dns
-@dir /usr/local/www/api/v1/system/dns/modify
-@dir /usr/local/www/api/v1/system/dns/delete
-@dir /usr/local/www/api/v1/system/dns/delete/servers
-/usr/local/www/api/v1/system/dns/index.php
-/usr/local/www/api/v1/system/dns/modify/index.php
-/usr/local/www/api/v1/system/dns/delete/servers/index.php
-
-@dir /usr/local/www/api/v1/system/certificates
-@dir /usr/local/www/api/v1/system/certificates/add
-@dir /usr/local/www/api/v1/system/certificates/delete
-/usr/local/www/api/v1/system/certificates/index.php
-/usr/local/www/api/v1/system/certificates/add/index.php
-/usr/local/www/api/v1/system/certificates/delete/index.php
-
 @dir /usr/local/www/api/v1/status
+@dir /usr/local/www/api/v1/firewall
+@dir /usr/local/www/api/v1/system
+@dir /usr/local/www/api/v1/users
+@dir /usr/local/www/api/v1/routing
+@dir /usr/local/www/api/v1/access_token
+@dir /usr/local/www/api/v1/services
+@dir /usr/local/www/api/v1/interfaces
 @dir /usr/local/www/api/v1/status/carp
 @dir /usr/local/www/api/v1/status/carp/modify
-/usr/local/www/api/v1/status/carp/index.php
-/usr/local/www/api/v1/status/carp/modify/index.php
-
-@dir /usr/local/www/api/v1/routing
-@dir /usr/local/www/api/v1/routing/gateways
-/usr/local/www/api/v1/routing/gateways/index.php
-
-@dir /usr/local/www/api/v1/interfaces
-@dir /usr/local/www/api/v1/interfaces/add
-@dir /usr/local/www/api/v1/interfaces/delete
-@dir /usr/local/www/api/v1/interfaces/vlans
-@dir /usr/local/www/api/v1/interfaces/vlans/add
-@dir /usr/local/www/api/v1/interfaces/vlans/delete
-@dir /usr/local/www/api/v1/interfaces/vlans/modify
-/usr/local/www/api/v1/interfaces/index.php
-/usr/local/www/api/v1/interfaces/add/index.php
-/usr/local/www/api/v1/interfaces/delete/index.php
-/usr/local/www/api/v1/interfaces/vlans/index.php
-/usr/local/www/api/v1/interfaces/vlans/add/index.php
-/usr/local/www/api/v1/interfaces/vlans/delete/index.php
-/usr/local/www/api/v1/interfaces/vlans/modify/index.php
-
-
-
-@dir /usr/local/www/api/v1/firewall
-
+@dir /usr/local/www/api/v1/firewall/nat
+@dir /usr/local/www/api/v1/firewall/virtualips
 @dir /usr/local/www/api/v1/firewall/states
+@dir /usr/local/www/api/v1/firewall/rules
+@dir /usr/local/www/api/v1/firewall/aliases
+@dir /usr/local/www/api/v1/firewall/nat/portforwards
+@dir /usr/local/www/api/v1/firewall/nat/portforwards/delete
+@dir /usr/local/www/api/v1/firewall/nat/portforwards/add
+@dir /usr/local/www/api/v1/firewall/virtualips/delete
+@dir /usr/local/www/api/v1/firewall/virtualips/add
 @dir /usr/local/www/api/v1/firewall/states/size
 @dir /usr/local/www/api/v1/firewall/states/size/modify
-/usr/local/www/api/v1/firewall/states/index.php
-/usr/local/www/api/v1/firewall/states/size/index.php
-/usr/local/www/api/v1/firewall/states/size/modify/index.php
-
-@dir /usr/local/www/api/v1/firewall/virtualips
-@dir /usr/local/www/api/v1/firewall/virtualips/add
-@dir /usr/local/www/api/v1/firewall/virtualips/delete
-/usr/local/www/api/v1/firewall/virtualips/index.php
-/usr/local/www/api/v1/firewall/virtualips/add/index.php
-/usr/local/www/api/v1/firewall/virtualips/delete/index.php
-
-@dir /usr/local/www/api/v1/firewall/nat
-@dir /usr/local/www/api/v1/firewall/nat/portforwards
-@dir /usr/local/www/api/v1/firewall/nat/portforwards/add
-@dir /usr/local/www/api/v1/firewall/nat/portforwards/delete
-/usr/local/www/api/v1/firewall/nat/index.php
-/usr/local/www/api/v1/firewall/nat/portforwards/index.php
-/usr/local/www/api/v1/firewall/nat/portforwards/add/index.php
-/usr/local/www/api/v1/firewall/nat/portforwards/delete/index.php
-
-@dir /usr/local/www/api/v1/firewall/aliases
-@dir /usr/local/www/api/v1/firewall/aliases/add
+@dir /usr/local/www/api/v1/firewall/rules/delete
+@dir /usr/local/www/api/v1/firewall/rules/add
 @dir /usr/local/www/api/v1/firewall/aliases/delete
 @dir /usr/local/www/api/v1/firewall/aliases/modify
-@dir /usr/local/www/api/v1/firewall/aliases/add/address
+@dir /usr/local/www/api/v1/firewall/aliases/add
 @dir /usr/local/www/api/v1/firewall/aliases/delete/address
-/usr/local/www/api/v1/firewall/aliases/index.php
-/usr/local/www/api/v1/firewall/aliases/add/index.php
-/usr/local/www/api/v1/firewall/aliases/delete/index.php
-/usr/local/www/api/v1/firewall/aliases/modify/index.php
-/usr/local/www/api/v1/firewall/aliases/add/address/index.php
-/usr/local/www/api/v1/firewall/aliases/delete/address/index.php
-
-@dir /usr/local/www/api/v1/firewall/rules
-@dir /usr/local/www/api/v1/firewall/rules/add
-@dir /usr/local/www/api/v1/firewall/rules/delete
-/usr/local/www/api/v1/firewall/rules/index.php
-/usr/local/www/api/v1/firewall/rules/add/index.php
-/usr/local/www/api/v1/firewall/rules/delete/index.php
-
-@dir /usr/local/www/api/v1/services
+@dir /usr/local/www/api/v1/firewall/aliases/add/address
+@dir /usr/local/www/api/v1/system/config
+@dir /usr/local/www/api/v1/system/certificates
+@dir /usr/local/www/api/v1/system/version
+@dir /usr/local/www/api/v1/system/api
+@dir /usr/local/www/api/v1/system/hostname
+@dir /usr/local/www/api/v1/system/arp
+@dir /usr/local/www/api/v1/system/dns
+@dir /usr/local/www/api/v1/system/certificates/delete
+@dir /usr/local/www/api/v1/system/certificates/add
+@dir /usr/local/www/api/v1/system/api/errors
+@dir /usr/local/www/api/v1/system/hostname/modify
+@dir /usr/local/www/api/v1/system/arp/delete
+@dir /usr/local/www/api/v1/system/dns/delete
+@dir /usr/local/www/api/v1/system/dns/modify
+@dir /usr/local/www/api/v1/system/dns/delete/servers
+@dir /usr/local/www/api/v1/users/delete
+@dir /usr/local/www/api/v1/users/modify
+@dir /usr/local/www/api/v1/users/authservers
+@dir /usr/local/www/api/v1/users/add
+@dir /usr/local/www/api/v1/users/delete/privs
+@dir /usr/local/www/api/v1/users/delete/groups
+@dir /usr/local/www/api/v1/users/authservers/delete
+@dir /usr/local/www/api/v1/users/authservers/ldap
+@dir /usr/local/www/api/v1/users/authservers/radius
+@dir /usr/local/www/api/v1/users/authservers/ldap/delete
+@dir /usr/local/www/api/v1/users/authservers/ldap/add
+@dir /usr/local/www/api/v1/users/authservers/radius/delete
+@dir /usr/local/www/api/v1/users/add/privs
+@dir /usr/local/www/api/v1/users/add/groups
+@dir /usr/local/www/api/v1/routing/gateways
+@dir /usr/local/www/api/v1/services/ntpd
+@dir /usr/local/www/api/v1/services/sshd
+@dir /usr/local/www/api/v1/services/syslogd
 @dir /usr/local/www/api/v1/services/start
 @dir /usr/local/www/api/v1/services/stop
 @dir /usr/local/www/api/v1/services/restart
 @dir /usr/local/www/api/v1/services/dhcpd
-@dir /usr/local/www/api/v1/services/dhcpd/start
-@dir /usr/local/www/api/v1/services/dhcpd/stop
-@dir /usr/local/www/api/v1/services/dhcpd/restart
 @dir /usr/local/www/api/v1/services/dpinger
-@dir /usr/local/www/api/v1/services/dpinger/start
-@dir /usr/local/www/api/v1/services/dpinger/stop
-@dir /usr/local/www/api/v1/services/dpinger/restart
-@dir /usr/local/www/api/v1/services/ntpd
+@dir /usr/local/www/api/v1/services/unbound
 @dir /usr/local/www/api/v1/services/ntpd/start
 @dir /usr/local/www/api/v1/services/ntpd/stop
 @dir /usr/local/www/api/v1/services/ntpd/restart
-@dir /usr/local/www/api/v1/services/sshd
 @dir /usr/local/www/api/v1/services/sshd/modify
 @dir /usr/local/www/api/v1/services/sshd/start
 @dir /usr/local/www/api/v1/services/sshd/stop
 @dir /usr/local/www/api/v1/services/sshd/restart
-@dir /usr/local/www/api/v1/services/syslogd
 @dir /usr/local/www/api/v1/services/syslogd/start
 @dir /usr/local/www/api/v1/services/syslogd/stop
 @dir /usr/local/www/api/v1/services/syslogd/restart
-@dir /usr/local/www/api/v1/services/unbound
-@dir /usr/local/www/api/v1/services/unbound/add
+@dir /usr/local/www/api/v1/services/dhcpd/start
+@dir /usr/local/www/api/v1/services/dhcpd/stop
+@dir /usr/local/www/api/v1/services/dhcpd/restart
+@dir /usr/local/www/api/v1/services/dpinger/start
+@dir /usr/local/www/api/v1/services/dpinger/stop
+@dir /usr/local/www/api/v1/services/dpinger/restart
+@dir /usr/local/www/api/v1/services/unbound/apply
 @dir /usr/local/www/api/v1/services/unbound/delete
 @dir /usr/local/www/api/v1/services/unbound/modify
 @dir /usr/local/www/api/v1/services/unbound/start
 @dir /usr/local/www/api/v1/services/unbound/stop
 @dir /usr/local/www/api/v1/services/unbound/restart
-@dir /usr/local/www/api/v1/services/unbound/apply
-@dir /usr/local/www/api/v1/services/unbound/add/hosts
+@dir /usr/local/www/api/v1/services/unbound/add
 @dir /usr/local/www/api/v1/services/unbound/delete/hosts
 @dir /usr/local/www/api/v1/services/unbound/modify/hosts
+@dir /usr/local/www/api/v1/services/unbound/add/hosts
+@dir /usr/local/www/api/v1/interfaces/vlans
+@dir /usr/local/www/api/v1/interfaces/delete
+@dir /usr/local/www/api/v1/interfaces/add
+@dir /usr/local/www/api/v1/interfaces/vlans/delete
+@dir /usr/local/www/api/v1/interfaces/vlans/modify
+@dir /usr/local/www/api/v1/interfaces/vlans/add
+@dir /usr/local/share/pfSense-pkg-API
+@dir /etc/inc
+@dir /etc/inc/php-jwt
+@dir /etc/inc/api
+@dir /etc/inc/php-jwt/src
+@dir /etc/inc/api/framework
+@dir /etc/inc/api/api_models
+
+/usr/local/www/api/index.php
+/usr/local/www/api/v1/api_return_codes.txt
+/usr/local/www/api/v1/status/carp/index.php
+/usr/local/www/api/v1/status/carp/modify/index.php
+/usr/local/www/api/v1/firewall/nat/index.php
+/usr/local/www/api/v1/firewall/nat/portforwards/index.php
+/usr/local/www/api/v1/firewall/nat/portforwards/delete/index.php
+/usr/local/www/api/v1/firewall/nat/portforwards/add/index.php
+/usr/local/www/api/v1/firewall/virtualips/index.php
+/usr/local/www/api/v1/firewall/virtualips/delete/index.php
+/usr/local/www/api/v1/firewall/virtualips/add/index.php
+/usr/local/www/api/v1/firewall/states/index.php
+/usr/local/www/api/v1/firewall/states/size/index.php
+/usr/local/www/api/v1/firewall/states/size/modify/index.php
+/usr/local/www/api/v1/firewall/rules/index.php
+/usr/local/www/api/v1/firewall/rules/delete/index.php
+/usr/local/www/api/v1/firewall/rules/add/index.php
+/usr/local/www/api/v1/firewall/aliases/index.php
+/usr/local/www/api/v1/firewall/aliases/delete/index.php
+/usr/local/www/api/v1/firewall/aliases/delete/address/index.php
+/usr/local/www/api/v1/firewall/aliases/modify/index.php
+/usr/local/www/api/v1/firewall/aliases/add/index.php
+/usr/local/www/api/v1/firewall/aliases/add/address/index.php
+/usr/local/www/api/v1/system/config/index.php
+/usr/local/www/api/v1/system/certificates/index.php
+/usr/local/www/api/v1/system/certificates/delete/index.php
+/usr/local/www/api/v1/system/certificates/add/index.php
+/usr/local/www/api/v1/system/version/index.php
+/usr/local/www/api/v1/system/api/index.php
+/usr/local/www/api/v1/system/api/errors/index.php
+/usr/local/www/api/v1/system/hostname/index.php
+/usr/local/www/api/v1/system/hostname/modify/index.php
+/usr/local/www/api/v1/system/arp/index.php
+/usr/local/www/api/v1/system/arp/delete/index.php
+/usr/local/www/api/v1/system/dns/index.php
+/usr/local/www/api/v1/system/dns/delete/servers/index.php
+/usr/local/www/api/v1/system/dns/modify/index.php
+/usr/local/www/api/v1/users/index.php
+/usr/local/www/api/v1/users/delete/index.php
+/usr/local/www/api/v1/users/delete/privs/index.php
+/usr/local/www/api/v1/users/delete/groups/index.php
+/usr/local/www/api/v1/users/modify/index.php
+/usr/local/www/api/v1/users/authservers/index.php
+/usr/local/www/api/v1/users/authservers/delete/index.php
+/usr/local/www/api/v1/users/authservers/ldap/index.php
+/usr/local/www/api/v1/users/authservers/ldap/delete/index.php
+/usr/local/www/api/v1/users/authservers/ldap/add/index.php
+/usr/local/www/api/v1/users/authservers/radius/index.php
+/usr/local/www/api/v1/users/authservers/radius/delete/index.php
+/usr/local/www/api/v1/users/add/index.php
+/usr/local/www/api/v1/users/add/privs/index.php
+/usr/local/www/api/v1/users/add/groups/index.php
+/usr/local/www/api/v1/routing/gateways/index.php
+/usr/local/www/api/v1/access_token/index.php
 /usr/local/www/api/v1/services/index.php
-/usr/local/www/api/v1/services/start/index.php
-/usr/local/www/api/v1/services/stop/index.php
-/usr/local/www/api/v1/services/restart/index.php
-/usr/local/www/api/v1/services/dhcpd/start/index.php
-/usr/local/www/api/v1/services/dhcpd/stop/index.php
-/usr/local/www/api/v1/services/dhcpd/restart/index.php
-/usr/local/www/api/v1/services/dpinger/start/index.php
-/usr/local/www/api/v1/services/dpinger/stop/index.php
-/usr/local/www/api/v1/services/dpinger/restart/index.php
 /usr/local/www/api/v1/services/ntpd/start/index.php
 /usr/local/www/api/v1/services/ntpd/stop/index.php
 /usr/local/www/api/v1/services/ntpd/restart/index.php
@@ -219,14 +178,129 @@
 /usr/local/www/api/v1/services/syslogd/start/index.php
 /usr/local/www/api/v1/services/syslogd/stop/index.php
 /usr/local/www/api/v1/services/syslogd/restart/index.php
+/usr/local/www/api/v1/services/start/index.php
+/usr/local/www/api/v1/services/stop/index.php
+/usr/local/www/api/v1/services/restart/index.php
+/usr/local/www/api/v1/services/dhcpd/start/index.php
+/usr/local/www/api/v1/services/dhcpd/stop/index.php
+/usr/local/www/api/v1/services/dhcpd/restart/index.php
+/usr/local/www/api/v1/services/dpinger/start/index.php
+/usr/local/www/api/v1/services/dpinger/stop/index.php
+/usr/local/www/api/v1/services/dpinger/restart/index.php
 /usr/local/www/api/v1/services/unbound/index.php
+/usr/local/www/api/v1/services/unbound/apply/index.php
+/usr/local/www/api/v1/services/unbound/delete/hosts/index.php
+/usr/local/www/api/v1/services/unbound/modify/hosts/index.php
 /usr/local/www/api/v1/services/unbound/start/index.php
 /usr/local/www/api/v1/services/unbound/stop/index.php
 /usr/local/www/api/v1/services/unbound/restart/index.php
-/usr/local/www/api/v1/services/unbound/apply/index.php
 /usr/local/www/api/v1/services/unbound/add/hosts/index.php
-/usr/local/www/api/v1/services/unbound/delete/hosts/index.php
-/usr/local/www/api/v1/services/unbound/modify/hosts/index.php
-
-
-%%DATADIR%%/info.xml
+/usr/local/www/api/v1/interfaces/index.php
+/usr/local/www/api/v1/interfaces/vlans/index.php
+/usr/local/www/api/v1/interfaces/vlans/delete/index.php
+/usr/local/www/api/v1/interfaces/vlans/modify/index.php
+/usr/local/www/api/v1/interfaces/vlans/add/index.php
+/usr/local/www/api/v1/interfaces/delete/index.php
+/usr/local/www/api/v1/interfaces/add/index.php
+/usr/local/pkg/api.xml
+/usr/local/share/pfSense-pkg-API/info.xml
+/etc/inc/php-jwt/LICENSE
+/etc/inc/php-jwt/README.md
+/etc/inc/php-jwt/composer.json
+/etc/inc/php-jwt/src/SignatureInvalidException.php
+/etc/inc/php-jwt/src/BeforeValidException.php
+/etc/inc/php-jwt/src/JWK.php
+/etc/inc/php-jwt/src/ExpiredException.php
+/etc/inc/php-jwt/src/JWT.php
+/etc/inc/api/framework/APITools.inc
+/etc/inc/api/framework/APIAuth.inc
+/etc/inc/api/framework/APIBaseModel.inc
+/etc/inc/api/framework/APIResponse.inc
+/etc/inc/api/api_models/APIUsersAuthservers.inc
+/etc/inc/api/api_models/APIServicesUnboundRestart.inc
+/etc/inc/api/api_models/APIUsersAuthserversLDAPDelete.inc
+/etc/inc/api/api_models/APIFirewallAliasesAdd.inc
+/etc/inc/api/api_models/APIStatusCarpModify.inc
+/etc/inc/api/api_models/APIFirewallNatPortForwardsDelete.inc
+/etc/inc/api/api_models/APIFirewallVirtualIPs.inc
+/etc/inc/api/api_models/APIInterfacesAdd.inc
+/etc/inc/api/api_models/APIServicesUnbound.inc
+/etc/inc/api/api_models/APIServicesSyslogdRestart.inc
+/etc/inc/api/api_models/APISystemDNSModify.inc
+/etc/inc/api/api_models/APIServicesRestart.inc
+/etc/inc/api/api_models/APIServicesSSHdModify.inc
+/etc/inc/api/api_models/APIServicesUnboundStop.inc
+/etc/inc/api/api_models/APIServicesSSHdRestart.inc
+/etc/inc/api/api_models/APIServicesNtpdStart.inc
+/etc/inc/api/api_models/APIInterfacesVLANs.inc
+/etc/inc/api/api_models/APIServicesSSHdStop.inc
+/etc/inc/api/api_models/APIInterfacesVLANsModify.inc
+/etc/inc/api/api_models/APIAccessToken.inc
+/etc/inc/api/api_models/APIServicesUnboundDeleteHosts.inc
+/etc/inc/api/api_models/APISystemARP.inc
+/etc/inc/api/api_models/APISystemCertificates.inc
+/etc/inc/api/api_models/APIServicesDpingerStop.inc
+/etc/inc/api/api_models/APIFirewallRulesAdd.inc
+/etc/inc/api/api_models/APISystemARPDelete.inc
+/etc/inc/api/api_models/APIServicesSyslogdStop.inc
+/etc/inc/api/api_models/APIUsersAuthserversLDAPAdd.inc
+/etc/inc/api/api_models/APIInterfacesDelete.inc
+/etc/inc/api/api_models/APIServicesSyslogdStart.inc
+/etc/inc/api/api_models/APIUsersModify.inc
+/etc/inc/api/api_models/APIUsersAuthserversRADIUS.inc
+/etc/inc/api/api_models/APISystemConfig.inc
+/etc/inc/api/api_models/APISystemAPI.inc
+/etc/inc/api/api_models/APIFirewallAliasesModify.inc
+/etc/inc/api/api_models/APIServicesNtpdRestart.inc
+/etc/inc/api/api_models/APIServicesUnboundStart.inc
+/etc/inc/api/api_models/APISystemHostnameModify.inc
+/etc/inc/api/api_models/APIServicesDHCPdStart.inc
+/etc/inc/api/api_models/APIUsersAddPrivs.inc
+/etc/inc/api/api_models/APIServicesStart.inc
+/etc/inc/api/api_models/APIFirewallNat.inc
+/etc/inc/api/api_models/APIUsersDeletePrivs.inc
+/etc/inc/api/api_models/APIFirewallVirtualIPsAdd.inc
+/etc/inc/api/api_models/APIFirewallAliases.inc
+/etc/inc/api/api_models/APISystemDNS.inc
+/etc/inc/api/api_models/APIInterfaces.inc
+/etc/inc/api/api_models/APIFirewallStates.inc
+/etc/inc/api/api_models/APIServicesUnboundModifyHosts.inc
+/etc/inc/api/api_models/APIServicesDpingerStart.inc
+/etc/inc/api/api_models/APIUsersAuthserversDelete.inc
+/etc/inc/api/api_models/APIUsersDeleteGroups.inc
+/etc/inc/api/api_models/APISystemCertificatesAdd.inc
+/etc/inc/api/api_models/APIServicesSSHdStart.inc
+/etc/inc/api/api_models/APIFirewallVirtualIPsDelete.inc
+/etc/inc/api/api_models/APISystemVersion.inc
+/etc/inc/api/api_models/APIFirewallAliasesDelete.inc
+/etc/inc/api/api_models/APIInterfacesVLANsAdd.inc
+/etc/inc/api/api_models/APIFirewallStatesSizeModify.inc
+/etc/inc/api/api_models/APIUsersDelete.inc
+/etc/inc/api/api_models/APISystemDNSDeleteServers.inc
+/etc/inc/api/api_models/APIUsersAdd.inc
+/etc/inc/api/api_models/APIFirewallNatPortForwards.inc
+/etc/inc/api/api_models/APIRoutingGateways.inc
+/etc/inc/api/api_models/APIStatusCarp.inc
+/etc/inc/api/api_models/APIUsersAuthserversLDAP.inc
+/etc/inc/api/api_models/APIFirewallStatesSize.inc
+/etc/inc/api/api_models/APISystemCertificatesDelete.inc
+/etc/inc/api/api_models/APISystemHostname.inc
+/etc/inc/api/api_models/APIServicesDpingerRestart.inc
+/etc/inc/api/api_models/APIFirewallAliasesAddAddress.inc
+/etc/inc/api/api_models/APIFirewallAliasesDeleteAddress.inc
+/etc/inc/api/api_models/APIUsersAuthserversRADIUSDelete.inc
+/etc/inc/api/api_models/APIServicesUnboundApply.inc
+/etc/inc/api/api_models/APIServicesUnboundAddHosts.inc
+/etc/inc/api/api_models/APIServicesNtpdStop.inc
+/etc/inc/api/api_models/APIServicesDHCPdStop.inc
+/etc/inc/api/api_models/APISystemAPIErrors.inc
+/etc/inc/api/api_models/APIInterfacesVLANsDelete.inc
+/etc/inc/api/api_models/APIFirewallRulesDelete.inc
+/etc/inc/api/api_models/APIServicesSSHd.inc
+/etc/inc/api/api_models/APIFirewallNatPortForwardsAdd.inc
+/etc/inc/api/api_models/APIServicesDHCPdRestart.inc
+/etc/inc/api/api_models/APIUsers.inc
+/etc/inc/api/api_models/APIFirewallRules.inc
+/etc/inc/api/api_models/APIServices.inc
+/etc/inc/api/api_models/APIServicesStop.inc
+/etc/inc/api/api_models/APIUsersAddGroups.inc

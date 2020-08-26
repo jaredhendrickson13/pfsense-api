@@ -1,3 +1,2 @@
 #!/bin/sh
-/bin/rm -rf /etc/inc/php-jwt
 /usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% ${2}

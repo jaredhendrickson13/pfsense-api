@@ -1,0 +1,6 @@
+{% for dir in files["dir"] -%}
+@dir {{ dir }}
+{% endfor %}
+{% for file in files["file"] -%}
+{{ file }}
+{% endfor %}
