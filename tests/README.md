@@ -11,25 +11,32 @@ argument to your commands
 
 ## Example Usage
 ```commandline
-python3 tests/test_api_v1_access_token.py --url https://172.16.209.129 
-OK: Response is valid
+$ python3 tests/test_api_v1_access_token.py --host https://172.16.209.129 
+OK [POST /api/v1/access_token]: Response is valid
 ```
 
 ```commandline
-python3 tests/test_api_v1_access_token.py -h
-usage: test_api_v1_access_token.py [-h] --url URL [--username USERNAME]
-                                   [--password PASSWORD]
+$ python3 tests/test_api_v1_system_api.py --help
+usage: test_api_v1_system_api.py [-h] --host HOST [--port {1-65535}] [--scheme {http,https}] [--username USERNAME] [--password PASSWORD] [--timeout TIMEOUT] [--verbose]
 
-Tests if pfSense APIs Access Token endpoint is operating normally
+Check pfSense API's '/api/v1/system/api' endpoint for correct functionality.
 
 optional arguments:
-  -h, --help           show this help message and exit
-  --url URL            URL of the remote pfSense host to check
-  --username USERNAME  Username to authenticate as
-  --password PASSWORD  Password to authenticate with
+  -h, --help            show this help message and exit
+  --host HOST           The host to connect to
+  --port {1-65535}      The port to use when connecting
+  --scheme {http,https}
+                        The URL scheme to use when connecting
+  --username USERNAME   Username to authenticate as.
+  --password PASSWORD   Password to authenticate with
+  --timeout TIMEOUT     Connection timeout limit in seconds
+  --verbose             Display verbose output
 
 ```
 
 ## Output
 Tests typically print an OK or ERROR status to the console depending on the tests outcome. These scripts will also
 set the command's exit code to 1 upon error or 0 upon success.
+
+## Notes
+- For information on writing API unit tests, check the contributors guide at `docs/CONTRIBUTING.md`

@@ -12,19 +12,24 @@
  */
 	]]>
     </copyright>
-    <description>A full API for pfSense</description>
+    <description>A REST API for pfSense</description>
     <name>API</name>
     <title>System: API</title>
     <menu>
         <name>API</name>
-        <tooltiptext>A full API for pfSense.</tooltiptext>
+        <tooltiptext>A REST API for pfSense.</tooltiptext>
         <section>System</section>
         <url>/api/</url>
     </menu>
     <tabs>
         <tab>
-            <text>API Settings</text>
+            <text>Settings</text>
             <url>/api/</url>
+            <active/>
+        </tab>
+        <tab>
+            <text>Documentation</text>
+            <url>/api/v1/</url>
             <active/>
         </tab>
     </tabs>

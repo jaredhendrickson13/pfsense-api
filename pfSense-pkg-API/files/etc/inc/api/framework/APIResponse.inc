@@ -132,6 +132,55 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Could not locate system certificate"
         ],
+        1010 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Tunable name is required"
+        ],
+        1011 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Tunable name must be string type"
+        ],
+        1012 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Tunable name already exists"
+        ],
+        1013 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Tunable value is required"
+        ],
+        1014 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Tunable value may only contain alphanumeric characters, -, _, %, and /"
+        ],
+        1015 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Tunable description must be string type"
+        ],
+        1016 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Tunable ID is required"
+        ],
+        1017 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Could not locate tunable with ID"
+        ],
+
         // 2000-2999 reserved for /services API calls
         2000 => [
             "status" => "bad request",
@@ -753,13 +802,13 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Firewall rule ID required"
+            "message" => "Firewall rule tracker ID required"
         ],
         4032 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Firewall rule ID does not exist"
+            "message" => "Firewall rule tracker ID does not exist"
         ],
         4033 => [
             "status" => "bad request",
@@ -1007,6 +1056,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Invalid firewall state table size"
         ],
+        4074 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall alias id required"
+        ],
         //5000-5999 reserved for /users API calls
         5000 => [
             "status" => "bad request",
@@ -1170,9 +1225,52 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Authentication server name already in use"
         ],
-    ];
+        //6000-6999 reserved for /routing API calls
+        6000 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Static route network value is required"
+        ],
+        6001 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Static route network value must be valid IPv4, IPv6 or alias"
+        ],
+        6002 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Static route network subnet out of range"
+        ],
+        6003 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Static route gateway value is required"
+        ],
+        6004 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Static route gateway does not exist"
+        ],
+        6005 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Static route ID is required"
+        ],
+        6006 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Static route ID does not exist"
+        ],
 
-    $response = $responses[$id];
+    ];
+    $response = $responses[(!in_array($id, $responses)) ? $id : 1];
     $response["data"] = $data;
     if ($all === true) {
         $response = $responses;
