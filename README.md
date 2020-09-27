@@ -66,7 +66,7 @@ API token client ID and a `client-token` value containing your API token client 
 (e.g. `{"client-id": "cccdj-311s", "client-token": "42jkjl-k234jlk1b38123kj3kjl-ffwzzuilaei"}`
 
 # Authorization
-pfSense API uses the same privielges as the pfSense webConfigurator. The required privileges for each endpoint are stated in the API documentation.
+pfSense API uses the same privielges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.
 
 # Response Codes
 `200 (OK)` : API call succeeded<br>
@@ -81,6 +81,53 @@ A full list of error codes can be found by navigating to /api/v1/system/api/erro
  JSON data containing each error code and their corresponding error message. No authentication is required to view the 
  error code library. This also makes API integration with third-party software easy as the API error codes and messages 
  are always just an HTTP call away!
+
+# Queries
+For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you like to, in order to match the query, each parameter must match exactly. If no matches were found, the endpoint will return an empty array in the data field. 
+<details>
+    <summary>Show example</summary>
+For example, say an API endpoint normally returns a response like this without a query:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 0, "name": "Test", "type": "type1"}, 
+        {"id": 1, "name": "Other Test", "type": "type2"},
+        {"id": 2, "name": "Another Test", "type": "type1"}
+
+    ]
+}
+```
+
+If I wanted the endpoint to only return the objects that had their `type` set to `type1` I could add `{"type": "type1"}` to my payload. These would return something like this:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 0, "name": "Test", "type": "type1"}, 
+        {"id": 2, "name": "Another Test", "type": "type1"}
+    ]
+}
+```
+</details>
+
+
+### Requirements for queries:
+- API call must be successful and return `0` in the `return` field.
+- Endpoints must return an array of objects in the data field (e.g. `[{"id": 0, "name": "Test"}, {"id": 1, "name": "Other Test"}]`).
+- At least two objects must be present within the array to support queries.
+- If an array is being used in a query, it must much the target data completely and exactly. There are no recursive queries.
+
+### Notes:
+- For those using the Local database or API token authentication types, `client-id` and `client-token` are excluded from queries
 
 # Rate limit
 There is no limit to API calls at this time but is important to note that pfSense's XML configuration was not designed for quick simultaneous writes like a traditional database. It may be necessary to delay API calls in sequence to prevent unexpected behavior. Alternatively, you may limit the API to read-only mode to only allow endpoints with read (GET) access within the webConfigurator's System > API page.
