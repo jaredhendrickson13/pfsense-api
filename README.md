@@ -47,23 +47,20 @@ authentication.
 
 To authenticate your API call, follow the instructions for your configured authentication mode:
 
-- Local Database (default) : Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, simply
-add a `client-id` value containing your username and a `client-token` value containing your password to your payload. For 
-example `{"client-id": "admin", "client-token": "pfsense"}`
+<details>
+    <summary>Local Database (default)</summary
+        Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, simply add a `client-id` value containing your username and a `client-token` value containing your password to your payload. For example `{"client-id": "admin", "client-token": "pfsense"}`
+</details>
 
-- JWT : Requires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token,
-you may make a POST request to /api/v1/access_token/ and include a `client-id` value containing your pfSense username 
-and a `client-token` value containing your pfSense password to your payload. For example 
-`{"client-id": "admin", "client-token": "pfsense"}`. Once you have your bearer token, you can authenticate your API
-call by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)
+<details>
+    <summary>JWT</summary
+        Requires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a `client-id` value containing your pfSense username and a `client-token` value containing your pfSense password to your payload. For example `{"client-id": "admin", "client-token": "pfsense"}`. Once you have your bearer token, you can authenticate your APIcall by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)
+</details>
 
-- API Token : Uses standalone tokens generated via the UI. These are better suited to distribute to systems as they are
-revocable and will only allow API authentication and not UI or SSH authentication (like the local database credentials). 
-To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to
-API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing
-tokens. Once you have your API token, you may authenticate your API call by adding a `client-id` value containing your
-API token client ID and a `client-token` value containing your API token client token to your payload.
-(e.g. `{"client-id": "cccdj-311s", "client-token": "42jkjl-k234jlk1b38123kj3kjl-ffwzzuilaei"}`
+<details>
+    <summary>API Token</summary
+        Uses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication and not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by adding a `client-id` value containing yourAPI token client ID and a `client-token` value containing your API token client token to your payload. (e.g. `{"client-id": "cccdj-311s", "client-token": "42jkjl-k234jlk1b38123kj3kjl-ffwzzuilaei"}`
+</details>
 
 # Authorization
 pfSense API uses the same privielges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.
@@ -4173,3 +4170,4 @@ URL: https://{{$hostname}}/api/v1/user/privilege
 
 ---
 [Back to top](#pfsense-rest-api-documentation)
+> Made with &#9829; by [thedevsaddam](https://github.com/thedevsaddam) | Generated at: 2020-09-27 10:50:11 by [docgen](https://github.com/thedevsaddam/docgen)
