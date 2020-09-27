@@ -2,7 +2,7 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-function host_cmp($a, $b) {
+function override_create_host_cmp($a, $b) {
     return strcasecmp($a['host'], $b['host']);
 }
 
@@ -16,22 +16,25 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
 
     public function action() {
         $this->config["unbound"]["hosts"][] = $this->validated_data;
-        usort($this->config["unbound"]["hosts"], "host_cmp");
+        usort($this->config["unbound"]["hosts"], "override_create_host_cmp");
         $this->write_config();
         mark_subsystem_dirty("unbound");
         # If user requests immediately application
         if ($this->initial_data['apply'] === true) {
-            $applied = unbound_reload_config();
+            APITools\unbound_reload_config();
         }
         return APIResponse\get(0, $this->validated_data);
     }
     
     public function validate_payload() {
+        # Check for our required 'host' payload value
         if (isset($this->initial_data['host'])) {
             $this->validated_data["host"] = trim($this->initial_data['host']);
         } else {
             $this->errors[] = APIResponse\get(2004);
         }
+
+        # Check for our required 'domain' payload value
         if (isset($this->initial_data['domain'])) {
             $this->validated_data["domain"] = trim($this->initial_data['domain']);
             if (APITools\unbound_host_override_exists($this->validated_data["host"], $this->validated_data["domain"])) {
@@ -40,6 +43,8 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
         } else {
             $this->errors[] = APIResponse\get(2005);
         }
+
+        # Check for our required 'ip' payload value
         if (isset($this->initial_data['ip'])) {
             if (!is_ipaddrv4($this->initial_data["ip"]) and !is_ipaddrv6($this->initial_data["ip"])) {
                 $this->errors[] = APIResponse\get(2011);
@@ -49,58 +54,28 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
         } else {
             $this->errors[] = APIResponse\get(2006);
         }
+
+        # Check for our optional 'descr' payload value
         if (isset($this->initial_data['descr'])) {
             $this->validated_data["descr"] = $this->initial_data['descr'];
         }
-        if (isset($this->initial_data['aliases'])) {
-            $this->validated_data["aliases"] = $this->unbound_parse_aliases($this->initial_data['aliases']);
-        }
-    }
 
-    // Check user's DNS Resolver (Unbound) host override alias input for errors
-    public function unbound_parse_aliases($aliases) {
-        $aliases_fin = "";    // Default our alias value to blank string
-        if (is_array($aliases)) {
-            $a_count = 0;
-            $aliases_fin = array();
-            foreach ($aliases as $alias_ent) {
-                // Check that each alias has a valid hostname
-                if (array_key_exists("host", $alias_ent) and is_string($alias_ent["host"])) {
-                    $aliases_fin[$a_count] = array("host" => trim($alias_ent["host"]));
-                } else {
-                    $this->errors[] = APIResponse\get(2007);
-                }
-                // Check that each alias has a valid domain name
-                if (array_key_exists("domain", $alias_ent) and is_string($alias_ent["domain"])) {
-                    $aliases_fin[$a_count]["domain"] = trim($alias_ent["domain"]);
-                } else {
-                    $this->errors[] = APIResponse\get(2008);
-                }
-                // Check for alias description under descr key
-                if (array_key_exists("descr", $alias_ent) and is_string($alias_ent["descr"])) {
-                    if (is_string($alias_ent["descr"])) {
-                        $aliases_fin[$a_count]["description"] = $alias_ent["descr"];
-                    }
-                }
-                // Check for alias description under description key
-                if (array_key_exists("description", $alias_ent) and is_string($alias_ent["description"])) {
-                    if (is_string($alias_ent["description"])) {
-                        $aliases_fin[$a_count]["description"] = $alias_ent["description"];
-                    }
-                }
-                // Increase our counter
-                $a_count++;
+        # Check for our optional 'aliases' payload value. This is a nested model creation.
+        if (isset($this->initial_data['aliases'])) {
+            # Allow aliases to be nested under "item" as found in the XML config
+            if (array_key_exists("item", $this->initial_data['aliases'])) {
+                $this->initial_data['aliases'] = $this->initial_data['aliases']["item"];
             }
-            // Check if our aliases already exist
-            foreach ($aliases_fin as $af) {
-                if (APITools\unbound_host_override_exists($af["host"], $af["domain"]) === true) {
-                    $this->errors[] = APIResponse\get(2009);
-                }
+
+            $this->validated_data["aliases"]["item"] = [];
+            foreach ($this->initial_data['aliases'] as $alias) {
+                $alias_create = new APIServicesUnboundHostOverrideAliasCreate();
+                $alias_create->initial_data = $alias;
+                $alias_create->validate_id = false;
+                $alias_create->validate_payload();
+                $this->errors = array_merge($this->errors, $alias_create->errors);
+                $this->validated_data["aliases"]["item"][] = $alias_create->validated_data;
             }
-            // Nest our aliases under the item key
-            $aliases_fin = array("item" => $aliases_fin);
         }
-        // Return our parsed aliases
-        return $aliases_fin;
     }
 }

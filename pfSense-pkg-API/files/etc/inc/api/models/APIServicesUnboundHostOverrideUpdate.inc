@@ -12,127 +12,76 @@ class APIServicesUnboundHostOverrideUpdate extends APIModel {
 
     public function action() {
         // Sort and write our new configuration
-        //usort($this->validated_data["hosts_conf"], "strcmp");
-        $this->config["unbound"]["hosts"] = $this->validated_data["hosts_conf"];
+        $this->config["unbound"]["hosts"][$this->id] = $this->validated_data;
         $this->write_config();
         mark_subsystem_dirty("unbound");
         # If user requests immediately application
-        if ($this->validated_data["apply"] === true) {
+        if ($this->initial_data["apply"] === true) {
             APITools\unbound_reload_config();
         }
-        return APIResponse\get(0, $this->validated_data["update_list"]);
+        return APIResponse\get(0, $this->validated_data);
     }
-    
+
     public function validate_payload() {
+        # Check for our required 'id' payload value.
+        if (isset($this->initial_data["id"])) {
+            if (array_key_exists($this->initial_data["id"], $this->config["unbound"]["hosts"])) {
+                $this->id = $this->initial_data["id"];
+                $this->validated_data = $this->config["unbound"]["hosts"][$this->id];
+            } else {
+                $this->errors[] = APIResponse\get(2016);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(2015);
+        }
+
+        # Check for our optional 'host' payload value
         if (isset($this->initial_data['host'])) {
-            $this->validated_data["hostname"] = trim($this->initial_data['host']);
-            $h_mode = true;
+            $this->validated_data["host"] = trim($this->initial_data['host']);
         }
-        if (isset($this->initial_data['new_host'])) {
-            $this->validated_data["new_hostname"] = trim($this->initial_data['new_host']);
-        }
+
+        # Check for our optional 'domain' payload value
         if (isset($this->initial_data['domain'])) {
             $this->validated_data["domain"] = trim($this->initial_data['domain']);
-        } elseif ($h_mode) {
-            $this->errors[] = APIResponse\get(2005);
         }
-        if (isset($this->initial_data['new_domain'])) {
-            $this->validated_data["new_domain"] = trim($this->initial_data['new_domain']);
+
+        # Check for our required 'ip' payload value
+        if (isset($this->initial_data['ip'])) {
+            if (!is_ipaddrv4($this->initial_data["ip"]) and !is_ipaddrv6($this->initial_data["ip"])) {
+                $this->errors[] = APIResponse\get(2011);
+            } else {
+                $this->validated_data["ip"] = trim($this->initial_data['ip']);
+            }
         }
-        if (isset($this->initial_data['ip']) and !$h_mode) {
-            $this->validated_data["ip"] = trim($this->initial_data['ip']);
-            $i_mode = true;
-        }
-        if (isset($this->initial_data['new_ip'])) {
-            $this->validated_data["new_ip"] = trim($this->initial_data['new_ip']);
-        } elseif ($i_mode) {
-            $this->errors[] = APIResponse\get(2012);
-        }
+
+        # Check for our optional 'descr' payload value
         if (isset($this->initial_data['descr'])) {
             $this->validated_data["descr"] = $this->initial_data['descr'];
         }
-        if ($this->initial_data['apply'] === true) {
-            $this->validated_data["apply"] = $this->initial_data['apply'];
-        }
-        // Validate our input against our exist configuration
-        if (APITools\unbound_host_override_exists($this->validated_data["hostname"], $this->validated_data["domain"]) or $i_mode) {
-            $this->validated_data["hosts_conf"] = $this->config["unbound"]["hosts"];    // Current Unbound host overrides
-            $h_count = 0;    // Assign a loop counter
-            $this->validated_data["update_list"] = array();    // Assign array to track which values were updated
-            // Check modification mode
-            if ($i_mode) {
-                if (is_ipaddrv4($this->validated_data["new_ip"]) or is_ipaddrv6($this->validated_data["new_ip"])) {
-                    foreach ($this->validated_data["hosts_conf"] as $he) {
-                        // If our IP matches, update our IP
-                        if ($this->validated_data["ip"] === $he["ip"]) {
-                            $this->validated_data["hosts_conf"][$h_count]["ip"] = $this->validated_data["new_ip"];
-                            $this->validated_data["update_list"][] = $this->validated_data["hosts_conf"][$h_count];
-                        }
-                        // Increase our counter
-                        $h_count++;
-                    }
-                } else {
-                    $this->errors[] = APIResponse\get(2011);
-                }
-            } elseif ($h_mode) {
-                foreach ($this->validated_data["hosts_conf"] as $he) {
-                    $he_updated = false;
-                    // Check if both our hostname and domain names were changed
-                    if (isset($this->validated_data["new_hostname"]) and isset($this->validated_data["new_domain"])) {
-                        if ($this->validated_data["hostname"] === $he["host"] and $this->validated_data["domain"] === $he["domain"]) {
-                            if (!APITools\unbound_host_override_exists($this->validated_data["new_hostname"], $this->validated_data["new_domain"])) {
-                                $this->validated_data["hosts_conf"][$h_count]["host"] = $this->validated_data["new_hostname"];
-                                $this->validated_data["hosts_conf"][$h_count]["domain"] = $this->validated_data["new_domain"];
-                                $he_updated = true;
-                            } else {
-                                $this->errors[] = APIResponse\get(2010);
-                            }
-                        }
-                    } elseif (isset($this->validated_data["new_hostname"])) {
-                        if ($this->validated_data["hostname"] === $he["host"] and $this->validated_data["domain"] === $he["domain"]) {
-                            if (!APITools\unbound_host_override_exists($this->validated_data["new_hostname"], $he["domain"])) {
-                                $this->validated_data["hosts_conf"][$h_count]["host"] = $this->validated_data["new_hostname"];
-                                $he_updated = true;
-                            } else {
-                                $this->errors[] = APIResponse\get(2010);
-                            }
-                        }
-                    } elseif (isset($this->validated_data["new_domain"])) {
-                        if ($this->validated_data["hostname"] === $he["host"] and $this->validated_data["domain"] === $he["domain"]) {
-                            if (!APITools\unbound_host_override_exists($he["host"], $this->validated_data["new_domain"])) {
-                                $this->validated_data["hosts_conf"][$h_count]["domain"] = $this->validated_data["new_domain"];
-                                $he_updated = true;
-                            } else {
-                                $this->errors[] = APIResponse\get(2010);
-                            }
-                        }
-                    }
-                    if (isset($this->validated_data["new_ip"])) {
-                        if (is_ipaddrv4($this->validated_data["new_ip"]) or is_ipaddrv6($this->validated_data["new_ip"])) {
-                            if ($this->validated_data["hostname"] === $he["host"] and $this->validated_data["domain"] === $he["domain"]) {
-                                $this->validated_data["hosts_conf"][$h_count]["ip"] = $this->validated_data["new_ip"];
-                                $he_updated = true;
-                            }
-                        } else {
-                            $this->errors[] = APIResponse\get(2011);
-                        }
-                    }
-                    if (isset($this->validated_data["descr"])) {
-                        if ($this->validated_data["hostname"] === $he["host"] and $this->validated_data["domain"] === $he["domain"]) {
-                            $this->validated_data["hosts_conf"][$h_count]["descr"] = $this->validated_data["descr"];
-                            $he_updated = true;
-                        }
-                    }
-                    // Check if our entry was updated, if so add it to our update list
-                    if ($he_updated) {
-                        $this->validated_data["update_list"][] = $this->validated_data["hosts_conf"][$h_count];
-                    }
-                    // Increase our counter
-                    $h_count++;
-                }
+
+        # If host or domain was updated, ensure this host override doesn't already exist
+        if (isset($this->initial_data["host"]) or isset($this->initial_data["domain"])) {
+            if (APITools\unbound_host_override_exists($this->validated_data["host"], $this->validated_data["domain"])) {
+                $this->errors[] = APIResponse\get(2010);
             }
-        } else {
-            $this->errors[] = APIResponse\get(2013);
+        }
+
+        # Check for our optional 'aliases' payload value. This is a nested model creation.
+        if (isset($this->initial_data['aliases'])) {
+            # Allow aliases to be nested under "item" as found in the XML config
+            if (array_key_exists("item", $this->initial_data['aliases'])) {
+                $this->initial_data['aliases'] = $this->initial_data['aliases']["item"];
+            }
+
+            $this->validated_data["aliases"]["item"] = [];
+            foreach ($this->initial_data['aliases'] as $alias) {
+                $alias_create = new APIServicesUnboundHostOverrideAliasCreate();
+                $alias_create->initial_data = $alias;
+                $alias_create->validate_id = false;
+                $alias_create->validate_payload();
+                $this->errors = array_merge($this->errors, $alias_create->errors);
+                $this->validated_data["aliases"]["item"][] = $alias_create->validated_data;
+            }
         }
     }
 }

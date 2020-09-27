@@ -214,6 +214,10 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Read Unbound Host Override](#3-read-unbound-host-override)
   * [Update Unbound Host Override](#4-update-unbound-host-override)
 
+* [SERVICES/UNBOUND/HOST_OVERRIDE/ALIAS](#servicesunboundhost_overridealias)
+
+  * [Create Unbound Host Override Alias](#1-create-unbound-host-override-alias)
+
 * [STATUS/CARP](#statuscarp)
 
   * [Read CARP Status](#1-read-carp-status)
@@ -2441,6 +2445,7 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 | ip | string | IPv4 or IPv6 of new DNS A record |
 | descr | string | Description of host override (optional) |
 | aliases | array | Hostname aliases (CNAME) for host override (optional) |
+| apply | boolean | Apply this host override upon creation. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional) |
 
 
 
@@ -2486,10 +2491,8 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| host | string | Hostname of host override(s) to delete. This may be combined with a domain name and/or IP address for more specific deletions, or it may be used standalone to delete all host overrides that match the specified hostname |
-| domain | string | Domain of host override(s) to delete. This may be combined with a hostname and/or IP address for more specific deletions, or it may be used standalone to delete all host overrides that match the specified domain |
-| ip | string | IPv4/IPv6 address of host override(s) to delete. This may be combined with a hostname and/or domain name for more specific deletions, or it may be used standalone to delete all host overrides that match the specified IPv4/IPv6 address |
-| aliases | boolean | Delete aliases upon host and/or domain match (optional) |
+| id | integer | Specify the ID of the host override to delete |
+| apply | boolean | Apply this host override upon modification. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional) |
 
 
 
@@ -2545,13 +2548,13 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| host | string | Hostname of host override to modify. If specified, a `domain` value must be specified. |
-| domain | string | Domain of host override to modify. Only necessary if a `host` value was provided.  |
-| ip | string | IPv4/IPv6 address of host overrides to update IP. If specified, a `new_ip`value must be specified. If `host` and `domain` value are specified, this value will be ignored.  |
-| descr | string | Specify a new host override description. Only available if a `host` value was provided.  (optional) |
-| new_host | string | Specify a new hostname for the host override. Only available if a `host` value was provided.  (optional)  |
-| new_domain | string | Specify a new domain for the host override. Only available if a `host` value was provided.  (optional)  |
-| new_ip | string | Specify a new IPv4/IPv6 for the host override. Required if `ip` value was provided. |
+| id | integer | Specify the ID of the host override to update |
+| host | string | Update the hostname of this host override (optional) |
+| domain | string | Update the domain name of this host override (optional) |
+| ip | string | Update the IPv4/IPv6 address of this host override (optional) |
+| descr | string | Update the description of this host override (optional) |
+| aliases | array | Update the aliases for this host override. This will replace any existing entries. (optional) |
+| apply | boolean | Apply this host override upon modification. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional) |
 
 
 
@@ -2559,13 +2562,70 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 
 ```js        
 {
-	"host": "test",
+	"host": "updated_test",
 	"domain": "example.com",
-	"ip": "127.0.0.1",
-	"descr": "This is a test host override added via pfSense API!",
-    "new_host": "new_test",
-	"new_domain": "newdomain.com",
-	"new_ip": "123.123.123.123"
+	"ip": "127.0.0.2",
+	"descr": "This is a test host override update via pfSense API!",
+	"aliases": [
+        {
+            "host": "test2", 
+            "domain": "example.com", 
+            "descr": "This is an updated host override alias that will also resolve to this IP!"
+        },
+        {
+            "host": "updated_to_add", 
+            "domain": "example.com", 
+            "descr": "This is a test host override alias that was also added during the update!"
+        }
+    ]
+}
+```
+
+
+
+## SERVICES/UNBOUND/HOST_OVERRIDE/ALIAS
+
+
+
+### 1. Create Unbound Host Override Alias
+
+
+Add a new host override alias to DNS Resolver (Unbound).<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/unbound/host_override/alias
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the host override to apply this alias to. |
+| host | string | Specify the hostname of the alias |
+| domain | string | Specify the domain name of the alias |
+| description | string | Description of alias (optional) |
+| apply | boolean | Apply this host override upon creation. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+    "id": 0,
+	"host": "alias",
+	"domain": "example.com",
+	"descr": "This is a test host override alias added via pfSense API!",
+    "apply": true
 }
 ```
 
@@ -4066,4 +4126,3 @@ URL: https://{{$hostname}}/api/v1/user/privilege
 
 ---
 [Back to top](#pfsense-rest-api-documentation)
-> Made with &#9829; by [thedevsaddam](https://github.com/thedevsaddam) | Generated at: 2020-09-25 17:03:56 by [docgen](https://github.com/thedevsaddam/docgen)

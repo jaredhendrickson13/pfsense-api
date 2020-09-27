@@ -9,6 +9,7 @@ class APIModel {
     public $initial_data;
     public $validated_data;
     public $id;
+    public $validate_id;
     public $config;
     public $errors;
     public $methods;
@@ -25,6 +26,7 @@ class APIModel {
         $this->set_auth_mode = null;
         $this->change_note = "Made unknown change via API";
         $this->id = null;
+        $this->validate_id = true;
         $this->initial_data = APITools\get_request_data();
         $this->validated_data = [];
         $this->errors = [];

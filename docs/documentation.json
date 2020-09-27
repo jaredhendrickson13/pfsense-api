@@ -63,7 +63,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \n}"
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/ldap",
@@ -97,7 +100,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"TEST_AUTHSERVER\",\n\t\"host\": \"ldap.com\",\n\t\"ldap_port\": 636,\n\t\"ldap_urltype\": \"encrypted\",\n\t\"ldap_protver\": \"3\",\n\t\"ldap_timeout\": 12,\n\t\"ldap_scope\": \"subtree\",\n\t\"ldap_basedn\": \"dc=test,dc=com\",\n    \"ldap_authcn\": \"ou=people,dc=test,dc=com;ou=groups,dc=test,dc=com\",\n    \"ldap_attr_user\": \"uid\",\n    \"ldap_attr_group\": \"cn\",\n    \"ldap_attr_member\": \"memberof\",\n    \"ldap_attr_groupobj\": \"posixGroup\",\n    \"ldap_binddn\": \"cn=pfsense,dc=test,dc=com\",\n    \"ldap_bindpw\": \"asdf\",\n    \"active\": false\n}"
+									"raw": "{\n\t\"name\": \"TEST_AUTHSERVER\",\n\t\"host\": \"ldap.com\",\n\t\"ldap_port\": 636,\n\t\"ldap_urltype\": \"encrypted\",\n\t\"ldap_protver\": \"3\",\n\t\"ldap_timeout\": 12,\n\t\"ldap_scope\": \"subtree\",\n\t\"ldap_basedn\": \"dc=test,dc=com\",\n    \"ldap_authcn\": \"ou=people,dc=test,dc=com;ou=groups,dc=test,dc=com\",\n    \"ldap_attr_user\": \"uid\",\n    \"ldap_attr_group\": \"cn\",\n    \"ldap_attr_member\": \"memberof\",\n    \"ldap_attr_groupobj\": \"posixGroup\",\n    \"ldap_binddn\": \"cn=pfsense,dc=test,dc=com\",\n    \"ldap_bindpw\": \"asdf\",\n    \"active\": false\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/ldap?name=string&host=string&ldap_port=string or integer&ldap_urltype=string&ldap_protver=string or integer&ldap_scope=string&ldap_basedn=string&ldap_authcn=string&ldap_extended_query=string&ldap_binddn=string&ldap_bindpw=string&ldap_attr_user=string&ldap_attr_group=string&ldap_attr_member=string&ldap_attr_groupobj=string&ldap_utf8=boolean&ldap_timeout=string or integer&active=boolean",
@@ -223,7 +229,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"LDAP_AUTHSERVER_0\"\n}"
+									"raw": "{\n\t\"name\": \"LDAP_AUTHSERVER_0\"\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/ldap?name=string",
@@ -264,7 +273,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"test\"\n}"
+									"raw": "{\n\t\"name\": \"test\"\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/radius?name=string",
@@ -305,7 +317,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"test\"\n}"
+									"raw": "{\n\t\"name\": \"test\"\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server?name=string",
@@ -4534,6 +4549,74 @@
 							"name": "HOST_OVERRIDE",
 							"item": [
 								{
+									"name": "ALIAS",
+									"item": [
+										{
+											"name": "Create Unbound Host Override Alias",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": 0,\n\t\"host\": \"alias\",\n\t\"domain\": \"example.com\",\n\t\"descr\": \"This is a test host override alias added via pfSense API!\",\n    \"apply\": true\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "https://{{$hostname}}/api/v1/services/unbound/host_override/alias?id=integer&host=string&domain=string&description=string&apply=boolean",
+													"protocol": "https",
+													"host": [
+														"{{$hostname}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"services",
+														"unbound",
+														"host_override",
+														"alias"
+													],
+													"query": [
+														{
+															"key": "id",
+															"value": "integer",
+															"description": "Specify the ID of the host override to apply this alias to."
+														},
+														{
+															"key": "host",
+															"value": "string",
+															"description": "Specify the hostname of the alias"
+														},
+														{
+															"key": "domain",
+															"value": "string",
+															"description": "Specify the domain name of the alias"
+														},
+														{
+															"key": "description",
+															"value": "string",
+															"description": "Description of alias (optional)"
+														},
+														{
+															"key": "apply",
+															"value": "boolean",
+															"description": "Apply this host override upon creation. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional)"
+														}
+													]
+												},
+												"description": "Add a new host override alias to DNS Resolver (Unbound).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]"
+											},
+											"response": []
+										}
+									],
+									"description": "API endpoints to create, read, update and delete DNS Resolver (Unbound) host override aliases.",
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
+								},
+								{
 									"name": "Create Unbound Host Override",
 									"request": {
 										"method": "POST",
@@ -4548,7 +4631,7 @@
 											}
 										},
 										"url": {
-											"raw": "https://{{$hostname}}/api/v1/services/unbound/host_override?host=string&domain=string&ip=string&descr=string&aliases=array",
+											"raw": "https://{{$hostname}}/api/v1/services/unbound/host_override?host=string&domain=string&ip=string&descr=string&aliases=array&apply=boolean",
 											"protocol": "https",
 											"host": [
 												"{{$hostname}}"
@@ -4585,10 +4668,128 @@
 													"key": "aliases",
 													"value": "array",
 													"description": "Hostname aliases (CNAME) for host override (optional)"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Apply this host override upon creation. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional)"
 												}
 											]
 										},
 										"description": "Add a new host override to DNS Resolver (Unbound).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Update Unbound Host Override",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"host\": \"updated_test\",\n\t\"domain\": \"example.com\",\n\t\"ip\": \"127.0.0.2\",\n\t\"descr\": \"This is a test host override update via pfSense API!\",\n\t\"aliases\": [\n        {\n            \"host\": \"test2\", \n            \"domain\": \"example.com\", \n            \"descr\": \"This is an updated host override alias that will also resolve to this IP!\"\n        },\n        {\n            \"host\": \"updated_to_add\", \n            \"domain\": \"example.com\", \n            \"descr\": \"This is a test host override alias that was also added during the update!\"\n        }\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/unbound/host_override?id=integer&host=string&domain=string&ip=string&descr=string&aliases=array&apply=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"unbound",
+												"host_override"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "integer",
+													"description": "Specify the ID of the host override to update"
+												},
+												{
+													"key": "host",
+													"value": "string",
+													"description": "Update the hostname of this host override (optional)"
+												},
+												{
+													"key": "domain",
+													"value": "string",
+													"description": "Update the domain name of this host override (optional)"
+												},
+												{
+													"key": "ip",
+													"value": "string",
+													"description": "Update the IPv4/IPv6 address of this host override (optional)"
+												},
+												{
+													"key": "descr",
+													"value": "string",
+													"description": "Update the description of this host override (optional)"
+												},
+												{
+													"key": "aliases",
+													"value": "array",
+													"description": "Update the aliases for this host override. This will replace any existing entries. (optional)"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Apply this host override upon modification. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional)"
+												}
+											]
+										},
+										"description": "Modify host overrides from DNS Resolver (Unbound).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Unbound Host Override",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"host\": \"test\",\n\t\"domain\": \"example.com\",\n\t\"aliases\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/unbound/host_override?id=integer&apply=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"unbound",
+												"host_override"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "integer",
+													"description": "Specify the ID of the host override to delete"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Apply this host override upon modification. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional)"
+												}
+											]
+										},
+										"description": "Delete host overrides from DNS Resolver (Unbound).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]"
 									},
 									"response": []
 								},
@@ -4624,129 +4825,6 @@
 											]
 										},
 										"description": "Read host overrides from DNS Resolver (Unbound).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]"
-									},
-									"response": []
-								},
-								{
-									"name": "Update Unbound Host Override",
-									"request": {
-										"method": "PUT",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"host\": \"test\",\n\t\"domain\": \"example.com\",\n\t\"ip\": \"127.0.0.1\",\n\t\"descr\": \"This is a test host override added via pfSense API!\",\n    \"new_host\": \"new_test\",\n\t\"new_domain\": \"newdomain.com\",\n\t\"new_ip\": \"123.123.123.123\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "https://{{$hostname}}/api/v1/services/unbound/host_override?host=string&domain=string&ip=string&descr=string&new_host=string&new_domain=string&new_ip=string",
-											"protocol": "https",
-											"host": [
-												"{{$hostname}}"
-											],
-											"path": [
-												"api",
-												"v1",
-												"services",
-												"unbound",
-												"host_override"
-											],
-											"query": [
-												{
-													"key": "host",
-													"value": "string",
-													"description": "Hostname of host override to modify. If specified, a `domain` value must be specified."
-												},
-												{
-													"key": "domain",
-													"value": "string",
-													"description": "Domain of host override to modify. Only necessary if a `host` value was provided. "
-												},
-												{
-													"key": "ip",
-													"value": "string",
-													"description": "IPv4/IPv6 address of host overrides to update IP. If specified, a `new_ip`value must be specified. If `host` and `domain` value are specified, this value will be ignored. "
-												},
-												{
-													"key": "descr",
-													"value": "string",
-													"description": "Specify a new host override description. Only available if a `host` value was provided.  (optional)"
-												},
-												{
-													"key": "new_host",
-													"value": "string",
-													"description": "Specify a new hostname for the host override. Only available if a `host` value was provided.  (optional) "
-												},
-												{
-													"key": "new_domain",
-													"value": "string",
-													"description": "Specify a new domain for the host override. Only available if a `host` value was provided.  (optional) "
-												},
-												{
-													"key": "new_ip",
-													"value": "string",
-													"description": "Specify a new IPv4/IPv6 for the host override. Required if `ip` value was provided."
-												}
-											]
-										},
-										"description": "Modify host overrides from DNS Resolver (Unbound).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]"
-									},
-									"response": []
-								},
-								{
-									"name": "Delete Unbound Host Override",
-									"request": {
-										"method": "DELETE",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n    \"host\": \"test\",\n\t\"domain\": \"example.com\",\n\t\"aliases\": true\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "https://{{$hostname}}/api/v1/services/unbound/host_override?host=string&domain=string&ip=string&aliases=boolean",
-											"protocol": "https",
-											"host": [
-												"{{$hostname}}"
-											],
-											"path": [
-												"api",
-												"v1",
-												"services",
-												"unbound",
-												"host_override"
-											],
-											"query": [
-												{
-													"key": "host",
-													"value": "string",
-													"description": "Hostname of host override(s) to delete. This may be combined with a domain name and/or IP address for more specific deletions, or it may be used standalone to delete all host overrides that match the specified hostname"
-												},
-												{
-													"key": "domain",
-													"value": "string",
-													"description": "Domain of host override(s) to delete. This may be combined with a hostname and/or IP address for more specific deletions, or it may be used standalone to delete all host overrides that match the specified domain"
-												},
-												{
-													"key": "ip",
-													"value": "string",
-													"description": "IPv4/IPv6 address of host override(s) to delete. This may be combined with a hostname and/or domain name for more specific deletions, or it may be used standalone to delete all host overrides that match the specified IPv4/IPv6 address"
-												},
-												{
-													"key": "aliases",
-													"value": "boolean",
-													"description": "Delete aliases upon host and/or domain match (optional)"
-												}
-											]
-										},
-										"description": "Delete host overrides from DNS Resolver (Unbound).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]"
 									},
 									"response": []
 								}

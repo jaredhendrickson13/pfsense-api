@@ -272,6 +272,18 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Host override deletion criteria not met"
         ],
+        2015 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound host override ID required"
+        ],
+        2016 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound host override ID does not exist"
+        ],
 
         // 3000-3999 reserved for /interfaces API calls
         3000 => [

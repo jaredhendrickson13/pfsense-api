@@ -116,6 +116,11 @@ custom API model:
 - `$this->config` : Our pfSense configuration array. You may read current configuration values using this array or write
 changes to the configuration by updating it's values. If you do make changes to the configuration, you must use call
 `$this->write_config()` to apply them. 
+- `$this->id` : A property to track the current instances configuration ID. This is primarily helpful for updating and 
+deleting objects.
+- `$this->validate_id` : A boolean to dictate whether the model object should require validation of the configuraiton ID.
+This defaults to true, but can be useful for nested model object calls where you would like to validate a payload before
+it's parent is created. It is entirely up to you to implement this property if desired.
 
 #### Reading and Writing to pfSense's XML Configuration ####
 Included in the API framework are properties and methods to read and write to pfSense's XML configuration. Please note
