@@ -180,6 +180,18 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Could not locate tunable with ID"
         ],
+        1018 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Table name is required"
+        ],
+        1019 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Table name does not exist"
+        ],
 
         // 2000-2999 reserved for /services API calls
         2000 => [

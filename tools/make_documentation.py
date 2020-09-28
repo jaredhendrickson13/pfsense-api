@@ -7,11 +7,80 @@ import subprocess
 args = None
 css = """
 <style>
-    div.col-md-12.collection-intro, footer{
+    body {
+        display: block;
+        width: 90%;
+        margin: 0 auto;
+    }
+    footer {
         display:none;
     }
-    div.col-md-12{
+    div.col-md-12 {
         margin-top: 20px;
+    }
+
+    li:before {
+        content:"• ";
+    }
+
+    summary:hover {
+        cursor: pointer;
+        color: darkred;
+    }
+
+    details[open] summary ~ * {
+      animation: open 0.3s ease-in-out;
+    }
+
+    @keyframes open {
+      0% {
+        opacity: 0;
+      }
+      100% {
+        opacity: 1;
+      }
+    }
+
+    details summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details summary {
+      width: 100%;
+      padding: 0.5rem 0;
+      border-top: 1px solid black;
+      position: relative;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      list-style: none;
+    }
+
+    details summary:before {
+      content: "+ ";
+      color: black;
+      position: relative;
+      font-size: 12px;
+      line-height: 0;
+      margin-top: 0.75rem;
+      font-weight: 400;
+      transform-origin: center;
+      transition: 200ms linear;
+    }
+
+    details[open] summary:before {
+      content: "- ";
+      font-size: 12px;
+    }
+
+    details summary {
+      outline: 0;
+    }
+
+    details p {
+      font-size: 14px;
+      margin: 0 0 1rem;
+      padding-top: 1rem;
     }
 </style>
 """

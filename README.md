@@ -2,6 +2,7 @@
 # pfSense REST API Documentation
 
 ---
+
 # Introduction
 pfSense API is a fast, safe, REST API package for pfSense firewalls. This works by leveraging the same PHP functions and processes used 
 by pfSense's webConfigurator into API endpoints to create, read, update and delete pfSense configurations. All API 
@@ -9,29 +10,30 @@ endpoints enforce input validation to prevent invalid configurations from being 
 properly written to the master XML configuration and the correct backend configurations are made preventing the need for
  a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!
 
+
 # Requirements
 - pfSense 2.4.4 or later is supported
 - pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the 
 webConfigurator are required to make calls to the API endpoints
-- While not an enforced requirement, it is STRONGLY recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit
+- While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit
+
 
 # Installation
 To install pfSense API, simply run the following command from the pfSense shell:<br>
 ```
-pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/download/v0.0.4/pfSense-2-4-pkg-API-0.0_4.txz && /etc/rc.restart_webgui
+pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/download/v1.0.0/pfSense-2-4-pkg-API-1.0_0.txz && /etc/rc.restart_webgui
 ```
-<br>
 
 To uninstall, run the following command:<br>
 ```
 pkg delete pfSense-pkg-API
 ```
-<br>
 
 ### Notes: 
 - In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package
 - If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to 
 'Diagnostics > Command Prompt' and enter the commands there
+
 
 # UI Settings & Documentation
 After installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System > API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation with context to your pfSense instance.
@@ -39,7 +41,8 @@ After installation, you will be able to access the API user interface pages with
 ### Notes: 
 - Users must hold the `page-all` or `page-system-api` privileges to access the API page within the webConfigurator
 
-# Authentication
+
+# Authentication & Authorization
 By default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense 
 from the API out of the box, and user passwords may be changed from the API to immediately add additional security if 
 needed. After installation, you can navigate to System > API in the pfSense webConfigurator to configure API
@@ -57,7 +60,7 @@ Uses the same credentials as the pfSense webConfigurator. To authenticate API ca
 <details>
     <summary>JWT</summary>
 
-Requires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a `client-id` value containing your pfSense username and a `client-token` value containing your pfSense password to your payload. For example `{"client-id": "admin", "client-token": "pfsense"}`. Once you have your bearer token, you can authenticate your APIcall by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)
+Requires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a `client-id` value containing your pfSense username and a `client-token` value containing your pfSense password to your payload. For example `{"client-id": "admin", "client-token": "pfsense"}`. Once you have your bearer token, you can authenticate your API call by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)
 </details>
 
 <details>
@@ -66,22 +69,25 @@ Requires a bearer token to be included in the `Authorization` header of your req
 Uses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication and not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by adding a `client-id` value containing yourAPI token client ID and a `client-token` value containing your API token client token to your payload. (e.g. `{"client-id": "cccdj-311s", "client-token": "42jkjl-k234jlk1b38123kj3kjl-ffwzzuilaei"}`
 </details>
 
-# Authorization
-pfSense API uses the same privielges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.
+### Authorization
+pfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.
+
 
 # Response Codes
 `200 (OK)` : API call succeeded<br>
 `400 (Bad Request)` : An error was found within your requested parameters<br>
 `401 (Unauthorized)` : API client has not completed authentication or authorization successfully<br>
-`403 (Forbidden)` : The API endpoint has refused your call. Commonly due to your access settings found in `System > API`<br>
+`403 (Forbidden)` : The API endpoint has refused your call. Commonly due to your access settings found in System > API<br>
 `404 (Not found)` : Either the API endpoint or requested data was not found<br>
 `500 (Server error)` : The API endpoint encountered an unexpected error processing your API request<br>
+
 
 # Error Codes
 A full list of error codes can be found by navigating to /api/v1/system/api/errors/ after installation. This will return
  JSON data containing each error code and their corresponding error message. No authentication is required to view the 
  error code library. This also makes API integration with third-party software easy as the API error codes and messages 
  are always just an HTTP call away!
+
 
 # Queries
 For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you like to, in order to match the query, each parameter must match exactly. If no matches were found, the endpoint will return an empty array in the data field. 
@@ -105,7 +111,7 @@ For example, say an API endpoint normally returns a response like this without a
 }
 ```
 
-If I wanted the endpoint to only return the objects that had their `type` set to `type1` I could add `{"type": "type1"}` to my payload. These would return something like this:
+If I wanted the endpoint to only return the objects that had their `type` set to `type1` I could add `{"type": "type1"}` to my payload. This would return something like this:
 
 ```json
 {
@@ -131,8 +137,12 @@ If I wanted the endpoint to only return the objects that had their `type` set to
 ### Notes:
 - For those using the Local database or API token authentication types, `client-id` and `client-token` are excluded from queries
 
+
 # Rate limit
 There is no limit to API calls at this time but is important to note that pfSense's XML configuration was not designed for quick simultaneous writes like a traditional database. It may be necessary to delay API calls in sequence to prevent unexpected behavior. Alternatively, you may limit the API to read-only mode to only allow endpoints with read (GET) access within the webConfigurator's System > API page.
+
+
+# Endpoints
 
 ## Indices
 
@@ -2549,9 +2559,7 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 
 ```js        
 {
-    "host": "test",
-	"domain": "example.com",
-	"aliases": true
+    "id": 0
 }
 ```
 
@@ -4175,4 +4183,3 @@ URL: https://{{$hostname}}/api/v1/user/privilege
 
 ---
 [Back to top](#pfsense-rest-api-documentation)
-> Made with &#9829; by [thedevsaddam](https://github.com/thedevsaddam) | Generated at: 2020-09-27 11:01:44 by [docgen](https://github.com/thedevsaddam/docgen)
