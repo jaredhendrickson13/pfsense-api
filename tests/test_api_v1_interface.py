@@ -19,7 +19,7 @@ class APIUnitTestInterface(unit_test_framework.APIUnitTest):
     get_payloads = [{}]
     post_payloads = [
         {
-            "if": "em1",
+            "if": "em2",
             "descr": "asdf",
             "enable": "",
             "type": "staticv4",
@@ -30,7 +30,7 @@ class APIUnitTestInterface(unit_test_framework.APIUnitTest):
     ]
     delete_payloads = [
         {
-            "if": "em1"
+            "if": "em2"
         }
     ]
 
