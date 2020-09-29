@@ -388,10 +388,10 @@ If you wanted to target objects whose tag is greater than or equal to `100`, you
 - API call must be successful and return `0` in the `return` field.
 - Endpoints must return an array of objects in the data field (e.g. `[{"id": 0, "name": "Test"}, {"id": 1, "name": "Other Test"}]`).
 - At least two objects must be present within the array to support queries.
-- If an array is being used in a query, it must much the target data completely and exactly. There are no recursive queries.
 
 ### Notes:
-- For those using the Local database or API token authentication types, `client-id` and `client-token` are excluded from queries
+- For those using the Local database or API token authentication types, `client-id` and `client-token` are excluded from queries by default
+- Both recursive queries and query filters are seperated by double underscores (`__`)
 
 
 # Rate limit
