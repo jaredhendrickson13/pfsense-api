@@ -38,58 +38,45 @@ Make an attempt to match the format of existing code. The basic conventions are:
 _Note: suggestions to coding conventions are welcome, refactoring as things change is necessary to support maintainable 
 code_
 
-Writing new API Endpoints
+Creating new API functionality
 ---------------------
 Most contributions to this project will be in the form of integrating new API endpoints. API endpoints are comprised of
 a few different components. It is strongly recommended that you familiarize yourself with pfSense's PHP shell before
 diving into creating endpoints. To get started writing your own endpoints, please follow the steps below:
 
-### Things to Know ###
- - The API is based on REST principals. Unfortunately, pfSense does not seem to allow any custom changes to the NGINX 
- configuration so alternate request methods like `PUT` and `DELETE` do not appear to be possible. To accommodate this, 
- the requested action must be defined in the endpoint path. 
-    - Create actions must be a `POST` request to an endpoint ending in `/add/` 
-     (e.g. `https://localhost/api/v1/firewall/rules/add/`) 
-    - Read actions must be a `GET` request to a base endpoint (e.g. `https://localhost/api/v1/firewall/rules/`)
-    - Update actions must be a `POST` request to an endpoint ending in `/update/` 
-     (e.g. `https://localhost/api/v1/firewall/rules/update/`)
-    - Delete actions must be a `POST` request to an endpoint ending in `/delete/`
-     (e.g. `https://localhost/api/v1/firewall/rules/delete/`)
-
-### Writing the API model ### 
+## Writing the API model ## 
 At the core of the API endpoint is the API model. This is a class that validates client request data, writes changes
 to the pfSense configuration file, and makes any corresponding system changes. pfSense API is distributed with a 
 custom micro-framework to accommodate developers wanting to contribute or create their own API models and endpoints.
 
 #### Getting Started ####
-To get started creating a new API model, you first need to create a new PHP file in `/files/etc/inc/api/api_models` and
-create a new class that extends our APIBaseModel framework class:
+To get started creating a new API model, you first need to create a new PHP file in `/files/etc/inc/api/models` and
+create a new class that extends our APIModel framework class:
 
 ```php
 <?php
-require_once("api/framework/APIBaseModel.inc");
+require_once("api/framework/APIModel.inc");
 
-class NewAPIModel extends APIBaseModel {
+class NewAPIModel extends APIModel {
     
 }
 ```
 
 #### Constructing the API Model ####
-In order to use the APIBaseModel framework, you must add a `__construct()` method to your new API model class and 
-initialize the APIBaseModel class as such. Additionally, you may specify any model attribute overrides within this 
+In order to use the APIModel framework, you must add a `__construct()` method to your new API model class and 
+initialize the APIModel class as such. Additionally, you may specify any model attribute overrides within this 
 method:
 
 ```php
 <?php
-require_once("api/framework/APIBaseModel.inc");
+require_once("api/framework/APIModel.inc");
 
-class NewAPIModel extends APIBaseModel {
+class NewAPIModel extends APIModel {
     # Create our construct method
     public function __construct() {
-        parent::__construct();    // Initializes our APIBaseModel class
+        parent::__construct();    // Initializes our APIModel class
 
         # Add your API model properties here (see Overriding Base Model Properties
-        $this->methods = ["POST"];
         $this->privileges = ["page-all", "page-diagnostics-arptable"];
         $this->requires_auth = false;
     }
@@ -99,9 +86,6 @@ class NewAPIModel extends APIBaseModel {
 #### Overriding Base Model Properties ####
 There are several class properties that you can customize to fit the needs of your API Model. If a model attribute is
 not specified, the default values are assumed:
-
-- `$this->methods` : Allows you to set what HTTP methods are allowed in array format. Due limitations of pfSense's NGINX
- configuration, only GET and POST requests can be used. Defaults to `["GET", "POST"]`.
  
 - `$this->privileges` : Allows you to set what pfSense permissions are required for clients to access this model. This
 utilizes the same permissions as the pfSense webConfigurator. Specify the privileges internal config value in array
@@ -122,7 +106,7 @@ This is only necessary if your API model writes changes to the configuration.
 
 
 #### Other Base Model Properties ####
-There are other properties inherited from APIBaseModel that are not intended (and shouldn't be) overridden by your
+There are other properties inherited from APIModel that are not intended (and shouldn't be) overridden by your
 custom API model:
 
 - `$this->client` : An APIAuth object that contains information about the client (for more see Accessing Client Data)
@@ -132,6 +116,11 @@ custom API model:
 - `$this->config` : Our pfSense configuration array. You may read current configuration values using this array or write
 changes to the configuration by updating it's values. If you do make changes to the configuration, you must use call
 `$this->write_config()` to apply them. 
+- `$this->id` : A property to track the current instances configuration ID. This is primarily helpful for updating and 
+deleting objects.
+- `$this->validate_id` : A boolean to dictate whether the model object should require validation of the configuraiton ID.
+This defaults to true, but can be useful for nested model object calls where you would like to validate a payload before
+it's parent is created. It is entirely up to you to implement this property if desired.
 
 #### Reading and Writing to pfSense's XML Configuration ####
 Included in the API framework are properties and methods to read and write to pfSense's XML configuration. Please note
@@ -152,17 +141,16 @@ appends an error response to the `$this->errors` property.
 For example:
 ```php
 <?php
-require_once("api/framework/APIBaseModel.inc");
+require_once("api/framework/APIModel.inc");
 
-class NewAPIModel extends APIBaseModel {
+class NewAPIModel extends APIModel {
     public function __construct() {
         parent::__construct();
-        $this->methods = ["POST"];
         $this->privileges = ["page-all", "page-diagnostics-arptable"];
         $this->requires_auth = false;
     }
 
-    # Overrides our APIBaseModel validate_payload method to validate data within our initial_data property
+    # Overrides our APIModel validate_payload method to validate data within our initial_data property
     public function validate_payload() {
         # Check if we have a test value in our payload, if so add the value to validated_data array
         if (array_key_exists("test", $this->initial_data)) {
@@ -179,7 +167,7 @@ class NewAPIModel extends APIBaseModel {
 #### Writing API Model Action ####
 By default, the API model will return a 'Your API request was valid but no actions were specified for this endpoint' 
 error after validating input. This is because we need to tell it what to do when our request is valid! We do this by 
-overriding the APIBaseModel's `action()` method. This method should simply be a set of tasks to perform upon a 
+overriding the APIModel's `action()` method. This method should simply be a set of tasks to perform upon a 
 successful API call. If you are writing an endpoint to perform a change that is usually performed via the pfSense 
 webConfigurator, it may be helpful to look at the PHP code for the webConfigurator page. This method must return an
 APIResponse item.
@@ -187,10 +175,9 @@ APIResponse item.
 As a basic example, if I wanted to add our validated input to our pfSense configuration:
 
 ```php
-class NewAPIModel extends APIBaseModel {
+class NewAPIModel extends APIModel {
     public function __construct() {
         parent::__construct();
-        $this->methods = ["POST"];
         $this->privileges = ["page-all", "page-diagnostics-arptable"];
         $this->requires_auth = false;
         
@@ -218,39 +205,115 @@ class NewAPIModel extends APIBaseModel {
 }
 ```
 
-#### Writing API endpoints ####
-API models are not useful if we do not have an API endpoint that calls upon the model. API endpoints are the PHP scripts
-that will be placed in pfSense's web path. To create a new API endpoint, add an index.php file in 
-`/files/usr/local/www/api/v1/` wherever makes the most sense for your API call. You may also create new directories
-if none of the existing ones describe your API call well enough. For example, if I wanted to create a new API call
-that would be available at https://pfsensehost/api/v1/system/test/, I would need to create a new directory within
-/files/usr/local/www/api/v1/system/ called 'test' and add my index.php in that directory. 
-
-All that is needed for API endpoints is the following. Be sure to change the API model class name to your own:
-```php
-<?php
-require_once("api/api_models/YourAPIModel.inc");
-
-# Creates our API model object and listens for API calls
-(new YourAPIModel())->listen();    
-```
-
-
-
 #### Accessing Client Data ####
 If for any reason you need to access client data from within your API model class, you can access the `$this->client`
 property. This is an APIAuth object that contains details about the client:
 
 - `$this->client->username` : Our client's corresponding pfSense username
 - `$this->client->ip_address` : The IP address of our client
-- `$this->client->is_authenticated` : Whether the client successfully authenticated. Keep in mind the APIBaseModel will
+- `$this->client->is_authenticated` : Whether the client successfully authenticated. Keep in mind the APIModel will
 handle all authentication and authorization for you, so this is likely unneeded.
-- `$this->client->is_authorized` : Whether the client was authorized. Keep in mind the APIBaseModel will
+- `$this->client->is_authorized` : Whether the client was authorized. Keep in mind the APIModel will
 handle all authentication and authorization for you, so this is likely unneeded.
 - `$this->client->privs` : An array of privileges this user has
 - `$this->client->auth_mode` : The authentication mode that was used to authenticate the user
 
-### Writing API responses ###
+## Writing API endpoints ####
+API endpoints are classes that map API models to various HTTP methods and also specify the URL where the endpoint 
+will be available. API endpoints are dynamically generated by the frameworks `/usr/local/share/pfSense-pkg-API/manage.php` script.
+
+#### Getting Started ####
+To get started creating a new API endpoint, you first need to create a new PHP file in `/files/etc/inc/api/endpoints` 
+and create a new class that extends our APIEndpoint framework class:
+
+```php
+<?php
+require_once("api/framework/APIEndpoint.inc");
+
+class NewAPIEndpoint extends APIEndpoint {
+    
+}
+```
+
+#### Constructing the API Endpoint ####
+In order to use the APIEndpoint framework, you must add a `__construct()` method to your new API endpoint class and 
+initialize the APIEndpoint class as such. Additionally, you may specify any model attribute overrides within this 
+method:
+
+```php
+<?php
+require_once("api/framework/APIEndpoint.inc");
+
+class NewAPIEndpoint extends APIEndpoint {
+    # Create our construct method
+    public function __construct() {
+        parent::__construct();
+
+        # Add your API endpoint properties here (see Overriding Base Model Properties
+        $this->url = "/api/v1/firewall/your_new_endpoint";
+    }
+}
+
+```
+#### Overriding Base Model Properties ####
+There are class properties that you can customize to fit the needs of your API endpoint. If a model attribute is
+not specified, the default values are assumed:
+ 
+- `$this->url` : Specify the URL where this endpoint will be built. For example, `/api/v1/firewall/your_new_endpoint`.
+Please note that this URL should start with a `/` but not end with one. This will recursively create any directory 
+within the URL path and overwrite any existing index.php file at this location. Defaults to `null` which will throw an
+error when building endpoints.
+- `$this-query_excludes` : Specify parameters to exclude from queries on GET requests. This is typically only necessary
+if your GET request requires parameters to locate data.
+
+#### Overriding Base Model Methods ####
+There are class methods that you will need to override to map API models to specific HTTP methods. If any of these
+methods are not overridden, a "method not supported" response will be returned. Please note that all classes within
+`/etc/inc/api/models/` are imported by the APIEndpoint base class so you do not need to import your API models again.
+Each overridden method should return the return data of the API model's `call()` method.
+
+```php
+<?php
+require_once("api/framework/APIEndpoint.inc");
+
+class NewAPIEndpoint extends APIEndpoint {
+    # Create our construct method
+    public function __construct() {
+        parent::__construct();
+
+        # Add your API endpoint properties here (see Overriding Base Model Properties
+        $this->url = "/api/v1/firewall/your_new_endpoint";
+    }
+
+    # Override the get() method to map the model that should be used upon a GET request
+    protected function get() {
+        return (new NewAPIModelRead())->call();
+    }
+
+    # Override the post() method to map the model that should be used upon a POST request
+    protected function post() {
+        return (new NewAPIModelCreate())->call();
+    }
+    
+    # Override the put() method to map the model that should be used upon a PUT request
+    protected function put() {
+        return (new NewAPIModelUpdate())->call();
+    }
+    
+    # Override the delete() method to map the model that should be used upon a DELETE request
+    protected function delete() {
+        return (new NewAPIModelDelete())->call();
+    }
+}
+```
+#### Building the API endpoint ####
+API endpoint classes are merely blueprints to build the actual endpoint within pfSense's web root (`/usr/local/www/`).
+These endpoints are automatically built when the package is installed. If you need to manually build endpoints to test,
+you may run `php -f /usr/local/share/pfSense-pkg-API/manage.php buildendpoints`. This will output a list of endpoint classes that
+were built and the file path they were built at. If there was a problem building an endpoint, an error message will 
+be returned and the script will exit on a non-zero return code.
+
+## Writing API responses ##
 The API uses a centralized API response array (found in `/files/etc/inc/api/framework/APIResponse.inc` of this repo). 
 Each response corresponds with a unique ID that can be used to get the API response message, status, etc. This is 
 particularly helpful when API response messages need to be changed as it is always in one central location. To add a 
@@ -278,19 +341,135 @@ Optionally, you can add data to the response as a parameter of the `get()` funct
 
 `$this->errors[] = APIResponse\get(620, $some_data);`
 
-
-### Writing tool functions ###
+## Writing tool functions ##
 Often times you will need to create functions to condense redundant tasks. You can place any necessary tool functions in
 `/files/etc/inc/api/framework/APITools.inc`. You may then access the tool function from your API model like this:
 
 `$some_variable = APITools\your_custom_tool_function();`
 
-### Adding Models and Endpoints to the Package
+
+## Writing API Unit Tests ##
+Unit tests are written using Python3. pfSense API includes a an unit_test_framework module in the `tests` directory to make
+this process simple. Unit tests help to ensure each endpoint remains functional when changes have been made.
+
+#### Getting Started ####
+To get started creating a new API unit test, you first need to create a new Python3 file in `/tests`. This file must 
+start with `test` and end with `.py` to be included in the `run_all_tests.py` script. Once you have created this file, 
+you must create a new class that extends our APIUnitTest framework class:
+
+```python
+import unit_test_framework
+
+class NewAPIUnitTest(unit_test_framework.APIUnitTest):
+    # ...
+```
+
+#### Overriding Base Model Properties ####
+The APIUnitTest class requires you to override a some properties to function correctly:
+
+- `url` : A string specifying the URL this unit test will be testing<br>
+- `get_payloads` : A list of dictionary formatted API payloads to use when testing GET requests. If this endpoint does not
+support GET requests, you do not need to override this property. If this endpoint does support GET request, but does not
+require any payload data to receive a valid response you must set this value to `[{}]`
+- `post_payloads` : A list of dictionary formatted API payloads to use when testing POST requests. If this endpoint does 
+not support POST requests, you do not need to override this property. 
+- `put_payloads` : A list of dictionary formatted API payloads to use when testing PUT requests. If this endpoint does 
+not support PUT requests, you do not need to override this property. 
+- `delete_payloads` : A list of dictionary formatted API payloads to use when testing DELETE requests. If this endpoint does 
+not support DELETE requests, you do not need to override this property. 
+- `get_responses` : A list of previously executed GET requests in a dictionary format. Failing responses will not be 
+included.
+- `post_responses` : A list of previously executed POST requests in a dictionary format. Failing responses will not be 
+included.
+- `put_responses` : A list of previously executed PUT requests in a dictionary format. Failing responses will not be 
+included.
+- `delete_responses` : A list of previously executed DELETE requests in a dictionary format. Failing responses will not be 
+included.
+
+```python
+import unit_test_framework
+
+class NewAPIUnitTest(unit_test_framework.APIUnitTest):
+    url = "/api/v1/your_endpoint"
+    get_payloads = [{}]
+    post_payloads = [
+        {"some_parameter": "some value to create"},
+        {"some_parameter": "some other value to create"}
+    ]
+    put_payloads = [
+        {"some_parameter": "some value to update"},
+        {"some_parameter": "some other value to update"}
+    ]  
+    delete_payloads = [
+        {"some_parameter": "some value to delete"},
+    ]    
+```
+
+#### Overriding Base Model Methods ####
+There are methods that will assist you when you need to dynamically format API request data. These are typically used 
+when you need to add payload data that is dependent on a previous API response. The following methods may 
+overridden:
+
+- `pre_get()` : Runs before the GET request is made.
+- `post_get()` : Runs after the GET request is made.
+- `pre_post()` : Runs before the POST request is made.
+- `post_post()` : Runs after the POST request is made.
+- `pre_put()` : Runs before the PUT request is made.
+- `post_put()` : Runs after the PUT request is made.
+- `pre_delete()` : Runs before the DELETE request is made.
+- `post_delete()` : Runs after the DELETE request is made.
+
+#### Running Unit Tests ####
+Once you have written your unit test class, you must ensure you create the unit test object at the end of the file
+you've created like so:
+
+```python
+import unit_test_framework
+
+class NewAPIUnitTest(unit_test_framework.APIUnitTest):
+    url = "/api/v1/your_endpoint"
+    get_payloads = [{}]
+    post_payloads = [
+        {"some_parameter": "some value to create"},
+        {"some_parameter": "some other value to create"}
+    ]
+    put_payloads = [
+        {"some_parameter": "some value to update"},
+        {"some_parameter": "some other value to update"}
+    ]  
+    delete_payloads = [
+        {"some_parameter": "some value to delete"},
+    ]    
+
+NewAPIUnitTest()
+```
+
+Once this is done, you can run the unit test via command line by running:<br>
+`python3 test/test_your_unit_test_framework.py --host <ENTER PFSENSE IP/HOSTNAME HERE>`
+
+Or you may run all the unit tests by running:<br>
+`python3 test/run_all_tests.py`
+
+Unit tests will check API responses for the following:
+- Ability to connect to API endpoint
+- API responses properly return data in a JSON format
+- API payloads return a 200 OK response
+- CRUD success. POST requests are always run first, then GET requests to check that the creation was successful, then
+PUT requests attempt to update the created object, then finally DELETE requests attempt to destroy the object. 
+
+## Making the pfSense API package ##
 The package Makefile and pkg-plist files are auto generated by `tools/make_package.py`. This simply pulls the files and
 directories needed to build our package from the `files` directory. For more information on building the package, refer
 to `tools/README.md`
 
-    
+## Creating or Updating Documentation ##
+Documentation is written and maintained using Postman. The JSON export of the Postman collection can be found in 
+`docs/documentation.json`. Both the README.md and embedded documentation are generated using this JSON file. To update
+or add documentation, you can either import this collection to Postman, make your changes in Postman and then export the
+updated collection as JSON, or you may edit the JSON file directly if you are familiar with the structure. To generate
+the README.md and embedded documentation pages, you may use the `tools/make_documentation.py` script. For more info on
+running the script, refer to `tools/README.md`
+ 
 Questions
 ---------
 There are some complex components to this project. Please feel free to reach out with any questions, 

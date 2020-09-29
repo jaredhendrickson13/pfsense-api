@@ -1,2 +1,8 @@
 #!/bin/sh
+if [ "${2}" != "POST-DEINSTALL" ]; then
+    rm -rf /usr/local/www/api/v1/*
+	exit 0
+fi
+
 /usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% ${2}
+/bin/mv /etc/inc/system.original.inc /etc/inc/system.inc

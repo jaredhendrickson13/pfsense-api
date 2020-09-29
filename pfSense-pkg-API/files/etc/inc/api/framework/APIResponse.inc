@@ -1,4 +1,18 @@
 <?php
+//   Copyright 2020 Jared Hendrickson
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+
 namespace APIResponse;
 
 # Pulls a assoc array API response from our response library. Optionally formats descriptive data into messages.
@@ -31,7 +45,7 @@ function get($id, $data=[], $all=false) {
         ],
         4 => [
             "status" => "forbidden",
-            "code" => 401,
+            "code" => 403,
             "return" => $id,
             "message" => "Authorization failed",
         ],
@@ -132,6 +146,67 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Could not locate system certificate"
         ],
+        1010 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Tunable name is required"
+        ],
+        1011 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Tunable name must be string type"
+        ],
+        1012 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Tunable name already exists"
+        ],
+        1013 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Tunable value is required"
+        ],
+        1014 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Tunable value may only contain alphanumeric characters, -, _, %, and /"
+        ],
+        1015 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Tunable description must be string type"
+        ],
+        1016 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Tunable ID is required"
+        ],
+        1017 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Could not locate tunable with ID"
+        ],
+        1018 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Table name is required"
+        ],
+        1019 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Table name does not exist"
+        ],
+
         // 2000-2999 reserved for /services API calls
         2000 => [
             "status" => "bad request",
@@ -222,6 +297,192 @@ function get($id, $data=[], $all=false) {
             "code" => 400,
             "return" => $id,
             "message" => "Host override deletion criteria not met"
+        ],
+        2015 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound host override ID required"
+        ],
+        2016 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound host override ID does not exist"
+        ],
+        2017 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd interface is required"
+        ],
+        2018 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd interface does not exist"
+        ],
+        2019 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd interface must be enabled and host a static IPv4 subnet"
+        ],
+        2020 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd start range is required"
+        ],
+        2021 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd start range must be valid IPv4 address"
+        ],
+        2022 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd start range is outside of available IP range"
+        ],
+        2023 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd end range is required"
+        ],
+        2024 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd end range must be valid IPv4 address"
+        ],
+        2025 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd end range is outside of available IP range"
+        ],
+        2026 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Only 4 DHCPd DNS servers are allowed"
+        ],
+        2027 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd DNS servers must be valid IPv4 addresses"
+        ],
+        2028 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd gateway must be valid IPv4 address"
+        ],
+        2029 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd gateway is outside of available IP range"
+        ],
+        2030 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd domain must be valid hostname"
+        ],
+        2031 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd domain search list entries must be valid hostnames"
+        ],
+        2032 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd allowed MAC entries must be partial or full MAC addresses"
+        ],
+        2033 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd denied MAC entries must be partial or full MAC addresses"
+        ],
+        2034 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping MAC address is required"
+        ],
+        2035 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping MAC address is invalid"
+        ],
+        2036 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping MAC address already exists on this interface"
+        ],
+        2037 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping IPv4 address is required"
+        ],
+        2038 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping IPv4 address is invalid"
+        ],
+        2039 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping IPv4 address already in use"
+        ],
+        2040 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping hostname is invalid"
+        ],
+        2041 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping IPv4 cannot match interface address"
+        ],
+        2042 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping IPv4 must be within interface subnet"
+        ],
+        2043 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping IPv4 cannot be within existing DHCP pool"
+        ],
+        2044 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping ID is required"
+        ],
+        2045 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping ID does not exist"
         ],
 
         // 3000-3999 reserved for /interfaces API calls
@@ -753,13 +1014,13 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Firewall rule ID required"
+            "message" => "Firewall rule tracker ID required"
         ],
         4032 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Firewall rule ID does not exist"
+            "message" => "Firewall rule tracker ID does not exist"
         ],
         4033 => [
             "status" => "bad request",
@@ -1007,6 +1268,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Invalid firewall state table size"
         ],
+        4074 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall alias id required"
+        ],
         //5000-5999 reserved for /users API calls
         5000 => [
             "status" => "bad request",
@@ -1170,9 +1437,52 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Authentication server name already in use"
         ],
-    ];
+        //6000-6999 reserved for /routing API calls
+        6000 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Static route network value is required"
+        ],
+        6001 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Static route network value must be valid IPv4, IPv6 or alias"
+        ],
+        6002 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Static route network subnet out of range"
+        ],
+        6003 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Static route gateway value is required"
+        ],
+        6004 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Static route gateway does not exist"
+        ],
+        6005 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Static route ID is required"
+        ],
+        6006 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Static route ID does not exist"
+        ],
 
-    $response = $responses[$id];
+    ];
+    $response = $responses[(!in_array($id, $responses)) ? $id : 1];
     $response["data"] = $data;
     if ($all === true) {
         $response = $responses;

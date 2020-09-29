@@ -1,4 +1,18 @@
 <?php
+//   Copyright 2020 Jared Hendrickson
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+
 include_once("util.inc");
 include_once("guiconfig.inc");
 require_once("api/framework/APITools.inc");
@@ -9,8 +23,10 @@ $pgtitle = array(gettext('System'), gettext('API'), gettext('Settings'));    // 
 include_once("head.inc");    // Write our header, this must be done after defining pgtitle
 $tab_array   = array();    // Init our tabs
 $tab_array[] = array(gettext("Settings"), true, "/api/");    // Define our page tabs
+$tab_array[] = array(gettext("Documentation"), false, "/api/documentation/");    // Define our page tabs
 display_top_tabs($tab_array, true);    // Ensure the tabs are written to the top of page
 $user = $_SESSION["Username"];    // Save our username
+$user_privs = get_user_privileges(getUserEntry($user));
 $sec_client_id = bin2hex($user);    // Save our secure username client ID (token mode)
 $pkg_config = APITools\get_api_config();    // Save our entire pkg config
 $pkg_index = $pkg_config[0];    // Save our pkg configurations index value
@@ -20,6 +36,12 @@ $available_hash_algos = array("sha256" => "SHA256", "sha384" => "SHA384", "sha51
 $available_key_bytes = array("16", "32", "64");    // Save our allowed key bitlengths
 $non_config_ifs = array("any" => "Any", "localhost" => "Link-local");    // Save non-configurable interface ids
 $availabe_api_if = array_merge($non_config_ifs, get_configured_interface_with_descr(true));    // Combine if arrays
+
+# Redirect user if they do not have privilege to access this page
+if (!in_array("page-system-api", $user_privs) and !in_array("page-all", $user_privs)) {
+    header("Location: /");
+    exit();
+}
 
 // UPON POST
 if ($_POST["gen"] === "1") {

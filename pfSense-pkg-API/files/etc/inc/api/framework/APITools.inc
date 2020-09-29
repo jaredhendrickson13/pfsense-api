@@ -1,4 +1,18 @@
 <?php
+//   Copyright 2020 Jared Hendrickson
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+
 namespace APITools;
 require_once("php-jwt/src/JWT.php");
 require_once("php-jwt/src/ExpiredException.php");
@@ -366,17 +380,21 @@ function str_starts_with($needle, $haystack) {
 }
 
 // Remove virtual IP and bring down virtual interface
-function bring_down_virtual_ip($vip_ent, $id) {
-    global $err_lib, $config;
+function bring_down_virtual_ip($vip_ent, $id, $delete=true) {
+    global $config;
     if ($vip_ent['mode'] == "proxyarp") {
+        if ($delete) {
+            unset($config["virtualip"]["vip"][$id]);
+        }
         $viface = $vip_ent['interface'];
-        unset($config["virtualip"]["vip"][$id]);
         interface_proxyarp_configure($viface);
     } else {
         interface_vip_bring_down($vip_ent);
-        unset($config["virtualip"]["vip"][$id]);
+        if ($delete) {
+            unset($config["virtualip"]["vip"][$id]);
+        }
     }
-    if (count($config['virtualip']['vip']) == 0) {
+    if ($delete and count($config['virtualip']['vip']) == 0) {
         unset($config['virtualip']['vip']);
     }
 }
@@ -489,14 +507,13 @@ function sort_firewall_rules($mode=null, $data=null) {
 // Checks if inputted routing gateway exists
 function is_gateway($gw) {
     // Local variables
-    global $config;
-    $gw_config = $config["gateways"]["gateway_item"];
+    $gw_config = return_gateways_array(true, true);
     $gw_exists = false;
     // Check that we have gateways configured
     if (is_array($gw_config)) {
         // Loop through each gateway and see if name matches
-        foreach ($gw_config as $gw_item) {
-            if ($gw === $gw_item["name"]) {
+        foreach ($gw_config as $gw_name => $gw_item) {
+            if ($gw === $gw_name) {
                 $gw_exists = true;
                 break;
             }
@@ -934,4 +951,39 @@ function apply_interface_config($if_conf) {
     system_routing_configure();
     // Return true or false if configuration was successful
     return true;
+}
+
+function delete_static_route($id) {
+    global $config;
+    $a_routes = &$config['staticroutes']['route'];
+    $a_gateways = return_gateways_array(true, true, true);
+
+    if (!isset($a_routes[$id])) {
+        return;
+    }
+
+    $targets = array();
+    if (is_alias($a_routes[$id]['network'])) {
+        foreach (filter_expand_alias_array($a_routes[$id]['network']) as $tgt) {
+            if (is_ipaddrv4($tgt)) {
+                $tgt .= "/32";
+            } else if (is_ipaddrv6($tgt)) {
+                $tgt .= "/128";
+            }
+            if (!is_subnet($tgt)) {
+                continue;
+            }
+            $targets[] = $tgt;
+        }
+    } else {
+        $targets[] = $a_routes[$id]['network'];
+    }
+
+    foreach ($targets as $tgt) {
+        $family = (is_subnetv6($tgt) ? "-inet6" : "-inet");
+        $gateway = $a_gateways[$a_routes[$id]['gateway']]['gateway'];
+        mwexec("/sbin/route delete {$family} " . escapeshellarg($tgt) . " " . escapeshellarg($gateway));
+    }
+
+    unset($targets);
 }
