@@ -90,11 +90,11 @@ A full list of error codes can be found by navigating to /api/v1/system/api/erro
 
 
 # Queries
-pfSense API contains an advanced query engine to make it easy to query specific data from API alls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you like to, in order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field. 
+pfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field. 
 <details>
     <summary>Targetting Objects</summary>
     
-You may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns a response like this without a query:
+You may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns this response without a query:
 
 ```json
 {
@@ -111,7 +111,7 @@ You may find yourself only needing to read objects with specific values set. For
 }
 ```
 
-If you want the endpoint to only return the objects that had their `type` set to `type1` you could add `{"type": "type1"}` to your payload. This returns:
+If you want the endpoint to only return the objects that have their `type` value set to `type1` you could add `{"type": "type1"}` to your payload. This returns:
 
 ```json
 {
@@ -126,7 +126,7 @@ If you want the endpoint to only return the objects that had their `type` set to
 }
 ```
 
-Additionally, if you need to target values that are nested within an array, you could add `{"extra__tag": 100}` to recursively target the `tag` value within the `extra` array. This returns:
+Additionally, if you need to target values that are nested within an array, you can add `{"extra__tag": 100}` to recursively target the `tag` value within the `extra` array. This returns:
 
 ```json
 {
@@ -145,7 +145,7 @@ Additionally, if you need to target values that are nested within an array, you 
 <details>
     <summary>Query Filters</summary>
     
-Query filters allow you to apply logic to the objects you target. This makes it easy to target data that meets certain criteria:
+Query filters allow you to apply logic to the objects you target. This makes it easy to target data that meets specific criteria:
 
 ### Starts With
     
@@ -387,7 +387,7 @@ If you wanted to target objects whose tag is greater than or equal to `100`, you
 ### Requirements for queries:
 - API call must be successful and return `0` in the `return` field.
 - Endpoints must return an array of objects in the data field (e.g. `[{"id": 0, "name": "Test"}, {"id": 1, "name": "Other Test"}]`).
-- At least two objects must be present within the array to support queries.
+- At least two objects must be present within the data field to support queries.
 
 ### Notes:
 - For those using the Local database or API token authentication types, `client-id` and `client-token` are excluded from queries by default
