@@ -375,6 +375,14 @@ not support POST requests, you do not need to override this property.
 not support PUT requests, you do not need to override this property. 
 - `delete_payloads` : A list of dictionary formatted API payloads to use when testing DELETE requests. If this endpoint does 
 not support DELETE requests, you do not need to override this property. 
+- `get_responses` : A list of previously executed GET requests in a dictionary format. Failing responses will not be 
+included.
+- `post_responses` : A list of previously executed POST requests in a dictionary format. Failing responses will not be 
+included.
+- `put_responses` : A list of previously executed PUT requests in a dictionary format. Failing responses will not be 
+included.
+- `delete_responses` : A list of previously executed DELETE requests in a dictionary format. Failing responses will not be 
+included.
 
 ```python
 import unit_test_framework
@@ -394,6 +402,20 @@ class NewAPIUnitTest(unit_test_framework.APIUnitTest):
         {"some_parameter": "some value to delete"},
     ]    
 ```
+
+#### Overriding Base Model Methods ####
+There are methods that will assist you when you need to dynamically format API request data. These are typically used 
+when you need to add payload data that is dependent on a previous API response. The following methods may 
+overridden:
+
+- `pre_get()` : Runs before the GET request is made.
+- `post_get()` : Runs after the GET request is made.
+- `pre_post()` : Runs before the POST request is made.
+- `post_post()` : Runs after the POST request is made.
+- `pre_put()` : Runs before the PUT request is made.
+- `post_put()` : Runs after the PUT request is made.
+- `pre_delete()` : Runs before the DELETE request is made.
+- `post_delete()` : Runs after the DELETE request is made.
 
 #### Running Unit Tests ####
 Once you have written your unit test class, you must ensure you create the unit test object at the end of the file

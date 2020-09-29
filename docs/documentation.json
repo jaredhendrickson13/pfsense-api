@@ -63,10 +63,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \n}",
-									"options": {
-										"raw": {}
-									}
+									"raw": "{\n    \n}"
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/ldap",
@@ -100,10 +97,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"TEST_AUTHSERVER\",\n\t\"host\": \"ldap.com\",\n\t\"ldap_port\": 636,\n\t\"ldap_urltype\": \"encrypted\",\n\t\"ldap_protver\": \"3\",\n\t\"ldap_timeout\": 12,\n\t\"ldap_scope\": \"subtree\",\n\t\"ldap_basedn\": \"dc=test,dc=com\",\n    \"ldap_authcn\": \"ou=people,dc=test,dc=com;ou=groups,dc=test,dc=com\",\n    \"ldap_attr_user\": \"uid\",\n    \"ldap_attr_group\": \"cn\",\n    \"ldap_attr_member\": \"memberof\",\n    \"ldap_attr_groupobj\": \"posixGroup\",\n    \"ldap_binddn\": \"cn=pfsense,dc=test,dc=com\",\n    \"ldap_bindpw\": \"asdf\",\n    \"active\": false\n}",
-									"options": {
-										"raw": {}
-									}
+									"raw": "{\n\t\"name\": \"TEST_AUTHSERVER\",\n\t\"host\": \"ldap.com\",\n\t\"ldap_port\": 636,\n\t\"ldap_urltype\": \"encrypted\",\n\t\"ldap_protver\": \"3\",\n\t\"ldap_timeout\": 12,\n\t\"ldap_scope\": \"subtree\",\n\t\"ldap_basedn\": \"dc=test,dc=com\",\n    \"ldap_authcn\": \"ou=people,dc=test,dc=com;ou=groups,dc=test,dc=com\",\n    \"ldap_attr_user\": \"uid\",\n    \"ldap_attr_group\": \"cn\",\n    \"ldap_attr_member\": \"memberof\",\n    \"ldap_attr_groupobj\": \"posixGroup\",\n    \"ldap_binddn\": \"cn=pfsense,dc=test,dc=com\",\n    \"ldap_bindpw\": \"asdf\",\n    \"active\": false\n}"
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/ldap?name=string&host=string&ldap_port=string or integer&ldap_urltype=string&ldap_protver=string or integer&ldap_scope=string&ldap_basedn=string&ldap_authcn=string&ldap_extended_query=string&ldap_binddn=string&ldap_bindpw=string&ldap_attr_user=string&ldap_attr_group=string&ldap_attr_member=string&ldap_attr_groupobj=string&ldap_utf8=boolean&ldap_timeout=string or integer&active=boolean",
@@ -229,10 +223,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"LDAP_AUTHSERVER_0\"\n}",
-									"options": {
-										"raw": {}
-									}
+									"raw": "{\n\t\"name\": \"LDAP_AUTHSERVER_0\"\n}"
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/ldap?name=string",
@@ -273,10 +264,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"test\"\n}",
-									"options": {
-										"raw": {}
-									}
+									"raw": "{\n\t\"name\": \"test\"\n}"
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/radius?name=string",
@@ -317,10 +305,7 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"test\"\n}",
-									"options": {
-										"raw": {}
-									}
+									"raw": "{\n\t\"name\": \"test\"\n}"
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server?name=string",
@@ -4483,6 +4468,51 @@
 									]
 								},
 								"description": "Read the dhcpd.log file.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-logs-dhcp`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Read Configuration History Status Log",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwZlNlbnNlIiwiZXhwIjoxNTk4MDcwMTAzLCJuYmYiOjE1OTgwNjE3MDMsImRhdGEiOiJhZG1pbiJ9.hgvNu96Bvsehcq6ygTa9LPB8eymiLnxYu4V6J8_h0-o",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/status/log/config_history",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"status",
+										"log",
+										"config_history"
+									]
+								},
+								"description": "Read the configuration history log.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-configurationhistory`]"
 							},
 							"response": []
 						}

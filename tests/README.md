@@ -35,8 +35,32 @@ optional arguments:
 ```
 
 ## Output
-Tests typically print an OK or ERROR status to the console depending on the tests outcome. These scripts will also
+Tests print an OK or ERROR status to the console depending on the tests outcome. These scripts will also
 set the command's exit code to 1 upon error or 0 upon success.
+
+```
+OK ------> [ POST https://172.16.209.139:443/api/v1/user/privilege ]: Response is valid
+```
+
+## Running All Tests
+`tests/run_all_tests.py` is a script that will run through all tests within the `tests/` directory. In order for
+unit tests to be included, they must start with `test_` and end with `.py`. 
+
+### Example
+```commandline
+$ python3 tests/run_all_tests.py --host 172.16.209.139
+OK ------> [ POST https://172.16.209.139:443/api/v1/user/privilege ]: Response is valid
+OK ------> [ DELETE https://172.16.209.139:443/api/v1/user/privilege ]: Response is valid
+OK ------> [ GET https://172.16.209.139:443/api/v1/system/dns ]: Response is valid
+OK ------> [ PUT https://172.16.209.139:443/api/v1/system/dns ]: Response is valid
+OK ------> [ PUT https://172.16.209.139:443/api/v1/system/dns ]: Response is valid
+OK ------> [ POST https://172.16.209.139:443/api/v1/services/ntpd/stop ]: Response is valid
+OK ------> [ POST https://172.16.209.139:443/api/v1/services/ntpd/start ]: Response is valid
+OK ------> [ POST https://172.16.209.139:443/api/v1/services/unbound/start ]: Response is valid
+OK ------> [ GET https://172.16.209.139:443/api/v1/status/carp ]: Response is valid
+OK ------> [ PUT https://172.16.209.139:443/api/v1/status/carp ]: Response is valid
+...
+```
 
 ## Notes
 - For information on writing API unit tests, check the contributors guide at `docs/CONTRIBUTING.md`

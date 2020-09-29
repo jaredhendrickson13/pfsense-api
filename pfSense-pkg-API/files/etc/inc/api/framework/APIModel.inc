@@ -1,4 +1,18 @@
 <?php
+//   Copyright 2020 Jared Hendrickson
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+
 require_once("api/framework/APITools.inc");
 require_once("api/framework/APIResponse.inc");
 require_once("api/framework/APIAuth.inc");
@@ -19,6 +33,7 @@ class APIModel {
 
     public function __construct() {
         global $config;
+        error_reporting(E_ERROR);
         $this->config =& $config;
         $this->privileges = ["page-all"];
         $this->client = null;
@@ -41,8 +56,10 @@ class APIModel {
     }
 
     protected function write_config() {
-        $_SESSION["Username"] = $this->client->username;    // Save our user to session data for logging
-        write_config(sprintf(gettext(" ".$this->change_note)));    // Apply our configuration change
+        # Start a temporary session to write the config that contains the user's username in the config history
+        session_start();
+        $_SESSION["Username"] = $this->client->username;    // This is what adds the username to the change log
+        write_config(sprintf(gettext(" ".$this->change_note)));
         unset($_SESSION);
     }
 

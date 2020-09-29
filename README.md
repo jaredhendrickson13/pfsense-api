@@ -284,9 +284,10 @@ There is no limit to API calls at this time but is important to note that pfSens
 
 * [STATUS/LOG](#statuslog)
 
-  * [Read DHCP Status Log](#1-read-dhcp-status-log)
-  * [Read Firewall Status Log](#2-read-firewall-status-log)
-  * [Read System Status Log](#3-read-system-status-log)
+  * [Read Configuration History Status Log](#1-read-configuration-history-status-log)
+  * [Read DHCP Status Log](#2-read-dhcp-status-log)
+  * [Read Firewall Status Log](#3-read-firewall-status-log)
+  * [Read System Status Log](#4-read-system-status-log)
 
 * [SYSTEM/API](#systemapi)
 
@@ -2762,7 +2763,35 @@ URL: https://{{$hostname}}/api/v1/status/carp
 
 
 
-### 1. Read DHCP Status Log
+### 1. Read Configuration History Status Log
+
+
+Read the configuration history log.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-configurationhistory`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/status/log/config_history
+```
+
+
+
+***Body:***
+
+```js        
+{
+
+}
+```
+
+
+
+### 2. Read DHCP Status Log
 
 
 Read the dhcpd.log file.<br><br>
@@ -2790,7 +2819,7 @@ URL: https://{{$hostname}}/api/v1/status/log/dhcp
 
 
 
-### 2. Read Firewall Status Log
+### 3. Read Firewall Status Log
 
 
 Read the filter.log file.<br><br>
@@ -2818,7 +2847,7 @@ URL: https://{{$hostname}}/api/v1/status/log/firewall
 
 
 
-### 3. Read System Status Log
+### 4. Read System Status Log
 
 
 Read the system.log file.<br><br>
@@ -4183,3 +4212,4 @@ URL: https://{{$hostname}}/api/v1/user/privilege
 
 ---
 [Back to top](#pfsense-rest-api-documentation)
+> Made with &#9829; by [thedevsaddam](https://github.com/thedevsaddam) | Generated at: 2020-09-28 16:26:07 by [docgen](https://github.com/thedevsaddam/docgen)

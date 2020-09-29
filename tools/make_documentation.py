@@ -1,3 +1,17 @@
+# Copyright [2020] [Jared Hendrickson]
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import argparse
 import pathlib
 import os
@@ -10,6 +24,7 @@ css = """
     body {
         display: block;
         width: 90%;
+        max-width: 1500px;
         margin: 0 auto;
     }
     footer {
@@ -18,71 +33,76 @@ css = """
     div.col-md-12 {
         margin-top: 20px;
     }
-
+    
     li:before {
         content:"• ";
     }
-
+    
     summary:hover {
         cursor: pointer;
         color: darkred;
     }
-
+    
     details[open] summary ~ * {
-      animation: open 0.3s ease-in-out;
+        animation: open 0.3s ease-in-out;
     }
-
+    
     @keyframes open {
-      0% {
-        opacity: 0;
-      }
-      100% {
-        opacity: 1;
-      }
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
     }
-
+    
     details summary::-webkit-details-marker {
-      display: none;
+        display: none;
     }
-
+    
     details summary {
-      width: 100%;
-      padding: 0.5rem 0;
-      border-top: 1px solid black;
-      position: relative;
-      cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
-      list-style: none;
+        width: 100%;
+        padding: 0.5rem 0;
+        border-top: 1px solid black;
+        position: relative;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        list-style: none;
     }
-
+    
     details summary:before {
-      content: "+ ";
-      color: black;
-      position: relative;
-      font-size: 12px;
-      line-height: 0;
-      margin-top: 0.75rem;
-      font-weight: 400;
-      transform-origin: center;
-      transition: 200ms linear;
+        content: "+ ";
+        color: black;
+        position: relative;
+        font-size: 12px;
+        line-height: 0;
+        margin-top: 0.75rem;
+        font-weight: 400;
+        transform-origin: center;
+        transition: 200ms linear;
     }
-
+    
     details[open] summary:before {
-      content: "- ";
-      font-size: 12px;
+        content: "- ";
+        font-size: 12px;
     }
-
+    
     details summary {
-      outline: 0;
+        outline: 0;
     }
-
+    
     details p {
-      font-size: 14px;
-      margin: 0 0 1rem;
-      padding-top: 1rem;
+        font-size: 14px;
+        margin: 0 0 1rem;
+        padding-top: 1rem;
     }
-</style>
+    
+    strong.border-success, strong.border-warning, strong.border-info, strong.border-danger {
+        border-radius: 5px;
+        padding: 2px;
+    }
+    </style>
 """
 
 # Parses command line arguments and generates help pages
