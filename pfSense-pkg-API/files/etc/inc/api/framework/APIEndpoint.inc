@@ -14,6 +14,7 @@
 //   limitations under the License.
 
 require_once("api/framework/APIModel.inc");
+require_once("api/framework/APIQuery.inc");
 
 # Allow endpoints to access any API model class
 foreach(glob("/etc/inc/api/models/*.inc") as $model) {
@@ -22,10 +23,12 @@ foreach(glob("/etc/inc/api/models/*.inc") as $model) {
 
 class APIEndpoint {
     public $url;
+    public $query_excludes;
 
     # Set class contructor defaults
     public function __construct() {
         $this->url = null;
+        $this->query_excludes = [];
     }
 
     # Model to run when endpoint receives a GET request
@@ -48,57 +51,10 @@ class APIEndpoint {
         return APIResponse\get(2);
     }
 
-    # Limit GET results using search queries
-    private function query_get_data($resp) {
-        $excluded_keys = ["client-token", "client-id"];
-        # Check if response is eligible for search querying
-        if ($resp["return"] === 0) {
-            $new_resp = $resp;
-            $new_resp["data"] = [];
-            # Loop through each request and ensure it is an array, if so, check for query matches
-            foreach ($resp["data"] as $id=>$data) {
-                if (is_array($data)) {
-                    $is_query = false;
-                    # Loop through each payload value and check for matches
-                    foreach (APITools\get_request_data() as $key=>$value) {
-                        # Ensure key is not excluded
-                        if (!in_array($key, $excluded_keys)) {
-                            $is_query = true;
-                            if (array_key_exists($key, $data) and $data[$key] === $value) {
-                                $match = true;
-                            } else {
-                                $match = false;
-                                break;
-                            }
-                        }
-                    }
-
-                    # If this entry matched our query, add it to our new response.
-                    if ($match === true) {
-                        $new_resp["data"][$id] = $data;
-                    }
-
-                } else {
-                    return $resp;
-                }
-            }
-
-            # Only return our query results if user passed in query parameters
-            if ($is_query) {
-                return $new_resp;
-            } else {
-                return $resp;
-            }
-
-        } else {
-            return $resp;
-        }
-    }
-
     # Listen for HTTP requests and call the corresponding method
     public function listen() {
         if ($_SERVER["REQUEST_METHOD"] === "GET") {
-            $resp = $this->query_get_data($this->get());
+            $resp = (new APIQuery($this->get(), $this->query_excludes))->query();
         } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
             $resp = $this->post();
         } elseif ($_SERVER["REQUEST_METHOD"] === "PUT") {

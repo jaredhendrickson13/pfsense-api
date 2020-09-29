@@ -64,10 +64,10 @@ JSON data containing each error code and their corresponding error message. No a
 error code library. This also makes API integration with third-party software easy as the API error codes and messages
 are always just an HTTP call away!
 # Queries
-For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you like to, in order to match the query, each parameter must match exactly. If no matches were found, the endpoint will return an empty array in the data field.
+pfSense API contains an advanced query engine to make it easy to query specific data from API alls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you like to, in order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field.
 <details>
-<summary>Show example</summary>
-For example, say an API endpoint normally returns a response like this without a query:
+<summary>Targetting Objects</summary>
+You may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns a response like this without a query:
 ```json
 {
 "status":"ok",
@@ -75,13 +75,13 @@ For example, say an API endpoint normally returns a response like this without a
 "return":0,
 "message":"Success",
 "data": [
-{"id": 0, "name": "Test", "type": "type1"},
-{"id": 1, "name": "Other Test", "type": "type2"},
-{"id": 2, "name": "Another Test", "type": "type1"}
+{"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
+{"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+{"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
 ]
 }
 ```
-If I wanted the endpoint to only return the objects that had their `type` set to `type1` I could add `{"type": "type1"}` to my payload. This would return something like this:
+If you want the endpoint to only return the objects that had their `type` set to `type1` you could add `{"type": "type1"}` to your payload. This returns:
 ```json
 {
 "status":"ok",
@@ -89,8 +89,217 @@ If I wanted the endpoint to only return the objects that had their `type` set to
 "return":0,
 "message":"Success",
 "data": [
-{"id": 0, "name": "Test", "type": "type1"},
-{"id": 2, "name": "Another Test", "type": "type1"}
+{"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
+{"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+]
+}
+```
+Additionally, if you need to target values that are nested within an array, you could add `{"extra__tag": 100}` to recursively target the `tag` value within the `extra` array. This returns:
+```json
+{
+"status":"ok",
+"code":200,
+"return":0,
+"message":"Success",
+"data": [
+{"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}}
+]
+}
+```
+</details>
+<details>
+<summary>Query Filters</summary>
+Query filters allow you to apply logic to the objects you target. This makes it easy to target data that meets certain criteria:
+### Starts With
+The `startswith` filter allows you to target objects whose values start with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:
+```json
+{
+"status":"ok",
+"code":200,
+"return":0,
+"message":"Success",
+"data": [
+{"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
+{"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+{"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+]
+}
+```
+If you wanted to target objects whose names started with `Other`, you could use the payload `{"name__startswith": "Other"}`. This returns:
+```json
+{
+"status":"ok",
+"code":200,
+"return":0,
+"message":"Success",
+"data": [
+{"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}}
+]
+}
+```
+### Ends With
+The `endswith` filter allows you to target objects whose values end with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:
+```json
+{
+"status":"ok",
+"code":200,
+"return":0,
+"message":"Success",
+"data": [
+{"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
+{"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+{"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+]
+}
+```
+If you wanted to target objects whose names ended with `er Test`, you could use the payload `{"name__endswith" "er Test"}`. This returns:
+```json
+{
+"status":"ok",
+"code":200,
+"return":0,
+"message":"Success",
+"data": [
+{"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+{"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+]
+}
+```
+### Contains
+The `contains` filter allows you to target objects whose values contain a specific substring. This will work on both string and integer data types. Below is an example response without any queries:
+```json
+{
+"status":"ok",
+"code":200,
+"return":0,
+"message":"Success",
+"data": [
+{"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
+{"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+{"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+]
+}
+```
+If you wanted to target objects whose names contain `ther`, you could use the payload `{"name__contains": "ther"}`. This returns:
+```json
+{
+"status":"ok",
+"code":200,
+"return":0,
+"message":"Success",
+"data": [
+{"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+{"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+]
+}
+```
+### Less Than
+The `lt` filter allows you to target objects whose values are less than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:
+```json
+{
+"status":"ok",
+"code":200,
+"return":0,
+"message":"Success",
+"data": [
+{"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
+{"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+{"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+]
+}
+```
+If you wanted to target objects whose tag is less than `100`, you could use the payload `{"extra__tag__lt": 100}`. This returns:
+```json
+{
+"status":"ok",
+"code":200,
+"return":0,
+"message":"Success",
+"data": [
+{"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}
+]
+}
+```
+### Less Than or Equal To
+The `lte` filter allows you to target objects whose values are less than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:
+```json
+{
+"status":"ok",
+"code":200,
+"return":0,
+"message":"Success",
+"data": [
+{"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
+{"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+{"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+]
+}
+```
+If you wanted to target objects whose tag is less than or equal to `100`, you could use the payload `{"extra__tag__lte": 100}`. This returns:
+```json
+{
+"status":"ok",
+"code":200,
+"return":0,
+"message":"Success",
+"data": [
+{"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
+{"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}}
+]
+}
+```
+### Greater Than
+The `gt` filter allows you to target objects whose values are greater than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:
+```json
+{
+"status":"ok",
+"code":200,
+"return":0,
+"message":"Success",
+"data": [
+{"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
+{"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+{"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+]
+}
+```
+If you wanted to target objects whose tag is greater than `100`, you could use the payload `{"extra__tag__gt": 100}`. This returns:
+```json
+{
+"status":"ok",
+"code":200,
+"return":0,
+"message":"Success",
+"data": [
+{"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+]
+}
+```
+### Greater Than or Equal To
+The `lte` filter allows you to target objects whose values are greater than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:
+```json
+{
+"status":"ok",
+"code":200,
+"return":0,
+"message":"Success",
+"data": [
+{"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
+{"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+{"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+]
+}
+```
+If you wanted to target objects whose tag is greater than or equal to `100`, you could use the payload `{"extra__tag__gte": 100}`. This returns:
+```json
+{
+"status":"ok",
+"code":200,
+"return":0,
+"message":"Success",
+"data": [
+{"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+{"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
 ]
 }
 ```
@@ -120,30 +329,190 @@ needed. After installation, you can navigate to System &gt; API in the pfSense w
 authentication.<p>To authenticate your API call, follow the instructions for your configured authentication mode:<p><details><summary>Local Database (default)</summary><p>Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, simply add a <code>client-id</code> value containing your username and a <code>client-token</code> value containing your password to your payload. For example <code>{&quot;client-id&quot;: &quot;admin&quot;, &quot;client-token&quot;: &quot;pfsense&quot;}</code><p></details><p><details><summary>JWT</summary><p>Requires a bearer token to be included in the <code>Authorization</code> header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a <code>client-id</code> value containing your pfSense username and a <code>client-token</code> value containing your pfSense password to your payload. For example <code>{&quot;client-id&quot;: &quot;admin&quot;, &quot;client-token&quot;: &quot;pfsense&quot;}</code>. Once you have your bearer token, you can authenticate your API call by adding it to the request&rsquo;s authorization header. (e.g. <code>Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx</code>)</details><p><details><summary>API Token</summary><p>Uses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication and not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System &gt; API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by adding a <code>client-id</code> value containing yourAPI token client ID and a <code>client-token</code> value containing your API token client token to your payload. (e.g. <code>{&quot;client-id&quot;: &quot;cccdj-311s&quot;, &quot;client-token&quot;: &quot;42jkjl-k234jlk1b38123kj3kjl-ffwzzuilaei&quot;}</code></details><h3>Authorization</h3><p>pfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.<h1>Response Codes</h1><p><code>200 (OK)</code> : API call succeeded<br><code>400 (Bad Request)</code> : An error was found within your requested parameters<br><code>401 (Unauthorized)</code> : API client has not completed authentication or authorization successfully<br><code>403 (Forbidden)</code> : The API endpoint has refused your call. Commonly due to your access settings found in System &gt; API<br><code>404 (Not found)</code> : Either the API endpoint or requested data was not found<br><code>500 (Server error)</code> : The API endpoint encountered an unexpected error processing your API request<br><h1>Error Codes</h1><p>A full list of error codes can be found by navigating to /api/v1/system/api/errors/ after installation. This will return
 JSON data containing each error code and their corresponding error message. No authentication is required to view the
 error code library. This also makes API integration with third-party software easy as the API error codes and messages
-are always just an HTTP call away!<h1>Queries</h1><p>For endpoints supporting <code>GET</code> requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you like to, in order to match the query, each parameter must match exactly. If no matches were found, the endpoint will return an empty array in the data field.
-<details><summary>Show example</summary><p>For example, say an API endpoint normally returns a response like this without a query:<pre><code class=language-json>{
+are always just an HTTP call away!<h1>Queries</h1><p>pfSense API contains an advanced query engine to make it easy to query specific data from API alls. For endpoints supporting <code>GET</code> requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you like to, in order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field.
+<details><summary>Targetting Objects</summary><p>You may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns a response like this without a query:<pre><code class=language-json>{
     &quot;status&quot;:&quot;ok&quot;,
     &quot;code&quot;:200,
     &quot;return&quot;:0,
     &quot;message&quot;:&quot;Success&quot;,
     &quot;data&quot;: [
-        {&quot;id&quot;: 0, &quot;name&quot;: &quot;Test&quot;, &quot;type&quot;: &quot;type1&quot;}, 
-        {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;, &quot;type&quot;: &quot;type2&quot;},
-        {&quot;id&quot;: 2, &quot;name&quot;: &quot;Another Test&quot;, &quot;type&quot;: &quot;type1&quot;}
+        {&quot;id&quot;: 0, &quot;name&quot;: &quot;Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 0}}, 
+        {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;, &quot;type&quot;: &quot;type2&quot;, &quot;extra&quot;: {&quot;tag&quot;: 100}},
+        {&quot;id&quot;: 2, &quot;name&quot;: &quot;Another Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 200}}
 
     ]
 }
-</code></pre><p>If I wanted the endpoint to only return the objects that had their <code>type</code> set to <code>type1</code> I could add <code>{&quot;type&quot;: &quot;type1&quot;}</code> to my payload. This would return something like this:<pre><code class=language-json>{
+</code></pre><p>If you want the endpoint to only return the objects that had their <code>type</code> set to <code>type1</code> you could add <code>{&quot;type&quot;: &quot;type1&quot;}</code> to your payload. This returns:<pre><code class=language-json>{
     &quot;status&quot;:&quot;ok&quot;,
     &quot;code&quot;:200,
     &quot;return&quot;:0,
     &quot;message&quot;:&quot;Success&quot;,
     &quot;data&quot;: [
-        {&quot;id&quot;: 0, &quot;name&quot;: &quot;Test&quot;, &quot;type&quot;: &quot;type1&quot;}, 
-        {&quot;id&quot;: 2, &quot;name&quot;: &quot;Another Test&quot;, &quot;type&quot;: &quot;type1&quot;}
+        {&quot;id&quot;: 0, &quot;name&quot;: &quot;Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 0}}, 
+        {&quot;id&quot;: 2, &quot;name&quot;: &quot;Another Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 200}}
     ]
 }
-</code></pre><p></details><h3>Requirements for queries:</h3><ul><li>API call must be successful and return <code>0</code> in the <code>return</code> field.<li>Endpoints must return an array of objects in the data field (e.g. <code>[{&quot;id&quot;: 0, &quot;name&quot;: &quot;Test&quot;}, {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;}]</code>).<li>At least two objects must be present within the array to support queries.<li>If an array is being used in a query, it must much the target data completely and exactly. There are no recursive queries.</ul><h3>Notes:</h3><ul><li>For those using the Local database or API token authentication types, <code>client-id</code> and <code>client-token</code> are excluded from queries</ul><h1>Rate limit</h1><p>There is no limit to API calls at this time but is important to note that pfSense&rsquo;s XML configuration was not designed for quick simultaneous writes like a traditional database. It may be necessary to delay API calls in sequence to prevent unexpected behavior. Alternatively, you may limit the API to read-only mode to only allow endpoints with read (GET) access within the webConfigurator&rsquo;s System &gt; API page.<h1>Endpoints</h1></div><div class=col-md-12><div class=col-md-3><ul><li><strong><a href=#ACCESSTOKEN>ACCESS_TOKEN</a></strong><ul><li><a class=endpoint_menu href=#jump-ACCESSTOKEN-RequestAccessToken>Request Access Token</a></ul><li><strong><a href=#FIREWALL_2FALIAS>FIREWALL/ALIAS</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FALIAS-CreateFirewallAliases>Create Firewall Aliases</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FALIAS-DeleteFirewallAliases>Delete Firewall Aliases</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FALIAS-ReadFirewallAliases>Read Firewall Aliases</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FALIAS-UpdateFirewallAliases>Update Firewall Aliases</a></ul><li><strong><a href=#FIREWALL_2FALIAS_2FENTRY>FIREWALL/ALIAS/ENTRY</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FALIAS_2FENTRY-CreateFirewallAliasEntries>Create Firewall Alias Entries</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FALIAS_2FENTRY-DeleteFirewallAliasEntries>Delete Firewall Alias Entries</a></ul><li><strong><a href=#FIREWALL_2FNAT>FIREWALL/NAT</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FNAT-ReadNAT>Read NAT</a></ul><li><strong><a href=#FIREWALL_2FNAT_2FPORTFOWARD>FIREWALL/NAT/PORTFOWARD</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FNAT_2FPORTFOWARD-CreateNATPortForwards>Create NAT Port Forwards</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FNAT_2FPORTFOWARD-DeleteNATPortForwards>Delete NAT Port Forwards</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FNAT_2FPORTFOWARD-ReadNATPortForwards>Read NAT Port Forwards</a></ul><li><strong><a href=#FIREWALL_2FRULE>FIREWALL/RULE</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FRULE-CreateFirewallRules>Create Firewall Rules</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FRULE-DeleteFirewallRules>Delete Firewall Rules</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FRULE-ReadFirewallRules>Read Firewall Rules</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FRULE-UpdateFirewallRules>Update Firewall Rules</a></ul><li><strong><a href=#FIREWALL_2FSTATES>FIREWALL/STATES</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FSTATES-ReadFirewallStates>Read Firewall States</a></ul><li><strong><a href=#FIREWALL_2FSTATES_2FSIZE>FIREWALL/STATES/SIZE</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FSTATES_2FSIZE-ReadFirewallStateSize>Read Firewall State Size</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FSTATES_2FSIZE-UpdateFirewallStateSize>Update Firewall State Size</a></ul><li><strong><a href=#FIREWALL_2FVIRTUALIP>FIREWALL/VIRTUAL_IP</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FVIRTUALIP-CreateVirtualIPs>Create Virtual IPs</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FVIRTUALIP-DeleteVirtualIPs>Delete Virtual IPs</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FVIRTUALIP-ReadVirtualIPs>Read Virtual IPs</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FVIRTUALIP-UpdateVirtualIPs>Update Virtual IPs</a></ul><li><strong><a href=#INTERFACE>INTERFACE</a></strong><ul><li><a class=endpoint_menu href=#jump-INTERFACE-CreateInterfaces>Create Interfaces</a><li><a class=endpoint_menu href=#jump-INTERFACE-DeleteInterfaces>Delete Interfaces</a><li><a class=endpoint_menu href=#jump-INTERFACE-ReadInterfaces>Read Interfaces</a></ul><li><strong><a href=#INTERFACE_2FVLAN>INTERFACE/VLAN</a></strong><ul><li><a class=endpoint_menu href=#jump-INTERFACE_2FVLAN-CreateInterfaceVLANs>Create Interface VLANs</a><li><a class=endpoint_menu href=#jump-INTERFACE_2FVLAN-DeleteInterfaceVLANs>Delete Interface VLANs</a><li><a class=endpoint_menu href=#jump-INTERFACE_2FVLAN-ReadInterfaceVLANs>Read Interface VLANs</a><li><a class=endpoint_menu href=#jump-INTERFACE_2FVLAN-UpdateInterfaceVLANs>Update Interface VLANs</a></ul><li><strong><a href=#ROUTING_2FGATEWAY>ROUTING/GATEWAY</a></strong><ul><li><a class=endpoint_menu href=#jump-ROUTING_2FGATEWAY-ReadRoutingGateways>Read Routing Gateways</a></ul><li><strong><a href=#ROUTING_2FSTATICROUTE>ROUTING/STATIC_ROUTE</a></strong><ul><li><a class=endpoint_menu href=#jump-ROUTING_2FSTATICROUTE-CreateStaticRoutes>Create Static Routes</a><li><a class=endpoint_menu href=#jump-ROUTING_2FSTATICROUTE-DeleteStaticRoutes>Delete Static Routes</a><li><a class=endpoint_menu href=#jump-ROUTING_2FSTATICROUTE-ReadStaticRoutes>Read Static Routes</a><li><a class=endpoint_menu href=#jump-ROUTING_2FSTATICROUTE-UpdateStaticRoutes>Update Static Routes</a></ul><li><strong><a href=#SERVICES>SERVICES</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES-ReadServices>Read Services</a><li><a class=endpoint_menu href=#jump-SERVICES-RestartAllServices>Restart All Services</a><li><a class=endpoint_menu href=#jump-SERVICES-StartAllServices>Start All Services</a><li><a class=endpoint_menu href=#jump-SERVICES-StopAllServices>Stop All Services</a></ul><li><strong><a href=#SERVICES_2FDHCPD>SERVICES/DHCPD</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FDHCPD-RestartDHCPdService>Restart DHCPd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FDHCPD-StartDHCPdService>Start DHCPd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FDHCPD-StopDHCPdService>Stop DHCPd Service</a></ul><li><strong><a href=#SERVICES_2FDPINGER>SERVICES/DPINGER</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FDPINGER-RestartDPINGERService>Restart DPINGER Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FDPINGER-StartDPINGERService>Start DPINGER Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FDPINGER-StopDPINGERService>Stop DPINGER Service</a></ul><li><strong><a href=#SERVICES_2FNTPD>SERVICES/NTPD</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FNTPD-RestartNTPdService>Restart NTPd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FNTPD-StartNTPdService>Start NTPd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FNTPD-StopNTPdService>Stop NTPd Service</a></ul><li><strong><a href=#SERVICES_2FSSHD>SERVICES/SSHD</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FSSHD-ReadSSHdConfiguration>Read SSHd Configuration</a><li><a class=endpoint_menu href=#jump-SERVICES_2FSSHD-RestartSSHdService>Restart SSHd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FSSHD-StartSSHdService>Start SSHd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FSSHD-StopSSHdService>Stop SSHd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FSSHD-UpdateSSHdConfiguration>Update SSHd Configuration</a></ul><li><strong><a href=#SERVICES_2FSYSLOGD>SERVICES/SYSLOGD</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FSYSLOGD-RestartSYSLOGdService>Restart SYSLOGd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FSYSLOGD-StartSYSLOGdService>Start SYSLOGd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FSYSLOGD-StopSYSLOGdService>Stop SYSLOGd Service</a></ul><li><strong><a href=#SERVICES_2FUNBOUND>SERVICES/UNBOUND</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND-ApplyPendingUnboundChanges>Apply Pending Unbound Changes</a><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND-ReadUnboundConfiguration>Read Unbound Configuration</a><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND-RestartUnboundService>Restart Unbound Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND-StartUnboundService>Start Unbound Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND-StopUnboundService>Stop Unbound Service</a></ul><li><strong><a href=#SERVICES_2FUNBOUND_2FHOSTOVERRIDE>SERVICES/UNBOUND/HOST_OVERRIDE</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND_2FHOSTOVERRIDE-CreateUnboundHostOverride>Create Unbound Host Override</a><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND_2FHOSTOVERRIDE-DeleteUnboundHostOverride>Delete Unbound Host Override</a><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND_2FHOSTOVERRIDE-ReadUnboundHostOverride>Read Unbound Host Override</a><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND_2FHOSTOVERRIDE-UpdateUnboundHostOverride>Update Unbound Host Override</a></ul><li><strong><a href=#SERVICES_2FUNBOUND_2FHOSTOVERRIDE_2FALIAS>SERVICES/UNBOUND/HOST_OVERRIDE/ALIAS</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND_2FHOSTOVERRIDE_2FALIAS-CreateUnboundHostOverrideAlias>Create Unbound Host Override Alias</a></ul><li><strong><a href=#STATUS_2FCARP>STATUS/CARP</a></strong><ul><li><a class=endpoint_menu href=#jump-STATUS_2FCARP-ReadCARPStatus>Read CARP Status</a><li><a class=endpoint_menu href=#jump-STATUS_2FCARP-UpdateCARPStatus>Update CARP Status</a></ul><li><strong><a href=#STATUS_2FLOG>STATUS/LOG</a></strong><ul><li><a class=endpoint_menu href=#jump-STATUS_2FLOG-ReadConfigurationHistoryStatusLog>Read Configuration History Status Log</a><li><a class=endpoint_menu href=#jump-STATUS_2FLOG-ReadDHCPStatusLog>Read DHCP Status Log</a><li><a class=endpoint_menu href=#jump-STATUS_2FLOG-ReadFirewallStatusLog>Read Firewall Status Log</a><li><a class=endpoint_menu href=#jump-STATUS_2FLOG-ReadSystemStatusLog>Read System Status Log</a></ul><li><strong><a href=#SYSTEM_2FAPI>SYSTEM/API</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FAPI-ReadSystemAPIConfiguration>Read System API Configuration</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FAPI-ReadSystemAPIErrorLibrary>Read System API Error Library</a></ul><li><strong><a href=#SYSTEM_2FARP>SYSTEM/ARP</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FARP-DeleteSystemARPTable>Delete System ARP Table</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FARP-ReadSystemARPTable>Read System ARP Table</a></ul><li><strong><a href=#SYSTEM_2FCERTIFICATE>SYSTEM/CERTIFICATE</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FCERTIFICATE-CreateSystemCertificates>Create System Certificates</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FCERTIFICATE-DeleteSystemCertificates>Delete System Certificates</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FCERTIFICATE-ReadSystemCertificates>Read System Certificates</a></ul><li><strong><a href=#SYSTEM_2FCONFIG>SYSTEM/CONFIG</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FCONFIG-ReadSystemConfiguration>Read System Configuration</a></ul><li><strong><a href=#SYSTEM_2FDNS>SYSTEM/DNS</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FDNS-ReadSystemDNS>Read System DNS</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FDNS-UpdateSystemDNS>Update System DNS</a></ul><li><strong><a href=#SYSTEM_2FDNS_2FSERVER>SYSTEM/DNS/SERVER</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FDNS_2FSERVER-CreateSystemDNSServer>Create System DNS Server</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FDNS_2FSERVER-DeleteSystemDNSServer>Delete System DNS Server</a></ul><li><strong><a href=#SYSTEM_2FHOSTNAME>SYSTEM/HOSTNAME</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FHOSTNAME-ReadSystemHostname>Read System Hostname</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FHOSTNAME-UpdateSystemHostname>Update System Hostname</a></ul><li><strong><a href=#SYSTEM_2FTABLE>SYSTEM/TABLE</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FTABLE-ReadSystemTables>Read System Tables</a></ul><li><strong><a href=#SYSTEM_2FTUNABLE>SYSTEM/TUNABLE</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FTUNABLE-CreateSystemTunables>Create System Tunables</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FTUNABLE-DeleteSystemTunables>Delete System Tunables</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FTUNABLE-ReadSystemTunables>Read System Tunables</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FTUNABLE-UpdateSystemTunables>Update System Tunables</a></ul><li><strong><a href=#SYSTEM_2FVERSION>SYSTEM/VERSION</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FVERSION-ReadSystemVersion>Read System Version</a></ul><li><strong><a href=#USER>USER</a></strong><ul><li><a class=endpoint_menu href=#jump-USER-CreateUsers>Create Users</a><li><a class=endpoint_menu href=#jump-USER-DeleteUsers>Delete Users</a><li><a class=endpoint_menu href=#jump-USER-ReadUsers>Read Users</a><li><a class=endpoint_menu href=#jump-USER-UpdateUsers>Update Users</a></ul><li><strong><a href=#USER_2FAUTHSERVER>USER/AUTH_SERVER</a></strong><ul><li><a class=endpoint_menu href=#jump-USER_2FAUTHSERVER-CreateLDAPAuthServers>Create LDAP Auth Servers</a><li><a class=endpoint_menu href=#jump-USER_2FAUTHSERVER-DeleteAuthServers>Delete Auth Servers</a><li><a class=endpoint_menu href=#jump-USER_2FAUTHSERVER-DeleteLDAPAuthServers>Delete LDAP Auth Servers</a><li><a class=endpoint_menu href=#jump-USER_2FAUTHSERVER-DeleteRADIUSAuthServers>Delete RADIUS Auth Servers</a><li><a class=endpoint_menu href=#jump-USER_2FAUTHSERVER-ReadAuthServers>Read Auth Servers</a><li><a class=endpoint_menu href=#jump-USER_2FAUTHSERVER-ReadLDAPAuthServers>Read LDAP Auth Servers</a><li><a class=endpoint_menu href=#jump-USER_2FAUTHSERVER-ReadRADIUSAuthServers>Read RADIUS Auth Servers</a></ul><li><strong><a href=#USER_2FGROUP>USER/GROUP</a></strong><ul><li><a class=endpoint_menu href=#jump-USER_2FGROUP-CreateUserGroup>Create User Group</a><li><a class=endpoint_menu href=#jump-USER_2FGROUP-DeleteUserGroup>Delete User Group</a></ul><li><strong><a href=#USER_2FPRIVILEGE>USER/PRIVILEGE</a></strong><ul><li><a class=endpoint_menu href=#jump-USER_2FPRIVILEGE-CreateUserPrivileges>Create User Privileges</a><li><a class=endpoint_menu href=#jump-USER_2FPRIVILEGE-DeleteUserPrivileges>Delete User Privileges</a></ul></ul></div><div class=col-md-9><div class="panel panel-default"><div class=panel-heading><h3 class=panel-title id=ACCESSTOKEN>ACCESS_TOKEN
+</code></pre><p>Additionally, if you need to target values that are nested within an array, you could add <code>{&quot;extra__tag&quot;: 100}</code> to recursively target the <code>tag</code> value within the <code>extra</code> array. This returns:<pre><code class=language-json>{
+    &quot;status&quot;:&quot;ok&quot;,
+    &quot;code&quot;:200,
+    &quot;return&quot;:0,
+    &quot;message&quot;:&quot;Success&quot;,
+    &quot;data&quot;: [
+        {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;, &quot;type&quot;: &quot;type2&quot;, &quot;extra&quot;: {&quot;tag&quot;: 100}}
+    ]
+}
+</code></pre><p></details><p><details><summary>Query Filters</summary><p>Query filters allow you to apply logic to the objects you target. This makes it easy to target data that meets certain criteria:<h3>Starts With</h3><p>The <code>startswith</code> filter allows you to target objects whose values start with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:<pre><code class=language-json>{
+    &quot;status&quot;:&quot;ok&quot;,
+    &quot;code&quot;:200,
+    &quot;return&quot;:0,
+    &quot;message&quot;:&quot;Success&quot;,
+    &quot;data&quot;: [
+        {&quot;id&quot;: 0, &quot;name&quot;: &quot;Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 0}}, 
+        {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;, &quot;type&quot;: &quot;type2&quot;, &quot;extra&quot;: {&quot;tag&quot;: 100}},
+        {&quot;id&quot;: 2, &quot;name&quot;: &quot;Another Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 200}}
+
+    ]
+}
+</code></pre><p>If you wanted to target objects whose names started with <code>Other</code>, you could use the payload <code>{&quot;name__startswith&quot;: &quot;Other&quot;}</code>. This returns:<pre><code class=language-json>{
+    &quot;status&quot;:&quot;ok&quot;,
+    &quot;code&quot;:200,
+    &quot;return&quot;:0,
+    &quot;message&quot;:&quot;Success&quot;,
+    &quot;data&quot;: [
+        {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;, &quot;type&quot;: &quot;type2&quot;, &quot;extra&quot;: {&quot;tag&quot;: 100}}
+    ]
+}
+</code></pre><h3>Ends With</h3><p>The <code>endswith</code> filter allows you to target objects whose values end with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:<pre><code class=language-json>{
+    &quot;status&quot;:&quot;ok&quot;,
+    &quot;code&quot;:200,
+    &quot;return&quot;:0,
+    &quot;message&quot;:&quot;Success&quot;,
+    &quot;data&quot;: [
+        {&quot;id&quot;: 0, &quot;name&quot;: &quot;Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 0}}, 
+        {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;, &quot;type&quot;: &quot;type2&quot;, &quot;extra&quot;: {&quot;tag&quot;: 100}},
+        {&quot;id&quot;: 2, &quot;name&quot;: &quot;Another Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 200}}
+
+    ]
+}
+</code></pre><p>If you wanted to target objects whose names ended with <code>er Test</code>, you could use the payload <code>{&quot;name__endswith&quot; &quot;er Test&quot;}</code>. This returns:<pre><code class=language-json>{
+    &quot;status&quot;:&quot;ok&quot;,
+    &quot;code&quot;:200,
+    &quot;return&quot;:0,
+    &quot;message&quot;:&quot;Success&quot;,
+    &quot;data&quot;: [
+        {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;, &quot;type&quot;: &quot;type2&quot;, &quot;extra&quot;: {&quot;tag&quot;: 100}},
+        {&quot;id&quot;: 2, &quot;name&quot;: &quot;Another Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 200}}    
+    ]
+}
+</code></pre><h3>Contains</h3><p>The <code>contains</code> filter allows you to target objects whose values contain a specific substring. This will work on both string and integer data types. Below is an example response without any queries:<pre><code class=language-json>{
+    &quot;status&quot;:&quot;ok&quot;,
+    &quot;code&quot;:200,
+    &quot;return&quot;:0,
+    &quot;message&quot;:&quot;Success&quot;,
+    &quot;data&quot;: [
+        {&quot;id&quot;: 0, &quot;name&quot;: &quot;Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 0}}, 
+        {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;, &quot;type&quot;: &quot;type2&quot;, &quot;extra&quot;: {&quot;tag&quot;: 100}},
+        {&quot;id&quot;: 2, &quot;name&quot;: &quot;Another Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 200}}
+
+    ]
+}
+</code></pre><p>If you wanted to target objects whose names contain <code>ther</code>, you could use the payload <code>{&quot;name__contains&quot;: &quot;ther&quot;}</code>. This returns:<pre><code class=language-json>{
+    &quot;status&quot;:&quot;ok&quot;,
+    &quot;code&quot;:200,
+    &quot;return&quot;:0,
+    &quot;message&quot;:&quot;Success&quot;,
+    &quot;data&quot;: [
+        {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;, &quot;type&quot;: &quot;type2&quot;, &quot;extra&quot;: {&quot;tag&quot;: 100}},
+        {&quot;id&quot;: 2, &quot;name&quot;: &quot;Another Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 200}}    
+    ]
+}
+</code></pre><h3>Less Than</h3><p>The <code>lt</code> filter allows you to target objects whose values are less than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:<pre><code class=language-json>{
+    &quot;status&quot;:&quot;ok&quot;,
+    &quot;code&quot;:200,
+    &quot;return&quot;:0,
+    &quot;message&quot;:&quot;Success&quot;,
+    &quot;data&quot;: [
+        {&quot;id&quot;: 0, &quot;name&quot;: &quot;Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 0}}, 
+        {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;, &quot;type&quot;: &quot;type2&quot;, &quot;extra&quot;: {&quot;tag&quot;: 100}},
+        {&quot;id&quot;: 2, &quot;name&quot;: &quot;Another Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 200}}
+
+    ]
+}
+</code></pre><p>If you wanted to target objects whose tag is less than <code>100</code>, you could use the payload <code>{&quot;extra__tag__lt&quot;: 100}</code>. This returns:<pre><code class=language-json>{
+    &quot;status&quot;:&quot;ok&quot;,
+    &quot;code&quot;:200,
+    &quot;return&quot;:0,
+    &quot;message&quot;:&quot;Success&quot;,
+    &quot;data&quot;: [
+        {&quot;id&quot;: 0, &quot;name&quot;: &quot;Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 0}}  
+    ]
+}
+</code></pre><h3>Less Than or Equal To</h3><p>The <code>lte</code> filter allows you to target objects whose values are less than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:<pre><code class=language-json>{
+    &quot;status&quot;:&quot;ok&quot;,
+    &quot;code&quot;:200,
+    &quot;return&quot;:0,
+    &quot;message&quot;:&quot;Success&quot;,
+    &quot;data&quot;: [
+        {&quot;id&quot;: 0, &quot;name&quot;: &quot;Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 0}}, 
+        {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;, &quot;type&quot;: &quot;type2&quot;, &quot;extra&quot;: {&quot;tag&quot;: 100}},
+        {&quot;id&quot;: 2, &quot;name&quot;: &quot;Another Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 200}}
+
+    ]
+}
+</code></pre><p>If you wanted to target objects whose tag is less than or equal to <code>100</code>, you could use the payload <code>{&quot;extra__tag__lte&quot;: 100}</code>. This returns:<pre><code class=language-json>{
+    &quot;status&quot;:&quot;ok&quot;,
+    &quot;code&quot;:200,
+    &quot;return&quot;:0,
+    &quot;message&quot;:&quot;Success&quot;,
+    &quot;data&quot;: [
+        {&quot;id&quot;: 0, &quot;name&quot;: &quot;Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 0}},
+        {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;, &quot;type&quot;: &quot;type2&quot;, &quot;extra&quot;: {&quot;tag&quot;: 100}}
+    ]
+}
+</code></pre><h3>Greater Than</h3><p>The <code>gt</code> filter allows you to target objects whose values are greater than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:<pre><code class=language-json>{
+    &quot;status&quot;:&quot;ok&quot;,
+    &quot;code&quot;:200,
+    &quot;return&quot;:0,
+    &quot;message&quot;:&quot;Success&quot;,
+    &quot;data&quot;: [
+        {&quot;id&quot;: 0, &quot;name&quot;: &quot;Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 0}}, 
+        {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;, &quot;type&quot;: &quot;type2&quot;, &quot;extra&quot;: {&quot;tag&quot;: 100}},
+        {&quot;id&quot;: 2, &quot;name&quot;: &quot;Another Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 200}}
+
+    ]
+}
+</code></pre><p>If you wanted to target objects whose tag is greater than <code>100</code>, you could use the payload <code>{&quot;extra__tag__gt&quot;: 100}</code>. This returns:<pre><code class=language-json>{
+    &quot;status&quot;:&quot;ok&quot;,
+    &quot;code&quot;:200,
+    &quot;return&quot;:0,
+    &quot;message&quot;:&quot;Success&quot;,
+    &quot;data&quot;: [
+        {&quot;id&quot;: 2, &quot;name&quot;: &quot;Another Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 200}}  
+    ]
+}
+</code></pre><h3>Greater Than or Equal To</h3><p>The <code>lte</code> filter allows you to target objects whose values are greater than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:<pre><code class=language-json>{
+    &quot;status&quot;:&quot;ok&quot;,
+    &quot;code&quot;:200,
+    &quot;return&quot;:0,
+    &quot;message&quot;:&quot;Success&quot;,
+    &quot;data&quot;: [
+        {&quot;id&quot;: 0, &quot;name&quot;: &quot;Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 0}}, 
+        {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;, &quot;type&quot;: &quot;type2&quot;, &quot;extra&quot;: {&quot;tag&quot;: 100}},
+        {&quot;id&quot;: 2, &quot;name&quot;: &quot;Another Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 200}}
+
+    ]
+}
+</code></pre><p>If you wanted to target objects whose tag is greater than or equal to <code>100</code>, you could use the payload <code>{&quot;extra__tag__gte&quot;: 100}</code>. This returns:<pre><code class=language-json>{
+    &quot;status&quot;:&quot;ok&quot;,
+    &quot;code&quot;:200,
+    &quot;return&quot;:0,
+    &quot;message&quot;:&quot;Success&quot;,
+    &quot;data&quot;: [
+        {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;, &quot;type&quot;: &quot;type2&quot;, &quot;extra&quot;: {&quot;tag&quot;: 100}},
+        {&quot;id&quot;: 2, &quot;name&quot;: &quot;Another Test&quot;, &quot;type&quot;: &quot;type1&quot;, &quot;extra&quot;: {&quot;tag&quot;: 200}}
+    ]
+}
+</code></pre><p></details><h3>Requirements for queries:</h3><ul><li>API call must be successful and return <code>0</code> in the <code>return</code> field.<li>Endpoints must return an array of objects in the data field (e.g. <code>[{&quot;id&quot;: 0, &quot;name&quot;: &quot;Test&quot;}, {&quot;id&quot;: 1, &quot;name&quot;: &quot;Other Test&quot;}]</code>).<li>At least two objects must be present within the array to support queries.<li>If an array is being used in a query, it must much the target data completely and exactly. There are no recursive queries.</ul><h3>Notes:</h3><ul><li>For those using the Local database or API token authentication types, <code>client-id</code> and <code>client-token</code> are excluded from queries</ul><h1>Rate limit</h1><p>There is no limit to API calls at this time but is important to note that pfSense&rsquo;s XML configuration was not designed for quick simultaneous writes like a traditional database. It may be necessary to delay API calls in sequence to prevent unexpected behavior. Alternatively, you may limit the API to read-only mode to only allow endpoints with read (GET) access within the webConfigurator&rsquo;s System &gt; API page.<h1>Endpoints</h1></div><div class=col-md-12><div class=col-md-3><ul><li><strong><a href=#ACCESSTOKEN>ACCESS_TOKEN</a></strong><ul><li><a class=endpoint_menu href=#jump-ACCESSTOKEN-RequestAccessToken>Request Access Token</a></ul><li><strong><a href=#FIREWALL_2FALIAS>FIREWALL/ALIAS</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FALIAS-CreateFirewallAliases>Create Firewall Aliases</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FALIAS-DeleteFirewallAliases>Delete Firewall Aliases</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FALIAS-ReadFirewallAliases>Read Firewall Aliases</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FALIAS-UpdateFirewallAliases>Update Firewall Aliases</a></ul><li><strong><a href=#FIREWALL_2FALIAS_2FENTRY>FIREWALL/ALIAS/ENTRY</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FALIAS_2FENTRY-CreateFirewallAliasEntries>Create Firewall Alias Entries</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FALIAS_2FENTRY-DeleteFirewallAliasEntries>Delete Firewall Alias Entries</a></ul><li><strong><a href=#FIREWALL_2FNAT>FIREWALL/NAT</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FNAT-ReadNAT>Read NAT</a></ul><li><strong><a href=#FIREWALL_2FNAT_2FPORTFOWARD>FIREWALL/NAT/PORTFOWARD</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FNAT_2FPORTFOWARD-CreateNATPortForwards>Create NAT Port Forwards</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FNAT_2FPORTFOWARD-DeleteNATPortForwards>Delete NAT Port Forwards</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FNAT_2FPORTFOWARD-ReadNATPortForwards>Read NAT Port Forwards</a></ul><li><strong><a href=#FIREWALL_2FRULE>FIREWALL/RULE</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FRULE-CreateFirewallRules>Create Firewall Rules</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FRULE-DeleteFirewallRules>Delete Firewall Rules</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FRULE-ReadFirewallRules>Read Firewall Rules</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FRULE-UpdateFirewallRules>Update Firewall Rules</a></ul><li><strong><a href=#FIREWALL_2FSTATES>FIREWALL/STATES</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FSTATES-ReadFirewallStates>Read Firewall States</a></ul><li><strong><a href=#FIREWALL_2FSTATES_2FSIZE>FIREWALL/STATES/SIZE</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FSTATES_2FSIZE-ReadFirewallStateSize>Read Firewall State Size</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FSTATES_2FSIZE-UpdateFirewallStateSize>Update Firewall State Size</a></ul><li><strong><a href=#FIREWALL_2FVIRTUALIP>FIREWALL/VIRTUAL_IP</a></strong><ul><li><a class=endpoint_menu href=#jump-FIREWALL_2FVIRTUALIP-CreateVirtualIPs>Create Virtual IPs</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FVIRTUALIP-DeleteVirtualIPs>Delete Virtual IPs</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FVIRTUALIP-ReadVirtualIPs>Read Virtual IPs</a><li><a class=endpoint_menu href=#jump-FIREWALL_2FVIRTUALIP-UpdateVirtualIPs>Update Virtual IPs</a></ul><li><strong><a href=#INTERFACE>INTERFACE</a></strong><ul><li><a class=endpoint_menu href=#jump-INTERFACE-CreateInterfaces>Create Interfaces</a><li><a class=endpoint_menu href=#jump-INTERFACE-DeleteInterfaces>Delete Interfaces</a><li><a class=endpoint_menu href=#jump-INTERFACE-ReadInterfaces>Read Interfaces</a></ul><li><strong><a href=#INTERFACE_2FVLAN>INTERFACE/VLAN</a></strong><ul><li><a class=endpoint_menu href=#jump-INTERFACE_2FVLAN-CreateInterfaceVLANs>Create Interface VLANs</a><li><a class=endpoint_menu href=#jump-INTERFACE_2FVLAN-DeleteInterfaceVLANs>Delete Interface VLANs</a><li><a class=endpoint_menu href=#jump-INTERFACE_2FVLAN-ReadInterfaceVLANs>Read Interface VLANs</a><li><a class=endpoint_menu href=#jump-INTERFACE_2FVLAN-UpdateInterfaceVLANs>Update Interface VLANs</a></ul><li><strong><a href=#ROUTING_2FGATEWAY>ROUTING/GATEWAY</a></strong><ul><li><a class=endpoint_menu href=#jump-ROUTING_2FGATEWAY-ReadRoutingGateways>Read Routing Gateways</a></ul><li><strong><a href=#ROUTING_2FSTATICROUTE>ROUTING/STATIC_ROUTE</a></strong><ul><li><a class=endpoint_menu href=#jump-ROUTING_2FSTATICROUTE-CreateStaticRoutes>Create Static Routes</a><li><a class=endpoint_menu href=#jump-ROUTING_2FSTATICROUTE-DeleteStaticRoutes>Delete Static Routes</a><li><a class=endpoint_menu href=#jump-ROUTING_2FSTATICROUTE-ReadStaticRoutes>Read Static Routes</a><li><a class=endpoint_menu href=#jump-ROUTING_2FSTATICROUTE-UpdateStaticRoutes>Update Static Routes</a></ul><li><strong><a href=#SERVICES>SERVICES</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES-ReadServices>Read Services</a><li><a class=endpoint_menu href=#jump-SERVICES-RestartAllServices>Restart All Services</a><li><a class=endpoint_menu href=#jump-SERVICES-StartAllServices>Start All Services</a><li><a class=endpoint_menu href=#jump-SERVICES-StopAllServices>Stop All Services</a></ul><li><strong><a href=#SERVICES_2FDHCPD>SERVICES/DHCPD</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FDHCPD-ReadDHCPdServiceConfiguration>Read DHCPd Service Configuration</a><li><a class=endpoint_menu href=#jump-SERVICES_2FDHCPD-RestartDHCPdService>Restart DHCPd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FDHCPD-StartDHCPdService>Start DHCPd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FDHCPD-StopDHCPdService>Stop DHCPd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FDHCPD-UpdateDHCPdServiceConfiguration>Update DHCPd Service Configuration</a></ul><li><strong><a href=#SERVICES_2FDHCPD_2FSTATICMAPPING>SERVICES/DHCPD/STATIC_MAPPING</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FDHCPD_2FSTATICMAPPING-CreateDHCPdStaticMappings>Create DHCPd Static Mappings</a><li><a class=endpoint_menu href=#jump-SERVICES_2FDHCPD_2FSTATICMAPPING-DeleteDHCPdStaticMappings>Delete DHCPd Static Mappings</a><li><a class=endpoint_menu href=#jump-SERVICES_2FDHCPD_2FSTATICMAPPING-ReadDHCPdStaticMappings>Read DHCPd Static Mappings</a><li><a class=endpoint_menu href=#jump-SERVICES_2FDHCPD_2FSTATICMAPPING-UpdateDHCPdStaticMappings>Update DHCPd Static Mappings</a></ul><li><strong><a href=#SERVICES_2FDPINGER>SERVICES/DPINGER</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FDPINGER-RestartDPINGERService>Restart DPINGER Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FDPINGER-StartDPINGERService>Start DPINGER Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FDPINGER-StopDPINGERService>Stop DPINGER Service</a></ul><li><strong><a href=#SERVICES_2FNTPD>SERVICES/NTPD</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FNTPD-RestartNTPdService>Restart NTPd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FNTPD-StartNTPdService>Start NTPd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FNTPD-StopNTPdService>Stop NTPd Service</a></ul><li><strong><a href=#SERVICES_2FSSHD>SERVICES/SSHD</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FSSHD-ReadSSHdConfiguration>Read SSHd Configuration</a><li><a class=endpoint_menu href=#jump-SERVICES_2FSSHD-RestartSSHdService>Restart SSHd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FSSHD-StartSSHdService>Start SSHd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FSSHD-StopSSHdService>Stop SSHd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FSSHD-UpdateSSHdConfiguration>Update SSHd Configuration</a></ul><li><strong><a href=#SERVICES_2FSYSLOGD>SERVICES/SYSLOGD</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FSYSLOGD-RestartSYSLOGdService>Restart SYSLOGd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FSYSLOGD-StartSYSLOGdService>Start SYSLOGd Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FSYSLOGD-StopSYSLOGdService>Stop SYSLOGd Service</a></ul><li><strong><a href=#SERVICES_2FUNBOUND>SERVICES/UNBOUND</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND-ApplyPendingUnboundChanges>Apply Pending Unbound Changes</a><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND-ReadUnboundConfiguration>Read Unbound Configuration</a><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND-RestartUnboundService>Restart Unbound Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND-StartUnboundService>Start Unbound Service</a><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND-StopUnboundService>Stop Unbound Service</a></ul><li><strong><a href=#SERVICES_2FUNBOUND_2FHOSTOVERRIDE>SERVICES/UNBOUND/HOST_OVERRIDE</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND_2FHOSTOVERRIDE-CreateUnboundHostOverride>Create Unbound Host Override</a><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND_2FHOSTOVERRIDE-DeleteUnboundHostOverride>Delete Unbound Host Override</a><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND_2FHOSTOVERRIDE-ReadUnboundHostOverride>Read Unbound Host Override</a><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND_2FHOSTOVERRIDE-UpdateUnboundHostOverride>Update Unbound Host Override</a></ul><li><strong><a href=#SERVICES_2FUNBOUND_2FHOSTOVERRIDE_2FALIAS>SERVICES/UNBOUND/HOST_OVERRIDE/ALIAS</a></strong><ul><li><a class=endpoint_menu href=#jump-SERVICES_2FUNBOUND_2FHOSTOVERRIDE_2FALIAS-CreateUnboundHostOverrideAlias>Create Unbound Host Override Alias</a></ul><li><strong><a href=#STATUS_2FCARP>STATUS/CARP</a></strong><ul><li><a class=endpoint_menu href=#jump-STATUS_2FCARP-ReadCARPStatus>Read CARP Status</a><li><a class=endpoint_menu href=#jump-STATUS_2FCARP-UpdateCARPStatus>Update CARP Status</a></ul><li><strong><a href=#STATUS_2FLOG>STATUS/LOG</a></strong><ul><li><a class=endpoint_menu href=#jump-STATUS_2FLOG-ReadConfigurationHistoryStatusLog>Read Configuration History Status Log</a><li><a class=endpoint_menu href=#jump-STATUS_2FLOG-ReadDHCPStatusLog>Read DHCP Status Log</a><li><a class=endpoint_menu href=#jump-STATUS_2FLOG-ReadFirewallStatusLog>Read Firewall Status Log</a><li><a class=endpoint_menu href=#jump-STATUS_2FLOG-ReadSystemStatusLog>Read System Status Log</a></ul><li><strong><a href=#SYSTEM_2FAPI>SYSTEM/API</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FAPI-ReadSystemAPIConfiguration>Read System API Configuration</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FAPI-ReadSystemAPIErrorLibrary>Read System API Error Library</a></ul><li><strong><a href=#SYSTEM_2FARP>SYSTEM/ARP</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FARP-DeleteSystemARPTable>Delete System ARP Table</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FARP-ReadSystemARPTable>Read System ARP Table</a></ul><li><strong><a href=#SYSTEM_2FCERTIFICATE>SYSTEM/CERTIFICATE</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FCERTIFICATE-CreateSystemCertificates>Create System Certificates</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FCERTIFICATE-DeleteSystemCertificates>Delete System Certificates</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FCERTIFICATE-ReadSystemCertificates>Read System Certificates</a></ul><li><strong><a href=#SYSTEM_2FCONFIG>SYSTEM/CONFIG</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FCONFIG-ReadSystemConfiguration>Read System Configuration</a></ul><li><strong><a href=#SYSTEM_2FDNS>SYSTEM/DNS</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FDNS-ReadSystemDNS>Read System DNS</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FDNS-UpdateSystemDNS>Update System DNS</a></ul><li><strong><a href=#SYSTEM_2FDNS_2FSERVER>SYSTEM/DNS/SERVER</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FDNS_2FSERVER-CreateSystemDNSServer>Create System DNS Server</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FDNS_2FSERVER-DeleteSystemDNSServer>Delete System DNS Server</a></ul><li><strong><a href=#SYSTEM_2FHOSTNAME>SYSTEM/HOSTNAME</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FHOSTNAME-ReadSystemHostname>Read System Hostname</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FHOSTNAME-UpdateSystemHostname>Update System Hostname</a></ul><li><strong><a href=#SYSTEM_2FTABLE>SYSTEM/TABLE</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FTABLE-ReadSystemTables>Read System Tables</a></ul><li><strong><a href=#SYSTEM_2FTUNABLE>SYSTEM/TUNABLE</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FTUNABLE-CreateSystemTunables>Create System Tunables</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FTUNABLE-DeleteSystemTunables>Delete System Tunables</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FTUNABLE-ReadSystemTunables>Read System Tunables</a><li><a class=endpoint_menu href=#jump-SYSTEM_2FTUNABLE-UpdateSystemTunables>Update System Tunables</a></ul><li><strong><a href=#SYSTEM_2FVERSION>SYSTEM/VERSION</a></strong><ul><li><a class=endpoint_menu href=#jump-SYSTEM_2FVERSION-ReadSystemVersion>Read System Version</a></ul><li><strong><a href=#USER>USER</a></strong><ul><li><a class=endpoint_menu href=#jump-USER-CreateUsers>Create Users</a><li><a class=endpoint_menu href=#jump-USER-DeleteUsers>Delete Users</a><li><a class=endpoint_menu href=#jump-USER-ReadUsers>Read Users</a><li><a class=endpoint_menu href=#jump-USER-UpdateUsers>Update Users</a></ul><li><strong><a href=#USER_2FAUTHSERVER>USER/AUTH_SERVER</a></strong><ul><li><a class=endpoint_menu href=#jump-USER_2FAUTHSERVER-CreateLDAPAuthServers>Create LDAP Auth Servers</a><li><a class=endpoint_menu href=#jump-USER_2FAUTHSERVER-DeleteAuthServers>Delete Auth Servers</a><li><a class=endpoint_menu href=#jump-USER_2FAUTHSERVER-DeleteLDAPAuthServers>Delete LDAP Auth Servers</a><li><a class=endpoint_menu href=#jump-USER_2FAUTHSERVER-DeleteRADIUSAuthServers>Delete RADIUS Auth Servers</a><li><a class=endpoint_menu href=#jump-USER_2FAUTHSERVER-ReadAuthServers>Read Auth Servers</a><li><a class=endpoint_menu href=#jump-USER_2FAUTHSERVER-ReadLDAPAuthServers>Read LDAP Auth Servers</a><li><a class=endpoint_menu href=#jump-USER_2FAUTHSERVER-ReadRADIUSAuthServers>Read RADIUS Auth Servers</a></ul><li><strong><a href=#USER_2FGROUP>USER/GROUP</a></strong><ul><li><a class=endpoint_menu href=#jump-USER_2FGROUP-CreateUserGroup>Create User Group</a><li><a class=endpoint_menu href=#jump-USER_2FGROUP-DeleteUserGroup>Delete User Group</a></ul><li><strong><a href=#USER_2FPRIVILEGE>USER/PRIVILEGE</a></strong><ul><li><a class=endpoint_menu href=#jump-USER_2FPRIVILEGE-CreateUserPrivileges>Create User Privileges</a><li><a class=endpoint_menu href=#jump-USER_2FPRIVILEGE-DeleteUserPrivileges>Delete User Privileges</a></ul></ul></div><div class=col-md-9><div class="panel panel-default"><div class=panel-heading><h3 class=panel-title id=ACCESSTOKEN>ACCESS_TOKEN
 <span class=badge>1</span></h3></div><div class=panel-body><p><p>API endpoints used to receive access tokens used to authenticate API requests. Only applicable when the API authentication mode is set to JWT.<div class=request-item><div class=panel-group id=accordion-ACCESSTOKEN><div class="panel panel-success" id=jump-ACCESSTOKEN-RequestAccessToken><div class=panel-heading><small class="pull-right text-muted">raw</small>
 <a class=text-success data-toggle=collapse data-parent=#accordion-ACCESSTOKEN href=#collapse-ACCESSTOKEN-RequestAccessToken><h4 class=panel-title><span class="glyphicon glyphicon-plus"></span><strong>Request Access Token</strong> &nbsp;|&nbsp;
 <strong class="request-method border-success">POST</strong>
@@ -437,7 +806,12 @@ https://<?echo $_SERVER['HTTP_HOST'];?>/api/v1/services/start</h4></a></div><div
 &nbsp;
 https://<?echo $_SERVER['HTTP_HOST'];?>/api/v1/services/stop</h4></a></div><div id=collapse-SERVICES-StopAllServices class="panel-collapse collapse"><div class=panel-body><h5 class="label label-default">Description</h5><br><small><p>Stop all available services.<br><br><p><em>Requires at least one of the following privileges:</em> [<code>page-all</code>, <code>page-status-services</code>]</small><br><br><h5 class="label label-primary">Body</h5><span class=resp-prettyprint>{
 }</span><div class=clearfix></div></div></div></div></div></div></div></div><div class="panel panel-default"><div class=panel-heading><h3 class=panel-title id=SERVICES_2FDHCPD>SERVICES/DHCPD
-<span class=badge>3</span></h3></div><div class=panel-body><p><div class=request-item><div class=panel-group id=accordion-SERVICES_2FDHCPD><div class="panel panel-success" id=jump-SERVICES_2FDHCPD-RestartDHCPdService><div class=panel-heading><small class="pull-right text-muted">raw</small>
+<span class=badge>5</span></h3></div><div class=panel-body><p><div class=request-item><div class=panel-group id=accordion-SERVICES_2FDHCPD><div class="panel panel-info" id=jump-SERVICES_2FDHCPD-ReadDHCPdServiceConfiguration><div class=panel-heading><small class="pull-right text-muted">raw</small>
+<a class=text-info data-toggle=collapse data-parent=#accordion-SERVICES_2FDHCPD href=#collapse-SERVICES_2FDHCPD-ReadDHCPdServiceConfiguration><h4 class=panel-title><span class="glyphicon glyphicon-plus"></span><strong>Read DHCPd Service Configuration</strong> &nbsp;|&nbsp;
+<strong class="request-method border-info">GET</strong>
+&nbsp;
+https://<?echo $_SERVER['HTTP_HOST'];?>/api/v1/services/dhcpd</h4></a></div><div id=collapse-SERVICES_2FDHCPD-ReadDHCPdServiceConfiguration class="panel-collapse collapse"><div class=panel-body><h5 class="label label-default">Description</h5><br><small><p>Read the current DHCPd configuration.<br><p><em>Requires at least one of the following privileges:</em> [<code>page-all</code>, <code>page-services-dhcpserverpage-services-dhcpserver</code>]</small><br><br><h5 class="label label-primary">Body</h5><span class=resp-prettyprint>{
+}</span><div class=clearfix></div></div></div></div><div class="panel panel-success" id=jump-SERVICES_2FDHCPD-RestartDHCPdService><div class=panel-heading><small class="pull-right text-muted">raw</small>
 <a class=text-success data-toggle=collapse data-parent=#accordion-SERVICES_2FDHCPD href=#collapse-SERVICES_2FDHCPD-RestartDHCPdService><h4 class=panel-title><span class="glyphicon glyphicon-plus"></span><strong>Restart DHCPd Service</strong> &nbsp;|&nbsp;
 <strong class="request-method border-success">POST</strong>
 &nbsp;
@@ -452,6 +826,70 @@ https://<?echo $_SERVER['HTTP_HOST'];?>/api/v1/services/dhcpd/start</h4></a></di
 <strong class="request-method border-success">POST</strong>
 &nbsp;
 https://<?echo $_SERVER['HTTP_HOST'];?>/api/v1/services/dhcpd/stop</h4></a></div><div id=collapse-SERVICES_2FDHCPD-StopDHCPdService class="panel-collapse collapse"><div class=panel-body><h5 class="label label-default">Description</h5><br><small><p>Stop the dhcpd service.<br><br><p><em>Requires at least one of the following privileges:</em> [<code>page-all</code>, <code>page-status-services</code>]</small><br><br><h5 class="label label-primary">Body</h5><span class=resp-prettyprint>{
+}</span><div class=clearfix></div></div></div></div><div class="panel panel-warning" id=jump-SERVICES_2FDHCPD-UpdateDHCPdServiceConfiguration><div class=panel-heading><small class="pull-right text-muted">raw</small>
+<a class=text-warning data-toggle=collapse data-parent=#accordion-SERVICES_2FDHCPD href=#collapse-SERVICES_2FDHCPD-UpdateDHCPdServiceConfiguration><h4 class=panel-title><span class="glyphicon glyphicon-plus"></span><strong>Update DHCPd Service Configuration</strong> &nbsp;|&nbsp;
+<strong class="request-method border-warning">PUT</strong>
+&nbsp;
+https://<?echo $_SERVER['HTTP_HOST'];?>/api/v1/services/dhcpd</h4></a></div><div id=collapse-SERVICES_2FDHCPD-UpdateDHCPdServiceConfiguration class="panel-collapse collapse"><div class=panel-body><h5 class="label label-default">Description</h5><br><small><p>Update the current DHCPd configuration.<br><p><em>Requires at least one of the following privileges:</em> [<code>page-all</code>, <code>page-services-dhcpserverpage-services-dhcpserver</code>]</small><br><br><h5 class="label label-info">Query</h5><table class="table table-hover"><thead><tr><th>Key<th>Value<th>Description<tbody><tr><td>interface<td>string<td><p>Specify which interface&rsquo;s DHCP configuration to update. You may specify either the interface&rsquo;s descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). This Interface must host a static IPv4 subnet that has more than one available within the subnet.<tr><td>enable<td>boolean<td><p>Enable or disable the DHCP server for this Interface (optional)<tr><td>range_from<td>string<td><p>Update the DHCP pool&rsquo;s start IPv4 address. This must be an available address within the Interface&rsquo;s subnet and be less than the <code>range_to</code> value. (optional)<tr><td>range_to<td>string<td><p>Update the DHCP pool&rsquo;s end IPv4 address. This must be an available address within the Interface&rsquo;s subnet and be greater than the <code>range_from</code> value. (optional)<tr><td>dnsserver<td>string or array<td><p>Update the DNS servers to include In DHCP leases. Multiple values may be passed in as an array or single values may be passed in as a string. Each value must be a valid IPv4 address. Alternatively, you may pass In an empty array to revert to the system default. (optional)<tr><td>domain<td>string<td><p>Update the domain name to Include In the DHCP lease. This must be a valid domain name or an empty string to assume the system default (optional)<tr><td>domainsearchlist<td>string or array<td><p>Update the search domains to include In the DHCP lease. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid doman name. (optional)<tr><td>mac_allow<td>string or array<td><p>Update the list of allowed MAC addresses. You may pass In an array for multiple entries or a string for single entries. Each entry must be a full or partial MAC address. Alternatively, you may specify an empty array to revert to default (optional)<tr><td>mac_deny<td>string or array<td><p>Update the list of denied MAC addresses. You may pass In an array for multiple entries or a string for single entries. Each entry must be a full or partial MAC address. Alternatively, you may specify an empty array to revert to default (optional)<tr><td>gateway<td>string<td><p>Update the gateway to include In DHCP leases. This value must be a valid IPv4 address within the Interface&rsquo;s subnet. Alternatively, you can pass In an empty string to revert to the system default. (optional)<tr><td>ignorebootp<td>boolean<td><p>Update whether or not to ignore BOOTP requests. True to Ignore, false to allow. (optional)<tr><td>denyunknown<td>boolean<td><p>Update whether or not to ignore unknown MAC addresses. If true, you must specify MAC addresses in the <code>mac_allow</code> field or add a static DHCP entry to receive DHCP requests. (optional)</table><h5 class="label label-primary">Body</h5><span class=resp-prettyprint>{
+&#34;interface&#34;: &#34;lan&#34;,
+&#34;enable&#34;: true,
+&#34;ignorebootp&#34;: false,
+&#34;denyunknown&#34;: false,
+&#34;range_from&#34;: &#34;192.168.1.25&#34;,
+&#34;range_to&#34;: &#34;192.168.1.50&#34;,
+&#34;dnsserver&#34;: [&#34;1.1.1.1&#34;],
+&#34;gateway&#34;: &#34;192.168.1.2&#34;,
+&#34;domainsearchlist&#34;: [&#34;example.com&#34;],
+&#34;domain&#34;: &#34;example.com&#34;,
+&#34;mac_allow&#34;: [&#34;00:00:00:01:E5:FF&#34;, &#34;00:00:00:01:E5&#34;],
+&#34;mac_deny&#34;: []
+}</span><div class=clearfix></div></div></div></div></div></div></div></div><div class="panel panel-default"><div class=panel-heading><h3 class=panel-title id=SERVICES_2FDHCPD_2FSTATICMAPPING>SERVICES/DHCPD/STATIC_MAPPING
+<span class=badge>4</span></h3></div><div class=panel-body><p><div class=request-item><div class=panel-group id=accordion-SERVICES_2FDHCPD_2FSTATICMAPPING><div class="panel panel-success" id=jump-SERVICES_2FDHCPD_2FSTATICMAPPING-CreateDHCPdStaticMappings><div class=panel-heading><small class="pull-right text-muted">raw</small>
+<a class=text-success data-toggle=collapse data-parent=#accordion-SERVICES_2FDHCPD_2FSTATICMAPPING href=#collapse-SERVICES_2FDHCPD_2FSTATICMAPPING-CreateDHCPdStaticMappings><h4 class=panel-title><span class="glyphicon glyphicon-plus"></span><strong>Create DHCPd Static Mappings</strong> &nbsp;|&nbsp;
+<strong class="request-method border-success">POST</strong>
+&nbsp;
+https://<?echo $_SERVER['HTTP_HOST'];?>/api/v1/services/dhcpd/static_mapping</h4></a></div><div id=collapse-SERVICES_2FDHCPD_2FSTATICMAPPING-CreateDHCPdStaticMappings class="panel-collapse collapse"><div class=panel-body><h5 class="label label-default">Description</h5><br><small><p>Create new DHCPd static mappings.<br><p><em>Requires at least one of the following privileges:</em> [<code>page-all</code>, <code>page-services-dhcpserver-editstaticmapping</code>]</small><br><br><h5 class="label label-info">Query</h5><table class="table table-hover"><thead><tr><th>Key<th>Value<th>Description<tbody><tr><td>interface<td>string<td><p>Specify which interface to create the static mapping<tr><td>mac<td>string<td><p>Specify the full MAC address of the host this static mapping Is for<tr><td>ipaddr<td>string<td><p>Specify the IPv4 address the MAC address will be assigned<tr><td>cid<td>string<td><p>Specify a client identifier (optional)<tr><td>hostname<td>string<td><p>Specify a hostname for this host (optional)<tr><td>domain<td>string<td><p>Specify a domain for this host (optional)<tr><td>descr<td>string<td><p>Specify a description for this mapping (optional)<tr><td>dnsserver<td>string or array<td><p>Specify the DNS servers to assign this client. Multiple values may be passed in as an array or single values may be passed in as a string. Each value must be a valid IPv4 address. Alternatively, you may pass In an empty array to revert to the system default. (optional)<tr><td>domainsearchlist<td>string or array<td><p>Specify the search domains to assign to this host. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid doman name. (optional)<tr><td>gateway<td>string<td><p>Specify the gateway to assign this host. This value must be a valid IPv4 address within the Interface&rsquo;s subnet. Alternatively, you can pass In an empty string to revert to the system default. (optional)<tr><td>arp_table_static_entry<td>boolean<td><p>Specify whether or not a static ARP entry should be created for this host (optional)</table><h5 class="label label-primary">Body</h5><span class=resp-prettyprint>{
+&#34;interface&#34;: &#34;lan&#34;,
+&#34;mac&#34;: &#34;ac:de:48:00:11:22&#34;,
+&#34;ipaddr&#34;: &#34;192.168.1.254&#34;,
+&#34;cid&#34;: &#34;a098b-zpe9s-1vr45&#34;,
+&#34;descr&#34;: &#34;This is a DHCP static mapping created by pfSense API&#34;,
+&#34;hostname&#34;: &#34;test-host&#34;,
+&#34;domain&#34;: &#34;example.com&#34;,
+&#34;dnsserver&#34;: [&#34;1.1.1.1&#34;],
+&#34;domainsearchlist&#34;: [&#34;example.com&#34;],
+&#34;gateway&#34;: &#34;192.168.1.1&#34;,
+&#34;arp_table_static_entry&#34;: true
+}</span><div class=clearfix></div></div></div></div><div class="panel panel-danger" id=jump-SERVICES_2FDHCPD_2FSTATICMAPPING-DeleteDHCPdStaticMappings><div class=panel-heading><small class="pull-right text-muted">raw</small>
+<a class=text-danger data-toggle=collapse data-parent=#accordion-SERVICES_2FDHCPD_2FSTATICMAPPING href=#collapse-SERVICES_2FDHCPD_2FSTATICMAPPING-DeleteDHCPdStaticMappings><h4 class=panel-title><span class="glyphicon glyphicon-plus"></span><strong>Delete DHCPd Static Mappings</strong> &nbsp;|&nbsp;
+<strong class="request-method border-danger">DELETE</strong>
+&nbsp;
+https://<?echo $_SERVER['HTTP_HOST'];?>/api/v1/services/dhcpd/static_mapping</h4></a></div><div id=collapse-SERVICES_2FDHCPD_2FSTATICMAPPING-DeleteDHCPdStaticMappings class="panel-collapse collapse"><div class=panel-body><h5 class="label label-default">Description</h5><br><small><p>Delete existing DHCPd static mappings.<br><p><em>Requires at least one of the following privileges:</em> [<code>page-all</code>, <code>page-services-dhcpserver-editstaticmapping</code>]</small><br><br><h5 class="label label-info">Query</h5><table class="table table-hover"><thead><tr><th>Key<th>Value<th>Description<tbody><tr><td>id<td>integer<td><p>Specify the ID of the static mapping to delete<tr><td>interface<td>string<td><p>Specify which interface to update the static mapping</table><h5 class="label label-primary">Body</h5><span class=resp-prettyprint>{
+&#34;id&#34;: 0,
+&#34;interface&#34;: &#34;lan&#34;
+}</span><div class=clearfix></div></div></div></div><div class="panel panel-info" id=jump-SERVICES_2FDHCPD_2FSTATICMAPPING-ReadDHCPdStaticMappings><div class=panel-heading><small class="pull-right text-muted">raw</small>
+<a class=text-info data-toggle=collapse data-parent=#accordion-SERVICES_2FDHCPD_2FSTATICMAPPING href=#collapse-SERVICES_2FDHCPD_2FSTATICMAPPING-ReadDHCPdStaticMappings><h4 class=panel-title><span class="glyphicon glyphicon-plus"></span><strong>Read DHCPd Static Mappings</strong> &nbsp;|&nbsp;
+<strong class="request-method border-info">GET</strong>
+&nbsp;
+https://<?echo $_SERVER['HTTP_HOST'];?>/api/v1/services/dhcpd/static_mapping</h4></a></div><div id=collapse-SERVICES_2FDHCPD_2FSTATICMAPPING-ReadDHCPdStaticMappings class="panel-collapse collapse"><div class=panel-body><h5 class="label label-default">Description</h5><br><small><p>Read the current DHCPd static mappings.<br><p><em>Requires at least one of the following privileges:</em> [<code>page-all</code>, <code>page-services-dhcpserver-editstaticmapping</code>]</small><br><br><h5 class="label label-info">Query</h5><table class="table table-hover"><thead><tr><th>Key<th>Value<th>Description<tbody><tr><td>interface<td>string<td><p>Specify which interface to read static mappings from</table><h5 class="label label-primary">Body</h5><span class=resp-prettyprint>{
+&#34;interface&#34;: &#34;lan&#34;
+}</span><div class=clearfix></div></div></div></div><div class="panel panel-warning" id=jump-SERVICES_2FDHCPD_2FSTATICMAPPING-UpdateDHCPdStaticMappings><div class=panel-heading><small class="pull-right text-muted">raw</small>
+<a class=text-warning data-toggle=collapse data-parent=#accordion-SERVICES_2FDHCPD_2FSTATICMAPPING href=#collapse-SERVICES_2FDHCPD_2FSTATICMAPPING-UpdateDHCPdStaticMappings><h4 class=panel-title><span class="glyphicon glyphicon-plus"></span><strong>Update DHCPd Static Mappings</strong> &nbsp;|&nbsp;
+<strong class="request-method border-warning">PUT</strong>
+&nbsp;
+https://<?echo $_SERVER['HTTP_HOST'];?>/api/v1/services/dhcpd/static_mapping</h4></a></div><div id=collapse-SERVICES_2FDHCPD_2FSTATICMAPPING-UpdateDHCPdStaticMappings class="panel-collapse collapse"><div class=panel-body><h5 class="label label-default">Description</h5><br><small><p>Update existing DHCPd static mappings.<br><p><em>Requires at least one of the following privileges:</em> [<code>page-all</code>, <code>page-services-dhcpserver-editstaticmapping</code>]</small><br><br><h5 class="label label-info">Query</h5><table class="table table-hover"><thead><tr><th>Key<th>Value<th>Description<tbody><tr><td>id<td>integer<td><p>Specify the ID of the static mapping to update<tr><td>interface<td>string<td><p>Specify which interface to update the static mapping<tr><td>mac<td>string<td><p>Update the full MAC address of the host this static mapping Is for<tr><td>ipaddr<td>string<td><p>Update the IPv4 address the MAC address will be assigned<tr><td>cid<td>string<td><p>Update the client identifier (optional)<tr><td>hostname<td>string<td><p>Update the hostname for this host (optional)<tr><td>domain<td>string<td><p>Update the domain for this host (optional)<tr><td>descr<td>string<td><p>Update the description for this mapping (optional)<tr><td>dnsserver<td>string or array<td><p>Update the DNS servers to assign this client. Multiple values may be passed in as an array or single values may be passed in as a string. Each value must be a valid IPv4 address. Alternatively, you may pass In an empty array to revert to the system default. (optional)<tr><td>domainsearchlist<td>string or array<td><p>Update the search domains to assign to this host. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid doman name. (optional)<tr><td>gateway<td>string<td><p>Update the gateway to assign this host. This value must be a valid IPv4 address within the Interface&rsquo;s subnet. Alternatively, you can pass In an empty string to revert to the system default. (optional)<tr><td>arp_table_static_entry<td>boolean<td><p>Update whether or not a static ARP entry should be created for this host (optional)</table><h5 class="label label-primary">Body</h5><span class=resp-prettyprint>{
+&#34;id&#34;: 0,
+&#34;interface&#34;: &#34;lan&#34;,
+&#34;mac&#34;: &#34;ac:de:48:00:11:22&#34;,
+&#34;ipaddr&#34;: &#34;192.168.1.250&#34;,
+&#34;cid&#34;: &#34;updated-a098b-zpe9s-1vr45&#34;,
+&#34;descr&#34;: &#34;This is an updated DHCP static mapping created by pfSense API&#34;,
+&#34;hostname&#34;: &#34;updated-test-host&#34;,
+&#34;domain&#34;: &#34;updated.example.com&#34;,
+&#34;dnsserver&#34;: [&#34;8.8.8.8&#34;, &#34;8.8.4.4&#34;, &#34;1.1.1.1&#34;],
+&#34;domainsearchlist&#34;: [&#34;updated.example.com&#34;, &#34;extra.example.com&#34;],
+&#34;gateway&#34;: &#34;192.168.1.2&#34;,
+&#34;arp_table_static_entry&#34;: false
 }</span><div class=clearfix></div></div></div></div></div></div></div></div><div class="panel panel-default"><div class=panel-heading><h3 class=panel-title id=SERVICES_2FDPINGER>SERVICES/DPINGER
 <span class=badge>3</span></h3></div><div class=panel-body><p><div class=request-item><div class=panel-group id=accordion-SERVICES_2FDPINGER><div class="panel panel-success" id=jump-SERVICES_2FDPINGER-RestartDPINGERService><div class=panel-heading><small class="pull-right text-muted">raw</small>
 <a class=text-success data-toggle=collapse data-parent=#accordion-SERVICES_2FDPINGER href=#collapse-SERVICES_2FDPINGER-RestartDPINGERService><h4 class=panel-title><span class="glyphicon glyphicon-plus"></span><strong>Restart DPINGER Service</strong> &nbsp;|&nbsp;
@@ -578,7 +1016,8 @@ https://<?echo $_SERVER['HTTP_HOST'];?>/api/v1/services/unbound/host_override</h
 <strong class="request-method border-danger">DELETE</strong>
 &nbsp;
 https://<?echo $_SERVER['HTTP_HOST'];?>/api/v1/services/unbound/host_override</h4></a></div><div id=collapse-SERVICES_2FUNBOUND_2FHOSTOVERRIDE-DeleteUnboundHostOverride class="panel-collapse collapse"><div class=panel-body><h5 class="label label-default">Description</h5><br><small><p>Delete host overrides from DNS Resolver (Unbound).<br><br><p><em>Requires at least one of the following privileges:</em> [<code>page-all</code>, <code>page-services-dnsresolver-edithost</code>]</small><br><br><h5 class="label label-info">Query</h5><table class="table table-hover"><thead><tr><th>Key<th>Value<th>Description<tbody><tr><td>id<td>integer<td><p>Specify the ID of the host override to delete<tr><td>apply<td>boolean<td><p>Apply this host override upon modification. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional)</table><h5 class="label label-primary">Body</h5><span class=resp-prettyprint>{
-&#34;id&#34;: 0
+&#34;id&#34;: 0,
+&#34;apply&#34;: true
 }</span><div class=clearfix></div></div></div></div><div class="panel panel-info" id=jump-SERVICES_2FUNBOUND_2FHOSTOVERRIDE-ReadUnboundHostOverride><div class=panel-heading><small class="pull-right text-muted">raw</small>
 <a class=text-info data-toggle=collapse data-parent=#accordion-SERVICES_2FUNBOUND_2FHOSTOVERRIDE href=#collapse-SERVICES_2FUNBOUND_2FHOSTOVERRIDE-ReadUnboundHostOverride><h4 class=panel-title><span class="glyphicon glyphicon-plus"></span><strong>Read Unbound Host Override</strong> &nbsp;|&nbsp;
 <strong class="request-method border-info">GET</strong>
@@ -909,7 +1348,7 @@ if(IsJsonString(html)){var obj=JSON.parse(html);var formattedJson=JSON.stringify
 function IsJsonString(str){try{JSON.parse(str);}catch(e){return false;}
 return true;}
 String.prototype.replaceAll=function(replaceThis,withThis){var re=new RegExp(RegExp.quote(replaceThis),"g");return this.replace(re,withThis);};RegExp.quote=function(str){return str.replace(/([.?*+^$[\]\\(){}-])/g,"\\$1");};function syntaxHighlight(json){json=json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,function(match){var cls='number';if(/^"/.test(match)){if(/:$/.test(match)){cls='key';}else{cls='string';}}else if(/true|false/.test(match)){cls='boolean';}else if(/null/.test(match)){cls='null';}
-return '<span class="'+cls+'">'+match+'</span>';});}</script><br><br><footer class="navbar-default navbar-fixed-bottom"><div class=container-fluid><div class="span12 text-center"><span data-toggle=tooltip title="If the application help you, please feel free to give a star to the project in github. Your star inspire me to work more on open-source projects like this!">Made with <em class=love-color>&#9829;</em> by <a href=https://github.com/thedevsaddam target=_blank class=text-muted>thedevsaddam</a> | Generated at: 2020-09-28 16:26:07 by <a href=https://github.com/thedevsaddam/docgen target=_blank class=text-muted>docgen</a></span></div></div></footer>
+return '<span class="'+cls+'">'+match+'</span>';});}</script><br><br><footer class="navbar-default navbar-fixed-bottom"><div class=container-fluid><div class="span12 text-center"><span data-toggle=tooltip title="If the application help you, please feel free to give a star to the project in github. Your star inspire me to work more on open-source projects like this!">Made with <em class=love-color>&#9829;</em> by <a href=https://github.com/thedevsaddam target=_blank class=text-muted>thedevsaddam</a> | Generated at: 2020-09-29 15:20:16 by <a href=https://github.com/thedevsaddam/docgen target=_blank class=text-muted>docgen</a></span></div></div></footer>
 <style>
     body {
         display: block;

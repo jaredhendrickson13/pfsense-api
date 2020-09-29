@@ -90,11 +90,11 @@ A full list of error codes can be found by navigating to /api/v1/system/api/erro
 
 
 # Queries
-For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you like to, in order to match the query, each parameter must match exactly. If no matches were found, the endpoint will return an empty array in the data field. 
+pfSense API contains an advanced query engine to make it easy to query specific data from API alls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you like to, in order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field. 
 <details>
-    <summary>Show example</summary>
+    <summary>Targetting Objects</summary>
     
-For example, say an API endpoint normally returns a response like this without a query:
+You may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns a response like this without a query:
 
 ```json
 {
@@ -103,15 +103,15 @@ For example, say an API endpoint normally returns a response like this without a
     "return":0,
     "message":"Success",
     "data": [
-        {"id": 0, "name": "Test", "type": "type1"}, 
-        {"id": 1, "name": "Other Test", "type": "type2"},
-        {"id": 2, "name": "Another Test", "type": "type1"}
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
 
     ]
 }
 ```
 
-If I wanted the endpoint to only return the objects that had their `type` set to `type1` I could add `{"type": "type1"}` to my payload. This would return something like this:
+If you want the endpoint to only return the objects that had their `type` set to `type1` you could add `{"type": "type1"}` to your payload. This returns:
 
 ```json
 {
@@ -120,13 +120,269 @@ If I wanted the endpoint to only return the objects that had their `type` set to
     "return":0,
     "message":"Success",
     "data": [
-        {"id": 0, "name": "Test", "type": "type1"}, 
-        {"id": 2, "name": "Another Test", "type": "type1"}
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
     ]
 }
 ```
+
+Additionally, if you need to target values that are nested within an array, you could add `{"extra__tag": 100}` to recursively target the `tag` value within the `extra` array. This returns:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}}
+    ]
+}
+```
+
 </details>
 
+<details>
+    <summary>Query Filters</summary>
+    
+Query filters allow you to apply logic to the objects you target. This makes it easy to target data that meets certain criteria:
+
+### Starts With
+    
+The `startswith` filter allows you to target objects whose values start with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+
+    ]
+}
+```
+
+If you wanted to target objects whose names started with `Other`, you could use the payload `{"name__startswith": "Other"}`. This returns:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}}
+    ]
+}
+```
+
+### Ends With
+    
+The `endswith` filter allows you to target objects whose values end with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+
+    ]
+}
+```
+
+If you wanted to target objects whose names ended with `er Test`, you could use the payload `{"name__endswith" "er Test"}`. This returns:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}    
+    ]
+}
+```
+
+### Contains
+    
+The `contains` filter allows you to target objects whose values contain a specific substring. This will work on both string and integer data types. Below is an example response without any queries:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+
+    ]
+}
+```
+
+If you wanted to target objects whose names contain `ther`, you could use the payload `{"name__contains": "ther"}`. This returns:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}    
+    ]
+}
+```
+
+### Less Than
+    
+The `lt` filter allows you to target objects whose values are less than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+
+    ]
+}
+```
+
+If you wanted to target objects whose tag is less than `100`, you could use the payload `{"extra__tag__lt": 100}`. This returns:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}  
+    ]
+}
+```
+
+### Less Than or Equal To
+    
+The `lte` filter allows you to target objects whose values are less than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+
+    ]
+}
+```
+
+If you wanted to target objects whose tag is less than or equal to `100`, you could use the payload `{"extra__tag__lte": 100}`. This returns:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
+        {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}}
+    ]
+}
+```
+
+### Greater Than
+    
+The `gt` filter allows you to target objects whose values are greater than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+
+    ]
+}
+```
+
+If you wanted to target objects whose tag is greater than `100`, you could use the payload `{"extra__tag__gt": 100}`. This returns:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}  
+    ]
+}
+```
+
+### Greater Than or Equal To
+    
+The `lte` filter allows you to target objects whose values are greater than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+
+    ]
+}
+```
+
+If you wanted to target objects whose tag is greater than or equal to `100`, you could use the payload `{"extra__tag__gte": 100}`. This returns:
+
+```json
+{
+    "status":"ok",
+    "code":200,
+    "return":0,
+    "message":"Success",
+    "data": [
+        {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
+    ]
+}
+```
+
+</details>
 
 ### Requirements for queries:
 - API call must be successful and return `0` in the `return` field.
@@ -228,9 +484,18 @@ There is no limit to API calls at this time but is important to note that pfSens
 
 * [SERVICES/DHCPD](#servicesdhcpd)
 
-  * [Restart DHCPd Service](#1-restart-dhcpd-service)
-  * [Start DHCPd Service](#2-start-dhcpd-service)
-  * [Stop DHCPd Service](#3-stop-dhcpd-service)
+  * [Read DHCPd Service Configuration](#1-read-dhcpd-service-configuration)
+  * [Restart DHCPd Service](#2-restart-dhcpd-service)
+  * [Start DHCPd Service](#3-start-dhcpd-service)
+  * [Stop DHCPd Service](#4-stop-dhcpd-service)
+  * [Update DHCPd Service Configuration](#5-update-dhcpd-service-configuration)
+
+* [SERVICES/DHCPD/STATIC_MAPPING](#servicesdhcpdstatic_mapping)
+
+  * [Create DHCPd Static Mappings](#1-create-dhcpd-static-mappings)
+  * [Delete DHCPd Static Mappings](#2-delete-dhcpd-static-mappings)
+  * [Read DHCPd Static Mappings](#3-read-dhcpd-static-mappings)
+  * [Update DHCPd Static Mappings](#4-update-dhcpd-static-mappings)
 
 * [SERVICES/DPINGER](#servicesdpinger)
 
@@ -1824,7 +2089,36 @@ URL: https://{{$hostname}}/api/v1/services/stop
 
 
 
-### 1. Restart DHCPd Service
+### 1. Read DHCPd Service Configuration
+
+
+Read the current DHCPd configuration.<br>
+
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserverpage-services-dhcpserver`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dhcpd
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Restart DHCPd Service
 
 
 Restart the dhcpd service.<br><br>
@@ -1852,7 +2146,7 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd/restart
 
 
 
-### 2. Start DHCPd Service
+### 3. Start DHCPd Service
 
 
 Start the dhcpd service.<br><br>
@@ -1880,7 +2174,7 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd/start
 
 
 
-### 3. Stop DHCPd Service
+### 4. Stop DHCPd Service
 
 
 Stop the dhcpd service.<br><br>
@@ -1903,6 +2197,261 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd/stop
 ```js        
 {
     
+}
+```
+
+
+
+### 5. Update DHCPd Service Configuration
+
+
+Update the current DHCPd configuration.<br>
+
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserverpage-services-dhcpserver`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dhcpd
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| interface | string | Specify which interface's DHCP configuration to update. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). This Interface must host a static IPv4 subnet that has more than one available within the subnet. |
+| enable | boolean | Enable or disable the DHCP server for this Interface (optional) |
+| range_from | string | Update the DHCP pool's start IPv4 address. This must be an available address within the Interface's subnet and be less than the `range_to` value. (optional) |
+| range_to | string | Update the DHCP pool's end IPv4 address. This must be an available address within the Interface's subnet and be greater than the `range_from` value. (optional) |
+| dnsserver | string or array | Update the DNS servers to include In DHCP leases. Multiple values may be passed in as an array or single values may be passed in as a string. Each value must be a valid IPv4 address. Alternatively, you may pass In an empty array to revert to the system default. (optional) |
+| domain | string | Update the domain name to Include In the DHCP lease. This must be a valid domain name or an empty string to assume the system default (optional) |
+| domainsearchlist | string or array | Update the search domains to include In the DHCP lease. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid doman name. (optional) |
+| mac_allow | string or array | Update the list of allowed MAC addresses. You may pass In an array for multiple entries or a string for single entries. Each entry must be a full or partial MAC address. Alternatively, you may specify an empty array to revert to default (optional) |
+| mac_deny | string or array | Update the list of denied MAC addresses. You may pass In an array for multiple entries or a string for single entries. Each entry must be a full or partial MAC address. Alternatively, you may specify an empty array to revert to default (optional) |
+| gateway | string | Update the gateway to include In DHCP leases. This value must be a valid IPv4 address within the Interface's subnet. Alternatively, you can pass In an empty string to revert to the system default. (optional) |
+| ignorebootp | boolean | Update whether or not to ignore BOOTP requests. True to Ignore, false to allow. (optional) |
+| denyunknown | boolean | Update whether or not to ignore unknown MAC addresses. If true, you must specify MAC addresses in the `mac_allow` field or add a static DHCP entry to receive DHCP requests. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+    "interface": "lan",
+    "enable": true,
+    "ignorebootp": false,
+    "denyunknown": false,
+    "range_from": "192.168.1.25",
+    "range_to": "192.168.1.50",
+    "dnsserver": ["1.1.1.1"],
+    "gateway": "192.168.1.2",
+    "domainsearchlist": ["example.com"],
+    "domain": "example.com",
+    "mac_allow": ["00:00:00:01:E5:FF", "00:00:00:01:E5"],
+    "mac_deny": []
+}
+```
+
+
+
+## SERVICES/DHCPD/STATIC_MAPPING
+
+
+
+### 1. Create DHCPd Static Mappings
+
+
+Create new DHCPd static mappings.<br>
+
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dhcpd/static_mapping
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| interface | string | Specify which interface to create the static mapping |
+| mac | string | Specify the full MAC address of the host this static mapping Is for |
+| ipaddr | string | Specify the IPv4 address the MAC address will be assigned |
+| cid | string | Specify a client identifier (optional) |
+| hostname | string | Specify a hostname for this host (optional) |
+| domain | string | Specify a domain for this host (optional) |
+| descr | string | Specify a description for this mapping (optional) |
+| dnsserver | string or array | Specify the DNS servers to assign this client. Multiple values may be passed in as an array or single values may be passed in as a string. Each value must be a valid IPv4 address. Alternatively, you may pass In an empty array to revert to the system default. (optional) |
+| domainsearchlist | string or array  | Specify the search domains to assign to this host. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid doman name. (optional) |
+| gateway | string | Specify the gateway to assign this host. This value must be a valid IPv4 address within the Interface's subnet. Alternatively, you can pass In an empty string to revert to the system default. (optional) |
+| arp_table_static_entry | boolean | Specify whether or not a static ARP entry should be created for this host (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+    "interface": "lan",
+    "mac": "ac:de:48:00:11:22",
+    "ipaddr": "192.168.1.254",
+    "cid": "a098b-zpe9s-1vr45",
+    "descr": "This is a DHCP static mapping created by pfSense API",
+    "hostname": "test-host",
+    "domain": "example.com",
+    "dnsserver": ["1.1.1.1"],
+    "domainsearchlist": ["example.com"],
+    "gateway": "192.168.1.1",
+    "arp_table_static_entry": true
+}
+```
+
+
+
+### 2. Delete DHCPd Static Mappings
+
+
+Delete existing DHCPd static mappings.<br>
+
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dhcpd/static_mapping
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the static mapping to delete |
+| interface | string | Specify which interface to update the static mapping |
+
+
+
+***Body:***
+
+```js        
+{
+    "id": 0,
+    "interface": "lan"
+}
+```
+
+
+
+### 3. Read DHCPd Static Mappings
+
+
+Read the current DHCPd static mappings.<br>
+
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dhcpd/static_mapping
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| interface | string | Specify which interface to read static mappings from |
+
+
+
+***Body:***
+
+```js        
+{
+    "interface": "lan"
+}
+```
+
+
+
+### 4. Update DHCPd Static Mappings
+
+
+Update existing DHCPd static mappings.<br>
+
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dhcpd/static_mapping
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the static mapping to update |
+| interface | string | Specify which interface to update the static mapping |
+| mac | string | Update the full MAC address of the host this static mapping Is for |
+| ipaddr | string | Update the IPv4 address the MAC address will be assigned |
+| cid | string | Update the client identifier (optional) |
+| hostname | string | Update the hostname for this host (optional) |
+| domain | string | Update the domain for this host (optional) |
+| descr | string | Update the description for this mapping (optional) |
+| dnsserver | string or array | Update the DNS servers to assign this client. Multiple values may be passed in as an array or single values may be passed in as a string. Each value must be a valid IPv4 address. Alternatively, you may pass In an empty array to revert to the system default. (optional) |
+| domainsearchlist | string or array  | Update the search domains to assign to this host. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid doman name. (optional) |
+| gateway | string | Update the gateway to assign this host. This value must be a valid IPv4 address within the Interface's subnet. Alternatively, you can pass In an empty string to revert to the system default. (optional) |
+| arp_table_static_entry | boolean | Update whether or not a static ARP entry should be created for this host (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+    "id": 0,
+    "interface": "lan",
+    "mac": "ac:de:48:00:11:22",
+    "ipaddr": "192.168.1.250",
+    "cid": "updated-a098b-zpe9s-1vr45",
+    "descr": "This is an updated DHCP static mapping created by pfSense API",
+    "hostname": "updated-test-host",
+    "domain": "updated.example.com",
+    "dnsserver": ["8.8.8.8", "8.8.4.4", "1.1.1.1"],
+    "domainsearchlist": ["updated.example.com", "extra.example.com"],
+    "gateway": "192.168.1.2",
+    "arp_table_static_entry": false
 }
 ```
 
@@ -2560,7 +3109,8 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 
 ```js        
 {
-    "id": 0
+    "id": 0,
+    "apply": true
 }
 ```
 
@@ -4212,4 +4762,3 @@ URL: https://{{$hostname}}/api/v1/user/privilege
 
 ---
 [Back to top](#pfsense-rest-api-documentation)
-> Made with &#9829; by [thedevsaddam](https://github.com/thedevsaddam) | Generated at: 2020-09-28 16:26:07 by [docgen](https://github.com/thedevsaddam/docgen)

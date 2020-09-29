@@ -263,6 +263,8 @@ not specified, the default values are assumed:
 Please note that this URL should start with a `/` but not end with one. This will recursively create any directory 
 within the URL path and overwrite any existing index.php file at this location. Defaults to `null` which will throw an
 error when building endpoints.
+- `$this-query_excludes` : Specify parameters to exclude from queries on GET requests. This is typically only necessary
+if your GET request requires parameters to locate data.
 
 #### Overriding Base Model Methods ####
 There are class methods that you will need to override to map API models to specific HTTP methods. If any of these

@@ -310,6 +310,180 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Unbound host override ID does not exist"
         ],
+        2017 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd interface is required"
+        ],
+        2018 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd interface does not exist"
+        ],
+        2019 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd interface must be enabled and host a static IPv4 subnet"
+        ],
+        2020 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd start range is required"
+        ],
+        2021 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd start range must be valid IPv4 address"
+        ],
+        2022 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd start range is outside of available IP range"
+        ],
+        2023 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd end range is required"
+        ],
+        2024 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd end range must be valid IPv4 address"
+        ],
+        2025 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd end range is outside of available IP range"
+        ],
+        2026 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Only 4 DHCPd DNS servers are allowed"
+        ],
+        2027 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd DNS servers must be valid IPv4 addresses"
+        ],
+        2028 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd gateway must be valid IPv4 address"
+        ],
+        2029 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd gateway is outside of available IP range"
+        ],
+        2030 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd domain must be valid hostname"
+        ],
+        2031 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd domain search list entries must be valid hostnames"
+        ],
+        2032 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd allowed MAC entries must be partial or full MAC addresses"
+        ],
+        2033 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd denied MAC entries must be partial or full MAC addresses"
+        ],
+        2034 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping MAC address is required"
+        ],
+        2035 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping MAC address is invalid"
+        ],
+        2036 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping MAC address already exists on this interface"
+        ],
+        2037 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping IPv4 address is required"
+        ],
+        2038 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping IPv4 address is invalid"
+        ],
+        2039 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping IPv4 address already in use"
+        ],
+        2040 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping hostname is invalid"
+        ],
+        2041 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping IPv4 cannot match interface address"
+        ],
+        2042 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping IPv4 must be within interface subnet"
+        ],
+        2043 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping IPv4 cannot be within existing DHCP pool"
+        ],
+        2044 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping ID is required"
+        ],
+        2045 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd static mapping ID does not exist"
+        ],
 
         // 3000-3999 reserved for /interfaces API calls
         3000 => [

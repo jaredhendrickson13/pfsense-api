@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "82c19cd3-0a51-4363-8e6a-a40500a3aea7",
 		"name": "pfSense REST API Documentation",
-		"description": "---\n\n# Introduction\npfSense API is a fast, safe, REST API package for pfSense firewalls. This works by leveraging the same PHP functions and processes used \nby pfSense's webConfigurator into API endpoints to create, read, update and delete pfSense configurations. All API \nendpoints enforce input validation to prevent invalid configurations from being made. Configurations made via API are \nproperly written to the master XML configuration and the correct backend configurations are made preventing the need for\n a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!\n\n\n# Requirements\n- pfSense 2.4.4 or later is supported\n- pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the \nwebConfigurator are required to make calls to the API endpoints\n- While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit\n\n\n# Installation\nTo install pfSense API, simply run the following command from the pfSense shell:<br>\n```\npkg add https://github.com/jaredhendrickson13/pfsense-api/releases/download/v1.0.0/pfSense-2-4-pkg-API-1.0_0.txz && /etc/rc.restart_webgui\n```\n\nTo uninstall, run the following command:<br>\n```\npkg delete pfSense-pkg-API\n```\n\n### Notes: \n- In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package\n- If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to \n'Diagnostics > Command Prompt' and enter the commands there\n\n\n# UI Settings & Documentation\nAfter installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System > API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation with context to your pfSense instance.\n\n### Notes: \n- Users must hold the `page-all` or `page-system-api` privileges to access the API page within the webConfigurator\n\n\n# Authentication & Authorization\nBy default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense \nfrom the API out of the box, and user passwords may be changed from the API to immediately add additional security if \nneeded. After installation, you can navigate to System > API in the pfSense webConfigurator to configure API\nauthentication.\n\nTo authenticate your API call, follow the instructions for your configured authentication mode:\n\n<details>\n    <summary>Local Database (default)</summary>\n\nUses the same credentials as the pfSense webConfigurator. To authenticate API calls, simply add a `client-id` value containing your username and a `client-token` value containing your password to your payload. For example `{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}`\n\n</details>\n\n<details>\n    <summary>JWT</summary>\n\nRequires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a `client-id` value containing your pfSense username and a `client-token` value containing your pfSense password to your payload. For example `{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}`. Once you have your bearer token, you can authenticate your API call by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)\n</details>\n\n<details>\n    <summary>API Token</summary>\n\nUses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication and not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by adding a `client-id` value containing yourAPI token client ID and a `client-token` value containing your API token client token to your payload. (e.g. `{\"client-id\": \"cccdj-311s\", \"client-token\": \"42jkjl-k234jlk1b38123kj3kjl-ffwzzuilaei\"}`\n</details>\n\n### Authorization\npfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.\n\n\n# Response Codes\n`200 (OK)` : API call succeeded<br>\n`400 (Bad Request)` : An error was found within your requested parameters<br>\n`401 (Unauthorized)` : API client has not completed authentication or authorization successfully<br>\n`403 (Forbidden)` : The API endpoint has refused your call. Commonly due to your access settings found in System > API<br>\n`404 (Not found)` : Either the API endpoint or requested data was not found<br>\n`500 (Server error)` : The API endpoint encountered an unexpected error processing your API request<br>\n\n\n# Error Codes\nA full list of error codes can be found by navigating to /api/v1/system/api/errors/ after installation. This will return\n JSON data containing each error code and their corresponding error message. No authentication is required to view the \n error code library. This also makes API integration with third-party software easy as the API error codes and messages \n are always just an HTTP call away!\n\n\n# Queries\nFor endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you like to, in order to match the query, each parameter must match exactly. If no matches were found, the endpoint will return an empty array in the data field. \n<details>\n    <summary>Show example</summary>\n    \nFor example, say an API endpoint normally returns a response like this without a query:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\"}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\"},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\"}\n\n    ]\n}\n```\n\nIf I wanted the endpoint to only return the objects that had their `type` set to `type1` I could add `{\"type\": \"type1\"}` to my payload. This would return something like this:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\"}, \n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\"}\n    ]\n}\n```\n</details>\n\n\n### Requirements for queries:\n- API call must be successful and return `0` in the `return` field.\n- Endpoints must return an array of objects in the data field (e.g. `[{\"id\": 0, \"name\": \"Test\"}, {\"id\": 1, \"name\": \"Other Test\"}]`).\n- At least two objects must be present within the array to support queries.\n- If an array is being used in a query, it must much the target data completely and exactly. There are no recursive queries.\n\n### Notes:\n- For those using the Local database or API token authentication types, `client-id` and `client-token` are excluded from queries\n\n\n# Rate limit\nThere is no limit to API calls at this time but is important to note that pfSense's XML configuration was not designed for quick simultaneous writes like a traditional database. It may be necessary to delay API calls in sequence to prevent unexpected behavior. Alternatively, you may limit the API to read-only mode to only allow endpoints with read (GET) access within the webConfigurator's System > API page.\n\n\n# Endpoints",
+		"description": "---\n\n# Introduction\npfSense API is a fast, safe, REST API package for pfSense firewalls. This works by leveraging the same PHP functions and processes used \nby pfSense's webConfigurator into API endpoints to create, read, update and delete pfSense configurations. All API \nendpoints enforce input validation to prevent invalid configurations from being made. Configurations made via API are \nproperly written to the master XML configuration and the correct backend configurations are made preventing the need for\n a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!\n\n\n# Requirements\n- pfSense 2.4.4 or later is supported\n- pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the \nwebConfigurator are required to make calls to the API endpoints\n- While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit\n\n\n# Installation\nTo install pfSense API, simply run the following command from the pfSense shell:<br>\n```\npkg add https://github.com/jaredhendrickson13/pfsense-api/releases/download/v1.0.0/pfSense-2-4-pkg-API-1.0_0.txz && /etc/rc.restart_webgui\n```\n\nTo uninstall, run the following command:<br>\n```\npkg delete pfSense-pkg-API\n```\n\n### Notes: \n- In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package\n- If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to \n'Diagnostics > Command Prompt' and enter the commands there\n\n\n# UI Settings & Documentation\nAfter installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System > API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation with context to your pfSense instance.\n\n### Notes: \n- Users must hold the `page-all` or `page-system-api` privileges to access the API page within the webConfigurator\n\n\n# Authentication & Authorization\nBy default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense \nfrom the API out of the box, and user passwords may be changed from the API to immediately add additional security if \nneeded. After installation, you can navigate to System > API in the pfSense webConfigurator to configure API\nauthentication.\n\nTo authenticate your API call, follow the instructions for your configured authentication mode:\n\n<details>\n    <summary>Local Database (default)</summary>\n\nUses the same credentials as the pfSense webConfigurator. To authenticate API calls, simply add a `client-id` value containing your username and a `client-token` value containing your password to your payload. For example `{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}`\n\n</details>\n\n<details>\n    <summary>JWT</summary>\n\nRequires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a `client-id` value containing your pfSense username and a `client-token` value containing your pfSense password to your payload. For example `{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}`. Once you have your bearer token, you can authenticate your API call by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)\n</details>\n\n<details>\n    <summary>API Token</summary>\n\nUses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication and not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by adding a `client-id` value containing yourAPI token client ID and a `client-token` value containing your API token client token to your payload. (e.g. `{\"client-id\": \"cccdj-311s\", \"client-token\": \"42jkjl-k234jlk1b38123kj3kjl-ffwzzuilaei\"}`\n</details>\n\n### Authorization\npfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.\n\n\n# Response Codes\n`200 (OK)` : API call succeeded<br>\n`400 (Bad Request)` : An error was found within your requested parameters<br>\n`401 (Unauthorized)` : API client has not completed authentication or authorization successfully<br>\n`403 (Forbidden)` : The API endpoint has refused your call. Commonly due to your access settings found in System > API<br>\n`404 (Not found)` : Either the API endpoint or requested data was not found<br>\n`500 (Server error)` : The API endpoint encountered an unexpected error processing your API request<br>\n\n\n# Error Codes\nA full list of error codes can be found by navigating to /api/v1/system/api/errors/ after installation. This will return\n JSON data containing each error code and their corresponding error message. No authentication is required to view the \n error code library. This also makes API integration with third-party software easy as the API error codes and messages \n are always just an HTTP call away!\n\n\n# Queries\npfSense API contains an advanced query engine to make it easy to query specific data from API alls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you like to, in order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field. \n<details>\n    <summary>Targetting Objects</summary>\n    \nYou may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns a response like this without a query:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you want the endpoint to only return the objects that had their `type` set to `type1` you could add `{\"type\": \"type1\"}` to your payload. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n    ]\n}\n```\n\nAdditionally, if you need to target values that are nested within an array, you could add `{\"extra__tag\": 100}` to recursively target the `tag` value within the `extra` array. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n</details>\n\n<details>\n    <summary>Query Filters</summary>\n    \nQuery filters allow you to apply logic to the objects you target. This makes it easy to target data that meets certain criteria:\n\n### Starts With\n    \nThe `startswith` filter allows you to target objects whose values start with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names started with `Other`, you could use the payload `{\"name__startswith\": \"Other\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n### Ends With\n    \nThe `endswith` filter allows you to target objects whose values end with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names ended with `er Test`, you could use the payload `{\"name__endswith\" \"er Test\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}    \n    ]\n}\n```\n\n### Contains\n    \nThe `contains` filter allows you to target objects whose values contain a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names contain `ther`, you could use the payload `{\"name__contains\": \"ther\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}    \n    ]\n}\n```\n\n### Less Than\n    \nThe `lt` filter allows you to target objects whose values are less than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is less than `100`, you could use the payload `{\"extra__tag__lt\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}  \n    ]\n}\n```\n\n### Less Than or Equal To\n    \nThe `lte` filter allows you to target objects whose values are less than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is less than or equal to `100`, you could use the payload `{\"extra__tag__lte\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}},\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n### Greater Than\n    \nThe `gt` filter allows you to target objects whose values are greater than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is greater than `100`, you could use the payload `{\"extra__tag__gt\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}  \n    ]\n}\n```\n\n### Greater Than or Equal To\n    \nThe `lte` filter allows you to target objects whose values are greater than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is greater than or equal to `100`, you could use the payload `{\"extra__tag__gte\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n    ]\n}\n```\n\n</details>\n\n### Requirements for queries:\n- API call must be successful and return `0` in the `return` field.\n- Endpoints must return an array of objects in the data field (e.g. `[{\"id\": 0, \"name\": \"Test\"}, {\"id\": 1, \"name\": \"Other Test\"}]`).\n- At least two objects must be present within the array to support queries.\n- If an array is being used in a query, it must much the target data completely and exactly. There are no recursive queries.\n\n### Notes:\n- For those using the Local database or API token authentication types, `client-id` and `client-token` are excluded from queries\n\n\n# Rate limit\nThere is no limit to API calls at this time but is important to note that pfSense's XML configuration was not designed for quick simultaneous writes like a traditional database. It may be necessary to delay API calls in sequence to prevent unexpected behavior. Alternatively, you may limit the API to read-only mode to only allow endpoints with read (GET) access within the webConfigurator's System > API page.\n\n\n# Endpoints",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -63,7 +63,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \n}"
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/ldap",
@@ -97,7 +100,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"TEST_AUTHSERVER\",\n\t\"host\": \"ldap.com\",\n\t\"ldap_port\": 636,\n\t\"ldap_urltype\": \"encrypted\",\n\t\"ldap_protver\": \"3\",\n\t\"ldap_timeout\": 12,\n\t\"ldap_scope\": \"subtree\",\n\t\"ldap_basedn\": \"dc=test,dc=com\",\n    \"ldap_authcn\": \"ou=people,dc=test,dc=com;ou=groups,dc=test,dc=com\",\n    \"ldap_attr_user\": \"uid\",\n    \"ldap_attr_group\": \"cn\",\n    \"ldap_attr_member\": \"memberof\",\n    \"ldap_attr_groupobj\": \"posixGroup\",\n    \"ldap_binddn\": \"cn=pfsense,dc=test,dc=com\",\n    \"ldap_bindpw\": \"asdf\",\n    \"active\": false\n}"
+									"raw": "{\n\t\"name\": \"TEST_AUTHSERVER\",\n\t\"host\": \"ldap.com\",\n\t\"ldap_port\": 636,\n\t\"ldap_urltype\": \"encrypted\",\n\t\"ldap_protver\": \"3\",\n\t\"ldap_timeout\": 12,\n\t\"ldap_scope\": \"subtree\",\n\t\"ldap_basedn\": \"dc=test,dc=com\",\n    \"ldap_authcn\": \"ou=people,dc=test,dc=com;ou=groups,dc=test,dc=com\",\n    \"ldap_attr_user\": \"uid\",\n    \"ldap_attr_group\": \"cn\",\n    \"ldap_attr_member\": \"memberof\",\n    \"ldap_attr_groupobj\": \"posixGroup\",\n    \"ldap_binddn\": \"cn=pfsense,dc=test,dc=com\",\n    \"ldap_bindpw\": \"asdf\",\n    \"active\": false\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/ldap?name=string&host=string&ldap_port=string or integer&ldap_urltype=string&ldap_protver=string or integer&ldap_scope=string&ldap_basedn=string&ldap_authcn=string&ldap_extended_query=string&ldap_binddn=string&ldap_bindpw=string&ldap_attr_user=string&ldap_attr_group=string&ldap_attr_member=string&ldap_attr_groupobj=string&ldap_utf8=boolean&ldap_timeout=string or integer&active=boolean",
@@ -223,7 +229,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"LDAP_AUTHSERVER_0\"\n}"
+									"raw": "{\n\t\"name\": \"LDAP_AUTHSERVER_0\"\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/ldap?name=string",
@@ -264,7 +273,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"test\"\n}"
+									"raw": "{\n\t\"name\": \"test\"\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/radius?name=string",
@@ -305,7 +317,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"test\"\n}"
+									"raw": "{\n\t\"name\": \"test\"\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server?name=string",
@@ -4786,7 +4801,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"id\": 0\n}",
+											"raw": "{\n    \"id\": 0,\n    \"apply\": true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -5078,6 +5093,283 @@
 					"name": "DHCPD",
 					"item": [
 						{
+							"name": "STATIC_MAPPING",
+							"item": [
+								{
+									"name": "Read DHCPd Static Mappings",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"interface\": \"lan\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/dhcpd/static_mapping?interface=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"dhcpd",
+												"static_mapping"
+											],
+											"query": [
+												{
+													"key": "interface",
+													"value": "string",
+													"description": "Specify which interface to read static mappings from"
+												}
+											]
+										},
+										"description": "Read the current DHCPd static mappings.<br>\n\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Create DHCPd Static Mappings",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"interface\": \"lan\",\n    \"mac\": \"ac:de:48:00:11:22\",\n    \"ipaddr\": \"192.168.1.254\",\n    \"cid\": \"a098b-zpe9s-1vr45\",\n    \"descr\": \"This is a DHCP static mapping created by pfSense API\",\n    \"hostname\": \"test-host\",\n    \"domain\": \"example.com\",\n    \"dnsserver\": [\"1.1.1.1\"],\n    \"domainsearchlist\": [\"example.com\"],\n    \"gateway\": \"192.168.1.1\",\n    \"arp_table_static_entry\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/dhcpd/static_mapping?interface=string&mac=string&ipaddr=string&cid=string&hostname=string&domain=string&descr=string&dnsserver=string or array&domainsearchlist=string or array &gateway=string&arp_table_static_entry=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"dhcpd",
+												"static_mapping"
+											],
+											"query": [
+												{
+													"key": "interface",
+													"value": "string",
+													"description": "Specify which interface to create the static mapping"
+												},
+												{
+													"key": "mac",
+													"value": "string",
+													"description": "Specify the full MAC address of the host this static mapping Is for"
+												},
+												{
+													"key": "ipaddr",
+													"value": "string",
+													"description": "Specify the IPv4 address the MAC address will be assigned"
+												},
+												{
+													"key": "cid",
+													"value": "string",
+													"description": "Specify a client identifier (optional)"
+												},
+												{
+													"key": "hostname",
+													"value": "string",
+													"description": "Specify a hostname for this host (optional)"
+												},
+												{
+													"key": "domain",
+													"value": "string",
+													"description": "Specify a domain for this host (optional)"
+												},
+												{
+													"key": "descr",
+													"value": "string",
+													"description": "Specify a description for this mapping (optional)"
+												},
+												{
+													"key": "dnsserver",
+													"value": "string or array",
+													"description": "Specify the DNS servers to assign this client. Multiple values may be passed in as an array or single values may be passed in as a string. Each value must be a valid IPv4 address. Alternatively, you may pass In an empty array to revert to the system default. (optional)"
+												},
+												{
+													"key": "domainsearchlist",
+													"value": "string or array ",
+													"description": "Specify the search domains to assign to this host. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid doman name. (optional)"
+												},
+												{
+													"key": "gateway",
+													"value": "string",
+													"description": "Specify the gateway to assign this host. This value must be a valid IPv4 address within the Interface's subnet. Alternatively, you can pass In an empty string to revert to the system default. (optional)"
+												},
+												{
+													"key": "arp_table_static_entry",
+													"value": "boolean",
+													"description": "Specify whether or not a static ARP entry should be created for this host (optional)"
+												}
+											]
+										},
+										"description": "Create new DHCPd static mappings.<br>\n\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Update DHCPd Static Mappings",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": 0,\n    \"interface\": \"lan\",\n    \"mac\": \"ac:de:48:00:11:22\",\n    \"ipaddr\": \"192.168.1.250\",\n    \"cid\": \"updated-a098b-zpe9s-1vr45\",\n    \"descr\": \"This is an updated DHCP static mapping created by pfSense API\",\n    \"hostname\": \"updated-test-host\",\n    \"domain\": \"updated.example.com\",\n    \"dnsserver\": [\"8.8.8.8\", \"8.8.4.4\", \"1.1.1.1\"],\n    \"domainsearchlist\": [\"updated.example.com\", \"extra.example.com\"],\n    \"gateway\": \"192.168.1.2\",\n    \"arp_table_static_entry\": false\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/dhcpd/static_mapping?id=integer&interface=string&mac=string&ipaddr=string&cid=string&hostname=string&domain=string&descr=string&dnsserver=string or array&domainsearchlist=string or array &gateway=string&arp_table_static_entry=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"dhcpd",
+												"static_mapping"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "integer",
+													"description": "Specify the ID of the static mapping to update"
+												},
+												{
+													"key": "interface",
+													"value": "string",
+													"description": "Specify which interface to update the static mapping"
+												},
+												{
+													"key": "mac",
+													"value": "string",
+													"description": "Update the full MAC address of the host this static mapping Is for"
+												},
+												{
+													"key": "ipaddr",
+													"value": "string",
+													"description": "Update the IPv4 address the MAC address will be assigned"
+												},
+												{
+													"key": "cid",
+													"value": "string",
+													"description": "Update the client identifier (optional)"
+												},
+												{
+													"key": "hostname",
+													"value": "string",
+													"description": "Update the hostname for this host (optional)"
+												},
+												{
+													"key": "domain",
+													"value": "string",
+													"description": "Update the domain for this host (optional)"
+												},
+												{
+													"key": "descr",
+													"value": "string",
+													"description": "Update the description for this mapping (optional)"
+												},
+												{
+													"key": "dnsserver",
+													"value": "string or array",
+													"description": "Update the DNS servers to assign this client. Multiple values may be passed in as an array or single values may be passed in as a string. Each value must be a valid IPv4 address. Alternatively, you may pass In an empty array to revert to the system default. (optional)"
+												},
+												{
+													"key": "domainsearchlist",
+													"value": "string or array ",
+													"description": "Update the search domains to assign to this host. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid doman name. (optional)"
+												},
+												{
+													"key": "gateway",
+													"value": "string",
+													"description": "Update the gateway to assign this host. This value must be a valid IPv4 address within the Interface's subnet. Alternatively, you can pass In an empty string to revert to the system default. (optional)"
+												},
+												{
+													"key": "arp_table_static_entry",
+													"value": "boolean",
+													"description": "Update whether or not a static ARP entry should be created for this host (optional)"
+												}
+											]
+										},
+										"description": "Update existing DHCPd static mappings.<br>\n\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete DHCPd Static Mappings",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": 0,\n    \"interface\": \"lan\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/dhcpd/static_mapping?id=integer&interface=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"dhcpd",
+												"static_mapping"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "integer",
+													"description": "Specify the ID of the static mapping to delete"
+												},
+												{
+													"key": "interface",
+													"value": "string",
+													"description": "Specify which interface to update the static mapping"
+												}
+											]
+										},
+										"description": "Delete existing DHCPd static mappings.<br>\n\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints to create, read, update and delete DHCP static mappings",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
 							"name": "Start DHCPd Service",
 							"request": {
 								"method": "POST",
@@ -5106,6 +5398,133 @@
 									]
 								},
 								"description": "Start the dhcpd service.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Read DHCPd Service Configuration",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/dhcpd",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"services",
+										"dhcpd"
+									]
+								},
+								"description": "Read the current DHCPd configuration.<br>\n\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserverpage-services-dhcpserver`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Update DHCPd Service Configuration",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"interface\": \"lan\",\n    \"enable\": true,\n    \"ignorebootp\": false,\n    \"denyunknown\": false,\n    \"range_from\": \"192.168.1.25\",\n    \"range_to\": \"192.168.1.50\",\n    \"dnsserver\": [\"1.1.1.1\"],\n    \"gateway\": \"192.168.1.2\",\n    \"domainsearchlist\": [\"example.com\"],\n    \"domain\": \"example.com\",\n    \"mac_allow\": [\"00:00:00:01:E5:FF\", \"00:00:00:01:E5\"],\n    \"mac_deny\": []\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/dhcpd?interface=string&enable=boolean&range_from=string&range_to=string&dnsserver=string or array&domain=string&domainsearchlist=string or array&mac_allow=string or array&mac_deny=string or array&gateway=string&ignorebootp=boolean&denyunknown=boolean",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"services",
+										"dhcpd"
+									],
+									"query": [
+										{
+											"key": "interface",
+											"value": "string",
+											"description": "Specify which interface's DHCP configuration to update. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). This Interface must host a static IPv4 subnet that has more than one available within the subnet."
+										},
+										{
+											"key": "enable",
+											"value": "boolean",
+											"description": "Enable or disable the DHCP server for this Interface (optional)"
+										},
+										{
+											"key": "range_from",
+											"value": "string",
+											"description": "Update the DHCP pool's start IPv4 address. This must be an available address within the Interface's subnet and be less than the `range_to` value. (optional)"
+										},
+										{
+											"key": "range_to",
+											"value": "string",
+											"description": "Update the DHCP pool's end IPv4 address. This must be an available address within the Interface's subnet and be greater than the `range_from` value. (optional)"
+										},
+										{
+											"key": "dnsserver",
+											"value": "string or array",
+											"description": "Update the DNS servers to include In DHCP leases. Multiple values may be passed in as an array or single values may be passed in as a string. Each value must be a valid IPv4 address. Alternatively, you may pass In an empty array to revert to the system default. (optional)"
+										},
+										{
+											"key": "domain",
+											"value": "string",
+											"description": "Update the domain name to Include In the DHCP lease. This must be a valid domain name or an empty string to assume the system default (optional)"
+										},
+										{
+											"key": "domainsearchlist",
+											"value": "string or array",
+											"description": "Update the search domains to include In the DHCP lease. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid doman name. (optional)"
+										},
+										{
+											"key": "mac_allow",
+											"value": "string or array",
+											"description": "Update the list of allowed MAC addresses. You may pass In an array for multiple entries or a string for single entries. Each entry must be a full or partial MAC address. Alternatively, you may specify an empty array to revert to default (optional)"
+										},
+										{
+											"key": "mac_deny",
+											"value": "string or array",
+											"description": "Update the list of denied MAC addresses. You may pass In an array for multiple entries or a string for single entries. Each entry must be a full or partial MAC address. Alternatively, you may specify an empty array to revert to default (optional)"
+										},
+										{
+											"key": "gateway",
+											"value": "string",
+											"description": "Update the gateway to include In DHCP leases. This value must be a valid IPv4 address within the Interface's subnet. Alternatively, you can pass In an empty string to revert to the system default. (optional)"
+										},
+										{
+											"key": "ignorebootp",
+											"value": "boolean",
+											"description": "Update whether or not to ignore BOOTP requests. True to Ignore, false to allow. (optional)"
+										},
+										{
+											"key": "denyunknown",
+											"value": "boolean",
+											"description": "Update whether or not to ignore unknown MAC addresses. If true, you must specify MAC addresses in the `mac_allow` field or add a static DHCP entry to receive DHCP requests. (optional)"
+										}
+									]
+								},
+								"description": "Update the current DHCPd configuration.<br>\n\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserverpage-services-dhcpserver`]"
 							},
 							"response": []
 						},
