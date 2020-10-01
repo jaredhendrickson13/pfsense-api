@@ -119,7 +119,6 @@ class APIAuth {
         $authorized = false;
         $client_config =& getUserEntry($this->username);;
         $this->privs = get_user_privileges($client_config);
-        $read_only = array_key_exists("readonly", $this->api_config);
 
         # If no require privileges were given, assume call is always authorized
         if (!empty($this->req_privs)) {

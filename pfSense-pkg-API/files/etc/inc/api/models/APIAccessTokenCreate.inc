@@ -21,7 +21,7 @@ class APIAccessTokenCreate extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->set_auth_mode = "local";
-        $this->set_read_mode = false;
+        $this->bypass_read_mode = false;
     }
 
     # Validate our API configurations auth mode (must be JWT)

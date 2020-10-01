@@ -98,6 +98,7 @@ if (isset($_POST["save"])) {
     $config["installedpackages"]["package"][$pkg_index]["conf"] = $api_config;
     $change_note = " Updated API settings";
     write_config(sprintf(gettext($change_note)));
+    APITools\create_jwt_server_key();
     print_apply_result_box(0);
 }
 
