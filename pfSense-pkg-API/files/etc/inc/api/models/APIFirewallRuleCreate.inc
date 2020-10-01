@@ -34,6 +34,9 @@ class APIFirewallRuleCreate extends APIModel {
     }
 
     public function validate_payload() {
+        # Include static rule ID
+        $this->validated_data["id"] = "";
+
         # Check for our required 'type' payload value
         if (isset($this->initial_data["type"])) {
             $type_options = array("pass", "block", "reject");
@@ -179,8 +182,8 @@ class APIFirewallRuleCreate extends APIModel {
 
 
         # Check for our optional 'disabled' payload value
-        if ($this->initial_data['disabled'] !== true) {
-            $this->validated_data["id"] = "";
+        if ($this->initial_data['disabled'] === true) {
+            $this->validated_data["disabled"] = "";
         }
 
         # Check for our optional 'descr' payload value

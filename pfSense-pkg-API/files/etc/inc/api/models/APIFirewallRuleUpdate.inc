@@ -51,7 +51,7 @@ class APIFirewallRuleUpdate extends APIModel {
             $this->errors[] = APIResponse\get(4031);
         }
 
-        # Check for our required 'type' payload value
+        # Check for our optional 'type' payload value
         if (isset($this->initial_data["type"])) {
             $type_options = array("pass", "block", "reject");
             # Ensure our type is a valid option
@@ -62,7 +62,7 @@ class APIFirewallRuleUpdate extends APIModel {
             }
         }
 
-        # Check for our required 'interface' payload value
+        # Check for our optional 'interface' payload value
         if (isset($this->initial_data['interface'])) {
             $this->initial_data['interface'] = APITools\get_pfsense_if_id($this->initial_data['interface']);
             # Check that we found the request pfSense interface ID
@@ -73,7 +73,7 @@ class APIFirewallRuleUpdate extends APIModel {
             }
         }
 
-        # Check for our required 'ipprotocol' payload value
+        # Check for our optional 'ipprotocol' payload value
         if (isset($this->initial_data['ipprotocol'])) {
             $ipprotocol_options = array("inet", "inet6", "inet46");
             # Check that our ipprotocol value is a support option
@@ -84,13 +84,21 @@ class APIFirewallRuleUpdate extends APIModel {
             }
         }
 
-        # Check for our required 'protocol' payload value
+        # Check for our optional 'protocol' payload value
         if (isset($this->initial_data['protocol'])) {
-            $port_required = (!in_array($this->validated_data["protocol"], ["tcp", "udp", "tcp/udp"])) ? true : false;
+            $missing_port = (!in_array($this->validated_data["protocol"], ["tcp", "udp", "tcp/udp"])) ? true : false;
+            $requires_port = (in_array($this->initial_data["protocol"], ["tcp", "udp", "tcp/udp"])) ? true : false;
             $protocol_options = [
                 "any", "tcp", "udp", "tcp/udp", "icmp", "esp", "ah",
                 "gre", "ipv6", "igmp", "pim", "ospf", "carp", "pfsync"
             ];
+
+            # If a new protocol was chosen that doesn't require a port, remove existing ports from the rule
+            if ((!in_array($this->initial_data["protocol"], ["tcp", "udp", "tcp/udp"]))) {
+                unset($this->validated_data["source"]["port"]);
+                unset($this->validated_data["destination"]["port"]);
+            }
+
             # Check that our protocol value is a support option
             if (in_array($this->initial_data["protocol"], $protocol_options)) {
                 # Don't add a specific protocol if any
@@ -102,9 +110,10 @@ class APIFirewallRuleUpdate extends APIModel {
             } else {
                 $this->errors[] = APIResponse\get(4042);
             }
-            $protocol = $this->initial_data['protocol'];
         } else {
-            $this->errors[] = APIResponse\get(4036);
+            # If a new protocol was not selected don't validate ports
+            $requires_port = false;
+            $missing_port = false;
         }
 
         # Check for our optional 'icmpsubtype' payload value when our protocol is set to ICMP
@@ -130,7 +139,7 @@ class APIFirewallRuleUpdate extends APIModel {
             }
         }
 
-        # Check for our required 'src' payload value
+        # Check for our optional 'src' payload value
         if (isset($this->initial_data['src'])) {
             // Check if our source and destination values are valid
             $dir_check = APITools\is_valid_rule_addr($this->initial_data['src'], "source");
@@ -141,7 +150,7 @@ class APIFirewallRuleUpdate extends APIModel {
             }
         }
 
-        # Check for our required 'src' payload value
+        # Check for our optional 'src' payload value
         if (isset($this->initial_data['dst'])) {
             // Check if our source and destination values are valid
             $dir_check = APITools\is_valid_rule_addr($this->initial_data['dst'], "destination");
@@ -152,8 +161,8 @@ class APIFirewallRuleUpdate extends APIModel {
             }
         }
 
-        # Check for our required 'srcport' and 'dstport' payload values if protocol is TCP, UDP or TCP/UDP
-        if ($port_required && in_array($this->initial_data["protocol"], ["tcp", "udp", "tcp/udp"])) {
+        # Check for our optional 'srcport' and 'dstport' payload values if protocol is TCP, UDP or TCP/UDP
+        if ($requires_port) {
             if (isset($this->initial_data['srcport'])) {
                 $val = str_replace("-", ":", $this->initial_data['srcport']);
                 if (!is_port_or_range($val) and $val !== "any") {
@@ -161,7 +170,7 @@ class APIFirewallRuleUpdate extends APIModel {
                 } elseif ($val !== "any") {
                     $this->validated_data["source"]["port"] = str_replace(":", "-", $val);;
                 }
-            } else {
+            } elseif ($missing_port) {
                 $this->errors[] = APIResponse\get(4047);
             }
 
@@ -172,7 +181,7 @@ class APIFirewallRuleUpdate extends APIModel {
                 } elseif ($val !== "any") {
                     $this->validated_data["destination"]["port"] = str_replace(":", "-", $val);;
                 }
-            } else {
+            } elseif ($missing_port) {
                 $this->errors[] = APIResponse\get(4047);
             }
         }
@@ -189,8 +198,10 @@ class APIFirewallRuleUpdate extends APIModel {
 
 
         # Check for our optional 'disabled' payload value
-        if ($this->initial_data['disabled'] !== true) {
-            $this->validated_data["id"] = "";
+        if ($this->initial_data['disabled'] === true) {
+            $this->validated_data["disabled"] = "";
+        } elseif ($this->initial_data['disabled'] === false) {
+            unset($this->validated_data["disabled"]);
         }
 
         # Check for our optional 'descr' payload value
