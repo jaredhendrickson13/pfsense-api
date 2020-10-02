@@ -123,7 +123,7 @@ class APIAuth {
         # If no require privileges were given, assume call is always authorized
         if (!empty($this->req_privs)) {
             # If API is in readonly mode, only allow GET requests
-            if ($this->read_mode === false or ($this->read_mode === true and $_SERVER['REQUEST_METHOD'] === "GET")) {
+            if (!$this->read_mode or ($this->read_mode and $_SERVER['REQUEST_METHOD'] === "GET")) {
                 # Loop through each of our req privs and ensure the client has them, also check if access is read only
                 foreach ($this->req_privs as &$priv) {
                     if (in_array($priv, $this->privs)) {

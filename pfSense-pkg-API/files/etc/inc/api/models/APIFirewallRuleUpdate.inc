@@ -88,16 +88,11 @@ class APIFirewallRuleUpdate extends APIModel {
         if (isset($this->initial_data['protocol'])) {
             $missing_port = (!in_array($this->validated_data["protocol"], ["tcp", "udp", "tcp/udp"])) ? true : false;
             $requires_port = (in_array($this->initial_data["protocol"], ["tcp", "udp", "tcp/udp"])) ? true : false;
+            $this->unset_ports();
             $protocol_options = [
                 "any", "tcp", "udp", "tcp/udp", "icmp", "esp", "ah",
                 "gre", "ipv6", "igmp", "pim", "ospf", "carp", "pfsync"
             ];
-
-            # If a new protocol was chosen that doesn't require a port, remove existing ports from the rule
-            if ((!in_array($this->initial_data["protocol"], ["tcp", "udp", "tcp/udp"]))) {
-                unset($this->validated_data["source"]["port"]);
-                unset($this->validated_data["destination"]["port"]);
-            }
 
             # Check that our protocol value is a support option
             if (in_array($this->initial_data["protocol"], $protocol_options)) {
@@ -196,7 +191,6 @@ class APIFirewallRuleUpdate extends APIModel {
             }
         }
 
-
         # Check for our optional 'disabled' payload value
         if ($this->initial_data['disabled'] === true) {
             $this->validated_data["disabled"] = "";
@@ -224,5 +218,14 @@ class APIFirewallRuleUpdate extends APIModel {
             "time" => time(),
             "username" => $this->client->username."@".$this->client->ip_address." (API)"
         ];
+    }
+
+    # Removes port specifications when updating to a protocol that is not port based
+    private function unset_ports() {
+        # If a new protocol was chosen that doesn't require a port, remove existing ports from the rule
+        if ((!in_array($this->initial_data["protocol"], ["tcp", "udp", "tcp/udp"]))) {
+            unset($this->validated_data["source"]["port"]);
+            unset($this->validated_data["destination"]["port"]);
+        }
     }
 }

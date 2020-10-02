@@ -21,22 +21,29 @@ webConfigurator are required to make calls to the API endpoints
 # Installation
 To install pfSense API, simply run the following command from the pfSense shell:<br>
 ```
-pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/download/v1.0.0/pfSense-2-4-pkg-API-1.0_0.txz && /etc/rc.restart_webgui
+pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.4-pkg-API.txz && /etc/rc.restart_webgui
 ```
 
-To uninstall, run the following command:<br>
+To uninstall pfSense API, run the following command:<br>
 ```
 pkg delete pfSense-pkg-API
 ```
 
+To update pfSense API to latest version, run the following command:
+```
+pkg delete pfSense-pkg-API && pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.4-pkg-API.txz && /etc/rc.restart_webgui
+```
+
 ### Notes: 
+- pfSense API is supported on the pfSense 2.5 developer snapshots. To install the 2.5 package, simply change the `2.4` in the install URL to `2.5`.
 - In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package
 - If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to 
 'Diagnostics > Command Prompt' and enter the commands there
+- When updating pfSense, **_you must reinstall pfSense API afterwards_**. Unfortunately, pfSense removes all existing packages and only reinstalls packages found within pfSense's package repositories. Since pfSense API is not an official package in pfSense's repositories, it does not get reinstalled automatically.
 
 
 # UI Settings & Documentation
-After installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System > API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation with context to your pfSense instance.
+After installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System > API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation in context to your pfSense instance.
 
 ### Notes: 
 - Users must hold the `page-all` or `page-system-api` privileges to access the API page within the webConfigurator

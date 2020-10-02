@@ -100,8 +100,8 @@ writing a model that tests user's local database credentials and do not want the
 auth mode you would specify `$this->set_auth_mode = "local";` to always force local authentication. Defaults to the 
 API's configured auth mode in the /api/ webConfigurator page.
 
-- `$this->set_read_mode` : Allows the read only API setting to be bypassed for this model. If you set this value to 
-`true` the model will be allowed to use POST, PUT or DELETE methods even when the API is in read only mode. There is 
+- `$this->set_read_mode` : Allows the read-only API setting to be bypassed for this model. If you set this value to 
+`true` the model will be allowed to use POST, PUT or DELETE methods even when the API is in read-only mode. There is 
 rarely a use case for this. Do not override this property unless absolutely needed. 
 
 - `$this->change_note` : Sets the description of the action that occurred via API. This value will be shown in the 

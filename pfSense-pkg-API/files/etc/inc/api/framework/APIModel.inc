@@ -37,12 +37,8 @@ class APIModel {
         error_reporting(E_ERROR);
         $this->config =& $config;
         $this->privileges = ["page-all"];
-        $this->client = null;
         $this->requires_auth = true;
-        $this->set_auth_mode = null;
-        $this->bypass_read_mode = null;
         $this->change_note = "Made unknown change via API";
-        $this->id = null;
         $this->validate_id = true;
         $this->initial_data = APITools\get_request_data();
         $this->validated_data = [];
