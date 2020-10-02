@@ -1,4 +1,4 @@
-# Copyright [2020] [Jared Hendrickson]
+# Copyright 2020 Jared Hendrickson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,18 @@ import subprocess
 
 # Variables
 args = None
+php = """<?php
+require_once("api/framework/APITools.inc");
+session_start();
+
+$user_privs = get_user_privileges(getUserEntry($_SESSION["Username"]));
+# Redirect user if they do not have privilege to access this page
+if (!in_array("page-system-api", $user_privs) and !in_array("page-all", $user_privs)) {
+    header("Location: /");
+    exit();
+}
+?>
+"""
 css = """
 <style>
     body {
@@ -140,7 +152,7 @@ def format_docs():
 
     # Write a new PHP script containing the HTML created by docgen, then override custom attributes and CSS
     with open("documentation.php", "w") as dw:
-        html_doc = "<?php\n?>\n" + html_doc
+        html_doc = php + html_doc
         html_doc = html_doc + css
         html_doc = html_doc.replace("{{$hostname}}", "<?echo $_SERVER['HTTP_HOST'];?>")
         dw.write(html_doc)

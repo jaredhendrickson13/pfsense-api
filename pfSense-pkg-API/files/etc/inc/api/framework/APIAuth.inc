@@ -20,6 +20,7 @@ class APIAuth {
     private $api_config;
     private $request;
     public $auth_mode;
+    public $read_mode;
     public $req_privs;
     public $username;
     public $privs;
@@ -28,9 +29,10 @@ class APIAuth {
     public $is_authorized;
 
     # Create our method constructor
-    public function __construct($req_privs, $enforce_auth_mode=null){
+    public function __construct($req_privs, $enforce_auth_mode=null, $read_mode=null){
         $this->api_config = APITools\get_api_config()[1];
         $this->auth_mode = (is_null($enforce_auth_mode)) ? $this->api_config["authmode"] : $enforce_auth_mode;
+        $this->read_mode = (is_null($read_mode)) ? array_key_exists("readonly", $this->api_config) : $read_mode;
         $this->request = APITools\get_request_data();
         $this->req_privs = $req_privs;
         $this->privs = [];
@@ -113,17 +115,16 @@ class APIAuth {
     # AUTHORIZATION #
     # Checks if the current user has the necessary privileges to access this resource
     public function authorize() {
-        // Local variables
+        # Local variables
         $authorized = false;
         $client_config =& getUserEntry($this->username);;
         $this->privs = get_user_privileges($client_config);
-        $read_only = array_key_exists("readonly", $this->api_config);
 
         # If no require privileges were given, assume call is always authorized
         if (!empty($this->req_privs)) {
-            // Ensure our API is not read only OR if it is read only, only authorize the request if it is a GET request
-            if ($read_only === false or ($read_only === true and $_SERVER['REQUEST_METHOD'] === "GET")) {
-                // Loop through each of our req privs and ensure the client has them, also check if access is read only
+            # If API is in readonly mode, only allow GET requests
+            if (!$this->read_mode or ($this->read_mode and $_SERVER['REQUEST_METHOD'] === "GET")) {
+                # Loop through each of our req privs and ensure the client has them, also check if access is read only
                 foreach ($this->req_privs as &$priv) {
                     if (in_array($priv, $this->privs)) {
                         $authorized = true;

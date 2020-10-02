@@ -30,17 +30,15 @@ class APIModel {
     public $change_note;
     public $requires_auth;
     public $set_auth_mode;
+    public $bypass_read_mode;
 
     public function __construct() {
         global $config;
         error_reporting(E_ERROR);
         $this->config =& $config;
         $this->privileges = ["page-all"];
-        $this->client = null;
         $this->requires_auth = true;
-        $this->set_auth_mode = null;
         $this->change_note = "Made unknown change via API";
-        $this->id = null;
         $this->validate_id = true;
         $this->initial_data = APITools\get_request_data();
         $this->validated_data = [];
@@ -95,7 +93,7 @@ class APIModel {
     }
 
     private function check_authentication() {
-        $this->client = new APIAuth($this->privileges, $this->set_auth_mode);
+        $this->client = new APIAuth($this->privileges, $this->set_auth_mode, $this->bypass_read_mode);
         if ($this->requires_auth === true) {
             if (!$this->client->is_authenticated) {
                 $this->errors[] = APIResponse\get(3);
