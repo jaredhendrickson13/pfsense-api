@@ -30,14 +30,24 @@ require_once("auth.inc");
 require_once("functions.inc");
 use Firebase\JWT\JWT;
 
-# Gathers our URL form encoded data or JSON body data from our request and places them in a single array
+# Checks our content type header and parses the content accordingly
 function get_request_data() {
-    $data = $_GET;    // Accept HTTP requests in URL encoded format
-    // Check if our URL encoded parameters are empty, if so try JSON encoded parameters
-    if (empty($data)) {
-        $data = json_decode(file_get_contents('php://input'), true);
+    # Support application/x-www-form-urlencoded content type
+    if (strtolower($_SERVER["HTTP_CONTENT_TYPE"] === "application/x-www-form-urlencoded")) {
+        return $_GET;
     }
-    return $data;
+    # Support application/json content type
+    elseif (strtolower($_SERVER["HTTP_CONTENT_TYPE"] === "application/json")) {
+        return json_decode(file_get_contents('php://input'), true);
+    }
+    # If a static content type was not provided, attempt to determine the content type
+    else {
+        if (!empty($_GET)) {
+            return $_GET;
+        } else {
+            return json_decode(file_get_contents('php://input'), true);
+        }
+    }
 }
 
 # Check our local pfSense version
