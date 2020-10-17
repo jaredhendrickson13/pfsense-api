@@ -32,13 +32,20 @@ use Firebase\JWT\JWT;
 
 # Checks our content type header and parses the content accordingly
 function get_request_data() {
-    # Support application/x-www-form-urlencoded content type
-    if (strtolower($_SERVER["HTTP_CONTENT_TYPE"] === "application/x-www-form-urlencoded")) {
-        return $_GET;
-    }
-    # Support application/json content type
-    elseif (strtolower($_SERVER["HTTP_CONTENT_TYPE"] === "application/json")) {
-        return json_decode(file_get_contents('php://input'), true);
+    $content_types = [
+        "application/x-www-form-urlencoded" => $_GET,
+        "application/json" => json_decode(file_get_contents('php://input'), true)
+    ];
+    # If client passed in a static content type via header, attempt to parse data using that type
+    if (!empty($_SERVER["HTTP_CONTENT_TYPE"])) {
+        # Check if content type is supported, if so return corresponding parsed request data
+        if (array_key_exists($_SERVER["HTTP_CONTENT_TYPE"], $content_types)) {
+            return $content_types[$_SERVER["HTTP_CONTENT_TYPE"]];
+        }
+        # Return false if the content type is unknown or unsupported
+        else {
+            return false;
+        }
     }
     # If a static content type was not provided, attempt to determine the content type
     else {

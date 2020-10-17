@@ -81,9 +81,15 @@ function get($id, $data=[], $all=false) {
         ],
         10 => [
             "status" => "server error",
-            "code" => "500",
+            "code" => 500,
             "return" => $id,
             "message" => "Your API request was valid but no actions were specified for this endpoint",
+        ],
+        11 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Specified content type is not supported"
         ],
         // 1000-1999 reserved for /system API calls
         1000 => [

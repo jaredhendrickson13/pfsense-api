@@ -68,13 +68,20 @@ class APIModel {
     }
 
     public function validate() {
+        # Checks API status and requirements
         $this->check_enable();
         $this->check_server_ip();
         $this->check_version();
+
+        # Checks request data
+        $this->check_request_data();
+
+        # Checks authentication and authorization if required
         if ($this->requires_auth) {
             $this->check_authentication();
             $this->check_authorization();
         }
+
         $this->validate_payload();
 
         if (count($this->errors) === 0) {
@@ -150,6 +157,13 @@ class APIModel {
 
         # Return 444 response if we did not find a previous match
         $this->errors[] = APIResponse\get(6);
+    }
+
+    # Check if our requested content-type is supported and parsed data correctly, sets error if not
+    private function check_request_data() {
+        if ($this->initial_data === false) {
+            $this->errors[] = APIResponse\get(11);
+        }
     }
 
 }
