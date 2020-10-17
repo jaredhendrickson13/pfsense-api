@@ -53,7 +53,8 @@ After installation, you will be able to access the API user interface pages with
 By default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense 
 from the API out of the box, and user passwords may be changed from the API to immediately add additional security if 
 needed. After installation, you can navigate to System > API in the pfSense webConfigurator to configure API
-authentication.
+authentication. Please note that external authentication servers like LDAP or RADIUS are not supported with any 
+API authentication method at this time. 
 
 To authenticate your API call, follow the instructions for your configured authentication mode:
 
@@ -79,6 +80,81 @@ Uses standalone tokens generated via the UI. These are better suited to distribu
 ### Authorization
 pfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.
 
+
+# Content Types
+pfSense API can handle a few different content types. Please note, if a `Content-Type` header is not specified in your request pfSense API will attempt to determine the
+content type which may have undesired results. It is recommended you specify your preferred `Content-Type` on each request. While several content types may be enabled,
+`application/json` is the recommended content type. Supported content types are:
+
+<details>
+    <summary>application/json</summary>
+
+Parses the request body as a JSON formatted string. This is the recommended content type.
+
+Example:
+
+```
+curl -s -H "Content-Type: application/json" -d '{"client-id": "admin", "client-token": "pfsense"}' -X GET https://pfsense.example.com/api/v1/firewall/rule
+{
+  "status": "ok",
+  "code": 200,
+  "return": 0,
+  "message": "Success",
+  "data": [
+    {
+      "ip": "192.168.1.1",
+      "mac": "00:0c:29:f6:be:d9",
+      "interface": "em1",
+      "status": "permanent",
+      "linktype": "ethernet"
+    },
+    {
+      "ip": "172.16.209.139",
+      "mac": "00:0c:29:f6:be:cf",
+      "interface": "em0",
+      "status": "permanent",
+      "linktype": "ethernet"
+    }
+  ]
+}
+```
+
+</details>
+
+<details>
+    <summary>application/x-www-form-urlencoded</summary>
+
+Parses the request body as URL encoded parameters.
+
+Example:
+
+```
+curl -s -H "Content-Type: application/x-www-form-urlencoded" -X GET "https://pfsense.example.com/api/v1/firewall/rule?client-id=admin&client-token=pfsense"
+{
+  "status": "ok",
+  "code": 200,
+  "return": 0,
+  "message": "Success",
+  "data": [
+    {
+      "ip": "192.168.1.1",
+      "mac": "00:0c:29:f6:be:d9",
+      "interface": "em1",
+      "status": "permanent",
+      "linktype": "ethernet"
+    },
+    {
+      "ip": "172.16.209.139",
+      "mac": "00:0c:29:f6:be:cf",
+      "interface": "em0",
+      "status": "permanent",
+      "linktype": "ethernet"
+    }
+  ]
+}
+```
+
+</details>
 
 # Response Codes
 `200 (OK)` : API call succeeded<br>

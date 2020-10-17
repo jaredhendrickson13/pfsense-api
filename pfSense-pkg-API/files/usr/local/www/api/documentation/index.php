@@ -50,7 +50,8 @@ After installation, you will be able to access the API user interface pages with
 By default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense
 from the API out of the box, and user passwords may be changed from the API to immediately add additional security if
 needed. After installation, you can navigate to System > API in the pfSense webConfigurator to configure API
-authentication.
+authentication. Please note that external authentication servers like LDAP or RADIUS are not supported with any
+API authentication method at this time.
 To authenticate your API call, follow the instructions for your configured authentication mode:
 <details>
 <summary>Local Database (default)</summary>
@@ -66,6 +67,70 @@ Uses standalone tokens generated via the UI. These are better suited to distribu
 </details>
 ### Authorization
 pfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.
+# Content Types
+pfSense API can handle a few different content types. Please note, if a `Content-Type` header is not specified in your request pfSense API will attempt to determine the
+content type which may have undesired results. It is recommended you specify your preferred `Content-Type` on each request. While several content types may be enabled,
+`application/json` is the recommended content type. Supported content types are:
+<details>
+<summary>application/json</summary>
+Parses the request body as a JSON formatted string. This is the recommended content type.
+Example:
+```
+curl -s -H "Content-Type: application/json" -d '{"client-id": "admin", "client-token": "pfsense"}' -X GET https://pfsense.example.com/api/v1/firewall/rule
+{
+"status": "ok",
+"code": 200,
+"return": 0,
+"message": "Success",
+"data": [
+{
+"ip": "192.168.1.1",
+"mac": "00:0c:29:f6:be:d9",
+"interface": "em1",
+"status": "permanent",
+"linktype": "ethernet"
+},
+{
+"ip": "172.16.209.139",
+"mac": "00:0c:29:f6:be:cf",
+"interface": "em0",
+"status": "permanent",
+"linktype": "ethernet"
+}
+]
+}
+```
+</details>
+<details>
+<summary>application/x-www-form-urlencoded</summary>
+Parses the request body as URL encoded parameters.
+Example:
+```
+curl -s -H "Content-Type: application/x-www-form-urlencoded" -X GET "https://pfsense.example.com/api/v1/firewall/rule?client-id=admin&client-token=pfsense"
+{
+"status": "ok",
+"code": 200,
+"return": 0,
+"message": "Success",
+"data": [
+{
+"ip": "192.168.1.1",
+"mac": "00:0c:29:f6:be:d9",
+"interface": "em1",
+"status": "permanent",
+"linktype": "ethernet"
+},
+{
+"ip": "172.16.209.139",
+"mac": "00:0c:29:f6:be:cf",
+"interface": "em0",
+"status": "permanent",
+"linktype": "ethernet"
+}
+]
+}
+```
+</details>
 # Response Codes
 `200 (OK)` : API call succeeded<br>
 `400 (Bad Request)` : An error was found within your requested parameters<br>
@@ -342,7 +407,56 @@ webConfigurator are required to make calls to the API endpoints<li>While not an 
 &lsquo;Diagnostics &gt; Command Prompt&rsquo; and enter the commands there<li>When updating pfSense, <strong><em>you must reinstall pfSense API afterwards</em></strong>. Unfortunately, pfSense removes all existing packages and only reinstalls packages found within pfSense&rsquo;s package repositories. Since pfSense API is not an official package in pfSense&rsquo;s repositories, it does not get reinstalled automatically.</ul><h1>UI Settings &amp; Documentation</h1><p>After installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System &gt; API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation in context to your pfSense instance.<h3>Notes:</h3><ul><li>Users must hold the <code>page-all</code> or <code>page-system-api</code> privileges to access the API page within the webConfigurator</ul><h1>Authentication &amp; Authorization</h1><p>By default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense
 from the API out of the box, and user passwords may be changed from the API to immediately add additional security if
 needed. After installation, you can navigate to System &gt; API in the pfSense webConfigurator to configure API
-authentication.<p>To authenticate your API call, follow the instructions for your configured authentication mode:<p><details><summary>Local Database (default)</summary><p>Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, simply add a <code>client-id</code> value containing your username and a <code>client-token</code> value containing your password to your payload. For example <code>{&quot;client-id&quot;: &quot;admin&quot;, &quot;client-token&quot;: &quot;pfsense&quot;}</code><p></details><p><details><summary>JWT</summary><p>Requires a bearer token to be included in the <code>Authorization</code> header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a <code>client-id</code> value containing your pfSense username and a <code>client-token</code> value containing your pfSense password to your payload. For example <code>{&quot;client-id&quot;: &quot;admin&quot;, &quot;client-token&quot;: &quot;pfsense&quot;}</code>. Once you have your bearer token, you can authenticate your API call by adding it to the request&rsquo;s authorization header. (e.g. <code>Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx</code>)</details><p><details><summary>API Token</summary><p>Uses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication and not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System &gt; API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by adding a <code>client-id</code> value containing yourAPI token client ID and a <code>client-token</code> value containing your API token client token to your payload. (e.g. <code>{&quot;client-id&quot;: &quot;cccdj-311s&quot;, &quot;client-token&quot;: &quot;42jkjl-k234jlk1b38123kj3kjl-ffwzzuilaei&quot;}</code></details><h3>Authorization</h3><p>pfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.<h1>Response Codes</h1><p><code>200 (OK)</code> : API call succeeded<br><code>400 (Bad Request)</code> : An error was found within your requested parameters<br><code>401 (Unauthorized)</code> : API client has not completed authentication or authorization successfully<br><code>403 (Forbidden)</code> : The API endpoint has refused your call. Commonly due to your access settings found in System &gt; API<br><code>404 (Not found)</code> : Either the API endpoint or requested data was not found<br><code>500 (Server error)</code> : The API endpoint encountered an unexpected error processing your API request<br><h1>Error Codes</h1><p>A full list of error codes can be found by navigating to /api/v1/system/api/errors/ after installation. This will return
+authentication. Please note that external authentication servers like LDAP or RADIUS are not supported with any
+API authentication method at this time.<p>To authenticate your API call, follow the instructions for your configured authentication mode:<p><details><summary>Local Database (default)</summary><p>Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, simply add a <code>client-id</code> value containing your username and a <code>client-token</code> value containing your password to your payload. For example <code>{&quot;client-id&quot;: &quot;admin&quot;, &quot;client-token&quot;: &quot;pfsense&quot;}</code><p></details><p><details><summary>JWT</summary><p>Requires a bearer token to be included in the <code>Authorization</code> header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a <code>client-id</code> value containing your pfSense username and a <code>client-token</code> value containing your pfSense password to your payload. For example <code>{&quot;client-id&quot;: &quot;admin&quot;, &quot;client-token&quot;: &quot;pfsense&quot;}</code>. Once you have your bearer token, you can authenticate your API call by adding it to the request&rsquo;s authorization header. (e.g. <code>Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx</code>)</details><p><details><summary>API Token</summary><p>Uses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication and not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System &gt; API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by adding a <code>client-id</code> value containing yourAPI token client ID and a <code>client-token</code> value containing your API token client token to your payload. (e.g. <code>{&quot;client-id&quot;: &quot;cccdj-311s&quot;, &quot;client-token&quot;: &quot;42jkjl-k234jlk1b38123kj3kjl-ffwzzuilaei&quot;}</code></details><h3>Authorization</h3><p>pfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.<h1>Content Types</h1><p>pfSense API can handle a few different content types. Please note, if a <code>Content-Type</code> header is not specified in your request pfSense API will attempt to determine the
+content type which may have undesired results. It is recommended you specify your preferred <code>Content-Type</code> on each request. While several content types may be enabled,
+<code>application/json</code> is the recommended content type. Supported content types are:<p><details><summary>application/json</summary><p>Parses the request body as a JSON formatted string. This is the recommended content type.<p>Example:<pre><code>curl -s -H &quot;Content-Type: application/json&quot; -d '{&quot;client-id&quot;: &quot;admin&quot;, &quot;client-token&quot;: &quot;pfsense&quot;}' -X GET https://pfsense.example.com/api/v1/firewall/rule
+{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;code&quot;: 200,
+  &quot;return&quot;: 0,
+  &quot;message&quot;: &quot;Success&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;ip&quot;: &quot;192.168.1.1&quot;,
+      &quot;mac&quot;: &quot;00:0c:29:f6:be:d9&quot;,
+      &quot;interface&quot;: &quot;em1&quot;,
+      &quot;status&quot;: &quot;permanent&quot;,
+      &quot;linktype&quot;: &quot;ethernet&quot;
+    },
+    {
+      &quot;ip&quot;: &quot;172.16.209.139&quot;,
+      &quot;mac&quot;: &quot;00:0c:29:f6:be:cf&quot;,
+      &quot;interface&quot;: &quot;em0&quot;,
+      &quot;status&quot;: &quot;permanent&quot;,
+      &quot;linktype&quot;: &quot;ethernet&quot;
+    }
+  ]
+}
+</code></pre><p></details><p><details><summary>application/x-www-form-urlencoded</summary><p>Parses the request body as URL encoded parameters.<p>Example:<pre><code>curl -s -H &quot;Content-Type: application/x-www-form-urlencoded&quot; -X GET &quot;https://pfsense.example.com/api/v1/firewall/rule?client-id=admin&amp;client-token=pfsense&quot;
+{
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;code&quot;: 200,
+  &quot;return&quot;: 0,
+  &quot;message&quot;: &quot;Success&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;ip&quot;: &quot;192.168.1.1&quot;,
+      &quot;mac&quot;: &quot;00:0c:29:f6:be:d9&quot;,
+      &quot;interface&quot;: &quot;em1&quot;,
+      &quot;status&quot;: &quot;permanent&quot;,
+      &quot;linktype&quot;: &quot;ethernet&quot;
+    },
+    {
+      &quot;ip&quot;: &quot;172.16.209.139&quot;,
+      &quot;mac&quot;: &quot;00:0c:29:f6:be:cf&quot;,
+      &quot;interface&quot;: &quot;em0&quot;,
+      &quot;status&quot;: &quot;permanent&quot;,
+      &quot;linktype&quot;: &quot;ethernet&quot;
+    }
+  ]
+}
+</code></pre><p></details><h1>Response Codes</h1><p><code>200 (OK)</code> : API call succeeded<br><code>400 (Bad Request)</code> : An error was found within your requested parameters<br><code>401 (Unauthorized)</code> : API client has not completed authentication or authorization successfully<br><code>403 (Forbidden)</code> : The API endpoint has refused your call. Commonly due to your access settings found in System &gt; API<br><code>404 (Not found)</code> : Either the API endpoint or requested data was not found<br><code>500 (Server error)</code> : The API endpoint encountered an unexpected error processing your API request<br><h1>Error Codes</h1><p>A full list of error codes can be found by navigating to /api/v1/system/api/errors/ after installation. This will return
 JSON data containing each error code and their corresponding error message. No authentication is required to view the
 error code library. This also makes API integration with third-party software easy as the API error codes and messages
 are always just an HTTP call away!<h1>Queries</h1><p>pfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting <code>GET</code> requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field.
@@ -1364,7 +1478,7 @@ if(IsJsonString(html)){var obj=JSON.parse(html);var formattedJson=JSON.stringify
 function IsJsonString(str){try{JSON.parse(str);}catch(e){return false;}
 return true;}
 String.prototype.replaceAll=function(replaceThis,withThis){var re=new RegExp(RegExp.quote(replaceThis),"g");return this.replace(re,withThis);};RegExp.quote=function(str){return str.replace(/([.?*+^$[\]\\(){}-])/g,"\\$1");};function syntaxHighlight(json){json=json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,function(match){var cls='number';if(/^"/.test(match)){if(/:$/.test(match)){cls='key';}else{cls='string';}}else if(/true|false/.test(match)){cls='boolean';}else if(/null/.test(match)){cls='null';}
-return '<span class="'+cls+'">'+match+'</span>';});}</script><br><br><footer class="navbar-default navbar-fixed-bottom"><div class=container-fluid><div class="span12 text-center"><span data-toggle=tooltip title="If the application help you, please feel free to give a star to the project in github. Your star inspire me to work more on open-source projects like this!">Made with <em class=love-color>&#9829;</em> by <a href=https://github.com/thedevsaddam target=_blank class=text-muted>thedevsaddam</a> | Generated at: 2020-10-02 11:59:04 by <a href=https://github.com/thedevsaddam/docgen target=_blank class=text-muted>docgen</a></span></div></div></footer>
+return '<span class="'+cls+'">'+match+'</span>';});}</script><br><br><footer class="navbar-default navbar-fixed-bottom"><div class=container-fluid><div class="span12 text-center"><span data-toggle=tooltip title="If the application help you, please feel free to give a star to the project in github. Your star inspire me to work more on open-source projects like this!">Made with <em class=love-color>&#9829;</em> by <a href=https://github.com/thedevsaddam target=_blank class=text-muted>thedevsaddam</a> | Generated at: 2020-10-17 16:32:04 by <a href=https://github.com/thedevsaddam/docgen target=_blank class=text-muted>docgen</a></span></div></div></footer>
 <style>
     body {
         display: block;

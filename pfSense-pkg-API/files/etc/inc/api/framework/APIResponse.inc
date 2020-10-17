@@ -86,8 +86,8 @@ function get($id, $data=[], $all=false) {
             "message" => "Your API request was valid but no actions were specified for this endpoint",
         ],
         11 => [
-            "status" => "bad request",
-            "code" => 400,
+            "status" => "unsupported media type",
+            "code" => 415,
             "return" => $id,
             "message" => "Specified content type is not supported"
         ],
