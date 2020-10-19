@@ -82,7 +82,7 @@ pfSense API uses the same privileges as the pfSense webConfigurator. The require
 
 
 # Content Types
-pfSense API can handle a few different content types. Please note, if a `Content-Type` header is not specified in your request pfSense API will attempt to determine the
+pfSense API can handle a few different content types. Please note, if a `Content-Type` header is not specified in your request, pfSense API will attempt to determine the
 content type which may have undesired results. It is recommended you specify your preferred `Content-Type` on each request. While several content types may be enabled,
 `application/json` is the recommended content type. Supported content types are:
 
@@ -94,7 +94,7 @@ Parses the request body as a JSON formatted string. This is the recommended cont
 Example:
 
 ```
-curl -s -H "Content-Type: application/json" -d '{"client-id": "admin", "client-token": "pfsense"}' -X GET https://pfsense.example.com/api/v1/firewall/rule
+curl -s -H "Content-Type: application/json" -d '{"client-id": "admin", "client-token": "pfsense"}' -X GET https://pfsense.example.com/api/v1/system/arp
 {
   "status": "ok",
   "code": 200,
@@ -129,7 +129,7 @@ Parses the request body as URL encoded parameters.
 Example:
 
 ```
-curl -s -H "Content-Type: application/x-www-form-urlencoded" -X GET "https://pfsense.example.com/api/v1/firewall/rule?client-id=admin&client-token=pfsense"
+curl -s -H "Content-Type: application/x-www-form-urlencoded" -X GET "https://pfsense.example.com/api/v1/system/arp?client-id=admin&client-token=pfsense"
 {
   "status": "ok",
   "code": 200,
