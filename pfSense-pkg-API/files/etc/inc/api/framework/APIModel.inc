@@ -22,6 +22,7 @@ class APIModel {
     public $privileges;
     public $initial_data;
     public $validated_data;
+    public $type_map;
     public $id;
     public $validate_id;
     public $config;
@@ -34,7 +35,7 @@ class APIModel {
 
     public function __construct() {
         global $config;
-        error_reporting(E_ERROR);
+        error_reporting(E_ERROR);    // Prevents PHP warnings from printing to API responses
         $this->config =& $config;
         $this->privileges = ["page-all"];
         $this->requires_auth = true;
@@ -43,7 +44,7 @@ class APIModel {
         $this->initial_data = APITools\get_request_data();
         $this->validated_data = [];
         $this->errors = [];
-
+        $this->type_map = [];
     }
 
     public function action() {

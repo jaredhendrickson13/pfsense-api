@@ -74,7 +74,10 @@ Requires a bearer token to be included in the `Authorization` header of your req
 <details>
     <summary>API Token</summary>
 
-Uses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication and not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by adding a `client-id` value containing yourAPI token client ID and a `client-token` value containing your API token client token to your payload. (e.g. `{"client-id": "cccdj-311s", "client-token": "42jkjl-k234jlk1b38123kj3kjl-ffwzzuilaei"}`
+Uses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication; not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by specifying your client-id and client-token within an `Authorization` header, these values must be seperated by a space. (e.g. `Authorization: client-id-here client-token-here`)
+
+_Note: In previous versions of pfSense API, the client-id and client-token were provided via the request payload. This functionality is still supported but is not recommended. It will be removed in a future release._
+
 </details>
 
 ### Authorization
