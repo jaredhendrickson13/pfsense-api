@@ -709,28 +709,32 @@ function unbound_reload_config() {
 }
 
 // Check if a DNS Resolver (Unbound) host override already exists
-function unbound_host_override_exists($hostname, $domain) {
-    // Local variables
-    global $err_lib, $config;
-    $curr_hosts = array();
+function is_unbound_fqdn($hostname, $domain, $instance_id=null) {
+    # Local variables
+    global $config;
+    $curr_hosts = (array_key_exists("hosts", $config["unbound"])) ? $config["unbound"]["hosts"] : [];
     $host_exists = false;
-    // Check if host override already exists
-    if (array_key_exists("hosts", $config["unbound"])) {
-        $curr_hosts = $config["unbound"]["hosts"];
-    }
+    $index = 0;
+
+    # Loop through each host override and check if the FQDN already exists
     foreach ($curr_hosts as $host_ent) {
+        # Check the FQDN matches this entry
         if ($host_ent["host"] === $hostname and $host_ent["domain"] === $domain) {
-            $host_exists = true;
-            break;
+            # If we are working with an existing instance, allow existing FQDN if ID matches
+            if ($index !== $instance_id) {
+                return true;
+            }
         }
+
+        # Check FQDN within host override aliases as well
         if (is_array($host_ent["aliases"])) {
             foreach ($host_ent["aliases"]["item"] as $alias_ent) {
                 if ($alias_ent["host"] === $hostname and $alias_ent["domain"] === $domain) {
-                    $host_exists = true;
-                    break;
+                    return true;
                 }
             }
         }
+        $index++;
     }
     return $host_exists;
 }

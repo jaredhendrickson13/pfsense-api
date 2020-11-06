@@ -73,7 +73,7 @@ class APIServicesUnboundHostOverrideAliasCreate extends APIModel {
         }
 
         # Ensure this hostname doesn't already exis
-        if (APITools\unbound_host_override_exists($this->validated_data["host"], $this->validated_data["domain"])) {
+        if (APITools\is_unbound_fqdn($this->validated_data["host"], $this->validated_data["domain"])) {
             $this->errors[] = APIResponse\get(2009);
         }
     }
