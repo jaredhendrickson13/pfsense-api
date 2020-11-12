@@ -637,6 +637,10 @@ There is no limit to API calls at this time but is important to note that pfSens
 
   * [Read Gateway Status](#1-read-gateway-status)
 
+* [STATUS/INTERFACE](#statusinterface)
+
+  * [Read Interface Status](#1-read-interface-status)
+
 * [STATUS/LOG](#statuslog)
 
   * [Read Configuration History Status Log](#1-read-configuration-history-status-log)
@@ -3417,6 +3421,38 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-g
 Method: GET
 Type: RAW
 URL: https://{{$hostname}}/api/v1/status/gateway
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## STATUS/INTERFACE
+
+
+
+### 1. Read Interface Status
+
+
+Read interface status and metrics.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-interfaces`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/status/interface
 ```
 
 
