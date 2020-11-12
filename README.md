@@ -633,6 +633,10 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Read CARP Status](#1-read-carp-status)
   * [Update CARP Status](#2-update-carp-status)
 
+* [STATUS/GATEWAY](#statusgateway)
+
+  * [Read Gateway Status](#1-read-gateway-status)
+
 * [STATUS/LOG](#statuslog)
 
   * [Read Configuration History Status Log](#1-read-configuration-history-status-log)
@@ -3390,6 +3394,38 @@ URL: https://{{$hostname}}/api/v1/status/carp
 {
 	"enable": true,
 	"maintenance_mode": true
+}
+```
+
+
+
+## STATUS/GATEWAY
+
+
+
+### 1. Read Gateway Status
+
+
+Read gateway status and metrics.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-gateway`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/status/gateway
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
 }
 ```
 
