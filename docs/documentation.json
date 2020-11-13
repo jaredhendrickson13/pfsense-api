@@ -4661,6 +4661,58 @@
 					"description": "API endpoints that read interface statuses and metrics.",
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
+				},
+				{
+					"name": "SYSTEM",
+					"item": [
+						{
+							"name": "Read System Status",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwZlNlbnNlIiwiZXhwIjoxNTk4MDcwMTAzLCJuYmYiOjE1OTgwNjE3MDMsImRhdGEiOiJhZG1pbiJ9.hgvNu96Bvsehcq6ygTa9LPB8eymiLnxYu4V6J8_h0-o",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/status/system",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"status",
+										"system"
+									]
+								},
+								"description": "Read system status and metrics.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-dashboard-widgets`, `page-dashboard-all`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that read system statuses.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"description": "API endpoints that read and update system statuses.",

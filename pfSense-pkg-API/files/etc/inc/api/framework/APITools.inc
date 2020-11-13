@@ -1008,3 +1008,15 @@ function delete_static_route($id) {
 
     unset($targets);
 }
+
+# Converts an integer-of-100 percent to a decimal percentage
+function float_percent($value) {
+    # Only return converted value if it is numeric
+    if (is_numeric($value)) {
+        # Add a leading 0 if number is single digit
+        if (floatval($value) > 0 and floatval($value) < 10) {
+            $value = "0" . strval($value);
+        }
+        return floatval("0." . $value);
+    }
+}

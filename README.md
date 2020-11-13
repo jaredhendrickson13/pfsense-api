@@ -648,6 +648,10 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Read Firewall Status Log](#3-read-firewall-status-log)
   * [Read System Status Log](#4-read-system-status-log)
 
+* [STATUS/SYSTEM](#statussystem)
+
+  * [Read System Status](#1-read-system-status)
+
 * [SYSTEM/API](#systemapi)
 
   * [Read System API Configuration](#1-read-system-api-configuration)
@@ -3578,6 +3582,38 @@ URL: https://{{$hostname}}/api/v1/status/log/system
 ```js        
 {
 
+}
+```
+
+
+
+## STATUS/SYSTEM
+
+
+
+### 1. Read System Status
+
+
+Read system status and metrics.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-dashboard-widgets`, `page-dashboard-all`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/status/system
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
 }
 ```
 
