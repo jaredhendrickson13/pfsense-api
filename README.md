@@ -3594,7 +3594,7 @@ URL: https://{{$hostname}}/api/v1/status/log/system
 ### 1. Read System Status
 
 
-Read system status and metrics.<br><br>
+Read system status and metrics. All usage values are represented as a decimal percentage. Temperature readings require thermal sensor and/or driver configuration.<br><br>
 
 _Requires at least one of the following privileges:_ [`page-all`, `page-dashboard-widgets`, `page-dashboard-all`]
 

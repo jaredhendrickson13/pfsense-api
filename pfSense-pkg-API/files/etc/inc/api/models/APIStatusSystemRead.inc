@@ -15,6 +15,7 @@
 
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
+require_once("includes/functions.inc.php");
 
 
 class APIStatusSystemRead extends APIModel {
@@ -29,13 +30,6 @@ class APIStatusSystemRead extends APIModel {
     }
 
     private function __get_metrics() {
-        include_once("includes/functions.inc.php");
-        # Pre-return definitions
-        foreach(get_mounted_filesystems() as $fs) {
-            if ($fs["mountpoint"] === "/") {
-                $disk_usage = APITools\float_percent($fs["percent_used"]);
-            }
-        }
 
         # Place each gathered metric into our return array
         $sys_info = [
@@ -46,14 +40,15 @@ class APIStatusSystemRead extends APIModel {
             "bios_version" => $this->__get_bios_info()["bios_version"],
             "bios_date" => $this->__get_bios_info()["bios_date"],
             "cpu_model" => get_single_sysctl("hw.model"),
+            "kernel_pti" => boolval(get_single_sysctl('vm.pmap.pti')),
             "mds_mitigation" => get_single_sysctl('hw.mds_disable_state'),
-            "mbuf_usage" => $this->__get_mbuf_usage(),
             "temp_c" => $this->__get_temp(),
             "temp_f" => $this->__get_temp(false),
             "load_avg" => $this->__get_load_avg(),
+            "mbuf_usage" => $this->__get_mbuf_usage(),
             "mem_usage" => (!is_null(mem_usage())) ? APITools\float_percent(mem_usage()) : null,
             "swap_usage" => (!is_null(swap_usage())) ? APITools\float_percent(swap_usage()) : null,
-            "disk_usage" => $disk_usage
+            "disk_usage" => $this->__get_filesystem_usage()
         ];
         return $sys_info;
     }
@@ -69,9 +64,9 @@ class APIStatusSystemRead extends APIModel {
     # Gets the current CPU temperatures in either Fº or Cº, return null if no temperature could be found
     private function __get_temp($celsius=true) {
         if ($celsius) {
-            return (!empty(get_temp())) ? get_temp() : null;
+            return (!empty(get_temp())) ? floatval(get_temp()) : null;
         } else {
-            return (!empty(get_temp())) ? get_temp() * 1.8 + 32 : null;
+            return (!empty(get_temp())) ? floatval(get_temp()) * 1.8 + 32 : null;
         }
     }
 
@@ -94,6 +89,15 @@ class APIStatusSystemRead extends APIModel {
         # Remove newlines
         foreach ($bios_info as $key=>$value) {$bios_info[$key] = str_replace("\n", "", $value);}
         return $bios_info;
+    }
+
+    # Gathers filesystem usage data
+    private function __get_filesystem_usage() {
+        foreach(get_mounted_filesystems() as $fs) {
+            if ($fs["mountpoint"] === "/") {
+                return APITools\float_percent($fs["percent_used"]);
+            }
+        }
     }
 
 }

@@ -4705,7 +4705,7 @@
 										"system"
 									]
 								},
-								"description": "Read system status and metrics.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-dashboard-widgets`, `page-dashboard-all`]"
+								"description": "Read system status and metrics. All usage values are represented as a decimal percentage. Temperature readings require thermal sensor and/or driver configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-dashboard-widgets`, `page-dashboard-all`]"
 							},
 							"response": []
 						}
