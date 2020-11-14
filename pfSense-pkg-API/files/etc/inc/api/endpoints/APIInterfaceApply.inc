@@ -15,25 +15,12 @@
 
 require_once("api/framework/APIEndpoint.inc");
 
-class APIInterface extends APIEndpoint {
+class APIInterfaceApply extends APIEndpoint {
     public function __construct() {
-        $this->url = "/api/v1/interface";
-    }
-
-    protected function get() {
-        return (new APIInterfaceRead())->call();
+        $this->url = "/api/v1/interface/apply";
     }
 
     protected function post() {
-        return (new APIInterfaceCreate())->call();
+        return (new APIInterfaceApplyCreate())->call();
     }
-
-    protected function put() {
-        return (new APIInterfaceUpdate())->call();
-    }
-
-    protected function delete() {
-        return (new APIInterfaceDelete())->call();
-    }
-
 }

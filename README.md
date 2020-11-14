@@ -542,6 +542,11 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Create Interfaces](#1-create-interfaces)
   * [Delete Interfaces](#2-delete-interfaces)
   * [Read Interfaces](#3-read-interfaces)
+  * [Update Interfaces](#4-update-interfaces)
+
+* [INTERFACE/APPLY](#interfaceapply)
+
+  * [Apply Interfaces](#1-apply-interfaces)
 
 * [INTERFACE/VLAN](#interfacevlan)
 
@@ -1641,6 +1646,7 @@ URL: https://{{$hostname}}/api/v1/interface
 | prefix-6rd-v4plen | integer or string | Set the 6RD IPv4 prefix length. This is typically assigned by the ISP. Only available when `type6` is set to `6rd` |
 | track6-interface | string | Set the Track6 dynamic IPv6 interface. This must be a dynamically configured IPv6 interface. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Only required with `type6` is set to `track6` |
 | track6-prefix-id-hex | string or integer | Set the IPv6 prefix ID. The value in this field is the (Delegated) IPv6 prefix ID. This determines the configurable network ID based on the dynamic IPv6 connection. The default value is 0. Only available when `type6` is set to `track6` |
+| apply | boolean | Specify whether the Interface configuration should be applied Immediately or not (optional) |
 
 
 
@@ -1710,6 +1716,120 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-interfac
 Method: GET
 Type: RAW
 URL: https://{{$hostname}}/api/v1/interface
+```
+
+
+
+***Body:***
+
+```js        
+{
+}
+```
+
+
+
+### 4. Update Interfaces
+
+
+Update an existing interface.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/interface
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | string | Specify the Interface to update. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0) |
+| if | string | Update the physical interface configured (optional) |
+| descr | string | Update the descriptive name of the interface (optional) |
+| enable | boolean | Enable or disable the Interface (optional) |
+| spoofmac | string | Update the MAC address of the interface (optional) |
+| mtu | string or integer | Update the MTU for this interface (optional) |
+| mss | string or integer | Update the MSS for the this interface (optional) |
+| media | string | Update the speed/duplex setting for this interface (optional) |
+| type | string | Update the interface IPv4  configuration type (optional) |
+| type6 | string | Update the interface IPv6  configuration type (optional) |
+| ipaddr | string | Update the interface's static IPv4 address (required if `type` is set to `staticv4`) |
+| subnet | string or integer | Update the interface's static IPv4 address's subnet bitmask (required if `type` is set to `staticv4`) |
+| gateway | string | Update the interface network's upstream gateway. This is only necessary on WAN/UPLINK interfaces (optional) |
+| ipaddrv6 | string | Update the interface's static IPv6 address (required if `type6` is set to `staticv6`) |
+| subnetv6 | string or integer | Update the interface's static IPv6 address's subnet bitmask (required if `type6` is set to `staticv6`) |
+| gatewayv6 | string | Update the interface network's upstream IPv6 gateway. This is only necessary on WAN/UPLINK interfaces (optional) |
+| ipv6usev4iface | boolean | Enable or disable IPv6 over IPv4 uplink connection (optional) |
+| dhcphostname | string | Update the IPv4 DHCP hostname. Only available when `type` is set to `dhcp` (optional) |
+| dhcprejectfrom | string or array | Update the IPv4 DHCP rejected servers. You may pass values in as array or as comma seperated string. Only available when `type` is set to `dhcp` (optional) |
+| alias-address | string | Update the IPv4 DHCP address alias. The value in this field is used as a fixed alias IPv4 address by the DHCP client (optional) |
+| alias-subnet | string or integer | Update the IPv4 DHCP address aliases subnet (optional) |
+| adv_dhcp_pt_timeout | string or integer | Update the IPv4 DHCP protocol timeout interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_retry | string or integer | Update the IPv4 DHCP protocol retry interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_select_timeout | string or integer | Update the IPv4 DHCP protocol select timeout interval. Must be numeric value greater than 0 (optional) |
+| adv_dhcp_pt_reboot | string or integer | Update the IPv4 DHCP protocol reboot interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_backoff_cutoff | string or integer | Update the IPv4 DHCP protocol backoff cutoff interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_initial_interval | string or integer | Update the IPv4 DHCP protocol initial interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_config_advanced | boolean | Enable or disable the IPv4 DHCP advanced configuration options. This enables the DHCP options listed below (optional) |
+| adv_dhcp_send_options | string | Update the IPv4 `send` option (optional) |
+| adv_dhcp_request_options | string | Update the IPv4 `request` option (optional) |
+| adv_dhcp_request_options | string | Update the IPv4 `required` option (optional) |
+| adv_dhcp_option_modifiers | string | Update the IPv4 optionamodifier (optional) |
+| adv_dhcp_config_file_override | boolean | Enable or disable local DHCP configuration file override (optional) |
+| adv_dhcp_config_file_override_file | string | Update the custom DHCP configuration file's absolute path. This file must exist beforehand (optional) |
+| dhcpvlanenable | boolean | Enable or disable DHCP VLAN prioritization (optional) |
+| dhcpcvpt | string or integer | Update the DHCP VLAN priority. Must be a numeric value between 1 and 7 (optional) |
+| gateway-6rd | string | Update the 6RD interface IPv4 gateway address. Only required when `type6` is set to `6rd` |
+| prefix-6rd | string | Update the 6RD IPv6 prefix assigned by the ISP. Only required when `type6` is set to `6rd` |
+| prefix-6rd-v4plen | integer or string | Update the 6RD IPv4 prefix length. This is typically assigned by the ISP. Only available when `type6` is set to `6rd` |
+| track6-interface | string | Update the Track6 dynamic IPv6 interface. This must be a dynamically configured IPv6 interface. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Only required with `type6` is set to `track6` |
+| track6-prefix-id-hex | string or integer | Update the IPv6 prefix ID. The value in this field is the (Delegated) IPv6 prefix ID. This determines the configurable network ID based on the dynamic IPv6 connection. The default value is 0. Only available when `type6` is set to `track6` |
+| apply | boolean | Specify whether the updates should be Immediately applied to the Interface or not (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"if": "em1.3",
+	"descr": "asdf",
+	"enable": "",
+	"type": "staticv4",
+	"ipaddr": "10.250.0.1",
+	"subnet": "24",
+	"blockbogons": true
+}
+```
+
+
+
+## INTERFACE/APPLY
+
+
+
+### 1. Apply Interfaces
+
+
+Apply pending interface updates. This will apply the current configuration for each interface.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/interface/apply
 ```
 
 

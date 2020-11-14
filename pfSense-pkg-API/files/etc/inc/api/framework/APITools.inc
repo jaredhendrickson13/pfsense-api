@@ -313,34 +313,29 @@ function sort_nat_rules($mode=null, $data=null) {
     $config["nat"]["rule"] = $master_arr;
 }
 
-// Input a physical interface ID, or a descriptive interface name, and return the pfSense interface ID (lan,wan,optx)
-function get_pfsense_if_id($interface)
-{
-    // Variables
-    global $err_lib, $config;
-    // Loop through our config and check each interface for a physical ID match
-    foreach ($config["interfaces"] as $ifid => $ife) {
-        // Check that we have a configured interface ID first
-        if (array_key_exists("if", $ife)) {
+# Input a physical interface ID, or a descriptive interface name, and return the pfSense interface ID (lan,wan,optx)
+function get_pfsense_if_id($interface) {
+    # Variables
+    global $config;
+    # Loop through our config and check each interface for a physical ID match
+    foreach ($config["interfaces"] as $if_id => $if_ent) {
+        # First check if the requested interface matches this physical interface ID
+        if (array_key_exists("if", $if_ent)) {
             // Check if the interface id matches
-            if ($interface === $ife["if"]) {
-                return $ifid;    // Return our pfSense interface ID
-                break;    // Break loop just in case
+            if ($interface === $if_ent["if"]) {
+                return $if_id;
             }
         }
-        // Check that we have a configured interface descr first
-        if (array_key_exists("descr", $ife)) {
+        # Next, check if the requested interface matches this pfSense interface description
+        if (array_key_exists("descr", $if_ent)) {
             // Check if the interface descr matches
-            if ($interface === $ife["descr"]) {
-                return $ifid;    // Return our pfSense interface ID
-                break;    // Break loop just in case
+            if ($interface === $if_ent["descr"]) {
+                return $if_id;
             }
-        } else {
-            // Check if the pfSense interface ID matches
-            if (strtolower($interface) === $ifid) {
-                return $ifid;    // Return our pfSense interface ID
-                break;    // Break loop just in case
-            }
+        }
+        # Next, check if the requested interface matches this pfSense interface ID (wan, lan, opt1, opt2, etc.)
+        if ($interface === $if_id) {
+            return $if_id;
         }
     }
 }
@@ -924,33 +919,31 @@ function get_ipv6_if_list() {
 }
 
 // Apply a new interface configuration
-function apply_interface_config($if_conf) {
+function apply_interface_config($if_id, $if_conf) {
     // Local variables
-    global $err_lib, $config;
+    global $config;
     $vlan_redo = false;
     // Check that our if configuration is an array
     if (is_array($if_conf)) {
-        foreach ($if_conf as $if_apply => $if_go) {
-            if (isset($config['interfaces'][$if_apply]['enable'])) {
-                interface_bring_down($if_apply, false, $if_go);
-                interface_configure($if_apply, true);
-                if ($config['interfaces'][$if_apply]['ipaddrv6'] == "track6") {
-                    // Configure IPv6 track6 type if present
-                    $wan_cfg = $config['interfaces'][$if_apply];
-                    interface_track6_configure($if_apply, $wan_cfg, true);
-                }
-            } else {
-                interface_bring_down($if_apply, true, $if_go);
-                // Restart DHCPD if enabled
-                if (isset($config['dhcpd'][$if_apply]['enable']) ||
-                    isset($config['dhcpdv6'][$if_apply]['enable'])) {
-                    services_dhcpd_configure();
-                }
+        if (isset($config['interfaces'][$if_id]['enable'])) {
+            interface_bring_down($if_id, false, $if_conf);
+            interface_configure($if_id, true);
+            if ($config['interfaces'][$if_id]['ipaddrv6'] == "track6") {
+                // Configure IPv6 track6 type if present
+                $wan_cfg = $config['interfaces'][$if_id];
+                interface_track6_configure($if_id, $wan_cfg, true);
             }
-            // Check if VLANs are configured for this interface, if so, reapply them
-            if (interface_has_clones(get_real_interface($if_apply))) {
-                $vlan_redo = true;
+        } else {
+            interface_bring_down($if_id, true, $if_conf);
+            // Restart DHCPD if enabled
+            if (isset($config['dhcpd'][$if_id]['enable']) ||
+                isset($config['dhcpdv6'][$if_id]['enable'])) {
+                services_dhcpd_configure();
             }
+        }
+        // Check if VLANs are configured for this interface, if so, reapply them
+        if (interface_has_clones(get_real_interface($if_id))) {
+            $vlan_redo = true;
         }
     }
     // Check if DHCP needs to be reloaded
@@ -1019,4 +1012,59 @@ function float_percent($value) {
         }
         return floatval("0." . $value);
     }
+}
+
+# Checks if an alias exists with a specified name, and returns the alias type. Returns null if not found
+function is_alias($name) {
+    global $config;
+    if (is_array($config['aliases']['alias'])) {
+        foreach ($config['aliases']['alias'] as $alias) {
+            if (strcasecmp($alias['name'], $name) == 0) {
+                return $alias["type"];
+            }
+        }
+    }
+}
+
+# Checks if an interface group with a specified name already exists. Returns true or false.
+function is_ifgroup($name) {
+    global $config;
+    if (is_array($config['ifgroups']['ifgroupentry'])) {
+        foreach ($config['ifgroups']['ifgroupentry'] as $if_group_ent) {
+            if ($if_group_ent["ifname"] === $name) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+# Checks if an interface has DHCPD enabled. Returns true or false.
+function is_dhcpd_enabled($if) {
+    global $config;
+
+    # Ensure our interface is in it's pfSense ID format
+    $if = get_pfsense_if_id($if);
+
+    # Check if this interface is enabled
+    if (isset($config['dhcpd'][$if]['enable'])) {
+        return true;
+    }
+
+    return false;
+}
+
+# Checks if an interface has DHCPDv6 enabled. Returns true or false.
+function is_dhcpdv6_enabled($if) {
+    global $config;
+
+    # Ensure our interface is in it's pfSense ID format
+    $if = get_pfsense_if_id($if);
+
+    # Check if this interface is enabled
+    if (isset($config['dhcpdv6'][$if]['enable'])) {
+        return true;
+    }
+
+    return false;
 }

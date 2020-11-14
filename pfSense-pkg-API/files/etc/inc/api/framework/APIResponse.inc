@@ -828,6 +828,60 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Interface VLAN parent required"
         ],
+        3056 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface ID is required"
+        ],
+        3057 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface ID does not exist"
+        ],
+        3058 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface descriptive name cannot start with 'pkg_'"
+        ],
+        3059 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface descriptive name cannot match alias name"
+        ],
+        3060 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface descriptive name cannot be entirely numeric"
+        ],
+        3061 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface descriptive name cannot match interface group name"
+        ],
+        3062 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface type cannot be changed while DHCP server is enabled"
+        ],
+        3063 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface subnet must be less than 31 while DHCP server is enabled"
+        ],
+        3064 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface type6 cannot be changed while DHCPv6 server is enabled"
+        ],
 
         // 4000-4999 reserved for /firewall API calls
         4000 => [

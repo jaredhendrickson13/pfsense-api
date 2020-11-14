@@ -17,21 +17,19 @@ require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
 
-class APIInterfaceCreate extends APIModel {
+class APIInterfaceUpdate extends APIModel {
     private $if_list;
-    private $next_if;
 
     # Create our method constructor
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-assignnetworkports"];
-        $this->change_note = "Added interface via API";
+        $this->change_note = "Modified interface via API";
         $this->if_list = APITools\get_all_avail_interfaces();
-        $this->next_if = APITools\get_next_pfsense_if_id();
     }
 
     public function action() {
-        $this->config["interfaces"][$this->next_if] = $this->validated_data;
+        $this->config["interfaces"][$this->id] = $this->validated_data;
         $this->write_config();
         mark_subsystem_dirty('interfaces');
 
@@ -44,6 +42,21 @@ class APIInterfaceCreate extends APIModel {
         return APIResponse\get(0, $this->validated_data);
     }
 
+    private function __validate_id() {
+        # Ensure the client passed in an interface ID so we can locate the existing interface
+        if (isset($this->initial_data["id"])) {
+            $this->id = APITools\get_pfsense_if_id($this->initial_data["id"]);
+            # Check that the provided ID is associated with an existing interface
+            if ($this->id) {
+                $this->validated_data = $this->config["interfaces"][$this->id];
+            } else {
+                $this->errors[] = APIResponse\get(3057);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(3056);
+        }
+    }
+
     private function __validate_if() {
         if (isset($this->initial_data["if"])) {
             $this->validated_data["if"] = trim($this->initial_data["if"]);
@@ -54,15 +67,16 @@ class APIInterfaceCreate extends APIModel {
                 $this->errors[] = APIResponse\get(3001);
             }
             $this->validated_data["if"] = $this->initial_data["if"];
-        } else {
-            $this->errors[] = APIResponse\get(3002);
         }
     }
-
+    
     private function __validate_enable() {
         // Check for our enable value
         if ($this->initial_data["enable"] === true) {
             $this->validated_data["enable"] = "";
+        }
+        elseif($this->initial_data["enable"] === false) {
+            unset($this->validated_data["enable"]);
         }
     }
 
@@ -104,7 +118,6 @@ class APIInterfaceCreate extends APIModel {
             // Check if MSS is within range
             if (576 > $this->initial_data["mss"] or $this->initial_data["mss"] > 65535) {
                 $this->errors[] = APIResponse\get(3005);
-
             } else {
                 $this->validated_data["mss"] = $this->initial_data["mss"];
             }
@@ -134,10 +147,10 @@ class APIInterfaceCreate extends APIModel {
     }
 
     private function __validate_descr() {
-        # Check for our description value
-        if (isset($this->initial_data["descr"])) {
+        # Check for our description value, skip if our payload value alrady matches our configured value
+        if (isset($this->initial_data["descr"]) and $this->initial_data["descr"] !== $this->validated_data["descr"]) {
             $this->initial_data["descr"] = APITools\sanitize_str($this->initial_data["descr"]);
-            # Ensure this interface description does not contain reserved keywords
+            # Ensure this interface description does not contain reserved pkg keywords
             if (substr($this->initial_data['descr'], 0, 4) === "pkg_") {
                 $this->errors[] = APIResponse\get(3058);
             }
@@ -145,7 +158,7 @@ class APIInterfaceCreate extends APIModel {
             elseif (APITools\is_alias($this->initial_data["descr"])) {
                 $this->errors[] = APIResponse\get(3059);
             }
-            # Ensure this interface is name named entirely numerical
+            # Ensure this interface is not named entirely numerical
             elseif (is_numeric($this->initial_data["descr"])) {
                 $this->errors[] = APIResponse\get(3060);
             }
@@ -161,8 +174,6 @@ class APIInterfaceCreate extends APIModel {
             else {
                 $this->validated_data["descr"] = $this->initial_data["descr"];
             }
-        } else {
-            $this->validated_data["descr"] = strtoupper($this->next_if);
         }
     }
 
@@ -170,6 +181,8 @@ class APIInterfaceCreate extends APIModel {
         // Check for our block private IP value
         if ($this->initial_data["blockpriv"] === true) {
             $this->validated_data["blockpriv"] = "";
+        } elseif ($this->initial_data["blockpriv"] === false) {
+            unset($this->validated_data["blockpriv"]);
         }
     }
 
@@ -177,38 +190,62 @@ class APIInterfaceCreate extends APIModel {
         // Check for our block bogon value
         if ($this->initial_data["blockbogons"] === true) {
             $this->validated_data["blockbogons"] = "";
+        } elseif ($this->initial_data["blockbogons"] === false) {
+            unset($this->validated_data["blockbogons"]);
         }
     }
 
     private function __validate_type_staticv4_ipaddr() {
-        // Check if our IP is set
-        if (isset($this->initial_data["ipaddr"])) {
-            // Check if IP address is valid
-            if (!is_ipaddrv4($this->initial_data["ipaddr"])) {
-                $this->errors[] = APIResponse\get(3010);
-            } elseif (APITools\is_ip_in_use($this->initial_data["ipaddr"])) {
-                $this->errors[] = APIResponse\get(3009);
+        # Use the existing ipaddr value if one was not passed in
+        if (!isset($this->initial_data["ipaddr"])) {
+            # Only assign the existing value if it exists, otherwise return error
+            if (isset($this->validated_data["ipaddr"])) {
+                $this->initial_data["ipaddr"] = $this->validated_data["ipaddr"];
             } else {
-                $this->validated_data["ipaddr"] = $this->initial_data["ipaddr"];
+                $this->errors[] = APIResponse\get(3011);
             }
-        } else {
-            $this->errors[] = APIResponse\get(3011);
+        }
+
+        # Check if IP address is valid
+        if (!is_ipaddrv4($this->initial_data["ipaddr"])) {
+            $this->errors[] = APIResponse\get(3010);
+        }
+        # Ensure IP is not already in use by something else
+        elseif (APITools\is_ip_in_use($this->initial_data["ipaddr"])) {
+            # Only throw an error if the IP in use is not the interface we are trying to update
+            if ($this->initial_data["ipaddr"] !== $this->validated_data["ipaddr"]) {
+                $this->errors[] = APIResponse\get(3009);
+            }
+        }
+        # Otherwise, this IP appears to be valid, update the value.
+        else {
+            $this->validated_data["ipaddr"] = $this->initial_data["ipaddr"];
         }
     }
 
     private function __validate_type_staticv4_subnet() {
-        // Check if our subnet is valid
-        if (isset($this->initial_data["subnet"])) {
-            $subnet = strval($this->initial_data["subnet"]);
-            // Check if our subnet is within range
-            if (!is_subnet($this->validated_data["ipaddr"]."/".$subnet)) {
-                $this->errors[] = APIResponse\get(3012);
+        # If a subnet value was not provided, use the existing value
+        if (!isset($this->initial_data["subnet"])) {
+            # Only use the existing value if it exists, otherwise return an error
+            if (isset($this->validated_data["subnet"])) {
+                $this->initial_data["subnet"] = $this->validated_data["subnet"];
             } else {
-                $this->validated_data["subnet"] = $subnet;
+                $this->errors[] = APIResponse\get(3013);
             }
-        } else {
-            // Update our message if we did not already encounter an error
-            $this->errors[] = APIResponse\get(3013);
+        }
+
+        $this->initial_data["subnet"] = strval($this->initial_data["subnet"]);
+        # Check if our subnet is within range
+        if (!is_subnet($this->validated_data["ipaddr"]."/".$this->initial_data["subnet"])) {
+            $this->errors[] = APIResponse\get(3012);
+        }
+        # Check if DHCP server is enabled for this interface, if so do not allow /32
+        elseif(APITools\is_dhcpd_enabled($this->id) and intval($this->initial_data["subnet"]) >= 31) {
+            $this->errors[] = APIResponse\get(3063);
+        }
+        # Otherwise, this subnet appears to be valid. Update the value.
+        else {
+            $this->validated_data["subnet"] = $this->initial_data["subnet"];
         }
     }
     
@@ -396,7 +433,12 @@ class APIInterfaceCreate extends APIModel {
     }
     
     private function __validate_type_dhcp() {
-        $this->validated_data["ipaddr"] = $this->initial_data["type"];
+        # Before configuring for DHCP, ensure the DHCP server is not enabled
+        if (APITools\is_dhcpd_enabled($this->id)) {
+            $this->errors[] = APIResponse\get(3062);
+        }
+
+        $this->validated_data["ipaddr"] = "dhcp";
         $this->__validate_type_dhcp_dhcphostname();
         $this->__validate_type_dhcp_alias_address();
         $this->__validate_type_dhcp_dhcprejectfrom();
@@ -406,34 +448,58 @@ class APIInterfaceCreate extends APIModel {
         $this->__validate_type_dhcp_dhcpvlanenable();
     }
 
+    private function __validate_type6_change() {
+        # Before configuring for non-static type6, ensure DHCPv6 is not enabled
+        if (APITools\is_dhcpdv6_enabled($this->id)) {
+            $this->errors[] = APIResponse\get(3064);
+        }
+    }
+
     private function __validate_type6_staticv6_ipaddrv6() {
-        // Check if our IP is set
-        if (isset($this->initial_data["ipaddrv6"])) {
-            // Check if IP address is valid
-            if (!is_ipaddrv6($this->initial_data["ipaddrv6"])) {
-                $this->errors[] = APIResponse\get(3026);
-            } elseif (APITools\is_ip_in_use($this->initial_data["ipaddrv6"])) {
-                $this->errors[] = APIResponse\get(3027);
+        # If the client did not specify an IPv6 address, try to use the existing value
+        if (!isset($this->initial_data["ipaddrv6"])) {
+            # Only use the existing value if it exists, otherwise return error
+            if (isset($this->validated_data["ipaddrv6"])) {
+                $this->initial_data["ipaddrv6"] = $this->validated_data["ipaddrv6"];
             } else {
-                $this->validated_data["ipaddrv6"] = $this->initial_data["ipaddrv6"];
+                $this->errors[] = APIResponse\get(3028);
             }
-        } else {
-            $this->errors[] = APIResponse\get(3028);
+        }
+
+        # Check if IPv6 address is valid
+        if (!is_ipaddrv6($this->initial_data["ipaddrv6"])) {
+            $this->errors[] = APIResponse\get(3026);
+        }
+        # Check if this IPv6 address is in use somewhere else
+        elseif (APITools\is_ip_in_use($this->initial_data["ipaddrv6"])) {
+            # If there was a match and the matching IP was not this interface, return an error
+            if ($this->initial_data["ipaddrv6"] !== $this->validated_data["ipaddrv6"]) {
+                $this->errors[] = APIResponse\get(3027);
+            }
+        }
+        # Otherewise, our IPv6 appears to be valid, update the value
+        else {
+            $this->validated_data["ipaddrv6"] = $this->initial_data["ipaddrv6"];
         }
     }
 
     private function __validate_type6_staticv6_subnetv6() {
-        // Check if our subnet is valid
-        if (isset($this->initial_data["subnetv6"])) {
-            $subnetv6 = strval($this->initial_data["subnetv6"]);
-            // Check if our subnet is within range
-            if (!is_subnet($this->validated_data["ipaddrv6"] . "/" . $subnetv6)) {
-                $this->errors[] = APIResponse\get(3029);
+        # If a subnet value was not provided, use the existing value
+        if (!isset($this->initial_data["subnetv6"])) {
+            # Only use the existing value if it exists, otherwise return an error
+            if (isset($this->validated_data["subnetv6"])) {
+                $this->initial_data["subnetv6"] = $this->validated_data["subnetv6"];
             } else {
-                $this->validated_data["subnetv6"] = $subnetv6;
+                $this->errors[] = APIResponse\get(3013);
             }
+        }
+
+        # Check if our subnet is within range
+        $subnet = strval($this->initial_data["subnetv6"]);
+        if (!is_subnet($this->validated_data["ipaddrv6"]."/".$subnet)) {
+            $this->errors[] = APIResponse\get(3012);
         } else {
-            $this->errors[] = APIResponse\get(3030);
+            $this->validated_data["subnetv6"] = $subnet;
         }
     }
 
@@ -455,6 +521,9 @@ class APIInterfaceCreate extends APIModel {
         if ($this->initial_data["ipv6usev4iface"] === true) {
             $this->validated_data["ipv6usev4iface"] = "";
         }
+        elseif ($this->initial_data["ipv6usev4iface"] === false) {
+            unset($this->validated_data["ipv6usev4iface"]);
+        }
     }
     
     private function __validate_type6_staticv6() {
@@ -469,12 +538,18 @@ class APIInterfaceCreate extends APIModel {
         if ($this->initial_data["ipv6usev4iface"] === true) {
             $this->validated_data["ipv6usev4iface"] = "";
         }
+        elseif ($this->initial_data["ipv6usev4iface"] === false) {
+            unset($this->validated_data["ipv6usev4iface"]);
+        }
     }
 
     private function __validate_type6_dhcp6_dhcp6prefixonly() {
         // Check if user set dhcp6prefixonly value
         if ($this->initial_data["dhcp6prefixonly"] === true) {
             $this->validated_data["dhcp6prefixonly"] = "";
+        }
+        elseif ($this->initial_data["dhcp6prefixonly"] === false) {
+            unset($this->validated_data["dhcp6prefixonly"]);
         }
     }
 
@@ -483,12 +558,18 @@ class APIInterfaceCreate extends APIModel {
         if ($this->initial_data["dhcp6-ia-pd-send-hint"] === true) {
             $this->validated_data["dhcp6-ia-pd-send-hint"] = "";
         }
+        elseif ($this->initial_data["dhcp6-ia-pd-send-hint"] === false) {
+            unset($this->validated_data["dhcp6-ia-pd-send-hint"]);
+        }
     }
 
     private function __validate_type6_dhcp6_dhcp6debug() {
         // Check if user set dhcp6debug value
         if ($this->initial_data["dhcp6debug"] === true) {
             $this->validated_data["dhcp6debug"] = "";
+        }
+        elseif ($this->initial_data["dhcp6debug"] === false) {
+            unset($this->validated_data["dhcp6debug"]);
         }
     }
 
@@ -497,6 +578,9 @@ class APIInterfaceCreate extends APIModel {
         if ($this->initial_data["dhcp6withoutra"] === true) {
             $this->validated_data["dhcp6withoutra"] = "";
         }
+        elseif ($this->initial_data["dhcp6withoutra"] === false) {
+            unset($this->validated_data["dhcp6withoutra"]);
+        }
     }
 
     private function __validate_type6_dhcp6_dhcp6norelease() {
@@ -504,12 +588,18 @@ class APIInterfaceCreate extends APIModel {
         if ($this->initial_data["dhcp6norelease"] === true) {
             $this->validated_data["dhcp6norelease"] = "";
         }
+        elseif ($this->initial_data["dhcp6norelease"] === false) {
+            unset($this->validated_data["dhcp6norelease"]);
+        }
     }
 
     private function __validate_type6_dhcp6_dhcp6vlanenable() {
         // Check if user set dhcp6vlanenable value
         if ($this->initial_data["dhcp6vlanenable"] === true) {
             $this->validated_data["dhcp6vlanenable"] = "";
+        }
+        elseif ($this->initial_data["dhcp6vlanenable"] === false) {
+            unset($this->validated_data["dhcp6vlanenable"]);
         }
     }
 
@@ -592,6 +682,7 @@ class APIInterfaceCreate extends APIModel {
 
     private function __validate_type6_dhcp6() {
         $this->validated_data["ipaddrv6"] = "dhcp6";
+        $this->__validate_type6_change();
         $this->__validate_type6_dhcp6_ipv6usev4iface();
         $this->__validate_type6_dhcp6_dhcp6prefixonly();
         $this->__validate_type6_dhcp6_dhcp6_ia_pd_send_hint();
@@ -606,20 +697,26 @@ class APIInterfaceCreate extends APIModel {
 
     private function __validate_type6_slaac() {
         $this->validated_data["ipaddrv6"] = "slaac";
+        $this->__validate_type6_change();
     }
 
     private function __validate_type6_6rd_gateway_6rd() {
-        // Check for a 6RD border relay
-        if (isset($this->initial_data["gateway-6rd"])) {
-            $gw6rd = $this->initial_data["gateway-6rd"];
-            // Check that our gateway is a valid IPv4 address
-            if (is_ipaddrv4($gw6rd)) {
-                $this->validated_data["gateway-6rd"] = $this->initial_data["gateway-6rd"];
+        # If a 6RD gateway was not specified, try to use the existing value
+        if (!isset($this->initial_data["gateway-6rd"])) {
+            # Only use the existing value if it exists, otherwise return error
+            if (isset($this->validated_data["gateway-6rd"])) {
+                $this->initial_data["gateway-6rd"] = $this->validated_data["gateway-6rd"];
             } else {
-                $this->errors[] = APIResponse\get(3035);
+                $this->errors[] = APIResponse\get(3036);
             }
+        }
+
+        // Check that our gateway is a valid IPv4 address
+        $gw6rd = $this->initial_data["gateway-6rd"];
+        if (is_ipaddrv4($gw6rd)) {
+            $this->validated_data["gateway-6rd"] = $this->initial_data["gateway-6rd"];
         } else {
-            $this->errors[] = APIResponse\get(3036);
+            $this->errors[] = APIResponse\get(3035);
         }
     }
 
@@ -640,32 +737,40 @@ class APIInterfaceCreate extends APIModel {
             } else {
                 $this->errors[] = APIResponse\get(3037);
             }
-        } else {
+        } elseif (!isset($this->validated_data["prefix-6rd-v4plen"])) {
             $this->validated_data["prefix-6rd-v4plen"] = 0;
         }
     }
 
     private function __validate_type6_6rd() {
         $this->validated_data["ipaddrv6"] = "6rd";
+        $this->__validate_type6_change();
         $this->__validate_type6_6rd_gateway_6rd();
         $this->__validate_type6_6rd_prefix_6rd();
         $this->__validate_type6_6rd_prefix_6rd_v4plen();
     }
 
     private function __validate_type6_track6_track6_interface() {
-        // Check for track 6 interface
-        if (isset($this->initial_data["track6-interface"])) {
-            $track_if = $this->initial_data["track6-interface"];
-            $track_if = APITools\get_pfsense_if_id($track_if);
-            // Check that our gateway is a valid IPv4 address
-            if (array_key_exists($track_if, APITools\get_ipv6_if_list())) {
-                $this->validated_data["track6-interface"] = $this->initial_data["track6-interface"];
+        # If the client did not specify a track interface, try to use the existing value
+        if (!isset($this->initial_data["track6-interface"])) {
+            # Only use an existing value if it exists, otherwise return error
+            if (isset($this->validated_data["track6-interface"])) {
+                $this->initial_data["track6-interface"] = $this->validated_data["track6-interface"];
             } else {
-                $this->errors[] = APIResponse\get(3038);
+                $this->errors[] = APIResponse\get(3039);
             }
-        } else {
-            $this->errors[] = APIResponse\get(3039);
+
         }
+
+        $track_if = $this->initial_data["track6-interface"];
+        $track_if = APITools\get_pfsense_if_id($track_if);
+        // Check that our gateway is a valid IPv4 address
+        if (array_key_exists($track_if, APITools\get_ipv6_if_list())) {
+            $this->validated_data["track6-interface"] = $this->initial_data["track6-interface"];
+        } else {
+            $this->errors[] = APIResponse\get(3038);
+        }
+
     }
 
     private function __validate_type6_track6_track6_prefix_id_hex() {
@@ -678,23 +783,25 @@ class APIInterfaceCreate extends APIModel {
             } else {
                 $this->errors[] = APIResponse\get(3040);
             }
-        } else {
+        } elseif (!isset($this->validated_data["track6-prefix-id--hex"])) {
             $this->validated_data["track6-prefix-id--hex"] = 0;
         }
     }
 
     private function __validate_type6_track6() {
         $this->validated_data["ipaddrv6"] = "track6";
+        $this->__validate_type6_change();
         $this->__validate_type6_track6_track6_interface();
         $this->__validate_type6_track6_track6_prefix_id_hex();
     }
 
     private function __validate_type6_6to4() {
         $this->validated_data["ipaddrv6"] = "6to4";
+        $this->__validate_type6_change();
     }
 
-
     public function validate_payload() {
+        $this->__validate_id();
         $this->__validate_if();
         $this->__validate_enable();
         $this->__validate_spoofmac();

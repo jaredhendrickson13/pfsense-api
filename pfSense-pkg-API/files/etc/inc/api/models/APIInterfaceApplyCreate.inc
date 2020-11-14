@@ -17,29 +17,22 @@ require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
 
-class APIStatusGatewayRead extends APIModel {
+class APIInterfaceApplyCreate extends APIModel {
+
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-status-gateways"];
+        $this->privileges = ["page-all", "page-interfaces-assignnetworkports"];
+        $this->change_note = "Applied interface via API";
     }
 
     public function action() {
-        return APIResponse\get(0, $this->__get_metrics());
-    }
-
-    private function __get_metrics() {
-        $gw_metrics_raw = return_gateways_status(true);
-        $gw_metrics = [];
-
-        # Loop through each gateway's metrics, format time data as floats, and update statuses
-        foreach ($gw_metrics_raw as $gw) {
-            $gw["delay"] = floatval(str_replace(["%", "ms"], "", $gw["delay"]));
-            $gw["stddev"] = floatval(str_replace(["%", "ms"], "", $gw["stddev"]));
-            $gw["loss"] = floatval(str_replace(["%", "ms"], "", $gw["loss"]));
-            $gw["status"] = ($gw["status"] === "none") ? "up" : $gw["status"];
-            $gw_metrics[] = $gw;
+        # Loop through each interface and apply it's configuration
+        foreach ($this->config["interfaces"] as $if_id => $if_ent) {
+            APITools\apply_interface_config($if_id, $if_ent);
         }
-        return $gw_metrics;
+
+        clear_subsystem_dirty('interfaces');
+        return APIResponse\get(0);
     }
 }

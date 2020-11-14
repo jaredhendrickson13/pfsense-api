@@ -1104,6 +1104,45 @@
 					"_postman_isSubFolder": true
 				},
 				{
+					"name": "APPLY",
+					"item": [
+						{
+							"name": "Apply Interfaces",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/interface/apply",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"interface",
+										"apply"
+									]
+								},
+								"description": "Apply pending interface updates. This will apply the current configuration for each interface.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints to apply pending interface configurations.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "Read Interfaces",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
@@ -1151,7 +1190,7 @@
 							}
 						},
 						"url": {
-							"raw": "https://{{$hostname}}/api/v1/interface?if=string&descr=string&enable=boolean&spoofmac=string&mtu=string or integer&mss=string or integer&media=string&type=string&type6=string&ipaddr=string&subnet=string or integer&gateway=string&ipaddrv6=string&subnetv6=string or integer&gatewayv6=string&ipv6usev4iface=boolean&dhcphostname=string&dhcprejectfrom=string or array&alias-address=string&alias-subnet=string or integer&adv_dhcp_pt_timeout=string or integer&adv_dhcp_pt_retry=string or integer&adv_dhcp_pt_select_timeout=string or integer&adv_dhcp_pt_reboot=string or integer&adv_dhcp_pt_backoff_cutoff=string or integer&adv_dhcp_pt_initial_interval=string or integer&adv_dhcp_config_advanced=boolean&adv_dhcp_send_options=string&adv_dhcp_request_options=string&adv_dhcp_request_options=string&adv_dhcp_option_modifiers=string&adv_dhcp_config_file_override=boolean&adv_dhcp_config_file_override_file=string&dhcpvlanenable=boolean&dhcpcvpt=string or integer&gateway-6rd=string&prefix-6rd=string&prefix-6rd-v4plen=integer or string&track6-interface=string&track6-prefix-id-hex=string or integer",
+							"raw": "https://{{$hostname}}/api/v1/interface?if=string&descr=string&enable=boolean&spoofmac=string&mtu=string or integer&mss=string or integer&media=string&type=string&type6=string&ipaddr=string&subnet=string or integer&gateway=string&ipaddrv6=string&subnetv6=string or integer&gatewayv6=string&ipv6usev4iface=boolean&dhcphostname=string&dhcprejectfrom=string or array&alias-address=string&alias-subnet=string or integer&adv_dhcp_pt_timeout=string or integer&adv_dhcp_pt_retry=string or integer&adv_dhcp_pt_select_timeout=string or integer&adv_dhcp_pt_reboot=string or integer&adv_dhcp_pt_backoff_cutoff=string or integer&adv_dhcp_pt_initial_interval=string or integer&adv_dhcp_config_advanced=boolean&adv_dhcp_send_options=string&adv_dhcp_request_options=string&adv_dhcp_request_options=string&adv_dhcp_option_modifiers=string&adv_dhcp_config_file_override=boolean&adv_dhcp_config_file_override_file=string&dhcpvlanenable=boolean&dhcpcvpt=string or integer&gateway-6rd=string&prefix-6rd=string&prefix-6rd-v4plen=integer or string&track6-interface=string&track6-prefix-id-hex=string or integer&apply=boolean",
 							"protocol": "https",
 							"host": [
 								"{{$hostname}}"
@@ -1361,10 +1400,257 @@
 									"key": "track6-prefix-id-hex",
 									"value": "string or integer",
 									"description": "Set the IPv6 prefix ID. The value in this field is the (Delegated) IPv6 prefix ID. This determines the configurable network ID based on the dynamic IPv6 connection. The default value is 0. Only available when `type6` is set to `track6`"
+								},
+								{
+									"key": "apply",
+									"value": "boolean",
+									"description": "Specify whether the Interface configuration should be applied Immediately or not (optional)"
 								}
 							]
 						},
 						"description": "Add a new interface.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Interfaces",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"if\": \"em1.3\",\n\t\"descr\": \"asdf\",\n\t\"enable\": \"\",\n\t\"type\": \"staticv4\",\n\t\"ipaddr\": \"10.250.0.1\",\n\t\"subnet\": \"24\",\n\t\"blockbogons\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{$hostname}}/api/v1/interface?id=string&if=string&descr=string&enable=boolean&spoofmac=string&mtu=string or integer&mss=string or integer&media=string&type=string&type6=string&ipaddr=string&subnet=string or integer&gateway=string&ipaddrv6=string&subnetv6=string or integer&gatewayv6=string&ipv6usev4iface=boolean&dhcphostname=string&dhcprejectfrom=string or array&alias-address=string&alias-subnet=string or integer&adv_dhcp_pt_timeout=string or integer&adv_dhcp_pt_retry=string or integer&adv_dhcp_pt_select_timeout=string or integer&adv_dhcp_pt_reboot=string or integer&adv_dhcp_pt_backoff_cutoff=string or integer&adv_dhcp_pt_initial_interval=string or integer&adv_dhcp_config_advanced=boolean&adv_dhcp_send_options=string&adv_dhcp_request_options=string&adv_dhcp_request_options=string&adv_dhcp_option_modifiers=string&adv_dhcp_config_file_override=boolean&adv_dhcp_config_file_override_file=string&dhcpvlanenable=boolean&dhcpcvpt=string or integer&gateway-6rd=string&prefix-6rd=string&prefix-6rd-v4plen=integer or string&track6-interface=string&track6-prefix-id-hex=string or integer&apply=boolean",
+							"protocol": "https",
+							"host": [
+								"{{$hostname}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"interface"
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "string",
+									"description": "Specify the Interface to update. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0)"
+								},
+								{
+									"key": "if",
+									"value": "string",
+									"description": "Update the physical interface configured (optional)"
+								},
+								{
+									"key": "descr",
+									"value": "string",
+									"description": "Update the descriptive name of the interface (optional)"
+								},
+								{
+									"key": "enable",
+									"value": "boolean",
+									"description": "Enable or disable the Interface (optional)"
+								},
+								{
+									"key": "spoofmac",
+									"value": "string",
+									"description": "Update the MAC address of the interface (optional)"
+								},
+								{
+									"key": "mtu",
+									"value": "string or integer",
+									"description": "Update the MTU for this interface (optional)"
+								},
+								{
+									"key": "mss",
+									"value": "string or integer",
+									"description": "Update the MSS for the this interface (optional)"
+								},
+								{
+									"key": "media",
+									"value": "string",
+									"description": "Update the speed/duplex setting for this interface (optional)"
+								},
+								{
+									"key": "type",
+									"value": "string",
+									"description": "Update the interface IPv4  configuration type (optional)"
+								},
+								{
+									"key": "type6",
+									"value": "string",
+									"description": "Update the interface IPv6  configuration type (optional)"
+								},
+								{
+									"key": "ipaddr",
+									"value": "string",
+									"description": "Update the interface's static IPv4 address (required if `type` is set to `staticv4`)"
+								},
+								{
+									"key": "subnet",
+									"value": "string or integer",
+									"description": "Update the interface's static IPv4 address's subnet bitmask (required if `type` is set to `staticv4`)"
+								},
+								{
+									"key": "gateway",
+									"value": "string",
+									"description": "Update the interface network's upstream gateway. This is only necessary on WAN/UPLINK interfaces (optional)"
+								},
+								{
+									"key": "ipaddrv6",
+									"value": "string",
+									"description": "Update the interface's static IPv6 address (required if `type6` is set to `staticv6`)"
+								},
+								{
+									"key": "subnetv6",
+									"value": "string or integer",
+									"description": "Update the interface's static IPv6 address's subnet bitmask (required if `type6` is set to `staticv6`)"
+								},
+								{
+									"key": "gatewayv6",
+									"value": "string",
+									"description": "Update the interface network's upstream IPv6 gateway. This is only necessary on WAN/UPLINK interfaces (optional)"
+								},
+								{
+									"key": "ipv6usev4iface",
+									"value": "boolean",
+									"description": "Enable or disable IPv6 over IPv4 uplink connection (optional)"
+								},
+								{
+									"key": "dhcphostname",
+									"value": "string",
+									"description": "Update the IPv4 DHCP hostname. Only available when `type` is set to `dhcp` (optional)"
+								},
+								{
+									"key": "dhcprejectfrom",
+									"value": "string or array",
+									"description": "Update the IPv4 DHCP rejected servers. You may pass values in as array or as comma seperated string. Only available when `type` is set to `dhcp` (optional)"
+								},
+								{
+									"key": "alias-address",
+									"value": "string",
+									"description": "Update the IPv4 DHCP address alias. The value in this field is used as a fixed alias IPv4 address by the DHCP client (optional)"
+								},
+								{
+									"key": "alias-subnet",
+									"value": "string or integer",
+									"description": "Update the IPv4 DHCP address aliases subnet (optional)"
+								},
+								{
+									"key": "adv_dhcp_pt_timeout",
+									"value": "string or integer",
+									"description": "Update the IPv4 DHCP protocol timeout interval. Must be numeric value greater than 1 (optional)"
+								},
+								{
+									"key": "adv_dhcp_pt_retry",
+									"value": "string or integer",
+									"description": "Update the IPv4 DHCP protocol retry interval. Must be numeric value greater than 1 (optional)"
+								},
+								{
+									"key": "adv_dhcp_pt_select_timeout",
+									"value": "string or integer",
+									"description": "Update the IPv4 DHCP protocol select timeout interval. Must be numeric value greater than 0 (optional)"
+								},
+								{
+									"key": "adv_dhcp_pt_reboot",
+									"value": "string or integer",
+									"description": "Update the IPv4 DHCP protocol reboot interval. Must be numeric value greater than 1 (optional)"
+								},
+								{
+									"key": "adv_dhcp_pt_backoff_cutoff",
+									"value": "string or integer",
+									"description": "Update the IPv4 DHCP protocol backoff cutoff interval. Must be numeric value greater than 1 (optional)"
+								},
+								{
+									"key": "adv_dhcp_pt_initial_interval",
+									"value": "string or integer",
+									"description": "Update the IPv4 DHCP protocol initial interval. Must be numeric value greater than 1 (optional)"
+								},
+								{
+									"key": "adv_dhcp_config_advanced",
+									"value": "boolean",
+									"description": "Enable or disable the IPv4 DHCP advanced configuration options. This enables the DHCP options listed below (optional)"
+								},
+								{
+									"key": "adv_dhcp_send_options",
+									"value": "string",
+									"description": "Update the IPv4 `send` option (optional)"
+								},
+								{
+									"key": "adv_dhcp_request_options",
+									"value": "string",
+									"description": "Update the IPv4 `request` option (optional)"
+								},
+								{
+									"key": "adv_dhcp_request_options",
+									"value": "string",
+									"description": "Update the IPv4 `required` option (optional)"
+								},
+								{
+									"key": "adv_dhcp_option_modifiers",
+									"value": "string",
+									"description": "Update the IPv4 optionamodifier (optional)"
+								},
+								{
+									"key": "adv_dhcp_config_file_override",
+									"value": "boolean",
+									"description": "Enable or disable local DHCP configuration file override (optional)"
+								},
+								{
+									"key": "adv_dhcp_config_file_override_file",
+									"value": "string",
+									"description": "Update the custom DHCP configuration file's absolute path. This file must exist beforehand (optional)"
+								},
+								{
+									"key": "dhcpvlanenable",
+									"value": "boolean",
+									"description": "Enable or disable DHCP VLAN prioritization (optional)"
+								},
+								{
+									"key": "dhcpcvpt",
+									"value": "string or integer",
+									"description": "Update the DHCP VLAN priority. Must be a numeric value between 1 and 7 (optional)"
+								},
+								{
+									"key": "gateway-6rd",
+									"value": "string",
+									"description": "Update the 6RD interface IPv4 gateway address. Only required when `type6` is set to `6rd`"
+								},
+								{
+									"key": "prefix-6rd",
+									"value": "string",
+									"description": "Update the 6RD IPv6 prefix assigned by the ISP. Only required when `type6` is set to `6rd`"
+								},
+								{
+									"key": "prefix-6rd-v4plen",
+									"value": "integer or string",
+									"description": "Update the 6RD IPv4 prefix length. This is typically assigned by the ISP. Only available when `type6` is set to `6rd`"
+								},
+								{
+									"key": "track6-interface",
+									"value": "string",
+									"description": "Update the Track6 dynamic IPv6 interface. This must be a dynamically configured IPv6 interface. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Only required with `type6` is set to `track6`"
+								},
+								{
+									"key": "track6-prefix-id-hex",
+									"value": "string or integer",
+									"description": "Update the IPv6 prefix ID. The value in this field is the (Delegated) IPv6 prefix ID. This determines the configurable network ID based on the dynamic IPv6 connection. The default value is 0. Only available when `type6` is set to `track6`"
+								},
+								{
+									"key": "apply",
+									"value": "boolean",
+									"description": "Specify whether the updates should be Immediately applied to the Interface or not (optional)"
+								}
+							]
+						},
+						"description": "Update an existing interface.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]"
 					},
 					"response": []
 				},
