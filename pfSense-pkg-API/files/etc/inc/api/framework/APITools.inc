@@ -301,7 +301,7 @@ function sort_nat_rules($top=false, $data=null) {
             $sort_arr[] = $fre;
         }
     }
-    if (!empty($config["nat"]["rule"])) {
+    if (!empty($sort_arr)) {
         $config["nat"]["rule"] = $sort_arr;
     } else {
         unset($config["nat"]["rule"]);
