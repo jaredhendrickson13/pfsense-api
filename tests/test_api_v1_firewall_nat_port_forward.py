@@ -33,6 +33,26 @@ class APIUnitTestFirewallNATPortForward(unit_test_framework.APIUnitTest):
             "top": True
         }
     ]
+    put_payloads = [
+        {
+            "id": 0,
+            "interface": "WAN",
+            "protocol": "tcp",
+            "src": "!1.1.1.1/24",
+            "srcport": "any",
+            "dst": "wanip",
+            "dstport": 80,
+            "target": "192.168.1.1",
+            "local-port": "80",
+            "natreflection": "enable",
+            "descr": "Updated Unit Test",
+            "nosync": False,
+            "nordr": True,
+            "disabled": True,
+            "top": True,
+            "apply": True
+        }
+    ]
     delete_payloads = [
         {"id": 0}
     ]

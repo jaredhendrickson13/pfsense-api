@@ -28,6 +28,10 @@ class APIFirewallNATPortForward extends APIEndpoint {
         return (new APIFirewallNATPortForwardCreate())->call();
     }
 
+    protected function put() {
+        return (new APIFirewallNATPortForwardUpdate())->call();
+    }
+
     protected function delete() {
         return (new APIFirewallNATPortForwardDelete())->call();
     }

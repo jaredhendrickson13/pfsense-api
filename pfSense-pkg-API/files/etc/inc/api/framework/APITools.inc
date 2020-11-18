@@ -287,30 +287,25 @@ function enable_carp($enable) {
 }
 
 // Sorts nat rules by specified criteria and reloads the filter
-function sort_nat_rules($mode=null, $data=null) {
+function sort_nat_rules($top=false, $data=null) {
     // Variables
     global $config;
     $sort_arr = [];
-    $master_arr = [];
-    foreach ($config["nat"]["rule"] as $idx => $fre) {
-        $curr_iface = $fre["interface"];    // Save our current entries interface
-        // Create our interface array if does not exist
-        if (!isset($sort_arr[$curr_iface])) {
-            $sort_arr[$curr_iface] = [];
-        }
-        // Check if user requested this rule to be placed at the top of array
-        if ($mode === "top" and $idx === $data) {
-            array_unshift($sort_arr[$curr_iface], $fre);
+    $rules = (array_key_exists(0, $config["nat"]["rule"])) ? $config["nat"]["rule"] : [$config["nat"]["rule"]];
+
+    foreach ($rules as $idx => $fre) {
+        # Check if top mode is enabled, if so add this item to the start of the array
+        if ($top === true and $idx === $data) {
+            array_unshift($sort_arr, $fre);
         } else {
-            $sort_arr[$curr_iface][] = $fre;
+            $sort_arr[] = $fre;
         }
     }
-    foreach ($sort_arr as $if) {
-        foreach ($if as $rule) {
-            $master_arr[] = $rule;
-        }
+    if (!empty($config["nat"]["rule"])) {
+        $config["nat"]["rule"] = $sort_arr;
+    } else {
+        unset($config["nat"]["rule"]);
     }
-    $config["nat"]["rule"] = $master_arr;
 }
 
 # Input a physical interface ID, or a descriptive interface name, and return the pfSense interface ID (lan,wan,optx)

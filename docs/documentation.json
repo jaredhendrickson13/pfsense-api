@@ -2704,7 +2704,7 @@
 											}
 										},
 										"url": {
-											"raw": "https://{{$hostname}}/api/v1/firewall/nat/port_forward?type=string&interface=string&protocol=string&src=string&dst=string&srcport=string or integer&dstport=string or integer&target=string&local-port=string&natreflection=string&descr=string&disabled=boolean&top=boolean",
+											"raw": "https://{{$hostname}}/api/v1/firewall/nat/port_forward?interface=string&protocol=string&src=string&dst=string&srcport=string or integer&dstport=string or integer&target=string&local-port=string&natreflection=string&descr=string&disabled=boolean&top=boolean",
 											"protocol": "https",
 											"host": [
 												"{{$hostname}}"
@@ -2717,11 +2717,6 @@
 												"port_forward"
 											],
 											"query": [
-												{
-													"key": "type",
-													"value": "string",
-													"description": "Set a firewall rule type (`pass`, `block`, `reject`)"
-												},
 												{
 													"key": "interface",
 													"value": "string",
@@ -2780,11 +2775,110 @@
 												{
 													"key": "top",
 													"value": "boolean",
-													"description": "Add firewall rule to top of access control list (optional)"
+													"description": "Add this port forward rule to top of access control list (optional)"
 												}
 											]
 										},
 										"description": "Add a new NAT port forward rule.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-portforward-edit`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Update NAT Port Forwards",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"interface\": \"WAN\",\n\t\"protocol\": \"tcp\",\n\t\"src\": \"any\",\n\t\"srcport\": \"433\",\n\t\"dst\": \"em0ip\",\n\t\"dstport\": \"443\",\n\t\"target\": \"192.168.1.123\",\n\t\"local-port\": \"443\",\n\t\"natreflection\": \"purenat\",\n\t\"descr\": \"Forward pb to lc\",\n\t\"nosync\": true,\n\t\"top\": false\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/nat/port_forward?Id=Integer&interface=string&protocol=string&src=string&dst=string&srcport=string or integer&dstport=string or integer&target=string&local-port=string&natreflection=string&descr=string&disabled=boolean&top=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"nat",
+												"port_forward"
+											],
+											"query": [
+												{
+													"key": "Id",
+													"value": "Integer",
+													"description": "Specify the ID of the port forward rule to update."
+												},
+												{
+													"key": "interface",
+													"value": "string",
+													"description": "Update the interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported. (optional)"
+												},
+												{
+													"key": "protocol",
+													"value": "string",
+													"description": "Update which transfer protocol the rule will apply to. If `tcp`, `udp`, `tcp/udp`, you must define a source and destination port. (optional)"
+												},
+												{
+													"key": "src",
+													"value": "string",
+													"description": "Update the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional)"
+												},
+												{
+													"key": "dst",
+													"value": "string",
+													"description": "Update the destination address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To only use interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional)"
+												},
+												{
+													"key": "srcport",
+													"value": "string or integer",
+													"description": "Update the TCP and/or UDP source port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` (optional)"
+												},
+												{
+													"key": "dstport",
+													"value": "string or integer",
+													"description": "Update the TCP and/or UDP destination port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` (optional)"
+												},
+												{
+													"key": "target",
+													"value": "string",
+													"description": "Update the IP to forward traffic to (optional)"
+												},
+												{
+													"key": "local-port",
+													"value": "string",
+													"description": "Udate the TCP and/or UDP  port to forward traffic to. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp`. Port ranges may be specified using colon or hyphen. (optional)"
+												},
+												{
+													"key": "natreflection",
+													"value": "string",
+													"description": "Update the NAT reflection mode explicitly (optional)"
+												},
+												{
+													"key": "descr",
+													"value": "string",
+													"description": "Update a description for the rule (optional)"
+												},
+												{
+													"key": "disabled",
+													"value": "boolean",
+													"description": "Enable or disable the rule upon creation. True to disable, false to enable (optional)"
+												},
+												{
+													"key": "top",
+													"value": "boolean",
+													"description": "Move this port forward rule to top of access control list (optional)"
+												}
+											]
+										},
+										"description": "Update an existing port forward rule.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-portforward-edit`]"
 									},
 									"response": []
 								},

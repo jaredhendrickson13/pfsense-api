@@ -16,31 +16,24 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-class APIFirewallNATPortForwardCreate extends APIModel {
+class APIFirewallNATPortForwardUpdate extends APIModel {
     private $protocols;
     private $nat_reflection;
-    private $created_by_msg;
+    private $updated_by_msg;
     private $port_required;
 
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->change_note = "Added NAT rule via API";
+        $this->change_note = "Modified NAT rule via API";
         $this->privileges = ["page-all", "page-firewall-nat-portforward-edit"];
         $this->protocols = ["tcp", "udp", "tcp/udp", "icmp", "esp", "ah", "gre", "ipv6", "igmp", "pim", "ospf"];
         $this->nat_reflection = ["enable", "disable", "purenat"];
         $this->port_required = false;
-        $this->id = count($this->config["nat"]["rule"]);
     }
 
     public function action() {
-        # Ensure our config is formatted for NAT rules
-        if (!is_array($this->config["nat"]["rule"])) {
-            $this->config["nat"] = [];
-            $this->config["nat"]["rule"] = [];
-        }
-
-        # Add our new configuration
+        # Update our new configuration
         $this->config["nat"]["rule"][$this->id] = $this->validated_data;
         APITools\sort_nat_rules($this->initial_data["top"], $this->id);
         $this->write_config();
@@ -55,8 +48,23 @@ class APIFirewallNATPortForwardCreate extends APIModel {
         return APIResponse\get(0, $this->validated_data);
     }
 
+    private function __validate_id() {
+        # Require clients to specify a port forward ID to modify
+        if (isset($this->initial_data["id"])) {
+            # Require the port forward ID specified to exist
+            if (array_key_exists($this->initial_data["id"], $this->config["nat"]["rule"])) {
+                $this->id = $this->initial_data["id"];
+                $this->validated_data = $this->config["nat"]["rule"][$this->id];
+            } else {
+                $this->errors[] = APIResponse\get(4016);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(4015);
+        }
+    }
+
     private function __validate_interface() {
-        # Require clients to pass in an interface
+        # Optionally allow clients to update the associated interface
         if (isset($this->initial_data['interface'])) {
             $interface = APITools\get_pfsense_if_id($this->initial_data['interface']);
             # Require interface to exist
@@ -65,31 +73,29 @@ class APIFirewallNATPortForwardCreate extends APIModel {
             } else {
                 $this->errors[] = APIResponse\get(4006);
             }
-        } else {
-            $this->errors[] = APIResponse\get(4000);
         }
     }
 
     private function __validate_protocol() {
-        # Require client to pass in a protocol
+        # Optionally allow client to update the protocol
         if (isset($this->initial_data['protocol'])) {
             # Require protocol to be a known/supported protocol
             if (in_array($this->initial_data['protocol'], $this->protocols)) {
-                $this->validated_data["protocol"] = $this->initial_data['protocol'];
-                # Set our port required toggle to true if our protocol depends on a port
-                if (in_array($this->validated_data["protocol"], ["tcp", "udp", "tcp/udp"])) {
-                    $this->port_required = true;
+                # Only require ports if updating to port protocol from non-port protocol
+                if (in_array($this->initial_data["protocol"], ["tcp", "udp", "tcp/udp"])) {
+                    if (!in_array($this->validated_data["protocol"], ["tcp", "udp", "tcp/udp"])) {
+                        $this->port_required = true;
+                    }
                 }
+                $this->validated_data["protocol"] = $this->initial_data['protocol'];
             } else {
                 $this->errors[] = APIResponse\get(4007);
             }
-        } else {
-            $this->errors[] = APIResponse\get(4001);
         }
     }
 
     private function __validate_target() {
-        # Require client to pass in an internal target for the port forward
+        # Optionally allow client to update internal target for the port forward
         if (isset($this->initial_data['target'])) {
             # Require the target to either be a valid IPv4 or IPv6 address
             if (is_ipaddrv4($this->initial_data['target'])) {
@@ -99,8 +105,6 @@ class APIFirewallNATPortForwardCreate extends APIModel {
             } else {
                 $this->errors[] = APIResponse\get(4009);
             }
-        } else {
-            $this->errors[] = APIResponse\get(4002);
         }
     }
 
@@ -122,7 +126,7 @@ class APIFirewallNATPortForwardCreate extends APIModel {
     }
 
     private function __validate_src() {
-        # Require to specify a source address
+        # Optionally allow client to update source address
         if (isset($this->initial_data['src'])) {
             $rule_check = APITools\is_valid_rule_addr($this->initial_data['src'], "source");
             if ($rule_check["valid"]) {
@@ -130,13 +134,11 @@ class APIFirewallNATPortForwardCreate extends APIModel {
             } else {
                 $this->errors[] = APIResponse\get(4011);
             }
-        } else {
-            $this->errors[] = APIResponse\get(4004);
         }
     }
 
     private function __validate_dst() {
-        # Require to specify a destination address
+        # Optionally allow client to update destination address
         if (isset($this->initial_data['dst'])) {
             $rule_check = APITools\is_valid_rule_addr($this->initial_data['dst'], "destination");
             if ($rule_check["valid"]) {
@@ -144,8 +146,6 @@ class APIFirewallNATPortForwardCreate extends APIModel {
             } else {
                 $this->errors[] = APIResponse\get(4012);
             }
-        } else {
-            $this->errors[] = APIResponse\get(4005);
         }
     }
 
@@ -180,22 +180,31 @@ class APIFirewallNATPortForwardCreate extends APIModel {
     }
 
     private function __validate_disabled() {
-        # Optionally allow client to disable port forward upon entry
+        # Optionally allow client to enable or disable port forward upon update
         if ($this->initial_data['disabled'] === true) {
             $this->validated_data["disabled"] = "";
+        }
+        elseif($this->initial_data["disabled"] === false) {
+            unset($this->validated_data["disabled"]);
         }
     }
 
     private function __validate_nordr() {
-        # Optionally allow client to disable RDR for this entry
+        # Optionally allow client to enable or disable RDR upon update
         if ($this->initial_data['nordr'] === true) {
             $this->validated_data["nordr"] = "";
         }
+        elseif($this->initial_data["nordr"] === false) {
+            unset($this->validated_data["nordr"]);
+        }
     }
     private function __validate_nosync() {
-        # Optionally allow client to disable pfSync for this entry
+        # Optionally allow client to enable or disable pfSync upon update
         if ($this->initial_data['nosync'] === true) {
             $this->validated_data["nosync"] = "";
+        }
+        elseif($this->initial_data["nosync"] === false) {
+            unset($this->validated_data["nosync"]);
         }
     }
 
@@ -220,6 +229,7 @@ class APIFirewallNATPortForwardCreate extends APIModel {
 
     public function validate_payload() {
         # Run each field validator method
+        $this->__validate_id();
         $this->__validate_interface();
         $this->__validate_protocol();
         $this->__validate_target();
@@ -235,9 +245,8 @@ class APIFirewallNATPortForwardCreate extends APIModel {
         $this->__validate_natreflection();
 
         # Add static field values
-        $this->created_by_msg = $this->client->username."@".$this->client->ip_address." (API)";
+        $this->updated_by_msg = $this->client->username."@".$this->client->ip_address." (API)";
         $this->validated_data["associated-rule-id"] = "pass";
-        $this->validated_data["created"] = array("time" => time(), "username" => $this->created_by_msg);
-        $this->validated_data["updated"] = $this->validated_data["created"];
+        $this->validated_data["updated"] = array("time" => time(), "username" => $this->updated_by_msg);
     }
 }

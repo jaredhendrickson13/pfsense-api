@@ -513,6 +513,7 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Create NAT Port Forwards](#1-create-nat-port-forwards)
   * [Delete NAT Port Forwards](#2-delete-nat-port-forwards)
   * [Read NAT Port Forwards](#3-read-nat-port-forwards)
+  * [Update NAT Port Forwards](#4-update-nat-port-forwards)
 
 * [FIREWALL/RULE](#firewallrule)
 
@@ -1044,7 +1045,6 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| type | string | Set a firewall rule type (`pass`, `block`, `reject`) |
 | interface | string | Set which interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported.  |
 | protocol | string | Set which transfer protocol the rule will apply to. If `tcp`, `udp`, `tcp/udp`, you must define a source and destination port |
 | src | string | Set the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
@@ -1056,7 +1056,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 | natreflection | string | Set the NAT reflection mode explicitly (optional) |
 | descr | string | Set a description for the rule (optional) |
 | disabled | boolean | Disable the rule upon creation (optional) |
-| top | boolean | Add firewall rule to top of access control list (optional) |
+| top | boolean | Add this port forward rule to top of access control list (optional) |
 
 
 
@@ -1141,6 +1141,65 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 ```js        
 {
     
+}
+```
+
+
+
+### 4. Update NAT Port Forwards
+
+
+Update an existing port forward rule.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-portforward-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| Id | Integer | Specify the ID of the port forward rule to update. |
+| interface | string | Update the interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported. (optional) |
+| protocol | string | Update which transfer protocol the rule will apply to. If `tcp`, `udp`, `tcp/udp`, you must define a source and destination port. (optional) |
+| src | string | Update the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional) |
+| dst | string | Update the destination address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To only use interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional) |
+| srcport | string or integer | Update the TCP and/or UDP source port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` (optional) |
+| dstport | string or integer | Update the TCP and/or UDP destination port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` (optional) |
+| target | string | Update the IP to forward traffic to (optional) |
+| local-port | string | Udate the TCP and/or UDP  port to forward traffic to. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp`. Port ranges may be specified using colon or hyphen. (optional) |
+| natreflection | string | Update the NAT reflection mode explicitly (optional) |
+| descr | string | Update a description for the rule (optional) |
+| disabled | boolean | Enable or disable the rule upon creation. True to disable, false to enable (optional) |
+| top | boolean | Move this port forward rule to top of access control list (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"interface": "WAN",
+	"protocol": "tcp",
+	"src": "any",
+	"srcport": "433",
+	"dst": "em0ip",
+	"dstport": "443",
+	"target": "192.168.1.123",
+	"local-port": "443",
+	"natreflection": "purenat",
+	"descr": "Forward pb to lc",
+	"nosync": true,
+	"top": false
 }
 ```
 
