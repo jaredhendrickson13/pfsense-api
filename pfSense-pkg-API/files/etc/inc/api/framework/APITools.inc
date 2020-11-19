@@ -291,9 +291,8 @@ function sort_nat_rules($top=false, $data=null) {
     // Variables
     global $config;
     $sort_arr = [];
-    $rules = (array_key_exists(0, $config["nat"]["rule"])) ? $config["nat"]["rule"] : [$config["nat"]["rule"]];
 
-    foreach ($rules as $idx => $fre) {
+    foreach ($config["nat"]["rule"] as $idx => $fre) {
         # Check if top mode is enabled, if so add this item to the start of the array
         if ($top === true and $idx === $data) {
             array_unshift($sort_arr, $fre);
