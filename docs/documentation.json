@@ -2704,7 +2704,7 @@
 											}
 										},
 										"url": {
-											"raw": "https://{{$hostname}}/api/v1/firewall/nat/port_forward?interface=string&protocol=string&src=string&dst=string&srcport=string or integer&dstport=string or integer&target=string&local-port=string&natreflection=string&descr=string&disabled=boolean&top=boolean",
+											"raw": "https://{{$hostname}}/api/v1/firewall/nat/port_forward?interface=string&protocol=string&src=string&dst=string&srcport=string or integer&dstport=string or integer&target=string&local-port=string&natreflection=string&descr=string&disabled=boolean&top=boolean&apply=boolean",
 											"protocol": "https",
 											"host": [
 												"{{$hostname}}"
@@ -2776,6 +2776,11 @@
 													"key": "top",
 													"value": "boolean",
 													"description": "Add this port forward rule to top of access control list (optional)"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Immediately apply this port forward rule after creation (optional)"
 												}
 											]
 										},
@@ -2798,7 +2803,7 @@
 											}
 										},
 										"url": {
-											"raw": "https://{{$hostname}}/api/v1/firewall/nat/port_forward?Id=Integer&interface=string&protocol=string&src=string&dst=string&srcport=string or integer&dstport=string or integer&target=string&local-port=string&natreflection=string&descr=string&disabled=boolean&top=boolean",
+											"raw": "https://{{$hostname}}/api/v1/firewall/nat/port_forward?Id=Integer&interface=string&protocol=string&src=string&dst=string&srcport=string or integer&dstport=string or integer&target=string&local-port=string&natreflection=string&descr=string&disabled=boolean&top=boolean&apply=boolean",
 											"protocol": "https",
 											"host": [
 												"{{$hostname}}"
@@ -2875,6 +2880,11 @@
 													"key": "top",
 													"value": "boolean",
 													"description": "Move this port forward rule to top of access control list (optional)"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Immediately apply the update to this port forward rule (optional)"
 												}
 											]
 										},
@@ -2897,7 +2907,7 @@
 											}
 										},
 										"url": {
-											"raw": "https://{{$hostname}}/api/v1/firewall/nat/port_forward?id=string or integer",
+											"raw": "https://{{$hostname}}/api/v1/firewall/nat/port_forward?id=string or integer&apply=boolean",
 											"protocol": "https",
 											"host": [
 												"{{$hostname}}"
@@ -2914,6 +2924,11 @@
 													"key": "id",
 													"value": "string or integer",
 													"description": "Specify the rule ID to delete"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Immediately delete this port forward rule (optional)"
 												}
 											]
 										},
@@ -2945,6 +2960,266 @@
 									}
 								}
 							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "ONE_TO_ONE",
+							"item": [
+								{
+									"name": "Read NAT 1:1 Mappings",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/nat/one_to_one",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"nat",
+												"one_to_one"
+											]
+										},
+										"description": "Read 1:1 NAT mappings.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Create NAT 1:1 Mappings",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"interface\": \"WAN\",\n\t\"src\": \"any\",\n\t\"dst\": \"em0ip\",\n\t\"external\": \"1.2.3.4\",\n\t\"natreflection\": \"enable\",\n\t\"descr\": \"Test 1:1 NAT entry\",\n\t\"nobinat\": true,\n\t\"top\": false,\n    \"apply\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/nat/port_forward?interface=string&src=string&dst=string&external=string&natreflection=string&descr=string&disabled=boolean&nobinat=boolean&top=boolean&apply=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"nat",
+												"port_forward"
+											],
+											"query": [
+												{
+													"key": "interface",
+													"value": "string",
+													"description": "Set which interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported. "
+												},
+												{
+													"key": "src",
+													"value": "string",
+													"description": "Set the source address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!`"
+												},
+												{
+													"key": "dst",
+													"value": "string",
+													"description": "Set the destination address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To only use interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!`"
+												},
+												{
+													"key": "external",
+													"value": "string",
+													"description": "Specify IPv4 or IPv6 external address to map Inside traffic to. This Is typically an address on an uplink Interface."
+												},
+												{
+													"key": "natreflection",
+													"value": "string",
+													"description": "Set the NAT reflection mode explicitly. Options are `enable` or `disable`. (optional)"
+												},
+												{
+													"key": "descr",
+													"value": "string",
+													"description": "Set a description for the mapping (optional)"
+												},
+												{
+													"key": "disabled",
+													"value": "boolean",
+													"description": "Disable the mapping upon creation (optional)"
+												},
+												{
+													"key": "nobinat",
+													"value": "boolean",
+													"description": "Disable binat. This excludes the address from a later, more general, rule. (optional)"
+												},
+												{
+													"key": "top",
+													"value": "boolean",
+													"description": "Add this mapping to top of access control list (optional)"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Immediately apply this mapping after creation (optional)"
+												}
+											]
+										},
+										"description": "Add a new NAT 1:1 Mapping.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1-edit`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Update NAT 1:1 Mappings",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"interface\": \"LAN\",\n\t\"src\": \"10.0.0.0/24\",\n\t\"dst\": \"!1.2.3.4\",\n\t\"external\": \"4.3.2.1\",\n\t\"natreflection\": \"disable\",\n\t\"descr\": \"Updated test 1:1 NAT entry\",\n    \"disabled\": true,\n\t\"nobinat\": false,\n\t\"top\": true,\n    \"apply\": false\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/nat/port_forward?id=integer&interface=string&src=string&dst=string&external=string&natreflection=string&descr=string&disabled=boolean&nobinat=boolean&top=boolean&apply=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"nat",
+												"port_forward"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "integer",
+													"description": "Specify the ID of the 1:1 mapping to update."
+												},
+												{
+													"key": "interface",
+													"value": "string",
+													"description": "Update which interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). (optional)"
+												},
+												{
+													"key": "src",
+													"value": "string",
+													"description": "Update the source address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!`"
+												},
+												{
+													"key": "dst",
+													"value": "string",
+													"description": "Update the destination address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To only use interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional)"
+												},
+												{
+													"key": "external",
+													"value": "string",
+													"description": "Update the IPv4 or IPv6 external address to map Inside traffic to. This Is typically an address on an uplink Interface. (optional)"
+												},
+												{
+													"key": "natreflection",
+													"value": "string",
+													"description": "Update the NAT reflection mode explicitly. Options are `enable` or `disable`. (optional)"
+												},
+												{
+													"key": "descr",
+													"value": "string",
+													"description": "Update the description for the mapping (optional)"
+												},
+												{
+													"key": "disabled",
+													"value": "boolean",
+													"description": "Enable or disable the mapping upon update. True to disable, false to enable. (optional)"
+												},
+												{
+													"key": "nobinat",
+													"value": "boolean",
+													"description": "Enable or disable binat. This excludes the address from a later, more general, rule. True to disable binat, false to enable binat. (optional)"
+												},
+												{
+													"key": "top",
+													"value": "boolean",
+													"description": "Move this mapping to top of access control list upon update (optional)"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Immediately apply this mapping after update (optional)"
+												}
+											]
+										},
+										"description": "Update an existing NAT 1:1 Mapping.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1-edit`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete NAT 1:1 Mappings",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"id\": 0, \n    \"apply\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/nat/port_forward?id=string or integer&apply=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"nat",
+												"port_forward"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "string or integer",
+													"description": "Specify the 1:1 NAT mapping ID to delete"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Immediately delete this mapping rule (optional)"
+												}
+											]
+										},
+										"description": "Delete an existing NAT 1:1 mapping by ID.<br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1-edit`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that create, read, update and delete 1:1 NAT mappings.",
 							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},

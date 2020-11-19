@@ -286,13 +286,13 @@ function enable_carp($enable) {
     }
 }
 
-// Sorts nat rules by specified criteria and reloads the filter
-function sort_nat_rules($top=false, $data=null) {
+# Sorts NAT rules by specified criteria
+function sort_nat_rules($top=false, $data=null, $field="rule") {
     // Variables
     global $config;
     $sort_arr = [];
 
-    foreach ($config["nat"]["rule"] as $idx => $fre) {
+    foreach ($config["nat"][$field] as $idx => $fre) {
         # Check if top mode is enabled, if so add this item to the start of the array
         if ($top === true and $idx === $data) {
             array_unshift($sort_arr, $fre);
@@ -301,9 +301,9 @@ function sort_nat_rules($top=false, $data=null) {
         }
     }
     if (!empty($sort_arr)) {
-        $config["nat"]["rule"] = $sort_arr;
+        $config["nat"][$field] = $sort_arr;
     } else {
-        unset($config["nat"]["rule"]);
+        unset($config["nat"][$field]);
     }
 }
 
@@ -327,10 +327,15 @@ function get_pfsense_if_id($interface) {
                 return $if_id;
             }
         }
+        # Alternatively, check if the interface does not have a description. If so, check it's default description.
+        elseif (strtoupper($if_id) === $interface) {
+            return $if_id;
+        }
         # Next, check if the requested interface matches this pfSense interface ID (wan, lan, opt1, opt2, etc.)
         if ($interface === $if_id) {
             return $if_id;
         }
+
     }
 }
 

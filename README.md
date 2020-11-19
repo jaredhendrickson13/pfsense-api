@@ -508,6 +508,13 @@ There is no limit to API calls at this time but is important to note that pfSens
 
   * [Read NAT](#1-read-nat)
 
+* [FIREWALL/NAT/ONE_TO_ONE](#firewallnatone_to_one)
+
+  * [Create NAT 1:1 Mappings](#1-create-nat-1:1-mappings)
+  * [Delete NAT 1:1 Mappings](#2-delete-nat-1:1-mappings)
+  * [Read NAT 1:1 Mappings](#3-read-nat-1:1-mappings)
+  * [Update NAT 1:1 Mappings](#4-update-nat-1:1-mappings)
+
 * [FIREWALL/NAT/PORTFOWARD](#firewallnatportfoward)
 
   * [Create NAT Port Forwards](#1-create-nat-port-forwards)
@@ -1019,6 +1026,184 @@ URL: https://{{$hostname}}/api/v1/firewall/nat
 
 
 
+## FIREWALL/NAT/ONE_TO_ONE
+
+
+
+### 1. Create NAT 1:1 Mappings
+
+
+Add a new NAT 1:1 Mapping.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| interface | string | Set which interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported.  |
+| src | string | Set the source address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
+| dst | string | Set the destination address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To only use interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
+| external | string | Specify IPv4 or IPv6 external address to map Inside traffic to. This Is typically an address on an uplink Interface. |
+| natreflection | string | Set the NAT reflection mode explicitly. Options are `enable` or `disable`. (optional) |
+| descr | string | Set a description for the mapping (optional) |
+| disabled | boolean | Disable the mapping upon creation (optional) |
+| nobinat | boolean | Disable binat. This excludes the address from a later, more general, rule. (optional) |
+| top | boolean | Add this mapping to top of access control list (optional) |
+| apply | boolean | Immediately apply this mapping after creation (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"interface": "WAN",
+	"src": "any",
+	"dst": "em0ip",
+	"external": "1.2.3.4",
+	"natreflection": "enable",
+	"descr": "Test 1:1 NAT entry",
+	"nobinat": true,
+	"top": false,
+    "apply": true
+}
+```
+
+
+
+### 2. Delete NAT 1:1 Mappings
+
+
+Delete an existing NAT 1:1 mapping by ID.<br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | string or integer | Specify the 1:1 NAT mapping ID to delete |
+| apply | boolean | Immediately delete this mapping rule (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"id": 0, 
+    "apply": true
+}
+```
+
+
+
+### 3. Read NAT 1:1 Mappings
+
+
+Read 1:1 NAT mappings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 4. Update NAT 1:1 Mappings
+
+
+Update an existing NAT 1:1 Mapping.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the 1:1 mapping to update. |
+| interface | string | Update which interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). (optional) |
+| src | string | Update the source address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
+| dst | string | Update the destination address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To only use interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional) |
+| external | string | Update the IPv4 or IPv6 external address to map Inside traffic to. This Is typically an address on an uplink Interface. (optional) |
+| natreflection | string | Update the NAT reflection mode explicitly. Options are `enable` or `disable`. (optional) |
+| descr | string | Update the description for the mapping (optional) |
+| disabled | boolean | Enable or disable the mapping upon update. True to disable, false to enable. (optional) |
+| nobinat | boolean | Enable or disable binat. This excludes the address from a later, more general, rule. True to disable binat, false to enable binat. (optional) |
+| top | boolean | Move this mapping to top of access control list upon update (optional) |
+| apply | boolean | Immediately apply this mapping after update (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"interface": "LAN",
+	"src": "10.0.0.0/24",
+	"dst": "!1.2.3.4",
+	"external": "4.3.2.1",
+	"natreflection": "disable",
+	"descr": "Updated test 1:1 NAT entry",
+    "disabled": true,
+	"nobinat": false,
+	"top": true,
+    "apply": false
+}
+```
+
+
+
 ## FIREWALL/NAT/PORTFOWARD
 
 
@@ -1057,6 +1242,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 | descr | string | Set a description for the rule (optional) |
 | disabled | boolean | Disable the rule upon creation (optional) |
 | top | boolean | Add this port forward rule to top of access control list (optional) |
+| apply | boolean | Immediately apply this port forward rule after creation (optional) |
 
 
 
@@ -1105,6 +1291,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 | Key | Value | Description |
 | --- | ------|-------------|
 | id | string or integer | Specify the rule ID to delete |
+| apply | boolean | Immediately delete this port forward rule (optional) |
 
 
 
@@ -1181,6 +1368,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 | descr | string | Update a description for the rule (optional) |
 | disabled | boolean | Enable or disable the rule upon creation. True to disable, false to enable (optional) |
 | top | boolean | Move this port forward rule to top of access control list (optional) |
+| apply | boolean | Immediately apply the update to this port forward rule (optional) |
 
 
 

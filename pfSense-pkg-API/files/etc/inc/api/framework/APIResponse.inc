@@ -1334,6 +1334,67 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall alias id required"
         ],
+        4075 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "1:1 NAT interface is required"
+        ],
+        4076=> [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown 1:1 NAT interface"
+        ],
+        4077 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "1:1 NAT source required"
+        ],
+        4078 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "1:1 NAT destination required"
+        ],
+        4079 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid 1:1 NAT source address"
+        ],
+        4080 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid 1:1 NAT destination address"
+        ],
+        4081 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "1:1 NAT external address required"
+        ],
+        4082 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid 1:1 NAT external address"
+        ],
+        4083 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "1:1 NAT rule ID required"
+        ],
+        4084 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "1:1 NAT rule ID does not exist"
+        ],
+
         //5000-5999 reserved for /users API calls
         5000 => [
             "status" => "bad request",

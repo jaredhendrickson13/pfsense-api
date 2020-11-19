@@ -166,5 +166,4 @@ class APIModel {
             $this->errors[] = APIResponse\get(11);
         }
     }
-
 }
