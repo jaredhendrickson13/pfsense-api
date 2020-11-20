@@ -3220,6 +3220,110 @@
 								}
 							],
 							"description": "API endpoints that create, read, update and delete 1:1 NAT mappings.",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "b651d13f-bac6-4972-b51b-e809a66de831",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "e47f7092-4987-458a-9712-e6073c33a4f7",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "OUTBOUND",
+							"item": [
+								{
+									"name": "Read Outbound NAT Settings",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/nat/outbound",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"nat",
+												"outbound"
+											]
+										},
+										"description": "Read outbound NAT mode settings.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Update Outbound NAT Settings",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/nat/outbound?mode=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"nat",
+												"outbound"
+											],
+											"query": [
+												{
+													"key": "mode",
+													"value": "string",
+													"description": "Update the outbound NAT mode. Options are `automatic` to automatically generate outbound NAT rules, `hybrid` to support both automatiic and manual outbound NAT rules , `advanced` to require all rules to be entered manually, or `disabled` to disable outbound NAT altogether. If updating to `advanced` from `automatic` or `hybrid`, the API will automatically create manual entries for each automatically generated outbound NAT entry."
+												}
+											]
+										},
+										"description": "Update outbound NAT mode settings.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that create, read, update and delete outbound NAT settings.",
 							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},

@@ -515,6 +515,11 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Read NAT 1:1 Mappings](#3-read-nat-1:1-mappings)
   * [Update NAT 1:1 Mappings](#4-update-nat-1:1-mappings)
 
+* [FIREWALL/NAT/OUTBOUND](#firewallnatoutbound)
+
+  * [Read Outbound NAT Settings](#1-read-outbound-nat-settings)
+  * [Update Outbound NAT Settings](#2-update-outbound-nat-settings)
+
 * [FIREWALL/NAT/PORTFOWARD](#firewallnatportfoward)
 
   * [Create NAT Port Forwards](#1-create-nat-port-forwards)
@@ -1199,6 +1204,74 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 	"nobinat": false,
 	"top": true,
     "apply": false
+}
+```
+
+
+
+## FIREWALL/NAT/OUTBOUND
+
+
+
+### 1. Read Outbound NAT Settings
+
+
+Read outbound NAT mode settings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/outbound
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Update Outbound NAT Settings
+
+
+Update outbound NAT mode settings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/outbound
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| mode | string | Update the outbound NAT mode. Options are `automatic` to automatically generate outbound NAT rules, `hybrid` to support both automatiic and manual outbound NAT rules , `advanced` to require all rules to be entered manually, or `disabled` to disable outbound NAT altogether. If updating to `advanced` from `automatic` or `hybrid`, the API will automatically create manual entries for each automatically generated outbound NAT entry. |
+
+
+
+***Body:***
+
+```js        
+{
+    
 }
 ```
 

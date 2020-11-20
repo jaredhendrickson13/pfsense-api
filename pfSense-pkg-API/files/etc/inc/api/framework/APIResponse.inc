@@ -1394,6 +1394,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "1:1 NAT rule ID does not exist"
         ],
+        4085 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid outbound NAT mode"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [
