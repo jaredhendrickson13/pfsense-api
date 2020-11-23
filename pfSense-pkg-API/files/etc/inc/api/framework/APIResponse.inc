@@ -1400,6 +1400,126 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Invalid outbound NAT mode"
         ],
+        4086 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping interface is required"
+        ],
+        4087 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown outbound NAT mapping interface"
+        ],
+        4088=> [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping protocol required"
+        ],
+        4089 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown outbound NAT mapping protocol"
+        ],
+        4090 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown outbound NAT mapping pool option"
+        ],
+        4091 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping source hash key must start with 0x"
+        ],
+        4092 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping source hash key must contain a hexadecimal value after 0x"
+        ],
+        4093 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping source hash key must be 34 characters in length including 0x"
+        ],
+        4094 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping target is required"
+        ],
+        4095 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid outbound NAT mapping target"
+        ],
+        4096 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping pool option must be default or round robin when using an alias target"
+        ],
+        4097 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid outbound NAT port"
+        ],
+        4098 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping source required"
+        ],
+        4099 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid outbound NAT source address"
+        ],
+        4100 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping destination required"
+        ],
+        4101 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid outbound NAT destination address"
+        ],
+        4102 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid outbound NAT source port"
+        ],
+        4103 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid outbound NAT destination port"
+        ],
+        4104 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping ID required"
+        ],
+        4105 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping ID does not exist"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [

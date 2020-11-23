@@ -33,7 +33,7 @@ class APIUnitTestFirewallNATOneToOne(unit_test_framework.APIUnitTest):
     put_payloads = [
         {
             "id": 0,
-            "interface": "lan",
+            "interface": "wan",
             "src": "!1.1.1.1",
             "dst": "1.2.3.4",
             "external": "4.3.2.1",
@@ -46,7 +46,7 @@ class APIUnitTestFirewallNATOneToOne(unit_test_framework.APIUnitTest):
         }
     ]
     delete_payloads = [
-        {"id": 0, "apply": true}
+        {"id": 0, "apply": True}
     ]
 
 APIUnitTestFirewallNATOneToOne()

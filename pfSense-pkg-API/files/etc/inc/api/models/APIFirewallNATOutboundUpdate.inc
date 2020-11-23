@@ -25,6 +25,7 @@ class APIFirewallNATOutboundUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-nat-outbound"];
         $this->modes = ["automatic", "hybrid", "advanced", "disabled"];
+        var_dump($this->initial_data);
 
     }
 

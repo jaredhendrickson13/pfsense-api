@@ -3249,6 +3249,330 @@
 							"name": "OUTBOUND",
 							"item": [
 								{
+									"name": "MAPPING",
+									"item": [
+										{
+											"name": "Read Outbound NAT Mappings",
+											"protocolProfileBehavior": {
+												"disableBodyPruning": true
+											},
+											"request": {
+												"method": "GET",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping",
+													"protocol": "https",
+													"host": [
+														"{{$hostname}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"firewall",
+														"nat",
+														"outbound",
+														"mapping"
+													]
+												},
+												"description": "Read existing outbound NAT mode mappings.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]"
+											},
+											"response": []
+										},
+										{
+											"name": "Create Outbound NAT Mappings",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n\t\"interface\": \"WAN\",\n\t\"protocol\": \"tcp\",\n\t\"src\": \"any\",\n\t\"srcport\": \"433\",\n\t\"dst\": \"em0ip\",\n\t\"dstport\": \"443\",\n\t\"target\": \"192.168.1.123\",\n\t\"local-port\": \"443\",\n\t\"natreflection\": \"purenat\",\n\t\"descr\": \"Forward pb to lc\",\n\t\"nosync\": true,\n\t\"top\": false\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping?interface=string&protocol=string&src=string&dst=string&srcport=string or integer&dstport=string or integer&target=string&natport=string&staticnatport=boolean&descr=string&poolopts=string&source_hash_key=string&disabled=boolean&nonat=boolean&top=boolean&apply=boolean",
+													"protocol": "https",
+													"host": [
+														"{{$hostname}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"firewall",
+														"nat",
+														"outbound",
+														"mapping"
+													],
+													"query": [
+														{
+															"key": "interface",
+															"value": "string",
+															"description": "Set which interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). "
+														},
+														{
+															"key": "protocol",
+															"value": "string",
+															"description": "Set which transfer protocol the mapping will apply to. "
+														},
+														{
+															"key": "src",
+															"value": "string",
+															"description": "Set the source address of the firewall rule. This must be an IP, CIDR, alias or any."
+														},
+														{
+															"key": "dst",
+															"value": "string",
+															"description": "Set the destination address of the firewall rule. This may be a single IP, network CIDR, or alias name. To negate the context of the  address, you may prepend the address with `!`"
+														},
+														{
+															"key": "srcport",
+															"value": "string or integer",
+															"description": "Set the TCP and/or UDP source port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp`"
+														},
+														{
+															"key": "dstport",
+															"value": "string or integer",
+															"description": "Set the TCP and/or UDP destination port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp`"
+														},
+														{
+															"key": "target",
+															"value": "string",
+															"description": "Specify the external IP to map this traffic to. This may be an IP address, IP subnet, alias, or empty string to use the Interface address. "
+														},
+														{
+															"key": "natport",
+															"value": "string",
+															"description": "Set the TCP and/or UDP  port or port range to utilize when NATing (optional)"
+														},
+														{
+															"key": "staticnatport",
+															"value": "boolean",
+															"description": "Enable or disable static NAT ports. When enabling this field, any existing `natport` value will be lost. Defaults to false. (optional)"
+														},
+														{
+															"key": "descr",
+															"value": "string",
+															"description": "Set a description for the rule (optional)"
+														},
+														{
+															"key": "poolopts",
+															"value": "string",
+															"description": "Set the outbound NAT pool option for load balancing. Options are `round-robin`, `round-robin sticky-address`, `random`, `random sticky-address`, `source-hash`, `bitmask` or empty string for default. (optional)"
+														},
+														{
+															"key": "source_hash_key",
+															"value": "string",
+															"description": "Set a custom key hash to use when utilizing the `source-hash` NAT pool option. Value must start with `0x` following a 32 digit hex value. If this field is not specified, a random key hash will be generated. This field Is only available when `poolopts` Is set to `source-hash`.   (optional)"
+														},
+														{
+															"key": "disabled",
+															"value": "boolean",
+															"description": "Disable the rule upon creation. Defaults to false. (optional)"
+														},
+														{
+															"key": "nonat",
+															"value": "boolean",
+															"description": "Enable or disable NAT for traffic that matches this rule. True for no NAT, false to enable NAT. Defaults to false. (optional)"
+														},
+														{
+															"key": "top",
+															"value": "boolean",
+															"description": "Add this mapping to top of access control list. Defaults to false. (optional)"
+														},
+														{
+															"key": "apply",
+															"value": "boolean",
+															"description": "Immediately apply this mapping after creation. Defaults to false. (optional)"
+														}
+													]
+												},
+												"description": "Create new outbound NAT mappings.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound-edit`]"
+											},
+											"response": []
+										},
+										{
+											"name": "Update Outbound NAT Mappings",
+											"request": {
+												"method": "PUT",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n\t\"interface\": \"WAN\",\n\t\"protocol\": \"tcp\",\n\t\"src\": \"any\",\n\t\"srcport\": \"433\",\n\t\"dst\": \"em0ip\",\n\t\"dstport\": \"443\",\n\t\"target\": \"192.168.1.123\",\n\t\"local-port\": \"443\",\n\t\"natreflection\": \"purenat\",\n\t\"descr\": \"Forward pb to lc\",\n\t\"nosync\": true,\n\t\"top\": false\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping?id=integer&interface=string&protocol=string&src=string&dst=string&srcport=string or integer&dstport=string or integer&target=string&natport=string&staticnatport=boolean&descr=string&poolopts=string&source_hash_key=string&disabled=boolean&nonat=boolean&top=boolean&apply=boolean",
+													"protocol": "https",
+													"host": [
+														"{{$hostname}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"firewall",
+														"nat",
+														"outbound",
+														"mapping"
+													],
+													"query": [
+														{
+															"key": "id",
+															"value": "integer",
+															"description": "Specify the ID of the outbound NAT mapping to update"
+														},
+														{
+															"key": "interface",
+															"value": "string",
+															"description": "Update the interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). (optional)"
+														},
+														{
+															"key": "protocol",
+															"value": "string",
+															"description": "Update the transfer protocol the mapping will apply to. (optional)"
+														},
+														{
+															"key": "src",
+															"value": "string",
+															"description": "Update the source address of the firewall rule. This must be an IP, CIDR, alias or any. (optional)"
+														},
+														{
+															"key": "dst",
+															"value": "string",
+															"description": "Update the destination address of the firewall rule. This may be a single IP, network CIDR, or alias name. To negate the context of the  address, you may prepend the address with `!` (optional)"
+														},
+														{
+															"key": "srcport",
+															"value": "string or integer",
+															"description": "Update the TCP and/or UDP source port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` (optional)"
+														},
+														{
+															"key": "dstport",
+															"value": "string or integer",
+															"description": "Update the TCP and/or UDP destination port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` (optional)"
+														},
+														{
+															"key": "target",
+															"value": "string",
+															"description": "Update the external IP to map this traffic to. This may be an IP address, IP subnet, alias, or empty string to use the Interface address. (optional)"
+														},
+														{
+															"key": "natport",
+															"value": "string",
+															"description": "Update the TCP and/or UDP  port or port range to utilize when NATing (optional)"
+														},
+														{
+															"key": "staticnatport",
+															"value": "boolean",
+															"description": "Enable or disable static NAT ports. When enabling this field, any existing `natport` value will be lost. Defaults to false. (optional)"
+														},
+														{
+															"key": "descr",
+															"value": "string",
+															"description": "Update the description for the rule (optional)"
+														},
+														{
+															"key": "poolopts",
+															"value": "string",
+															"description": "Update the outbound NAT pool option for load balancing. Options are `round-robin`, `round-robin sticky-address`, `random`, `random sticky-address`, `source-hash`, `bitmask` or empty string for default. (optional)"
+														},
+														{
+															"key": "source_hash_key",
+															"value": "string",
+															"description": "Update the hash to  a custom key hash to use when utilizing the `source-hash` NAT pool option. Value must start with `0x` following a 32 digit hex value. If this field is not specified, a random key hash will be generated. This field Is only available when `poolopts` Is set to `source-hash`.   (optional)"
+														},
+														{
+															"key": "disabled",
+															"value": "boolean",
+															"description": "Disable the rule upon creation. Defaults to false. (optional)"
+														},
+														{
+															"key": "nonat",
+															"value": "boolean",
+															"description": "Enable or disable NAT for traffic that matches this rule. True for no NAT, false to enable NAT. Defaults to false. (optional)"
+														},
+														{
+															"key": "top",
+															"value": "boolean",
+															"description": "Move this mapping to top of access control list. Defaults to false. (optional)"
+														},
+														{
+															"key": "apply",
+															"value": "boolean",
+															"description": "Immediately apply this mapping after update. Defaults to false. (optional)"
+														}
+													]
+												},
+												"description": "Update existing outbound NAT mappings.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound-edit`]"
+											},
+											"response": []
+										},
+										{
+											"name": "Delete Outbound NAT Mappings",
+											"request": {
+												"method": "DELETE",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n\t\"interface\": \"WAN\",\n\t\"protocol\": \"tcp\",\n\t\"src\": \"any\",\n\t\"srcport\": \"433\",\n\t\"dst\": \"em0ip\",\n\t\"dstport\": \"443\",\n\t\"target\": \"192.168.1.123\",\n\t\"local-port\": \"443\",\n\t\"natreflection\": \"purenat\",\n\t\"descr\": \"Forward pb to lc\",\n\t\"nosync\": true,\n\t\"top\": false\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping?id=integer&apply=boolean",
+													"protocol": "https",
+													"host": [
+														"{{$hostname}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"firewall",
+														"nat",
+														"outbound",
+														"mapping"
+													],
+													"query": [
+														{
+															"key": "id",
+															"value": "integer",
+															"description": "Specify the ID of the outbound NAT mapping to update"
+														},
+														{
+															"key": "apply",
+															"value": "boolean",
+															"description": "Immediately delete this outbound NAT mapping. Defaults to false. (optional)"
+														}
+													]
+												},
+												"description": "Update existing outbound NAT mappings.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound-edit`]"
+											},
+											"response": []
+										}
+									],
+									"description": "API endpoints that create, read, update and delete outbound NAT mappings.",
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
+								},
+								{
 									"name": "Read Outbound NAT Settings",
 									"protocolProfileBehavior": {
 										"disableBodyPruning": true

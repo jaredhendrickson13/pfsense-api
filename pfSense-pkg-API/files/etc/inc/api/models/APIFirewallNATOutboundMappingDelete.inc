@@ -16,19 +16,19 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-class APIFirewallNATOneToOneDelete extends APIModel {
+class APIFirewallNATOutboundMappingDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-nat-1-1-edit"];
-        $this->change_note = "Deleted 1:1 NAT mapping via API";
+        $this->privileges = ["page-all", "page-nat-outbound-edit"];
+        $this->change_note = "Deleted outbound NAT mapping via API";
     }
 
     public function action() {
         # Capture the deleted item then remove it. Mark the subsystem as dirty until it is applied.
-        $del_rule = $this->config["nat"]["onetoone"][$this->id];
-        unset($this->config["nat"]["onetoone"][$this->id]);
-        APITools\sort_nat_rules(null, null, "onetoone");
+        $del_rule = $this->config["nat"]["outbound"]["rule"][$this->id];
+        unset($this->config["nat"]["outbound"]["rule"][$this->id]);
+        APITools\sort_nat_rules(null, null, "outbound");
         $this->write_config();
         mark_subsystem_dirty('natconf');
 
@@ -45,13 +45,13 @@ class APIFirewallNATOneToOneDelete extends APIModel {
 
         if (isset($this->initial_data['id'])) {
             // Check that our rule ID exists
-            if (array_key_exists($this->initial_data['id'], $this->config["nat"]["onetoone"])) {
+            if (array_key_exists($this->initial_data['id'], $this->config["nat"]["outbound"]["rule"])) {
                 $this->id = $this->initial_data['id'];
             } else {
-                $this->errors[] = APIResponse\get(4084);
+                $this->errors[] = APIResponse\get(4105);
             }
         } else {
-            $this->errors[] = APIResponse\get(4083);
+            $this->errors[] = APIResponse\get(4104);
         }
     }
 }

@@ -287,12 +287,24 @@ function enable_carp($enable) {
 }
 
 # Sorts NAT rules by specified criteria
-function sort_nat_rules($top=false, $data=null, $field="rule") {
+function sort_nat_rules($top=false, $data=null, $field=null) {
     // Variables
     global $config;
     $sort_arr = [];
 
-    foreach ($config["nat"][$field] as $idx => $fre) {
+    # Set appropriate config location depending on specified field
+    switch($field) {
+        case "onetoone":
+            $acl =& $config["nat"]["onetoone"];
+            break;
+        case "outbound":
+            $acl =& $config["nat"]["outbound"]["rule"];
+            break;
+        default:
+            $acl =& $config["nat"]["rule"];
+    }
+
+    foreach ($acl as $idx => $fre) {
         # Check if top mode is enabled, if so add this item to the start of the array
         if ($top === true and $idx === $data) {
             array_unshift($sort_arr, $fre);
@@ -301,9 +313,9 @@ function sort_nat_rules($top=false, $data=null, $field="rule") {
         }
     }
     if (!empty($sort_arr)) {
-        $config["nat"][$field] = $sort_arr;
+        $acl = $sort_arr;
     } else {
-        unset($config["nat"][$field]);
+        unset($acl);
     }
 }
 
@@ -1066,4 +1078,17 @@ function is_dhcpdv6_enabled($if) {
     }
 
     return false;
+}
+
+# Checks if a value is an IPv4 address, subnet, or alias
+function is_ip_subnet_or_alias($value) {
+    if (is_subnet($value) === 4) {
+        return "ipv4_subnet";
+    } elseif (is_ipaddrv4($value)) {
+        return "ipv4_addr";
+    } elseif (is_ipaddroralias($value)) {
+        return "alias";
+    } else {
+        return false;
+    }
 }
