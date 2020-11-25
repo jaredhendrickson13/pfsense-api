@@ -25,62 +25,74 @@ class APIFirewallAliasEntryDelete extends APIModel {
     }
 
     public function action() {
-        $this->config["aliases"]["alias"][$this->validated_data["id"]]["address"] = implode(" ", $this->validated_data["address"]);
-        $this->config["aliases"]["alias"][$this->validated_data["id"]]["detail"] = implode("||", $this->validated_data["detail"]);
-        $this->write_config();    // Apply our configuration change
-        send_event("filter reload");    // Ensure our firewall filter is reloaded
-        return APIResponse\get(0, $this->config["aliases"]["alias"][$this->validated_data["id"]]);
+        $this->config["aliases"]["alias"][$this->id] = $this->validated_data;
+        $this->write_config();
+        send_event("filter reload");
+        return APIResponse\get(0, $this->validated_data);
     }
-    
-    public function validate_payload() {
 
+    private function __validate_name() {
+        # Require clients to pass in a name value to locate the alias to add addresses to
         if (isset($this->initial_data['name'])) {
-            $name = $this->initial_data['name'];
-            $name = APITools\sanitize_str($name);
+            # Ensure our alias name is a string
+            if (is_string($this->initial_data['name'])) {
+                # Ensure this alias exists
+                $this->id = $this->__get_alias_id($this->initial_data["name"]);
+                if (isset($this->id)) {
+                    $this->validated_data = $this->config["aliases"]["alias"][$this->id];
+                } else {
+                    $this->errors[] = APIResponse\get(4055);
+                }
+            } else {
+                $this->errors[] = APIResponse\get(4053);
+            }
         } else {
             $this->errors[] = APIResponse\get(4050);
         }
-        if (isset($this->initial_data['address'])) {
-            $address = $this->initial_data['address'];
-            // Convert string to array
-            if (!is_array($address)) {
-                $address = array($address);
+    }
+
+    private function __validate_address() {
+        # Require client to pass in an array of address values to delete
+        if (isset($this->initial_data["address"])) {
+            # Ensure our input and existing data is in array format
+            $this->initial_data["address"] = $this->__value_to_array($this->initial_data["address"]);
+            $this->validated_data["address"] = array_filter(explode(" ", $this->validated_data["address"]));
+            $this->validated_data["detail"] = array_filter(explode("||", $this->validated_data["detail"]));
+
+            # Loop through each request address value and remove it if it exists
+            foreach ($this->validated_data["address"] as $id => $address) {
+                if (in_array($address, $this->initial_data["address"])) {
+                    unset($this->validated_data["address"][$id]);
+                    unset($this->validated_data["detail"][$id]);
+                }
             }
+            $this->validated_data["address"] = implode(" ", $this->validated_data["address"]);
+            $this->validated_data["detail"] = implode("||", $this->validated_data["detail"]);
+        }
+    }
+    
+    public function validate_payload() {
+        $this->__validate_name();
+        $this->__validate_address();
+    }
+
+    private function __get_alias_id($name) {
+        # Loop through each alias until we find one that matches
+        foreach ($this->config["aliases"]["alias"] as $id => $alias) {
+            # Check if the name matches
+            if ($name === $alias["name"]) {
+                return intval($id);
+            }
+        }
+    }
+
+    # Adds a non-array variable to an array
+    private function __value_to_array($value) {
+        # Only convert the value if it is not already array
+        if (!is_array($value)) {
+            return ([$value]);
         } else {
-            $this->errors[] = APIResponse\get(4052);
+            return $value;
         }
-        // Check that our input is valid
-        if (!is_string($name)) {
-            $this->errors[] = APIResponse\get(4053);
-        } elseif (!is_array($address)) {
-            $this->errors[] = APIResponse\get(4054);
-        }
-        // Loop through our existing firewall entries and check for our requested alias
-        $c_count = 0;
-        foreach ($this->config["aliases"]["alias"] as $ce) {
-            if ($name === $ce["name"]) {
-                $alias_found = true;
-                $this->validated_data["id"] = $c_count;
-                $this->validated_data["address"] = explode(" ", $ce["address"]);
-                $this->validated_data["detail"] = explode("||", $ce["detail"]);
-                break;
-            }
-            $c_count++;    // Increase our counter
-        }
-        // If we could not find an alias, return error
-        if ($alias_found !== true) {
-            $this->errors[] = APIResponse\get(4055);
-        }
-
-        // Loop through our existing configuration and remove alias address values on match
-        $r_count = 0;
-        foreach ($this->validated_data["address"] as $re) {
-            if (in_array($re, $address)) {
-                unset($this->validated_data["address"][$r_count]);
-                unset($this->validated_data["detail"][$r_count]);
-            }
-            $r_count++;    // Increase our counter
-        }
-
     }
 }

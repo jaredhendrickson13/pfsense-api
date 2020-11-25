@@ -25,135 +25,142 @@ class APIFirewallAliasEntryCreate extends APIModel {
     }
 
     public function action() {
-        // Add our alias
-        $this->config["aliases"]["alias"][$this->initial_data["id"]]["address"] = implode(" ", $this->validated_data["address"]);
-        $this->config["aliases"]["alias"][$this->initial_data["id"]]["detail"] = implode("||", $this->validated_data["detail"]);
-        $this->write_config();    // Apply our configuration change
-        send_event("filter reload");    // Ensure our firewall filter is reloaded
-        return APIResponse\get(0, $this->config["aliases"]["alias"][$this->initial_data["id"]]);
-    }
-    
-    public function validate_payload() {
+        # Update our alias with the new entries
+        $this->config["aliases"]["alias"][$this->id] = $this->validated_data;
+        $this->write_config();
+        send_event("filter reload");
 
+        return APIResponse\get(0, $this->config["aliases"]["alias"][$this->id]);
+    }
+
+    private function __validate_name() {
+        # Require clients to pass in a name value to locate the alias to add addresses to
         if (isset($this->initial_data['name'])) {
-            $name = $this->initial_data['name'];
-            $name = APITools\sanitize_str($name);
+            # Ensure our alias name is a string
+            if (is_string($this->initial_data['name'])) {
+                # Ensure this alias exists
+                $this->id = $this->__get_alias_id($this->initial_data["name"]);
+                if (isset($this->id)) {
+                    $this->validated_data = $this->config["aliases"]["alias"][$this->id];
+                } else {
+                    $this->errors[] = APIResponse\get(4055);
+                }
+            } else {
+                $this->errors[] = APIResponse\get(4053);
+            }
         } else {
             $this->errors[] = APIResponse\get(4050);
         }
-        if (isset($this->initial_data['address'])) {
-            $address = $this->initial_data['address'];
-            // Convert string to array
-            if (!is_array($address)) {
-                $address = array($address);
-            }
-        } else {
-            $this->errors[] = APIResponse\get(4052);
+    }
 
-        }
-        if (isset($this->initial_data['detail'])) {
-            $detail = $this->initial_data['detail'];
-            // Convert string to array
-            if (!is_array($detail)) {
-                $detail = array($detail);
+    private function __validate_address() {
+        # Require clients to pass in addresses to add to the alias
+        if (isset($this->initial_data["address"])) {
+            # Ensure our input and existing data is in array format
+            $this->initial_data["address"] = $this->__value_to_array($this->initial_data["address"]);
+            $this->validated_data["address"] = array_filter(explode(" ", $this->validated_data["address"]));
+
+            # Loop through each address and ensure it matches the alias type
+            foreach ($this->initial_data["address"] as $address) {
+                # If the alias is a host type, validate it accordingly
+                if ($this->validated_data["type"] === "host") {
+                    # Require each address to be either IPv4 address, IPv6 address, or FQDN
+                    if (is_ipaddrv4($address) or is_ipaddrv6($address) or is_fqdn($address)) {
+                        $this->validated_data["address"][] = $address;
+                    } else {
+                        $this->errors[] = APIResponse\get(4058);
+                    }
+                }
+                # If the alias is a network type, validate it accordingly
+                elseif ($this->validated_data["type"] === "network") {
+                    # Require each address to be either an IPv4/IPv6 subnet, or an FQDN
+                    if (is_subnet($address) or is_fqdn($address) or is_ipaddrv6($address)) {
+                        # If a singular IP, add /32 or /128 subnet mask
+                        if (is_ipaddrv4($address)) {
+                            $address = $address."/32";
+                        } elseif (is_ipaddrv6($address)) {
+                            $address = $address."/128";
+                        }
+                        $this->validated_data["address"][] = $address;
+                    } else {
+                        $this->errors[] = APIResponse\get(4059);
+                    }
+                }
+                # If the alias is a port type, validate it accordingly
+                elseif ($this->validated_data["type"] === "port") {
+                    # Require each address to be either a TCP/UDP port or range
+                    if (is_port_or_range(strval($address))) {
+                        $this->validated_data["address"][] = $address;
+                    } else {
+                        $this->errors[] = APIResponse\get(4060);
+                    }
+                }
             }
+            $this->validated_data["address"] = implode(" ", $this->validated_data["address"]);
         }
-        // Check that our input is valid
-        if (!is_string($name)) {
-            $this->errors[] = APIResponse\get(4053);
-        } elseif (!is_array($address)) {
-            $this->errors[] = APIResponse\get(4054);
-        } elseif (isset($detail) and !is_array($detail)) {
-            $this->errors[] = APIResponse\get(4064);
-        }
-        // Loop through our existing firewall entries and check for our requested alias
-        $c_count = 0;
-        foreach ($this->config["aliases"]["alias"] as $ce) {
-            if ($name === $ce["name"]) {
-                $this->initial_data["id"] = $c_count;
-                $type = $ce["type"];
-                $curr_addr = explode(" ", $ce["address"]);
-                $curr_detail = explode("||", $ce["detail"]);
+    }
+
+    private function __validate_detail() {
+        # Ensure our input and existing data is in array format & determine how many detail values are allowed
+        $this->validated_data["detail"] = array_filter(explode("||", $this->validated_data["detail"]));
+        $this->initial_data["detail"] = $this->__value_to_array($this->initial_data["detail"]);
+
+        # If we have less detail values than address values, add some defaults
+        while(true) {
+            # Check if we have the correct number of detail values
+            if (count($this->initial_data["detail"]) < count($this->initial_data["address"])) {
+                $this->initial_data["detail"][] = "Entry added " . date('r');
+            } else {
                 break;
             }
-            $c_count++;    // Increase our counter
         }
-        // If we could not find an alias, return error
-        if (!isset($type)) {
-            $this->errors[] = APIResponse\get(4055);
-        }
-        if (!isset($type_err)) {
-            // Loop through our arrays and ensure the values are valid
-            $a_count = 0;   // Define a loop counter
-            foreach ($address as $ae) {
-                // Conditions for alias type 'port'
-                if ($type === "port") {
-                    // Check that our value is numeric
-                    if (is_numeric($ae)) {
-                        if (1 <= intval($ae) and intval($ae) <= 65535) {
-                            $address[$a_count] = strval($ae);
-                        } else {
-                            $this->errors[] = APIResponse\get(4065);
 
-                        }
-                    } else {
-                        $this->errors[] = APIResponse\get(4066);
-
-                    }
-                }
-                // Conditionals for alias type 'network'
-                if ($type === "network") {
-                    // Check that values are strings
-                    if (is_string($ae)) {
-                        // Check that string is a network CIDR
-                        if (strpos($ae, "/")) {
-                            $net_ip = explode("/", $ae)[0];    // Save our network IP
-                            $bit_mask = explode("/", $ae)[1];    // Save our subnet bit mask
-                            // Check if our IP is IPv4
-                            if (is_ipaddrv4($net_ip)) {
-                                $max_bits = 32;    // Assign our maximum IPv4 bitmask
-                            } elseif (is_ipaddrv6($net_ip)) {
-                                $max_bits = 128;    // Assign our maximum IPv4 bitmask
-                            } else {
-                                $this->errors[] = APIResponse\get(4067);
-                            }
-                            // Check if our bitmask is numeric and in range
-                            if (is_numeric($bit_mask)) {
-                                if (1 <= intval($bit_mask) and intval($bit_mask) <= $max_bits) {
-                                    continue;
-                                } else {
-                                    $this->errors[] = APIResponse\get(4068);
-                                }
-                            } else {
-                                $this->errors[] = APIResponse\get(4069);
-                            }
-                        } else {
-                            $this->errors[] = APIResponse\get(4069);
-                        }
-                    } else {
-                        $this->errors[] = APIResponse\get(4070);
-                    }
-                }
-                // Conditions for alias type 'host'
-                if ($type === "host") {
-                    // Check that values are strings
-                    if (is_string($ae)) {
-                        $address[$a_count] = APITools\sanitize_str($ae);
-                    } else {
-                        $this->errors[] = APIResponse\get(4070);
-                    }
-                }
-                // Increase our counter
-                $a_count++;
-            }
-            // Check each of our alias details
-            foreach ($detail as $de) {
-                if (!is_string($de)) {
+        # Ensure the number of detail values is less than or equal to the number of address values
+        if (count($this->initial_data["detail"]) <= count($this->initial_data["address"])) {
+            # Loop through each alias detail and ensure it is a string
+            foreach ($this->initial_data["detail"] as $detail) {
+                if (is_string($detail)) {
+                    $this->validated_data["detail"][] = $detail;
+                } else {
                     $this->errors[] = APIResponse\get(4071);
                 }
             }
-            $this->validated_data["address"] = array_merge($curr_addr, $address);
-            $this->validated_data["detail"] = array_merge($curr_detail, $detail);
+
+            # Convert our array to pfSense's expect XML string format
+            $this->validated_data["detail"] = implode("||", $this->validated_data["detail"]);
+        } else {
+            $this->errors[] = APIResponse\get(4106);
+        }
+    }
+    
+    public function validate_payload() {
+        $this->__validate_name();
+        $this->__validate_address();
+        $this->__validate_detail();
+    }
+
+    private function __get_alias_id($name) {
+        # Loop through each alias until we find one that matches
+        foreach ($this->config["aliases"]["alias"] as $id => $alias) {
+            # Check if the name matches
+            if ($name === $alias["name"]) {
+                return intval($id);
+            }
+        }
+    }
+
+    # Adds a non-array variable to an array
+    private function __value_to_array($value) {
+        # Only convert the value if it is not already array
+        if (!is_array($value)) {
+            if (is_null($value)) {
+                return [];
+            } else {
+                return [$value];
+
+            }
+        } else {
+            return $value;
         }
     }
 }

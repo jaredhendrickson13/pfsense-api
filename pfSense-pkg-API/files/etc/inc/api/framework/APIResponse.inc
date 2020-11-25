@@ -1520,6 +1520,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Outbound NAT mapping ID does not exist"
         ],
+        4106 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Alias details cannot contain more items than alias addresses"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [
@@ -1727,6 +1733,139 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Static route ID does not exist"
         ],
+        6007 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway interface is required"
+        ],
+        6008 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid gateway interface"
+        ],
+        6009 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway IP protocol is required"
+        ],
+        6010 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid gateway IP protocol"
+        ],
+        6011 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway name is required"
+        ],
+        6012 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid gateway name"
+        ],
+        6013 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway address is required"
+        ],
+        6014 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid gateway address"
+        ],
+        6015 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway weight must be between 1 and 30"
+        ],
+        6016 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway data payload must be greater than 1"
+        ],
+        6017 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway low latency threshold must be positive integer"
+        ],
+        6018 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway high latency threshold must be greater than low latency threshold"
+        ],
+        6019 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway low packet loss threshold must be between 1 and 100"
+        ],
+        6020 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway high packet loss threshold must be between the low threshold and 100"
+        ],
+        6021 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway probe interval must be between 1 and 3600000"
+        ],
+        6022 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway loss interval must be greater than the high latency threshold"
+        ],
+        6023 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway time period must be greater than twice the probe interval plus the loss interval"
+        ],
+        6024 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway alert interval must be greater than or greater to the probe interval"
+        ],
+        6025 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid gateway monitor address"
+        ],
+        6026 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway name already exists"
+        ],
+        6027 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway ID required"
+        ],
+        6028 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway ID does not exist"
+        ],
+
 
     ];
     $response = $responses[(!in_array($id, $responses)) ? $id : 1];

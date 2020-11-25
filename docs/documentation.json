@@ -1767,7 +1767,7 @@
 												{
 													"key": "detail",
 													"value": "string or array",
-													"description": "Array of descriptions for alias values. Descriptions must match the order the that they are specified in the `address` array. Single descriptions may be specified as string"
+													"description": "Array of descriptions for alias values. Descriptions must match the order the that they are specified in the `address` array. Single descriptions may be specified as string. If you pass In less `detail` values than `address` values, a default auto-created detail will be applied to the remaining values. (optional)"
 												}
 											]
 										},
@@ -5021,7 +5021,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"client-id\": \"admin\",\n    \"client-token\": \"pfsense\"\n}",
+									"raw": "{\n\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -5042,6 +5042,310 @@
 									]
 								},
 								"description": "Read routing gateways.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Routing Gateways",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/routing/gateway?id=integer",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"routing",
+										"gateway"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "integer",
+											"description": "Specify the ID of the gateway to delete"
+										}
+									]
+								},
+								"description": "Delete existing routing gateways.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Create Routing Gateways",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"interface\": \"wan\",\n    \"name\": \"TEST_GATEWAY\",\n    \"ipprotocol\": \"inet\",\n    \"gateway\": \"172.16.209.1\",\n    \"monitor\": \"172.16.209.250\",\n    \"descr\": \"Test gateway\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/routing/gateway?interface=string&ipprotocol=string&name=string&gateway=string&monitor=string&disabled=boolean&monitor_disable=boolean&action_disable=boolean&force_down=boolean&descr=string&weight=integer&data_payload=integer&latencylow=integer&latencyhigh=integer&losslow=integer&losshigh=integer&interval=integer&loss_interval=integer&time_period=integer&alert_interval=integer",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"routing",
+										"gateway"
+									],
+									"query": [
+										{
+											"key": "interface",
+											"value": "string",
+											"description": "Set which interface the gateway will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). "
+										},
+										{
+											"key": "ipprotocol",
+											"value": "string",
+											"description": "Set what IP protocol this gateway will serve. Options are `inet` for IPv4, or `inet6` for IPv6."
+										},
+										{
+											"key": "name",
+											"value": "string",
+											"description": "Set a descriptive name for this gateway. This name must be unique, and can only contains alphanumeric characters and underscores."
+										},
+										{
+											"key": "gateway",
+											"value": "string",
+											"description": "Set the IP address of the gateway. This value must be a valid IPv4 address If you have set your `ipprotocol` value to `inet`, or it must be a valid IPv6 address if you have set your `ipprotocol` value to `inet6`. Unlike the pfSense webConfigurator, this address Is not restricted to an address within the interfaces subnet by default."
+										},
+										{
+											"key": "monitor",
+											"value": "string",
+											"description": "Set the IP address used to monitor this gateway. This is usually only necessary if the `gateway` IP does not accept ICMP probes. Defaults to the `gateway` address. (optional)"
+										},
+										{
+											"key": "disabled",
+											"value": "boolean",
+											"description": "Disable this gateway upon creation. Defaults to false. (optional)"
+										},
+										{
+											"key": "monitor_disable",
+											"value": "boolean",
+											"description": "Disable gateway monitoring for this gateway. Defaults to false. (optional)"
+										},
+										{
+											"key": "action_disable",
+											"value": "boolean",
+											"description": "Disable any action taken on gateway events for this gateway. This will consider the gateway always up. Defaults to false. (optional)"
+										},
+										{
+											"key": "force_down",
+											"value": "boolean",
+											"description": "Force this gateway to always be considered down. Defaults to false. (optional)"
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Set a description for this gateway (optional)"
+										},
+										{
+											"key": "weight",
+											"value": "integer",
+											"description": "Set this gateways weight when utilizing gateway load balancing within a gateway group. This value must be between 1 and 30. Defaults to 1. (optional)"
+										},
+										{
+											"key": "data_payload",
+											"value": "integer",
+											"description": "Set a data payload to send on ICMP packets sent to the gateway monitor IP. This value must be a positive integer. Defaults to 1. (optional)"
+										},
+										{
+											"key": "latencylow",
+											"value": "integer",
+											"description": "Set the low threshold in milliseconds for latency. Any packet that exceeds this threshold will be trigger a minor latency gateway event. This value must be a positive integer that is less than the `latencyhigh` value. Defaults to 200. (optional)"
+										},
+										{
+											"key": "latencyhigh",
+											"value": "integer",
+											"description": "Set the high threshold in milliseconds for latency. Any packet that exceeds this threshold will be trigger a major latency gateway event. This value must be a positive integer that is greater than the `latencylow` value. Defaults to 500. (optional)"
+										},
+										{
+											"key": "losslow",
+											"value": "integer",
+											"description": "Set the low threshold for packet loss In %. If total packet loss exceeds this percentage, a minor packet loss gateway event will be triggered. This value must be greater or equal to 1 and be less than the `losshigh` value. Defaults to 10. (optional)"
+										},
+										{
+											"key": "losshigh",
+											"value": "integer",
+											"description": "Set the high threshold for packet loss In %. If total packet loss exceeds this percentage, a major packet loss gateway event will be triggered. This value must be greater than the `losslow` value and be less or equal to 100. Defaults to 20. (optional)"
+										},
+										{
+											"key": "interval",
+											"value": "integer",
+											"description": "Set how often gateway monitor ICMP probes will be sent in milliseconds. This value must be greater than or equal to 1 and less than or equal to 3600000. Defaults to 500. (optional)"
+										},
+										{
+											"key": "loss_interval",
+											"value": "integer",
+											"description": "Set how long the gateway monitor will wait (in milliseconds) for response packets before considering the packet lost. This value must be greater than or equal to the `latencyhigh` value. Defaults to 2000. (optional)"
+										},
+										{
+											"key": "time_period",
+											"value": "integer",
+											"description": "Set the time period In milliseconds for gateway monitor metrics to be averaged. This value must be greater than twice the probe interval plus the loss interval. Defaults to 60000. (optional)"
+										},
+										{
+											"key": "alert_interval",
+											"value": "integer",
+											"description": "Set the time interval in milliseconds which alert conditions will be checked. This value must be greater than or equal to the `interval` value. Defaults to 1000. (optional)"
+										}
+									]
+								},
+								"description": "Create new routing gateways.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Routing Gateways",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"id\": 0,\n    \"name\": \"UPDATED_TEST_GATEWAY\",\n    \"ipprotocol\": \"inet6\",\n    \"gateway\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n    \"monitor\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n    \"descr\": \"Updated Unit Test\",\n    \"disabled\": true,\n    \"action_disable\": true,\n    \"monitor_disable\": true,\n    \"weight\": 2,\n    \"data_payload\": 5,\n    \"latencylow\": 300,\n    \"latencyhigh\": 600,\n    \"interval\": 2100,\n    \"loss_interval\": 2500,\n    \"action_interval\": 1040,\n    \"time_period\": 66000,\n    \"losslow\": 5,\n    \"losshigh\": 10\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/routing/gateway?interface=string&ipprotocol=string&name=string&gateway=string&monitor=string&disabled=boolean&monitor_disable=boolean&action_disable=boolean&force_down=boolean&descr=string&weight=integer&data_payload=integer&latencylow=integer&latencyhigh=integer&losslow=integer&losshigh=integer&interval=integer&loss_interval=integer&time_period=integer&alert_interval=integer",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"routing",
+										"gateway"
+									],
+									"query": [
+										{
+											"key": "interface",
+											"value": "string",
+											"description": "Update the interface the gateway will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). (optional)"
+										},
+										{
+											"key": "ipprotocol",
+											"value": "string",
+											"description": "Update the IP protocol this gateway will serve. Options are `inet` for IPv4, or `inet6` for IPv6. If you are changing the protocol, you will also be required to update the `gateway` and/or `monitor` values to match the specified protocol. (optional)"
+										},
+										{
+											"key": "name",
+											"value": "string",
+											"description": "Update the descriptive name for this gateway. This name must be unique, and can only contain alphanumeric characters and underscores. (optional)"
+										},
+										{
+											"key": "gateway",
+											"value": "string",
+											"description": "Update the IP address of the gateway. This value must be a valid IPv4 address If you have set your `ipprotocol` value to `inet`, or it must be a valid IPv6 address if you have set your `ipprotocol` value to `inet6`. Unlike the pfSense webConfigurator, this address Is not restricted to an address within the interfaces subnet by default. (optional)"
+										},
+										{
+											"key": "monitor",
+											"value": "string",
+											"description": "Set the IP address used to monitor this gateway. This is usually only necessary if the `gateway` IP does not accept ICMP probes. Defaults to the `gateway` address. (optional)"
+										},
+										{
+											"key": "disabled",
+											"value": "boolean",
+											"description": "Enable or disable this gateway upon update. True to disable, false to enable. (optional)"
+										},
+										{
+											"key": "monitor_disable",
+											"value": "boolean",
+											"description": "Enable or disable gateway monitoring for this gateway. True to disable, false to enable. (optional)"
+										},
+										{
+											"key": "action_disable",
+											"value": "boolean",
+											"description": "Enable or disable any action taken on gateway events for this gateway. If disabled, this will consider the gateway always up. True for disabled, false for enable. (optional)"
+										},
+										{
+											"key": "force_down",
+											"value": "boolean",
+											"description": "Enable or disable forcing this gateway to always be considered down. True for enable, false for disable. (optional)"
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Update the description for this gateway (optional)"
+										},
+										{
+											"key": "weight",
+											"value": "integer",
+											"description": "Update this gateways weight when utilizing gateway load balancing within a gateway group. This value must be between 1 and 30. (optional)"
+										},
+										{
+											"key": "data_payload",
+											"value": "integer",
+											"description": "Update the data payload to send on ICMP packets sent to the gateway monitor IP. This value must be a positive integer. (optional)"
+										},
+										{
+											"key": "latencylow",
+											"value": "integer",
+											"description": "Update the low threshold in milliseconds for latency. Any packet that exceeds this threshold will be trigger a minor latency gateway event. This value must be a positive integer that is less than the `latencyhigh` value.  (optional)"
+										},
+										{
+											"key": "latencyhigh",
+											"value": "integer",
+											"description": "Update the high threshold in milliseconds for latency. Any packet that exceeds this threshold will be trigger a major latency gateway event. This value must be a positive integer that is greater than the `latencylow` value. (optional)"
+										},
+										{
+											"key": "losslow",
+											"value": "integer",
+											"description": "Update the low threshold for packet loss In %. If total packet loss exceeds this percentage, a minor packet loss gateway event will be triggered. This value must be greater or equal to 1 and be less than the `losshigh` value. (optional)"
+										},
+										{
+											"key": "losshigh",
+											"value": "integer",
+											"description": "Update the high threshold for packet loss In %. If total packet loss exceeds this percentage, a major packet loss gateway event will be triggered. This value must be greater than the `losslow` value and be less or equal to 100. (optional)"
+										},
+										{
+											"key": "interval",
+											"value": "integer",
+											"description": "Update how often gateway monitor ICMP probes will be sent in milliseconds. This value must be greater than or equal to 1 and less than or equal to 3600000. (optional)"
+										},
+										{
+											"key": "loss_interval",
+											"value": "integer",
+											"description": "Update how long the gateway monitor will wait (in milliseconds) for response packets before considering the packet lost. This value must be greater than or equal to the `latencyhigh` value. (optional)"
+										},
+										{
+											"key": "time_period",
+											"value": "integer",
+											"description": "Update the time period In milliseconds for gateway monitor metrics to be averaged. This value must be greater than twice the probe interval plus the loss interval. (optional)"
+										},
+										{
+											"key": "alert_interval",
+											"value": "integer",
+											"description": "Update the time interval in milliseconds which alert conditions will be checked. This value must be greater than or equal to the `interval` value. (optional)"
+										}
+									]
+								},
+								"description": "Update existing routing gateways.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]"
 							},
 							"response": []
 						}
