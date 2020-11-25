@@ -1274,6 +1274,13 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall alias id required"
         ],
+        4106 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Alias details cannot contain more items than alias addresses"
+        ],
+
         //5000-5999 reserved for /users API calls
         5000 => [
             "status" => "bad request",
