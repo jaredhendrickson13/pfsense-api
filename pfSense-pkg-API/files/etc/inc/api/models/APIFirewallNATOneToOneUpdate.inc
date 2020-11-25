@@ -32,14 +32,7 @@ class APIFirewallNATOneToOneUpdate extends APIModel {
         $this->config["nat"]["onetoone"][$this->id] = $this->validated_data;
         APITools\sort_nat_rules($this->initial_data["top"], $this->id, "onetoone");
         $this->write_config();
-        mark_subsystem_dirty('natconf');
-
-        # Allow clients to apply this rule immediately if they passed in an apply value
-        if ($this->initial_data["apply"] === true) {
-            filter_configure();
-            clear_subsystem_dirty('natconf');
-            clear_subsystem_dirty('filter');
-        }
+        $this->apply();
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -160,4 +153,17 @@ class APIFirewallNATOneToOneUpdate extends APIModel {
         $this->__validate_descr();
         $this->__validate_natreflection();
     }
+
+    public function apply() {
+        # Mark the NAT subsystem as changed, clear if applied
+        mark_subsystem_dirty('natconf');
+
+        # Allow clients to apply this rule immediately if they passed in an apply value
+        if ($this->initial_data["apply"] === true) {
+            filter_configure();
+            clear_subsystem_dirty('natconf');
+            clear_subsystem_dirty('filter');
+        }
+    }
+
 }

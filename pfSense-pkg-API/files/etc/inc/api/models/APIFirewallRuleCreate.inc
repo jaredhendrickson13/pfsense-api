@@ -29,7 +29,7 @@ class APIFirewallRuleCreate extends APIModel {
         $this->config["filter"]["rule"][] = $this->validated_data;    // Write to our master config
         APITools\sort_firewall_rules($this->initial_data["top"], $next_rule_id);    // Sort our firewall rules
         $this->write_config();    // Apply our configuration change
-        send_event("filter reload");    // Ensure our firewall filter is reloaded
+        $this->apply();
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -139,7 +139,7 @@ class APIFirewallRuleCreate extends APIModel {
             if ($dir_check["valid"] === true) {
                 $this->validated_data = array_merge($this->validated_data, $dir_check["data"]);
             } else {
-                $this->errors[] = APIResponse\get(4049);
+                $this->errors[] = APIResponse\get(4045);
             }
         } else {
             $this->errors[] = APIResponse\get(4038);
@@ -161,7 +161,7 @@ class APIFirewallRuleCreate extends APIModel {
             if (isset($this->initial_data['dstport'])) {
                 $val = str_replace("-", ":", $this->initial_data['dstport']);
                 if (!is_port_or_range($val) and $val !== "any") {
-                    $this->errors[] = APIResponse\get(4048);
+                    $this->errors[] = APIResponse\get(4049);
                 } elseif ($val !== "any") {
                     $this->validated_data["destination"]["port"] = str_replace(":", "-", $val);;
                 }
@@ -208,5 +208,16 @@ class APIFirewallRuleCreate extends APIModel {
             "username" => $this->client->username."@".$this->client->ip_address." (API)"
         ];
         $this->validated_data["updated"] = $this->validated_data["created"];
+    }
+
+    public function apply() {
+        # Mark the firewall subsystem as changed, this will be cleared if applied
+        mark_subsystem_dirty('filter');
+
+        # Optionally allow clients to apply this rule immediately if they passed in a true apply value
+        if ($this->initial_data["apply"] === true) {
+            filter_configure();
+            clear_subsystem_dirty('filter');
+        }
     }
 }

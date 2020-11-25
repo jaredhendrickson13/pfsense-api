@@ -25,10 +25,11 @@ class APIFirewallRuleUpdate extends APIModel {
     }
 
     public function action() {
-        $this->config["filter"]["rule"][$this->id] = $this->validated_data;    // Write to our master config
-        APITools\sort_firewall_rules($this->initial_data["top"], $this->id);    // Sort our firewall rules
-        $this->write_config();    // Apply our configuration change
-        send_event("filter reload");    // Ensure our firewall filter is reloaded
+        # Update our config item, sort rule filters and apply.
+        $this->config["filter"]["rule"][$this->id] = $this->validated_data;
+        APITools\sort_firewall_rules($this->initial_data["top"], $this->id);
+        $this->write_config();
+        $this->apply();
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -226,6 +227,17 @@ class APIFirewallRuleUpdate extends APIModel {
         if ((!in_array($this->initial_data["protocol"], ["tcp", "udp", "tcp/udp"]))) {
             unset($this->validated_data["source"]["port"]);
             unset($this->validated_data["destination"]["port"]);
+        }
+    }
+
+    public function apply() {
+        # Mark the firewall subsystem as changed, this will be cleared if applied
+        mark_subsystem_dirty('filter');
+
+        # Optionally allow clients to apply this rule immediately if they passed in a true apply value
+        if ($this->initial_data["apply"] === true) {
+            filter_configure();
+            clear_subsystem_dirty('filter');
         }
     }
 }

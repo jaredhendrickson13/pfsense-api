@@ -30,11 +30,7 @@ class APIRoutingGatewayUpdate extends APIModel {
     public function action() {
         $this->config["gateways"]["gateway_item"][$this->id] = $this->validated_data;
         $this->write_config();
-        system_routing_configure();
-        system_resolvconf_generate();
-        filter_configure();
-        setup_gateways_monitor();
-        send_event("service reload dyndnsall");
+        $this->apply();
 
         return APIResponse\get(0, $this->validated_data);
     }
@@ -365,5 +361,20 @@ class APIRoutingGatewayUpdate extends APIModel {
         $this->__validate_loss_interval();
         $this->__validate_time_period();
         $this->__validate_alert_interval();
+    }
+
+    public function apply() {
+        # Mark the routing subsystem as changed, clear if applied
+        mark_subsystem_dirty("staticroutes");
+
+        # Optionally allow clients to apply this gateway immediately if they passed in a true apply value
+        if ($this->initial_data["apply"] === true) {
+            system_routing_configure();
+            system_resolvconf_generate();
+            filter_configure();
+            setup_gateways_monitor();
+            send_event("service reload dyndnsall");
+            clear_subsystem_dirty("staticroutes");
+        }
     }
 }

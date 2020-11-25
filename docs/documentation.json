@@ -1133,7 +1133,7 @@
 										"apply"
 									]
 								},
-								"description": "Apply pending interface updates. This will apply the current configuration for each interface.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]"
+								"description": "Apply pending interface updates. This will apply the current configuration for each interface. This endpoint returns no data.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]"
 							},
 							"response": []
 						}
@@ -1404,7 +1404,7 @@
 								{
 									"key": "apply",
 									"value": "boolean",
-									"description": "Specify whether the Interface configuration should be applied Immediately or not (optional)"
+									"description": "Specify whether or not you would like this interface to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple interfaces at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/interface/apply` endpoint. Otherwise, If you are only creating a single interface, you may set this true to apply it immediately. Defaults to false. (optional)"
 								}
 							]
 						},
@@ -1646,7 +1646,7 @@
 								{
 									"key": "apply",
 									"value": "boolean",
-									"description": "Specify whether the updates should be Immediately applied to the Interface or not (optional)"
+									"description": "Specify whether or not you would like this interface update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple interfaces at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/interface/apply` endpoint. Otherwise, If you are only updating a single interface, you may set this true to apply it immediately. Defaults to false. (optional)"
 								}
 							]
 						},
@@ -1687,7 +1687,7 @@
 								}
 							]
 						},
-						"description": "Delete an existing interface.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]"
+						"description": "Delete an existing interface. __Note: interface deletions will be applied immediately, there is no need to apply interface changes afterwards__<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]"
 					},
 					"response": []
 				}
@@ -2124,7 +2124,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/firewall/rule?type=string&interface=string&ipprotocol=string&protocol=string&icmptype=string or array&src=string&dst=string&srcport=string or integer&dstport=string or integer&gateway=string&disabled=boolean&descr=string&log=boolean&top=boolean",
+									"raw": "https://{{$hostname}}/api/v1/firewall/rule?type=string&interface=string&ipprotocol=string&protocol=string&icmptype=string or array&src=string&dst=string&srcport=string or integer&dstport=string or integer&gateway=string&disabled=boolean&descr=string&log=boolean&top=boolean&apply=boolean",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -2205,6 +2205,11 @@
 											"key": "top",
 											"value": "boolean",
 											"description": "Add firewall rule to top of access control list (optional)"
+										},
+										{
+											"key": "apply",
+											"value": "boolean",
+											"description": "Specify whether or not you would like this rule to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple rules at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single rule, you may set this true to apply it immediately. Defaults to false. (optional)"
 										}
 									]
 								},
@@ -2227,7 +2232,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/firewall/rule?tracker=string or Integer&type=string&interface=string&ipprotocol=string&protocol=string&icmptype=string or array&src=string&dst=string&srcport=string or integer&dstport=string or integer&gateway=string&disabled=boolean&descr=string&log=boolean&top=boolean",
+									"raw": "https://{{$hostname}}/api/v1/firewall/rule?tracker=string or Integer&type=string&interface=string&ipprotocol=string&protocol=string&icmptype=string or array&src=string&dst=string&srcport=string or integer&dstport=string or integer&gateway=string&disabled=boolean&descr=string&log=boolean&top=boolean&apply=boolean",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -2313,6 +2318,11 @@
 											"key": "top",
 											"value": "boolean",
 											"description": "Move firewall rule to top of access control list (optional)"
+										},
+										{
+											"key": "apply",
+											"value": "boolean",
+											"description": "Specify whether or not you would like this rule update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple rules at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating a single rule, you may set this true to apply it immediately. Defaults to false. (optional)"
 										}
 									]
 								},
@@ -2335,7 +2345,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/firewall/rule?tracker=string or integer",
+									"raw": "https://{{$hostname}}/api/v1/firewall/rule?tracker=string or integer&apply=boolean",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -2351,6 +2361,11 @@
 											"key": "tracker",
 											"value": "string or integer",
 											"description": "Specify the rule tracker ID to delete"
+										},
+										{
+											"key": "apply",
+											"value": "boolean",
+											"description": "Specify whether or not you would like this rule deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple rules at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single rule, you may set this true to apply it immediately. Defaults to false. (optional)"
 										}
 									]
 								},
@@ -2780,7 +2795,7 @@
 												{
 													"key": "apply",
 													"value": "boolean",
-													"description": "Immediately apply this port forward rule after creation (optional)"
+													"description": "Specify whether or not you would like this port forward to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple port forwards at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single port forward, you may set this true to apply it immediately. Defaults to false. (optional)"
 												}
 											]
 										},
@@ -2884,7 +2899,7 @@
 												{
 													"key": "apply",
 													"value": "boolean",
-													"description": "Immediately apply the update to this port forward rule (optional)"
+													"description": "Specify whether or not you would like this port forward update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple port forwards at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating a single port forward, you may set this true to apply it immediately. Defaults to false. (optional)"
 												}
 											]
 										},
@@ -2928,7 +2943,7 @@
 												{
 													"key": "apply",
 													"value": "boolean",
-													"description": "Immediately delete this port forward rule (optional)"
+													"description": "Specify whether or not you would like this port forward deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple port forwards at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single port forward, you may set this true to apply it immediately. Defaults to false. (optional)"
 												}
 											]
 										},
@@ -3077,7 +3092,7 @@
 												{
 													"key": "apply",
 													"value": "boolean",
-													"description": "Immediately apply this mapping after creation (optional)"
+													"description": "Specify whether or not you would like this 1:1 mapping to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple 1:1 mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single 1:1 mapping, you may set this true to apply it immediately. Defaults to false. (optional)"
 												}
 											]
 										},
@@ -3166,7 +3181,7 @@
 												{
 													"key": "apply",
 													"value": "boolean",
-													"description": "Immediately apply this mapping after update (optional)"
+													"description": "Specify whether or not you would like this 1:1 mapping update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple 1:1 mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating a single 1:1 mapping, you may set this true to apply it immediately. Defaults to false. (optional)"
 												}
 											]
 										},
@@ -3210,7 +3225,7 @@
 												{
 													"key": "apply",
 													"value": "boolean",
-													"description": "Immediately delete this mapping rule (optional)"
+													"description": "Specify whether or not you would like this 1:1 mapping deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple 1:1 mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single 1:1 mapping, you may set this true to apply it immediately. Defaults to false. (optional)"
 												}
 											]
 										},
@@ -3394,7 +3409,7 @@
 														{
 															"key": "apply",
 															"value": "boolean",
-															"description": "Immediately apply this mapping after creation. Defaults to false. (optional)"
+															"description": "Specify whether or not you would like this outbound NAT mapping to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple outbound NAT mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single outbound NAT mapping, you may set this true to apply it immediately. Defaults to false. (optional)"
 														}
 													]
 												},
@@ -3514,7 +3529,7 @@
 														{
 															"key": "apply",
 															"value": "boolean",
-															"description": "Immediately apply this mapping after update. Defaults to false. (optional)"
+															"description": "Specify whether or not you would like this outbound NAT mapping update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple outbound NAT mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating a single outbound NAT mapping, you may set this true to apply it immediately. Defaults to false. (optional)"
 														}
 													]
 												},
@@ -3559,7 +3574,7 @@
 														{
 															"key": "apply",
 															"value": "boolean",
-															"description": "Immediately delete this outbound NAT mapping. Defaults to false. (optional)"
+															"description": "Specify whether or not you would like this outbound NAT mapping deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple outbound NAT mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single outbound NAT mapping, you may set this true to apply it immediately. Defaults to false. (optional)"
 														}
 													]
 												},
@@ -3650,40 +3665,6 @@
 							"description": "API endpoints that create, read, update and delete outbound NAT settings.",
 							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
-						},
-						{
-							"name": "Read NAT",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://{{$hostname}}/api/v1/firewall/nat",
-									"protocol": "https",
-									"host": [
-										"{{$hostname}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"firewall",
-										"nat"
-									]
-								},
-								"description": "Read NAT configuration and rules.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`]"
-							},
-							"response": []
 						}
 					],
 					"description": "API endpoints that create, read, update and delete NAT configuration.",
@@ -3854,6 +3835,45 @@
 							}
 						}
 					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "APPLY",
+					"item": [
+						{
+							"name": "Apply Firewall",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/firewall/apply",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"firewall",
+										"apply"
+									]
+								},
+								"description": "Apply pending firewall changes. This will reload all filter items. This endpoint returns no data.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules`, `page-firewall-rules-edit`, `page-firewall-aliases`, `page-firewall-aliases-edit`, `page-firewall-nat-1-1`, `page-firewall-nat-1-1-edit`, `page-firewall-nat-outbound`, `page-firewall-nat-outbound-edit`, `page-firewall-nat-portforward`, `page-firewall-nat-portforward-edit`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that apply pending firewall changes.",
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				}
@@ -5079,7 +5099,7 @@
 										}
 									]
 								},
-								"description": "Delete existing routing gateways.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]"
+								"description": "Delete existing routing gateways. __Note: gateway deletions will be applied immediately, there is no need to apply routing changes afterwards__<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]"
 							},
 							"response": []
 						},
@@ -5098,7 +5118,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/routing/gateway?interface=string&ipprotocol=string&name=string&gateway=string&monitor=string&disabled=boolean&monitor_disable=boolean&action_disable=boolean&force_down=boolean&descr=string&weight=integer&data_payload=integer&latencylow=integer&latencyhigh=integer&losslow=integer&losshigh=integer&interval=integer&loss_interval=integer&time_period=integer&alert_interval=integer",
+									"raw": "https://{{$hostname}}/api/v1/routing/gateway?interface=string&ipprotocol=string&name=string&gateway=string&monitor=string&disabled=boolean&monitor_disable=boolean&action_disable=boolean&force_down=boolean&descr=string&weight=integer&data_payload=integer&latencylow=integer&latencyhigh=integer&losslow=integer&losshigh=integer&interval=integer&loss_interval=integer&time_period=integer&alert_interval=integer&apply=boolean",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -5209,6 +5229,11 @@
 											"key": "alert_interval",
 											"value": "integer",
 											"description": "Set the time interval in milliseconds which alert conditions will be checked. This value must be greater than or equal to the `interval` value. Defaults to 1000. (optional)"
+										},
+										{
+											"key": "apply",
+											"value": "boolean",
+											"description": "Specify whether or not you would like this gateway to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple gateways at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only creating a single gateway, you may set this true to apply it immediately. Defaults to false. (optional)"
 										}
 									]
 								},
@@ -5231,7 +5256,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/routing/gateway?interface=string&ipprotocol=string&name=string&gateway=string&monitor=string&disabled=boolean&monitor_disable=boolean&action_disable=boolean&force_down=boolean&descr=string&weight=integer&data_payload=integer&latencylow=integer&latencyhigh=integer&losslow=integer&losshigh=integer&interval=integer&loss_interval=integer&time_period=integer&alert_interval=integer",
+									"raw": "https://{{$hostname}}/api/v1/routing/gateway?interface=string&ipprotocol=string&name=string&gateway=string&monitor=string&disabled=boolean&monitor_disable=boolean&action_disable=boolean&force_down=boolean&descr=string&weight=integer&data_payload=integer&latencylow=integer&latencyhigh=integer&losslow=integer&losshigh=integer&interval=integer&loss_interval=integer&time_period=integer&alert_interval=integer&apply=boolean",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -5342,6 +5367,11 @@
 											"key": "alert_interval",
 											"value": "integer",
 											"description": "Update the time interval in milliseconds which alert conditions will be checked. This value must be greater than or equal to the `interval` value. (optional)"
+										},
+										{
+											"key": "apply",
+											"value": "boolean",
+											"description": "Specify whether or not you would like these gateway updates to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple gateways at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only updating a single gateway, you may set this true to apply it immediately. Defaults to false. (optional)"
 										}
 									]
 								},
@@ -5447,7 +5477,7 @@
 										}
 									]
 								},
-								"description": "Delete existing static routes.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]"
+								"description": "Delete existing static routes. __Note: route deletions will be applied immediately, there is no need to apply routing changes afterwards__<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]"
 							},
 							"response": []
 						},
@@ -5466,7 +5496,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/routing/static_route?network=string&gateway=string&descr=string&disabled=bool",
+									"raw": "https://{{$hostname}}/api/v1/routing/static_route?network=string&gateway=string&descr=string&disabled=boolean&apply=boolean",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -5495,8 +5525,13 @@
 										},
 										{
 											"key": "disabled",
-											"value": "bool",
+											"value": "boolean",
 											"description": "Disable this route upon creation (optional)"
+										},
+										{
+											"key": "apply",
+											"value": "boolean",
+											"description": "Specify whether or not you would like this route to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple routes at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only creating a single route, you may set this true to apply it immediately. Defaults to false. (optional)"
 										}
 									]
 								},
@@ -5519,7 +5554,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/routing/static_route?id=Integer&network=string&gateway=string&descr=string&disabled=boolean",
+									"raw": "https://{{$hostname}}/api/v1/routing/static_route?id=Integer&network=string&gateway=string&descr=string&disabled=boolean&apply=boolean",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -5555,6 +5590,11 @@
 											"key": "disabled",
 											"value": "boolean",
 											"description": "Disable this route (optional)"
+										},
+										{
+											"key": "apply",
+											"value": "boolean",
+											"description": "Specify whether or not you would like this route update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple routes at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only updating a single route, you may set this true to apply it immediately. Please note, this will default to true for routing updates, if this is set to false when updating routes, the existing route will be removed from the routing table until the changes are applied! Defaults to true. (optional)"
 										}
 									]
 								},
@@ -5579,6 +5619,67 @@
 							"listen": "test",
 							"script": {
 								"id": "4db4f333-c729-4d77-b74f-4db889c1355d",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "APPLY",
+					"item": [
+						{
+							"name": "Apply Routing",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/routing/apply",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"routing",
+										"apply"
+									]
+								},
+								"description": "Apply pending routing changes. This endpoint returns no data.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`, `page-system-gateways-editgateway`, `page-system-staticroutes`, `page-system-staticroutes-editroute`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that apply pending routing changes.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "022f36c2-10c1-4710-9340-24fbecd06b49",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "140625c3-4808-4005-b6dc-62203c44f08b",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -6191,7 +6292,7 @@
 														{
 															"key": "apply",
 															"value": "boolean",
-															"description": "Apply this host override upon creation. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional)"
+															"description": "Specify whether or not you would like this host override alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host override aliases at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only updating a single host override alias, you may set this true to apply it immediately. Defaults to false. (optional)"
 														}
 													]
 												},
@@ -6260,7 +6361,7 @@
 												{
 													"key": "apply",
 													"value": "boolean",
-													"description": "Apply this host override upon creation. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional)"
+													"description": "Specify whether or not you would like this host override to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only creating a single host override, you may set this true to apply it immediately. Defaults to false. (optional)"
 												}
 											]
 										},
@@ -6329,7 +6430,7 @@
 												{
 													"key": "apply",
 													"value": "boolean",
-													"description": "Apply this host override upon modification. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional)"
+													"description": "Specify whether or not you would like this host override update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only updating a single host override, you may set this true to apply it immediately. Defaults to false. (optional)"
 												}
 											]
 										},
@@ -6373,7 +6474,7 @@
 												{
 													"key": "apply",
 													"value": "boolean",
-													"description": "Apply this host override upon modification. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional)"
+													"description": "Specify whether or not you would like this host override deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only deleting a single host override, you may set this to true to apply it immediately. Defaults to false. (optional)"
 												}
 											]
 										},

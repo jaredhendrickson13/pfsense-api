@@ -25,20 +25,10 @@ class APIRoutingGatewayCreate extends APIModel {
     }
 
     public function action() {
-        # Ensure our gateway configuration is in array format
-        if (!is_array($this->config["gateways"]["gateway_item"])) {
-            $this->config["gateways"] = [];
-            $this->config["gateways"]["gateway_item"] = [];
-        }
-
+        $this->__init_config();
         $this->config["gateways"]["gateway_item"][] = $this->validated_data;
         $this->write_config();
-        system_routing_configure();
-        system_resolvconf_generate();
-        filter_configure();
-        setup_gateways_monitor();
-        send_event("service reload dyndnsall");
-
+        $this->apply();
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -317,5 +307,28 @@ class APIRoutingGatewayCreate extends APIModel {
         $this->__validate_loss_interval();
         $this->__validate_time_period();
         $this->__validate_alert_interval();
+    }
+
+    private function __init_config() {
+        # Ensure our gateway configuration is in array format
+        if (!is_array($this->config["gateways"]["gateway_item"])) {
+            $this->config["gateways"] = [];
+            $this->config["gateways"]["gateway_item"] = [];
+        }
+    }
+
+    public function apply() {
+        # Mark the routing subsystem as changed, clear if applied
+        mark_subsystem_dirty("staticroutes");
+
+        # Optionally allow clients to apply this gateway immediately if they passed in a true apply value
+        if ($this->initial_data["apply"] === true) {
+            system_routing_configure();
+            system_resolvconf_generate();
+            filter_configure();
+            setup_gateways_monitor();
+            send_event("service reload dyndnsall");
+            clear_subsystem_dirty("staticroutes");
+        }
     }
 }

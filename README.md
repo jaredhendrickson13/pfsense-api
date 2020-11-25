@@ -504,9 +504,9 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Create Firewall Alias Entries](#1-create-firewall-alias-entries)
   * [Delete Firewall Alias Entries](#2-delete-firewall-alias-entries)
 
-* [FIREWALL/NAT](#firewallnat)
+* [FIREWALL/APPLY](#firewallapply)
 
-  * [Read NAT](#1-read-nat)
+  * [Apply Firewall](#1-apply-firewall)
 
 * [FIREWALL/NAT/ONE_TO_ONE](#firewallnatone_to_one)
 
@@ -574,6 +574,10 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Delete Interface VLANs](#2-delete-interface-vlans)
   * [Read Interface VLANs](#3-read-interface-vlans)
   * [Update Interface VLANs](#4-update-interface-vlans)
+
+* [ROUTING/APPLY](#routingapply)
+
+  * [Apply Routing](#1-apply-routing)
 
 * [ROUTING/GATEWAY](#routinggateway)
 
@@ -1019,24 +1023,33 @@ URL: https://{{$hostname}}/api/v1/firewall/alias/entry
 
 
 
-## FIREWALL/NAT
+## FIREWALL/APPLY
 
 
 
-### 1. Read NAT
+### 1. Apply Firewall
 
 
-Read NAT configuration and rules.<br><br>
+Apply pending firewall changes. This will reload all filter items. This endpoint returns no data.<br><br>
 
-_Requires at least one of the following privileges:_ [`page-all`]
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules`, `page-firewall-rules-edit`, `page-firewall-aliases`, `page-firewall-aliases-edit`, `page-firewall-nat-1-1`, `page-firewall-nat-1-1-edit`, `page-firewall-nat-outbound`, `page-firewall-nat-outbound-edit`, `page-firewall-nat-portforward`, `page-firewall-nat-portforward-edit`]
 
 
 ***Endpoint:***
 
 ```bash
-Method: GET
+Method: POST
 Type: RAW
-URL: https://{{$hostname}}/api/v1/firewall/nat
+URL: https://{{$hostname}}/api/v1/firewall/apply
+```
+
+
+
+***Body:***
+
+```js        
+{
+}
 ```
 
 
@@ -1076,7 +1089,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 | disabled | boolean | Disable the mapping upon creation (optional) |
 | nobinat | boolean | Disable binat. This excludes the address from a later, more general, rule. (optional) |
 | top | boolean | Add this mapping to top of access control list (optional) |
-| apply | boolean | Immediately apply this mapping after creation (optional) |
+| apply | boolean | Specify whether or not you would like this 1:1 mapping to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple 1:1 mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single 1:1 mapping, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1121,7 +1134,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 | Key | Value | Description |
 | --- | ------|-------------|
 | id | string or integer | Specify the 1:1 NAT mapping ID to delete |
-| apply | boolean | Immediately delete this mapping rule (optional) |
+| apply | boolean | Specify whether or not you would like this 1:1 mapping deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple 1:1 mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single 1:1 mapping, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1196,7 +1209,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 | disabled | boolean | Enable or disable the mapping upon update. True to disable, false to enable. (optional) |
 | nobinat | boolean | Enable or disable binat. This excludes the address from a later, more general, rule. True to disable binat, false to enable binat. (optional) |
 | top | boolean | Move this mapping to top of access control list upon update (optional) |
-| apply | boolean | Immediately apply this mapping after update (optional) |
+| apply | boolean | Specify whether or not you would like this 1:1 mapping update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple 1:1 mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating a single 1:1 mapping, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1328,7 +1341,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping
 | disabled | boolean | Disable the rule upon creation. Defaults to false. (optional) |
 | nonat | boolean | Enable or disable NAT for traffic that matches this rule. True for no NAT, false to enable NAT. Defaults to false. (optional) |
 | top | boolean | Add this mapping to top of access control list. Defaults to false. (optional) |
-| apply | boolean | Immediately apply this mapping after creation. Defaults to false. (optional) |
+| apply | boolean | Specify whether or not you would like this outbound NAT mapping to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple outbound NAT mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single outbound NAT mapping, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1376,7 +1389,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping
 | Key | Value | Description |
 | --- | ------|-------------|
 | id | integer | Specify the ID of the outbound NAT mapping to update |
-| apply | boolean | Immediately delete this outbound NAT mapping. Defaults to false. (optional) |
+| apply | boolean | Specify whether or not you would like this outbound NAT mapping deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple outbound NAT mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single outbound NAT mapping, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1467,7 +1480,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping
 | disabled | boolean | Disable the rule upon creation. Defaults to false. (optional) |
 | nonat | boolean | Enable or disable NAT for traffic that matches this rule. True for no NAT, false to enable NAT. Defaults to false. (optional) |
 | top | boolean | Move this mapping to top of access control list. Defaults to false. (optional) |
-| apply | boolean | Immediately apply this mapping after update. Defaults to false. (optional) |
+| apply | boolean | Specify whether or not you would like this outbound NAT mapping update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple outbound NAT mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating a single outbound NAT mapping, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1530,7 +1543,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 | descr | string | Set a description for the rule (optional) |
 | disabled | boolean | Disable the rule upon creation (optional) |
 | top | boolean | Add this port forward rule to top of access control list (optional) |
-| apply | boolean | Immediately apply this port forward rule after creation (optional) |
+| apply | boolean | Specify whether or not you would like this port forward to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple port forwards at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single port forward, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1579,7 +1592,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 | Key | Value | Description |
 | --- | ------|-------------|
 | id | string or integer | Specify the rule ID to delete |
-| apply | boolean | Immediately delete this port forward rule (optional) |
+| apply | boolean | Specify whether or not you would like this port forward deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple port forwards at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single port forward, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1656,7 +1669,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 | descr | string | Update a description for the rule (optional) |
 | disabled | boolean | Enable or disable the rule upon creation. True to disable, false to enable (optional) |
 | top | boolean | Move this port forward rule to top of access control list (optional) |
-| apply | boolean | Immediately apply the update to this port forward rule (optional) |
+| apply | boolean | Specify whether or not you would like this port forward update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple port forwards at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating a single port forward, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1721,6 +1734,7 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | descr | string | Set a description for the rule (optional) |
 | log | boolean | Enabling rule matche logging (optional) |
 | top | boolean | Add firewall rule to top of access control list (optional) |
+| apply | boolean | Specify whether or not you would like this rule to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple rules at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single rule, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1767,6 +1781,7 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | Key | Value | Description |
 | --- | ------|-------------|
 | tracker | string or integer | Specify the rule tracker ID to delete |
+| apply | boolean | Specify whether or not you would like this rule deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple rules at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single rule, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1846,6 +1861,7 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | descr | string | Update the description of the rule (optional) |
 | log | boolean | Enable rule matched logging (optional) |
 | top | boolean | Move firewall rule to top of access control list (optional) |
+| apply | boolean | Specify whether or not you would like this rule update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple rules at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating a single rule, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -2181,7 +2197,7 @@ URL: https://{{$hostname}}/api/v1/interface
 | prefix-6rd-v4plen | integer or string | Set the 6RD IPv4 prefix length. This is typically assigned by the ISP. Only available when `type6` is set to `6rd` |
 | track6-interface | string | Set the Track6 dynamic IPv6 interface. This must be a dynamically configured IPv6 interface. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Only required with `type6` is set to `track6` |
 | track6-prefix-id-hex | string or integer | Set the IPv6 prefix ID. The value in this field is the (Delegated) IPv6 prefix ID. This determines the configurable network ID based on the dynamic IPv6 connection. The default value is 0. Only available when `type6` is set to `track6` |
-| apply | boolean | Specify whether the Interface configuration should be applied Immediately or not (optional) |
+| apply | boolean | Specify whether or not you would like this interface to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple interfaces at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/interface/apply` endpoint. Otherwise, If you are only creating a single interface, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -2204,7 +2220,7 @@ URL: https://{{$hostname}}/api/v1/interface
 ### 2. Delete Interfaces
 
 
-Delete an existing interface.<br><br>
+Delete an existing interface. __Note: interface deletions will be applied immediately, there is no need to apply interface changes afterwards__<br><br>
 
 _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]
 
@@ -2327,7 +2343,7 @@ URL: https://{{$hostname}}/api/v1/interface
 | prefix-6rd-v4plen | integer or string | Update the 6RD IPv4 prefix length. This is typically assigned by the ISP. Only available when `type6` is set to `6rd` |
 | track6-interface | string | Update the Track6 dynamic IPv6 interface. This must be a dynamically configured IPv6 interface. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Only required with `type6` is set to `track6` |
 | track6-prefix-id-hex | string or integer | Update the IPv6 prefix ID. The value in this field is the (Delegated) IPv6 prefix ID. This determines the configurable network ID based on the dynamic IPv6 connection. The default value is 0. Only available when `type6` is set to `track6` |
-| apply | boolean | Specify whether the updates should be Immediately applied to the Interface or not (optional) |
+| apply | boolean | Specify whether or not you would like this interface update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple interfaces at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/interface/apply` endpoint. Otherwise, If you are only updating a single interface, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -2354,7 +2370,7 @@ URL: https://{{$hostname}}/api/v1/interface
 ### 1. Apply Interfaces
 
 
-Apply pending interface updates. This will apply the current configuration for each interface.<br><br>
+Apply pending interface updates. This will apply the current configuration for each interface. This endpoint returns no data.<br><br>
 
 _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]
 
@@ -2533,6 +2549,37 @@ URL: https://{{$hostname}}/api/v1/interface/vlan
 
 
 
+## ROUTING/APPLY
+
+
+
+### 1. Apply Routing
+
+
+Apply pending routing changes. This endpoint returns no data.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`, `page-system-gateways-editgateway`, `page-system-staticroutes`, `page-system-staticroutes-editroute`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/routing/apply
+```
+
+
+
+***Body:***
+
+```js        
+{
+}
+```
+
+
+
 ## ROUTING/GATEWAY
 
 
@@ -2579,6 +2626,7 @@ URL: https://{{$hostname}}/api/v1/routing/gateway
 | loss_interval | integer | Set how long the gateway monitor will wait (in milliseconds) for response packets before considering the packet lost. This value must be greater than or equal to the `latencyhigh` value. Defaults to 2000. (optional) |
 | time_period | integer | Set the time period In milliseconds for gateway monitor metrics to be averaged. This value must be greater than twice the probe interval plus the loss interval. Defaults to 60000. (optional) |
 | alert_interval | integer | Set the time interval in milliseconds which alert conditions will be checked. This value must be greater than or equal to the `interval` value. Defaults to 1000. (optional) |
+| apply | boolean | Specify whether or not you would like this gateway to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple gateways at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only creating a single gateway, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -2600,7 +2648,7 @@ URL: https://{{$hostname}}/api/v1/routing/gateway
 ### 2. Delete Routing Gateways
 
 
-Delete existing routing gateways.<br><br>
+Delete existing routing gateways. __Note: gateway deletions will be applied immediately, there is no need to apply routing changes afterwards__<br><br>
 
 _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]
 
@@ -2703,6 +2751,7 @@ URL: https://{{$hostname}}/api/v1/routing/gateway
 | loss_interval | integer | Update how long the gateway monitor will wait (in milliseconds) for response packets before considering the packet lost. This value must be greater than or equal to the `latencyhigh` value. (optional) |
 | time_period | integer | Update the time period In milliseconds for gateway monitor metrics to be averaged. This value must be greater than twice the probe interval plus the loss interval. (optional) |
 | alert_interval | integer | Update the time interval in milliseconds which alert conditions will be checked. This value must be greater than or equal to the `interval` value. (optional) |
+| apply | boolean | Specify whether or not you would like these gateway updates to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple gateways at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only updating a single gateway, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -2764,7 +2813,8 @@ URL: https://{{$hostname}}/api/v1/routing/static_route
 | network | string | Specify an IPv4 CIDR, IPv6 CIDR or network alias this route will apply to |
 | gateway | string | Specify the name of the gateway traffic matching this route will use |
 | descr | string | Leave a description of this route (optional) |
-| disabled | bool | Disable this route upon creation (optional) |
+| disabled | boolean | Disable this route upon creation (optional) |
+| apply | boolean | Specify whether or not you would like this route to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple routes at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only creating a single route, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -2783,7 +2833,7 @@ URL: https://{{$hostname}}/api/v1/routing/static_route
 ### 2. Delete Static Routes
 
 
-Delete existing static routes.<br><br>
+Delete existing static routes. __Note: route deletions will be applied immediately, there is no need to apply routing changes afterwards__<br><br>
 
 _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]
 
@@ -2872,6 +2922,7 @@ URL: https://{{$hostname}}/api/v1/routing/static_route
 | gateway | string | Update the name of the gateway traffic matching this route will use (optional) |
 | descr | string | Update description of this route (optional) |
 | disabled | boolean | Disable this route (optional) |
+| apply | boolean | Specify whether or not you would like this route update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple routes at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only updating a single route, you may set this true to apply it immediately. Please note, this will default to true for routing updates, if this is set to false when updating routes, the existing route will be removed from the routing table until the changes are applied! Defaults to true. (optional) |
 
 
 
@@ -3975,7 +4026,7 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 | ip | string | IPv4 or IPv6 of new DNS A record |
 | descr | string | Description of host override (optional) |
 | aliases | array | Hostname aliases (CNAME) for host override (optional) |
-| apply | boolean | Apply this host override upon creation. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional) |
+| apply | boolean | Specify whether or not you would like this host override to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only creating a single host override, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -4022,7 +4073,7 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 | Key | Value | Description |
 | --- | ------|-------------|
 | id | integer | Specify the ID of the host override to delete |
-| apply | boolean | Apply this host override upon modification. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional) |
+| apply | boolean | Specify whether or not you would like this host override deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only deleting a single host override, you may set this to true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -4083,7 +4134,7 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 | ip | string | Update the IPv4/IPv6 address of this host override (optional) |
 | descr | string | Update the description of this host override (optional) |
 | aliases | array | Update the aliases for this host override. This will replace any existing entries. (optional) |
-| apply | boolean | Apply this host override upon modification. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional) |
+| apply | boolean | Specify whether or not you would like this host override update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only updating a single host override, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -4142,7 +4193,7 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override/alias
 | host | string | Specify the hostname of the alias |
 | domain | string | Specify the domain name of the alias |
 | description | string | Description of alias (optional) |
-| apply | boolean | Apply this host override upon creation. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional) |
+| apply | boolean | Specify whether or not you would like this host override alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host override aliases at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only updating a single host override alias, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 

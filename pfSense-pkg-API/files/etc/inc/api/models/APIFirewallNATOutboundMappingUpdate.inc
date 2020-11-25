@@ -39,14 +39,7 @@ class APIFirewallNATOutboundMappingUpdate extends APIModel {
         $this->config["nat"]["outbound"]["rule"][$this->id] = $this->validated_data;
         APITools\sort_nat_rules($this->initial_data["top"], $this->id, "outbound");
         $this->write_config();
-        mark_subsystem_dirty('natconf');
-
-        # Allow clients to apply this rule immediately if they passed in an apply value
-        if ($this->initial_data["apply"] === true) {
-            filter_configure();
-            clear_subsystem_dirty('natconf');
-            clear_subsystem_dirty('filter');
-        }
+        $this->apply();
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -313,5 +306,16 @@ class APIFirewallNATOutboundMappingUpdate extends APIModel {
         $this->validated_data["updated"] = array("time" => time(), "username" => $this->created_by_msg);
     }
 
+    public function apply() {
+        # Mark the NAT subsystem as changed, clear if applied
+        mark_subsystem_dirty('natconf');
+
+        # Allow clients to apply this rule immediately if they passed in an apply value
+        if ($this->initial_data["apply"] === true) {
+            filter_configure();
+            clear_subsystem_dirty('natconf');
+            clear_subsystem_dirty('filter');
+        }
+    }
 
 }

@@ -13,24 +13,14 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-require_once("api/framework/APIModel.inc");
-require_once("api/framework/APIResponse.inc");
+require_once("api/framework/APIEndpoint.inc");
 
-
-class APIFirewallNATRead extends APIModel {
-    # Create our method constructor
+class APIRoutingApply extends APIEndpoint {
     public function __construct() {
-        parent::__construct();
-        $this->validators = [];
-        $this->privileges["page-all"];
+        $this->url = "/api/v1/routing/apply";
     }
 
-    public function action() {
-
-        // Check that we have a NAT configuration
-        if (!empty($this->config["nat"])) {
-            $this->validated_data = $this->config["nat"];
-        }
-        return APIResponse\get(0, $this->validated_data);
+    protected function post() {
+        return (new APIRoutingApplyCreate())->call();
     }
 }

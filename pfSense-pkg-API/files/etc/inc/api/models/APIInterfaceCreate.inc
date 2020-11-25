@@ -33,14 +33,7 @@ class APIInterfaceCreate extends APIModel {
     public function action() {
         $this->config["interfaces"][$this->next_if] = $this->validated_data;
         $this->write_config();
-        mark_subsystem_dirty('interfaces');
-
-        # Only apply the interface configuration if client requested
-        if ($this->initial_data["apply"] === true) {
-            APITools\apply_interface_config($this->id, $this->validated_data);
-            clear_subsystem_dirty('interfaces');
-        }
-
+        $this->apply();
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -747,6 +740,17 @@ class APIInterfaceCreate extends APIModel {
                     $this->errors[] = APIResponse\get(3041);
                     break;
             }
+        }
+    }
+
+    public function apply() {
+        # Mark the interfaces subsystem as changed, clear if applied
+        mark_subsystem_dirty('interfaces');
+
+        # Only apply the interface configuration if client requested
+        if ($this->initial_data["apply"] === true) {
+            APITools\apply_interface_config($this->id, $this->validated_data);
+            clear_subsystem_dirty('interfaces');
         }
     }
 }
