@@ -32,28 +32,21 @@ use Firebase\JWT\JWT;
 
 # Checks our content type header and parses the content accordingly
 function get_request_data() {
+    # TODO: x-www-form-urlencoded still attempts to use json if no parameters were passed in. This was intentionally done to
+    # TODO: support user scripts that didn't specify a static content type (before it was supported) remove this in a future
+    # TODO: release. It is preferred that content uses a specified content type.
     $content_types = [
-        "application/x-www-form-urlencoded" => $_GET,
-        "application/json" => json_decode(file_get_contents('php://input'), true)
+        "application/json" => json_decode(file_get_contents('php://input'), true),
+        "application/x-www-form-urlencoded" => (empty($_GET)) ? json_decode(file_get_contents('php://input'), true) : $_GET
     ];
-    # If client passed in a static content type via header, attempt to parse data using that type
-    if (!empty($_SERVER["HTTP_CONTENT_TYPE"])) {
-        # Check if content type is supported, if so return corresponding parsed request data
-        if (array_key_exists($_SERVER["HTTP_CONTENT_TYPE"], $content_types)) {
-            return $content_types[$_SERVER["HTTP_CONTENT_TYPE"]];
-        }
-        # Return false if the content type is unknown or unsupported
-        else {
-            return false;
-        }
+
+    # Check if content type is supported, if so return corresponding parsed request data
+    if (array_key_exists($_SERVER["HTTP_CONTENT_TYPE"], $content_types)) {
+        return $content_types[$_SERVER["HTTP_CONTENT_TYPE"]];
     }
-    # If a static content type was not provided, attempt to determine the content type
+    # Return false if the content type is unknown or unsupported
     else {
-        if (!empty($_GET)) {
-            return $_GET;
-        } else {
-            return json_decode(file_get_contents('php://input'), true);
-        }
+        return false;
     }
 }
 
