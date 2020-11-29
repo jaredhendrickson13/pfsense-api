@@ -29,8 +29,10 @@ class APIServicesDDNSRead extends APIModel {
         if (!empty($this->config['dyndnses']['dyndns'])) {
             $this->validated_data = $this->config['dyndnses']['dyndns'];
             # Loop through each entry and check if it's address is current
-            foreach ($this->validated_data as $id=>$dyndns_ent) {
-                $this->validated_data[$id]["current"] = $this->__is_dyndns_current($dyndns_ent);
+            foreach ($this->validated_data as $id=>$ddns_ent) {
+                $this->validated_data[$id]["cached_ip"] = $this->__get_cached_ip($ddns_ent);
+                $this->validated_data[$id]["cached_ipv6"] = $this->__get_cached_ip($ddns_ent, true);
+                $this->validated_data[$id]["current"] = $this->__is_dyndns_current($ddns_ent);
             }
         } else {
             $this->validated_data = [];
@@ -38,8 +40,9 @@ class APIServicesDDNSRead extends APIModel {
         return APIResponse\get(0, $this->validated_data);
     }
 
-    private function __is_dyndns_current($ddns_ent) {
+    private function __get_cached_ip($ddns_ent, $ipv6=false) {
         global $dyndns_split_domain_types;
+
         # Determine our DDNS hostname
         if (in_array($ddns_ent['type'], $dyndns_split_domain_types)) {
             $host = $ddns_ent['host'] . "." . $ddns_ent['domainname'];
@@ -50,26 +53,43 @@ class APIServicesDDNSRead extends APIModel {
         $file = "/conf/dyndns_".$ddns_ent['interface'].$ddns_ent['type'].escapeshellarg($host).$ddns_ent['id'].".cache";
         $file_v6 = "/conf/dyndns_".$ddns_ent['interface'].$ddns_ent['type'].escapeshellarg($host).$ddns_ent['id']."_v6.cache";
 
-        # Check if either the IPv4 or IPv6 files exist, otherwise return false.
-        if (file_exists($file)) {
-            $ipaddr = dyndnsCheckIP($ddns_ent['interface']);
+        # Get our cached IPv4 address
+        if (!$ipv6 and file_exists($file)) {
             $cached_ip_s = explode("|", file_get_contents($file));
-            $cached_ip = $cached_ip_s[0];
-            if ($ipaddr != $cached_ip) {
-                return false;
-            } else {
-                return true;
-            }
-        } else if (file_exists($file_v6)) {
-            $ipv6addr = get_interface_ipv6($ddns_ent['interface']);
+            return $cached_ip_s[0];
+        }
+        # Check our cached IPv6 address +
+        if ($ipv6 and file_exists($file_v6)) {
             $cached_ipv6_s = explode("|", file_get_contents($file_v6));
-            $cached_ipv6 = $cached_ipv6_s[0];
-            if ($ipv6addr != $cached_ipv6) {
-                return false;
-            } else {
+            return $cached_ipv6_s[0];
+        }
+    }
+
+    private function __is_dyndns_current($ddns_ent) {
+        # Local variables
+        $cached_ip = $this->__get_cached_ip($ddns_ent);
+        $cached_ipv6 = $this->__get_cached_ip($ddns_ent, true);
+
+        # Check if we found a cached IPv4 address
+        if ($cached_ip) {
+            # Check if our interfaces IP matches our cached DDNS IP
+            if (dyndnsCheckIP($ddns_ent['interface']) === $cached_ip) {
                 return true;
+            } else {
+                return false;
             }
-        } else {
+        }
+        # Otherwise, check if we found a cached IPv6 address
+        elseif ($cached_ipv6) {
+            # Check if our interfaces IPv6 matches our cached DDNS IPv6
+            if (get_interface_ipv6($ddns_ent['interface']) === $cached_ipv6) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        # If no DDNS cache was found, simply return false
+        else {
             return false;
         }
     }

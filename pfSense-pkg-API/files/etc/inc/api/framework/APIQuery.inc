@@ -167,7 +167,7 @@ class APIQuery {
 
     # Checks if an integer or numeric string is less than a given value
     private function lt($value, $limit) {
-        if (is_numeric($value) and is_numeric($value)) {
+        if (is_numeric($value) and is_numeric($limit)) {
             if (floatval($value) < floatval($limit)) {
                 return true;
             }
@@ -177,7 +177,7 @@ class APIQuery {
 
     # Checks if an integer or numeric string is less than or equal to a given value
     private function lte($value, $limit) {
-        if (is_numeric($value) and is_numeric($value)) {
+        if (is_numeric($value) and is_numeric($limit)) {
             if (floatval($value) <= floatval($limit)) {
                 return true;
             }
@@ -187,7 +187,7 @@ class APIQuery {
 
     # Checks if an integer or numeric string is greater than a given value
     private function gt($value, $limit) {
-        if (is_numeric($value) and is_numeric($value)) {
+        if (is_numeric($value) and is_numeric($limit)) {
             if (floatval($value) > floatval($limit)) {
                 return true;
             }
@@ -197,7 +197,7 @@ class APIQuery {
 
     # Checks if an integer or numeric string is greater than or equal to a given value
     private function gte($value, $limit) {
-        if (is_numeric($value) and is_numeric($value)) {
+        if (is_numeric($value) and is_numeric($limit)) {
             if (floatval($value) >= floatval($limit)) {
                 return true;
             }
