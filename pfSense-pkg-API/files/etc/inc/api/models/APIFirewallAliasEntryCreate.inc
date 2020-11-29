@@ -132,7 +132,7 @@ class APIFirewallAliasEntryCreate extends APIModel {
             $this->errors[] = APIResponse\get(4106);
         }
     }
-    
+
     public function validate_payload() {
         $this->__validate_name();
         $this->__validate_address();

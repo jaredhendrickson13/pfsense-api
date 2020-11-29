@@ -70,7 +70,7 @@ class APIFirewallAliasEntryDelete extends APIModel {
             $this->validated_data["detail"] = implode("||", $this->validated_data["detail"]);
         }
     }
-    
+
     public function validate_payload() {
         $this->__validate_name();
         $this->__validate_address();
