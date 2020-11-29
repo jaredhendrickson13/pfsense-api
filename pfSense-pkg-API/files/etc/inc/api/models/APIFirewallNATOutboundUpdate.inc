@@ -25,8 +25,6 @@ class APIFirewallNATOutboundUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-nat-outbound"];
         $this->modes = ["automatic", "hybrid", "advanced", "disabled"];
-        var_dump($this->initial_data);
-
     }
 
     public function action() {
@@ -107,7 +105,15 @@ class APIFirewallNATOutboundUpdate extends APIModel {
         return false;
     }
 
+    # Ensures we have our configuration array formatted for outbound NAT configurations
+    private function __init_config() {
+        $this->config["nat"] = (is_array($this->config["nat"])) ? $this->config["nat"] : [];
+        $this->config["nat"]["outbound"] = (is_array($this->config["nat"]["outbound"])) ? $this->config["nat"]["outbound"] : [];
+        $this->config["nat"]["outbound"]["rule"] = (is_array($this->config["nat"]["outbound"]["rule"])) ? $this->config["nat"]["outbound"]["rule"] : [];
+    }
+
     public function validate_payload() {
+        $this->__init_config();
         $this->__get_default();
         $this->__validate_mode();
     }

@@ -37,6 +37,7 @@ class APIFirewallNATOutboundMappingCreate extends APIModel {
 
     public function action() {
         # Add our new configuration
+        $this->__init_config();
         $this->config["nat"]["outbound"]["rule"][$this->id] = $this->validated_data;
         APITools\sort_nat_rules($this->initial_data["top"], $this->id, "outbound");
         $this->write_config();
@@ -283,6 +284,12 @@ class APIFirewallNATOutboundMappingCreate extends APIModel {
         $this->created_by_msg = $this->client->username."@".$this->client->ip_address." (API)";
         $this->validated_data["created"] = array("time" => time(), "username" => $this->created_by_msg);
         $this->validated_data["updated"] = $this->validated_data["created"];
+    }
+
+    private function __init_config() {
+        $this->config["nat"] = (is_array($this->config["nat"])) ? $this->config["nat"] : [];
+        $this->config["nat"]["outbound"] = (is_array($this->config["nat"]["outbound"])) ? $this->config["nat"]["outbound"] : [];
+        $this->config["nat"]["outbound"]["rule"] = (is_array($this->config["nat"]["outbound"]["rule"])) ? $this->config["nat"]["outbound"]["rule"] : [];
     }
 
     public function apply() {
