@@ -35,6 +35,7 @@ function get_request_data() {
     # TODO: x-www-form-urlencoded still attempts to use json if no parameters were passed in. This was intentionally done to
     # TODO: support user scripts that didn't specify a static content type (before it was supported) remove this in a future
     # TODO: release. It is preferred that content uses a specified content type.
+    $_SERVER["HTTP_CONTENT_TYPE"] = (empty($_SERVER["HTTP_CONTENT_TYPE"])) ? "application/x-www-form-urlencoded" : $_SERVER["HTTP_CONTENT_TYPE"];
     $content_types = [
         "application/json" => json_decode(file_get_contents('php://input'), true),
         "application/x-www-form-urlencoded" => (empty($_GET)) ? json_decode(file_get_contents('php://input'), true) : $_GET
