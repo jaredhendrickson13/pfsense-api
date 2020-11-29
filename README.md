@@ -600,6 +600,10 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Start All Services](#3-start-all-services)
   * [Stop All Services](#4-stop-all-services)
 
+* [SERVICES/DDNS](#servicesddns)
+
+  * [Read Dynamic DNS](#1-read-dynamic-dns)
+
 * [SERVICES/DHCPD](#servicesdhcpd)
 
   * [Read DHCPd Service Configuration](#1-read-dhcpd-service-configuration)
@@ -3043,6 +3047,38 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 Method: POST
 Type: RAW
 URL: https://{{$hostname}}/api/v1/services/stop
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## SERVICES/DDNS
+
+
+
+### 1. Read Dynamic DNS
+
+
+Read configured dynamic DNS settings and statuses.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dynamicdnsclients`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/ddns
 ```
 
 

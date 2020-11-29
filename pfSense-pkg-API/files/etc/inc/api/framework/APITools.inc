@@ -1092,3 +1092,25 @@ function is_ip_subnet_or_alias($value) {
         return false;
     }
 }
+
+# Checks if an array is a associative array. Returns true if assoc, false if numeric, or null if not array
+function is_assoc_array($array, $strict_seq=false) {
+    # Local variables
+    $i = 0;
+
+    # First check if our array is actually an array. Return null otherwise.
+    if (is_array($array)) {
+        # Loop through each array value and check it's key
+        foreach ($array as $key => $value) {
+            # Check if key is numeric
+            if (!is_numeric($key) or ($strict_seq and $i !== intval($key))) {
+               return true;
+            }
+            $i++;
+        }
+    } else {
+        return null;
+    }
+
+    return false;
+}

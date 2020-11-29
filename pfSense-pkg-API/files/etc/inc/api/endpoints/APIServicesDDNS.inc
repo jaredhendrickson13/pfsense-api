@@ -13,24 +13,14 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-require_once("api/framework/APIModel.inc");
-require_once("api/framework/APIResponse.inc");
+require_once("api/framework/APIEndpoint.inc");
 
-
-class APIFirewallAliasRead extends APIModel {
-    # Create our method constructor
+class APIServicesDDNS extends APIEndpoint {
     public function __construct() {
-        parent::__construct();
-        $this->privileges = ["page-all", "page-firewall-aliases"];
+        $this->url = "/api/v1/services/ddns";
     }
 
-    public function action() {
-        // Check that we have a configuration
-        if (!empty($this->config["aliases"]["alias"])) {
-            $alias_array = $this->config["aliases"]["alias"];
-        } else {
-            $alias_array = [];
-        }
-        return APIResponse\get(0, $alias_array);
+    protected function get() {
+        return (new APIServicesDDNSRead())->call();
     }
 }

@@ -14,8 +14,8 @@
 
 import unit_test_framework
 
-class APIUnitTestFirewallNAT(unit_test_framework.APIUnitTest):
-    url = "/api/v1/firewall/nat"
+class APIUnitTestServicesDDNS(unit_test_framework.APIUnitTest):
+    url = "/api/v1/services/ddns"
     get_payloads = [{}]
 
-APIUnitTestFirewallNAT()
+APIUnitTestServicesDDNS()

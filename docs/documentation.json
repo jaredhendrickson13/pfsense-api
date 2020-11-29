@@ -7855,6 +7855,48 @@
 					"_postman_isSubFolder": true
 				},
 				{
+					"name": "DDNS",
+					"item": [
+						{
+							"name": "Read Dynamic DNS",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/ddns",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"services",
+										"ddns"
+									]
+								},
+								"description": "Read configured dynamic DNS settings and statuses.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dynamicdnsclients`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that create, read, update, and delete Dynamic DNS configuration.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "Read Services",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true

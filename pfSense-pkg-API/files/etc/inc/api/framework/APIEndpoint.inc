@@ -71,8 +71,5 @@ class APIEndpoint {
         http_response_code($resp["code"]);
         echo json_encode($resp) . PHP_EOL;
         exit();
-
     }
-
-
 }
