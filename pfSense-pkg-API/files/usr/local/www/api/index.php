@@ -236,6 +236,7 @@ if (isset($_POST["save"])) {
         }
     ?>
         <button type="submit" id="save" name="save" class="btn btn-sm btn-primary" value="Save" title="Save API configuration"><i class="fa fa-save icon-embed-btn"></i>Save</button>
+        <a style="float: right;" class="fa fa-question-circle" href='https://github.com/jaredhendrickson13/pfsense-api/issues/new'> <span style="font-family: 'Helvetica'; font-size: 14px;">Report an Issue</span></a>
         </form>
 <!--    <nav class="action-buttons">-->
 <!--    </nav>-->
