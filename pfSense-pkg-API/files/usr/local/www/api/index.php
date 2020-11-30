@@ -161,7 +161,7 @@ if (isset($_POST["save"])) {
                                 }
                                 ?>
                             </select>
-                            <span class="help-block">Authentication method API uses to authenticate during API calls. `Local Database` uses basic authentication using your pfSense user/password, `Base 64` uses base64 encoded pfSense user/password, `API Token` generates specific API tokens for API access. `JWT` allows user to obtain a token via <a href="/api/v1/access_token/">access token endpoint.</a>.</span>
+                            <span class="help-block">Authentication method API uses to authenticate during API calls. API authentication is further covered in the <a href="/api/documentation/">developer documentation</a>.</span>
                         </div>
                     </div>
                     <div class="form-group">

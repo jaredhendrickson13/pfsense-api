@@ -510,10 +510,10 @@ There is no limit to API calls at this time but is important to note that pfSens
 
 * [FIREWALL/NAT/ONE_TO_ONE](#firewallnatone_to_one)
 
-  * [Create NAT 1:1 Mappings](#1-create-nat-1:1-mappings)
-  * [Delete NAT 1:1 Mappings](#2-delete-nat-1:1-mappings)
-  * [Read NAT 1:1 Mappings](#3-read-nat-1:1-mappings)
-  * [Update NAT 1:1 Mappings](#4-update-nat-1:1-mappings)
+  * [Create NAT 1-to-1 Mappings](#1-create-nat-1-to-1-mappings)
+  * [Delete NAT 1-to-1 Mappings](#2-delete-nat-1-to-1-mappings)
+  * [Read NAT 1-to-1 Mappings](#3-read-nat-1-to-1-mappings)
+  * [Update NAT 1-to-1 Mappings](#4-update-nat-1-to-1-mappings)
 
 * [FIREWALL/NAT/OUTBOUND](#firewallnatoutbound)
 
@@ -611,6 +611,10 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Start DHCPd Service](#3-start-dhcpd-service)
   * [Stop DHCPd Service](#4-stop-dhcpd-service)
   * [Update DHCPd Service Configuration](#5-update-dhcpd-service-configuration)
+
+* [SERVICES/DHCPD/LEASE](#servicesdhcpdlease)
+
+  * [Read DHCPd Leases](#1-read-dhcpd-leases)
 
 * [SERVICES/DHCPD/STATIC_MAPPING](#servicesdhcpdstatic_mapping)
 
@@ -1062,7 +1066,7 @@ URL: https://{{$hostname}}/api/v1/firewall/apply
 
 
 
-### 1. Create NAT 1:1 Mappings
+### 1. Create NAT 1-to-1 Mappings
 
 
 Add a new NAT 1:1 Mapping.<br><br>
@@ -1075,7 +1079,7 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 ```bash
 Method: POST
 Type: RAW
-URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
+URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
 ```
 
 
@@ -1115,7 +1119,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 
 
 
-### 2. Delete NAT 1:1 Mappings
+### 2. Delete NAT 1-to-1 Mappings
 
 
 Delete an existing NAT 1:1 mapping by ID.<br>
@@ -1128,7 +1132,7 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 ```bash
 Method: DELETE
 Type: RAW
-URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
+URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
 ```
 
 
@@ -1153,7 +1157,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 
 
 
-### 3. Read NAT 1:1 Mappings
+### 3. Read NAT 1-to-1 Mappings
 
 
 Read 1:1 NAT mappings.<br><br>
@@ -1181,7 +1185,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
 
 
 
-### 4. Update NAT 1:1 Mappings
+### 4. Update NAT 1-to-1 Mappings
 
 
 Update an existing NAT 1:1 Mapping.<br><br>
@@ -1194,7 +1198,7 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 ```bash
 Method: PUT
 Type: RAW
-URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
+URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
 ```
 
 
@@ -3264,6 +3268,39 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd
     "domain": "example.com",
     "mac_allow": ["00:00:00:01:E5:FF", "00:00:00:01:E5"],
     "mac_deny": []
+}
+```
+
+
+
+## SERVICES/DHCPD/LEASE
+
+
+
+### 1. Read DHCPd Leases
+
+
+Read the current DHCPd leases.<br>
+
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-dhcpleases`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dhcpd/leases
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
 }
 ```
 

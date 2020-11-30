@@ -70,6 +70,7 @@ class APIEndpoint {
         header("Referer: no-referrer");
         http_response_code($resp["code"]);
         echo json_encode($resp) . PHP_EOL;
+        session_destroy();
         exit();
     }
 }

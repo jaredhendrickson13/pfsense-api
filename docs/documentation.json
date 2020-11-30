@@ -2982,7 +2982,7 @@
 							"name": "ONE_TO_ONE",
 							"item": [
 								{
-									"name": "Read NAT 1:1 Mappings",
+									"name": "Read NAT 1-to-1 Mappings",
 									"protocolProfileBehavior": {
 										"disableBodyPruning": true
 									},
@@ -3017,7 +3017,7 @@
 									"response": []
 								},
 								{
-									"name": "Create NAT 1:1 Mappings",
+									"name": "Create NAT 1-to-1 Mappings",
 									"request": {
 										"method": "POST",
 										"header": [],
@@ -3031,7 +3031,7 @@
 											}
 										},
 										"url": {
-											"raw": "https://{{$hostname}}/api/v1/firewall/nat/port_forward?interface=string&src=string&dst=string&external=string&natreflection=string&descr=string&disabled=boolean&nobinat=boolean&top=boolean&apply=boolean",
+											"raw": "https://{{$hostname}}/api/v1/firewall/nat/one_to_one?interface=string&src=string&dst=string&external=string&natreflection=string&descr=string&disabled=boolean&nobinat=boolean&top=boolean&apply=boolean",
 											"protocol": "https",
 											"host": [
 												"{{$hostname}}"
@@ -3041,7 +3041,7 @@
 												"v1",
 												"firewall",
 												"nat",
-												"port_forward"
+												"one_to_one"
 											],
 											"query": [
 												{
@@ -3101,7 +3101,7 @@
 									"response": []
 								},
 								{
-									"name": "Update NAT 1:1 Mappings",
+									"name": "Update NAT 1-to-1 Mappings",
 									"request": {
 										"method": "PUT",
 										"header": [],
@@ -3115,7 +3115,7 @@
 											}
 										},
 										"url": {
-											"raw": "https://{{$hostname}}/api/v1/firewall/nat/port_forward?id=integer&interface=string&src=string&dst=string&external=string&natreflection=string&descr=string&disabled=boolean&nobinat=boolean&top=boolean&apply=boolean",
+											"raw": "https://{{$hostname}}/api/v1/firewall/nat/one_to_one?id=integer&interface=string&src=string&dst=string&external=string&natreflection=string&descr=string&disabled=boolean&nobinat=boolean&top=boolean&apply=boolean",
 											"protocol": "https",
 											"host": [
 												"{{$hostname}}"
@@ -3125,7 +3125,7 @@
 												"v1",
 												"firewall",
 												"nat",
-												"port_forward"
+												"one_to_one"
 											],
 											"query": [
 												{
@@ -3190,7 +3190,7 @@
 									"response": []
 								},
 								{
-									"name": "Delete NAT 1:1 Mappings",
+									"name": "Delete NAT 1-to-1 Mappings",
 									"request": {
 										"method": "DELETE",
 										"header": [],
@@ -3204,7 +3204,7 @@
 											}
 										},
 										"url": {
-											"raw": "https://{{$hostname}}/api/v1/firewall/nat/port_forward?id=string or integer&apply=boolean",
+											"raw": "https://{{$hostname}}/api/v1/firewall/nat/one_to_one?id=string or integer&apply=boolean",
 											"protocol": "https",
 											"host": [
 												"{{$hostname}}"
@@ -3214,7 +3214,7 @@
 												"v1",
 												"firewall",
 												"nat",
-												"port_forward"
+												"one_to_one"
 											],
 											"query": [
 												{
@@ -7010,6 +7010,49 @@
 								}
 							],
 							"description": "API endpoints to create, read, update and delete DHCP static mappings",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "LEASE",
+							"item": [
+								{
+									"name": "Read DHCPd Leases",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/dhcpd/leases",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"dhcpd",
+												"leases"
+											]
+										},
+										"description": "Read the current DHCPd leases.<br>\n\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-status-dhcpleases`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that create, read, update and delete DHCPd leases.",
 							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
