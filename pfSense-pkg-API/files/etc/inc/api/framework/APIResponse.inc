@@ -832,51 +832,57 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Interface ID is required"
+            "message" => "Interface VLAN ID required"
         ],
         3057 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Interface ID does not exist"
+            "message" => "Interface ID is required"
         ],
         3058 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Interface descriptive name cannot start with 'pkg_'"
+            "message" => "Interface ID does not exist"
         ],
         3059 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Interface descriptive name cannot match alias name"
+            "message" => "Interface descriptive name cannot start with 'pkg_'"
         ],
         3060 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Interface descriptive name cannot be entirely numeric"
+            "message" => "Interface descriptive name cannot match alias name"
         ],
         3061 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Interface descriptive name cannot match interface group name"
+            "message" => "Interface descriptive name cannot be entirely numeric"
         ],
         3062 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Interface type cannot be changed while DHCP server is enabled"
+            "message" => "Interface descriptive name cannot match existing interface name"
         ],
         3063 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Interface subnet must be less than 31 while DHCP server is enabled"
+            "message" => "Interface type cannot be changed while DHCP server is enabled"
         ],
         3064 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface subnet must be less than 31 while DHCP server is enabled"
+        ],
+        3065 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,

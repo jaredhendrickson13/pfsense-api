@@ -44,10 +44,10 @@ class APIInterfaceUpdate extends APIModel {
             if ($this->id) {
                 $this->validated_data = $this->config["interfaces"][$this->id];
             } else {
-                $this->errors[] = APIResponse\get(3057);
+                $this->errors[] = APIResponse\get(3058);
             }
         } else {
-            $this->errors[] = APIResponse\get(3056);
+            $this->errors[] = APIResponse\get(3057);
         }
     }
 
@@ -146,19 +146,19 @@ class APIInterfaceUpdate extends APIModel {
             $this->initial_data["descr"] = APITools\sanitize_str($this->initial_data["descr"]);
             # Ensure this interface description does not contain reserved pkg keywords
             if (substr($this->initial_data['descr'], 0, 4) === "pkg_") {
-                $this->errors[] = APIResponse\get(3058);
+                $this->errors[] = APIResponse\get(3059);
             }
             # Ensure this interface is not named the same as an alias
             elseif (APITools\is_alias($this->initial_data["descr"])) {
-                $this->errors[] = APIResponse\get(3059);
+                $this->errors[] = APIResponse\get(3060);
             }
             # Ensure this interface is not named entirely numerical
             elseif (is_numeric($this->initial_data["descr"])) {
-                $this->errors[] = APIResponse\get(3060);
+                $this->errors[] = APIResponse\get(3061);
             }
             # Ensure this interface is not named the same as an interface group
             elseif (APITools\is_ifgroup($this->initial_data["descr"])) {
-                $this->errors[] = APIResponse\get(3061);
+                $this->errors[] = APIResponse\get(3062);
             }
             # Ensure this interface description is not already used
             elseif (APITools\get_pfsense_if_id($this->initial_data["descr"])) {
@@ -235,7 +235,7 @@ class APIInterfaceUpdate extends APIModel {
         }
         # Check if DHCP server is enabled for this interface, if so do not allow /32
         elseif(APITools\is_dhcpd_enabled($this->id) and intval($this->initial_data["subnet"]) >= 31) {
-            $this->errors[] = APIResponse\get(3063);
+            $this->errors[] = APIResponse\get(3064);
         }
         # Otherwise, this subnet appears to be valid. Update the value.
         else {
@@ -429,7 +429,7 @@ class APIInterfaceUpdate extends APIModel {
     private function __validate_type_dhcp() {
         # Before configuring for DHCP, ensure the DHCP server is not enabled
         if (APITools\is_dhcpd_enabled($this->id)) {
-            $this->errors[] = APIResponse\get(3062);
+            $this->errors[] = APIResponse\get(3063);
         }
 
         $this->validated_data["ipaddr"] = "dhcp";
@@ -445,7 +445,7 @@ class APIInterfaceUpdate extends APIModel {
     private function __validate_type6_change() {
         # Before configuring for non-static type6, ensure DHCPv6 is not enabled
         if (APITools\is_dhcpdv6_enabled($this->id)) {
-            $this->errors[] = APIResponse\get(3064);
+            $this->errors[] = APIResponse\get(3065);
         }
     }
 

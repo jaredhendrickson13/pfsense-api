@@ -132,19 +132,19 @@ class APIInterfaceCreate extends APIModel {
             $this->initial_data["descr"] = APITools\sanitize_str($this->initial_data["descr"]);
             # Ensure this interface description does not contain reserved keywords
             if (substr($this->initial_data['descr'], 0, 4) === "pkg_") {
-                $this->errors[] = APIResponse\get(3058);
+                $this->errors[] = APIResponse\get(3059);
             }
             # Ensure this interface is not named the same as an alias
             elseif (APITools\is_alias($this->initial_data["descr"])) {
-                $this->errors[] = APIResponse\get(3059);
+                $this->errors[] = APIResponse\get(3060);
             }
             # Ensure this interface is name named entirely numerical
             elseif (is_numeric($this->initial_data["descr"])) {
-                $this->errors[] = APIResponse\get(3060);
+                $this->errors[] = APIResponse\get(3061);
             }
             # Ensure this interface is not named the same as an interface group
             elseif (APITools\is_ifgroup($this->initial_data["descr"])) {
-                $this->errors[] = APIResponse\get(3061);
+                $this->errors[] = APIResponse\get(3062);
             }
             # Ensure this interface description is not already used
             elseif (APITools\get_pfsense_if_id($this->initial_data["descr"])) {
