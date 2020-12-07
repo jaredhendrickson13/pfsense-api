@@ -20,23 +20,55 @@ class APIUnitTestInterfaceVLAN(unit_test_framework.APIUnitTest):
     post_payloads = [
         {
             "if": "lo0",
-            "tag": 3,
-            "pcp": 7,
-            "descr": "Unit Test"
+            "tag": 10,
+            "pcp": 0,
+            "descr": "Unit Test 0"
+        },
+        {
+            "if": "lo0",
+            "tag": 11,
+            "pcp": 1,
+            "descr": "Unit Test 1",
+        },
+        {
+            "if": "lo0",
+            "tag": 12,
+            "pcp": 2,
+            "descr": "Unit Test 2",
         }
     ]
     put_payloads = [
         {
-            "vlanif": "lo0.3",
+            "id": 0,
             "if": "lo0",
-            "tag": 5,
-            "pcp": 2,
-            "descr": "Updated Unit Test"
+            "tag": 20,
+            "pcp": 7,
+            "descr": "Updated unit Test 0"
+        },
+        {
+            "vlanif": "lo0.11",
+            "if": "lo0",
+            "tag": 21,
+            "pcp": 6,
+            "descr": "Updated unit Test 1"
+        },
+        {
+            "id": 2,
+            "if": "lo0",
+            "tag": 22,
+            "pcp": 5,
+            "descr": "Updated unit Test 2"
         }
     ]
     delete_payloads = [
         {
-            "vlanif": "lo0.5"
+            "id": 0
+        },
+        {
+            "vlanif": "lo0.22"
+        },
+        {
+            "id": 0
         }
     ]
 

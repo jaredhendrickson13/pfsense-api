@@ -18,95 +18,145 @@ require_once("api/framework/APIResponse.inc");
 
 
 class APIInterfaceVLANUpdate extends APIModel {
+    private $__prev_vlanif;
+    private $__if_changed;
+    private $__tag_changed;
+
     # Create our method constructor
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-vlan-edit"];
         $this->change_note = "Modified VLAN interface via API";
-
+        $this->__if_changed = false;
+        $this->__tag_changed = false;
     }
 
     public function action() {
-        $vlan_ent =& $this->config["vlans"]["vlan"][$this->initial_data["id"]];    // Get current VLAN config
-        $vlan_ent = array_replace($vlan_ent, $this->validated_data);    // Update our VLAN config
-        $vlan_ent["vlanif"] = $vlan_ent["if"].".".$vlan_ent["tag"];    // Update VLAN iface ID
-
-        pfSense_interface_destroy($this->initial_data["vlanif"]);
-        interface_vlan_configure($vlan_ent);
-        // Check if we need to reassign an interface
-        $assigned_if = APITools\get_pfsense_if_id($this->initial_data["vlanif"]);
-        if (!empty($assigned_if)) {
-            $this->config['interfaces'][$assigned_if]['if'] = $vlan_ent["vlanif"];    // Write interface config
-            $this->write_config();
-            interface_configure($assigned_if);    // Configure our assigned interface
-        }
+        $this->config["vlans"]["vlan"][$this->id] = $this->validated_data;
+        pfSense_interface_destroy($this->__prev_vlanif);
+        interface_vlan_configure($this->validated_data);
+        $this->__reassign_interface();
         $this->write_config();
-        return APIResponse\get(0, $vlan_ent);
+        return APIResponse\get(0, $this->validated_data);
     }
 
-    public function validate_payload() {
-        $if_list = get_interface_list();    // Get our interfaces list
-        $lagg_list = get_lagg_interface_list();    // Get our lagg interfaces list
-        $avail_ifs = $if_list + $lagg_list;    // Combine the two lists
-        // Remove LAGG interface members as they cannot be assigned VLANs
-        foreach ($lagg_list as $lagg_if => $lagg) {
-            $lagg_members = explode(',', $lagg['members']);
-            foreach ($lagg_members as $lagm) {
-                if (isset($avail_ifs[$lagm])) {
-                    unset($avail_ifs[$lagm]);
+    private function __validate_id() {
+        # Check if the given ID exists. Also allow vlanif for backward compatibility
+        if (isset($this->initial_data["id"]) or isset($this->initial_data["vlanif"])) {
+            # Allow user to locate the VLAN by vlanif
+            if (!is_null($this->__get_vlan_id_from_vlanif($this->initial_data["vlanif"]))) {
+                $this->id = $this->__get_vlan_id_from_vlanif($this->initial_data["vlanif"]);
+                $this->validated_data = $this->config["vlans"]["vlan"][$this->id];
+            }
+            # Try to locate our ID by configuration index ID
+            elseif (array_key_exists($this->initial_data["id"], $this->config["vlans"]["vlan"])) {
+                $this->id = $this->initial_data["id"];
+                $this->validated_data = $this->config["vlans"]["vlan"][$this->id];
+            }
+
+            else {
+                $this->errors[] = APIResponse\get(3050);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(3056);
+        }
+    }
+
+    private function __validate_if() {
+        # Optionally allow clients to update the parent if value
+        if (isset($this->initial_data['if'])) {
+            # Only update the value if it has changed
+            if ($this->initial_data["if"] !== $this->validated_data["if"]) {
+                if (does_interface_exist($this->initial_data['if'])) {
+                    $this->validated_data["if"] = $this->initial_data['if'];
+                    $this->__if_changed = true;
+                } else {
+                    $this->errors[] = APIResponse\get(3051);
                 }
             }
         }
-        if (!isset($this->initial_data['vlanif'])) {
-            $this->errors[] = APIResponse\get(3048);
+    }
+
+    private function __validate_tag() {
+        # Revalidate the tag if our if value was updated
+        if ($this->__if_changed and !isset($this->initial_data["tag"])) {
+            $this->initial_data["tag"] = $this->validated_data["tag"];
         }
-        if (isset($this->initial_data['if'])) {
-            $this->validated_data["if"] = $this->initial_data['if'];
-        }
+
+        # Optionally allow clients to update the VLAN tag value
         if (isset($this->initial_data['tag'])) {
-            $this->validated_data["tag"] = $this->initial_data['tag'];
-            $this->validated_data["tag"] = intval(trim($this->validated_data["tag"]));
-            $str_tag = strval($this->validated_data["tag"]);
+            # Indicate whether our tag value has changed
+            $this->__tag_changed = ($this->initial_data["tag"] == $this->validated_data["tag"]) ? false : true;
+
+            # Return an error if VLAN tag is not numeric, or is not between 1 and 4096
+            if (!is_numeric($this->initial_data['tag']) or (1 > intval($this->initial_data['tag']) or intval($this->initial_data['tag']) > 4096)) {
+                $this->errors[] = APIResponse\get(3052);
+            }
+            # Return an error if this VLAN already exists on this interface and it does not match the current value
+            elseif ($this->__is_vlan($this->validated_data["if"], $this->initial_data["tag"]) and ($this->__if_changed or $this->__tag_changed)) {
+                $this->errors[] = APIResponse\get(3054);
+            }
+            # Otherwise, store our tag value as validated
+            else {
+                $this->validated_data["tag"] = $this->initial_data['tag'];
+            }
         }
+    }
+
+    private function __validate_pcp() {
+        # Optionally allow client to update tge VLAN PCP value.
         if (isset($this->initial_data['pcp'])) {
-            $this->validated_data["pcp"] = $this->initial_data['pcp'];
-            $this->validated_data["pcp"] = intval(trim($this->validated_data["pcp"]));
+            # Return error if PCP value is not between 0 and 7
+            if (0 > $this->initial_data['pcp'] or $this->initial_data['pcp'] > 7) {
+                $this->errors[] = APIResponse\get(3053);
+            } else {
+                $this->validated_data["pcp"] = intval(trim($this->initial_data['pcp']));
+            }
         }
+    }
+
+    private function __validate__descr() {
+        # Optionally allow client to update the VLAN description.
         if (isset($this->initial_data['descr'])) {
             $this->validated_data["descr"] = $this->initial_data['descr'];
         }
-        // Ensure we have a vlanif and id regardless of which input selector was provided
-        if (isset($this->initial_data["vlanif"])) {
-            foreach ($this->config["vlans"]["vlan"] as $ind => $cve) {
-                if ($this->initial_data["vlanif"] === $cve["vlanif"]) {
-                    $this->initial_data["id"] = $ind;
-                    break;
-                }
-            }
-        } else {
-            $this->initial_data["vlanif"] = $this->config["vlans"]["vlan"][$this->initial_data["id"]]["vlanif"];
-        }
-        // Input validation
-        // Check if our parent interface exists
-        if (!array_key_exists($this->initial_data["id"], $this->config["vlans"]["vlan"])) {
-            $this->errors[] = APIResponse\get(3050);
-        } elseif (isset($this->validated_data["if"]) and !does_interface_exist($this->validated_data["if"])) {
-            $this->errors[] = APIResponse\get(3051);
-        } elseif (isset($this->validated_data["tag"]) and (1 > $this->validated_data["tag"] or $this->validated_data["tag"] > 4096)) {
-            $this->errors[] = APIResponse\get(3052);
-        } elseif (isset($this->validated_data["pcp"]) and (0 > $this->validated_data["pcp"] or $this->validated_data["pcp"] > 7)) {
-            $this->errors[] = APIResponse\get(3053);
-        }
-        // Check if our VLAN is already in use
-        if (is_array($this->config["vlans"]["vlan"])) {
-            if (isset($this->validated_data["if"]) and isset($this->validated_data["tag"])) {
-                foreach ($this->config["vlans"]["vlan"] as $vle) {
-                    if ($this->validated_data["if"] === $vle["if"] and $str_tag === $vle["tag"]) {
-                        $this->errors[] = APIResponse\get(3054);
+    }
 
-                    }
-                }
+    public function validate_payload() {
+        $this->__validate_id();
+        $this->__validate_if();
+        $this->__validate_tag();
+        $this->__validate_pcp();
+        $this->__validate__descr();
+        $this->__prev_vlanif = $this->validated_data["vlanif"];
+        $this->validated_data["vlanif"] = $this->validated_data["if"].".".$this->validated_data['tag'];
+    }
+
+    private function __is_vlan($if, $tag) {
+        # Check if our VLAN already exists
+        foreach ($this->config["vlans"]["vlan"] as $id => $vlan) {
+            if ($if === $vlan["if"] and strval($tag) === $vlan["tag"]) {
+                return true;
             }
+        }
+        return false;
+    }
+
+    private function __get_vlan_id_from_vlanif($vlanif) {
+        # Loop through each VLAN and return it's ID if it matches
+        foreach ($this->config["vlans"]["vlan"] as $id => $vlan) {
+            if ($vlanif === $vlan["vlanif"]) {
+                return $id;
+            }
+        }
+    }
+
+    private function __reassign_interface() {
+        # Check if we need to reassign an interface
+        $assigned_if = APITools\get_pfsense_if_id($this->initial_data["vlanif"]);
+        if (!empty($assigned_if)) {
+            $this->config['interfaces'][$assigned_if]['if'] = $this->validated_data["vlanif"];
+            interface_configure($assigned_if);
         }
     }
 }

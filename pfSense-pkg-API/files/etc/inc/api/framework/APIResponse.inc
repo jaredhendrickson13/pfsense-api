@@ -822,6 +822,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Interface VLAN parent required"
         ],
+        3056 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface VLAN ID required"
+        ],
 
         // 4000-4999 reserved for /firewall API calls
         4000 => [
