@@ -17,173 +17,235 @@ require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
 class APIFirewallNATPortForwardCreate extends APIModel {
+    private $protocols;
+    private $nat_reflection;
+    private $created_by_msg;
+    private $port_required;
+
     # Create our method constructor
     public function __construct() {
         parent::__construct();
         $this->change_note = "Added NAT rule via API";
         $this->privileges = ["page-all", "page-firewall-nat-portforward-edit"];
+        $this->protocols = ["tcp", "udp", "tcp/udp", "icmp", "esp", "ah", "gre", "ipv6", "igmp", "pim", "ospf"];
+        $this->nat_reflection = ["enable", "disable", "purenat"];
+        $this->port_required = false;
+        $this->id = count($this->config["nat"]["rule"]);
     }
 
     public function action() {
+        # Add our new configuration
+        $this->__init_config();
+        $this->config["nat"]["rule"][$this->id] = $this->validated_data;
+        APITools\sort_nat_rules($this->initial_data["top"], $this->id);
+        $this->write_config();
+        $this->apply();
+        return APIResponse\get(0, $this->validated_data);
+    }
+
+    private function __validate_interface() {
+        # Require clients to pass in an interface
+        if (isset($this->initial_data['interface'])) {
+            $interface = APITools\get_pfsense_if_id($this->initial_data['interface']);
+            # Require interface to exist
+            if ($interface) {
+                $this->validated_data["interface"] = $interface;
+            } else {
+                $this->errors[] = APIResponse\get(4006);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(4000);
+        }
+    }
+
+    private function __validate_protocol() {
+        # Require client to pass in a protocol
+        if (isset($this->initial_data['protocol'])) {
+            # Require protocol to be a known/supported protocol
+            if (in_array($this->initial_data['protocol'], $this->protocols)) {
+                $this->validated_data["protocol"] = $this->initial_data['protocol'];
+                # Set our port required toggle to true if our protocol depends on a port
+                if (in_array($this->validated_data["protocol"], ["tcp", "udp", "tcp/udp"])) {
+                    $this->port_required = true;
+                }
+            } else {
+                $this->errors[] = APIResponse\get(4007);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(4001);
+        }
+    }
+
+    private function __validate_target() {
+        # Require client to pass in an internal target for the port forward
+        if (isset($this->initial_data['target'])) {
+            # Require the target to either be a valid IPv4 or IPv6 address
+            if (is_ipaddrv4($this->initial_data['target'])) {
+                $this->validated_data["target"] = $this->initial_data['target'];
+            } elseif (alias_in_use($this->initial_data['target'])) {
+                $this->validated_data["target"] = $this->initial_data['target'];
+            } else {
+                $this->errors[] = APIResponse\get(4009);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(4002);
+        }
+    }
+
+    private function __validate_local_port() {
+        # Only require a local port if the protocol requires a port
+        if ($this->port_required) {
+            # Require client to pass in a local port to forward to the target
+            if (isset($this->initial_data['local-port'])) {
+                # Require the port to be a valid TCP/UDP port or range
+                if (is_port_or_range(strval($this->initial_data['local-port']))) {
+                    $this->validated_data["local-port"] = $this->initial_data['local-port'];
+                } else {
+                    $this->errors[] = APIResponse\get(4010);
+                }
+            } else {
+                $this->errors[] = APIResponse\get(4003);
+            }
+        }
+    }
+
+    private function __validate_src() {
+        # Require to specify a source address
+        if (isset($this->initial_data['src'])) {
+            $rule_check = APITools\is_valid_rule_addr($this->initial_data['src'], "source");
+            if ($rule_check["valid"]) {
+                $this->validated_data["source"] = $rule_check["data"]["source"];
+            } else {
+                $this->errors[] = APIResponse\get(4011);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(4004);
+        }
+    }
+
+    private function __validate_dst() {
+        # Require to specify a destination address
+        if (isset($this->initial_data['dst'])) {
+            $rule_check = APITools\is_valid_rule_addr($this->initial_data['dst'], "destination");
+            if ($rule_check["valid"]) {
+                $this->validated_data["destination"] = $rule_check["data"]["destination"];
+            } else {
+                $this->errors[] = APIResponse\get(4012);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(4005);
+        }
+    }
+
+    private function __validate_srcport() {
+        # Only require a source port value if our protocol requires ports
+        if ($this->port_required) {
+            $this->initial_data['srcport'] = str_replace("-", ":", $this->initial_data['srcport']);
+            # Require port to be a valid port or range, or be any
+            if (!is_port_or_range($this->initial_data['srcport']) and $this->initial_data['srcport'] !== "any") {
+                    $this->errors[] = APIResponse\get(4013);
+            }
+            # If our value is not any, replace the port range character with a - and save the value
+            elseif ($this->initial_data['srcport'] !== "any") {
+                $this->validated_data["source"]["port"] = str_replace(":", "-", $this->initial_data['srcport']);
+            }
+        }
+    }
+
+    private function __validate_dstport() {
+        # Only require a destination port value if our protocol requires ports
+        if ($this->port_required) {
+            $this->initial_data['dstport'] = str_replace("-", ":", $this->initial_data['dstport']);
+            # Require port to be a valid port or range, or be any
+            if (!is_port_or_range($this->initial_data['dstport']) and $this->initial_data['dstport'] !== "any") {
+                $this->errors[] = APIResponse\get(4014);
+            }
+            # If our value is not any, replace the port range character with a - and save the value
+            elseif ($this->initial_data['dstport'] !== "any") {
+                $this->validated_data["destination"]["port"] = str_replace(":", "-", $this->initial_data['dstport']);
+            }
+        }
+    }
+
+    private function __validate_disabled() {
+        # Optionally allow client to disable port forward upon entry
+        if ($this->initial_data['disabled'] === true) {
+            $this->validated_data["disabled"] = "";
+        }
+    }
+
+    private function __validate_nordr() {
+        # Optionally allow client to disable RDR for this entry
+        if ($this->initial_data['nordr'] === true) {
+            $this->validated_data["nordr"] = "";
+        }
+    }
+    private function __validate_nosync() {
+        # Optionally allow client to disable pfSync for this entry
+        if ($this->initial_data['nosync'] === true) {
+            $this->validated_data["nosync"] = "";
+        }
+    }
+
+    private function __validate_descr() {
+        # Optionally allow client to specify a description for this entry
+        if (isset($this->initial_data["descr"])) {
+            $this->validated_data["descr"] = $this->initial_data["descr"];
+        }
+    }
+
+    private function __validate_natreflection() {
+        # Optionally allow client to specify the NAT reflection mode
+        if (isset($this->initial_data['natreflection'])) {
+            # Ensure client specified a support NAT reflection mode
+            if (in_array($this->initial_data['natreflection'], $this->nat_reflection)) {
+                $this->validated_data["natreflection"] = $this->initial_data['natreflection'];
+            } else {
+                $this->errors[] = APIResponse\get(4008);
+            }
+        }
+    }
+
+    public function validate_payload() {
+        # Run each field validator method
+        $this->__validate_interface();
+        $this->__validate_protocol();
+        $this->__validate_target();
+        $this->__validate_local_port();
+        $this->__validate_src();
+        $this->__validate_dst();
+        $this->__validate_srcport();
+        $this->__validate_dstport();
+        $this->__validate_disabled();
+        $this->__validate_nordr();
+        $this->__validate_nosync();
+        $this->__validate_descr();
+        $this->__validate_natreflection();
+
+        # Add static field values
+        $this->created_by_msg = $this->client->username."@".$this->client->ip_address." (API)";
+        $this->validated_data["associated-rule-id"] = "pass";
+        $this->validated_data["created"] = array("time" => time(), "username" => $this->created_by_msg);
+        $this->validated_data["updated"] = $this->validated_data["created"];
+    }
+
+    public function apply() {
+        # Mark the NAT subsystem as changed, this will be cleared if applied
+        mark_subsystem_dirty('natconf');
+
+        # Allow clients to apply this rule immediately if they passed in an apply value
+        if ($this->initial_data["apply"] === true) {
+            filter_configure();
+            clear_subsystem_dirty('natconf');
+            clear_subsystem_dirty('filter');
+        }
+    }
+
+    private function __init_config() {
         # Ensure our config is formatted for NAT rules
         if (!is_array($this->config["nat"]["rule"])) {
             $this->config["nat"] = [];
             $this->config["nat"]["rule"] = [];
-        }
-
-        $this->config["nat"]["rule"][] = $this->validated_data;    // Write to our master config
-        $next_rule_id = count($this->config["nat"]["rule"]);    // Save our next rule ID
-        APITools\sort_nat_rules($this->initial_data["top"], $next_rule_id);    // Sort our nat rules
-        $this->write_config();    // Apply our configuration change
-        filter_configure();    // Ensure our firewall filter is reloaded
-        return APIResponse\get(0, $this->validated_data);
-    }
-
-    // TODO: break this down into smaller field specific validators
-    public function validate_payload() {
-        $user_created_msg = $this->client->username."@".$this->client->ip_address." (API)";    // Save the username and ip of client
-        $allowed_nat_ref = ["enable", "disable", "purenat"];    // Save our allow NAT reflection types
-        $allowed_prot = ["tcp", "udp", "tcp/udp", "icmp", "esp", "ah", "gre", "ipv6", "igmp", "pim", "ospf"];
-        if (isset($this->initial_data['interface'])) {
-            $interface = $this->initial_data['interface'];
-            $interface = APITools\get_pfsense_if_id($interface);
-        } else {
-            $this->errors[] = APIResponse\get(4000);
-        }
-        if (isset($this->initial_data['protocol'])) {
-            $protocol = $this->initial_data['protocol'];
-        } else {
-            $this->errors[] = APIResponse\get(4001);
-
-        }
-        if (isset($this->initial_data['target'])) {
-            $localip = $this->initial_data['target'];
-        } else {
-            $this->errors[] = APIResponse\get(4002);
-        }
-        if (isset($this->initial_data['local-port'])) {
-            $localport = $this->initial_data['local-port'];
-        } else {
-            $this->errors[] = APIResponse\get(4003);
-        }
-        if (isset($this->initial_data['src'])) {
-            $src = $this->initial_data['src'];
-        } else {
-            $this->errors[] = APIResponse\get(4004);
-
-        }
-        if (isset($this->initial_data['srcport'])) {
-            $srcport = $this->initial_data['srcport'];
-        }
-        if (isset($this->initial_data['dst'])) {
-            $dst = $this->initial_data['dst'];
-        } else {
-            $this->errors[] = APIResponse\get(4005);
-
-        }
-        if (isset($this->initial_data['dstport'])) {
-            $dstport = $this->initial_data['dstport'];
-        }
-        if (isset($this->initial_data['disabled'])) {
-            if ($this->initial_data['disabled']) {
-                $disabled = true;
-            }
-        }
-        if (isset($this->initial_data['nordr'])) {
-            if ($this->initial_data['nordr']) {
-                $nordr = true;
-            }
-        }
-        if (isset($this->initial_data['nosync'])) {
-            if ($this->initial_data['nosync'] === true) {
-                $nosync = true;
-            }
-        }
-        if (isset($this->initial_data['top'])) {
-            if ($this->initial_data['top']) {
-                $this->initial_data = "top";
-            }
-        }
-        if (isset($this->initial_data['descr'])) {
-            $descr = $this->initial_data['descr'];
-        }
-        if (isset($this->initial_data['natreflection'])) {
-            $natreflection = $this->initial_data['natreflection'];
-        }
-        
-        // INPUT VALIDATION/FORMATTING
-        // Check that our required array/interface values are valid
-        if (!is_string($interface)) {
-            $this->errors[] = APIResponse\get(4006);
-        } elseif (!in_array($protocol, $allowed_prot)) {
-            $this->errors[] = APIResponse\get(4007);
-        } elseif (isset($natreflection) and !in_array($natreflection, $allowed_nat_ref)) {
-            $this->errors[] = APIResponse\get(4008);
-        } elseif (!is_ipaddrv4($localip) and !alias_in_use($localip)) {
-            $this->errors[] = APIResponse\get(4009);
-        } elseif (!is_port_or_range($localport)) {
-            $this->errors[] = APIResponse\get(4010);
-        }
-        $this->validated_data = array();
-        // Check if rule is disabled
-        if ($disabled) {
-            $this->validated_data["disabled"] = "";
-        }
-        // Check if pfsync is disabled
-        if ($nosync) {
-            $this->validated_data["nosync"] = "";
-        }
-        // Check if RDR is disabled is disabled
-        if ($nordr) {
-            $this->validated_data["nordr"] = "";
-        }
-        // Check if user specified NAT reflection
-        if ($natreflection) {
-            $this->validated_data["natreflection"] = $natreflection;
-        }
-        $this->validated_data["interface"] = $interface;
-        $this->validated_data["protocol"] = $protocol;
-        $this->validated_data["source"] = array();
-        $this->validated_data["destination"] = array();
-        $this->validated_data["target"] = $localip;
-        $this->validated_data["local-port"] = $localport;
-        $this->validated_data["descr"] = $descr;
-        $this->validated_data["associated-rule-id"] = "pass";
-        $this->validated_data["created"] = array("time" => time(), "username" => $user_created_msg);
-        $this->validated_data["updated"] = $this->validated_data["created"];
-        // Check if our source and destination values are valid
-        foreach (array("source" => $src, "destination" => $dst) as $dir => $val) {
-            $dir_check = APITools\is_valid_rule_addr($val, $dir);
-            if (!$dir_check["valid"]) {
-                if ($dir === "source") {
-                    $this->errors[] = APIResponse\get(4011);
-                } else {
-                    $this->errors[] = APIResponse\get(4012);
-
-                }
-            } else {
-                $this->validated_data = array_merge($this->validated_data, $dir_check["data"]);
-            }
-        }
-        // Check if protocol calls for additional specifications
-        if (in_array($protocol, array("tcp", "udp", "tcp/udp"))) {
-            $port_req = true;
-        }
-        // Check our src and dst port values if ports are required
-        if ($port_req) {
-            foreach (array("source" => $srcport, "destination" => $dstport) as $dir => $val) {
-                $val = str_replace("-", ":", $val);
-                if (!is_port_or_range($val) and $val !== "any") {
-                    if ($dir === "source") {
-                        $this->errors[] = APIResponse\get(4013);
-
-                    } else {
-                        $this->errors[] = APIResponse\get(4014);
-                    }
-                } elseif ($val !== "any") {
-                    $this->validated_data[$dir]["port"] = str_replace(":", "-", $val);
-                }
-            }
         }
     }
 }

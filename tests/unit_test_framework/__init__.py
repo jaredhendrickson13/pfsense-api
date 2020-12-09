@@ -161,11 +161,15 @@ class APIUnitTest:
     def make_request(self, method, payload):
         success = False
 
-        # Add our authentication payload values if our auth mode requires
-        if self.args.auth_mode != "jwt":
+        # Create authentication payload for local authentication
+        if self.args.auth_mode == "local":
             payload.update(self.auth_payload)
             headers = {}
-        else:
+        # Create authentication headers for token authentication
+        elif self.args.auth_mode == "token":
+            headers = {"Authorization": self.args.username + " " + self.args.password}
+        # Create authentication headers for JWT authentication
+        elif self.args.auth_mode == "jwt":
             headers = {"Authorization": "Bearer " + self.__request_jwt__()}
 
         try:

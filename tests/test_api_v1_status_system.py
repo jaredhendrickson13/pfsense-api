@@ -14,8 +14,8 @@
 
 import unit_test_framework
 
-class APIUnitTestFirewallNAT(unit_test_framework.APIUnitTest):
-    url = "/api/v1/firewall/nat"
+class APIUnitTestStatusSystem(unit_test_framework.APIUnitTest):
+    url = "/api/v1/status/system"
     get_payloads = [{}]
 
-APIUnitTestFirewallNAT()
+APIUnitTestStatusSystem()

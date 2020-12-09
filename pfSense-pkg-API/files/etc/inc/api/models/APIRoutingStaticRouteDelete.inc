@@ -30,9 +30,7 @@ class APIRoutingStaticRouteDelete extends APIModel {
         APITools\delete_static_route($this->id);
         unset($this->config["staticroutes"]["route"][$this->id]);
         $this->write_config();
-        system_routing_configure();
-        filter_configure();
-        setup_gateways_monitor();
+        $this->apply();
         return APIResponse\get(0, $del_data);
     }
 
@@ -49,4 +47,14 @@ class APIRoutingStaticRouteDelete extends APIModel {
         }
     }
 
+    public function apply() {
+        # Mark the routing subsystem as changed, clear if applied
+        mark_subsystem_dirty("staticroutes");
+        system_routing_configure();
+        system_resolvconf_generate();
+        filter_configure();
+        setup_gateways_monitor();
+        send_event("service reload dyndnsall");
+        clear_subsystem_dirty("staticroutes");
+    }
 }

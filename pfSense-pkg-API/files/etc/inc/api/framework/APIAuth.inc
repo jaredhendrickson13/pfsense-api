@@ -79,6 +79,13 @@ class APIAuth {
 
     # Attempts to authenticate using API token authentication
     private function authenticate_token() {
+        # Check if the API token was passed in via authorization header
+        # TODO: in a future release make this the only way to pass in token credentials
+        if (!empty($_SERVER["HTTP_AUTHORIZATION"])) {
+            $this->request["client-id"] = explode(" ", $_SERVER["HTTP_AUTHORIZATION"])[0];
+            $this->request["client-token"] = explode(" ", $_SERVER["HTTP_AUTHORIZATION"])[1];
+        }
+
         if (APITools\authenticate_token($this->request["client-id"], $this->request["client-token"]) === true) {
             $this->username = pack("H*", $this->request["client-id"]);
             // Ensure user is not disabled

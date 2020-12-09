@@ -33,6 +33,9 @@ if (!in_array("page-system-api", $user_privs) and !in_array("page-all", $user_pr
 """
 css = """
 <style>
+    title {
+        content:"pfSense API Documentation";
+    }
     body {
         display: block;
         width: 90%;
@@ -40,7 +43,10 @@ css = """
         margin: 0 auto;
     }
     footer {
-        display:none;
+        text-align: center;
+    }
+    footer p {
+        margin: 2px;
     }
     div.col-md-12 {
         margin-top: 20px;
@@ -116,6 +122,16 @@ css = """
     }
     </style>
 """
+js = """
+<script type="text/javascript">
+    $(document).ready(function() {
+        document.title = 'pfSense REST API Documentation';
+        var curr_year = new Date().getFullYear();
+        document.querySelector('footer').innerHTML = "<a href='/api/'>Back to pfSense</a> | <a href='https://github.com/jaredhendrickson13/pfsense-api'>View on Github</a> | <a href='https://github.com/jaredhendrickson13/pfsense-api/issues/new'>Report an Issue</a><p>Copyright &copy; " + curr_year + " - Jared Hendrickson</p>";
+    });
+
+</script>
+"""
 
 # Parses command line arguments and generates help pages
 def start_argparse():
@@ -153,7 +169,7 @@ def format_docs():
     # Write a new PHP script containing the HTML created by docgen, then override custom attributes and CSS
     with open("documentation.php", "w") as dw:
         html_doc = php + html_doc
-        html_doc = html_doc + css
+        html_doc = html_doc + js + css
         html_doc = html_doc.replace("{{$hostname}}", "<?echo $_SERVER['HTTP_HOST'];?>")
         dw.write(html_doc)
 

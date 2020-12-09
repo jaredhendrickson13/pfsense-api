@@ -22,6 +22,7 @@ class APIModel {
     public $privileges;
     public $initial_data;
     public $validated_data;
+    public $type_map;
     public $id;
     public $validate_id;
     public $config;
@@ -34,7 +35,7 @@ class APIModel {
 
     public function __construct() {
         global $config;
-        error_reporting(E_ERROR);
+        error_reporting(E_ERROR);    // Prevents PHP warnings from printing to API responses
         $this->config =& $config;
         $this->privileges = ["page-all"];
         $this->requires_auth = true;
@@ -43,7 +44,7 @@ class APIModel {
         $this->initial_data = APITools\get_request_data();
         $this->validated_data = [];
         $this->errors = [];
-
+        $this->type_map = [];
     }
 
     public function action() {
@@ -68,13 +69,20 @@ class APIModel {
     }
 
     public function validate() {
+        # Checks API status and requirements
         $this->check_enable();
         $this->check_server_ip();
         $this->check_version();
+
+        # Checks request data
+        $this->check_request_data();
+
+        # Checks authentication and authorization if required
         if ($this->requires_auth) {
             $this->check_authentication();
             $this->check_authorization();
         }
+
         $this->validate_payload();
 
         if (count($this->errors) === 0) {
@@ -152,4 +160,10 @@ class APIModel {
         $this->errors[] = APIResponse\get(6);
     }
 
+    # Check if our requested content-type is supported and parsed data correctly, sets error if not
+    private function check_request_data() {
+        if ($this->initial_data === false) {
+            $this->errors[] = APIResponse\get(11);
+        }
+    }
 }

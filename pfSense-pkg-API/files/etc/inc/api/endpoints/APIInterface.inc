@@ -28,6 +28,10 @@ class APIInterface extends APIEndpoint {
         return (new APIInterfaceCreate())->call();
     }
 
+    protected function put() {
+        return (new APIInterfaceUpdate())->call();
+    }
+
     protected function delete() {
         return (new APIInterfaceDelete())->call();
     }

@@ -16,20 +16,19 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-
-class APIFirewallNATRead extends APIModel {
+class APIFirewallNATOutboundRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->validators = [];
-        $this->privileges["page-all"];
+        $this->privileges = ["page-all", "page-firewall-nat-outbound"];
     }
 
     public function action() {
-
-        // Check that we have a NAT configuration
-        if (!empty($this->config["nat"])) {
-            $this->validated_data = $this->config["nat"];
+        # If default outbound NAT mode (auto) is configured, set a representation of this value since none is shown
+        if (empty($this->config["nat"]["outbound"]["mode"])) {
+            $this->validated_data = ["mode" => "automatic"];
+        } else {
+            $this->validated_data = ["mode" => $this->config["nat"]["outbound"]["mode"]];
         }
         return APIResponse\get(0, $this->validated_data);
     }

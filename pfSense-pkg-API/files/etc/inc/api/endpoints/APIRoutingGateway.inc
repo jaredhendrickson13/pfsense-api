@@ -23,4 +23,16 @@ class APIRoutingGateway extends APIEndpoint {
     protected function get() {
         return (new APIRoutingGatewayRead())->call();
     }
+
+    protected function post() {
+        return (new APIRoutingGatewayCreate())->call();
+    }
+
+    protected function put() {
+        return (new APIRoutingGatewayUpdate())->call();
+    }
+
+    protected function delete() {
+        return (new APIRoutingGatewayDelete())->call();
+    }
 }

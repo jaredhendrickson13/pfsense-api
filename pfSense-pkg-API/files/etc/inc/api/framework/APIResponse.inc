@@ -81,9 +81,15 @@ function get($id, $data=[], $all=false) {
         ],
         10 => [
             "status" => "server error",
-            "code" => "500",
+            "code" => 500,
             "return" => $id,
             "message" => "Your API request was valid but no actions were specified for this endpoint",
+        ],
+        11 => [
+            "status" => "unsupported media type",
+            "code" => 415,
+            "return" => $id,
+            "message" => "Specified content type is not supported"
         ],
         // 1000-1999 reserved for /system API calls
         1000 => [
@@ -828,6 +834,60 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Interface VLAN ID required"
         ],
+        3057 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface ID is required"
+        ],
+        3058 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface ID does not exist"
+        ],
+        3059 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface descriptive name cannot start with 'pkg_'"
+        ],
+        3060 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface descriptive name cannot match alias name"
+        ],
+        3061 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface descriptive name cannot be entirely numeric"
+        ],
+        3062 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface descriptive name cannot match existing interface name"
+        ],
+        3063 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface type cannot be changed while DHCP server is enabled"
+        ],
+        3064 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface subnet must be less than 31 while DHCP server is enabled"
+        ],
+        3065 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface type6 cannot be changed while DHCPv6 server is enabled"
+        ],
 
         // 4000-4999 reserved for /firewall API calls
         4000 => [
@@ -1280,6 +1340,192 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall alias id required"
         ],
+        4075 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "1:1 NAT interface is required"
+        ],
+        4076=> [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown 1:1 NAT interface"
+        ],
+        4077 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "1:1 NAT source required"
+        ],
+        4078 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "1:1 NAT destination required"
+        ],
+        4079 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid 1:1 NAT source address"
+        ],
+        4080 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid 1:1 NAT destination address"
+        ],
+        4081 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "1:1 NAT external address required"
+        ],
+        4082 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid 1:1 NAT external address"
+        ],
+        4083 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "1:1 NAT rule ID required"
+        ],
+        4084 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "1:1 NAT rule ID does not exist"
+        ],
+        4085 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid outbound NAT mode"
+        ],
+        4086 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping interface is required"
+        ],
+        4087 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown outbound NAT mapping interface"
+        ],
+        4088=> [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping protocol required"
+        ],
+        4089 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown outbound NAT mapping protocol"
+        ],
+        4090 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown outbound NAT mapping pool option"
+        ],
+        4091 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping source hash key must start with 0x"
+        ],
+        4092 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping source hash key must contain a hexadecimal value after 0x"
+        ],
+        4093 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping source hash key must be 34 characters in length including 0x"
+        ],
+        4094 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping target is required"
+        ],
+        4095 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid outbound NAT mapping target"
+        ],
+        4096 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping pool option must be default or round robin when using an alias target"
+        ],
+        4097 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid outbound NAT port"
+        ],
+        4098 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping source required"
+        ],
+        4099 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid outbound NAT source address"
+        ],
+        4100 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping destination required"
+        ],
+        4101 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid outbound NAT destination address"
+        ],
+        4102 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid outbound NAT source port"
+        ],
+        4103 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid outbound NAT destination port"
+        ],
+        4104 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping ID required"
+        ],
+        4105 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Outbound NAT mapping ID does not exist"
+        ],
         4106 => [
             "status" => "bad request",
             "code" => 400,
@@ -1493,6 +1739,139 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Static route ID does not exist"
         ],
+        6007 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway interface is required"
+        ],
+        6008 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid gateway interface"
+        ],
+        6009 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway IP protocol is required"
+        ],
+        6010 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid gateway IP protocol"
+        ],
+        6011 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway name is required"
+        ],
+        6012 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid gateway name"
+        ],
+        6013 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway address is required"
+        ],
+        6014 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid gateway address"
+        ],
+        6015 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway weight must be between 1 and 30"
+        ],
+        6016 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway data payload must be greater than 1"
+        ],
+        6017 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway low latency threshold must be positive integer"
+        ],
+        6018 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway high latency threshold must be greater than low latency threshold"
+        ],
+        6019 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway low packet loss threshold must be between 1 and 100"
+        ],
+        6020 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway high packet loss threshold must be between the low threshold and 100"
+        ],
+        6021 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway probe interval must be between 1 and 3600000"
+        ],
+        6022 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway loss interval must be greater than the high latency threshold"
+        ],
+        6023 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway time period must be greater than twice the probe interval plus the loss interval"
+        ],
+        6024 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway alert interval must be greater than or greater to the probe interval"
+        ],
+        6025 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid gateway monitor address"
+        ],
+        6026 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway name already exists"
+        ],
+        6027 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway ID required"
+        ],
+        6028 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway ID does not exist"
+        ],
+
 
     ];
     $response = $responses[(!in_array($id, $responses)) ? $id : 1];

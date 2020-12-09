@@ -6,18 +6,18 @@
         <![CDATA[
 /**
  * API
- *  - A Full API for pfSense
+ *  - The missing REST API package for pfSense
  *
  * Copyright 2020 Jared Hendrickson
  */
 	]]>
     </copyright>
-    <description>A REST API for pfSense</description>
+    <description>The missing REST API package for pfSense</description>
     <name>API</name>
     <title>System: API</title>
     <menu>
         <name>API</name>
-        <tooltiptext>A REST API for pfSense.</tooltiptext>
+        <tooltiptext>The missing REST API package for pfSense</tooltiptext>
         <section>System</section>
         <url>/api/</url>
     </menu>

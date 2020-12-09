@@ -5,4 +5,5 @@ if [ "${2}" != "POST-DEINSTALL" ]; then
 fi
 
 /usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% ${2}
+/bin/rm /usr/local/bin/pfsense-api
 /bin/mv /etc/inc/system.original.inc /etc/inc/system.inc

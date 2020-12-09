@@ -75,7 +75,7 @@ class APIServicesUnboundHostOverrideUpdate extends APIModel {
 
         # If host or domain was updated, ensure this host override doesn't already exist
         if (isset($this->initial_data["host"]) or isset($this->initial_data["domain"])) {
-            if (APITools\unbound_host_override_exists($this->validated_data["host"], $this->validated_data["domain"])) {
+            if (APITools\is_unbound_fqdn($this->validated_data["host"], $this->validated_data["domain"], $this->id)) {
                 $this->errors[] = APIResponse\get(2010);
             }
         }

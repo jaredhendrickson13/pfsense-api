@@ -46,6 +46,13 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
                     "description": "Updated Unit Test"
                 }
             ],
+        },
+        {
+            "id": 0,
+            "host": "updated-pfsense-api",
+            "domain": "updated-unit.test",
+            "ip": "2.4.6.8",
+            "descr": "Check host and domain field unique constraint tolerance",
             "apply": True
         }
     ]

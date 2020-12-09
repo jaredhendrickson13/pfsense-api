@@ -15,12 +15,12 @@
 
 require_once("api/framework/APIEndpoint.inc");
 
-class APIFirewallNAT extends APIEndpoint {
+class APIServicesDDNS extends APIEndpoint {
     public function __construct() {
-        $this->url = "/api/v1/firewall/nat";
+        $this->url = "/api/v1/services/ddns";
     }
 
     protected function get() {
-        return (new APIFirewallNATRead())->call();
+        return (new APIServicesDDNSRead())->call();
     }
 }

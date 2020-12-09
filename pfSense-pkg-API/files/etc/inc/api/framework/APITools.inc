@@ -30,14 +30,25 @@ require_once("auth.inc");
 require_once("functions.inc");
 use Firebase\JWT\JWT;
 
-# Gathers our URL form encoded data or JSON body data from our request and places them in a single array
+# Checks our content type header and parses the content accordingly
 function get_request_data() {
-    $data = $_GET;    // Accept HTTP requests in URL encoded format
-    // Check if our URL encoded parameters are empty, if so try JSON encoded parameters
-    if (empty($data)) {
-        $data = json_decode(file_get_contents('php://input'), true);
+    # TODO: x-www-form-urlencoded still attempts to use json if no parameters were passed in. This was intentionally done to
+    # TODO: support user scripts that didn't specify a static content type (before it was supported) remove this in a future
+    # TODO: release. It is preferred that content uses a specified content type.
+    $_SERVER["HTTP_CONTENT_TYPE"] = (empty($_SERVER["HTTP_CONTENT_TYPE"])) ? "application/x-www-form-urlencoded" : $_SERVER["HTTP_CONTENT_TYPE"];
+    $content_types = [
+        "application/json" => json_decode(file_get_contents('php://input'), true),
+        "application/x-www-form-urlencoded" => (empty($_GET)) ? json_decode(file_get_contents('php://input'), true) : $_GET
+    ];
+
+    # Check if content type is supported, if so return corresponding parsed request data
+    if (array_key_exists($_SERVER["HTTP_CONTENT_TYPE"], $content_types)) {
+        return $content_types[$_SERVER["HTTP_CONTENT_TYPE"]];
     }
-    return $data;
+    # Return false if the content type is unknown or unsupported
+    else {
+        return false;
+    }
 }
 
 # Check our local pfSense version
@@ -269,62 +280,68 @@ function enable_carp($enable) {
     }
 }
 
-// Sorts nat rules by specified criteria and reloads the filter
-function sort_nat_rules($mode=null, $data=null) {
+# Sorts NAT rules by specified criteria
+function sort_nat_rules($top=false, $data=null, $field=null) {
     // Variables
     global $config;
     $sort_arr = [];
-    $master_arr = [];
-    foreach ($config["nat"]["rule"] as $idx => $fre) {
-        $curr_iface = $fre["interface"];    // Save our current entries interface
-        // Create our interface array if does not exist
-        if (!isset($sort_arr[$curr_iface])) {
-            $sort_arr[$curr_iface] = [];
-        }
-        // Check if user requested this rule to be placed at the top of array
-        if ($mode === "top" and $idx === $data) {
-            array_unshift($sort_arr[$curr_iface], $fre);
+
+    # Set appropriate config location depending on specified field
+    switch($field) {
+        case "onetoone":
+            $acl =& $config["nat"]["onetoone"];
+            break;
+        case "outbound":
+            $acl =& $config["nat"]["outbound"]["rule"];
+            break;
+        default:
+            $acl =& $config["nat"]["rule"];
+    }
+
+    foreach ($acl as $idx => $fre) {
+        # Check if top mode is enabled, if so add this item to the start of the array
+        if ($top === true and $idx === $data) {
+            array_unshift($sort_arr, $fre);
         } else {
-            $sort_arr[$curr_iface][] = $fre;
+            $sort_arr[] = $fre;
         }
     }
-    foreach ($sort_arr as $if) {
-        foreach ($if as $rule) {
-            $master_arr[] = $rule;
-        }
+    if (!empty($sort_arr)) {
+        $acl = $sort_arr;
+    } else {
+        unset($acl);
     }
-    $config["nat"]["rule"] = $master_arr;
 }
 
-// Input a physical interface ID, or a descriptive interface name, and return the pfSense interface ID (lan,wan,optx)
-function get_pfsense_if_id($interface)
-{
-    // Variables
-    global $err_lib, $config;
-    // Loop through our config and check each interface for a physical ID match
-    foreach ($config["interfaces"] as $ifid => $ife) {
-        // Check that we have a configured interface ID first
-        if (array_key_exists("if", $ife)) {
+# Input a physical interface ID, or a descriptive interface name, and return the pfSense interface ID (lan,wan,optx)
+function get_pfsense_if_id($interface) {
+    # Variables
+    global $config;
+    # Loop through our config and check each interface for a physical ID match
+    foreach ($config["interfaces"] as $if_id => $if_ent) {
+        # First check if the requested interface matches this physical interface ID
+        if (array_key_exists("if", $if_ent)) {
             // Check if the interface id matches
-            if ($interface === $ife["if"]) {
-                return $ifid;    // Return our pfSense interface ID
-                break;    // Break loop just in case
+            if ($interface === $if_ent["if"]) {
+                return $if_id;
             }
         }
-        // Check that we have a configured interface descr first
-        if (array_key_exists("descr", $ife)) {
+        # Next, check if the requested interface matches this pfSense interface description
+        if (array_key_exists("descr", $if_ent)) {
             // Check if the interface descr matches
-            if ($interface === $ife["descr"]) {
-                return $ifid;    // Return our pfSense interface ID
-                break;    // Break loop just in case
-            }
-        } else {
-            // Check if the pfSense interface ID matches
-            if (strtolower($interface) === $ifid) {
-                return $ifid;    // Return our pfSense interface ID
-                break;    // Break loop just in case
+            if ($interface === $if_ent["descr"]) {
+                return $if_id;
             }
         }
+        # Alternatively, check if the interface does not have a description. If so, check it's default description.
+        elseif (strtoupper($if_id) === $interface) {
+            return $if_id;
+        }
+        # Next, check if the requested interface matches this pfSense interface ID (wan, lan, opt1, opt2, etc.)
+        if ($interface === $if_id) {
+            return $if_id;
+        }
+
     }
 }
 
@@ -692,28 +709,32 @@ function unbound_reload_config() {
 }
 
 // Check if a DNS Resolver (Unbound) host override already exists
-function unbound_host_override_exists($hostname, $domain) {
-    // Local variables
-    global $err_lib, $config;
-    $curr_hosts = array();
+function is_unbound_fqdn($hostname, $domain, $instance_id=null) {
+    # Local variables
+    global $config;
+    $curr_hosts = (array_key_exists("hosts", $config["unbound"])) ? $config["unbound"]["hosts"] : [];
     $host_exists = false;
-    // Check if host override already exists
-    if (array_key_exists("hosts", $config["unbound"])) {
-        $curr_hosts = $config["unbound"]["hosts"];
-    }
+    $index = 0;
+
+    # Loop through each host override and check if the FQDN already exists
     foreach ($curr_hosts as $host_ent) {
+        # Check the FQDN matches this entry
         if ($host_ent["host"] === $hostname and $host_ent["domain"] === $domain) {
-            $host_exists = true;
-            break;
+            # If we are working with an existing instance, allow existing FQDN if ID matches
+            if ($index !== $instance_id) {
+                return true;
+            }
         }
+
+        # Check FQDN within host override aliases as well
         if (is_array($host_ent["aliases"])) {
             foreach ($host_ent["aliases"]["item"] as $alias_ent) {
                 if ($alias_ent["host"] === $hostname and $alias_ent["domain"] === $domain) {
-                    $host_exists = true;
-                    break;
+                    return true;
                 }
             }
         }
+        $index++;
     }
     return $host_exists;
 }
@@ -903,33 +924,31 @@ function get_ipv6_if_list() {
 }
 
 // Apply a new interface configuration
-function apply_interface_config($if_conf) {
+function apply_interface_config($if_id, $if_conf) {
     // Local variables
-    global $err_lib, $config;
+    global $config;
     $vlan_redo = false;
     // Check that our if configuration is an array
     if (is_array($if_conf)) {
-        foreach ($if_conf as $if_apply => $if_go) {
-            if (isset($config['interfaces'][$if_apply]['enable'])) {
-                interface_bring_down($if_apply, false, $if_go);
-                interface_configure($if_apply, true);
-                if ($config['interfaces'][$if_apply]['ipaddrv6'] == "track6") {
-                    // Configure IPv6 track6 type if present
-                    $wan_cfg = $config['interfaces'][$if_apply];
-                    interface_track6_configure($if_apply, $wan_cfg, true);
-                }
-            } else {
-                interface_bring_down($if_apply, true, $if_go);
-                // Restart DHCPD if enabled
-                if (isset($config['dhcpd'][$if_apply]['enable']) ||
-                    isset($config['dhcpdv6'][$if_apply]['enable'])) {
-                    services_dhcpd_configure();
-                }
+        if (isset($config['interfaces'][$if_id]['enable'])) {
+            interface_bring_down($if_id, false, $if_conf);
+            interface_configure($if_id, true);
+            if ($config['interfaces'][$if_id]['ipaddrv6'] == "track6") {
+                // Configure IPv6 track6 type if present
+                $wan_cfg = $config['interfaces'][$if_id];
+                interface_track6_configure($if_id, $wan_cfg, true);
             }
-            // Check if VLANs are configured for this interface, if so, reapply them
-            if (interface_has_clones(get_real_interface($if_apply))) {
-                $vlan_redo = true;
+        } else {
+            interface_bring_down($if_id, true, $if_conf);
+            // Restart DHCPD if enabled
+            if (isset($config['dhcpd'][$if_id]['enable']) ||
+                isset($config['dhcpdv6'][$if_id]['enable'])) {
+                services_dhcpd_configure();
             }
+        }
+        // Check if VLANs are configured for this interface, if so, reapply them
+        if (interface_has_clones(get_real_interface($if_id))) {
+            $vlan_redo = true;
         }
     }
     // Check if DHCP needs to be reloaded
@@ -986,4 +1005,106 @@ function delete_static_route($id) {
     }
 
     unset($targets);
+}
+
+# Converts an integer-of-100 percent to a decimal percentage
+function float_percent($value) {
+    # Only return converted value if it is numeric
+    if (is_numeric($value)) {
+        # Add a leading 0 if number is single digit
+        if (floatval($value) > 0 and floatval($value) < 10) {
+            $value = "0" . strval($value);
+        }
+        return floatval("0." . $value);
+    }
+}
+
+# Checks if an alias exists with a specified name, and returns the alias type. Returns null if not found
+function is_alias($name) {
+    global $config;
+    if (is_array($config['aliases']['alias'])) {
+        foreach ($config['aliases']['alias'] as $alias) {
+            if (strcasecmp($alias['name'], $name) == 0) {
+                return $alias["type"];
+            }
+        }
+    }
+}
+
+# Checks if an interface group with a specified name already exists. Returns true or false.
+function is_ifgroup($name) {
+    global $config;
+    if (is_array($config['ifgroups']['ifgroupentry'])) {
+        foreach ($config['ifgroups']['ifgroupentry'] as $if_group_ent) {
+            if ($if_group_ent["ifname"] === $name) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+# Checks if an interface has DHCPD enabled. Returns true or false.
+function is_dhcpd_enabled($if) {
+    global $config;
+
+    # Ensure our interface is in it's pfSense ID format
+    $if = get_pfsense_if_id($if);
+
+    # Check if this interface is enabled
+    if (isset($config['dhcpd'][$if]['enable'])) {
+        return true;
+    }
+
+    return false;
+}
+
+# Checks if an interface has DHCPDv6 enabled. Returns true or false.
+function is_dhcpdv6_enabled($if) {
+    global $config;
+
+    # Ensure our interface is in it's pfSense ID format
+    $if = get_pfsense_if_id($if);
+
+    # Check if this interface is enabled
+    if (isset($config['dhcpdv6'][$if]['enable'])) {
+        return true;
+    }
+
+    return false;
+}
+
+# Checks if a value is an IPv4 address, subnet, or alias
+function is_ip_subnet_or_alias($value) {
+    if (is_subnet($value) === 4) {
+        return "ipv4_subnet";
+    } elseif (is_ipaddrv4($value)) {
+        return "ipv4_addr";
+    } elseif (is_ipaddroralias($value)) {
+        return "alias";
+    } else {
+        return false;
+    }
+}
+
+# Checks if an array is a associative array. Returns true if assoc, false if numeric, or null if not array
+function is_assoc_array($array, $strict_seq=false) {
+    # Local variables
+    $i = 0;
+
+    # First check if our array is actually an array. Return null otherwise.
+    if (is_array($array)) {
+        # Loop through each array value and check it's key
+        foreach ($array as $key => $value) {
+            # Check if key is numeric
+            if (!is_numeric($key) or ($strict_seq and $i !== intval($key))) {
+               return true;
+            }
+            $i++;
+        }
+    } else {
+        return null;
+    }
+
+    return false;
 }

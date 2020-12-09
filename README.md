@@ -26,12 +26,17 @@ pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/downlo
 
 To uninstall pfSense API, run the following command:<br>
 ```
-pkg delete pfSense-pkg-API
+pfsense-api delete
 ```
 
-To update pfSense API to latest version, run the following command:
+To update pfSense API to latest stable version, run the following command:
 ```
-pkg delete pfSense-pkg-API && pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.4-pkg-API.txz && /etc/rc.restart_webgui
+pfsense-api update
+```
+
+To revert to a previous version of pfSense API (e.g. v1.0.2), run the following command:
+```
+pfsense-api revert v1.0.2
 ```
 
 ### Notes: 
@@ -40,6 +45,7 @@ pkg delete pfSense-pkg-API && pkg add https://github.com/jaredhendrickson13/pfse
 - If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to 
 'Diagnostics > Command Prompt' and enter the commands there
 - When updating pfSense, **_you must reinstall pfSense API afterwards_**. Unfortunately, pfSense removes all existing packages and only reinstalls packages found within pfSense's package repositories. Since pfSense API is not an official package in pfSense's repositories, it does not get reinstalled automatically.
+- The `pfsense-api` command line tool was introduced in v1.1.0. Refer to the corresponding documentation for earlier releases.
 
 
 # UI Settings & Documentation
@@ -53,7 +59,8 @@ After installation, you will be able to access the API user interface pages with
 By default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense 
 from the API out of the box, and user passwords may be changed from the API to immediately add additional security if 
 needed. After installation, you can navigate to System > API in the pfSense webConfigurator to configure API
-authentication.
+authentication. Please note that external authentication servers like LDAP or RADIUS are not supported with any 
+API authentication method at this time. 
 
 To authenticate your API call, follow the instructions for your configured authentication mode:
 
@@ -73,12 +80,90 @@ Requires a bearer token to be included in the `Authorization` header of your req
 <details>
     <summary>API Token</summary>
 
-Uses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication and not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by adding a `client-id` value containing yourAPI token client ID and a `client-token` value containing your API token client token to your payload. (e.g. `{"client-id": "cccdj-311s", "client-token": "42jkjl-k234jlk1b38123kj3kjl-ffwzzuilaei"}`
+Uses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication; not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by specifying your client-id and client-token within an `Authorization` header, these values must be seperated by a space. (e.g. `Authorization: client-id-here client-token-here`)
+
+_Note: In previous versions of pfSense API, the client-id and client-token were provided via the request payload. This functionality is still supported but is not recommended. It will be removed in a future release._
+
 </details>
 
 ### Authorization
 pfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.
 
+
+# Content Types
+pfSense API can handle a few different content types. Please note, if a `Content-Type` header is not specified in your request, pfSense API will attempt to determine the
+content type which may have undesired results. It is recommended you specify your preferred `Content-Type` on each request. While several content types may be enabled,
+`application/json` is the recommended content type. Supported content types are:
+
+<details>
+    <summary>application/json</summary>
+
+Parses the request body as a JSON formatted string. This is the recommended content type.
+
+Example:
+
+```
+curl -s -H "Content-Type: application/json" -d '{"client-id": "admin", "client-token": "pfsense"}' -X GET https://pfsense.example.com/api/v1/system/arp
+{
+  "status": "ok",
+  "code": 200,
+  "return": 0,
+  "message": "Success",
+  "data": [
+    {
+      "ip": "192.168.1.1",
+      "mac": "00:0c:29:f6:be:d9",
+      "interface": "em1",
+      "status": "permanent",
+      "linktype": "ethernet"
+    },
+    {
+      "ip": "172.16.209.139",
+      "mac": "00:0c:29:f6:be:cf",
+      "interface": "em0",
+      "status": "permanent",
+      "linktype": "ethernet"
+    }
+  ]
+}
+```
+
+</details>
+
+<details>
+    <summary>application/x-www-form-urlencoded</summary>
+
+Parses the request body as URL encoded parameters.
+
+Example:
+
+```
+curl -s -H "Content-Type: application/x-www-form-urlencoded" -X GET "https://pfsense.example.com/api/v1/system/arp?client-id=admin&client-token=pfsense"
+{
+  "status": "ok",
+  "code": 200,
+  "return": 0,
+  "message": "Success",
+  "data": [
+    {
+      "ip": "192.168.1.1",
+      "mac": "00:0c:29:f6:be:d9",
+      "interface": "em1",
+      "status": "permanent",
+      "linktype": "ethernet"
+    },
+    {
+      "ip": "172.16.209.139",
+      "mac": "00:0c:29:f6:be:cf",
+      "interface": "em0",
+      "status": "permanent",
+      "linktype": "ethernet"
+    }
+  ]
+}
+```
+
+</details>
 
 # Response Codes
 `200 (OK)` : API call succeeded<br>
@@ -90,7 +175,7 @@ pfSense API uses the same privileges as the pfSense webConfigurator. The require
 
 
 # Error Codes
-A full list of error codes can be found by navigating to /api/v1/system/api/errors/ after installation. This will return
+A full list of error codes can be found by navigating to /api/v1/system/api/error after installation. This will return
  JSON data containing each error code and their corresponding error message. No authentication is required to view the 
  error code library. This also makes API integration with third-party software easy as the API error codes and messages 
  are always just an HTTP call away!
@@ -425,15 +510,35 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Create Firewall Alias Entries](#1-create-firewall-alias-entries)
   * [Delete Firewall Alias Entries](#2-delete-firewall-alias-entries)
 
-* [FIREWALL/NAT](#firewallnat)
+* [FIREWALL/APPLY](#firewallapply)
 
-  * [Read NAT](#1-read-nat)
+  * [Apply Firewall](#1-apply-firewall)
+
+* [FIREWALL/NAT/ONE_TO_ONE](#firewallnatone_to_one)
+
+  * [Create NAT 1-to-1 Mappings](#1-create-nat-1-to-1-mappings)
+  * [Delete NAT 1-to-1 Mappings](#2-delete-nat-1-to-1-mappings)
+  * [Read NAT 1-to-1 Mappings](#3-read-nat-1-to-1-mappings)
+  * [Update NAT 1-to-1 Mappings](#4-update-nat-1-to-1-mappings)
+
+* [FIREWALL/NAT/OUTBOUND](#firewallnatoutbound)
+
+  * [Read Outbound NAT Settings](#1-read-outbound-nat-settings)
+  * [Update Outbound NAT Settings](#2-update-outbound-nat-settings)
+
+* [FIREWALL/NAT/OUTBOUND/MAPPING](#firewallnatoutboundmapping)
+
+  * [Create Outbound NAT Mappings](#1-create-outbound-nat-mappings)
+  * [Delete Outbound NAT Mappings](#2-delete-outbound-nat-mappings)
+  * [Read Outbound NAT Mappings](#3-read-outbound-nat-mappings)
+  * [Update Outbound NAT Mappings](#4-update-outbound-nat-mappings)
 
 * [FIREWALL/NAT/PORTFOWARD](#firewallnatportfoward)
 
   * [Create NAT Port Forwards](#1-create-nat-port-forwards)
   * [Delete NAT Port Forwards](#2-delete-nat-port-forwards)
   * [Read NAT Port Forwards](#3-read-nat-port-forwards)
+  * [Update NAT Port Forwards](#4-update-nat-port-forwards)
 
 * [FIREWALL/RULE](#firewallrule)
 
@@ -463,6 +568,11 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Create Interfaces](#1-create-interfaces)
   * [Delete Interfaces](#2-delete-interfaces)
   * [Read Interfaces](#3-read-interfaces)
+  * [Update Interfaces](#4-update-interfaces)
+
+* [INTERFACE/APPLY](#interfaceapply)
+
+  * [Apply Interfaces](#1-apply-interfaces)
 
 * [INTERFACE/VLAN](#interfacevlan)
 
@@ -471,9 +581,16 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Read Interface VLANs](#3-read-interface-vlans)
   * [Update Interface VLANs](#4-update-interface-vlans)
 
+* [ROUTING/APPLY](#routingapply)
+
+  * [Apply Routing](#1-apply-routing)
+
 * [ROUTING/GATEWAY](#routinggateway)
 
-  * [Read Routing Gateways](#1-read-routing-gateways)
+  * [Create Routing Gateways](#1-create-routing-gateways)
+  * [Delete Routing Gateways](#2-delete-routing-gateways)
+  * [Read Routing Gateways](#3-read-routing-gateways)
+  * [Update Routing Gateways](#4-update-routing-gateways)
 
 * [ROUTING/STATIC_ROUTE](#routingstatic_route)
 
@@ -489,6 +606,10 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Start All Services](#3-start-all-services)
   * [Stop All Services](#4-stop-all-services)
 
+* [SERVICES/DDNS](#servicesddns)
+
+  * [Read Dynamic DNS](#1-read-dynamic-dns)
+
 * [SERVICES/DHCPD](#servicesdhcpd)
 
   * [Read DHCPd Service Configuration](#1-read-dhcpd-service-configuration)
@@ -496,6 +617,10 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Start DHCPd Service](#3-start-dhcpd-service)
   * [Stop DHCPd Service](#4-stop-dhcpd-service)
   * [Update DHCPd Service Configuration](#5-update-dhcpd-service-configuration)
+
+* [SERVICES/DHCPD/LEASE](#servicesdhcpdlease)
+
+  * [Read DHCPd Leases](#1-read-dhcpd-leases)
 
 * [SERVICES/DHCPD/STATIC_MAPPING](#servicesdhcpdstatic_mapping)
 
@@ -554,12 +679,24 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Read CARP Status](#1-read-carp-status)
   * [Update CARP Status](#2-update-carp-status)
 
+* [STATUS/GATEWAY](#statusgateway)
+
+  * [Read Gateway Status](#1-read-gateway-status)
+
+* [STATUS/INTERFACE](#statusinterface)
+
+  * [Read Interface Status](#1-read-interface-status)
+
 * [STATUS/LOG](#statuslog)
 
   * [Read Configuration History Status Log](#1-read-configuration-history-status-log)
   * [Read DHCP Status Log](#2-read-dhcp-status-log)
   * [Read Firewall Status Log](#3-read-firewall-status-log)
   * [Read System Status Log](#4-read-system-status-log)
+
+* [STATUS/SYSTEM](#statussystem)
+
+  * [Read System Status](#1-read-system-status)
 
 * [SYSTEM/API](#systemapi)
 
@@ -846,7 +983,7 @@ URL: https://{{$hostname}}/api/v1/firewall/alias/entry
 | --- | ------|-------------|
 | name | string | Name of alias to add new address values |
 | address | string or array | Array of values to add to alias. A single value may be specified as string. |
-| detail | string or array | Array of descriptions for alias values. Descriptions must match the order the that they are specified in the `address` array. Single descriptions may be specified as string |
+| detail | string or array | Array of descriptions for alias values. Descriptions must match the order the that they are specified in the `address` array. Single descriptions may be specified as string. If you pass In less `detail` values than `address` values, a default auto-created detail will be applied to the remaining values. (optional) |
 
 
 
@@ -900,16 +1037,138 @@ URL: https://{{$hostname}}/api/v1/firewall/alias/entry
 
 
 
-## FIREWALL/NAT
+## FIREWALL/APPLY
 
 
 
-### 1. Read NAT
+### 1. Apply Firewall
 
 
-Read NAT configuration and rules.<br><br>
+Apply pending firewall changes. This will reload all filter items. This endpoint returns no data.<br><br>
 
-_Requires at least one of the following privileges:_ [`page-all`]
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules`, `page-firewall-rules-edit`, `page-firewall-aliases`, `page-firewall-aliases-edit`, `page-firewall-nat-1-1`, `page-firewall-nat-1-1-edit`, `page-firewall-nat-outbound`, `page-firewall-nat-outbound-edit`, `page-firewall-nat-portforward`, `page-firewall-nat-portforward-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/apply
+```
+
+
+
+***Body:***
+
+```js        
+{
+}
+```
+
+
+
+## FIREWALL/NAT/ONE_TO_ONE
+
+
+
+### 1. Create NAT 1-to-1 Mappings
+
+
+Add a new NAT 1:1 Mapping.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| interface | string | Set which interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported.  |
+| src | string | Set the source address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
+| dst | string | Set the destination address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To only use interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
+| external | string | Specify IPv4 or IPv6 external address to map Inside traffic to. This Is typically an address on an uplink Interface. |
+| natreflection | string | Set the NAT reflection mode explicitly. Options are `enable` or `disable`. (optional) |
+| descr | string | Set a description for the mapping (optional) |
+| disabled | boolean | Disable the mapping upon creation (optional) |
+| nobinat | boolean | Disable binat. This excludes the address from a later, more general, rule. (optional) |
+| top | boolean | Add this mapping to top of access control list (optional) |
+| apply | boolean | Specify whether or not you would like this 1:1 mapping to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple 1:1 mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single 1:1 mapping, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"interface": "WAN",
+	"src": "any",
+	"dst": "em0ip",
+	"external": "1.2.3.4",
+	"natreflection": "enable",
+	"descr": "Test 1:1 NAT entry",
+	"nobinat": true,
+	"top": false,
+    "apply": true
+}
+```
+
+
+
+### 2. Delete NAT 1-to-1 Mappings
+
+
+Delete an existing NAT 1:1 mapping by ID.<br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | string or integer | Specify the 1:1 NAT mapping ID to delete |
+| apply | boolean | Specify whether or not you would like this 1:1 mapping deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple 1:1 mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single 1:1 mapping, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"id": 0, 
+    "apply": true
+}
+```
+
+
+
+### 3. Read NAT 1-to-1 Mappings
+
+
+Read 1:1 NAT mappings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1`]
 
 
 ***Endpoint:***
@@ -917,7 +1176,345 @@ _Requires at least one of the following privileges:_ [`page-all`]
 ```bash
 Method: GET
 Type: RAW
-URL: https://{{$hostname}}/api/v1/firewall/nat
+URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 4. Update NAT 1-to-1 Mappings
+
+
+Update an existing NAT 1:1 Mapping.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the 1:1 mapping to update. |
+| interface | string | Update which interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). (optional) |
+| src | string | Update the source address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
+| dst | string | Update the destination address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To only use interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional) |
+| external | string | Update the IPv4 or IPv6 external address to map Inside traffic to. This Is typically an address on an uplink Interface. (optional) |
+| natreflection | string | Update the NAT reflection mode explicitly. Options are `enable` or `disable`. (optional) |
+| descr | string | Update the description for the mapping (optional) |
+| disabled | boolean | Enable or disable the mapping upon update. True to disable, false to enable. (optional) |
+| nobinat | boolean | Enable or disable binat. This excludes the address from a later, more general, rule. True to disable binat, false to enable binat. (optional) |
+| top | boolean | Move this mapping to top of access control list upon update (optional) |
+| apply | boolean | Specify whether or not you would like this 1:1 mapping update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple 1:1 mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating a single 1:1 mapping, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"interface": "LAN",
+	"src": "10.0.0.0/24",
+	"dst": "!1.2.3.4",
+	"external": "4.3.2.1",
+	"natreflection": "disable",
+	"descr": "Updated test 1:1 NAT entry",
+    "disabled": true,
+	"nobinat": false,
+	"top": true,
+    "apply": false
+}
+```
+
+
+
+## FIREWALL/NAT/OUTBOUND
+
+
+
+### 1. Read Outbound NAT Settings
+
+
+Read outbound NAT mode settings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/outbound
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Update Outbound NAT Settings
+
+
+Update outbound NAT mode settings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/outbound
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| mode | string | Update the outbound NAT mode. Options are `automatic` to automatically generate outbound NAT rules, `hybrid` to support both automatiic and manual outbound NAT rules , `advanced` to require all rules to be entered manually, or `disabled` to disable outbound NAT altogether. If updating to `advanced` from `automatic` or `hybrid`, the API will automatically create manual entries for each automatically generated outbound NAT entry. |
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## FIREWALL/NAT/OUTBOUND/MAPPING
+
+
+
+### 1. Create Outbound NAT Mappings
+
+
+Create new outbound NAT mappings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| interface | string | Set which interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0).  |
+| protocol | string | Set which transfer protocol the mapping will apply to.  |
+| src | string | Set the source address of the firewall rule. This must be an IP, CIDR, alias or any. |
+| dst | string | Set the destination address of the firewall rule. This may be a single IP, network CIDR, or alias name. To negate the context of the  address, you may prepend the address with `!` |
+| srcport | string or integer | Set the TCP and/or UDP source port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` |
+| dstport | string or integer | Set the TCP and/or UDP destination port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` |
+| target | string | Specify the external IP to map this traffic to. This may be an IP address, IP subnet, alias, or empty string to use the Interface address.  |
+| natport | string | Set the TCP and/or UDP  port or port range to utilize when NATing (optional) |
+| staticnatport | boolean | Enable or disable static NAT ports. When enabling this field, any existing `natport` value will be lost. Defaults to false. (optional) |
+| descr | string | Set a description for the rule (optional) |
+| poolopts | string | Set the outbound NAT pool option for load balancing. Options are `round-robin`, `round-robin sticky-address`, `random`, `random sticky-address`, `source-hash`, `bitmask` or empty string for default. (optional) |
+| source_hash_key | string | Set a custom key hash to use when utilizing the `source-hash` NAT pool option. Value must start with `0x` following a 32 digit hex value. If this field is not specified, a random key hash will be generated. This field Is only available when `poolopts` Is set to `source-hash`.   (optional) |
+| disabled | boolean | Disable the rule upon creation. Defaults to false. (optional) |
+| nonat | boolean | Enable or disable NAT for traffic that matches this rule. True for no NAT, false to enable NAT. Defaults to false. (optional) |
+| top | boolean | Add this mapping to top of access control list. Defaults to false. (optional) |
+| apply | boolean | Specify whether or not you would like this outbound NAT mapping to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple outbound NAT mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single outbound NAT mapping, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"interface": "WAN",
+	"protocol": "tcp",
+	"src": "any",
+	"srcport": "433",
+	"dst": "em0ip",
+	"dstport": "443",
+	"target": "192.168.1.123",
+	"local-port": "443",
+	"natreflection": "purenat",
+	"descr": "Forward pb to lc",
+	"nosync": true,
+	"top": false
+}
+```
+
+
+
+### 2. Delete Outbound NAT Mappings
+
+
+Update existing outbound NAT mappings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the outbound NAT mapping to update |
+| apply | boolean | Specify whether or not you would like this outbound NAT mapping deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple outbound NAT mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single outbound NAT mapping, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"interface": "WAN",
+	"protocol": "tcp",
+	"src": "any",
+	"srcport": "433",
+	"dst": "em0ip",
+	"dstport": "443",
+	"target": "192.168.1.123",
+	"local-port": "443",
+	"natreflection": "purenat",
+	"descr": "Forward pb to lc",
+	"nosync": true,
+	"top": false
+}
+```
+
+
+
+### 3. Read Outbound NAT Mappings
+
+
+Read existing outbound NAT mode mappings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 4. Update Outbound NAT Mappings
+
+
+Update existing outbound NAT mappings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the outbound NAT mapping to update |
+| interface | string | Update the interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). (optional) |
+| protocol | string | Update the transfer protocol the mapping will apply to. (optional) |
+| src | string | Update the source address of the firewall rule. This must be an IP, CIDR, alias or any. (optional) |
+| dst | string | Update the destination address of the firewall rule. This may be a single IP, network CIDR, or alias name. To negate the context of the  address, you may prepend the address with `!` (optional) |
+| srcport | string or integer | Update the TCP and/or UDP source port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` (optional) |
+| dstport | string or integer | Update the TCP and/or UDP destination port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` (optional) |
+| target | string | Update the external IP to map this traffic to. This may be an IP address, IP subnet, alias, or empty string to use the Interface address. (optional) |
+| natport | string | Update the TCP and/or UDP  port or port range to utilize when NATing (optional) |
+| staticnatport | boolean | Enable or disable static NAT ports. When enabling this field, any existing `natport` value will be lost. Defaults to false. (optional) |
+| descr | string | Update the description for the rule (optional) |
+| poolopts | string | Update the outbound NAT pool option for load balancing. Options are `round-robin`, `round-robin sticky-address`, `random`, `random sticky-address`, `source-hash`, `bitmask` or empty string for default. (optional) |
+| source_hash_key | string | Update the hash to  a custom key hash to use when utilizing the `source-hash` NAT pool option. Value must start with `0x` following a 32 digit hex value. If this field is not specified, a random key hash will be generated. This field Is only available when `poolopts` Is set to `source-hash`.   (optional) |
+| disabled | boolean | Disable the rule upon creation. Defaults to false. (optional) |
+| nonat | boolean | Enable or disable NAT for traffic that matches this rule. True for no NAT, false to enable NAT. Defaults to false. (optional) |
+| top | boolean | Move this mapping to top of access control list. Defaults to false. (optional) |
+| apply | boolean | Specify whether or not you would like this outbound NAT mapping update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple outbound NAT mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating a single outbound NAT mapping, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"interface": "WAN",
+	"protocol": "tcp",
+	"src": "any",
+	"srcport": "433",
+	"dst": "em0ip",
+	"dstport": "443",
+	"target": "192.168.1.123",
+	"local-port": "443",
+	"natreflection": "purenat",
+	"descr": "Forward pb to lc",
+	"nosync": true,
+	"top": false
+}
 ```
 
 
@@ -948,7 +1545,6 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| type | string | Set a firewall rule type (`pass`, `block`, `reject`) |
 | interface | string | Set which interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported.  |
 | protocol | string | Set which transfer protocol the rule will apply to. If `tcp`, `udp`, `tcp/udp`, you must define a source and destination port |
 | src | string | Set the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
@@ -960,7 +1556,8 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 | natreflection | string | Set the NAT reflection mode explicitly (optional) |
 | descr | string | Set a description for the rule (optional) |
 | disabled | boolean | Disable the rule upon creation (optional) |
-| top | boolean | Add firewall rule to top of access control list (optional) |
+| top | boolean | Add this port forward rule to top of access control list (optional) |
+| apply | boolean | Specify whether or not you would like this port forward to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple port forwards at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single port forward, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1009,6 +1606,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 | Key | Value | Description |
 | --- | ------|-------------|
 | id | string or integer | Specify the rule ID to delete |
+| apply | boolean | Specify whether or not you would like this port forward deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple port forwards at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single port forward, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1045,6 +1643,66 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 ```js        
 {
     
+}
+```
+
+
+
+### 4. Update NAT Port Forwards
+
+
+Update an existing port forward rule.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-portforward-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| Id | Integer | Specify the ID of the port forward rule to update. |
+| interface | string | Update the interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported. (optional) |
+| protocol | string | Update which transfer protocol the rule will apply to. If `tcp`, `udp`, `tcp/udp`, you must define a source and destination port. (optional) |
+| src | string | Update the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional) |
+| dst | string | Update the destination address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To only use interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional) |
+| srcport | string or integer | Update the TCP and/or UDP source port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` (optional) |
+| dstport | string or integer | Update the TCP and/or UDP destination port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` (optional) |
+| target | string | Update the IP to forward traffic to (optional) |
+| local-port | string | Udate the TCP and/or UDP  port to forward traffic to. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp`. Port ranges may be specified using colon or hyphen. (optional) |
+| natreflection | string | Update the NAT reflection mode explicitly (optional) |
+| descr | string | Update a description for the rule (optional) |
+| disabled | boolean | Enable or disable the rule upon creation. True to disable, false to enable (optional) |
+| top | boolean | Move this port forward rule to top of access control list (optional) |
+| apply | boolean | Specify whether or not you would like this port forward update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple port forwards at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating a single port forward, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"interface": "WAN",
+	"protocol": "tcp",
+	"src": "any",
+	"srcport": "433",
+	"dst": "em0ip",
+	"dstport": "443",
+	"target": "192.168.1.123",
+	"local-port": "443",
+	"natreflection": "purenat",
+	"descr": "Forward pb to lc",
+	"nosync": true,
+	"top": false
 }
 ```
 
@@ -1090,6 +1748,7 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | descr | string | Set a description for the rule (optional) |
 | log | boolean | Enabling rule matche logging (optional) |
 | top | boolean | Add firewall rule to top of access control list (optional) |
+| apply | boolean | Specify whether or not you would like this rule to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple rules at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single rule, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1136,6 +1795,7 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | Key | Value | Description |
 | --- | ------|-------------|
 | tracker | string or integer | Specify the rule tracker ID to delete |
+| apply | boolean | Specify whether or not you would like this rule deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple rules at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single rule, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1215,6 +1875,7 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | descr | string | Update the description of the rule (optional) |
 | log | boolean | Enable rule matched logging (optional) |
 | top | boolean | Move firewall rule to top of access control list (optional) |
+| apply | boolean | Specify whether or not you would like this rule update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple rules at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating a single rule, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1550,6 +2211,7 @@ URL: https://{{$hostname}}/api/v1/interface
 | prefix-6rd-v4plen | integer or string | Set the 6RD IPv4 prefix length. This is typically assigned by the ISP. Only available when `type6` is set to `6rd` |
 | track6-interface | string | Set the Track6 dynamic IPv6 interface. This must be a dynamically configured IPv6 interface. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Only required with `type6` is set to `track6` |
 | track6-prefix-id-hex | string or integer | Set the IPv6 prefix ID. The value in this field is the (Delegated) IPv6 prefix ID. This determines the configurable network ID based on the dynamic IPv6 connection. The default value is 0. Only available when `type6` is set to `track6` |
+| apply | boolean | Specify whether or not you would like this interface to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple interfaces at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/interface/apply` endpoint. Otherwise, If you are only creating a single interface, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1572,7 +2234,7 @@ URL: https://{{$hostname}}/api/v1/interface
 ### 2. Delete Interfaces
 
 
-Delete an existing interface.<br><br>
+Delete an existing interface. __Note: interface deletions will be applied immediately, there is no need to apply interface changes afterwards__<br><br>
 
 _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]
 
@@ -1619,6 +2281,120 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-interfac
 Method: GET
 Type: RAW
 URL: https://{{$hostname}}/api/v1/interface
+```
+
+
+
+***Body:***
+
+```js        
+{
+}
+```
+
+
+
+### 4. Update Interfaces
+
+
+Update an existing interface.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/interface
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | string | Specify the Interface to update. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0) |
+| if | string | Update the physical interface configured (optional) |
+| descr | string | Update the descriptive name of the interface (optional) |
+| enable | boolean | Enable or disable the Interface (optional) |
+| spoofmac | string | Update the MAC address of the interface (optional) |
+| mtu | string or integer | Update the MTU for this interface (optional) |
+| mss | string or integer | Update the MSS for the this interface (optional) |
+| media | string | Update the speed/duplex setting for this interface (optional) |
+| type | string | Update the interface IPv4  configuration type (optional) |
+| type6 | string | Update the interface IPv6  configuration type (optional) |
+| ipaddr | string | Update the interface's static IPv4 address (required if `type` is set to `staticv4`) |
+| subnet | string or integer | Update the interface's static IPv4 address's subnet bitmask (required if `type` is set to `staticv4`) |
+| gateway | string | Update the interface network's upstream gateway. This is only necessary on WAN/UPLINK interfaces (optional) |
+| ipaddrv6 | string | Update the interface's static IPv6 address (required if `type6` is set to `staticv6`) |
+| subnetv6 | string or integer | Update the interface's static IPv6 address's subnet bitmask (required if `type6` is set to `staticv6`) |
+| gatewayv6 | string | Update the interface network's upstream IPv6 gateway. This is only necessary on WAN/UPLINK interfaces (optional) |
+| ipv6usev4iface | boolean | Enable or disable IPv6 over IPv4 uplink connection (optional) |
+| dhcphostname | string | Update the IPv4 DHCP hostname. Only available when `type` is set to `dhcp` (optional) |
+| dhcprejectfrom | string or array | Update the IPv4 DHCP rejected servers. You may pass values in as array or as comma seperated string. Only available when `type` is set to `dhcp` (optional) |
+| alias-address | string | Update the IPv4 DHCP address alias. The value in this field is used as a fixed alias IPv4 address by the DHCP client (optional) |
+| alias-subnet | string or integer | Update the IPv4 DHCP address aliases subnet (optional) |
+| adv_dhcp_pt_timeout | string or integer | Update the IPv4 DHCP protocol timeout interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_retry | string or integer | Update the IPv4 DHCP protocol retry interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_select_timeout | string or integer | Update the IPv4 DHCP protocol select timeout interval. Must be numeric value greater than 0 (optional) |
+| adv_dhcp_pt_reboot | string or integer | Update the IPv4 DHCP protocol reboot interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_backoff_cutoff | string or integer | Update the IPv4 DHCP protocol backoff cutoff interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_initial_interval | string or integer | Update the IPv4 DHCP protocol initial interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_config_advanced | boolean | Enable or disable the IPv4 DHCP advanced configuration options. This enables the DHCP options listed below (optional) |
+| adv_dhcp_send_options | string | Update the IPv4 `send` option (optional) |
+| adv_dhcp_request_options | string | Update the IPv4 `request` option (optional) |
+| adv_dhcp_request_options | string | Update the IPv4 `required` option (optional) |
+| adv_dhcp_option_modifiers | string | Update the IPv4 optionamodifier (optional) |
+| adv_dhcp_config_file_override | boolean | Enable or disable local DHCP configuration file override (optional) |
+| adv_dhcp_config_file_override_file | string | Update the custom DHCP configuration file's absolute path. This file must exist beforehand (optional) |
+| dhcpvlanenable | boolean | Enable or disable DHCP VLAN prioritization (optional) |
+| dhcpcvpt | string or integer | Update the DHCP VLAN priority. Must be a numeric value between 1 and 7 (optional) |
+| gateway-6rd | string | Update the 6RD interface IPv4 gateway address. Only required when `type6` is set to `6rd` |
+| prefix-6rd | string | Update the 6RD IPv6 prefix assigned by the ISP. Only required when `type6` is set to `6rd` |
+| prefix-6rd-v4plen | integer or string | Update the 6RD IPv4 prefix length. This is typically assigned by the ISP. Only available when `type6` is set to `6rd` |
+| track6-interface | string | Update the Track6 dynamic IPv6 interface. This must be a dynamically configured IPv6 interface. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Only required with `type6` is set to `track6` |
+| track6-prefix-id-hex | string or integer | Update the IPv6 prefix ID. The value in this field is the (Delegated) IPv6 prefix ID. This determines the configurable network ID based on the dynamic IPv6 connection. The default value is 0. Only available when `type6` is set to `track6` |
+| apply | boolean | Specify whether or not you would like this interface update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple interfaces at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/interface/apply` endpoint. Otherwise, If you are only updating a single interface, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"if": "em1.3",
+	"descr": "asdf",
+	"enable": "",
+	"type": "staticv4",
+	"ipaddr": "10.250.0.1",
+	"subnet": "24",
+	"blockbogons": true
+}
+```
+
+
+
+## INTERFACE/APPLY
+
+
+
+### 1. Apply Interfaces
+
+
+Apply pending interface updates. This will apply the current configuration for each interface. This endpoint returns no data.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/interface/apply
 ```
 
 
@@ -1787,11 +2563,139 @@ URL: https://{{$hostname}}/api/v1/interface/vlan
 
 
 
+## ROUTING/APPLY
+
+
+
+### 1. Apply Routing
+
+
+Apply pending routing changes. This endpoint returns no data.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`, `page-system-gateways-editgateway`, `page-system-staticroutes`, `page-system-staticroutes-editroute`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/routing/apply
+```
+
+
+
+***Body:***
+
+```js        
+{
+}
+```
+
+
+
 ## ROUTING/GATEWAY
 
 
 
-### 1. Read Routing Gateways
+### 1. Create Routing Gateways
+
+
+Create new routing gateways.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/routing/gateway
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| interface | string | Set which interface the gateway will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0).  |
+| ipprotocol | string | Set what IP protocol this gateway will serve. Options are `inet` for IPv4, or `inet6` for IPv6. |
+| name | string | Set a descriptive name for this gateway. This name must be unique, and can only contains alphanumeric characters and underscores. |
+| gateway | string | Set the IP address of the gateway. This value must be a valid IPv4 address If you have set your `ipprotocol` value to `inet`, or it must be a valid IPv6 address if you have set your `ipprotocol` value to `inet6`. Unlike the pfSense webConfigurator, this address Is not restricted to an address within the interfaces subnet by default. |
+| monitor | string | Set the IP address used to monitor this gateway. This is usually only necessary if the `gateway` IP does not accept ICMP probes. Defaults to the `gateway` address. (optional) |
+| disabled | boolean | Disable this gateway upon creation. Defaults to false. (optional) |
+| monitor_disable | boolean | Disable gateway monitoring for this gateway. Defaults to false. (optional) |
+| action_disable | boolean | Disable any action taken on gateway events for this gateway. This will consider the gateway always up. Defaults to false. (optional) |
+| force_down | boolean | Force this gateway to always be considered down. Defaults to false. (optional) |
+| descr | string | Set a description for this gateway (optional) |
+| weight | integer | Set this gateways weight when utilizing gateway load balancing within a gateway group. This value must be between 1 and 30. Defaults to 1. (optional) |
+| data_payload | integer | Set a data payload to send on ICMP packets sent to the gateway monitor IP. This value must be a positive integer. Defaults to 1. (optional) |
+| latencylow | integer | Set the low threshold in milliseconds for latency. Any packet that exceeds this threshold will be trigger a minor latency gateway event. This value must be a positive integer that is less than the `latencyhigh` value. Defaults to 200. (optional) |
+| latencyhigh | integer | Set the high threshold in milliseconds for latency. Any packet that exceeds this threshold will be trigger a major latency gateway event. This value must be a positive integer that is greater than the `latencylow` value. Defaults to 500. (optional) |
+| losslow | integer | Set the low threshold for packet loss In %. If total packet loss exceeds this percentage, a minor packet loss gateway event will be triggered. This value must be greater or equal to 1 and be less than the `losshigh` value. Defaults to 10. (optional) |
+| losshigh | integer | Set the high threshold for packet loss In %. If total packet loss exceeds this percentage, a major packet loss gateway event will be triggered. This value must be greater than the `losslow` value and be less or equal to 100. Defaults to 20. (optional) |
+| interval | integer | Set how often gateway monitor ICMP probes will be sent in milliseconds. This value must be greater than or equal to 1 and less than or equal to 3600000. Defaults to 500. (optional) |
+| loss_interval | integer | Set how long the gateway monitor will wait (in milliseconds) for response packets before considering the packet lost. This value must be greater than or equal to the `latencyhigh` value. Defaults to 2000. (optional) |
+| time_period | integer | Set the time period In milliseconds for gateway monitor metrics to be averaged. This value must be greater than twice the probe interval plus the loss interval. Defaults to 60000. (optional) |
+| alert_interval | integer | Set the time interval in milliseconds which alert conditions will be checked. This value must be greater than or equal to the `interval` value. Defaults to 1000. (optional) |
+| apply | boolean | Specify whether or not you would like this gateway to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple gateways at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only creating a single gateway, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+    "interface": "wan",
+    "name": "TEST_GATEWAY",
+    "ipprotocol": "inet",
+    "gateway": "172.16.209.1",
+    "monitor": "172.16.209.250",
+    "descr": "Test gateway"
+}
+```
+
+
+
+### 2. Delete Routing Gateways
+
+
+Delete existing routing gateways. __Note: gateway deletions will be applied immediately, there is no need to apply routing changes afterwards__<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+Type: RAW
+URL: https://{{$hostname}}/api/v1/routing/gateway
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the gateway to delete |
+
+
+
+***Body:***
+
+```js        
+{
+
+}
+```
+
+
+
+### 3. Read Routing Gateways
 
 
 Read routing gateways.<br><br>
@@ -1813,8 +2717,81 @@ URL: https://{{$hostname}}/api/v1/routing/gateway
 
 ```js        
 {
-    "client-id": "admin",
-    "client-token": "pfsense"
+
+}
+```
+
+
+
+### 4. Update Routing Gateways
+
+
+Update existing routing gateways.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/routing/gateway
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| interface | string | Update the interface the gateway will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). (optional) |
+| ipprotocol | string | Update the IP protocol this gateway will serve. Options are `inet` for IPv4, or `inet6` for IPv6. If you are changing the protocol, you will also be required to update the `gateway` and/or `monitor` values to match the specified protocol. (optional) |
+| name | string | Update the descriptive name for this gateway. This name must be unique, and can only contain alphanumeric characters and underscores. (optional) |
+| gateway | string | Update the IP address of the gateway. This value must be a valid IPv4 address If you have set your `ipprotocol` value to `inet`, or it must be a valid IPv6 address if you have set your `ipprotocol` value to `inet6`. Unlike the pfSense webConfigurator, this address Is not restricted to an address within the interfaces subnet by default. (optional) |
+| monitor | string | Set the IP address used to monitor this gateway. This is usually only necessary if the `gateway` IP does not accept ICMP probes. Defaults to the `gateway` address. (optional) |
+| disabled | boolean | Enable or disable this gateway upon update. True to disable, false to enable. (optional) |
+| monitor_disable | boolean | Enable or disable gateway monitoring for this gateway. True to disable, false to enable. (optional) |
+| action_disable | boolean | Enable or disable any action taken on gateway events for this gateway. If disabled, this will consider the gateway always up. True for disabled, false for enable. (optional) |
+| force_down | boolean | Enable or disable forcing this gateway to always be considered down. True for enable, false for disable. (optional) |
+| descr | string | Update the description for this gateway (optional) |
+| weight | integer | Update this gateways weight when utilizing gateway load balancing within a gateway group. This value must be between 1 and 30. (optional) |
+| data_payload | integer | Update the data payload to send on ICMP packets sent to the gateway monitor IP. This value must be a positive integer. (optional) |
+| latencylow | integer | Update the low threshold in milliseconds for latency. Any packet that exceeds this threshold will be trigger a minor latency gateway event. This value must be a positive integer that is less than the `latencyhigh` value.  (optional) |
+| latencyhigh | integer | Update the high threshold in milliseconds for latency. Any packet that exceeds this threshold will be trigger a major latency gateway event. This value must be a positive integer that is greater than the `latencylow` value. (optional) |
+| losslow | integer | Update the low threshold for packet loss In %. If total packet loss exceeds this percentage, a minor packet loss gateway event will be triggered. This value must be greater or equal to 1 and be less than the `losshigh` value. (optional) |
+| losshigh | integer | Update the high threshold for packet loss In %. If total packet loss exceeds this percentage, a major packet loss gateway event will be triggered. This value must be greater than the `losslow` value and be less or equal to 100. (optional) |
+| interval | integer | Update how often gateway monitor ICMP probes will be sent in milliseconds. This value must be greater than or equal to 1 and less than or equal to 3600000. (optional) |
+| loss_interval | integer | Update how long the gateway monitor will wait (in milliseconds) for response packets before considering the packet lost. This value must be greater than or equal to the `latencyhigh` value. (optional) |
+| time_period | integer | Update the time period In milliseconds for gateway monitor metrics to be averaged. This value must be greater than twice the probe interval plus the loss interval. (optional) |
+| alert_interval | integer | Update the time interval in milliseconds which alert conditions will be checked. This value must be greater than or equal to the `interval` value. (optional) |
+| apply | boolean | Specify whether or not you would like these gateway updates to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple gateways at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only updating a single gateway, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+    "id": 0,
+    "name": "UPDATED_TEST_GATEWAY",
+    "ipprotocol": "inet6",
+    "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+    "monitor": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+    "descr": "Updated Unit Test",
+    "disabled": true,
+    "action_disable": true,
+    "monitor_disable": true,
+    "weight": 2,
+    "data_payload": 5,
+    "latencylow": 300,
+    "latencyhigh": 600,
+    "interval": 2100,
+    "loss_interval": 2500,
+    "action_interval": 1040,
+    "time_period": 66000,
+    "losslow": 5,
+    "losshigh": 10
 }
 ```
 
@@ -1850,7 +2827,8 @@ URL: https://{{$hostname}}/api/v1/routing/static_route
 | network | string | Specify an IPv4 CIDR, IPv6 CIDR or network alias this route will apply to |
 | gateway | string | Specify the name of the gateway traffic matching this route will use |
 | descr | string | Leave a description of this route (optional) |
-| disabled | bool | Disable this route upon creation (optional) |
+| disabled | boolean | Disable this route upon creation (optional) |
+| apply | boolean | Specify whether or not you would like this route to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple routes at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only creating a single route, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -1869,7 +2847,7 @@ URL: https://{{$hostname}}/api/v1/routing/static_route
 ### 2. Delete Static Routes
 
 
-Delete existing static routes.<br><br>
+Delete existing static routes. __Note: route deletions will be applied immediately, there is no need to apply routing changes afterwards__<br><br>
 
 _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]
 
@@ -1958,6 +2936,7 @@ URL: https://{{$hostname}}/api/v1/routing/static_route
 | gateway | string | Update the name of the gateway traffic matching this route will use (optional) |
 | descr | string | Update description of this route (optional) |
 | disabled | boolean | Disable this route (optional) |
+| apply | boolean | Specify whether or not you would like this route update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple routes at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only updating a single route, you may set this true to apply it immediately. Please note, this will default to true for routing updates, if this is set to false when updating routes, the existing route will be removed from the routing table until the changes are applied! Defaults to true. (optional) |
 
 
 
@@ -2078,6 +3057,38 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 Method: POST
 Type: RAW
 URL: https://{{$hostname}}/api/v1/services/stop
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## SERVICES/DDNS
+
+
+
+### 1. Read Dynamic DNS
+
+
+Read configured dynamic DNS settings and statuses.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dynamicdnsclients`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/ddns
 ```
 
 
@@ -2263,6 +3274,39 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd
     "domain": "example.com",
     "mac_allow": ["00:00:00:01:E5:FF", "00:00:00:01:E5"],
     "mac_deny": []
+}
+```
+
+
+
+## SERVICES/DHCPD/LEASE
+
+
+
+### 1. Read DHCPd Leases
+
+
+Read the current DHCPd leases.<br>
+
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-dhcpleases`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dhcpd/leases
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
 }
 ```
 
@@ -3061,7 +4105,7 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 | ip | string | IPv4 or IPv6 of new DNS A record |
 | descr | string | Description of host override (optional) |
 | aliases | array | Hostname aliases (CNAME) for host override (optional) |
-| apply | boolean | Apply this host override upon creation. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional) |
+| apply | boolean | Specify whether or not you would like this host override to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only creating a single host override, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -3108,7 +4152,7 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 | Key | Value | Description |
 | --- | ------|-------------|
 | id | integer | Specify the ID of the host override to delete |
-| apply | boolean | Apply this host override upon modification. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional) |
+| apply | boolean | Specify whether or not you would like this host override deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only deleting a single host override, you may set this to true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -3169,7 +4213,7 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 | ip | string | Update the IPv4/IPv6 address of this host override (optional) |
 | descr | string | Update the description of this host override (optional) |
 | aliases | array | Update the aliases for this host override. This will replace any existing entries. (optional) |
-| apply | boolean | Apply this host override upon modification. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional) |
+| apply | boolean | Specify whether or not you would like this host override update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only updating a single host override, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -3228,7 +4272,7 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override/alias
 | host | string | Specify the hostname of the alias |
 | domain | string | Specify the domain name of the alias |
 | description | string | Description of alias (optional) |
-| apply | boolean | Apply this host override upon creation. Defaults to false. If not set to true, you may apply these changes later by calling upon the /api/v1/services/unbound/apply endpoint. (optional) |
+| apply | boolean | Specify whether or not you would like this host override alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host override aliases at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only updating a single host override alias, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -3311,6 +4355,70 @@ URL: https://{{$hostname}}/api/v1/status/carp
 {
 	"enable": true,
 	"maintenance_mode": true
+}
+```
+
+
+
+## STATUS/GATEWAY
+
+
+
+### 1. Read Gateway Status
+
+
+Read gateway status and metrics.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-gateway`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/status/gateway
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## STATUS/INTERFACE
+
+
+
+### 1. Read Interface Status
+
+
+Read interface status and metrics.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-interfaces`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/status/interface
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
 }
 ```
 
@@ -3427,6 +4535,38 @@ URL: https://{{$hostname}}/api/v1/status/log/system
 ```js        
 {
 
+}
+```
+
+
+
+## STATUS/SYSTEM
+
+
+
+### 1. Read System Status
+
+
+Read system status and metrics. All usage values are represented as a decimal percentage. Temperature readings require thermal sensor and/or driver configuration.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-dashboard-widgets`, `page-dashboard-all`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/status/system
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
 }
 ```
 

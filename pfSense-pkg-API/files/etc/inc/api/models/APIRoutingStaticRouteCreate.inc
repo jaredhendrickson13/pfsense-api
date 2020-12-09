@@ -25,22 +25,16 @@ class APIRoutingStaticRouteCreate extends APIModel {
     }
 
     public function action() {
-        if (!is_array($this->config["staticroutes"])) {
-            $this->config["staticroutes"] = [];
-            $this->config["staticroutes"]["route"] = [];
-        }
-
+        $this->__init_config();
         $this->config["staticroutes"]["route"][] = $this->validated_data;
         $this->write_config();
         $this->validated_data["id"] = count($this->config["staticroutes"]["route"]) - 1;
-        system_routing_configure();
-        filter_configure();
-        setup_gateways_monitor();
+        $this->apply();
         return APIResponse\get(0, $this->validated_data);
     }
 
-    public function validate_payload() {
-        # Validate our required 'network' payload value
+    private function __validate_network() {
+        # Require clients to specify a network value in their payload
         if (isset($this->initial_data['network'])) {
             $subnet = intval(explode("/", $this->initial_data["network"])[1]);
             $ip = explode("/", $this->initial_data["network"])[0];
@@ -69,8 +63,10 @@ class APIRoutingStaticRouteCreate extends APIModel {
         } else {
             $this->errors[] = APIResponse\get(6000);
         }
+    }
 
-        # Validate our required 'gateway' payload value
+    private function __validate_gateway() {
+        # Require clients to specify a 'gateway' payload value
         if (isset($this->initial_data["gateway"])) {
             # Ensure this is a valid gateway
             if (APITools\is_gateway($this->initial_data["gateway"])) {
@@ -81,19 +77,52 @@ class APIRoutingStaticRouteCreate extends APIModel {
         } else {
             $this->errors[] = APIResponse\get(6003);
         }
+    }
 
-        # Validate our optional 'descr' payload value
+    private function __validate_desr() {
+        # Optionally allow clients to pass in a 'descr' payload value
         if (isset($this->initial_data["descr"])) {
             $this->validated_data["descr"] = strval($this->initial_data["descr"]);
         } else {
             $this->validated_data["descr"] = "";
         }
+    }
 
-        # Validate our optional 'disabled' payload value
-        if ($this->initial_data["disabled"] == true ) {
+    private function __validate_disabled() {
+        # Optionally allow clients to pass in a 'disabled' payload value
+        if ($this->initial_data["disabled"] === true ) {
             $this->validated_data["disabled"] = "";
         }
+    }
 
+    public function validate_payload() {
+        $this->__validate_network();
+        $this->__validate_gateway();
+        $this->__validate_desr();
+        $this->__validate_disabled();
+    }
+
+    public function apply() {
+        # Mark the routing subsystem as changed, clear if applied
+        mark_subsystem_dirty("staticroutes");
+
+        # Optionally allow clients to apply this route immediately if they passed in a true apply value
+        if ($this->initial_data["apply"] === true) {
+            system_routing_configure();
+            system_resolvconf_generate();
+            filter_configure();
+            setup_gateways_monitor();
+            send_event("service reload dyndnsall");
+            clear_subsystem_dirty("staticroutes");
+        }
+    }
+
+    private function __init_config() {
+        # Ensure our config is formatted for static routes
+        if (!is_array($this->config["staticroutes"])) {
+            $this->config["staticroutes"] = [];
+            $this->config["staticroutes"]["route"] = [];
+        }
     }
 
 }
