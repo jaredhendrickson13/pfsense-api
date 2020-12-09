@@ -5,4 +5,8 @@ fi
 /usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% ${2}
 /bin/cp /etc/inc/system.inc /etc/inc/system.original.inc
 /bin/cp /etc/inc/api/framework/overrides/system.inc /etc/inc/system.inc
+/bin/chmod +x /usr/local/share/pfSense-pkg-API/manage.php
+/bin/ln -s /usr/local/share/pfSense-pkg-API/manage.php /usr/local/bin/pfsense-api
 /usr/local/bin/php -f /usr/local/share/pfSense-pkg-API/manage.php buildendpoints
+/usr/local/bin/php -f /usr/local/share/pfSense-pkg-API/manage.php restore
+

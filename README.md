@@ -26,12 +26,17 @@ pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/downlo
 
 To uninstall pfSense API, run the following command:<br>
 ```
-pkg delete pfSense-pkg-API
+pfsense-api delete
 ```
 
-To update pfSense API to latest version, run the following command:
+To update pfSense API to latest stable version, run the following command:
 ```
-pkg delete pfSense-pkg-API && pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.4-pkg-API.txz && /etc/rc.restart_webgui
+pfsense-api update
+```
+
+To revert to a previous version of pfSense API (e.g. v1.0.2), run the following command:
+```
+pfsense-api revert v1.0.2
 ```
 
 ### Notes: 
@@ -40,6 +45,7 @@ pkg delete pfSense-pkg-API && pkg add https://github.com/jaredhendrickson13/pfse
 - If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to 
 'Diagnostics > Command Prompt' and enter the commands there
 - When updating pfSense, **_you must reinstall pfSense API afterwards_**. Unfortunately, pfSense removes all existing packages and only reinstalls packages found within pfSense's package repositories. Since pfSense API is not an official package in pfSense's repositories, it does not get reinstalled automatically.
+- The `pfsense-api` command line tool was introduced in v1.1.0. Refer to the corresponding documentation for earlier releases.
 
 
 # UI Settings & Documentation
@@ -169,7 +175,7 @@ curl -s -H "Content-Type: application/x-www-form-urlencoded" -X GET "https://pfs
 
 
 # Error Codes
-A full list of error codes can be found by navigating to /api/v1/system/api/errors/ after installation. This will return
+A full list of error codes can be found by navigating to /api/v1/system/api/error after installation. This will return
  JSON data containing each error code and their corresponding error message. No authentication is required to view the 
  error code library. This also makes API integration with third-party software easy as the API error codes and messages 
  are always just an HTTP call away!

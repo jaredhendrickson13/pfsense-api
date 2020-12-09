@@ -17,25 +17,25 @@ include_once("util.inc");
 include_once("guiconfig.inc");
 require_once("api/framework/APITools.inc");
 
-// Variables
-global $config;    // Define our config globally
-$pgtitle = array(gettext('System'), gettext('API'), gettext('Settings'));    // Save ui path array
-include_once("head.inc");    // Write our header, this must be done after defining pgtitle
-$tab_array   = array();    // Init our tabs
-$tab_array[] = array(gettext("Settings"), true, "/api/");    // Define our page tabs
-$tab_array[] = array(gettext("Documentation"), false, "/api/documentation/");    // Define our page tabs
-display_top_tabs($tab_array, true);    // Ensure the tabs are written to the top of page
-$user = $_SESSION["Username"];    // Save our username
+# Variables
+global $config;    # Define our config globally
+$pgtitle = array(gettext('System'), gettext('API'), gettext('Settings'));    # Save ui path array
+include_once("head.inc");    # Write our header, this must be done after defining pgtitle
+$tab_array   = array();    # Init our tabs
+$tab_array[] = array(gettext("Settings"), true, "/api/");    # Define our page tabs
+$tab_array[] = array(gettext("Documentation"), false, "/api/documentation/");    # Define our page tabs
+display_top_tabs($tab_array, true);    # Ensure the tabs are written to the top of page
+$user = $_SESSION["Username"];    # Save our username
 $user_privs = get_user_privileges(getUserEntry($user));
-$sec_client_id = bin2hex($user);    // Save our secure username client ID (token mode)
-$pkg_config = APITools\get_api_config();    // Save our entire pkg config
-$pkg_index = $pkg_config[0];    // Save our pkg configurations index value
-$api_config = $pkg_config[1];    // Save our api configuration from our pkg config
+$sec_client_id = bin2hex($user);    # Save our secure username client ID (token mode)
+$pkg_config = APITools\get_api_config();    # Save our entire pkg config
+$pkg_index = $pkg_config[0];    # Save our pkg configurations index value
+$api_config = $pkg_config[1];    # Save our api configuration from our pkg config
 $available_auth_modes = array("local" => "Local Database", "token" => "API Token", "jwt" => "JWT");
 $available_hash_algos = array("sha256" => "SHA256", "sha384" => "SHA384", "sha512" => "SHA512", "md5" => "MD5");
-$available_key_bytes = array("16", "32", "64");    // Save our allowed key bitlengths
-$non_config_ifs = array("any" => "Any", "localhost" => "Link-local");    // Save non-configurable interface ids
-$availabe_api_if = array_merge($non_config_ifs, get_configured_interface_with_descr(true));    // Combine if arrays
+$available_key_bytes = array("16", "32", "64");    # Save our allowed key bitlengths
+$non_config_ifs = array("any" => "Any", "localhost" => "Link-local");    # Save non-configurable interface ids
+$availabe_api_if = array_merge($non_config_ifs, get_configured_interface_with_descr(true));    # Combine if arrays
 
 # Redirect user if they do not have privilege to access this page
 if (!in_array("page-system-api", $user_privs) and !in_array("page-all", $user_privs)) {
@@ -43,12 +43,12 @@ if (!in_array("page-system-api", $user_privs) and !in_array("page-all", $user_pr
     exit();
 }
 
-// UPON POST
+# UPON POST
 if ($_POST["gen"] === "1") {
     $new_key = APITools\generate_token($user);
     print_apply_result_box(0, "\nSave this API key somewhere safe, it cannot be viewed again: \n".$new_key);
 }
-// Rotate JWT server key requested
+# Rotate JWT server key requested
 if ($_POST["rotate_server_key"] === "1") {
     APITools\create_jwt_server_key(true);
     print_apply_result_box(0, "\nRotated JWT server key.\n");
@@ -62,44 +62,56 @@ if (isset($_POST["del"]) and is_numeric($_POST["del"])) {
     print_apply_result_box(0);
 }
 if (isset($_POST["save"])) {
-    // Save enable value to config
+    # Save enable value to config
     if (isset($_POST["enable"])) {
         $api_config["enable"] = "";
     } else {
         unset($api_config["enable"]);
     }
-    // Save allowed interface value to config
+    # Save allowed interface value to config
     if (isset($_POST["allowed_interfaces"])) {
         $api_config["allowed_interfaces"] = implode(",", $_POST["allowed_interfaces"]);
     }
-    // Save authentication mode to config
+    # Save authentication mode to config
     if (isset($_POST["authmode"])) {
         $api_config["authmode"] = $_POST["authmode"];
     }
-    // Save JWT expiration value to coonfig
+    # Save JWT expiration value to coonfig
     if (isset($_POST["jwt_exp"])) {
         $api_config["jwt_exp"] = $_POST["jwt_exp"];
     }
-    // Save key hash algos to config
+    # Save key hash algos to config
     if (isset($_POST["keyhash"])) {
         $api_config["keyhash"] = $_POST["keyhash"];
     }
-    // Save key bit strength to config
+    # Save key bit strength to config
     if (isset($_POST["keybytes"])) {
         $api_config["keybytes"] = $_POST["keybytes"];
     }
-    // Save key bit strength to config
+    # Save persist value to config
+    if (isset($_POST["persist"])) {
+        $api_config["persist"] = "";
+    } else {
+        unlink("/usr/local/share/pfSense-pkg-API/backup.json");
+        unset($api_config["persist"]);
+    }
+    # Save our read only value
     if (isset($_POST["readonly"])) {
         $api_config["readonly"] = "";
     } else {
         unset($api_config["readonly"]);
     }
-    // Write and apply our changes, leave a session variable indicating save, then reload the page
+    # Write and apply our changes, leave a session variable indicating save, then reload the page
     $config["installedpackages"]["package"][$pkg_index]["conf"] = $api_config;
     $change_note = " Updated API settings";
     write_config(sprintf(gettext($change_note)));
     APITools\create_jwt_server_key();
     print_apply_result_box(0);
+}
+
+# Backup our configuration is persist is enabled and the request is a POST request
+if(isset($api_config["persist"]) and $_SERVER["REQUEST_METHOD"] === "POST") {
+    shell_exec("/usr/local/share/pfSense-pkg-API/manage.php backup");
 }
 
 ?>
@@ -131,7 +143,7 @@ if (isset($_POST["save"])) {
                         <div class="col-sm-10">
                             <select class="form-control general" name="allowed_interfaces[]" id="allowed_interfaces[]" multiple="multiple">
                                 <?
-                                // Pull our current allowed interfaces and select those values
+                                # Pull our current allowed interfaces and select those values
                                 $current_api_if = explode(",", $api_config["allowed_interfaces"]);
                                 foreach ($availabe_api_if as $aif => $descr) {
                                     if (in_array($aif, $current_api_if)) {
@@ -166,6 +178,21 @@ if (isset($_POST["save"])) {
                     </div>
                     <div class="form-group">
                         <label class="col-sm-2 control-label">
+                            <span>Persistent Configuration</span>
+                        </label>
+                        <div class="checkbox col-sm-10">
+                            <?
+                            if (isset($api_config["persist"])) {
+                                echo "<label class=\"chkboxlbl\"><input name=\"persist\" id=\"persist\" type=\"checkbox\" value=\"yes\" checked=\"checked\"> Enable persistent configuration</label>";
+                            } else {
+                                echo "<label class=\"chkboxlbl\"><input name=\"persist\" id=\"persist\" type=\"checkbox\" value=\"yes\"> Enable persistent configuration</label>";
+                            }
+                            ?>
+                            <span class="help-block">Keep existing API configuration when updating or uninstalling the pfSense API package. If checked, a copy of the API configuration will be kept. If unchecked, all API configuration including API tokens and keys will be lost when updating or uninstalling the package.</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">
                             <span>Read-only</span>
                         </label>
                         <div class="checkbox col-sm-10">
@@ -181,7 +208,7 @@ if (isset($_POST["save"])) {
                     </div>
                 </div>
     <?
-        // Print HTML depending on authmode
+        # Print HTML depending on authmode
         if ($api_config["authmode"] === "jwt") {
             $jwt_exp = $api_config["jwt_exp"];
             echo "<div class='form-group'>".PHP_EOL;
@@ -236,13 +263,13 @@ if (isset($_POST["save"])) {
         }
     ?>
         <button type="submit" id="save" name="save" class="btn btn-sm btn-primary" value="Save" title="Save API configuration"><i class="fa fa-save icon-embed-btn"></i>Save</button>
-        <a style="float: right;" class="fa fa-question-circle" href='https://github.com/jaredhendrickson13/pfsense-api/issues/new'> <span style="font-family: 'Helvetica'; font-size: 14px;">Report an Issue</span></a>
+        <a style="float: right;" class="fa fa-question-circle" href='https:#github.com/jaredhendrickson13/pfsense-api/issues/new'> <span style="font-family: 'Helvetica'; font-size: 14px;">Report an Issue</span></a>
         </form>
 <!--    <nav class="action-buttons">-->
 <!--    </nav>-->
 <?php
         if ($api_config["authmode"] === "token") {
-            // Pull credentials if configured
+            # Pull credentials if configured
             $user_creds = APITools\get_existing_tokens($user);
             echo "<div class=\"panel panel-default\">".PHP_EOL;
             echo "    <div class=\"panel-heading\">".PHP_EOL;

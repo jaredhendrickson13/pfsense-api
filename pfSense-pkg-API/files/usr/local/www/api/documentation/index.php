@@ -30,11 +30,15 @@ pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/downlo
 ```
 To uninstall pfSense API, run the following command:<br>
 ```
-pkg delete pfSense-pkg-API
+pfsense-api delete
 ```
-To update pfSense API to latest version, run the following command:
+To update pfSense API to latest stable version, run the following command:
 ```
-pkg delete pfSense-pkg-API && pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.4-pkg-API.txz && /etc/rc.restart_webgui
+pfsense-api update
+```
+To revert to a previous version of pfSense API (e.g. v1.0.2), run the following command:
+```
+pfsense-api revert v1.0.2
 ```
 ### Notes:
 - pfSense API is supported on the pfSense 2.5 developer snapshots. To install the 2.5 package, simply change the `2.4` in the install URL to `2.5`.
@@ -42,6 +46,7 @@ pkg delete pfSense-pkg-API && pkg add https://github.com/jaredhendrickson13/pfse
 - If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to
 'Diagnostics > Command Prompt' and enter the commands there
 - When updating pfSense, **_you must reinstall pfSense API afterwards_**. Unfortunately, pfSense removes all existing packages and only reinstalls packages found within pfSense's package repositories. Since pfSense API is not an official package in pfSense's repositories, it does not get reinstalled automatically.
+- The `pfsense-api` command line tool was introduced in v1.1.0. Refer to the corresponding documentation for earlier releases.
 # UI Settings & Documentation
 After installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System > API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation in context to your pfSense instance.
 ### Notes:
@@ -140,7 +145,7 @@ curl -s -H "Content-Type: application/x-www-form-urlencoded" -X GET "https://pfs
 `404 (Not found)` : Either the API endpoint or requested data was not found<br>
 `500 (Server error)` : The API endpoint encountered an unexpected error processing your API request<br>
 # Error Codes
-A full list of error codes can be found by navigating to /api/v1/system/api/errors/ after installation. This will return
+A full list of error codes can be found by navigating to /api/v1/system/api/error after installation. This will return
 JSON data containing each error code and their corresponding error message. No authentication is required to view the
 error code library. This also makes API integration with third-party software easy as the API error codes and messages
 are always just an HTTP call away!
@@ -402,10 +407,11 @@ endpoints enforce input validation to prevent invalid configurations from being 
 properly written to the master XML configuration and the correct backend configurations are made preventing the need for
 a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!<h1>Requirements</h1><ul><li>pfSense 2.4.4 or later is supported<li>pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the
 webConfigurator are required to make calls to the API endpoints<li>While not an enforced requirement, it is <strong>strongly</strong> recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit</ul><h1>Installation</h1><p>To install pfSense API, simply run the following command from the pfSense shell:<br><pre><code>pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.4-pkg-API.txz &amp;&amp; /etc/rc.restart_webgui
-</code></pre><p>To uninstall pfSense API, run the following command:<br><pre><code>pkg delete pfSense-pkg-API
-</code></pre><p>To update pfSense API to latest version, run the following command:<pre><code>pkg delete pfSense-pkg-API &amp;&amp; pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.4-pkg-API.txz &amp;&amp; /etc/rc.restart_webgui
+</code></pre><p>To uninstall pfSense API, run the following command:<br><pre><code>pfsense-api delete
+</code></pre><p>To update pfSense API to latest stable version, run the following command:<pre><code>pfsense-api update
+</code></pre><p>To revert to a previous version of pfSense API (e.g. v1.0.2), run the following command:<pre><code>pfsense-api revert v1.0.2
 </code></pre><h3>Notes:</h3><ul><li>pfSense API is supported on the pfSense 2.5 developer snapshots. To install the 2.5 package, simply change the <code>2.4</code> in the install URL to <code>2.5</code>.<li>In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package<li>If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to
-&lsquo;Diagnostics &gt; Command Prompt&rsquo; and enter the commands there<li>When updating pfSense, <strong><em>you must reinstall pfSense API afterwards</em></strong>. Unfortunately, pfSense removes all existing packages and only reinstalls packages found within pfSense&rsquo;s package repositories. Since pfSense API is not an official package in pfSense&rsquo;s repositories, it does not get reinstalled automatically.</ul><h1>UI Settings &amp; Documentation</h1><p>After installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System &gt; API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation in context to your pfSense instance.<h3>Notes:</h3><ul><li>Users must hold the <code>page-all</code> or <code>page-system-api</code> privileges to access the API page within the webConfigurator</ul><h1>Authentication &amp; Authorization</h1><p>By default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense
+&lsquo;Diagnostics &gt; Command Prompt&rsquo; and enter the commands there<li>When updating pfSense, <strong><em>you must reinstall pfSense API afterwards</em></strong>. Unfortunately, pfSense removes all existing packages and only reinstalls packages found within pfSense&rsquo;s package repositories. Since pfSense API is not an official package in pfSense&rsquo;s repositories, it does not get reinstalled automatically.<li>The <code>pfsense-api</code> command line tool was introduced in v1.1.0. Refer to the corresponding documentation for earlier releases.</ul><h1>UI Settings &amp; Documentation</h1><p>After installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System &gt; API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation in context to your pfSense instance.<h3>Notes:</h3><ul><li>Users must hold the <code>page-all</code> or <code>page-system-api</code> privileges to access the API page within the webConfigurator</ul><h1>Authentication &amp; Authorization</h1><p>By default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense
 from the API out of the box, and user passwords may be changed from the API to immediately add additional security if
 needed. After installation, you can navigate to System &gt; API in the pfSense webConfigurator to configure API
 authentication. Please note that external authentication servers like LDAP or RADIUS are not supported with any
@@ -457,7 +463,7 @@ content type which may have undesired results. It is recommended you specify you
     }
   ]
 }
-</code></pre><p></details><h1>Response Codes</h1><p><code>200 (OK)</code> : API call succeeded<br><code>400 (Bad Request)</code> : An error was found within your requested parameters<br><code>401 (Unauthorized)</code> : API client has not completed authentication or authorization successfully<br><code>403 (Forbidden)</code> : The API endpoint has refused your call. Commonly due to your access settings found in System &gt; API<br><code>404 (Not found)</code> : Either the API endpoint or requested data was not found<br><code>500 (Server error)</code> : The API endpoint encountered an unexpected error processing your API request<br><h1>Error Codes</h1><p>A full list of error codes can be found by navigating to /api/v1/system/api/errors/ after installation. This will return
+</code></pre><p></details><h1>Response Codes</h1><p><code>200 (OK)</code> : API call succeeded<br><code>400 (Bad Request)</code> : An error was found within your requested parameters<br><code>401 (Unauthorized)</code> : API client has not completed authentication or authorization successfully<br><code>403 (Forbidden)</code> : The API endpoint has refused your call. Commonly due to your access settings found in System &gt; API<br><code>404 (Not found)</code> : Either the API endpoint or requested data was not found<br><code>500 (Server error)</code> : The API endpoint encountered an unexpected error processing your API request<br><h1>Error Codes</h1><p>A full list of error codes can be found by navigating to /api/v1/system/api/error after installation. This will return
 JSON data containing each error code and their corresponding error message. No authentication is required to view the
 error code library. This also makes API integration with third-party software easy as the API error codes and messages
 are always just an HTTP call away!<h1>Queries</h1><p>pfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting <code>GET</code> requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field.
@@ -1699,7 +1705,7 @@ if(IsJsonString(html)){var obj=JSON.parse(html);var formattedJson=JSON.stringify
 function IsJsonString(str){try{JSON.parse(str);}catch(e){return false;}
 return true;}
 String.prototype.replaceAll=function(replaceThis,withThis){var re=new RegExp(RegExp.quote(replaceThis),"g");return this.replace(re,withThis);};RegExp.quote=function(str){return str.replace(/([.?*+^$[\]\\(){}-])/g,"\\$1");};function syntaxHighlight(json){json=json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,function(match){var cls='number';if(/^"/.test(match)){if(/:$/.test(match)){cls='key';}else{cls='string';}}else if(/true|false/.test(match)){cls='boolean';}else if(/null/.test(match)){cls='null';}
-return '<span class="'+cls+'">'+match+'</span>';});}</script><br><br><footer class="navbar-default navbar-fixed-bottom"><div class=container-fluid><div class="span12 text-center"><span data-toggle=tooltip title="If the application help you, please feel free to give a star to the project in github. Your star inspire me to work more on open-source projects like this!">Made with <em class=love-color>&#9829;</em> by <a href=https://github.com/thedevsaddam target=_blank class=text-muted>thedevsaddam</a> | Generated at: 2020-11-30 13:21:40 by <a href=https://github.com/thedevsaddam/docgen target=_blank class=text-muted>docgen</a></span></div></div></footer>
+return '<span class="'+cls+'">'+match+'</span>';});}</script><br><br><footer class="navbar-default navbar-fixed-bottom"><div class=container-fluid><div class="span12 text-center"><span data-toggle=tooltip title="If the application help you, please feel free to give a star to the project in github. Your star inspire me to work more on open-source projects like this!">Made with <em class=love-color>&#9829;</em> by <a href=https://github.com/thedevsaddam target=_blank class=text-muted>thedevsaddam</a> | Generated at: 2020-12-09 09:06:00 by <a href=https://github.com/thedevsaddam/docgen target=_blank class=text-muted>docgen</a></span></div></div></footer>
 <script type="text/javascript">
     $(document).ready(function() {
         document.title = 'pfSense REST API Documentation';

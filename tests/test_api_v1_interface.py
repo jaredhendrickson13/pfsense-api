@@ -21,7 +21,7 @@ class APIUnitTestInterface(unit_test_framework.APIUnitTest):
         {
             "if": "em2",
             "descr": "UNIT_TEST",
-            "enable": "",
+            "enable": True,
             "type": "staticv4",
             "type6": "staticv6",
             "ipaddr": "10.250.0.1",
@@ -35,7 +35,7 @@ class APIUnitTestInterface(unit_test_framework.APIUnitTest):
         {
             "id": "em2",
             "descr": "UNIT_TEST_UPDATED",
-            "enable": "",
+            "enable": False,
             "type": "dhcp",
             "type6": "dhcp6",
             "blockbogons": False,

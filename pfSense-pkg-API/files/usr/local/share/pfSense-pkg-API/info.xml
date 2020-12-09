@@ -3,7 +3,7 @@
     <package>
         <name>API</name>
         <internal_name>api</internal_name>
-        <descr><![CDATA[A full API for pfSense]]></descr>
+        <descr><![CDATA[The missing REST API package for pfSense]]></descr>
         <website>https://github.com/jaredhendrickson13/pfsense-api</website>
         <category>System</category>
         <version>%%PKGVERSION%%</version>
@@ -11,6 +11,7 @@
         <maintainer>jaredhendrickson13@gmail.com</maintainer>
         <conf>
 				<enable></enable>
+                <persist></persist>
 				<allowed_interfaces>any</allowed_interfaces>
                 <authmode>local</authmode>
 				<content_type>json</content_type>
