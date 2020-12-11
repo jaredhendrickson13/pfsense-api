@@ -108,6 +108,15 @@ function delete() {
     echo shell_exec("/etc/rc.restart_webgui");
 }
 
+function rotate_server_key() {
+    global $config;
+    $pkg_index = APITools\get_api_config()[0];
+    $config["installedpackages"]["package"][$pkg_index]["conf"]["keys"] = [];
+    echo "Rotating API server key... ";
+    APITools\create_jwt_server_key(true);
+    echo "done.".PHP_EOL;
+}
+
 function version() {
     echo shell_exec("/usr/sbin/pkg info pfSense-pkg-API");
 }
@@ -124,6 +133,7 @@ function help() {
     echo "  update           : Update package to the latest stable version available".PHP_EOL;
     echo "  revert           : Revert package to a specified version".PHP_EOL;
     echo "  delete           : Delete package from this system".PHP_EOL;
+    echo "  rotateserverkey  : Rotate the API server key and remove all existing tokens".PHP_EOL;
     echo "  backup           : Create a backup of the API configuration".PHP_EOL;
     echo "  restore          : Restore the API configuration from the latest backup".PHP_EOL;
     echo PHP_EOL;
@@ -152,6 +162,10 @@ elseif (in_array($argv[1], ["revert"])) {
 # DELETE COMMAND
 elseif (in_array($argv[1], ["delete"])) {
     delete();
+}
+# ROTATESERVERKEY COMMAND
+elseif (in_array($argv[1], ["rotateserverkey"])) {
+    rotate_server_key();
 }
 # VERSION COMMAND
 elseif (in_array($argv[1], ["version"])) {

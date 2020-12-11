@@ -29,7 +29,7 @@ To uninstall pfSense API, run the following command:<br>
 pfsense-api delete
 ```
 
-To update pfSense API to latest stable version, run the following command:
+To update pfSense API to the latest stable version, run the following command:
 ```
 pfsense-api update
 ```
@@ -3297,7 +3297,7 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-d
 ```bash
 Method: GET
 Type: RAW
-URL: https://{{$hostname}}/api/v1/services/dhcpd/leases
+URL: https://{{$hostname}}/api/v1/services/dhcpd/lease
 ```
 
 

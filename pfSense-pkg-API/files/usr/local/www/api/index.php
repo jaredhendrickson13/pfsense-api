@@ -50,8 +50,9 @@ if ($_POST["gen"] === "1") {
 }
 # Rotate JWT server key requested
 if ($_POST["rotate_server_key"] === "1") {
+    $config["installedpackages"]["package"][$pkg_index]["conf"]["keys"] = [];
     APITools\create_jwt_server_key(true);
-    print_apply_result_box(0, "\nRotated JWT server key.\n");
+    print_apply_result_box(0, "\nRotated server key.\n");
 }
 
 if (isset($_POST["del"]) and is_numeric($_POST["del"])) {
@@ -216,12 +217,12 @@ if(isset($api_config["persist"]) and $_SERVER["REQUEST_METHOD"] === "POST") {
             echo "                <span class='element-required'>JWT Expiration</span>".PHP_EOL;
             echo "            </label>".PHP_EOL;
             echo "            <div class='col-sm-10'>".PHP_EOL;
-            echo "                <input type='number' min='600' max='86400' class='form-control' name='jwt_exp' id='jwt_exp' value='".strval($jwt_exp)."'>".PHP_EOL;
-            echo "                <span class='help-block'>How long (in seconds) the JWT is valid for. Allows a minimum is 600 seconds (5 minutes) and maximum of 86400 seconds (1 day).</span>".PHP_EOL;
+            echo "                <input type='number' min='300' max='86400' class='form-control' name='jwt_exp' id='jwt_exp' value='".strval($jwt_exp)."'>".PHP_EOL;
+            echo "                <span class='help-block'>How long (in seconds) the JWT is valid for. Allows a minimum is 300 seconds (5 minutes) and maximum of 86400 seconds (1 day).</span>".PHP_EOL;
             echo "            </div>".PHP_EOL;
             echo "        </div>".PHP_EOL;
             echo "      </div>".PHP_EOL;
-            echo "    <button type='submit' id='rotate_server_key' name='rotate_server_key' class='btn btn-sm btn-success' value='1' title='Rotate JWT server key' onclick='return confirm(\"Rotating the JWT server key will void any existng JWTs. Proceed?\");'><i class='fa fa-level-up icon-embed-btn'></i>Rotate Server Key</button>".PHP_EOL;
+            echo "    <button type='submit' id='rotate_server_key' name='rotate_server_key' class='btn btn-sm btn-success' value='1' title='Rotate server key' onclick='return confirm(\"Rotating the server key will void any existng API tokens and JWTs. Proceed?\");'><i class='fa fa-level-up icon-embed-btn'></i>Rotate Server Key</button>".PHP_EOL;
         } elseif ($api_config["authmode"] === "token") {
             echo "<div class='form-group'>".PHP_EOL;
             echo "            <label class='col-sm-2 control-label'>".PHP_EOL;
@@ -258,6 +259,7 @@ if(isset($api_config["persist"]) and $_SERVER["REQUEST_METHOD"] === "POST") {
             echo "            </div>".PHP_EOL;
             echo "        </div>".PHP_EOL;
             echo "    </div>".PHP_EOL;
+            echo "    <button type='submit' id='rotate_server_key' name='rotate_server_key' class='btn btn-sm btn-success' value='1' title='Rotate server key' onclick='return confirm(\"Rotating the server key will void any existng API tokens and JWTs. Proceed?\");'><i class='fa fa-level-up icon-embed-btn'></i>Rotate Server Key</button>".PHP_EOL;
         } else {
             echo "    </div>".PHP_EOL;
         }
