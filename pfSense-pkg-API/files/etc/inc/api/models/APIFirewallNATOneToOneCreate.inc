@@ -29,13 +29,8 @@ class APIFirewallNATOneToOneCreate extends APIModel {
     }
 
     public function action() {
-        # Ensure our config is formatted for onetoone rules
-        if (!is_array($this->config["nat"]["onetoone"])) {
-            $this->config["nat"] = [];
-            $this->config["nat"]["onetoone"] = [];
-        }
-
         # Add our new configuration
+        $this->__init_array();
         $this->config["nat"]["onetoone"][$this->id] = $this->validated_data;
         APITools\sort_nat_rules($this->initial_data["top"], $this->id, "onetoone");
         $this->write_config();
@@ -118,6 +113,8 @@ class APIFirewallNATOneToOneCreate extends APIModel {
         # Optionally allow client to specify a description for this entry
         if (isset($this->initial_data["descr"])) {
             $this->validated_data["descr"] = $this->initial_data["descr"];
+        } else {
+            $this->validated_data["descr"] = "";
         }
     }
 
@@ -131,6 +128,19 @@ class APIFirewallNATOneToOneCreate extends APIModel {
                 $this->errors[] = APIResponse\get(4008);
             }
         }
+    }
+
+    private function __init_array() {
+        # Ensure our NAT configuration is initialized as an array
+        if (!is_array($this->config["nat"])) {
+            $this->config["nat"] = [];
+        }
+
+        # Ensure our one-to-one NAT configuration is initialized as an array
+        if (!is_array($this->config["nat"]["onetoone"])) {
+            $this->config["nat"]["onetoone"] = [];
+        }
+
     }
 
     public function validate_payload() {

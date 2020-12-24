@@ -25,45 +25,36 @@ class APIFirewallAliasDelete extends APIModel {
     }
 
     public function action() {
-        $del_conf = $this->config["aliases"]["alias"][$this->id];    // Capture alias config before deleting
-        unset($this->config["aliases"]["alias"][$this->id]);    // Remove this alias from our configuration
-        $this->config["aliases"]["alias"] = array_values($this->config["aliases"]["alias"]);    // Reindex array
-        $this->write_config();    // Apply our configuration change
-        send_event("filter reload");    // Ensure our firewall filter is reloaded
+        $del_conf = $this->config["aliases"]["alias"][$this->id];
+        unset($this->config["aliases"]["alias"][$this->id]);
+        $this->config["aliases"]["alias"] = array_values($this->config["aliases"]["alias"]);
+        $this->write_config();
+        send_event("filter reload");
         return APIResponse\get(0, $del_conf);
+    }
+
+    private function __validate_id() {
+        # Require clients to pass in an ID field containing the alias name or index value
+        if (isset($this->initial_data["id"])) {
+            # Loop through each alias and check for a match
+            foreach ($this->config["aliases"]["alias"] as $id=>$alias) {
+                # First check if the ID matches the index value or the alias name
+                if ($this->initial_data["id"] === $id or $this->initial_data["id"] === $alias["name"]) {
+                    $this->id = $id;
+                    $this->validated_data = $alias;
+                    break;
+                }
+            }
+            # If we did not find an ID in the loop, return a not found error
+            if (is_null($this->id)) {
+                $this->errors[] = APIResponse\get(4055);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(4050);
+        }
     }
     
     public function validate_payload() {
-
-        if (isset($this->initial_data['id'])) {
-            $name = $this->initial_data['id'];
-            $name = APITools\sanitize_str($name);
-
-            // Check that alias is not in use in our configuration
-            if (!APITools\alias_in_use($name)) {
-                // Loop through our current config and find the index ID for our alias to delete
-                $c_count = 0;    // Init loop counter
-                foreach ($this->config["aliases"]["alias"] as $ce) {
-                    // Check if this entry matches our requested value
-                    if ($ce["name"] === $name) {
-                        $del_index = $c_count;
-                        break;
-                    }
-                    $c_count++;
-                }
-
-                if (is_numeric($del_index)) {
-                    $this->id = $del_index;
-                } else {
-                    $this->errors[] = APIResponse\get(4055);
-                }
-
-            } else {
-                $this->errors[] = APIResponse\get(4051);
-            }
-        } else {
-            $this->errors = APIResponse\get(4074);
-        }
-
+        $this->__validate_id();
     }
 }

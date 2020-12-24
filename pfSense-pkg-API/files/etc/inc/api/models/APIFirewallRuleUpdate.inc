@@ -161,7 +161,7 @@ class APIFirewallRuleUpdate extends APIModel {
         if ($requires_port) {
             if (isset($this->initial_data['srcport'])) {
                 $val = str_replace("-", ":", $this->initial_data['srcport']);
-                if (!is_port_or_range($val) and $val !== "any") {
+                if (!is_port_or_range_or_alias($val) and $val !== "any") {
                     $this->errors[] = APIResponse\get(4048);
                 } elseif ($val !== "any") {
                     $this->validated_data["source"]["port"] = str_replace(":", "-", $val);;
@@ -172,7 +172,7 @@ class APIFirewallRuleUpdate extends APIModel {
 
             if (isset($this->initial_data['dstport'])) {
                 $val = str_replace("-", ":", $this->initial_data['dstport']);
-                if (!is_port_or_range($val) and $val !== "any") {
+                if (!is_port_or_range_or_alias($val) and $val !== "any") {
                     $this->errors[] = APIResponse\get(4048);
                 } elseif ($val !== "any") {
                     $this->validated_data["destination"]["port"] = str_replace(":", "-", $val);;
