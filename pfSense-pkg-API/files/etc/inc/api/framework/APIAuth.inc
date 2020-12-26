@@ -88,8 +88,8 @@ class APIAuth {
 
         if (APITools\authenticate_token($this->request["client-id"], $this->request["client-token"]) === true) {
             $this->username = pack("H*", $this->request["client-id"]);
-            // Ensure user is not disabled
-            if (APITools\is_user_disabled($this->request["client-id"]) === false) {
+            # Ensure user is not disabled
+            if (APITools\is_user_disabled($this->username) === false) {
                 unset($_SESSION["Username"]);
                 $_SESSION["Username"] = $this->username;
                 return true;
