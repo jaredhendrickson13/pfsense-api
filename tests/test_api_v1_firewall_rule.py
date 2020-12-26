@@ -38,9 +38,9 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
             "ipprotocol": "inet",
             "protocol": "tcp/udp",
             "src": "172.16.77.125",
-            "srcport": "any",
+            "srcport": "HTTP",
             "dst": "127.0.0.1",
-            "dstport": "8443",
+            "dstport": "HTTP",
             "descr": "Updated Unit test",
             "top": True
         }

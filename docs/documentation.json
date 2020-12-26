@@ -1980,7 +1980,7 @@
 										{
 											"key": "type",
 											"value": "string",
-											"description": "Change type of alias (optional)",
+											"description": "Change type of alias. Alias type can only be changed when the targetted alias is not in use (optional)",
 											"disabled": true
 										},
 										{
@@ -2022,7 +2022,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/firewall/alias?id=string",
+									"raw": "https://{{$hostname}}/api/v1/firewall/alias",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -2037,7 +2037,8 @@
 										{
 											"key": "id",
 											"value": "string",
-											"description": "Name of alias to delete. This alias must NOT be in use elsewhere in configuration"
+											"description": "Name or ID of alias to delete. This alias cannot be in use elsewhere in configuration",
+											"disabled": true
 										}
 									]
 								},
@@ -2174,12 +2175,12 @@
 										{
 											"key": "srcport",
 											"value": "string or integer",
-											"description": "Set the TCP and/or UDP source port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp`"
+											"description": "Set the TCP and/or UDP source port or port alias of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp`"
 										},
 										{
 											"key": "dstport",
 											"value": "string or integer",
-											"description": "Set the TCP and/or UDP destination port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp`"
+											"description": "Set the TCP and/or UDP destination port or port alias of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp`"
 										},
 										{
 											"key": "gateway",
@@ -2287,17 +2288,17 @@
 										{
 											"key": "srcport",
 											"value": "string or integer",
-											"description": "Update the TCP and/or UDP source port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` (optional)"
+											"description": "Update the TCP and/or UDP source port or port alias of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` (optional)"
 										},
 										{
 											"key": "dstport",
 											"value": "string or integer",
-											"description": "Update the TCP and/or UDP destination port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp`"
+											"description": "Update the TCP and/or UDP destination port or port alias of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp`"
 										},
 										{
 											"key": "gateway",
 											"value": "string",
-											"description": "UPdate the routing gateway traffic will take upon match (optional)"
+											"description": "Update the routing gateway traffic will take upon match (optional)"
 										},
 										{
 											"key": "disabled",

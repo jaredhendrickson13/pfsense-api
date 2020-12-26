@@ -149,7 +149,7 @@ class APIFirewallRuleCreate extends APIModel {
         if (in_array($this->validated_data["protocol"], ["tcp", "udp", "tcp/udp"])) {
             if (isset($this->initial_data['srcport'])) {
                 $val = str_replace("-", ":", $this->initial_data['srcport']);
-                if (!is_port_or_range($val) and $val !== "any") {
+                if (!is_port_or_range_or_alias($val) and $val !== "any") {
                     $this->errors[] = APIResponse\get(4048);
                 } elseif ($val !== "any") {
                     $this->validated_data["source"]["port"] = str_replace(":", "-", $val);;
@@ -160,7 +160,7 @@ class APIFirewallRuleCreate extends APIModel {
 
             if (isset($this->initial_data['dstport'])) {
                 $val = str_replace("-", ":", $this->initial_data['dstport']);
-                if (!is_port_or_range($val) and $val !== "any") {
+                if (!is_port_or_range_or_alias($val) and $val !== "any") {
                     $this->errors[] = APIResponse\get(4049);
                 } elseif ($val !== "any") {
                     $this->validated_data["destination"]["port"] = str_replace(":", "-", $val);;

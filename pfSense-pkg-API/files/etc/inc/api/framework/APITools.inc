@@ -593,8 +593,6 @@ function alias_in_use($alias_name) {
     alias_find_references(array('nat', 'rule'), array('target'), $alias_name, $is_alias_referenced, $referenced_by);
     alias_find_references(array('nat', 'rule'), array('local-port'), $alias_name, $is_alias_referenced, $referenced_by);
     // NAT 1:1 Rules
-    //alias_find_references(array('nat', 'onetoone'), array('external'), $alias_name, $is_alias_referenced, $referenced_by);
-    //alias_find_references(array('nat', 'onetoone'), array('source', 'address'), $alias_name, $is_alias_referenced, $referenced_by);
     alias_find_references(array('nat', 'onetoone'), array('destination', 'address'), $alias_name, $is_alias_referenced, $referenced_by);
     // NAT Outbound Rules
     alias_find_references(array('nat', 'outbound', 'rule'), array('source', 'network'), $alias_name, $is_alias_referenced, $referenced_by);

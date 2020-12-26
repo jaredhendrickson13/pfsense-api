@@ -34,17 +34,12 @@ class APIFirewallAliasEntryDelete extends APIModel {
     private function __validate_name() {
         # Require clients to pass in a name value to locate the alias to add addresses to
         if (isset($this->initial_data['name'])) {
-            # Ensure our alias name is a string
-            if (is_string($this->initial_data['name'])) {
-                # Ensure this alias exists
-                $this->id = $this->__get_alias_id($this->initial_data["name"]);
-                if (isset($this->id)) {
-                    $this->validated_data = $this->config["aliases"]["alias"][$this->id];
-                } else {
-                    $this->errors[] = APIResponse\get(4055);
-                }
+            # Ensure this alias exists
+            $this->id = $this->__get_alias_id($this->initial_data["name"]);
+            if (isset($this->id)) {
+                $this->validated_data = $this->config["aliases"]["alias"][$this->id];
             } else {
-                $this->errors[] = APIResponse\get(4053);
+                $this->errors[] = APIResponse\get(4055);
             }
         } else {
             $this->errors[] = APIResponse\get(4050);
