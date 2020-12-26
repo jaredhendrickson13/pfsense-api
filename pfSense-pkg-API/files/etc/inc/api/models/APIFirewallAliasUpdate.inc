@@ -18,6 +18,7 @@ require_once("api/framework/APIResponse.inc");
 
 class APIFirewallAliasUpdate extends APIModel {
     private $type_changed;
+    private $original_name;
 
     # Create our method constructor
     public function __construct() {
@@ -28,9 +29,10 @@ class APIFirewallAliasUpdate extends APIModel {
     }
 
     public function action() {
-        $this->config["aliases"]["alias"][$this->id] = $this->validated_data;    // Write to our master config
-        $this->write_config();    // Apply our configuration change
-        send_event("filter reload");    // Ensure our firewall filter is reloaded
+        $this->config["aliases"]["alias"][$this->id] = $this->validated_data;
+        $this->__rename_alias_references__();
+        $this->write_config();
+        send_event("filter reload");
         return APIResponse\get(0, $this->config["aliases"]["alias"][$this->id]);
     }
 
@@ -43,6 +45,7 @@ class APIFirewallAliasUpdate extends APIModel {
                 if ($this->initial_data["id"] === $id or $this->initial_data["id"] === $alias["name"]) {
                     $this->id = $id;
                     $this->validated_data = $alias;
+                    $this->original_name = $alias["name"];
                     break;
                 }
             }
@@ -76,7 +79,7 @@ class APIFirewallAliasUpdate extends APIModel {
         # Optionally allow clients to update the alias type
         if (isset($this->initial_data['type'])) {
             # Require alias to not be in use to change the type
-            if (!APITools\alias_in_use($this->validated_data["name"])) {
+            if (!APITools\alias_in_use($this->original_name)) {
                 # Require this type to be supported
                 if (in_array($this->initial_data['type'], ["host", "network", "port"])) {
                     $this->type_changed = true;
@@ -193,10 +196,17 @@ class APIFirewallAliasUpdate extends APIModel {
 
     public function validate_payload() {
         $this->__validate_id();
-        $this->__validate_type();    // Type must be validated before name as it depends on the original name
         $this->__validate_name();
+        $this->__validate_type();
         $this->__validate_descr();
         $this->__validate_address();
         $this->__validate_detail();
+    }
+
+    private function __rename_alias_references__() {
+        # Only update alias references if our name was changed
+        if ($this->original_name !== $this->validated_data["name"]) {
+            update_alias_name($this->validated_data["name"], $this->original_name);
+        }
     }
 }
