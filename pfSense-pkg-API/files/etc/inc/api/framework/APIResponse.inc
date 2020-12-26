@@ -1530,13 +1530,19 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Alias details cannot contain more items than alias addresses"
+            "message" => "Firewall alias details cannot contain more items than alias addresses"
         ],
         4107 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Alias type cannot be changed while in use"
+            "message" => "Firewall alias type cannot be changed while in use"
+        ],
+        4108 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall alias cannot be deleted while in use"
         ],
 
         //5000-5999 reserved for /users API calls

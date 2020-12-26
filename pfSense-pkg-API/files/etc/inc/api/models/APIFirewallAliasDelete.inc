@@ -40,8 +40,13 @@ class APIFirewallAliasDelete extends APIModel {
             foreach ($this->config["aliases"]["alias"] as $id=>$alias) {
                 # First check if the ID matches the index value or the alias name
                 if ($this->initial_data["id"] === $id or $this->initial_data["id"] === $alias["name"]) {
-                    $this->id = $id;
-                    $this->validated_data = $alias;
+                    # Only allow deletion if the firewall alias is not in use.
+                    if (!APITools\alias_in_use($alias["name"])) {
+                        $this->id = $id;
+                        $this->validated_data = $alias;
+                    } else {
+                        $this->errors[] = APIResponse\get(4108);
+                    }
                     break;
                 }
             }

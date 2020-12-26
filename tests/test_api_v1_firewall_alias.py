@@ -45,7 +45,7 @@ class APIUnitTestFirewallAlias(unit_test_framework.APIUnitTest):
         {
             "id": "RFC1918",
             "name": "UPDATED_RFC1918",
-            "type": "port",
+            "type": "network",
             "descr": "Updated Unit Test",
             "address": ["10.0.0.0/32", "172.16.0.0/32", "192.168.0.0/32"],
             "detail": ["New Class A", "New Class B", "New Class C"]
