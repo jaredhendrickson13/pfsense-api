@@ -195,7 +195,7 @@ class APIFirewallRuleCreate extends APIModel {
                 $this->errors[] = APIResponse\get(4043);
             }
             # Check if the gateway IP protocol matches our rule's IP protocol
-            elseif ($gw_protocol !== "inet46" and $gw_protocol !== $this->validated_data["ipprotocol"]) {
+            elseif ($gw_protocol !== $this->validated_data["ipprotocol"]) {
                 $this->errors[] = APIResponse\get(4109);
             }
             # Otherwise, the gateway is valid

@@ -28,6 +28,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
             "dst": "127.0.0.1",
             "dstport": "443",
             "descr": "Unit test",
+            "log": True,
             "top": True
         }
     ]
@@ -38,10 +39,12 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
             "ipprotocol": "inet",
             "protocol": "tcp/udp",
             "src": "172.16.77.125",
-            "srcport": "HTTP",
+            "srcport": "8080-8081",
             "dst": "127.0.0.1",
-            "dstport": "HTTP",
+            "dstport": "2222-4444",
             "descr": "Updated Unit test",
+            "gateway": "WAN_DHCP",
+            "log": False,
             "top": True
         }
     ]
