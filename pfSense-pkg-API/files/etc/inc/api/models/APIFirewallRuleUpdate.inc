@@ -17,11 +17,16 @@ require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
 class APIFirewallRuleUpdate extends APIModel {
+    private $requires_port;
+    private $missing_port;
+
     # Create our method constructor
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-rules-edit"];
         $this->change_note = "Modified firewall rule via API";
+        $this->requires_port = false;
+        $this->missing_port = false;
     }
 
     public function action() {
@@ -33,7 +38,7 @@ class APIFirewallRuleUpdate extends APIModel {
         return APIResponse\get(0, $this->validated_data);
     }
 
-    public function validate_payload() {
+    private function __validate_tracker() {
         # Check for our required 'tracker' payload value
         if (isset($this->initial_data['tracker'])) {
             # Loop through each rule and check if our tracker matches
@@ -51,7 +56,9 @@ class APIFirewallRuleUpdate extends APIModel {
         } else {
             $this->errors[] = APIResponse\get(4031);
         }
+    }
 
+    private function __validate_type() {
         # Check for our optional 'type' payload value
         if (isset($this->initial_data["type"])) {
             $type_options = array("pass", "block", "reject");
@@ -62,7 +69,9 @@ class APIFirewallRuleUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(4039);
             }
         }
+    }
 
+    private function __validate_interface() {
         # Check for our optional 'interface' payload value
         if (isset($this->initial_data['interface'])) {
             $this->initial_data['interface'] = APITools\get_pfsense_if_id($this->initial_data['interface']);
@@ -73,7 +82,9 @@ class APIFirewallRuleUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(4034);
             }
         }
+    }
 
+    private function __validate_ipprotocol() {
         # Check for our optional 'ipprotocol' payload value
         if (isset($this->initial_data['ipprotocol'])) {
             $ipprotocol_options = array("inet", "inet6", "inet46");
@@ -84,11 +95,13 @@ class APIFirewallRuleUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(4041);
             }
         }
+    }
 
+    private function __validate_protocol() {
         # Check for our optional 'protocol' payload value
         if (isset($this->initial_data['protocol'])) {
-            $missing_port = (!in_array($this->validated_data["protocol"], ["tcp", "udp", "tcp/udp"])) ? true : false;
-            $requires_port = (in_array($this->initial_data["protocol"], ["tcp", "udp", "tcp/udp"])) ? true : false;
+            $this->missing_port = (!in_array($this->validated_data["protocol"], ["tcp", "udp", "tcp/udp"])) ? true : false;
+            $this->requires_port = (in_array($this->initial_data["protocol"], ["tcp", "udp", "tcp/udp"])) ? true : false;
             $this->unset_ports();
             $protocol_options = [
                 "any", "tcp", "udp", "tcp/udp", "icmp", "esp", "ah",
@@ -106,12 +119,10 @@ class APIFirewallRuleUpdate extends APIModel {
             } else {
                 $this->errors[] = APIResponse\get(4042);
             }
-        } else {
-            # If a new protocol was not selected don't validate ports
-            $requires_port = false;
-            $missing_port = false;
         }
+    }
 
+    private function __validate_icmptype() {
         # Check for our optional 'icmpsubtype' payload value when our protocol is set to ICMP
         if (isset($this->initial_data["icmptype"]) and $this->validated_data["protocol"] === "icmp") {
             $icmptype_options = [
@@ -125,19 +136,21 @@ class APIFirewallRuleUpdate extends APIModel {
                 $this->initial_data["icmptype"] = array($this->initial_data["icmptype"]);
             }
 
-            // Loop through each of our subtypes
+            # Loop through each of our subtypes
             foreach ($this->initial_data["icmptype"] as $ict) {
                 if (!in_array($ict, $icmptype_options)) {
                     $this->errors[] = APIResponse\get(4046);
                 }
-                // Write our ICMP subtype config
+                # Write our ICMP subtype config
                 $this->validated_data["icmptype"] = implode(",", $this->initial_data["icmptype"]);
             }
         }
+    }
 
+    private function __validate_src() {
         # Check for our optional 'src' payload value
         if (isset($this->initial_data['src'])) {
-            // Check if our source and destination values are valid
+            # Check if our source and destination values are valid
             $dir_check = APITools\is_valid_rule_addr($this->initial_data['src'], "source");
             if ($dir_check["valid"] === true) {
                 $this->validated_data = array_merge($this->validated_data, $dir_check["data"]);
@@ -145,10 +158,12 @@ class APIFirewallRuleUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(4044);
             }
         }
+    }
 
+    private function __validate_dst() {
         # Check for our optional 'src' payload value
         if (isset($this->initial_data['dst'])) {
-            // Check if our source and destination values are valid
+            # Check if our source and destination values are valid
             $dir_check = APITools\is_valid_rule_addr($this->initial_data['dst'], "destination");
             if ($dir_check["valid"] === true) {
                 $this->validated_data = array_merge($this->validated_data, $dir_check["data"]);
@@ -156,9 +171,11 @@ class APIFirewallRuleUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(4049);
             }
         }
+    }
 
-        # Check for our optional 'srcport' and 'dstport' payload values if protocol is TCP, UDP or TCP/UDP
-        if ($requires_port) {
+    private function __validate_srcport() {
+        # Check for our optional 'srcport' payload values if protocol is TCP, UDP or TCP/UDP
+        if ($this->requires_port) {
             if (isset($this->initial_data['srcport'])) {
                 $val = str_replace("-", ":", $this->initial_data['srcport']);
                 if (!is_port_or_range_or_alias($val) and $val !== "any") {
@@ -166,10 +183,15 @@ class APIFirewallRuleUpdate extends APIModel {
                 } elseif ($val !== "any") {
                     $this->validated_data["source"]["port"] = str_replace(":", "-", $val);;
                 }
-            } elseif ($missing_port) {
+            } elseif ($this->missing_port) {
                 $this->errors[] = APIResponse\get(4047);
             }
+        }
+    }
 
+    private function __validate_dstport() {
+        # Check for our optional 'dstport' payload values if protocol is TCP, UDP or TCP/UDP
+        if ($this->requires_port) {
             if (isset($this->initial_data['dstport'])) {
                 $val = str_replace("-", ":", $this->initial_data['dstport']);
                 if (!is_port_or_range_or_alias($val) and $val !== "any") {
@@ -177,42 +199,83 @@ class APIFirewallRuleUpdate extends APIModel {
                 } elseif ($val !== "any") {
                     $this->validated_data["destination"]["port"] = str_replace(":", "-", $val);;
                 }
-            } elseif ($missing_port) {
+            } elseif ($this->missing_port) {
                 $this->errors[] = APIResponse\get(4047);
             }
         }
+    }
 
-        # Check for our optional 'gateway' payload value
-        if (isset($this->initial_data['gateway'])) {
-            # Check that the specified gateway exists
-            if (APITools\is_gateway($this->initial_data["gateway"])) {
-                $this->validated_data["gateway"] = $this->initial_data["gateway"];
-            } else {
+    private function __validate_gateway() {
+        # Check for our optional 'gateway' payload value. If already set, revalidate.
+        if (isset($this->initial_data['gateway']) or isset($this->validated_data['gateway'])) {
+            # Revalidate the existing value if a new one was not specified
+            if (!isset($this->initial_data["gateway"])) {
+                $this->initial_data["gateway"] = $this->validated_data["gateway"];
+            }
+            $gw_protocol = APITools\is_gateway($this->initial_data["gateway"], true);
+            # Check if we were able to locate the gateway
+            if ($gw_protocol === false) {
                 $this->errors[] = APIResponse\get(4043);
             }
+            # Check if the gateway IP protocol matches our rule's IP protocol
+            elseif ($gw_protocol !== "inet46" and $gw_protocol !== $this->validated_data["ipprotocol"]) {
+                $this->errors[] = APIResponse\get(4109);
+            }
+            # Otherwise, the gateway is valid
+            else {
+                $this->validated_data["gateway"] = $this->initial_data["gateway"];
+            }
         }
+    }
 
+    private function __validate_disabled() {
         # Check for our optional 'disabled' payload value
         if ($this->initial_data['disabled'] === true) {
             $this->validated_data["disabled"] = "";
         } elseif ($this->initial_data['disabled'] === false) {
             unset($this->validated_data["disabled"]);
         }
+    }
 
+    private function __validate_descr() {
         # Check for our optional 'descr' payload value
         if (isset($this->initial_data['descr'])) {
             $this->validated_data["descr"] = strval($this->initial_data['descr']);
         }
+    }
 
+    private function __validate_log() {
         # Check for our optional 'log' payload value
         if ($this->initial_data['log'] === true) {
             $this->validated_data["log"] = "";
+        } elseif ($this->initial_data['log'] === false) {
+            unset($this->validated_data["log"]);
         }
+    }
 
+    private function __validate_top() {
         # Check for our optional 'top' payload value
         if ($this->initial_data['top'] === true) {
             $this->initial_data['top'] = "top";
         }
+    }
+
+    public function validate_payload() {
+        $this->__validate_tracker();
+        $this->__validate_type();
+        $this->__validate_interface();
+        $this->__validate_ipprotocol();
+        $this->__validate_protocol();
+        $this->__validate_icmptype();
+        $this->__validate_src();
+        $this->__validate_dst();
+        $this->__validate_srcport();
+        $this->__validate_dstport();
+        $this->__validate_gateway();
+        $this->__validate_disabled();
+        $this->__validate_descr();
+        $this->__validate_log();
+        $this->__validate_top();
 
         # Update our 'updated' value
         $this->validated_data["updated"] = [

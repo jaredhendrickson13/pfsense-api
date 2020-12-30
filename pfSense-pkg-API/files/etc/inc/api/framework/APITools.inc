@@ -521,22 +521,28 @@ function sort_firewall_rules($mode=null, $data=null) {
     $config["filter"]["rule"] = $master_arr;
 }
 
-// Checks if inputted routing gateway exists
-function is_gateway($gw) {
-    // Local variables
-    $gw_config = return_gateways_array(true, true);
-    $gw_exists = false;
-    // Check that we have gateways configured
+# Checks if routing gateway exists
+function is_gateway($gw, $ret_protocol=false) {
+    # Local variables
+    $gw_config = return_gateways_array();
+    $gw_group_config = return_gateway_groups_array();
+
+    # Loop through each gateway/gateway group and check if our gw matches the name
     if (is_array($gw_config)) {
-        // Loop through each gateway and see if name matches
+        # Loop through each gateway and see if name matches
         foreach ($gw_config as $gw_name => $gw_item) {
             if ($gw === $gw_name) {
-                $gw_exists = true;
-                break;
+                return ($ret_protocol) ? $gw_item["ipprotocol"] : true;
+            }
+        }
+        # Loop through each gateway and see if name matches
+        foreach ($gw_group_config as $gwg_name => $gwg_item) {
+            if ($gw === $gwg_name) {
+                return ($ret_protocol) ? $gwg_item["ipprotocol"] : true;
             }
         }
     }
-    return $gw_exists;
+    return false;
 }
 
 // Duplicate function from /firewall_aliases.php: accept input and check if alias exists
