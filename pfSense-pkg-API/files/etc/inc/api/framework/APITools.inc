@@ -623,28 +623,6 @@ function sanitize_str($string) {
     return $string;
 }
 
-// Sort our state table
-function sort_state_table() {
-    // Local variables
-    $states = shell_exec("/sbin/pfctl -s state");
-    $state_table = array();
-    // Parse our output
-    $state_rows = explode("\n", $states);
-    foreach ($state_rows as $id => $data) {
-        $data = preg_replace('!\s+!', ' ', $data);    // Remove extra whitespace
-        $data_fields = explode(" ", $data);    // Split on whitespace
-        if (count($data_fields) > 1) {
-            $state_table[$id] = array();
-            $state_table[$id]["interface"] = $data_fields[0];
-            $state_table[$id]["protocol"] = $data_fields[1];
-            $state_table[$id]["source"] = ($data_fields[3] === "->") ? $data_fields[2] : $data_fields[4];
-            $state_table[$id]["destination"] = ($data_fields[3] === "->") ? $data_fields[4] : $data_fields[2];
-            $state_table[$id]["status"] = $data_fields[5];
-        }
-    }
-    return $state_table;
-}
-
 // Restarts the pfSense webConfigurator
 function restart_webconfigurator() {
     ob_flush();

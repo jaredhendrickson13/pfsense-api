@@ -25,6 +25,27 @@ class APIFirewallStatesRead extends APIModel {
     }
 
     public function action() {
-        return APIResponse\get(0, APITools\sort_state_table());
+        return APIResponse\get(0, $this->get_state_table());
+    }
+
+    public static function get_state_table() {
+        $raw_table = pfSense_get_pf_states();
+        return array_map(function($table) {
+            return array(
+                'interface' => $table['if'],
+                'protocol' => $table['proto'],
+                'source' => $table['src'],
+                'destination' => $table['dst'],
+                'status' => $table["state"],
+                'age' => $table["age"],
+                "expires_in" => $table["expires in"],
+                "packets_total" => $table["packets total"],
+                "packets_in" => $table["packets in"],
+                "packets_out" => $table["packets out"],
+                "bytes_total" => $table["bytes total"],
+                "bytes_in" => $table["bytes in"],
+                "bytes_out" => $table["bytes out"],
+            );
+        }, $raw_table);
     }
 }
