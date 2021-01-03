@@ -1544,6 +1544,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall alias cannot be deleted while in use"
         ],
+        4109 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rule gateway must match IP protocol"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [
