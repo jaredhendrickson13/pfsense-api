@@ -53,11 +53,13 @@ class APIInterfaceUpdate extends APIModel {
 
     private function __validate_if() {
         if (isset($this->initial_data["if"])) {
-            $this->validated_data["if"] = trim($this->initial_data["if"]);
-            // Check that our interface exists and is not in use
-            if (!array_key_exists($this->initial_data["if"], $this->if_list)) {
+            $if_info = $this->if_list[$this->initial_data["if"]];
+            # Return an error if the requested physical interface does not exist
+            if (empty($if_info)) {
                 $this->errors[] = APIResponse\get(3000);
-            } elseif (isset($this->if_list[$this->initial_data["if"]]["in_use"])) {
+            }
+            # Return an error if the physical interface is already in use by a different interface object
+            elseif (isset($if_info["in_use"]) and $if_info["in_use"] !== $this->id) {
                 $this->errors[] = APIResponse\get(3001);
             }
             $this->validated_data["if"] = $this->initial_data["if"];
