@@ -28,7 +28,7 @@ class APIFirewallNATOutboundMappingCreate extends APIModel {
         parent::__construct();
         $this->change_note = "Added outbound NAT mapping via API";
         $this->privileges = ["page-all", "page-firewall-nat-outbound-edit"];
-        $this->protocols = ["tcp", "udp", "tcp/udp", "icmp", "esp", "ah", "gre", "ipv6", "igmp", "pim", "ospf"];
+        $this->protocols = ["any", "tcp", "udp", "tcp/udp", "icmp", "esp", "ah", "gre", "ipv6", "igmp", "pim", "ospf"];
         $this->pool_options = ["round-robin", "round-robin sticky-address", "random", "random sticky-address", "source-hash", "bitmask"];
         $this->port_supported = false;
         $this->pool_source_hash_supported = false;
@@ -65,10 +65,13 @@ class APIFirewallNATOutboundMappingCreate extends APIModel {
         if (isset($this->initial_data['protocol'])) {
             # Require protocol to be a known/supported protocol
             if (in_array($this->initial_data['protocol'], $this->protocols)) {
-                $this->validated_data["protocol"] = $this->initial_data['protocol'];
-                # Set our port supported toggle to true if our protocol uses ports
-                if (in_array($this->validated_data["protocol"], ["tcp", "udp", "tcp/udp"])) {
-                    $this->port_supported = true;
+                # Only add the protocol if it is not any (XML expects no entry for any)
+                if ($this->initial_data["protocol"] !== "any") {
+                    $this->validated_data["protocol"] = $this->initial_data['protocol'];
+                    # Set our port supported toggle to true if our protocol uses ports
+                    if (in_array($this->validated_data["protocol"], ["tcp", "udp", "tcp/udp"])) {
+                        $this->port_supported = true;
+                    }
                 }
             } else {
                 $this->errors[] = APIResponse\get(4089);

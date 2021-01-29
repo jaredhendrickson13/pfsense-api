@@ -31,11 +31,36 @@ class APIUnitTestFirewallNATOutboundMapping(unit_test_framework.APIUnitTest):
             "descr": "Unit Test",
             "nosync": True,
             "top": True
+        },
+        {
+            "interface": "WAN",
+            "protocol": "any",
+            "src": "any",
+            "dst": "1.1.1.1",
+            "target": "192.168.1.123/24",
+            "poolopts": "round-robin",
+            "descr": "Unit Test 2",
+            "nosync": True,
+            "top": True
         }
     ]
     put_payloads = [
         {
             "id": 0,
+            "interface": "WAN",
+            "protocol": "any",
+            "src": "any",
+            "dst": "1.1.1.1",
+            "target": "192.168.1.123/24",
+            "poolopts": "round-robin",
+            "descr": "Updated Unit Test",
+            "nonat": True,
+            "disabled": True,
+            "nosync": True,
+            "top": True
+        },
+        {
+            "id": 1,
             "interface": "WAN",
             "protocol": "udp",
             "src": "any",
@@ -43,16 +68,17 @@ class APIUnitTestFirewallNATOutboundMapping(unit_test_framework.APIUnitTest):
             "dst": "1.1.1.1",
             "dstport": "443",
             "target": "192.168.1.123/24",
-            "natstaticport": True,
+            "staticnatport": True,
             "poolopts": "round-robin",
             "descr": "Updated Unit Test",
-            "nonat": True,
+            "nonat": False,
             "disabled": True,
             "nosync": True,
             "top": True
         }
     ]
     delete_payloads = [
+        {"id": 0},
         {"id": 0}
     ]
 
