@@ -28,7 +28,7 @@ class APIFirewallNATOutboundMappingUpdate extends APIModel {
         parent::__construct();
         $this->change_note = "Modified outbound NAT mapping via API";
         $this->privileges = ["page-all", "page-firewall-nat-outbound-edit"];
-        $this->protocols = ["tcp", "udp", "tcp/udp", "icmp", "esp", "ah", "gre", "ipv6", "igmp", "pim", "ospf"];
+        $this->protocols = ["any", "tcp", "udp", "tcp/udp", "icmp", "esp", "ah", "gre", "ipv6", "igmp", "pim", "ospf"];
         $this->pool_options = ["", "round-robin", "round-robin sticky-address", "random", "random sticky-address", "source-hash", "bitmask"];
         $this->port_supported = false;
         $this->pool_source_hash_supported = false;
@@ -76,7 +76,12 @@ class APIFirewallNATOutboundMappingUpdate extends APIModel {
         if (isset($this->initial_data['protocol'])) {
             # Require protocol to be a known/supported protocol
             if (in_array($this->initial_data['protocol'], $this->protocols)) {
-                $this->validated_data["protocol"] = $this->initial_data['protocol'];
+                # Unset the protocol value if it is any (XML expects no entry for any). Otherwise update value.
+                if ($this->initial_data["protocol"] === "any") {
+                    unset($this->validated_data["protocol"]);
+                } else {
+                    $this->validated_data["protocol"] = $this->initial_data['protocol'];
+                }
             } else {
                 $this->errors[] = APIResponse\get(4089);
             }
