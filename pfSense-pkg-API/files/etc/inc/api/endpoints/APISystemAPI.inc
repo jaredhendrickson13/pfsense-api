@@ -23,4 +23,8 @@ class APISystemAPI extends APIEndpoint {
     protected function get() {
         return (new APISystemAPIRead())->call();
     }
+
+    protected function put() {
+        return (new APISystemAPIUpdate())->call();
+    }
 }

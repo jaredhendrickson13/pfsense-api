@@ -212,6 +212,36 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Table name does not exist"
         ],
+        1020 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown API interface specified in allowed interfaces"
+        ],
+        1021 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown API authentication mode"
+        ],
+        1022 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "API JWT expiration threshold must be between 300 and 86400"
+        ],
+        1023 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown API token hash algorithm"
+        ],
+        1024 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unsupport API token bytes count"
+        ],
 
         // 2000-2999 reserved for /services API calls
         2000 => [

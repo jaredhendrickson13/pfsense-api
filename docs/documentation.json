@@ -4350,6 +4350,79 @@
 							"response": []
 						},
 						{
+							"name": "Update System API Configuration",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"persist\": false, \n    \"jwt_exp\": 86400, \n    \"authmode\": \"token\",\n    \"hashalgo\": \"sha512\", \n    \"keybytes\": 64, \n    \"allowed_interfaces\": [\"WAN\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/api?enable=boolean&persist=boolean&readonly=boolean&available_interfaces=array&authmode=string&jwt_exp=integer&keyhash=string&keybytes=integer",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"api"
+									],
+									"query": [
+										{
+											"key": "enable",
+											"value": "boolean",
+											"description": "Disable the API. If set to `false`, the API will be disable and no further API requests can be made. In most cases this Is not necessary. (optional)"
+										},
+										{
+											"key": "persist",
+											"value": "boolean",
+											"description": "Enable/disable persistant API configuration. If set to `true`, pfSense API will store a copy of the API configuration In the case a system update or package update Is needed and/or the API configuration must be restored. If set to `false`, all API configuration will be lost whenever the system updates, the package Is updated, or the package Is deleted. It Is recommended to keep this feature enabled. (optional)"
+										},
+										{
+											"key": "readonly",
+											"value": "boolean",
+											"description": "Enable read only mode. If set to `true`, the API will only answer read (GET) requests. This also means you will not be able to disable read only mode from the API. "
+										},
+										{
+											"key": "available_interfaces",
+											"value": "array",
+											"description": "Update the Interfaces that are allowed to answer API requests. Each Item In the array must be a valid physical Interface ID (e.g. `\"em0\"`), pfSense Interface ID, (e.g. `\"opt1\"`),  or descriptive Interface name (e.g. `\"WAN\"`). Additionally you may add `\"localhost\"` to allow local API requests, or add `\"any\"` to allow any Interface to answer API requests. It Is best practice to only allow Inside Interfaces to answer API requests, or use firewall rules to filter requests made to outside Interfaces. (optional)"
+										},
+										{
+											"key": "authmode",
+											"value": "string",
+											"description": "Update the API authentication mode. Choices are `\"local\"` for local database authentication, `\"jwt\"` for JWT bearer token authentication, and `\"token\"` for standalone API token authentication. (optional)"
+										},
+										{
+											"key": "jwt_exp",
+											"value": "integer",
+											"description": "Update the JWT expiration interval (in seconds). Value must be an Integer greater or equal to `300` and less than or equal to `86400`. This Is only applicable when the `authmode` setting Is set to `jwt`. (optional)"
+										},
+										{
+											"key": "keyhash",
+											"value": "string",
+											"description": "Update the hashing algorithm to use when generating API tokens. Choices are `\"sha256\"`, `\"sha384\"`, `\"sha512\"`, and `\"md5\"`. This Is only applicable when the `authmode` setting Is set to `token`. (optional)"
+										},
+										{
+											"key": "keybytes",
+											"value": "integer",
+											"description": "Update the key byte strength to use when generating API tokens. Choices are `16`, `32` and `64`. This Is only applicable when the `authmode` setting Is set to `token`. (optional)"
+										}
+									]
+								},
+								"description": "Update the API configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]"
+							},
+							"response": []
+						},
+						{
 							"name": "Read System API Error Library",
 							"protocolProfileBehavior": {
 								"disableBodyPruning": true
