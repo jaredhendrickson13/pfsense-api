@@ -27,10 +27,14 @@ class APIServicesNTPdUpdate extends APIModel {
     }
 
     public function action() {
-        # Save our updated configuration and apply the changes
+        # Save our updated configuration
         $this->config["ntpd"] = $this->validated_data;
         $this->write_config();
+
+        # Apply our change and return the response. Include all configured timeservers from system > timeservers as it
+        # is need to provide the full context of the configuration
         system_ntp_configure();
+        $this->validated_data["timeservers"] = explode(" ", $this->config["system"]["timeservers"]);;
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -57,7 +61,7 @@ class APIServicesNTPdUpdate extends APIModel {
                 $if = (APITools\get_pfsense_if_id($if)) ? APITools\get_pfsense_if_id($if) : $if;
 
                 # Check that this interface exists
-                if (array_key_exists($if, $this->__get_interfaces())) {
+                if (in_array($if, $this->__get_interfaces())) {
                     $this->validated_data["interface"][] = $if;
                 } else {
                     $this->errors[] = APIResponse\get(2047);
@@ -65,7 +69,26 @@ class APIServicesNTPdUpdate extends APIModel {
             }
 
             # Convert value to internal XML value
-            $this->validated_data["allowed_interfaces"] = implode(",", $this->validated_data["allowed_interfaces"]);
+            $this->validated_data["interface"] = implode(",", $this->validated_data["interface"]);
+        }
+    }
+
+    private function __validate_timeservers() {
+        # Check for our optional 'timeservers' payload value
+        if (isset($this->initial_data["timeservers"])) {
+            # Loop through each requested timeserver and ensure it is valid
+            foreach ($this->initial_data["timeservers"] as $timeserver) {
+                # Use the APIServicesNTPdTimeServerCreate model to validate each requested time server. This essentially
+                # creates a nested/internal API call to validate/create NTPd timeservers
+                $cts = new APIServicesNTPdTimeServerCreate();
+                $cts->initial_data = $timeserver;
+                $cts->validate_payload();
+
+                # If errors were encountered while validating the payload, save those errors to this models error field
+                if (!empty($cts->errors)) {
+                    $this->errors = $this->errors + $cts->errors;
+                }
+            }
         }
     }
 
@@ -146,7 +169,7 @@ class APIServicesNTPdUpdate extends APIModel {
     private function __get_interfaces() {
         # Local variables
         $if_raw = get_configured_interface_with_descr();
-        $if_list = [];
+        $if_list = ["lo0"];
 
         # Loop through each configured interface but only capture interfaces with valid IP addresses
         foreach ($if_raw as $if => $if_descr) {

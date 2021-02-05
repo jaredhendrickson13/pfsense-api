@@ -37,7 +37,8 @@ class APIServicesNTPdTimeServerDelete extends APIModel {
 
         # Reconfigure NTP to apply the changes. Since values are stored in two places, simply return the initial data.
         system_ntp_configure();
-        return APIResponse\get(0, $this->initial_data);
+        $this->validated_data["timeservers"] = $this->timeservers;
+        return APIResponse\get(0, $this->validated_data);
     }
 
     public function validate_payload() {
@@ -47,28 +48,34 @@ class APIServicesNTPdTimeServerDelete extends APIModel {
     private function __validate_timeserver() {
         # Before deleting the timeserver, ensure it exists
         if (in_array($this->initial_data["timeserver"], $this->timeservers)) {
-            # Remove the timeserver from our system timeservers
+            # Remove the timeserver from our system timeservers. Reindex the array afterwards.
             unset($this->timeservers[array_search($this->initial_data["timeserver"], $this->timeservers)]);
+            $this->timeservers = array_values($this->timeservers);
 
-            # Remove the timeserver from the ntpd ispool
+            # Remove the timeserver from the ntpd ispool if found
             $ispool_arr = explode(" ", $this->validated_data["ispool"]);
             if (in_array($this->initial_data["timeserver"], $ispool_arr)) {
                 unset($ispool_arr[array_search($this->initial_data["timeserver"], $ispool_arr)]);
                 $this->validated_data["ispool"] = implode(" ", $ispool_arr);
             }
 
-            # Remove the timeserver from the ntpd noselect
+            # Remove the timeserver from the ntpd noselect if found
             $noselect_arr = explode(" ", $this->validated_data["noselect"]);
             if (in_array($this->initial_data["timeserver"], $noselect_arr)) {
                 unset($noselect_arr[array_search($this->initial_data["timeserver"], $noselect_arr)]);
                 $this->validated_data["noselect"] = implode(" ", $noselect_arr);
             }
 
-            # Remove the timeserver from the ntpd prefer
+            # Remove the timeserver from the ntpd prefer if found
             $prefer_arr = explode(" ", $this->validated_data["prefer"]);
             if (in_array($this->initial_data["timeserver"], $prefer_arr)) {
                 unset($prefer_arr[array_search($this->initial_data["timeserver"], $prefer_arr)]);
                 $this->validated_data["prefer"] = implode(" ", $prefer_arr);
+            }
+
+            # If the last timeserver was removed, assert the default to prevent killing the system time
+            if (empty($this->timeservers)) {
+                $this->timeservers[] = "pool.ntp.org";
             }
         }
         # Otherwise, return error if the request name server does not exist

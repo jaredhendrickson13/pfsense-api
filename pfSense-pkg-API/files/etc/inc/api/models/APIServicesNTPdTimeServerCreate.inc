@@ -35,9 +35,10 @@ class APIServicesNTPdTimeServerCreate extends APIModel {
         $this->config["system"]["timeservers"] = implode(" ", $this->timeservers);
         $this->write_config();
 
-        # Reconfigure NTP to apply the changes. Since values are stored in two places, simply return the initial data.
+        # Reconfigure NTP to apply the changes then return the response
         system_ntp_configure();
-        return APIResponse\get(0, $this->initial_data);
+        $this->validated_data["timeservers"] = $this->timeservers;
+        return APIResponse\get(0, $this->validated_data);
     }
 
     public function validate_payload() {
@@ -50,7 +51,7 @@ class APIServicesNTPdTimeServerCreate extends APIModel {
 
     private function __validate_timeserver_limit() {
         # Before adding a new timeserver, ensure we are not already at our maximum limit
-        if (count($this->timeservers) > 10) {
+        if (count($this->timeservers) >= 10) {
             $this->errors[] = APIResponse\get(2050);
         }
     }
