@@ -27,7 +27,9 @@ class APIServicesNTPdRead extends APIModel {
     public function action() {
         # Return the current NTP configuration if it exists, otherwise return empty array
         if (isset($this->config["ntpd"])) {
-            return APIResponse\get(0, $this->config["ntpd"]);
+            $data = $this->config["ntpd"];
+            $data["timeservers"] = explode(" ", $this->config["system"]["timeservers"]);
+            return APIResponse\get(0, $data);
         } else {
             return APIResponse\get(0, []);
         }

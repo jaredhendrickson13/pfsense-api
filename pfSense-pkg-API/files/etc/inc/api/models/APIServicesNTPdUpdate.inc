@@ -30,16 +30,21 @@ class APIServicesNTPdUpdate extends APIModel {
         # Save our updated configuration
         $this->config["ntpd"] = $this->validated_data;
         $this->write_config();
+        $this->__validate_timeservers(true);    // Revalidate timeservers. This time create if valid.
 
-        # Apply our change and return the response. Include all configured timeservers from system > timeservers as it
-        # is need to provide the full context of the configuration
+        # Apply our change to the backend
         system_ntp_configure();
+
+        # Update our return values and return the response. Get the updated NTPd configuration and add the timeservers
+        # from system > timeservers to provide full context of the NTP configuration.
+        $this->validated_data = $this->config["ntpd"];
         $this->validated_data["timeservers"] = explode(" ", $this->config["system"]["timeservers"]);;
         return APIResponse\get(0, $this->validated_data);
     }
 
     public function validate_payload() {
         $this->__validate_interface();
+        $this->__validate_timeservers();
         $this->__validate_orphan();
         $this->__validate_logsys();
         $this->__validate_logpeer();
@@ -73,21 +78,42 @@ class APIServicesNTPdUpdate extends APIModel {
         }
     }
 
-    private function __validate_timeservers() {
+    private function __validate_timeservers($create=false) {
         # Check for our optional 'timeservers' payload value
         if (isset($this->initial_data["timeservers"])) {
-            # Loop through each requested timeserver and ensure it is valid
-            foreach ($this->initial_data["timeservers"] as $timeserver) {
-                # Use the APIServicesNTPdTimeServerCreate model to validate each requested time server. This essentially
-                # creates a nested/internal API call to validate/create NTPd timeservers
-                $cts = new APIServicesNTPdTimeServerCreate();
-                $cts->initial_data = $timeserver;
-                $cts->validate_payload();
-
-                # If errors were encountered while validating the payload, save those errors to this models error field
-                if (!empty($cts->errors)) {
-                    $this->errors = $this->errors + $cts->errors;
+            # Only proceed if 10 or less timeservers were specified.
+            if (is_array($this->initial_data["timeservers"]) and count($this->initial_data["timeservers"]) <= 10) {
+                # Assume default if empty array was passed in
+                if (empty($this->initial_data["timeservers"])) {
+                    $this->initial_data["timeservers"][] = ["timeserver"=>"pool.ntp.org", "ispool"=>true];
                 }
+
+                # Unset all existing timeservers.
+                unset($this->config["system"]["timeservers"]);
+                unset($this->config["ntpd"]["ispool"]);
+                unset($this->config["ntpd"]["noselect"]);
+                unset($this->config["ntpd"]["prefer"]);
+
+                # Loop through each requested timeserver and ensure it is valid
+                foreach ($this->initial_data["timeservers"] as $timeserver) {
+                    # Use the APIServicesNTPdTimeServerCreate model to validate each requested time server. This
+                    # essentiall creates a nested/internal API call to validate/create NTPd timeservers
+                    $cts = new APIServicesNTPdTimeServerCreate();
+                    $cts->initial_data = $timeserver;
+                    $cts->validate_payload();
+
+                    # If errors were encountered validating the payload, save those errors to this models error field
+                    if (!empty($cts->errors)) {
+                        $this->errors = $this->errors + $cts->errors;
+                    } # Otherwise, if our created parameter is true, create this timeserver after validation
+                    elseif ($create === true) {
+                        $cts->action();
+                    }
+                }
+            }
+            # If our limit was exceeded return an error
+            else {
+                $this->errors[] = APIResponse\get(2050);
             }
         }
     }
@@ -179,5 +205,13 @@ class APIServicesNTPdUpdate extends APIModel {
         }
 
         return $if_list;
+    }
+
+    # Private method to create the validated timeservers
+    private function __create_timeservers() {
+        # Only proceed if timeservers were requested and no errors were found
+        if (isset($this->initial_data["timeservers"]) and empty($this->create_timeserver->errors)) {
+            $this->create_timeserver->action();
+        }
     }
 }

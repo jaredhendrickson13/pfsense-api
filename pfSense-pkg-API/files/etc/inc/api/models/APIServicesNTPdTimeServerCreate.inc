@@ -32,7 +32,7 @@ class APIServicesNTPdTimeServerCreate extends APIModel {
     public function action() {
         # Save our updated configuration. Note this updates configuration in two different places.
         $this->config["ntpd"] = $this->validated_data;
-        $this->config["system"]["timeservers"] = implode(" ", $this->timeservers);
+        $this->config["system"]["timeservers"] = implode(" ", array_filter($this->timeservers));
         $this->write_config();
 
         # Reconfigure NTP to apply the changes then return the response
@@ -62,7 +62,7 @@ class APIServicesNTPdTimeServerCreate extends APIModel {
         # NTP service settings. Do not use the validated_data property to track valid timeserver input.
         if (isset($this->initial_data["timeserver"])) {
             # Ensure the value is a valid IP address or hostname
-            if (is_ipaddr($this->initial_data["timeserver"]) or is_fqdn($this->initial_data["timeserver"])) {
+            if (is_ipaddr($this->initial_data["timeserver"]) or is_hostname($this->initial_data["timeserver"])) {
                 $this->timeservers[] = $this->initial_data['timeserver'];
             } else {
                 $this->errors[] = APIResponse\get(2049);

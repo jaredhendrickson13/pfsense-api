@@ -542,13 +542,13 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "NTPd timeserver must be valid IP address or FQDN"
+            "message" => "NTPd timeserver must be valid IP address or hostname"
         ],
         2050 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Maximum limit of 10 NTPd timeservers has been met"
+            "message" => "Maximum limit of 10 NTPd timeservers exceeded"
         ],
         2051 => [
             "status" => "bad request",
