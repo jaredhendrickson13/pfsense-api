@@ -118,7 +118,7 @@ class APIQuery {
                             case "gte":
                                 return $this->gte($entry[$q], $value);
                             default:
-                                return false;
+                                return ($entry[$q] === $value);
                         }
                     } elseif (is_array($entry[$q])) {
                         $entry = $entry[$q];
