@@ -123,7 +123,15 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
         if (isset($this->initial_data['src'])) {
             $rule_check = APITools\is_valid_rule_addr($this->initial_data['src'], "source");
             if ($rule_check["valid"]) {
+                # Retain the source port and update the source array
+                $origin_port = $this->validated_data["source"]["port"];
                 $this->validated_data["source"] = $rule_check["data"]["source"];
+
+                # If we had a source port, rewrite it
+                if (isset($origin_port)) {
+                    $this->validated_data["source"]["port"] = $origin_port;
+                }
+
             } else {
                 $this->errors[] = APIResponse\get(4011);
             }
@@ -135,7 +143,14 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
         if (isset($this->initial_data['dst'])) {
             $rule_check = APITools\is_valid_rule_addr($this->initial_data['dst'], "destination");
             if ($rule_check["valid"]) {
+                # Retain the destination port and update the destination array
+                $origin_port = $this->validated_data["destination"]["port"];
                 $this->validated_data["destination"] = $rule_check["data"]["destination"];
+
+                # If we had a destination port, rewrite it
+                if (isset($origin_port)) {
+                    $this->validated_data["destination"]["port"] = $origin_port;
+                }
             } else {
                 $this->errors[] = APIResponse\get(4012);
             }
