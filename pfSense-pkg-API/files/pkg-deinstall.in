@@ -12,3 +12,4 @@ fi
 
 # Restore overriden files to their original state
 /bin/mv /etc/inc/system.inc.original /etc/inc/system.inc
+echo "Restoring file overrides to their original state... done."

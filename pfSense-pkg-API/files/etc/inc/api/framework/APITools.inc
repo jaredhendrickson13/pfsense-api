@@ -348,7 +348,7 @@ function get_pfsense_if_id($interface) {
 // Check if input is valid for rule source and destination
 function is_valid_rule_addr($addr, $direction) {
     // Variables
-    $addr_types = array("any", "pppoe", "l2tp");   // Array of special src/dst types
+    $addr_types = array("any", "pppoe", "l2tp", "(self)");   // Array of special src/dst types
     $ret_val = array("valid" => true, "data" => array());
     // Check if our source values are valid
     if (is_string($addr)) {

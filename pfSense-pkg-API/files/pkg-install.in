@@ -5,24 +5,24 @@ fi
 
 # Make this package known to pfSense
 /usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% ${2}
-echo "Creating backups of files to override...done."
+echo "Creating backups of files to override... done."
 
 # Backup original files before overriding
 /bin/cp /etc/inc/system.inc /etc/inc/system.inc.original
 
 # Check the local systems version of pfSense before assigning file overrides
 PFSENSE_VERSION=$(/bin/cat /etc/version)
-echo "Checking pfSense version...done."
+echo "Checking pfSense version... done."
 
 # Use the corresponding pfSense version's file overrides if they exist. Otherwise print warning and use default.
 if [ -d "/etc/inc/api/framework/overrides/${PFSENSE_VERSION}" ]
 then
     /bin/cp "/etc/inc/api/framework/overrides/${PFSENSE_VERSION}/system.inc" "/etc/inc/system.inc"
-    echo "Installing file overrides for ${PFSENSE_VERSION}...done."
+    echo "Installing file overrides for ${PFSENSE_VERSION}... done."
 else
     echo "WARNING: No overrides exist for ${PFSENSE_VERSION}, it may be unsupported. Using default overrides."
     /bin/cp "/etc/inc/api/framework/overrides/default/system.inc" "/etc/inc/system.inc"
-    echo "Installing default file overrides...done."
+    echo "Installing default file overrides... done."
 fi
 
 # Setup the pfsense-api command line tool
