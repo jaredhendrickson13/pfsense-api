@@ -4,6 +4,11 @@ if [ "${2}" != "POST-DEINSTALL" ]; then
 	exit 0
 fi
 
+# Unlink this package from pfSense
 /usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% ${2}
+
+# Remove the pfsense-api command line tool
 /bin/rm /usr/local/bin/pfsense-api
-/bin/mv /etc/inc/system.original.inc /etc/inc/system.inc
+
+# Restore overriden files to their original state
+/bin/mv /etc/inc/system.inc.original /etc/inc/system.inc

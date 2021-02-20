@@ -41,23 +41,15 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
     }
     
     public function validate_payload() {
-        # Check for our required 'host' payload value
-        if (isset($this->initial_data['host'])) {
-            $this->validated_data["host"] = trim($this->initial_data['host']);
-        } else {
-            $this->errors[] = APIResponse\get(2004);
-        }
+        # Validate the IP first, it is needed to validate the host/domain
+        $this->__validate_ip();
+        $this->__validate_host();
+        $this->__validate_domain();
+        $this->__validate_descr();
+        $this->__validate_aliases();
+    }
 
-        # Check for our required 'domain' payload value
-        if (isset($this->initial_data['domain'])) {
-            $this->validated_data["domain"] = trim($this->initial_data['domain']);
-            if (APITools\is_unbound_fqdn($this->validated_data["host"], $this->validated_data["domain"])) {
-                $this->errors[] = APIResponse\get(2010);
-            }
-        } else {
-            $this->errors[] = APIResponse\get(2005);
-        }
-
+    private function __validate_ip() {
         # Check for our required 'ip' payload value
         if (isset($this->initial_data['ip'])) {
             if (!is_ipaddrv4($this->initial_data["ip"]) and !is_ipaddrv6($this->initial_data["ip"])) {
@@ -68,12 +60,38 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
         } else {
             $this->errors[] = APIResponse\get(2006);
         }
+    }
 
+    private function __validate_host() {
+        # Check for our required 'host' payload value
+        if (isset($this->initial_data['host'])) {
+            $this->validated_data["host"] = trim($this->initial_data['host']);
+        } else {
+            $this->errors[] = APIResponse\get(2004);
+        }
+    }
+
+    private function __validate_domain() {
+        # Check for our required 'domain' payload value
+        if (isset($this->initial_data['domain'])) {
+            if (APITools\is_unbound_fqdn($this->validated_data["host"], $this->initial_data["domain"], $this->validated_data["ip"])) {
+                $this->errors[] = APIResponse\get(2010);
+            } else {
+                $this->validated_data["domain"] = trim($this->initial_data['domain']);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(2005);
+        }
+    }
+
+    private function __validate_descr() {
         # Check for our optional 'descr' payload value
         if (isset($this->initial_data['descr'])) {
             $this->validated_data["descr"] = $this->initial_data['descr'];
         }
+    }
 
+    private function __validate_aliases() {
         # Check for our optional 'aliases' payload value. This is a nested model creation.
         if (isset($this->initial_data['aliases'])) {
             # Allow aliases to be nested under "item" as found in the XML config
@@ -92,4 +110,5 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
             }
         }
     }
+
 }

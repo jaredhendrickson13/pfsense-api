@@ -278,7 +278,7 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Unbound host override already exists"
+            "message" => "Unbound host override already exists with this IP address type"
         ],
         2011 => [
             "status" => "bad request",

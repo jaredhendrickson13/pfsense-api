@@ -119,7 +119,7 @@ function create_jwt_server_key($rotate=false) {
     # Create a new server key if one is not set
     if (empty($api_config["server_key"]) or $rotate === true) {
         $config["installedpackages"]["package"][$pkg_index]["conf"]["server_key"] = bin2hex(random_bytes(32));
-        write_config();
+        write_config("API server key created");
     }
 }
 
@@ -691,26 +691,28 @@ function unbound_reload_config() {
 }
 
 // Check if a DNS Resolver (Unbound) host override already exists
-function is_unbound_fqdn($hostname, $domain, $instance_id=null) {
+function is_unbound_fqdn($hostname, $domain, $ip=null, $instance_id=null) {
     # Local variables
     global $config;
     $curr_hosts = (array_key_exists("hosts", $config["unbound"])) ? $config["unbound"]["hosts"] : [];
-    $host_exists = false;
     $index = 0;
 
     # Loop through each host override and check if the FQDN already exists
-    foreach ($curr_hosts as $host_ent) {
+    foreach ($curr_hosts as $ent) {
         # Check the FQDN matches this entry
-        if ($host_ent["host"] === $hostname and $host_ent["domain"] === $domain) {
-            # If we are working with an existing instance, allow existing FQDN if ID matches
-            if ($index !== $instance_id) {
-                return true;
+        if ($ent["host"] === $hostname and $ent["domain"] === $domain) {
+            # Host overrides are allowed an IPv4 and IPv6 address, check if it already has one.
+            if (!$ip or (is_ipaddrv4($ent["ip"]) and is_ipaddrv4($ip)) or (is_ipaddrv6($ent["ip"]) and is_ipaddrv6($ip))){
+                # If we are working with an existing instance, allow existing FQDN if ID matches
+                if ($index !== $instance_id) {
+                    return true;
+                }
             }
         }
 
         # Check FQDN within host override aliases as well
-        if (is_array($host_ent["aliases"])) {
-            foreach ($host_ent["aliases"]["item"] as $alias_ent) {
+        if (is_array($ent["aliases"])) {
+            foreach ($ent["aliases"]["item"] as $alias_ent) {
                 if ($alias_ent["host"] === $hostname and $alias_ent["domain"] === $domain) {
                     return true;
                 }
@@ -718,7 +720,7 @@ function is_unbound_fqdn($hostname, $domain, $instance_id=null) {
         }
         $index++;
     }
-    return $host_exists;
+    return false;
 }
 
 // Get a complete config list of ALL interfaces. Based off interfaces_assign.php

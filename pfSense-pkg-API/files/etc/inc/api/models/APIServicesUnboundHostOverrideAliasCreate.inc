@@ -41,6 +41,13 @@ class APIServicesUnboundHostOverrideAliasCreate extends APIModel {
     }
     
     public function validate_payload() {
+        $this->__validate_id();
+        $this->__validate_host();
+        $this->__validate_domain();
+        $this->__validate_description();
+    }
+
+    private function __validate_id() {
         # Check for our required 'id' payload value. Allow this to be bypassed internally for nested calls
         if ($this->validate_id === false) {
         } elseif (isset($this->initial_data["id"])) {
@@ -52,29 +59,37 @@ class APIServicesUnboundHostOverrideAliasCreate extends APIModel {
         } else {
             $this->errors[] = APIResponse\get(2015);
         }
+    }
 
+    private function __validate_host() {
         # Check for our required 'host' payload value
         if (isset($this->initial_data["host"])) {
             $this->validated_data["host"] = trim($this->initial_data["host"]);
         } else {
             $this->errors[] = APIResponse\get(2007);
         }
+    }
 
+    private function __validate_domain() {
+        # Check for our required 'domain' payload value
+        if (isset($this->initial_data["domain"])) {
+            # Ensure this host/domain combo doesn't already exist
+            if (APITools\is_unbound_fqdn($this->validated_data["host"], $this->validated_data["domain"])) {
+                $this->errors[] = APIResponse\get(2009);
+            } else {
+                $this->validated_data["domain"] = trim($this->initial_data["domain"]);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(2008);
+        }
+    }
+
+    private function __validate_description() {
         # Check for our required 'domain' payload value
         if (isset($this->initial_data["domain"])) {
             $this->validated_data["domain"] = trim($this->initial_data["domain"]);
         } else {
             $this->errors[] = APIResponse\get(2008);
-        }
-
-        # Check for our required 'description' payload value
-        if (isset($this->initial_data["description"])) {
-            $this->validated_data["description"] = trim($this->initial_data["description"]);
-        }
-
-        # Ensure this hostname doesn't already exis
-        if (APITools\is_unbound_fqdn($this->validated_data["host"], $this->validated_data["domain"])) {
-            $this->errors[] = APIResponse\get(2009);
         }
     }
 }
