@@ -690,38 +690,6 @@ function unbound_reload_config() {
     }
 }
 
-// Check if a DNS Resolver (Unbound) host override already exists
-function is_unbound_fqdn($hostname, $domain, $ip=null, $instance_id=null) {
-    # Local variables
-    global $config;
-    $curr_hosts = (array_key_exists("hosts", $config["unbound"])) ? $config["unbound"]["hosts"] : [];
-    $index = 0;
-
-    # Loop through each host override and check if the FQDN already exists
-    foreach ($curr_hosts as $ent) {
-        # Check the FQDN matches this entry
-        if ($ent["host"] === $hostname and $ent["domain"] === $domain) {
-            # Host overrides are allowed an IPv4 and IPv6 address, check if it already has one.
-            if (!$ip or (is_ipaddrv4($ent["ip"]) and is_ipaddrv4($ip)) or (is_ipaddrv6($ent["ip"]) and is_ipaddrv6($ip))){
-                # If we are working with an existing instance, allow existing FQDN if ID matches
-                if ($index !== $instance_id) {
-                    return true;
-                }
-            }
-        }
-
-        # Check FQDN within host override aliases as well
-        if (is_array($ent["aliases"])) {
-            foreach ($ent["aliases"]["item"] as $alias_ent) {
-                if ($alias_ent["host"] === $hostname and $alias_ent["domain"] === $domain) {
-                    return true;
-                }
-            }
-        }
-        $index++;
-    }
-    return false;
-}
 
 // Get a complete config list of ALL interfaces. Based off interfaces_assign.php
 function get_all_avail_interfaces() {

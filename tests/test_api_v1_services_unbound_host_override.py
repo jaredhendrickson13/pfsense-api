@@ -36,6 +36,13 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             "domain": "unit.test",
             "ip": "fd00:abcd::",
             "descr": "Unit Test IPv6",
+            "aliases": [
+                {
+                    "host": "pfsense-api-alias",
+                    "domain": "unit.test",
+                    "description": "Unit Test"
+                }
+            ]
         }
     ]
     put_payloads = [

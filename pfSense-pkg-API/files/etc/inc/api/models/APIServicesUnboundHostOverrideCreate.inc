@@ -41,12 +41,45 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
     }
     
     public function validate_payload() {
-        # Validate the IP first, it is needed to validate the host/domain
-        $this->__validate_ip();
         $this->__validate_host();
         $this->__validate_domain();
+        $this->__validate_ip();
+
+        # Before proceeding, check that a host override matching this host, domain and IP type doesn't already exist
+        if ($this->host_override_exists()) {
+            $this->errors[] = APIResponse\get(2010);
+        }
+
         $this->__validate_descr();
         $this->__validate_aliases();
+    }
+
+    private function __validate_host() {
+        # Check for our required 'host' payload value
+        if (isset($this->initial_data['host'])) {
+            # Ensure it is a valid hostname
+            if (is_hostname($this->initial_data["host"])) {
+                $this->validated_data["host"] = $this->initial_data['host'];
+            } else {
+                $this->errors[] = APIResponse\get(2046);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(2004);
+        }
+    }
+
+    private function __validate_domain() {
+        # Check for our required 'domain' payload value
+        if (isset($this->initial_data['domain'])) {
+            # Ensure it is a validate hostname
+            if (is_hostname($this->initial_data["domain"])) {
+                $this->validated_data["domain"] = $this->initial_data['domain'];
+            } else {
+                $this->errors[] = APIResponse\get(2047);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(2005);
+        }
     }
 
     private function __validate_ip() {
@@ -59,28 +92,6 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
             }
         } else {
             $this->errors[] = APIResponse\get(2006);
-        }
-    }
-
-    private function __validate_host() {
-        # Check for our required 'host' payload value
-        if (isset($this->initial_data['host'])) {
-            $this->validated_data["host"] = trim($this->initial_data['host']);
-        } else {
-            $this->errors[] = APIResponse\get(2004);
-        }
-    }
-
-    private function __validate_domain() {
-        # Check for our required 'domain' payload value
-        if (isset($this->initial_data['domain'])) {
-            if (APITools\is_unbound_fqdn($this->validated_data["host"], $this->initial_data["domain"], $this->validated_data["ip"])) {
-                $this->errors[] = APIResponse\get(2010);
-            } else {
-                $this->validated_data["domain"] = trim($this->initial_data['domain']);
-            }
-        } else {
-            $this->errors[] = APIResponse\get(2005);
         }
     }
 
@@ -103,12 +114,42 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
             foreach ($this->initial_data['aliases'] as $alias) {
                 $alias_create = new APIServicesUnboundHostOverrideAliasCreate();
                 $alias_create->initial_data = $alias;
-                $alias_create->validate_id = false;
-                $alias_create->validate_payload();
+                $alias_create->validate_host();
+                $alias_create->validate_domain();
+                $alias_create->validate_description();
+                $alias_create->alias_exists($this->validated_data);
                 $this->errors = array_merge($this->errors, $alias_create->errors);
                 $this->validated_data["aliases"]["item"][] = $alias_create->validated_data;
             }
         }
+    }
+
+    public function host_override_exists() {
+        # Local variables
+        $host = $this->validated_data["host"];
+        $domain = $this->validated_data["domain"];
+        $ip = $this->validated_data["ip"];
+
+        # Loop through each host override and check if the FQDN already exists
+        foreach ($this->config["unbound"]["hosts"] as $ent) {
+            # Check the FQDN matches this entry
+            if ($ent["host"] === $host and $ent["domain"] === $domain) {
+                # Host overrides are allowed an IPv4 and IPv6 address, check if it already has one.
+                if ((is_ipaddrv4($ent["ip"]) and is_ipaddrv4($ip)) or (is_ipaddrv6($ent["ip"]) and is_ipaddrv6($ip))){
+                    return true;
+                }
+            }
+
+            # Check FQDN within host override aliases as well
+            if (is_array($ent["aliases"])) {
+                foreach ($ent["aliases"]["item"] as $alias_ent) {
+                    if ($alias_ent["host"] === $host and $alias_ent["domain"] === $domain) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
 }
