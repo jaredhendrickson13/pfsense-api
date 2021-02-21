@@ -345,7 +345,8 @@ function get_pfsense_if_id($interface) {
     }
 }
 
-// Check if input is valid for rule source and destination
+# Check if input is valid for rule source and destination
+# TODO: this function is messy, clean it up
 function is_valid_rule_addr($addr, $direction) {
     // Variables
     $addr_types = array("any", "pppoe", "l2tp", "(self)");   // Array of special src/dst types
@@ -357,14 +358,17 @@ function is_valid_rule_addr($addr, $direction) {
             $addr_not = true;
             $addr = str_replace("!", "", $addr);
         }
-        // Check if our source data is valid
-        $addr_if = str_replace("ip", "", $addr);    // Save seperate variable to check for interface sourcees
+
+        // Check if our data is valid
+        $addr_if = str_replace("ip", "", $addr);
+
         if (is_ipaddr($addr) or is_subnet($addr)) {
             $ret_val["data"] = array($direction => array("address" => $addr));
         } elseif (is_alias($addr)) {
             $ret_val["data"] = array($direction => array("address" => $addr));
         } elseif (get_pfsense_if_id($addr_if)) {
             $addr_pfif = get_pfsense_if_id($addr_if);    // Save our interface pfid
+
             // If source was interface address (ending in ip), otherwise assume entire subnet
             if (str_replace($addr_if, "", $addr) === "ip") {
                 $ret_val["data"] = array($direction => array("network" => $addr_pfif . "ip"));
@@ -372,9 +376,16 @@ function is_valid_rule_addr($addr, $direction) {
                 $ret_val["data"] = array($direction => array("network" => $addr_pfif));
             }
         } elseif (in_array($addr, $addr_types)) {
+            # Format config for any address
             if ($addr === "any") {
                 $ret_val["data"] = array($direction => array("any" => ""));
-            } else {
+            }
+            # Do not allow (self) address if direction is source
+            elseif ($addr === "(self)" and $direction === "source") {
+                $ret_val["valid"] = false;
+            }
+            # Otherwise, Format config as network
+            else {
                 $ret_val["data"] = array($direction => array("network" => $addr));
             }
         } else {
