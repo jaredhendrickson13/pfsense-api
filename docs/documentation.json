@@ -7405,6 +7405,105 @@
 					"name": "NTPD",
 					"item": [
 						{
+							"name": "TIME_SERVER",
+							"item": [
+								{
+									"name": "Create NTPd Time Server",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"timeserver\": \"ntp.pool.org\", \n    \"ispool\": true, \n    \"prefer\": true, \n    \"noselect\": false\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/ntpd/time_server?timeserver=string&ispool=boolean&noselect=boolean&prefer=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"ntpd",
+												"time_server"
+											],
+											"query": [
+												{
+													"key": "timeserver",
+													"value": "string",
+													"description": "Specify the IP or hostname of the NTP time server to add."
+												},
+												{
+													"key": "ispool",
+													"value": "boolean",
+													"description": "Specify whether or not this time server represents an NTP server pool or a single NTP server. "
+												},
+												{
+													"key": "noselect",
+													"value": "boolean",
+													"description": "Enable or disable this NTP time server from selection. If `true`, the time server will be eligible for selection. If `false, the NTP server will remain In the configuration but not used."
+												},
+												{
+													"key": "prefer",
+													"value": "boolean",
+													"description": "Enable or disable this NTP time server as a preferred NTP time server. If `true`, this time server will take preference over other time servers."
+												}
+											]
+										},
+										"description": "Add a new NTP time server to the NTPd configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete NTPd Time Server",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"timeserver\": \"ntp.pool.org\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/ntpd/time_server?timeserver=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"ntpd",
+												"time_server"
+											],
+											"query": [
+												{
+													"key": "timeserver",
+													"value": "string",
+													"description": "Specify the IP or hostname of the NTP time server to delete. If more than one time server exists with this value, only the first match will be deleted. In the case that all time servers were deleted, the default time server `pool.ntp.org` will be written."
+												}
+											]
+										},
+										"description": "Delete an existing NTP time server from the NTPd configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that create, read, update and delete NTPd configuration."
+						},
+						{
 							"name": "Start NTPd Service",
 							"request": {
 								"method": "POST",
@@ -7433,6 +7532,123 @@
 									]
 								},
 								"description": "Start the ntpd service.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Read NTPd Service",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/ntpd",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"services",
+										"ntpd"
+									]
+								},
+								"description": "Read the ntpd service configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Update NTPd Service",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"interface\": [\"WAN\", \"lan\", \"lo0\"],\n    \"orphan\": 15,\n    \"logpeer\": true,\n    \"logsys\": true,\n    \"clockstats\": true,\n    \"loopstats\": false,\n    \"peerstats\": true,\n    \"statsgraph\": true,\n    \"timeservers\": [\n      {\"timeserver\": \"ntp.pool.org\", \"ispool\": true, \"prefer\": true, \"noselect\": false}\n    ]\n  }",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/ntpd?interface=array&time_servers=array&orphan=integer&leapsec=string&statsgraph=boolean&logpeer=boolean&logsys=boolean&clockstats=boolean&loopstats=boolean&peerstats=boolean",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"services",
+										"ntpd"
+									],
+									"query": [
+										{
+											"key": "interface",
+											"value": "array",
+											"description": "Update the Interfaces NTPd will listen on. This must be an array of strings. You may specify either the physical Interface ID, the pfSense Interface ID or the descriptive Interface name. To match any Interface, simply pass In an empty array. e.g. `[\"wan\", \"em1\", \"lo0\", \"LAN\"]` (optional)"
+										},
+										{
+											"key": "time_servers",
+											"value": "array",
+											"description": "Update the time servers used by the system. This must be an array of objects. Each object may use the parameters available In the /api/v1/services/ntpd/time_server endpoint. To revert to the default timeserver, you may pass In an empty array. Specifying this field will overwrite any existing time servers. To simply add or remove time servers, use the /api/v1/services/ntpd/time_server endpoint as it Is less taxing on the system. e.g. `[{\"timeserver\": \"pool.ntp.org\", \"ispool\": true\", \"prefer\": true, \"noselect\": false}]` (optional)"
+										},
+										{
+											"key": "orphan",
+											"value": "integer",
+											"description": "Update the orphan mode value. This must be a value between `1` and `15`. Orphan mode allows the system clock to be used when no other clocks are available. The number here specifies the stratum reported during orphan mode and should normally be set to a number high enough to insure that any other servers available to clients are preferred over this server. (optional)"
+										},
+										{
+											"key": "leapsec",
+											"value": "string",
+											"description": "Update the leap seconds configuration. This should be the contents of the leap seconds file received from the IERS. (optional)"
+										},
+										{
+											"key": "statsgraph",
+											"value": "boolean",
+											"description": "Enable or disable RRD graphs of NTP metrics. (optional)"
+										},
+										{
+											"key": "logpeer",
+											"value": "boolean",
+											"description": "Enable or disable the logging of peer messages. (optional)"
+										},
+										{
+											"key": "logsys",
+											"value": "boolean",
+											"description": "Enable or disable the logging of system messages. (optional)"
+										},
+										{
+											"key": "clockstats",
+											"value": "boolean",
+											"description": "Enable or disable the logging of reference clock statistics. (optional)"
+										},
+										{
+											"key": "loopstats",
+											"value": "boolean",
+											"description": "Enable or disable the logging of clock discipline statistics. (optional)"
+										},
+										{
+											"key": "peerstats",
+											"value": "boolean",
+											"description": "Enable or disable the logging of NTP peer statistics. (optional)"
+										}
+									]
+								},
+								"description": "Update the ntpd service configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]"
 							},
 							"response": []
 						},

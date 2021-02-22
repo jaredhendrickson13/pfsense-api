@@ -520,6 +520,42 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "DHCPd static mapping ID does not exist"
         ],
+        2046 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "NTPd orphan value must be between 1 and 15"
+        ],
+        2047 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown NTPd interface specified"
+        ],
+        2048 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "NTPd timeserver value is required"
+        ],
+        2049 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "NTPd timeserver must be valid IP address or hostname"
+        ],
+        2050 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Maximum limit of 10 NTPd timeservers exceeded"
+        ],
+        2051 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "NTPd timeserver does not exist"
+        ],
 
         // 3000-3999 reserved for /interfaces API calls
         3000 => [
@@ -1744,6 +1780,7 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Authentication server name already in use"
         ],
+
         //6000-6999 reserved for /routing API calls
         6000 => [
             "status" => "bad request",
