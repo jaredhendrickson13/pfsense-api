@@ -272,13 +272,13 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Unbound host override alias already exists"
+            "message" => "Unbound host override alias already exists with this IP address type"
         ],
         2010 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Unbound host override already exists"
+            "message" => "Unbound host override already exists with this IP address type"
         ],
         2011 => [
             "status" => "bad request",
@@ -489,6 +489,18 @@ function get($id, $data=[], $all=false) {
             "code" => 400,
             "return" => $id,
             "message" => "DHCPd static mapping ID does not exist"
+        ],
+        2046 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid unbound host value"
+        ],
+        2047 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid unbound domain value"
         ],
 
         // 3000-3999 reserved for /interfaces API calls
