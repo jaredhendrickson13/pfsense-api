@@ -21,6 +21,7 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
     private $nat_reflection;
     private $updated_by_msg;
     private $port_required;
+    private $port_protocol;
 
     # Create our method constructor
     public function __construct() {
@@ -30,6 +31,7 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
         $this->protocols = ["tcp", "udp", "tcp/udp", "icmp", "esp", "ah", "gre", "ipv6", "igmp", "pim", "ospf"];
         $this->nat_reflection = ["enable", "disable", "purenat"];
         $this->port_required = false;
+        $this->port_protocol = false;
     }
 
     public function action() {
@@ -48,6 +50,11 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
             if (array_key_exists($this->initial_data["id"], $this->config["nat"]["rule"])) {
                 $this->id = $this->initial_data["id"];
                 $this->validated_data = $this->config["nat"]["rule"][$this->id];
+
+                # Check if current protocol is a port based protocol
+                if (in_array($this->validated_data["protocol"], ["tcp", "udp", "tcp/udp"])) {
+                    $this->port_protocol = true;
+                }
             } else {
                 $this->errors[] = APIResponse\get(4016);
             }
@@ -74,11 +81,15 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
         if (isset($this->initial_data['protocol'])) {
             # Require protocol to be a known/supported protocol
             if (in_array($this->initial_data['protocol'], $this->protocols)) {
-                # Only require ports if updating to port protocol from non-port protocol
+                # Check if we are updating to a port based protocol
                 if (in_array($this->initial_data["protocol"], ["tcp", "udp", "tcp/udp"])) {
+                    $this->port_protocol = true;
+                    # Only require ports if updating to port protocol from non-port protocol
                     if (!in_array($this->validated_data["protocol"], ["tcp", "udp", "tcp/udp"])) {
                         $this->port_required = true;
                     }
+                } else {
+                    $this->port_protocol = false;
                 }
                 $this->validated_data["protocol"] = $this->initial_data['protocol'];
             } else {
@@ -103,7 +114,7 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
 
     private function __validate_local_port() {
         # Only require a local port if the protocol requires a port
-        if ($this->port_required) {
+        if ($this->port_required or (isset($this->initial_data['local-port']) and $this->port_protocol)) {
             # Require client to pass in a local port to forward to the target
             if (isset($this->initial_data['local-port'])) {
                 # Require the port to be a valid TCP/UDP port or range
@@ -123,7 +134,15 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
         if (isset($this->initial_data['src'])) {
             $rule_check = APITools\is_valid_rule_addr($this->initial_data['src'], "source");
             if ($rule_check["valid"]) {
+                # Retain the source port and update the source array
+                $origin_port = $this->validated_data["source"]["port"];
                 $this->validated_data["source"] = $rule_check["data"]["source"];
+
+                # If we had a source port, rewrite it
+                if (isset($origin_port)) {
+                    $this->validated_data["source"]["port"] = $origin_port;
+                }
+
             } else {
                 $this->errors[] = APIResponse\get(4011);
             }
@@ -135,7 +154,14 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
         if (isset($this->initial_data['dst'])) {
             $rule_check = APITools\is_valid_rule_addr($this->initial_data['dst'], "destination");
             if ($rule_check["valid"]) {
+                # Retain the destination port and update the destination array
+                $origin_port = $this->validated_data["destination"]["port"];
                 $this->validated_data["destination"] = $rule_check["data"]["destination"];
+
+                # If we had a destination port, rewrite it
+                if (isset($origin_port)) {
+                    $this->validated_data["destination"]["port"] = $origin_port;
+                }
             } else {
                 $this->errors[] = APIResponse\get(4012);
             }
@@ -144,7 +170,7 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
 
     private function __validate_srcport() {
         # Only require a source port value if our protocol requires ports
-        if ($this->port_required) {
+        if ($this->port_required or (isset($this->initial_data['srcport']) and $this->port_protocol)) {
             $this->initial_data['srcport'] = str_replace("-", ":", $this->initial_data['srcport']);
             # Require port to be a valid port or range, or be any
             if (!is_port_or_range($this->initial_data['srcport']) and $this->initial_data['srcport'] !== "any") {
@@ -159,7 +185,7 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
 
     private function __validate_dstport() {
         # Only require a destination port value if our protocol requires ports
-        if ($this->port_required) {
+        if ($this->port_required or (isset($this->initial_data['dstport']) and $this->port_protocol)) {
             $this->initial_data['dstport'] = str_replace("-", ":", $this->initial_data['dstport']);
             # Require port to be a valid port or range, or be any
             if (!is_port_or_range($this->initial_data['dstport']) and $this->initial_data['dstport'] !== "any") {

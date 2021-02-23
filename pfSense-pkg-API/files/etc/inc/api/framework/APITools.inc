@@ -119,7 +119,7 @@ function create_jwt_server_key($rotate=false) {
     # Create a new server key if one is not set
     if (empty($api_config["server_key"]) or $rotate === true) {
         $config["installedpackages"]["package"][$pkg_index]["conf"]["server_key"] = bin2hex(random_bytes(32));
-        write_config();
+        write_config("API server key created");
     }
 }
 
@@ -345,10 +345,11 @@ function get_pfsense_if_id($interface) {
     }
 }
 
-// Check if input is valid for rule source and destination
+# Check if input is valid for rule source and destination
+# TODO: this function is messy, clean it up
 function is_valid_rule_addr($addr, $direction) {
     // Variables
-    $addr_types = array("any", "pppoe", "l2tp");   // Array of special src/dst types
+    $addr_types = array("any", "pppoe", "l2tp", "(self)");   // Array of special src/dst types
     $ret_val = array("valid" => true, "data" => array());
     // Check if our source values are valid
     if (is_string($addr)) {
@@ -357,14 +358,17 @@ function is_valid_rule_addr($addr, $direction) {
             $addr_not = true;
             $addr = str_replace("!", "", $addr);
         }
-        // Check if our source data is valid
-        $addr_if = str_replace("ip", "", $addr);    // Save seperate variable to check for interface sourcees
+
+        // Check if our data is valid
+        $addr_if = str_replace("ip", "", $addr);
+
         if (is_ipaddr($addr) or is_subnet($addr)) {
             $ret_val["data"] = array($direction => array("address" => $addr));
         } elseif (is_alias($addr)) {
             $ret_val["data"] = array($direction => array("address" => $addr));
         } elseif (get_pfsense_if_id($addr_if)) {
             $addr_pfif = get_pfsense_if_id($addr_if);    // Save our interface pfid
+
             // If source was interface address (ending in ip), otherwise assume entire subnet
             if (str_replace($addr_if, "", $addr) === "ip") {
                 $ret_val["data"] = array($direction => array("network" => $addr_pfif . "ip"));
@@ -372,9 +376,16 @@ function is_valid_rule_addr($addr, $direction) {
                 $ret_val["data"] = array($direction => array("network" => $addr_pfif));
             }
         } elseif (in_array($addr, $addr_types)) {
+            # Format config for any address
             if ($addr === "any") {
                 $ret_val["data"] = array($direction => array("any" => ""));
-            } else {
+            }
+            # Do not allow (self) address if direction is source
+            elseif ($addr === "(self)" and $direction === "source") {
+                $ret_val["valid"] = false;
+            }
+            # Otherwise, Format config as network
+            else {
                 $ret_val["data"] = array($direction => array("network" => $addr));
             }
         } else {
@@ -690,36 +701,6 @@ function unbound_reload_config() {
     }
 }
 
-// Check if a DNS Resolver (Unbound) host override already exists
-function is_unbound_fqdn($hostname, $domain, $instance_id=null) {
-    # Local variables
-    global $config;
-    $curr_hosts = (array_key_exists("hosts", $config["unbound"])) ? $config["unbound"]["hosts"] : [];
-    $host_exists = false;
-    $index = 0;
-
-    # Loop through each host override and check if the FQDN already exists
-    foreach ($curr_hosts as $host_ent) {
-        # Check the FQDN matches this entry
-        if ($host_ent["host"] === $hostname and $host_ent["domain"] === $domain) {
-            # If we are working with an existing instance, allow existing FQDN if ID matches
-            if ($index !== $instance_id) {
-                return true;
-            }
-        }
-
-        # Check FQDN within host override aliases as well
-        if (is_array($host_ent["aliases"])) {
-            foreach ($host_ent["aliases"]["item"] as $alias_ent) {
-                if ($alias_ent["host"] === $hostname and $alias_ent["domain"] === $domain) {
-                    return true;
-                }
-            }
-        }
-        $index++;
-    }
-    return $host_exists;
-}
 
 // Get a complete config list of ALL interfaces. Based off interfaces_assign.php
 function get_all_avail_interfaces() {

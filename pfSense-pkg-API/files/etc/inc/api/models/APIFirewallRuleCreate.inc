@@ -249,6 +249,10 @@ class APIFirewallRuleCreate extends APIModel {
         $this->__validate_log();
         $this->__validate_top();
 
+        # Delay generating the tracker. Reduces the likelihood of two rules getting the same tracker in looped calls
+        # todo: this is a quick fix and still does not guarantee uniqueness, a better solution is needed
+        sleep(1);
+
         # Add our static 'tracker', 'created' and 'updated' values
         $this->validated_data["tracker"] = (int)microtime(true);
         $this->validated_data["created"] = [

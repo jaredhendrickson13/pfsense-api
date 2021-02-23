@@ -40,7 +40,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
             "protocol": "tcp/udp",
             "src": "172.16.77.125",
             "srcport": "8080-8081",
-            "dst": "127.0.0.1",
+            "dst": "(self)",
             "dstport": "2222-4444",
             "descr": "Updated Unit test",
             "gateway": "WAN_DHCP",

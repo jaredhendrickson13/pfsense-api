@@ -22,7 +22,20 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             "host": "pfsense-api",
             "domain": "unit.test",
             "ip": "1.2.3.4",
-            "descr": "Unit Test",
+            "descr": "Unit Test IPv4",
+            "aliases": [
+                {
+                    "host": "pfsense-api-alias",
+                    "domain": "unit.test",
+                    "description": "Unit Test"
+                }
+            ]
+        },
+        {
+            "host": "pfsense-api",
+            "domain": "unit.test",
+            "ip": "fd00:abcd::",
+            "descr": "Unit Test IPv6",
             "aliases": [
                 {
                     "host": "pfsense-api-alias",
@@ -57,7 +70,8 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
         }
     ]
     delete_payloads = [
-        {"id": 0}
+        {"id": 0},
+        {"id": 0, "apply": True}
     ]
 
 APIUnitTestServicesUnboundHostOverride()
