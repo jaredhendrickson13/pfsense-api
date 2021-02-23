@@ -69,7 +69,7 @@ class APIServicesNTPdUpdate extends APIModel {
                 if (in_array($if, $this->__get_interfaces())) {
                     $this->validated_data["interface"][] = $if;
                 } else {
-                    $this->errors[] = APIResponse\get(2047);
+                    $this->errors[] = APIResponse\get(2049);
                 }
             }
 
@@ -113,7 +113,7 @@ class APIServicesNTPdUpdate extends APIModel {
             }
             # If our limit was exceeded return an error
             else {
-                $this->errors[] = APIResponse\get(2050);
+                $this->errors[] = APIResponse\get(2052);
             }
         }
     }
@@ -125,7 +125,7 @@ class APIServicesNTPdUpdate extends APIModel {
             if ($this->initial_data['orphan'] >= 1 and $this->initial_data['orphan'] <= 15) {
                 $this->validated_data["orphan"] = $this->initial_data['orphan'];
             } else {
-                $this->errors[] = APIResponse\get(2046);
+                $this->errors[] = APIResponse\get(2048);
             }
         }
     }

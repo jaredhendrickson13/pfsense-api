@@ -524,33 +524,45 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "NTPd orphan value must be between 1 and 15"
+            "message" => "Invalid unbound host value"
         ],
         2047 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Unknown NTPd interface specified"
+            "message" => "Invalid unbound domain value"
         ],
         2048 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "NTPd timeserver value is required"
+            "message" => "NTPd orphan value must be between 1 and 15"
         ],
         2049 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "NTPd timeserver must be valid IP address or hostname"
+            "message" => "Unknown NTPd interface specified"
         ],
         2050 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Maximum limit of 10 NTPd timeservers exceeded"
+            "message" => "NTPd timeserver value is required"
         ],
         2051 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "NTPd timeserver must be valid IP address or hostname"
+        ],
+        2052 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Maximum limit of 10 NTPd timeservers exceeded"
+        ],
+        2053 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,

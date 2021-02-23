@@ -80,7 +80,7 @@ class APIServicesNTPdTimeServerDelete extends APIModel {
         }
         # Otherwise, return error if the request name server does not exist
         else {
-            $this->errors[] = APIResponse\get(2051);
+            $this->errors[] = APIResponse\get(2053);
         }
     }
 

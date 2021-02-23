@@ -52,7 +52,7 @@ class APIServicesNTPdTimeServerCreate extends APIModel {
     private function __validate_timeserver_limit() {
         # Before adding a new timeserver, ensure we are not already at our maximum limit
         if (count($this->timeservers) >= 10) {
-            $this->errors[] = APIResponse\get(2050);
+            $this->errors[] = APIResponse\get(2052);
         }
     }
 
@@ -65,10 +65,10 @@ class APIServicesNTPdTimeServerCreate extends APIModel {
             if (is_ipaddr($this->initial_data["timeserver"]) or is_hostname($this->initial_data["timeserver"])) {
                 $this->timeservers[] = $this->initial_data['timeserver'];
             } else {
-                $this->errors[] = APIResponse\get(2049);
+                $this->errors[] = APIResponse\get(2051);
             }
         } else {
-            $this->errors[] = APIResponse\get(2048);
+            $this->errors[] = APIResponse\get(2050);
         }
     }
 
