@@ -4356,7 +4356,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"persist\": false, \n    \"jwt_exp\": 86400, \n    \"authmode\": \"token\",\n    \"hashalgo\": \"sha512\", \n    \"keybytes\": 64, \n    \"allowed_interfaces\": [\"WAN\"]\n}",
+									"raw": "{\n    \"persist\": false, \n    \"jwt_exp\": 86400, \n    \"authmode\": \"token\",\n    \"hashalgo\": \"sha512\", \n    \"keybytes\": 64, \n    \"allowed_interfaces\": [\"WAN\"],\n    \"custom_headers\": {\"custom-header-1\": \"Value1\", \"custom-header-2\": \"Value2\"},\n    \"allow_options\": true\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -4364,7 +4364,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/system/api?enable=boolean&persist=boolean&readonly=boolean&available_interfaces=array&authmode=string&jwt_exp=integer&keyhash=string&keybytes=integer",
+									"raw": "https://{{$hostname}}/api/v1/system/api?enable=boolean&persist=boolean&readonly=boolean&allow_options=boolean&available_interfaces=array&authmode=string&jwt_exp=integer&keyhash=string&keybytes=integer&custom_headers=array",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -4392,6 +4392,11 @@
 											"description": "Enable read only mode. If set to `true`, the API will only answer read (GET) requests. This also means you will not be able to disable read only mode from the API. "
 										},
 										{
+											"key": "allow_options",
+											"value": "boolean",
+											"description": "Enable/disable the OPTIONS request method from API responses. If set to `true`, the API will answer OPTIONS requests. If set to `false`, the API will return a 405 Method Not Allowed response. (optional)"
+										},
+										{
 											"key": "available_interfaces",
 											"value": "array",
 											"description": "Update the Interfaces that are allowed to answer API requests. Each Item In the array must be a valid physical Interface ID (e.g. `\"em0\"`), pfSense Interface ID, (e.g. `\"opt1\"`),  or descriptive Interface name (e.g. `\"WAN\"`). Additionally you may add `\"localhost\"` to allow local API requests, or add `\"any\"` to allow any Interface to answer API requests. It Is best practice to only allow Inside Interfaces to answer API requests, or use firewall rules to filter requests made to outside Interfaces. (optional)"
@@ -4415,6 +4420,11 @@
 											"key": "keybytes",
 											"value": "integer",
 											"description": "Update the key byte strength to use when generating API tokens. Choices are `16`, `32` and `64`. This Is only applicable when the `authmode` setting Is set to `token`. (optional)"
+										},
+										{
+											"key": "custom_headers",
+											"value": "array",
+											"description": "Update the custom response headers for the API to return in API responses. This must be an array of key-value pairs (e.g. `{\"custom-header\": \"custom-header-value}`. To revert custom headers to the default state, simply pass in an empty array. In most cases, custom headers are not necessary. An example use case for custom headers is setting CORS policy headers required by some frontend web applications. (optional)"
 										}
 									]
 								},
