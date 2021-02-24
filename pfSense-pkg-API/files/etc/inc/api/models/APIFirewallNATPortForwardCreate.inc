@@ -243,8 +243,10 @@ class APIFirewallNATPortForwardCreate extends APIModel {
 
     private function __init_config() {
         # Ensure our config is formatted for NAT rules
-        if (!is_array($this->config["nat"]["rule"])) {
+        if (!is_array($this->config["nat"])) {
             $this->config["nat"] = [];
+        }
+        if (!is_array($this->config["nat"]["rule"])) {
             $this->config["nat"]["rule"] = [];
         }
     }

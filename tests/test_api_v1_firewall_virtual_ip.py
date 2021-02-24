@@ -39,6 +39,7 @@ class APIUnitTestFirewallVirtualIP(unit_test_framework.APIUnitTest):
             "interface": "wan",
             "subnet": "172.16.77.229/32",
             "password": "newtestpass",
+            "vhid": 25,
             "descr": "Updated unit Test"
         },
         {

@@ -37,9 +37,9 @@ function build_endpoints() {
 
         # Print success output if file now exists, otherwise output error and exit on non-zero code
         if (!is_null($endpoint_obj->url) and is_file("/usr/local/www".$endpoint_obj->url."/index.php")) {
-            echo "Builing ".$endpoint_class." endpoint at URL \"".$endpoint_obj->url."\"... done.".PHP_EOL;
+            echo "Building ".$endpoint_class." endpoint at URL \"".$endpoint_obj->url."\"... done.".PHP_EOL;
         } else {
-            echo "Builing ".$endpoint_class." endpoint at URL \"".$endpoint_obj->url."\"... failed.".PHP_EOL;
+            echo "Building ".$endpoint_class." endpoint at URL \"".$endpoint_obj->url."\"... failed.".PHP_EOL;
             exit(1);
         }
     }
