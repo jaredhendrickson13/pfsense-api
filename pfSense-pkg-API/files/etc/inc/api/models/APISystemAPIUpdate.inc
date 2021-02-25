@@ -59,6 +59,15 @@ class APISystemAPIUpdate extends APIModel {
         }
     }
 
+    private function __validate_allow_options() {
+        # Check for our optional 'allow_options' payload value
+        if ($this->initial_data['allow_options'] === true) {
+            $this->validated_data["allow_options"] = "";
+        } elseif ($this->initial_data['allow_options'] === false) {
+            unset($this->validated_data["allow_options"]);
+        }
+    }
+
     private function __validate_allowed_interfaces() {
         # Local variables
         $non_config_ifs = array("any" => "Any", "localhost" => "Link-local");
@@ -82,6 +91,28 @@ class APISystemAPIUpdate extends APIModel {
 
             # Convert value to internal XML value
             $this->validated_data["allowed_interfaces"] = implode(",", $this->validated_data["allowed_interfaces"]);
+        }
+    }
+
+    private function __validate_custom_headers() {
+        # Check for our optional 'custom_headers' payload value
+        if (isset($this->initial_data["custom_headers"]) and !empty($this->initial_data["custom_headers"])) {
+            if (is_array($this->initial_data["custom_headers"])) {
+                # Loop through each requested header and ensure types are valid
+                foreach ($this->initial_data["custom_headers"] as $key=>$value) {
+                    if (!is_string($key) or !is_string($value)) {
+                        $this->errors[] = APIResponse\get(1026);
+                        break;
+                    }
+                }
+                $this->validated_data["custom_headers"] = $this->initial_data["custom_headers"];
+            } else {
+                $this->errors[] = APIResponse\get(1025);
+            }
+        }
+        # When the custom_headers was passed in but is empty, unset custom headers
+        elseif (isset($this->initial_data["custom_headers"]) and empty($this->initial_data["custom_headers"])) {
+            unset($this->validated_data["custom_headers"]);
         }
     }
 
@@ -137,10 +168,12 @@ class APISystemAPIUpdate extends APIModel {
         $this->__validate_enable();
         $this->__validate_persist();
         $this->__validate_readonly();
+        $this->__validate_allow_options();
         $this->__validate_allowed_interfaces();
         $this->__validate_authmode();
         $this->__validate_jwt_exp();
         $this->__validate_keyhash();
         $this->__validate_keybytes();
+        $this->__validate_custom_headers();
     }
 }

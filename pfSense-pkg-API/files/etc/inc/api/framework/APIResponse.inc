@@ -240,7 +240,19 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Unsupport API token bytes count"
+            "message" => "Unsupported API token bytes count"
+        ],
+        1025 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "API custom headers must be an array containing key-value pairs"
+        ],
+        1026 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "API custom header key-value pairs must be string types"
         ],
 
         // 2000-2999 reserved for /services API calls

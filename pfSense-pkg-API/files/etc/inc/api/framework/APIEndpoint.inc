@@ -53,21 +53,42 @@ class APIEndpoint {
 
     # Listen for HTTP requests and call the corresponding method
     public function listen() {
+        $pkg_config = APITools\get_api_config()[1];
+
+        # Before responding, ensure the request method is allowed
         if ($_SERVER["REQUEST_METHOD"] === "GET") {
             $resp = (new APIQuery($this->get(), $this->query_excludes))->query();
-        } elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
+        }
+        elseif ($_SERVER["REQUEST_METHOD"] === "POST") {
             $resp = $this->post();
-        } elseif ($_SERVER["REQUEST_METHOD"] === "PUT") {
+        }
+        elseif ($_SERVER["REQUEST_METHOD"] === "PUT") {
             $resp = $this->put();
-        } elseif ($_SERVER["REQUEST_METHOD"] === "DELETE") {
+        }
+        elseif ($_SERVER["REQUEST_METHOD"] === "DELETE") {
             $resp = $this->delete();
-        } else {
+        }
+        # Only allow OPTIONS requests if the allow options setting is checked
+        elseif ($_SERVER["REQUEST_METHOD"] === "OPTIONS" and isset($pkg_config["allow_options"])) {
+            $resp = APIResponse\get(0);
+        }
+        # Method is not allowed when no match, set error response
+        else {
             $resp = APIResponse\get(2);
         }
 
-        # Format the HTTP response as JSON and set response code
+        # Add custom response headers if configured
+        if (!empty($pkg_config["custom_headers"])) {
+            foreach ($pkg_config["custom_headers"] as $name=>$value) {
+                header(strval($name).": ".strval($value));
+            }
+        }
+
+        # Add API required response headers, these will override any custom headers
         header("Content-Type: application/json", true);
         header("Referer: no-referrer");
+
+        # Format the HTTP response as JSON and set response code
         http_response_code($resp["code"]);
         echo json_encode($resp) . PHP_EOL;
         session_destroy();
