@@ -40,7 +40,8 @@ class APISystemDNSServerCreate extends APIModel {
         $this->__validate_dnsserver();
     }
 
-    private function __validate_dnsserver() {
+    public function __validate_dnsserver() {
+        # Validate the optional `dnsserver` payload value
         if (isset($this->initial_data['dnsserver'])) {
             # If values are not an array, convert it
             if (!is_array($this->initial_data["dnsserver"])) {

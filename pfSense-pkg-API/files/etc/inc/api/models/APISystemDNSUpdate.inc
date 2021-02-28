@@ -27,8 +27,58 @@ class APISystemDNSUpdate extends APIModel {
     }
 
     public function action() {
-        $this->write_config();    // Apply our configuration change
-        // Update a slew of backend services
+        $this->write_config();
+        $this->apply_backend_changes();
+        return APIResponse\get(0, (new APISystemDNSRead())->action()["data"]);
+    }
+
+    public function validate_payload() {
+        $this->__validate_dnsserver();
+        $this->__validate_dnsallowoverride();
+        $this->__validate_dnslocalhost();
+    }
+
+    private function __validate_dnsallowoverride() {
+        if ($this->initial_data['dnsallowoverride'] === true) {
+            $this->config["system"]["dnsallowoverride"] = "";
+        } elseif ($this->initial_data['dnsallowoverride'] === false) {
+            unset($this->config["system"]["dnsallowoverride"]);
+        }
+    }
+
+    private function __validate_dnslocalhost() {
+        # Validate this field as needed for pfSense 2.4.x
+        # TODO: remove this conditional once pfSense 2.4 nears EOL
+        if (APITools\get_pfsense_version()["program"] < 250) {
+            if ($this->initial_data['dnslocalhost'] === true) {
+                $this->config["system"]["dnslocalhost"] = "";
+            } elseif ($this->initial_data['dnslocalhost'] === false) {
+                unset($this->config["system"]["dnslocalhost"]);
+            }
+        }
+        # Validate this field as needed for pfSense 2.5+
+        else {
+            if ($this->initial_data['dnslocalhost'] === true) {
+                unset($this->config["system"]["dnslocalhost"]);
+            } elseif ($this->initial_data['dnslocalhost'] === false) {
+                $this->config["system"]["dnslocalhost"] = "remote";
+            }
+        }
+    }
+
+    private function __validate_dnsserver() {
+        if (isset($this->initial_data['dnsserver'])) {
+            # Use an internal API call to the APISystemDNSServerCreate model
+            $dns_server_c = new APISystemDNSServerCreate();
+            $dns_server_c->initial_data["dnsserver"] = $this->initial_data["dnsserver"];
+            $dns_server_c->__validate_dnsserver();
+            $this->errors = $this->errors + $dns_server_c->errors;
+            $this->config["system"]["dnsserver"] = $dns_server_c->validated_data["dnsserver"];
+        }
+    }
+
+    public function apply_backend_changes() {
+        # Update a slew of backend services
         system_resolvconf_generate();
         if (isset($this->config['dnsmasq']['enable'])) {
             services_dnsmasq_configure();
@@ -36,38 +86,8 @@ class APISystemDNSUpdate extends APIModel {
             services_unbound_configure();
         }
 
-        // Reload DNS services and firewall filter
+        # Reload DNS services and firewall filter
         send_event("service reload dns");
         filter_configure();
-        return APIResponse\get(0, (new APISystemDNSRead())->action()["data"]);
-    }
-
-    public function validate_payload() {
-        if (isset($this->initial_data['dnsserver'])) {
-            $this->initial_data["dnsserver"] = $this->initial_data['dnsserver'];
-            // If value is not an array, convert it
-            if (!is_array($this->initial_data["dnsserver"])) {
-                $this->initial_data["dnsserver"] = array($this->initial_data["dnsserver"]);
-            }
-            // Loop through our DNS servers and check that entry is valid
-            foreach ($this->initial_data["dnsserver"] as $ds) {
-                // Check if our DNS server is valid
-                if (!is_ipaddrv4($ds) and !is_ipaddrv6($ds)) {
-                    $this->errors[] = APIResponse\get(1007);
-                }
-            }
-            // Add our system DNS values to validated data
-            $this->config["system"]["dnsserver"] = $this->initial_data["dnsserver"];
-        }
-        if ($this->initial_data['dnsallowoverride'] === true) {
-            $this->config["system"]["dnsallowoverride"] = "";
-        } elseif ($this->initial_data['dnsallowoverride'] === false) {
-            unset($this->config["system"]["dnsallowoverride"]);
-        }
-        if ($this->initial_data['dnslocalhost'] === true) {
-            $this->config["system"]["dnslocalhost"] = "";
-        } elseif ($this->initial_data['dnslocalhost'] === false) {
-            unset($this->config["system"]["dnslocalhost"]);
-        }
     }
 }
