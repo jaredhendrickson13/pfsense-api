@@ -25,44 +25,43 @@ class APISystemHostnameUpdate extends APIModel {
     }
 
     public function action() {
-        // Write our new hostname
-        $this->write_config();    // Apply our configuration change
-        // Update a slew of backend services
-        if (isset($hostname) or isset($domain)) {
-            system_hostname_configure();
-            system_hosts_generate();
-            system_resolvconf_generate();
-            if (isset($this->config['dnsmasq']['enable'])) {
-                services_dnsmasq_configure();
-            } elseif (isset($this->config['unbound']['enable'])) {
-                services_unbound_configure();
-            }
-            filter_configure();
-        }
+        # Write our new hostname and apply changes to the backend
+        $this->write_config();
+        $this->apply_backend_changes();
+
         $data = ["hostname" => $this->config["system"]["hostname"], "domain" => $this->config["system"]["domain"]];
         return APIResponse\get(0, $data);
     }
 
     public function validate_payload() {
         if (isset($this->initial_data['hostname'])) {
-            $hostname = $this->initial_data['hostname'];
-            $hostname = trim($hostname);
-            // Check if our hostname is valid
-            if (!is_hostname($hostname) or !is_unqualified_hostname($hostname)) {
+            # Check if our hostname is valid
+            if (!is_hostname($this->initial_data['hostname']) or !is_unqualified_hostname($this->initial_data['hostname'])) {
                 $this->errors[] = APIResponse\get(1000);
             } else {
-                $this->config["system"]["hostname"] = $hostname;
+                $this->config["system"]["hostname"] = $this->initial_data['hostname'];
             }
         }
         if (isset($this->initial_data['domain'])) {
-            $domain = $this->initial_data['domain'];
-            $domain = trim($domain);
-            // Check if our hostname is valid
-            if (!is_domain($domain)) {
+            # Check if our hostname is valid
+            if (!is_domain($this->initial_data['domain'])) {
                 $this->errors[] = APIResponse\get(1001);
             } else {
-                $this->config["system"]["domain"] = $domain;
+                $this->config["system"]["domain"] = $this->initial_data['domain'];
             }
         }
+    }
+
+    public function apply_backend_changes() {
+        # Update a slew of backend services
+        system_hostname_configure();
+        system_hosts_generate();
+        system_resolvconf_generate();
+        if (isset($this->config['dnsmasq']['enable'])) {
+            services_dnsmasq_configure();
+        } elseif (isset($this->config['unbound']['enable'])) {
+            services_unbound_configure();
+        }
+        filter_configure();
     }
 }
