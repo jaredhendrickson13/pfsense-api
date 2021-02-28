@@ -27,34 +27,27 @@ class APISystemDNSServerCreate extends APIModel {
     }
 
     public function action() {
+        # Write changes to config and apply backend changes
         $this->config["system"]["dnsserver"] = $this->validated_data["dnsserver"];
-        $this->write_config();    // Apply our configuration change
+        $this->write_config();
+        $this->apply_backend_changes();
 
-        // Update a slew of backend services
-        system_resolvconf_generate();
-        if (isset($this->config['dnsmasq']['enable'])) {
-            services_dnsmasq_configure();
-        } elseif (isset($this->config['unbound']['enable'])) {
-            services_unbound_configure();
-        }
-
-        // Reload DNS services and firewall filter
-        send_event("service reload dns");
-        filter_configure();
         return APIResponse\get(0, $this->validated_data);
     }
 
     public function validate_payload() {
-        if (isset($this->initial_data['dnsserver'])) {
-            $this->validated_data["dnsserver"] = $this->config["system"]["dnsserver"];
+        $this->validated_data["dnsserver"] = $this->config["system"]["dnsserver"];
+        $this->__validate_dnsserver();
+    }
 
+    private function __validate_dnsserver() {
+        if (isset($this->initial_data['dnsserver'])) {
             # If values are not an array, convert it
             if (!is_array($this->initial_data["dnsserver"])) {
                 $this->initial_data["dnsserver"] = array($this->initial_data["dnsserver"]);
             }
             if (!is_array($this->validated_data["dnsserver"])) {
                 $this->validated_data["dnsserver"] = [$this->validated_data["dnsserver"]];
-
             }
 
             # Loop through each requested DNS server and ensure it is valid. Add this to our existing servers.
@@ -67,7 +60,25 @@ class APISystemDNSServerCreate extends APIModel {
                     $this->validated_data["dnsserver"][] = $ds;
                 }
             }
-            $this->validated_data = array_filter($this->validated_data);
+
+            # Ensure array values are unique, reindexed and purge duplicate items
+            $this->validated_data["dnsserver"] = array_filter($this->validated_data["dnsserver"]);
+            $this->validated_data["dnsserver"] = array_unique($this->validated_data["dnsserver"]);
+            $this->validated_data["dnsserver"] = array_values($this->validated_data["dnsserver"]);
         }
+    }
+
+    public function apply_backend_changes() {
+        # Update a slew of backend services
+        system_resolvconf_generate();
+        if (isset($this->config['dnsmasq']['enable'])) {
+            services_dnsmasq_configure();
+        } elseif (isset($this->config['unbound']['enable'])) {
+            services_unbound_configure();
+        }
+
+        # Reload DNS services and firewall filter
+        send_event("service reload dns");
+        filter_configure();
     }
 }
