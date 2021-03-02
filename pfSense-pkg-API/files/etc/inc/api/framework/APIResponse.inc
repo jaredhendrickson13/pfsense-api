@@ -1712,13 +1712,13 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "LDAP authentication server hostname or IP required"
+            "message" => "Authentication server hostname or IP required"
         ],
         5012 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Invalid LDAP authentication server hostname or IP"
+            "message" => "Invalid authentication server hostname or IP"
         ],
         5013 => [
             "status" => "bad request",
@@ -1803,6 +1803,60 @@ function get($id, $data=[], $all=false) {
             "code" => 400,
             "return" => $id,
             "message" => "Authentication server name already in use"
+        ],
+        5027 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unsupported RADIUS protocol"
+        ],
+        5028 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "RADIUS secret required"
+        ],
+        5029 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "RADIUS secret must be string type"
+        ],
+        5030 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid RADIUS authentication port"
+        ],
+        5031 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid RADIUS accounting port"
+        ],
+        5032 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "RADIUS authentication and/or accounting port required"
+        ],
+        5033 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "RADIUS timeout must be an integer of 1 or greater"
+        ],
+        5034 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown RADIUS NAS-IP attribute"
+        ],
+        5035 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Authentication server name is required"
         ],
 
         //6000-6999 reserved for /routing API calls
@@ -1983,7 +2037,7 @@ function get($id, $data=[], $all=false) {
 
 
     ];
-    $response = $responses[(!in_array($id, $responses)) ? $id : 1];
+    $response = $responses[(array_key_exists($id, $responses)) ? $id : 1];
     $response["data"] = $data;
     if ($all === true) {
         $response = $responses;

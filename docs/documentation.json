@@ -292,6 +292,87 @@
 							"response": []
 						},
 						{
+							"name": "Create RADIUS Auth Servers",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"type": "text",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"TEST_RADIUS\",\n    \"host\": \"123\",\n    \"radius_secret\": \"testsecret\",\n    \"radius_auth_port\": 1812,\n    \"radius_acct_port\": 1813,\n    \"radius_protocol\": \"MSCHAPv2\",\n    \"radius_timeout\": 5,\n    \"radius_nasip_attribute\": \"wan\"\n}"
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/user/auth_server/radius?name=string&host=string&radius_secret=string&radius_auth_port=integer&radius_acct_port=integer&radius_timeout=integer&radis_nasip_attribute=string&active=boolean&radius_protocol=string",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"auth_server",
+										"radius"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "string",
+											"description": "Specify a descriptive name for the RADIUS authentication server to create. This name must be unique from all other authentication servers on the system."
+										},
+										{
+											"key": "host",
+											"value": "string",
+											"description": "Specify the IP or hostname of the remote RADIUS authentication server."
+										},
+										{
+											"key": "radius_secret",
+											"value": "string",
+											"description": "Specify the shared secret of the remote RADIUS authentication server. "
+										},
+										{
+											"key": "radius_auth_port",
+											"value": "integer",
+											"description": "Specify the remote RADIUS authentication server's authentication port. If no value is specified, the authentication service on the remote RADIUS server will not be used. This field is optional if a `radius_acct_port` value is specified. (optional)"
+										},
+										{
+											"key": "radius_acct_port",
+											"value": "integer",
+											"description": "Specify the remote RADIUS authentication server's accounting port. If no value is specified, the accounting service on the remote RADIUS server will not be used. This field is optional if a `radius_auth_port` value is specified.(optional)"
+										},
+										{
+											"key": "radius_timeout",
+											"value": "integer",
+											"description": "Specify the amount of time (in seconds) to wait for the remote RADIUS server to respond before timing out. This value must be `1` or greater. Defaults to `5`. (optional)"
+										},
+										{
+											"key": "radis_nasip_attribute",
+											"value": "string",
+											"description": "Specify which Interface's IP address to send in the NAS IP RADIUS attribute. You may specify either the physical Interface ID, the pfSense Interface ID or the descriptive Interface name. Defaults to `wan`. (optional)"
+										},
+										{
+											"key": "active",
+											"value": "boolean",
+											"description": "Specify whether pfSense should use this authentication server by default after creation.  (optional)"
+										},
+										{
+											"key": "radius_protocol",
+											"value": "string",
+											"description": "Specify the RADIUS authentication protocol to use when communicating with the remote RADIUS server. Options are `PAP`, `CHAP_MD5`, `MSCHAPv1` or `MSCHAPv2`. Defaults to `MSCHAPv2`. (optional)"
+										}
+									]
+								},
+								"description": "Delete an existing RADIUS authentication server.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-authservers`]"
+							},
+							"response": []
+						},
+						{
 							"name": "Delete Auth Servers",
 							"request": {
 								"method": "DELETE",
