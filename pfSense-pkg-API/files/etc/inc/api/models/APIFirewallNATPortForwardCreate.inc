@@ -79,10 +79,8 @@ class APIFirewallNATPortForwardCreate extends APIModel {
     private function __validate_target() {
         # Require client to pass in an internal target for the port forward
         if (isset($this->initial_data['target'])) {
-            # Require the target to either be a valid IPv4 or IPv6 address
-            if (is_ipaddrv4($this->initial_data['target'])) {
-                $this->validated_data["target"] = $this->initial_data['target'];
-            } elseif (alias_in_use($this->initial_data['target'])) {
+            # Require the target to either be a valid IPv4 or alias
+            if (in_array(is_ipaddroralias($this->initial_data['target']), [4, true])) {
                 $this->validated_data["target"] = $this->initial_data['target'];
             } else {
                 $this->errors[] = APIResponse\get(4009);
