@@ -27,37 +27,56 @@ class APISystemDNSServerDelete extends APIModel {
     }
 
     public function action() {
-        $this->write_config();    // Apply our configuration change
-        // Update a slew of backend services
+        $this->config["system"]["dnsserver"] = $this->validated_data["dnsserver"];
+        $this->write_config();
+        $this->apply_backend_changes();
+        return APIResponse\get(0, $this->validated_data);
+    }
+
+    public function validate_payload() {
+        $this->validated_data["dnsserver"] = $this->config["system"]["dnsserver"];
+        $this->__validate_dnsserver();
+    }
+
+    private function __validate_dnsserver() {
+        # Validate the optional `dnsserver` payload value
+        if (isset($this->initial_data['dnsserver'])) {
+            $del_server = $this->initial_data['dnsserver'];
+            $del_server = (!is_array($del_server)) ? array($del_server) : $del_server;
+
+            # Ensure our config is array
+            if (!is_array($this->validated_data["dnsserver"])) {
+                $this->validated_data["dnsserver"] = array($this->validated_data["dnsserver"]);
+            }
+
+            # Loop through each requested DNS server to delete
+            foreach ($del_server as $ds) {
+                # Loop through each server and check for matches, delete on match
+                foreach ($this->validated_data["dnsserver"] as $id => $cs) {
+                    if ($ds === $cs) {
+                        unset($this->validated_data["dnsserver"][$id]);
+                    }
+                }
+            }
+
+            # Ensure array values are unique, reindexed and purge duplicate items
+            $this->validated_data["dnsserver"] = array_filter($this->validated_data["dnsserver"]);
+            $this->validated_data["dnsserver"] = array_unique($this->validated_data["dnsserver"]);
+            $this->validated_data["dnsserver"] = array_values($this->validated_data["dnsserver"]);
+        }
+    }
+
+    public function apply_backend_changes() {
+        # Update a slew of backend services
         system_resolvconf_generate();
         if (isset($this->config['dnsmasq']['enable'])) {
             services_dnsmasq_configure();
         } elseif (isset($this->config['unbound']['enable'])) {
             services_unbound_configure();
         }
+
+        # Reload DNS services and firewall filter
         send_event("service reload dns");
         filter_configure();
-        return APIResponse\get(0, $this->validated_data);
-    }
-
-    public function validate_payload() {
-        if (isset($this->initial_data['dnsserver'])) {
-            $del_server = $this->initial_data['dnsserver'];
-            $curr_servers = $this->config["system"]["dnsserver"];
-            $del_server = (!is_array($del_server)) ? array($del_server) : $del_server;
-            foreach ($del_server as $ds) {
-                // Ensure our config is array
-                if (!is_array($curr_servers)) {
-                    $curr_servers = array($this->config["system"]["dnsserver"]);
-                }
-                // Loop through each server and check for matches, delete on match
-                foreach ($curr_servers as $id => $cs) {
-                    if ($ds === $cs) {
-                        $this->validated_data["dnsserver"][] = $ds;
-                        unset($this->config["system"]["dnsserver"][$id]);
-                    }
-                }
-            }
-        }
     }
 }
