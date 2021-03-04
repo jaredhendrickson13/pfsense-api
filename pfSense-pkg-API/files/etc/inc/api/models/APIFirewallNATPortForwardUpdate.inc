@@ -101,10 +101,8 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
     private function __validate_target() {
         # Optionally allow client to update internal target for the port forward
         if (isset($this->initial_data['target'])) {
-            # Require the target to either be a valid IPv4 or IPv6 address
-            if (is_ipaddrv4($this->initial_data['target'])) {
-                $this->validated_data["target"] = $this->initial_data['target'];
-            } elseif (alias_in_use($this->initial_data['target'])) {
+            # Require the target to either be a valid IPv4 or alias
+            if (in_array(is_ipaddroralias($this->initial_data['target']), [4, true])) {
                 $this->validated_data["target"] = $this->initial_data['target'];
             } else {
                 $this->errors[] = APIResponse\get(4009);
@@ -118,7 +116,7 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
             # Require client to pass in a local port to forward to the target
             if (isset($this->initial_data['local-port'])) {
                 # Require the port to be a valid TCP/UDP port or range
-                if (is_port_or_range(strval($this->initial_data['local-port']))) {
+                if (is_port_or_range_or_alias(strval($this->initial_data['local-port']))) {
                     $this->validated_data["local-port"] = $this->initial_data['local-port'];
                 } else {
                     $this->errors[] = APIResponse\get(4010);
@@ -173,7 +171,7 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
         if ($this->port_required or (isset($this->initial_data['srcport']) and $this->port_protocol)) {
             $this->initial_data['srcport'] = str_replace("-", ":", $this->initial_data['srcport']);
             # Require port to be a valid port or range, or be any
-            if (!is_port_or_range($this->initial_data['srcport']) and $this->initial_data['srcport'] !== "any") {
+            if (!is_port_or_range_or_alias($this->initial_data['srcport']) and $this->initial_data['srcport'] !== "any") {
                     $this->errors[] = APIResponse\get(4013);
             }
             # If our value is not any, replace the port range character with a - and save the value
@@ -188,7 +186,7 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
         if ($this->port_required or (isset($this->initial_data['dstport']) and $this->port_protocol)) {
             $this->initial_data['dstport'] = str_replace("-", ":", $this->initial_data['dstport']);
             # Require port to be a valid port or range, or be any
-            if (!is_port_or_range($this->initial_data['dstport']) and $this->initial_data['dstport'] !== "any") {
+            if (!is_port_or_range_or_alias($this->initial_data['dstport']) and $this->initial_data['dstport'] !== "any") {
                 $this->errors[] = APIResponse\get(4014);
             }
             # If our value is not any, replace the port range character with a - and save the value

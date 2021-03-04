@@ -58,8 +58,12 @@ function restore() {
 
     # Local Variables
     $api_conf = APITools\get_api_config();
-    $backup_api_conf_json = file_get_contents("/usr/local/share/pfSense-pkg-API/backup.json");
-    $backup_api_conf = json_decode($backup_api_conf_json, true);;
+
+    # Only retrieve file contents if it exists
+    if (is_file("/usr/local/share/pfSense-pkg-API/backup.json")) {
+        $backup_api_conf_json = file_get_contents("/usr/local/share/pfSense-pkg-API/backup.json");
+        $backup_api_conf = json_decode($backup_api_conf_json, true);;
+    }
 
     # Restore our API configuration if the backup exists
     if (!empty($backup_api_conf_json)) {
