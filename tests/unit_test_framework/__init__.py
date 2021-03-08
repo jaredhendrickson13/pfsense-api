@@ -29,12 +29,12 @@ class APIUnitTest:
     args = {}
     uid = str(uuid.uuid4())
     url = ""
-    exit_code = 1
     time_delay = 1
-    get_payloads = []
-    post_payloads = []
-    put_payloads = []
-    delete_payloads = []
+    exit_code = 0
+    get_tests = []
+    post_tests = []
+    put_tests = []
+    delete_tests = []
     get_responses = []
     post_responses = []
     put_responses = []
@@ -42,49 +42,175 @@ class APIUnitTest:
 
     # CLASS METHODS #
     def __init__(self):
-        signal.signal(signal.SIGINT, APIUnitTest.__safe_escape__)
         self.__start_argparse__()
         self.url = self.args.scheme + "://" + self.args.host + ":" + str(self.args.port) + self.url
         self.auth_payload = {"client-id": self.args.username, "client-token": self.args.password}
 
         # Run unit tests and exit on corresponding status code
-        self.post()
-        self.get()
-        self.put()
-        self.delete()
-        sys.exit(self.exit_code)
+        try:
+            self.post()
+            self.get()
+            self.put()
+            self.delete()
+            sys.exit(self.exit_code)
+        except KeyboardInterrupt:
+            sys.exit(1)
 
     def get(self):
         # Loop through each GET payload and check that it's response is expected
-        for payload in self.get_payloads:
+        for test_params in self.get_tests:
             self.pre_get()
-            self.get_responses.append(self.make_request("GET", payload))
+            self.get_responses.append(self.make_request("GET", test_params))
             self.post_get()
             time.sleep(self.time_delay)
 
     def post(self):
         # Loop through each POST payload and check that it's response is expected
-        for payload in self.post_payloads:
+        for test_params in self.post_tests:
             self.pre_post()
-            self.post_responses.append(self.make_request("POST", payload))
+            self.post_responses.append(self.make_request("POST", test_params))
             self.post_post()
             time.sleep(self.time_delay)
 
     def put(self):
         # Loop through each PUT payload and check that it's response is expected
-        for payload in self.put_payloads:
+        for test_params in self.put_tests:
             self.pre_put()
-            self.put_responses.append(self.make_request("PUT", payload))
+            self.put_responses.append(self.make_request("PUT", test_params))
             self.post_put()
             time.sleep(self.time_delay)
 
     def delete(self):
         # Loop through each DELETE payload and check that it's response is expected
-        for payload in self.delete_payloads:
+        for test_params in self.delete_tests:
             self.pre_delete()
-            self.delete_responses.append(self.make_request("DELETE", payload))
+            self.delete_responses.append(self.make_request("DELETE", test_params))
             self.post_delete()
             time.sleep(self.time_delay)
+
+    # PRE/POST REQUEST METHODS. These are intended to be overwritten by a child class.
+    def pre_post(self):
+        pass
+
+    def post_post(self):
+        pass
+
+    def pre_get(self):
+        pass
+
+    def post_get(self):
+        pass
+
+    def pre_put(self):
+        pass
+
+    def post_put(self):
+        pass
+
+    def pre_delete(self):
+        pass
+
+    def post_delete(self):
+        pass
+
+    def make_request(self, method, test_params):
+        # Create authentication payload for local authentication
+        if self.args.auth_mode == "local":
+            test_params["payload"] = test_params.get("payload", {})
+            test_params["payload"].update(self.auth_payload)
+            headers = {}
+        # Create authentication headers for token authentication
+        elif self.args.auth_mode == "token":
+            headers = {"Authorization": self.args.username + " " + self.args.password}
+        # Create authentication headers for JWT authentication
+        elif self.args.auth_mode == "jwt":
+            headers = {"Authorization": "Bearer " + self.__request_jwt__()}
+
+        # Attempt to make the API call, if the request times out print timeout error
+        try:
+            req = requests.request(
+                method,
+                url=self.url,
+                data=json.dumps(test_params.get("payload", {})),
+                verify=False,
+                timeout=self.args.timeout,
+                headers=headers
+            )
+        except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
+            print(self.__format_msg__(method, test_params, "Exceeded timeout of {t}s".format(t=self.args.timeout)))
+            return None
+
+        if self.check_response(req, test_params, verbose=self.args.verbose):
+            return req.json()
+
+    @staticmethod
+    def has_json_response(req):
+        # Check if our request's response is valid JSON
+        try:
+            req.json()
+            return True
+        except json.decoder.JSONDecodeError:
+            return False
+
+    @staticmethod
+    def has_correct_http_status(req, test_params):
+        # Check if our HTTP status was expect
+        if req != None and int(req.status_code) == int(test_params.get("status", 200)):
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def has_correct_return_code(req, test_params):
+        # Check if our HTTP status was expect
+        if APIUnitTest.has_json_response(req) and req.json()["return"] == test_params.get("return", 0):
+            return True
+        else:
+            return False
+
+    @staticmethod
+    def has_correct_resp_time(req, test_params):
+        # Check if response time is within an acceptable threshold. Allow within 1 second variance.
+        if req.elapsed.total_seconds() < test_params.get("resp_time", 2) + 1:
+            return True
+        else:
+            return False
+
+    def check_response(self, req, test_params, verbose=False):
+        # Local variables
+        valid = False
+
+        # Run each check and print the results
+        if not APIUnitTest.has_json_response(req):
+            msg = "Expected JSON response, received {content}".format(content=req.content)
+            print(self.__format_msg__(req.request.method, msg))
+        elif not APIUnitTest.has_correct_http_status(req, test_params):
+            received_status = req.status_code
+            expected_status = test_params.get("status", 200)
+            msg = "Expected status code {e}, received {r}".format(e=expected_status, r=received_status)
+            print(self.__format_msg__(req.request.method, test_params, msg))
+        elif not APIUnitTest.has_correct_return_code(req, test_params):
+            received_return = req.json()["return"]
+            expected_return = test_params.get("return", 0)
+            msg = "Expected return code {e}, received {r}".format(e=expected_return, r=received_return)
+            print(self.__format_msg__(req.request.method, test_params, msg))
+        elif not APIUnitTest.has_correct_resp_time(req, test_params):
+            received_resp_time = req.elapsed.total_seconds()
+            expected_resp_time = test_params.get("resp_time", 2)
+            msg = "Expected response time within {e}s, received {r}s".format(e=expected_resp_time, r=received_resp_time)
+            print(self.__format_msg__(req.request.method, test_params, msg, mode="warning"))
+        else:
+            print(self.__format_msg__(req.request.method, test_params, "Response is valid", mode="ok"))
+            valid = True
+
+        # Print request output if verbose mode
+        if verbose:
+            print("RESPONSE STATUS: " + str(req.status_code))
+            print("RESPONSE TIME: " + str(req.elapsed.total_seconds()) + "s")
+            print("RESPONSE DATA: " + req.content.decode())
+
+        self.exit_code = 1 if not valid else self.exit_code
+        return valid
 
     def __start_argparse__(self):
         # Custom port type for argparse
@@ -146,7 +272,7 @@ class APIUnitTest:
             '--timeout',
             dest="timeout",
             type=int,
-            default=10,
+            default=12,
             help="Connection timeout limit in seconds"
         )
         parser.add_argument(
@@ -158,76 +284,31 @@ class APIUnitTest:
         )
         self.args = parser.parse_args()
 
-    def make_request(self, method, payload):
-        success = False
-
-        # Create authentication payload for local authentication
-        if self.args.auth_mode == "local":
-            payload.update(self.auth_payload)
-            headers = {}
-        # Create authentication headers for token authentication
-        elif self.args.auth_mode == "token":
-            headers = {"Authorization": self.args.username + " " + self.args.password}
-        # Create authentication headers for JWT authentication
-        elif self.args.auth_mode == "jwt":
-            headers = {"Authorization": "Bearer " + self.__request_jwt__()}
-
-        try:
-            req = requests.request(
-                method,
-                url=self.url,
-                data=json.dumps(payload),
-                verify=False,
-                timeout=self.args.timeout,
-                headers=headers
-            )
-        except requests.exceptions.ConnectTimeout:
-            print(self.__format_msg__(method, "Connection timed out"))
-            return None
-
-        # Check if our HTTP status code is expected
-        if req is not None and req.status_code == 200:
-            # Try to decode our request as JSON
-            try:
-                req.json()
-                is_json = True
-            except json.decoder.JSONDecodeError:
-                is_json = False
-
-            # Check if our response is JSON, if so proceed. Otherwise set error.
-            if is_json:
-                # Check if our API responses return code is 0. Otherwise set error.
-                if req.json()["return"] == 0:
-                    msg = self.__format_msg__(method,  "Response is valid", error=False)
-                    success = True
-                else:
-                    msg = self.__format_msg__(method, "Received non-zero return " + str(req.json()["return"]))
-            else:
-                msg = self.__format_msg__(method, "Expected JSON response, recieved " + str(req.content))
-        else:
-            msg = self.__format_msg__(method, "Expected status code 200, received " + str(req.status_code))
-
-        # Print our message to the console, if an error occurred
-        print(msg)
-
-        # Print request output if verbose mode
-        if self.args.verbose:
-            print(req.content.decode())
-
-        # Set exit code to one if this test failed
-        if success:
-            self.exit_code = 0
-            return req.json()
-
-    def __format_msg__(self, method, descr, error=True):
+    def __format_msg__(self, method, test_params, result, mode="failed"):
         methods = {
             "GET": "\33[32mGET\33[0m",
             'POST': "\33[33mPOST\33[0m",
             'PUT': "\33[34mPUT\33[0m",
             'DELETE': "\33[31mDELETE\33[0m"
         }
-        msg = "\33[31mFAILED -->\33[0m" if error else "\33[32mOK ------>\33[0m"
-        msg = msg + " [ " + methods[method] + " " + self.url + " ]: " + descr
+
+        # Check the mode and format the message accordingly
+        if mode == "failed":
+            msg = "\33[31mFAILED -->\33[0m"
+        elif mode == "ok":
+            msg = "\33[32mOK ------>\33[0m"
+        elif mode == "warning":
+            msg = "\33[33mWARNING ->\33[0m"
+        else:
+            raise ValueError("Unknown `mode` provided to APIUnitTest.__format_msg__")
+
+        # Piece the message together
+        msg = msg + " [ {m} {u} ][{n}]: {r}".format(
+            m=methods[method],
+            u=self.url,
+            n=test_params.get("name", "Unnamed test"),
+            r=result
+        )
         return msg
 
     def __request_jwt__(self):
@@ -242,35 +323,3 @@ class APIUnitTest:
             return req.json()["data"]["token"]
         except Exception:
             return ""
-
-    @staticmethod
-    def __safe_escape__(signum, frame):
-        try:
-            os._exit(0)
-        except OSError:
-            sys.exit(0)
-
-    # PRE/POST REQUEST METHODS. These are intended to be overwritten by a child class.
-    def pre_post(self):
-        pass
-
-    def post_post(self):
-        pass
-
-    def pre_get(self):
-        pass
-
-    def post_get(self):
-        pass
-
-    def pre_put(self):
-        pass
-
-    def post_put(self):
-        pass
-
-    def pre_delete(self):
-        pass
-
-    def post_delete(self):
-        pass

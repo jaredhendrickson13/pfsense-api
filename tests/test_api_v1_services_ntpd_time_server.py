@@ -16,13 +16,29 @@ import unit_test_framework
 
 class APIUnitTestServicesNTPdTimeServer(unit_test_framework.APIUnitTest):
     url = "/api/v1/services/ntpd/time_server"
-    post_payloads = [
-        {"timeserver": "time.google.com", "ispool": False, "noselect": True, "prefer": False},
-        {"timeserver": "1.pfsense.pool.ntp.org", "ispool": True, "noselect": False, "prefer": True}
+    post_tests = [
+        {
+            "name": "Add an NTP time server",
+            "payload": {"timeserver": "time.google.com", "ispool": False, "noselect": True, "prefer": False}
+        },
+        {
+            "name": "Test timeserver host/IP validation",
+            "status": 400,
+            "return": 2051,
+            "payload": {"timeserver": 0.123, "ispool": True, "noselect": False, "prefer": True}
+        }
     ]
-    delete_payloads = [
-        {"timeserver": "time.google.com"},
-        {"timeserver": "1.pfsense.pool.ntp.org"}
+    delete_tests = [
+        {
+            "name": "Delete existing timeserver",
+            "payload": {"timeserver": "time.google.com"}
+        },
+        {
+            "name": "Test deleting non-existing timeserver",
+            "status": 400,
+            "return": 2053,
+            "payload": {"timeserver": "1.pfsense.pool.ntp.org"}
+        }
     ]
 
 

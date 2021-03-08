@@ -16,6 +16,8 @@ import unit_test_framework
 
 class APIUnitTestServicesRestart(unit_test_framework.APIUnitTest):
     url = "/api/v1/services/restart"
-    post_payloads = [{}]
+    post_tests = [
+        {"resp_time": 15}    # Allow up to 15 seconds for all services to restart
+    ]
 
 APIUnitTestServicesRestart()

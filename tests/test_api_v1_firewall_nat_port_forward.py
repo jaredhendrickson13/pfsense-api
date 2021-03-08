@@ -16,45 +16,54 @@ import unit_test_framework
 
 class APIUnitTestFirewallNATPortForward(unit_test_framework.APIUnitTest):
     url = "/api/v1/firewall/nat/port_forward"
-    get_payloads = [{}]
-    post_payloads = [
+    get_tests = [
+        {"name": "Read all NAT port forwards"}
+    ]
+    post_tests = [
         {
-            "interface": "WAN",
-            "protocol": "tcp",
-            "src": "any",
-            "srcport": "433",
-            "dst": "wanip",
-            "dstport": "443",
-            "target": "192.168.1.123",
-            "local-port": "443",
-            "natreflection": "purenat",
-            "descr": "Unit Test",
-            "nosync": True,
-            "top": True
+            "name": "Create NAT port forward",
+            "payload": {
+                "interface": "WAN",
+                "protocol": "tcp",
+                "src": "any",
+                "srcport": "433",
+                "dst": "wanip",
+                "dstport": "443",
+                "target": "192.168.1.123",
+                "local-port": "443",
+                "natreflection": "purenat",
+                "descr": "Unit Test",
+                "nosync": True,
+                "top": True
+            }
         }
     ]
-    put_payloads = [
+    put_tests = [
         {
-            "id": 0,
-            "interface": "WAN",
-            "protocol": "tcp",
-            "src": "!1.1.1.1/24",
-            "srcport": "any",
-            "dst": "wanip",
-            "dstport": 80,
-            "target": "192.168.1.1",
-            "local-port": "80",
-            "natreflection": "enable",
-            "descr": "Updated Unit Test",
-            "nosync": False,
-            "nordr": True,
-            "disabled": True,
-            "top": True,
-            "apply": True
+            "name": "Update NAT port forward and apply",
+            "payload": {
+                "id": 0,
+                "interface": "WAN",
+                "protocol": "tcp",
+                "src": "!1.1.1.1/24",
+                "srcport": "any",
+                "dst": "wanip",
+                "dstport": 80,
+                "target": "192.168.1.1",
+                "local-port": "80",
+                "natreflection": "enable",
+                "descr": "Updated Unit Test",
+                "nosync": False,
+                "nordr": True,
+                "disabled": True,
+                "top": True,
+                "apply": True
+            },
+            "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         }
     ]
-    delete_payloads = [
-        {"id": 0}
+    delete_tests = [
+        {"name": "Delete NAT port forward", "payload": {"id": 0}}
     ]
 
 APIUnitTestFirewallNATPortForward()

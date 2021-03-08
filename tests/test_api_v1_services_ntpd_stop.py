@@ -16,6 +16,6 @@ import unit_test_framework
 
 class APIUnitTestServicesNTPdStop(unit_test_framework.APIUnitTest):
     url = "/api/v1/services/ntpd/stop"
-    post_payloads = [{}]
+    post_tests = [{"name": "Stop the NTPd service"}]
 
 APIUnitTestServicesNTPdStop()

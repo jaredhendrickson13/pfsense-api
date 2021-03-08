@@ -16,31 +16,37 @@ import unit_test_framework
 
 class APIUnitTestServicesNTPd(unit_test_framework.APIUnitTest):
     url = "/api/v1/services/ntpd"
-    get_payloads = [{}]
-    put_payloads = [
+    get_tests = [{"name": "Read the NTPd configuration"}]
+    put_tests = [
         {
-            "interface": ["WAN", "em1", "lo0"],
-            "orphan": 15,
-            "timeservers": [{"timeserver": "2.pfsense.ntp.pool.org", "ispool": True}],
-            "logpeer": True,
-            "logsys": True,
-            "clockstats": True,
-            "peerstats": True,
-            "loopstats": True,
-            "statsgraph": True,
-            "leapsec": "Test leap year configuration"
+            "name": "Update the NTPd configuration to enable all options",
+            "payload": {
+                "interface": ["WAN", "em1", "lo0"],
+                "orphan": 15,
+                "timeservers": [{"timeserver": "2.pfsense.ntp.pool.org", "ispool": True}],
+                "logpeer": True,
+                "logsys": True,
+                "clockstats": True,
+                "peerstats": True,
+                "loopstats": True,
+                "statsgraph": True,
+                "leapsec": "Test leap year configuration"
+            },
         },
         {
-            "interface": ["wan", "lo0"],
-            "orphan": 12,
-            "timeservers": [{"timeserver": "ntp.pool.org", "ispool": True}],
-            "logpeer": False,
-            "logsys": False,
-            "clockstats": False,
-            "peerstats": False,
-            "loopstats": False,
-            "statsgraph": False,
-            "leapsec": ""
+            "name": "Update the NTPd configuration to disable all options",
+            "payload": {
+                "interface": ["wan", "lo0"],
+                "orphan": 12,
+                "timeservers": [{"timeserver": "ntp.pool.org", "ispool": True}],
+                "logpeer": False,
+                "logsys": False,
+                "clockstats": False,
+                "peerstats": False,
+                "loopstats": False,
+                "statsgraph": False,
+                "leapsec": ""
+            },
         },
     ]
 

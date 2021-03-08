@@ -16,6 +16,6 @@ import unit_test_framework
 
 class APIUnitTestServicesDpingerRestart(unit_test_framework.APIUnitTest):
     url = "/api/v1/services/dpinger/restart"
-    post_payloads = [{}]
+    post_tests = [{"name": "Restart the dpinger service"}]
 
 APIUnitTestServicesDpingerRestart()

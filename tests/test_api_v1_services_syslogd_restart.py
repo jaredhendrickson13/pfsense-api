@@ -16,6 +16,6 @@ import unit_test_framework
 
 class APIUnitTestServicesSyslogdRestart(unit_test_framework.APIUnitTest):
     url = "/api/v1/services/syslogd/restart"
-    post_payloads = [{}]
+    post_tests = [{}]
 
 APIUnitTestServicesSyslogdRestart()

@@ -16,10 +16,16 @@ import unit_test_framework
 
 class APIUnitTestFirewallStatesSize(unit_test_framework.APIUnitTest):
     url = "/api/v1/firewall/states/size"
-    get_payloads = [{}]
-    put_payloads = [
-        {"maximumstates": 20000},
-        {"maximumstates": "default"}
+    get_tests = [{"name": "Read firewall states size"}]
+    put_tests = [
+        {
+            "name": "Update firewall states size to 20000",
+            "payload": {"maximumstates": 20000}
+        },
+        {
+            "name": "Revert firewall states size to default",
+            "payload": {"maximumstates": "default"}
+        }
     ]
 
 APIUnitTestFirewallStatesSize()

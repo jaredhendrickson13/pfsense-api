@@ -16,6 +16,6 @@ import unit_test_framework
 
 class APIUnitTestServicesSSHdStart(unit_test_framework.APIUnitTest):
     url = "/api/v1/services/sshd/start"
-    post_payloads = [{}]
+    post_tests = [{}]
 
 APIUnitTestServicesSSHdStart()

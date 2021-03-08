@@ -16,6 +16,6 @@ import unit_test_framework
 
 class APIUnitTestStatusInterface(unit_test_framework.APIUnitTest):
     url = "/api/v1/status/interface"
-    get_payloads = [{}]
+    get_tests = [{}]
 
 APIUnitTestStatusInterface()

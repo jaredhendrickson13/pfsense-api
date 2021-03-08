@@ -16,6 +16,6 @@ import unit_test_framework
 
 class APIUnitTestServices(unit_test_framework.APIUnitTest):
     url = "/api/v1/services"
-    get_payloads = [{}]
+    get_tests = [{"name": "Read all services"}]
 
 APIUnitTestServices()

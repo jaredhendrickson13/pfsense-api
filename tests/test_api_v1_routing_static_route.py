@@ -16,15 +16,32 @@ import unit_test_framework
 
 class APIUnitTestRoutingStaticRoute(unit_test_framework.APIUnitTest):
     url = "/api/v1/routing/static_route"
-    get_payloads = [{}]
-    post_payloads = [
-        {"network": "172.16.172.0/29", "gateway": "WAN_DHCP", "disabled": True, "descr": "Unit Test"}
+    get_tests = [{"name": "Read all static routes"}]
+    post_tests = [
+        {
+            "name": "Create static route",
+            "payload": {"network": "172.16.172.0/29", "gateway": "WAN_DHCP", "disabled": True, "descr": "Unit Test"}
+        }
     ]
-    put_payloads = [
-        {"id": 0, "network": "172.16.173.0/29", "gateway": "WAN_DHCP", "disabled": True, "descr": "Updated Unit Test"}
+    put_tests = [
+        {
+            "name": "Update static route",
+            "payload": {
+                "id": 0,
+                "network": "172.16.173.0/29",
+                "gateway": "WAN_DHCP",
+                "disabled": True,
+                "descr": "Updated Unit Test"
+            },
+            "resp_time": 5    # Allow a few seconds to reload the routing table
+        },
     ]
-    delete_payloads = [
-        {"id": 0}
+    delete_tests = [
+        {
+            "name": "Delete static route",
+            "payload": {"id": 0},
+            "resp_time": 5    # Allow a few seconds to reload the routing table
+        }
     ]
 
 APIUnitTestRoutingStaticRoute()

@@ -16,6 +16,6 @@ import unit_test_framework
 
 class APIUnitTestServicesDDNS(unit_test_framework.APIUnitTest):
     url = "/api/v1/services/ddns"
-    get_payloads = [{}]
+    get_tests = [{"name": "Read DDNS service configuration"}]
 
 APIUnitTestServicesDDNS()

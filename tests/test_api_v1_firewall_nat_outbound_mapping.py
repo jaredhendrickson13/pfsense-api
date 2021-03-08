@@ -16,70 +16,84 @@ import unit_test_framework
 
 class APIUnitTestFirewallNATOutboundMapping(unit_test_framework.APIUnitTest):
     url = "/api/v1/firewall/nat/outbound/mapping"
-    get_payloads = [{}]
-    post_payloads = [
+    get_tests = [
+        {"name": "Read all outbound NAT mappings"}
+    ]
+    post_tests = [
         {
-            "interface": "WAN",
-            "protocol": "tcp",
-            "src": "any",
-            "srcport": 434,
-            "dst": "1.1.1.1",
-            "dstport": 443,
-            "target": "192.168.1.123/24",
-            "natport": 443,
-            "poolopts": "round-robin",
-            "descr": "Unit Test",
-            "nosync": True,
-            "top": True
+            "name": "Create port-based outbound NAT mapping",
+            "payload": {
+                "interface": "WAN",
+                "protocol": "tcp",
+                "src": "any",
+                "srcport": 434,
+                "dst": "1.1.1.1",
+                "dstport": 443,
+                "target": "192.168.1.123/24",
+                "natport": 443,
+                "poolopts": "round-robin",
+                "descr": "Unit Test",
+                "nosync": True,
+                "top": True
+            }
         },
         {
-            "interface": "WAN",
-            "protocol": "any",
-            "src": "any",
-            "dst": "1.1.1.1",
-            "target": "192.168.1.123/24",
-            "poolopts": "round-robin",
-            "descr": "Unit Test 2",
-            "nosync": True,
-            "top": True
+            "name": "Create non-port-based outbound NAT mapping",
+            "payload": {
+                "interface": "WAN",
+                "protocol": "any",
+                "src": "any",
+                "dst": "1.1.1.1",
+                "target": "192.168.1.123/24",
+                "poolopts": "round-robin",
+                "descr": "Unit Test 2",
+                "nosync": True,
+                "top": True
+            }
         }
     ]
-    put_payloads = [
+    put_tests = [
         {
-            "id": 0,
-            "interface": "WAN",
-            "protocol": "any",
-            "src": "any",
-            "dst": "1.1.1.1",
-            "target": "192.168.1.123/24",
-            "poolopts": "round-robin",
-            "descr": "Updated Unit Test",
-            "nonat": True,
-            "disabled": True,
-            "nosync": True,
-            "top": True
+            "name": "Update port-based outbound NAT mapping to non-port-based",
+            "payload": {
+                "id": 0,
+                "interface": "WAN",
+                "protocol": "any",
+                "src": "any",
+                "dst": "1.1.1.1",
+                "target": "192.168.1.123/24",
+                "poolopts": "round-robin",
+                "descr": "Updated Unit Test",
+                "nonat": True,
+                "disabled": True,
+                "nosync": True,
+                "top": True
+            }
         },
         {
-            "id": 1,
-            "interface": "WAN",
-            "protocol": "udp",
-            "src": "any",
-            "srcport": "433",
-            "dst": "1.1.1.1",
-            "dstport": "443",
-            "target": "192.168.1.123/24",
-            "staticnatport": True,
-            "poolopts": "round-robin",
-            "descr": "Updated Unit Test",
-            "nonat": False,
-            "disabled": True,
-            "nosync": True,
-            "top": True
+            "name": "Update non-port-based outbound NAT mapping to port-based",
+            "payload": {
+                "id": 1,
+                "interface": "WAN",
+                "protocol": "udp",
+                "src": "any",
+                "srcport": "433",
+                "dst": "1.1.1.1",
+                "dstport": "443",
+                "target": "192.168.1.123/24",
+                "staticnatport": True,
+                "poolopts": "round-robin",
+                "descr": "Updated Unit Test",
+                "nonat": False,
+                "disabled": True,
+                "nosync": True,
+                "top": True
+            }
         }
     ]
-    delete_payloads = [
-        {"id": 0},
-        {"id": 0}
+    delete_tests = [
+        {"name": "Delete non-port-based outbound NAT mapping", "payload": {"id": 0}},
+        {"name": "Delete port-based outbound NAT mapping", "payload": {"id": 0}},
     ]
 
 APIUnitTestFirewallNATOutboundMapping()

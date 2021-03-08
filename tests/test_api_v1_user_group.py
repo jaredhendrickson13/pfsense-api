@@ -2,16 +2,20 @@ import unit_test_framework
 
 class APIUnitTestUserGroup(unit_test_framework.APIUnitTest):
     url = "/api/v1/user/group"
-    post_payloads = [
+    post_tests = [
         {
-            "username": "admin",
-            "group": ["admins"]
+            "payload": {
+                "username": "admin",
+                "group": ["admins"]
+            }
         }
     ]
-    delete_payloads = [
+    delete_tests = [
         {
-            "username": "admin",
-            "group": ["admins"]
+            "payload": {
+                "username": "admin",
+                "group": ["admins"]
+            }
         }
     ]
 

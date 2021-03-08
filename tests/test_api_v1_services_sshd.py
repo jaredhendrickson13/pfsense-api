@@ -16,19 +16,23 @@ import unit_test_framework
 
 class APIUnitTestServicesSSHd(unit_test_framework.APIUnitTest):
     url = "/api/v1/services/sshd"
-    get_payloads = [{}]
-    put_payloads = [
+    get_tests = [{}]
+    put_tests = [
         {
-            "enable": False,
-            "sshdkeyonly": "both",
-            "sshdagentforwarding": False,
-            "port": 2222
+            "payload": {
+                "enable": False,
+                "sshdkeyonly": "both",
+                "sshdagentforwarding": False,
+                "port": 2222
+            }
         },
         {
-            "enable": True,
-            "sshdkeyonly": "disabled",
-            "sshdagentforwarding": True,
-            "port": 22
+            "payload": {
+                "enable": True,
+                "sshdkeyonly": "disabled",
+                "sshdagentforwarding": True,
+                "port": 22
+            }
         }
     ]
 

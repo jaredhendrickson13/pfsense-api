@@ -16,46 +16,61 @@ import unit_test_framework
 
 class APIUnitTestServicesDHCPdStaticMapping(unit_test_framework.APIUnitTest):
     url = "/api/v1/services/dhcpd/static_mapping"
-    get_payloads = [
+    get_tests = [
         {
-            "interface": "lan"
+            "name": "Read all DHCPd static mappings on the LAN interface",
+            "payload": {
+                "interface": "lan"
+            }
         }
     ]
-    post_payloads = [
+    post_tests = [
         {
-            "interface": "lan",
-            "mac": "ac:de:48:00:11:22",
-            "ipaddr": "192.168.1.254",
-            "cid": "a098b-zpe9s-1vr45",
-            "descr": "This is a DHCP static mapping created by pfSense API",
-            "hostname": "test-host",
-            "domain": "example.com",
-            "dnsserver": ["1.1.1.1"],
-            "domainsearchlist": ["example.com"],
-            "gateway": "192.168.1.1",
-            "arp_table_static_entry": True
+            "name": "Create DHCPd static mapping on the LAN interface",
+            "payload": {
+                "interface": "lan",
+                "mac": "ac:de:48:00:11:22",
+                "ipaddr": "192.168.1.254",
+                "cid": "a098b-zpe9s-1vr45",
+                "descr": "This is a DHCP static mapping created by pfSense API",
+                "hostname": "test-host",
+                "domain": "example.com",
+                "dnsserver": ["1.1.1.1"],
+                "domainsearchlist": ["example.com"],
+                "gateway": "192.168.1.1",
+                "arp_table_static_entry": True
+            },
+            "resp_time": 5    # Allow a few seconds to reload the DHCP service
         }
     ]
-    put_payloads = [
+    put_tests = [
         {
-            "id": 0,
-            "interface": "lan",
-            "mac": "ac:de:48:00:11:22",
-            "ipaddr": "192.168.1.250",
-            "cid": "updated-a098b-zpe9s-1vr45",
-            "descr": "This is an updated DHCP static mapping created by pfSense API",
-            "hostname": "updated-test-host",
-            "domain": "updated.example.com",
-            "dnsserver": ["8.8.8.8", "8.8.4.4", "1.1.1.1"],
-            "domainsearchlist": ["updated.example.com", "extra.example.com"],
-            "gateway": "192.168.1.2",
-            "arp_table_static_entry": False
+            "name": "Update DHCPd static mapping on the LAN interface",
+            "payload": {
+                "id": 0,
+                "interface": "lan",
+                "mac": "ac:de:48:00:11:22",
+                "ipaddr": "192.168.1.250",
+                "cid": "updated-a098b-zpe9s-1vr45",
+                "descr": "This is an updated DHCP static mapping created by pfSense API",
+                "hostname": "updated-test-host",
+                "domain": "updated.example.com",
+                "dnsserver": ["8.8.8.8", "8.8.4.4", "1.1.1.1"],
+                "domainsearchlist": ["updated.example.com", "extra.example.com"],
+                "gateway": "192.168.1.2",
+                "arp_table_static_entry": False
+            },
+            "resp_time": 5    # Allow a few seconds to reload the DHCP service
         }
     ]
-    delete_payloads = [
+    delete_tests = [
         {
-            "interface": "lan",
-            "id": 0
+            "name": "Delete DHCPd static mapping on the LAN interface",
+            "payload": {
+                "interface": "lan",
+                "id": 0
+            },
+            "resp_time": 5    # Allow a few seconds to reload the DHCP service
         }
     ]
 

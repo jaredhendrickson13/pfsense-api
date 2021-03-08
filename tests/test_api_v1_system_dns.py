@@ -2,17 +2,23 @@ import unit_test_framework
 
 class APIUnitTestSystemDNS(unit_test_framework.APIUnitTest):
     url = "/api/v1/system/dns"
-    get_payloads = [{}]
-    put_payloads = [
+    get_tests = [{}]
+    put_tests = [
         {
-            "dnsserver": ["8.8.4.4", "1.1.1.1", "8.8.8.8"],
-            "dnslocalhost": False,
-            "dnsallowoverride": False
+            "payload": {
+                "dnsserver": ["8.8.4.4", "1.1.1.1", "8.8.8.8"],
+                "dnslocalhost": False,
+                "dnsallowoverride": False
+            },
+            "resp_time": 10    # Allow a few seconds for DNS services to be reloaded
         },
         {
-            "dnsserver": ["8.8.8.8", "8.8.4.4"],
-            "dnslocalhost": True,
-            "dnsallowoverride": True
+            "payload": {
+                "dnsserver": ["8.8.8.8", "8.8.4.4"],
+                "dnslocalhost": True,
+                "dnsallowoverride": True
+            },
+            "resp_time": 10    # Allow a few seconds for DNS services to be reloaded
         }
     ]
 

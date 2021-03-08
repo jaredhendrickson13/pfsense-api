@@ -16,12 +16,14 @@ import unit_test_framework
 
 class APIUnitTestFirewallNATOutbound(unit_test_framework.APIUnitTest):
     url = "/api/v1/firewall/nat/outbound"
-    get_payloads = [{}]
-    put_payloads = [
-        {"mode": "hybrid"},
-        {"mode": "advanced"},
-        {"mode": "disabled"},
-        {"mode": "automatic"}
+    get_tests = [
+        {"name": "Read entire outbound NAT configuration"}
+    ]
+    put_tests = [
+        {"name": "Set outbound NAT mode to hybrid", "payload": {"mode": "hybrid"}},
+        {"name": "Set outbound NAT mode to advanced", "payload": {"mode": "advanced"}},
+        {"name": "Set outbound NAT mode to disabled", "payload": {"mode": "disabled"}},
+        {"name": "Set outbound NAT mode to automatic", "payload": {"mode": "automatic"}}
     ]
 
 APIUnitTestFirewallNATOutbound()

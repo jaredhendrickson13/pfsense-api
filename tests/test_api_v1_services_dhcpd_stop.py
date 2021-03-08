@@ -16,6 +16,6 @@ import unit_test_framework
 
 class APIUnitTestServicesDHCPdStop(unit_test_framework.APIUnitTest):
     url = "/api/v1/services/dhcpd/stop"
-    post_payloads = [{}]
+    post_tests = [{"name": "Stop the DHCPd service"}]
 
 APIUnitTestServicesDHCPdStop()

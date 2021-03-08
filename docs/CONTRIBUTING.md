@@ -371,43 +371,60 @@ class NewAPIUnitTest(unit_test_framework.APIUnitTest):
 #### Overriding Base Model Properties ####
 The APIUnitTest class requires you to override a some properties to function correctly:
 
-- `url` : A string specifying the URL this unit test will be testing<br>
-- `get_payloads` : A list of dictionary formatted API payloads to use when testing GET requests. If this endpoint does not
-support GET requests, you do not need to override this property. If this endpoint does support GET request, but does not
-require any payload data to receive a valid response you must set this value to `[{}]`
-- `post_payloads` : A list of dictionary formatted API payloads to use when testing POST requests. If this endpoint does 
-not support POST requests, you do not need to override this property. 
-- `put_payloads` : A list of dictionary formatted API payloads to use when testing PUT requests. If this endpoint does 
-not support PUT requests, you do not need to override this property. 
-- `delete_payloads` : A list of dictionary formatted API payloads to use when testing DELETE requests. If this endpoint does 
-not support DELETE requests, you do not need to override this property. 
+- `url` : A string specifying the URL this unit test will be testing
+- `time_delay` : An integer specifying how many seconds should be waited between requests. Defaults to `1`.
+- `get_tests` : A list of dictionary formatted test parameters for GET requests. If this endpoint does not support 
+GET requests, you do not need to override this property. If this endpoint does support GET request, but does not require
+any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
+    - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
+    - `payload` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
+    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
+    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
+    - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
+    
+- `post_tests` : A list of dictionary formatted test parameters for POST requests. If this endpoint does not support 
+POST requests, you do not need to override this property. If this endpoint does support POST request, but does not require
+any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
+    - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
+    - `payload` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
+    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
+    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
+    - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
+    
+- `put_tests` : A list of dictionary formatted test parameters for PUT requests. If this endpoint does not support 
+PUT requests, you do not need to override this property. If this endpoint does support PUT request, but does not require
+any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
+    - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
+    - `payload` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
+    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
+    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
+    - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
+
+- `delete_tests` : A list of dictionary formatted test parameters for DELETE requests. If this endpoint does not support 
+DELETE requests, you do not need to override this property. If this endpoint does support DELETE request, but does not require
+any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
+    - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
+    - `payload` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
+    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
+    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
+    - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
+    
 - `get_responses` : A list of previously executed GET requests in a dictionary format. Failing responses will not be 
 included.
+
 - `post_responses` : A list of previously executed POST requests in a dictionary format. Failing responses will not be 
 included.
+
 - `put_responses` : A list of previously executed PUT requests in a dictionary format. Failing responses will not be 
 included.
+
 - `delete_responses` : A list of previously executed DELETE requests in a dictionary format. Failing responses will not be 
 included.
 
-```python
-import unit_test_framework
+#### Other Base Model Properties
+The APIUnitTest class also contains a few properties that are not intended to be overridden:
 
-class NewAPIUnitTest(unit_test_framework.APIUnitTest):
-    url = "/api/v1/your_endpoint"
-    get_payloads = [{}]
-    post_payloads = [
-        {"some_parameter": "some value to create"},
-        {"some_parameter": "some other value to create"}
-    ]
-    put_payloads = [
-        {"some_parameter": "some value to update"},
-        {"some_parameter": "some other value to update"}
-    ]  
-    delete_payloads = [
-        {"some_parameter": "some value to delete"},
-    ]    
-```
+- `uid` : a unique ID that can be used for payload fields that required a unique value
 
 #### Overriding Base Model Methods ####
 There are methods that will assist you when you need to dynamically format API request data. These are typically used 
@@ -432,18 +449,52 @@ import unit_test_framework
 
 class NewAPIUnitTest(unit_test_framework.APIUnitTest):
     url = "/api/v1/your_endpoint"
-    get_payloads = [{}]
-    post_payloads = [
-        {"some_parameter": "some value to create"},
-        {"some_parameter": "some other value to create"}
-    ]
-    put_payloads = [
-        {"some_parameter": "some value to update"},
-        {"some_parameter": "some other value to update"}
+    get_requests = [{}]
+    post_requests = [
+        {   
+            "payload": {
+                "some_parameter": "some value to create"
+            },
+            "status": 400,
+            "return": 1,
+            "resp_time": 0.5
+        },
+        {   
+            "payload": {
+                "some_other parameter": "some other value to create"
+            },
+            "status": 200,
+            "return": 0,
+            "resp_time": 0.6
+        },    ]
+    put_requests = [
+        {   
+            "payload": {
+                "some_parameter": "some value to update"
+            },
+            "status": 400,
+            "return": 1,
+            "resp_time": 0.5
+        },
+        {   
+            "payload": {
+                "some_other parameter": "some other value to update"
+            },
+            "status": 200,
+            "return": 0,
+            "resp_time": 0.6
+        },  
     ]  
-    delete_payloads = [
-        {"some_parameter": "some value to delete"},
-    ]    
+    delete_requests = [
+        {   
+            "payload": {
+                "some_parameter": "some value to delete"
+            },
+            "status": 200,
+            "return": 0,
+            "resp_time": 0.5
+        },
+    ]     
 
 NewAPIUnitTest()
 ```
@@ -457,7 +508,9 @@ Or you may run all the unit tests by running:<br>
 Unit tests will check API responses for the following:
 - Ability to connect to API endpoint
 - API responses properly return data in a JSON format
-- API payloads return a 200 OK response
+- API responses include the correct HTTP status code
+- API responses include the expected API return code
+- API responses are received within an acceptable time frame
 - CRUD success. POST requests are always run first, then GET requests to check that the creation was successful, then
 PUT requests attempt to update the created object, then finally DELETE requests attempt to destroy the object. 
 

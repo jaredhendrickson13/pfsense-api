@@ -2,16 +2,20 @@ import unit_test_framework
 
 class APIUnitTestUserPrivilege(unit_test_framework.APIUnitTest):
     url = "/api/v1/user/privilege"
-    post_payloads = [
+    post_tests = [
         {
-            "username": "admin",
-            "priv": ["page-all", "page-system-usermanager"]
+            "payload": {
+                "username": "admin",
+                "priv": ["page-all", "page-system-usermanager"]
+            }
         }
     ]
-    delete_payloads = [
+    delete_tests = [
         {
-            "username": "admin",
-            "priv": "page-system-usermanager"
+            "payload": {
+                "username": "admin",
+                "priv": ["page-system-usermanager"]
+            }
         }
     ]
 
