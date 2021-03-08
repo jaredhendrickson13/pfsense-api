@@ -62,7 +62,9 @@ class APIUnitTest:
             self.pre_get()
             self.get_responses.append(self.make_request("GET", test_params))
             self.post_get()
-            time.sleep(self.time_delay)
+            # For speed, only delay time if test is a non-200 OK test
+            if test_params.get("status", 200) == 200:
+                time.sleep(self.time_delay)
 
     def post(self):
         # Loop through each POST payload and check that it's response is expected
@@ -70,24 +72,27 @@ class APIUnitTest:
             self.pre_post()
             self.post_responses.append(self.make_request("POST", test_params))
             self.post_post()
-            time.sleep(self.time_delay)
-
+            # For speed, only delay time if test is a non-200 OK test
+            if test_params.get("status", 200) == 200:
+                time.sleep(self.time_delay)
     def put(self):
         # Loop through each PUT payload and check that it's response is expected
         for test_params in self.put_tests:
             self.pre_put()
             self.put_responses.append(self.make_request("PUT", test_params))
             self.post_put()
-            time.sleep(self.time_delay)
-
+            # For speed, only delay time if test is a non-200 OK test
+            if test_params.get("status", 200) == 200:
+                time.sleep(self.time_delay)
     def delete(self):
         # Loop through each DELETE payload and check that it's response is expected
         for test_params in self.delete_tests:
             self.pre_delete()
             self.delete_responses.append(self.make_request("DELETE", test_params))
             self.post_delete()
-            time.sleep(self.time_delay)
-
+            # For speed, only delay time if test is a non-200 OK test
+            if test_params.get("status", 200) == 200:
+                time.sleep(self.time_delay)
     # PRE/POST REQUEST METHODS. These are intended to be overwritten by a child class.
     def pre_post(self):
         pass

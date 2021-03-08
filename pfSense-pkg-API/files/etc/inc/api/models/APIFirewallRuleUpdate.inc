@@ -161,14 +161,14 @@ class APIFirewallRuleUpdate extends APIModel {
     }
 
     private function __validate_dst() {
-        # Check for our optional 'src' payload value
+        # Check for our optional 'dst' payload value
         if (isset($this->initial_data['dst'])) {
             # Check if our source and destination values are valid
             $dir_check = APITools\is_valid_rule_addr($this->initial_data['dst'], "destination");
             if ($dir_check["valid"] === true) {
                 $this->validated_data = array_merge($this->validated_data, $dir_check["data"]);
             } else {
-                $this->errors[] = APIResponse\get(4049);
+                $this->errors[] = APIResponse\get(4045);
             }
         }
     }
@@ -195,7 +195,7 @@ class APIFirewallRuleUpdate extends APIModel {
             if (isset($this->initial_data['dstport'])) {
                 $val = str_replace("-", ":", $this->initial_data['dstport']);
                 if (!is_port_or_range_or_alias($val) and $val !== "any") {
-                    $this->errors[] = APIResponse\get(4048);
+                    $this->errors[] = APIResponse\get(4049);
                 } elseif ($val !== "any") {
                     $this->validated_data["destination"]["port"] = str_replace(":", "-", $val);;
                 }
