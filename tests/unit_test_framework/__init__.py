@@ -171,7 +171,7 @@ class APIUnitTest:
     @staticmethod
     def has_correct_resp_time(req, test_params):
         # Check if response time is within an acceptable threshold. Allow within 1 second variance.
-        if req.elapsed.total_seconds() < test_params.get("resp_time", 2) + 1:
+        if req.elapsed.total_seconds() < test_params.get("resp_time", 1) + 1:
             return True
         else:
             return False
@@ -196,7 +196,7 @@ class APIUnitTest:
             print(self.__format_msg__(req.request.method, test_params, msg))
         elif not APIUnitTest.has_correct_resp_time(req, test_params):
             received_resp_time = req.elapsed.total_seconds()
-            expected_resp_time = test_params.get("resp_time", 2)
+            expected_resp_time = test_params.get("resp_time", 1)
             msg = "Expected response time within {e}s, received {r}s".format(e=expected_resp_time, r=received_resp_time)
             print(self.__format_msg__(req.request.method, test_params, msg, mode="warning"))
         else:

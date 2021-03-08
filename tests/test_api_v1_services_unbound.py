@@ -14,8 +14,10 @@
 
 import unit_test_framework
 
+
 class APIUnitTestServicesUnbound(unit_test_framework.APIUnitTest):
     url = "/api/v1/services/unbound"
-    get_tests = [{}]
+    get_tests = [{"name": "Read the Unbound configuration"}]
+
 
 APIUnitTestServicesUnbound()

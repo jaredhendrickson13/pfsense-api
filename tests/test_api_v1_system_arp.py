@@ -1,10 +1,15 @@
 import unit_test_framework
 
+
 class APIUnitTestSystemARP(unit_test_framework.APIUnitTest):
     url = "/api/v1/system/arp"
-    get_tests = [{}]
+    get_tests = [{"name": "Read the ARP table"}]
     delete_tests = [
-        {"payload": {"ip": "127.0.0.1"}}
+        {
+            "name": "Delete ARP table entry",
+            "payload": {"ip": "127.0.0.1"}
+        }
     ]
+
 
 APIUnitTestSystemARP()

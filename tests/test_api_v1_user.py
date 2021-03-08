@@ -2,9 +2,10 @@ import unit_test_framework
 
 class APIUnitTestUser(unit_test_framework.APIUnitTest):
     url = "/api/v1/user"
-    get_tests = [{}]
+    get_tests = [{"name": "Read local users"}]
     post_tests = [
         {
+            "name": "Create local user",
             "payload": {
                 "disabled": True,
                 "username": "new_user",
@@ -19,6 +20,7 @@ class APIUnitTestUser(unit_test_framework.APIUnitTest):
     ]
     put_tests = [
         {
+            "name": "Update local user",
             "payload": {
                 "disabled": False,
                 "username": "new_user",
@@ -33,7 +35,11 @@ class APIUnitTestUser(unit_test_framework.APIUnitTest):
 
     ]
     delete_tests = [
-        {"payload": {"username": "new_user"}}
+        {
+            "name": "Delete local user",
+            "payload": {"username": "new_user"}
+        }
     ]
+
 
 APIUnitTestUser()

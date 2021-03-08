@@ -14,8 +14,10 @@
 
 import unit_test_framework
 
+
 class APIUnitTestServicesSyslogdStart(unit_test_framework.APIUnitTest):
     url = "/api/v1/services/syslogd/start"
-    post_tests = [{}]
+    post_tests = [{"name": "Start the syslogd service"}]
+
 
 APIUnitTestServicesSyslogdStart()

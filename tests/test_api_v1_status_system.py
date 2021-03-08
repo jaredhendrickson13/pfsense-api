@@ -14,10 +14,15 @@
 
 import unit_test_framework
 
+
 class APIUnitTestStatusSystem(unit_test_framework.APIUnitTest):
     url = "/api/v1/status/system"
     get_tests = [
-        {"resp_time": 8}
+        {
+            "name": "Read the system status",
+            "resp_time": 8
+        }
     ]
+
 
 APIUnitTestStatusSystem()

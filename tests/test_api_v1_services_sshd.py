@@ -16,9 +16,10 @@ import unit_test_framework
 
 class APIUnitTestServicesSSHd(unit_test_framework.APIUnitTest):
     url = "/api/v1/services/sshd"
-    get_tests = [{}]
+    get_tests = [{"name": "Read SSHd configuration"}]
     put_tests = [
         {
+            "name": "Update and disable SSHd",
             "payload": {
                 "enable": False,
                 "sshdkeyonly": "both",
@@ -27,6 +28,7 @@ class APIUnitTestServicesSSHd(unit_test_framework.APIUnitTest):
             }
         },
         {
+            "name": "Update and enabled SSHd",
             "payload": {
                 "enable": True,
                 "sshdkeyonly": "disabled",

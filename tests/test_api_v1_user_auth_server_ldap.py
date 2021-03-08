@@ -1,10 +1,12 @@
 import unit_test_framework
 
+
 class APIUnitTestUserAuthServerLDAP(unit_test_framework.APIUnitTest):
     url = "/api/v1/user/auth_server/ldap"
-    get_tests = [{}]
+    get_tests = [{"name": "Read LDAP auth servers"}]
     post_tests = [
         {
+            "name": "Create LDAP auth server",
             "payload": {
                 "name": "TEST_AUTHSERVER",
                 "host": "ldap.com",
@@ -26,7 +28,11 @@ class APIUnitTestUserAuthServerLDAP(unit_test_framework.APIUnitTest):
         }
     ]
     delete_tests = [
-        {"payload": {"name": "TEST_AUTHSERVER"}}
+        {
+            "name": "Delete LDAP auth server",
+            "payload": {"name": "TEST_AUTHSERVER"}
+        }
     ]
+
 
 APIUnitTestUserAuthServerLDAP()
