@@ -126,7 +126,7 @@ class APIUserCreate extends APIModel {
     private function __validate_authorizedkeys() {
         # Check for our optional `authorizedkeys` payload value
         if (isset($this->initial_data['authorizedkeys'])) {
-            $this->validated_data["authorizedkeys"] = $this->initial_data['authorizedkeys'];
+            $this->validated_data["authorizedkeys"] = base64_encode($this->initial_data['authorizedkeys']);
         }
     }
 
