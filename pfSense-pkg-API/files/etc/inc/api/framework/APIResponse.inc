@@ -1598,7 +1598,7 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "User privilege must be type array or string"
+            "message" => "System users cannot be deleted"
         ],
         5006 => [
             "status" => "bad request",
