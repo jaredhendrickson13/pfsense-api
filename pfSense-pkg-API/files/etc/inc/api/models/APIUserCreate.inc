@@ -74,6 +74,29 @@ class APIUserCreate extends APIModel {
         }
     }
 
+    private function __validate_priv() {
+        global $priv_list;
+        $this->validated_data["priv"] = [];
+
+        # Check for our optional `priv` payload value
+        if ($this->initial_data["priv"]) {
+            # Ensure value is an array
+            if (!is_array($this->initial_data["priv"])) {
+                $this->initial_data["priv"] = array($this->initial_data["priv"]);
+            }
+
+             # Loop through each requested privilege and ensure it exists
+            foreach ($this->initial_data["priv"] as $priv) {
+                if (array_key_exists($priv, $priv_list)) {
+                    $this->validated_data["priv"][] = $priv;
+                } else {
+                    $this->errors[] = APIResponse\get(5006);
+                    break;
+                }
+            }
+        }
+    }
+
     private function __validate_disabled() {
         # Check for our optional `disabled` payload value
         if ($this->initial_data["disabled"] === true) {
@@ -123,11 +146,11 @@ class APIUserCreate extends APIModel {
         # Set static object values
         $this->validated_data["uid"] = $this->config["system"]["nextuid"];
         $this->validated_data["scope"] = "user";
-        $this->validated_data["priv"] = [];
 
         # Run each validation method
         $this->__validate_username();
         $this->__validate_password();
+        $this->__validate_priv();
         $this->__validate_descr();
         $this->__validate_disabled();
         $this->__validate_expires();
@@ -137,10 +160,10 @@ class APIUserCreate extends APIModel {
 
     public function is_username_reserved($user) {
         # Open the /etc/passwd file to read all system users
-        $etc_passwd = explode(PHP_EOL, file_get_contents("/etc/passwd"));
+        $sys_users = explode(PHP_EOL, file_get_contents("/etc/passwd"));
 
         # Loop through each system user and check if the username is reserved
-        foreach ($etc_passwd as $sys_user_ent) {
+        foreach ($sys_users as $sys_user_ent) {
             $sys_username = explode(":", $sys_user_ent)[0];
             if ($sys_username == $user) {
                 return true;
@@ -148,5 +171,4 @@ class APIUserCreate extends APIModel {
         }
         return false;
     }
-
 }
