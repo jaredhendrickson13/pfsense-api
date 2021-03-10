@@ -45,7 +45,7 @@ class APIUserCreate extends APIModel {
                     # Ensure username is not reserved by the system
                     if (!$this->is_username_reserved($this->initial_data["username"])) {
                         # Ensure username is not longer that 32 characters
-                        if (strlen($this->initial_data["username"]) > 32) {
+                        if (strlen($this->initial_data["username"]) <= 32) {
                             $this->validated_data["name"] = $this->initial_data['username'];
                         } else {
                             $this->errors[] = APIResponse\get(5038);

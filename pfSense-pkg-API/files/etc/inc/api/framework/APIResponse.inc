@@ -1934,7 +1934,7 @@ function get($id, $data=[], $all=false) {
 
 
     ];
-    $response = $responses[(!array_key_exists($id, $responses)) ? $id : 1];
+    $response = $responses[(array_key_exists($id, $responses)) ? $id : 1];
     $response["data"] = $data;
     if ($all === true) {
         $response = $responses;
