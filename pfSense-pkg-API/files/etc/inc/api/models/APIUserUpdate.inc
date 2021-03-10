@@ -76,6 +76,7 @@ class APIUserUpdate extends APIModel {
             foreach ($this->initial_data["priv"] as $priv) {
                 if (array_key_exists($priv, $priv_list)) {
                     $this->validated_data["priv"][] = $priv;
+                    $this->validated_data["priv"] = array_unique($this->validated_data["priv"]);
                 } else {
                     $this->errors[] = APIResponse\get(5006);
                     break;
