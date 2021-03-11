@@ -23,50 +23,52 @@ class APIUserPrivilegeDelete extends APIModel {
         $this->privileges = ["page-all", "page-system-usermanager-addprivs"];
         $this->change_note = "Deleted privileges for user via API";
     }
-
     public function action() {
-        $user_config =& getUserEntry($this->validated_data["username"]);
-        $user_id = index_users()[$this->validated_data["username"]];    // Save our user's array index ID
-        local_user_set($user_config);    // Set user backend parameters
-        $this->config["system"]["user"][$user_id] = $user_config;    // Add our new config
-        $this->write_config();    // Write to config
+        $this->config["system"]["user"][$this->id]["priv"] = $this->validated_data["priv"];
+        $this->write_config();
+        local_user_set($this->validated_data);
         return APIResponse\get(0, $this->validated_data["priv"]);
     }
 
     public function validate_payload() {
-        global $priv_list;
+        $this->__validate_username();
+        $this->__validate_priv();
+    }
+
+    private function __validate_username() {
+        # Check for our required `username` payload value
         if (isset($this->initial_data['username'])) {
-            $this->validated_data["username"] = $this->initial_data['username'];
-            $this->validated_data["username"] = trim($this->validated_data["username"]);
+            # Loop through each configured user and check if this user exists
+            foreach ($this->config["system"]["user"] as $id=>$user) {
+                if ($this->initial_data["username"] === $user["name"]) {
+                    $this->validated_data = $user;
+                    $this->id = intval($id);
+                }
+            }
+            # Set an error if no user was found
+            if (!isset($this->validated_data["uid"])) {
+                $this->errors[] = APIResponse\get(5001);
+            }
         } else {
             $this->errors[] = APIResponse\get(5000);
         }
-        if (isset($this->initial_data['priv'])) {
-            $this->validated_data["priv"] = $this->initial_data['priv'];
-        } else {
-            $this->errors[] = APIResponse\get(5004);
-        }
-        // Check if our user already exists, if so exit on non-zero
-        $user_config =& getUserEntry($this->validated_data["username"]);
-        if (!array_key_exists("uid", $user_config)) {
-            $this->errors[] = APIResponse\get(5002);
-        }
-        // Ensure our new priv is array, if it is a string create an array containing the string
-        if (is_string($this->validated_data["priv"])) {
-            $this->validated_data["priv"] = array($this->validated_data["priv"]);
-        }
-        if (is_array($this->validated_data["priv"])) {
-            // Loop through our new priv list and check that the privs are valid
-            foreach ($this->validated_data["priv"] as $dp) {
-                if (!array_key_exists($dp, $priv_list)) {
-                    $this->errors[] = APIResponse\get(5006);
-                }
-                if (in_array($dp, $user_config["priv"])) {
-                    $user_config["priv"] = \array_diff($user_config["priv"], array($dp));
+    }
+
+    private function __validate_priv() {
+        # Check for our optional `priv` payload value
+        if ($this->initial_data["priv"]) {
+            # Ensure value is an array
+            if (!is_array($this->initial_data["priv"])) {
+                $this->initial_data["priv"] = array($this->initial_data["priv"]);
+            }
+
+            # Loop through each of the user's stored privileges and remove it if matched
+            foreach ($this->validated_data["priv"] as $id=>$priv) {
+                # Check if this privilege is one that is being requested to remove
+                if (in_array($priv, $this->initial_data["priv"])) {
+                    unset($this->validated_data["priv"][$id]);
                 }
             }
-        } else {
-            $this->errors[] = APIResponse\get(5005);
         }
     }
 }

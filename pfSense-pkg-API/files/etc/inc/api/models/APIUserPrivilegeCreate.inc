@@ -25,42 +25,68 @@ class APIUserPrivilegeCreate extends APIModel {
     }
 
     public function action() {
-        local_user_set($this->validated_data["user_config"]);    // Set user backend parameters
+        $this->config["system"]["user"][$this->id]["priv"] = $this->validated_data["priv"];
         $this->write_config();
-        return APIResponse\get(0, $this->validated_data["user_config"]["priv"]);
+        local_user_set($this->validated_data);
+        return APIResponse\get(0, $this->validated_data["priv"]);
     }
 
     public function validate_payload() {
-        global $priv_list;
+        $this->__validate_username();
+        $this->__validate_priv();
+    }
+
+    private function __validate_username() {
+        # Check for our required `username` payload value
         if (isset($this->initial_data['username'])) {
-            $this->validated_data["username"] = trim($this->initial_data['username']);
-            $this->validated_data["user_config"] =& getUserEntry($this->validated_data["username"]);
-            if (!array_key_exists("uid", $this->validated_data["user_config"])) {
+            # Loop through each configured user and check if this user exists
+            foreach ($this->config["system"]["user"] as $id=>$user) {
+                if ($this->initial_data["username"] === $user["name"]) {
+                    $this->validated_data = $user;
+                    $this->id = intval($id);
+                }
+            }
+            # Set an error if no user was found
+            if (!isset($this->validated_data["uid"])) {
                 $this->errors[] = APIResponse\get(5001);
             }
         } else {
             $this->errors[] = APIResponse\get(5000);
         }
-        if (isset($this->initial_data['priv'])) {
-            // Ensure our new priv is array, if it is a string create an array containing the string
-            if (is_string($this->initial_data["priv"])) {
+    }
+
+    private function __validate_priv() {
+        global $priv_list;
+        $this->__init_config();
+
+        # Check for our optional `priv` payload value
+        if ($this->initial_data["priv"]) {
+            # Ensure value is an array
+            if (!is_array($this->initial_data["priv"])) {
                 $this->initial_data["priv"] = array($this->initial_data["priv"]);
             }
-            if (is_array($this->initial_data["priv"])) {
-                // Loop through our new priv list and check that the privs are valid
-                foreach ($this->initial_data["priv"] as $np) {
-                    if (!array_key_exists($np, $priv_list)) {
-                        $this->errors[] = APIResponse\get(5006);
-                    }
-                    if (!in_array($np, $this->validated_data["user_config"]["priv"])) {
-                        $this->validated_data["user_config"]["priv"][] = $np;
-                    }
+
+            # Loop through each requested privilege and ensure it exists
+            foreach ($this->initial_data["priv"] as $priv) {
+                if (array_key_exists($priv, $priv_list)) {
+                    $this->validated_data["priv"][] = $priv;
+                    $this->validated_data["priv"] = array_unique($this->validated_data["priv"]);
+                } else {
+                    $this->errors[] = APIResponse\get(5006);
+                    break;
                 }
-            } else {
-                $this->errors[] = APIResponse\get(5005);
             }
-        } else {
-            $this->errors[] = APIResponse\get(5004);
+        }
+    }
+
+    private function __init_config() {
+        # Initialize the priv array if the user does not already have one
+        if (empty($this->validated_data["priv"])) {
+            $this->validated_data["priv"] = [];
+        }
+        # If the user has a priv set, but as a string, convert it to an array
+        elseif (is_string($this->validated_data["priv"])) {
+            $this->validated_data["priv"] = array($this->validated_data["priv"]);
         }
     }
 }
