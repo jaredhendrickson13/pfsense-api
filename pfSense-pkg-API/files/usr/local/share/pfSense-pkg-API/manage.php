@@ -81,8 +81,9 @@ function restore() {
 }
 
 function update() {
+    $pf_version = substr(file_get_contents("/etc/version"), 0, 3);
     echo shell_exec("/usr/sbin/pkg delete -y pfSense-pkg-API");
-    echo shell_exec("/usr/sbin/pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.4-pkg-API.txz");
+    echo shell_exec("/usr/sbin/pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-".$pf_version."-pkg-API.txz");
     echo shell_exec("/etc/rc.restart_webgui");
 }
 
