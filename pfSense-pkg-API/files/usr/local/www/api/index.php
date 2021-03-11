@@ -176,7 +176,7 @@ $general_section->addInput(new Form_Checkbox(
 $general_section->addInput(new Form_Select(
     'allowed_interfaces',
     'Network Interfaces',
-    $pkg_config["allowed_interfaces"],
+    explode(",", $pkg_config["allowed_interfaces"]),
     array_merge(["any" => "Any", "localhost" => "Link-local"], get_configured_interface_with_descr(true)),
     true
 ))->setHelp(
