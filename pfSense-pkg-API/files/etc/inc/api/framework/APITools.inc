@@ -1050,6 +1050,35 @@ function is_ip_subnet_or_alias($value) {
     }
 }
 
+# Checks if a given IP is within a given CIDR
+function is_ip_in_cidr($ip, $cidr) {
+    # Use IP2Long to determine if a specified IP is within a specified cidr
+    $subnet = explode('/', $cidr)[0];
+    $subnet = ip2long($subnet);
+    $bits = (!is_null(explode('/', $cidr)[1])) ? explode('/', $cidr)[1] : 32;
+    $ip = ip2long($ip);
+    $mask = -1 << (32 - $bits);
+    $subnet &= $mask;
+    return ($ip & $mask) == $subnet;
+}
+
+# Check if a specified IP is a configured virtual IP
+function is_ip_vip($ip, $if=null) {
+    global $config;
+
+    # Loop through each configured virtual IP
+    foreach ($config["virtualip"]["vip"] as $vip) {
+        # Check if this VIPs interface matches the requested interface, or any if none was specified
+        if ($vip["interface"] === $if or $if === null) {
+            # Check if the specified IP is contained in this VIP
+            if (is_ip_in_cidr($ip, $vip["subnet"]."/".$vip["subnet_bits"])) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 # Checks if an array is a associative array. Returns true if assoc, false if numeric, or null if not array
 function is_assoc_array($array, $strict_seq=false) {
     # Local variables

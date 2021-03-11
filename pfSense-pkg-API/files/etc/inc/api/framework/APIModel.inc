@@ -141,17 +141,17 @@ class APIModel {
         $allow_ifs = $pkg_conf["allowed_interfaces"];
         $whitelist = explode(",", $allow_ifs);
 
-        // Check if our server IP is in our whitelist
+        # Check if our server IP is in our whitelist
         foreach ($whitelist as $wif) {
             $if_info = get_interface_info($wif);
-            // Check if our server IP is a valid if address, localhost, or any
-            if ($_SERVER["SERVER_ADDR"] === $if_info["ipaddr"]) {
+            # Check if our server IP is a valid if address, VIP, localhost, or any
+            if ($_SERVER["SERVER_ADDR"] === $if_info["ipaddr"] or APITools\is_ip_vip($_SERVER["SERVER_ADDR"], $wif)) {
                 return;
             } elseif ($_SERVER["SERVER_ADDR"] === $if_info["ipaddrv6"]) {
                 return;
             } elseif (in_array($_SERVER["SERVER_ADDR"], ["::1", "127.0.0.1", "localhost"]) and $wif === "localhost") {
                 return;
-            }elseif ($wif === "any") {
+            } elseif ($wif === "any") {
                 return;
             }
         }
