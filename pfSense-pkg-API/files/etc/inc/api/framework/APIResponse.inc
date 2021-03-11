@@ -1640,6 +1640,78 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall rule gateway must match IP protocol"
         ],
+        4110 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper interface is required"
+        ],
+        4111 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall traffic shaper interface"
+        ],
+        4112 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper already exists for this interface"
+        ],
+        4113 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper scheduler is required"
+        ],
+        4114 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall traffic shaper scheduler"
+        ],
+        4115 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper bandwidth type is required"
+        ],
+        4116 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall traffic shaper bandwidth type"
+        ],
+        4117 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper bandwidth is required"
+        ],
+        4118 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper bandwidth must be 1 or greater"
+        ],
+        4119 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper bandwidth must be 100 or less with % bandwidth type"
+        ],
+        4120 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue limit must be 1 or greater"
+        ],
+        4121 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper TBR size must be 1 or greater"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [
