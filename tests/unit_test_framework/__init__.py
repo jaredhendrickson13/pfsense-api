@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pfsense_vshell
 import requests
 import argparse
 import json
@@ -122,14 +123,16 @@ class APIUnitTest:
         # Create authentication payload for local authentication
         if self.args.auth_mode == "local":
             test_params["payload"] = test_params.get("payload", {})
-            test_params["payload"].update(self.auth_payload)
+            test_params["payload"].update(test_params.get("auth_payload", self.auth_payload))
             headers = {}
         # Create authentication headers for token authentication
         elif self.args.auth_mode == "token":
             headers = {"Authorization": self.args.username + " " + self.args.password}
         # Create authentication headers for JWT authentication
         elif self.args.auth_mode == "jwt":
-            headers = {"Authorization": "Bearer " + self.__request_jwt__()}
+            headers = {
+                "Authorization": "Bearer " + self.__request_jwt__(test_params.get("auth_payload", self.auth_payload))
+            }
 
         # Attempt to make the API call, if the request times out print timeout error
         try:
@@ -316,12 +319,12 @@ class APIUnitTest:
         )
         return msg
 
-    def __request_jwt__(self):
+    def __request_jwt__(self, auth_payload):
         try:
             req = requests.request(
                 "POST",
                 url=self.args.scheme + "://" + self.args.host + ":" + str(self.args.port) + "/api/v1/access_token",
-                data=json.dumps({"client-id": self.args.username, "client-token": self.args.password}),
+                data=json.dumps(auth_payload),
                 verify=False,
                 timeout=self.args.timeout
             )

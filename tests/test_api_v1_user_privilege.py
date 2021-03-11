@@ -8,7 +8,29 @@ class APIUnitTestUserPrivilege(unit_test_framework.APIUnitTest):
             "name": "Grant user privileges",
             "payload": {
                 "username": "admin",
-                "priv": ["page-all", "page-system-usermanager"]
+                "priv": ["page-all", "page-system-api"]
+            }
+        },
+        {
+            "name": "Check username requirement",
+            "status": 400,
+            "return": 5000,
+        },
+        {
+            "name": "Check non-existing username",
+            "status": 400,
+            "return": 5001,
+            "payload": {
+                "username": "INVALID"
+            }
+        },
+        {
+            "name": "Check non-existing privileges",
+            "status": 400,
+            "return": 5006,
+            "payload": {
+                "username": "admin",
+                "priv": ["INVALID"]
             }
         }
     ]
@@ -17,7 +39,7 @@ class APIUnitTestUserPrivilege(unit_test_framework.APIUnitTest):
             "name": "Delete user privileges",
             "payload": {
                 "username": "admin",
-                "priv": ["page-system-usermanager"]
+                "priv": ["page-system-api"]
             }
         }
     ]
