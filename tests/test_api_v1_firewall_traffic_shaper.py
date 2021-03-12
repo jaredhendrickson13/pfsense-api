@@ -246,5 +246,36 @@ class APIUnitTestFirewallTrafficShaper(unit_test_framework.APIUnitTest):
             }
         },
     ]
+    delete_tests = [
+        {
+            "name": "Delete traffic shaper for LAN interface",
+            "payload": {
+                "interface": "lan",
+                "apply": True
+            }
+        },
+        {
+            "name": "Check interface requirement",
+            "status": 400,
+            "return": 4110
+        },
+        {
+            "name": "Delete non-existent traffic shaper",
+            "status": 400,
+            "return": 4122,
+            "payload": {
+                "interface": "lan"
+            }
+        },
+        {
+            "name": "Check interface validation",
+            "status": 400,
+            "return": 4111,
+            "payload": {
+                "interface": "INVALID"
+            }
+        },
+    ]
+
 
 APIUnitTestFirewallTrafficShaper()

@@ -32,4 +32,7 @@ class APIFirewallTrafficShaper extends APIEndpoint {
         return (new APIFirewallTrafficShaperUpdate())->call();
     }
 
+    protected function delete() {
+        return (new APIFirewallTrafficShaperDelete())->call();
+    }
 }
