@@ -13,19 +13,24 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-require_once("api/framework/APIEndpoint.inc");
+require_once("api/framework/APIModel.inc");
+require_once("api/framework/APIResponse.inc");
 
-class APIFirewallTrafficShaper extends APIEndpoint {
+
+class APIFirewallTrafficShaperRead extends APIModel {
+    # Create our method constructor
     public function __construct() {
-        $this->url = "/api/v1/firewall/traffic_shaper";
+        parent::__construct();
+        $this->privileges = ["page-all", "page-firewall-trafficshaper"];
     }
 
-    protected function get() {
-        return (new APIFirewallTrafficShaperRead())->call();
+    public function action() {
+        # Check that we have a configuration
+        if (!empty($this->config["shaper"]["queue"])) {
+            $shaper_array = $this->config["shaper"]["queue"];
+        } else {
+            $shaper_array = [];
+        }
+        return APIResponse\get(0, $shaper_array);
     }
-
-    protected function post() {
-        return (new APIFirewallTrafficShaperCreate())->call();
-    }
-
 }

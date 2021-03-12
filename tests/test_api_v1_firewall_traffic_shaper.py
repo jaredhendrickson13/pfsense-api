@@ -16,6 +16,7 @@ import unit_test_framework
 
 class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
     url = "/api/v1/firewall/traffic_shaper"
+    get_tests = [{"name": "Read all traffic shapers"}]
     post_tests = [
         {
             "name": "Create a traffic shaper",
