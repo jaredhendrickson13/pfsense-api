@@ -16,18 +16,19 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-class APIFirewallTrafficShaperCreate extends APIModel {
+class APIFirewallTrafficShaperUpdate extends APIModel {
+    private $type_changed;
+
     # Create our method constructor
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-trafficshaper"];
-        $this->change_note = "Added firewall traffic shaper via API";
+        $this->change_note = "Modified firewall traffic shaper via API";
     }
 
     public function action() {
-        # Initialize the traffic shaper configuration and save our shaper, mark the subsystem as un-applied
-        $this->__init_config();
-        $this->config["shaper"]["queue"][] = $this->validated_data;
+        # Save the updated shaper, mark the subsystem as un-applied
+        $this->config["shaper"]["queue"][$this->id] = $this->validated_data;
         $this->write_config();
         mark_subsystem_dirty('shaper');
 
@@ -46,7 +47,7 @@ class APIFirewallTrafficShaperCreate extends APIModel {
     public function validate_payload() {
         $this->__validate_interface();
         $this->__validate_scheduler();
-        $this->__validate_bandwidthtype();    // Must run before __validate_banddwith()
+        $this->__validate_bandwidthtype();    // Must run before __validate_bandwidth()
         $this->__validate_bandwidth();
         $this->__validate_enabled();
         $this->__validate_qlimit();
@@ -61,12 +62,12 @@ class APIFirewallTrafficShaperCreate extends APIModel {
             # Check that the requested interface exists
             if ($this->initial_data["interface"]) {
                 # Check that a traffic shaper does not already exist for this interface
-                if (!$this->get_shaper_id_by_interface($this->initial_data["interface"], true)) {
-                    # Set the interface and name of this shaper
-                    $this->validated_data["interface"] = $this->initial_data["interface"];
-                    $this->validated_data["name"] = $this->initial_data["interface"];
+                if ($this->get_shaper_id_by_interface($this->initial_data["interface"], true)) {
+                    # Fetch the traffic shaper object associated with this interface
+                    $this->id = $this->get_shaper_id_by_interface($this->initial_data["interface"]);
+                    $this->validated_data = $this->config["shaper"]["queue"][$this->id];
                 } else {
-                    $this->errors[] = APIResponse\get(4112);
+                    $this->errors[] = APIResponse\get(4122);
                 }
             } else {
                 $this->errors[] = APIResponse\get(4111);
@@ -77,7 +78,7 @@ class APIFirewallTrafficShaperCreate extends APIModel {
     }
 
     private function __validate_scheduler() {
-        # Check for our required `scheduler` payload value
+        # Check for our optional `scheduler` payload value
         if (isset($this->initial_data["scheduler"])) {
             # Check that the scheduler type is supported
             if (in_array($this->initial_data["scheduler"], ["HFSC", "CBQ", "FAIRQ", "CODELQ", "PRIQ"])) {
@@ -85,27 +86,27 @@ class APIFirewallTrafficShaperCreate extends APIModel {
             } else {
                 $this->errors[] = APIResponse\get(4114);
             }
-        } else {
-            $this->errors[] = APIResponse\get(4113);
         }
     }
 
     private function __validate_bandwidthtype() {
         # Check for our required `bandwidthtype` payload value
         if (isset($this->initial_data["bandwidthtype"])) {
-            # Check that the scheduler type is supported
-            if (in_array($this->initial_data["bandwidthtype"], ["%", "b", "Kb", "Mb", "Gb"])) {
-                $this->validated_data["bandwidthtype"] = $this->initial_data["bandwidthtype"];
-            } else {
-                $this->errors[] = APIResponse\get(4116);
+            # Only update the bandwidth type if it has changed
+            if ($this->initial_data["bandwidthtype"] !== $this->validated_data["bandwidthtype"]) {
+                # Check that the scheduler type is supported
+                if (in_array($this->initial_data["bandwidthtype"], ["%", "b", "Kb", "Mb", "Gb"])) {
+                    $this->validated_data["bandwidthtype"] = $this->initial_data["bandwidthtype"];
+                    $this->type_changed = true;
+                } else {
+                    $this->errors[] = APIResponse\get(4116);
+                }
             }
-        } else {
-            $this->errors[] = APIResponse\get(4115);
         }
     }
 
     private function __validate_bandwidth() {
-        # Check for our required `bandwidth` payload value
+        # Check for our optional `bandwidth` payload value
         if (isset($this->initial_data["bandwidth"])) {
             # Check that the bandwidth is 1 or greater
             if (intval($this->initial_data["bandwidth"]) >= 1) {
@@ -118,15 +119,21 @@ class APIFirewallTrafficShaperCreate extends APIModel {
             } else {
                 $this->errors[] = APIResponse\get(4118);
             }
-        } else {
+        }
+        # Require a new bandwidth value be specified if the type was changed
+        elseif ($this->type_changed) {
             $this->errors[] = APIResponse\get(4117);
         }
     }
 
     private function __validate_enabled() {
-        # Enable this shaper by default if a non-false value was provided
-        if ($this->initial_data["enabled"] !== false) {
+        # Enable this shaper if requested
+        if ($this->initial_data["enabled"] === true) {
             $this->validated_data["enabled"] = "on";
+        }
+        # Disabled this shaper if requested
+        elseif ($this->validated_data["enabled"] === false) {
+            unset($this->validated_data["enabled"]);
         }
     }
 
@@ -151,17 +158,6 @@ class APIFirewallTrafficShaperCreate extends APIModel {
             } else {
                 $this->errors[] = APIResponse\get(4121);
             }
-        }
-    }
-
-    private function __init_config() {
-        # Check if there is no shaper array in the config
-        if (empty($this->config["shaper"])) {
-            $this->config["shaper"] = [];
-        }
-        # Check if there is no shaper queue array in the config
-        if (empty($this->config["shaper"]["queue"])) {
-            $this->config["shaper"]["queue"] = [];
         }
     }
 

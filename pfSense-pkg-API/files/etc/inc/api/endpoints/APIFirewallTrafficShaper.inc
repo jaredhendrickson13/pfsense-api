@@ -28,4 +28,8 @@ class APIFirewallTrafficShaper extends APIEndpoint {
         return (new APIFirewallTrafficShaperCreate())->call();
     }
 
+    protected function put() {
+        return (new APIFirewallTrafficShaperUpdate())->call();
+    }
+
 }

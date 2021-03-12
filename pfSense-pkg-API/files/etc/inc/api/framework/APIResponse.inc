@@ -1712,6 +1712,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall traffic shaper TBR size must be 1 or greater"
         ],
+        4122 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper does not exist for this interface"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [

@@ -14,7 +14,7 @@
 
 import unit_test_framework
 
-class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
+class APIUnitTestFirewallTrafficShaper(unit_test_framework.APIUnitTest):
     url = "/api/v1/firewall/traffic_shaper"
     get_tests = [{"name": "Read all traffic shapers"}]
     post_tests = [
@@ -145,5 +145,106 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
             }
         },
     ]
+    put_tests = [
+        {
+            "name": "Create a traffic shaper",
+            "payload": {
+                "interface": "lan",
+                "scheduler": "HFSC",
+                "bandwidthtype": "Mb",
+                "bandwidth": 100,
+                "enabled": True,
+                "qlimit": 500,
+                "tbrconfig": 500,
+                "apply": True
+            }
+        },
+        {
+            "name": "Check interface requirement",
+            "status": 400,
+            "return": 4110
+        },
+        {
+            "name": "Check interface validation",
+            "status": 400,
+            "return": 4111,
+            "payload": {
+                "interface": "INVALID"
+            }
+        },
+        {
+            "name": "Check non-existing traffic shaper",
+            "status": 400,
+            "return": 4122,
+            "payload": {
+                "interface": "wan"
+            }
+        },
+        {
+            "name": "Check scheduler validation",
+            "status": 400,
+            "return": 4114,
+            "payload": {
+                "interface": "lan",
+                "scheduler": "INVALID"
+            }
+        },
+        {
+            "name": "Check bandwidth requirement when changing bandwidth types",
+            "status": 400,
+            "return": 4117,
+            "payload": {
+                "interface": "lan",
+                "bandwidthtype": "b"
+            }
+        },
+        {
+            "name": "Check bandwidth type validation",
+            "status": 400,
+            "return": 4116,
+            "payload": {
+                "interface": "lan",
+                "bandwidthtype": "INVALID"
+            }
+        },
 
-APIUnitTestFirewallRule()
+        {
+            "name": "Check bandwidth minimum constraint",
+            "status": 400,
+            "return": 4118,
+            "payload": {
+                "interface": "lan",
+                "bandwidth": 0
+            }
+        },
+        {
+            "name": "Check bandwidth maximum constraint when percentage type is chosen",
+            "status": 400,
+            "return": 4119,
+            "payload": {
+                "interface": "lan",
+                "bandwidthtype": "%",
+                "bandwidth": 101
+            }
+        },
+        {
+            "name": "Check queue limit minimum constraint",
+            "status": 400,
+            "return": 4120,
+            "payload": {
+                "interface": "lan",
+                "qlimit": 0
+            }
+        },
+        {
+            "name": "Check TBR size minimum constraint",
+            "status": 400,
+            "return": 4121,
+            "payload": {
+                "interface": "lan",
+                "tbrconfig": 0
+            }
+        },
+    ]
+
+APIUnitTestFirewallTrafficShaper()
