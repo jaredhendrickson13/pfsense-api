@@ -1718,6 +1718,42 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall traffic shaper does not exist for this interface"
         ],
+        4123 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue name is required"
+        ],
+        4124 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue name must only contain alphanumerics, underscore, and hyphens"
+        ],
+        4125 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue name must be between 1 and 15 characters"
+        ],
+        4126 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue name already exists for this interface"
+        ],
+        4127 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue priority must be between 0 and 7 for CBQ and FAIRQ schedulers"
+        ],
+        4128 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue priority must be between 0 and 15 for PRIQ schedulers"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [
