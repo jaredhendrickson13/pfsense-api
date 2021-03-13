@@ -25,52 +25,129 @@ class APIUserUpdate extends APIModel {
     }
 
     public function action() {
-        local_user_set($this->validated_data);
+        # Update our new user in the config and set the user on the backend
+        $this->config["system"]["user"][$this->id] = $this->validated_data;
         $this->write_config();
+        local_user_set($this->validated_data);
         return APIResponse\get(0, $this->validated_data);
     }
 
-    public function validate_payload() {
+    private function __validate_username() {
+        # Check for our required `username` payload value
         if (isset($this->initial_data['username'])) {
-            $this->validated_data =& getUserEntry($this->initial_data['username']);
-            // Check that our user already exists
-            if (!array_key_exists("uid", $this->validated_data)) {
+            # Loop through each configured user and check if this user exists
+            foreach ($this->config["system"]["user"] as $id=>$user) {
+                if ($this->initial_data["username"] === $user["name"]) {
+                    $this->validated_data = $user;
+                    $this->id = intval($id);
+                }
+            }
+            # Set an error if no user was found
+            if (!isset($this->validated_data["uid"])) {
                 $this->errors[] = APIResponse\get(5001);
             }
         } else {
             $this->errors[] = APIResponse\get(5000);
         }
-        if (isset($this->initial_data['password'])) {
-            $password = $this->initial_data['password'];
-            $password = trim($password);
-            local_user_set_password($this->validated_data, $password);  // Set our new user's password
-        }
-        if ($this->initial_data["disabled"] === true) {
-            $this->validated_data["disabled"] = "";    // Update our user's disabled value if not false
-        } elseif ($this->initial_data["disabled"] === false) {
-            unset($this->validated_data["disabled"]);    // Unset our disabled value if not requested
+    }
 
+    private function __validate_password() {
+        # Check for our optional `password` payload value
+        if (isset($this->initial_data['password'])) {
+            # Generate the password hash and add it to our validated data
+            local_user_set_password($this->validated_data, $this->initial_data['password']);
         }
+    }
+
+    private function __validate_priv() {
+        global $priv_list;
+
+        # Check for our optional `priv` payload value
+        if ($this->initial_data["priv"]) {
+            # Revert priv array to default
+            $this->validated_data["priv"] = [];
+
+            # Ensure value is an array
+            if (!is_array($this->initial_data["priv"])) {
+                $this->initial_data["priv"] = array($this->initial_data["priv"]);
+            }
+
+            # Loop through each requested privilege and ensure it exists
+            foreach ($this->initial_data["priv"] as $priv) {
+                if (array_key_exists($priv, $priv_list)) {
+                    $this->validated_data["priv"][] = $priv;
+                    $this->validated_data["priv"] = array_unique($this->validated_data["priv"]);
+                } else {
+                    $this->errors[] = APIResponse\get(5006);
+                    break;
+                }
+            }
+        }
+    }
+
+    private function __validate_disabled() {
+        # Check for our optional `disabled` payload value
+        if ($this->initial_data["disabled"] === true) {
+            $this->validated_data["disabled"] = "";
+        } elseif($this->initial_data["disabled"] === false) {
+            unset($this->validated_data["disabled"]);
+        }
+    }
+
+    private function __validate_descr() {
+        # Check for our optional `descr` payload value
         if (isset($this->initial_data['descr'])) {
-            $descr = $this->initial_data['descr'];
-            $descr = trim($descr);
-            $this->validated_data["descr"] = $descr;    // Update our user's full name
+            $this->validated_data["descr"] = $this->initial_data['descr'];
         }
+    }
+
+    private function __validate_expires() {
+        # Check for our optional `expires` payload value
         if (isset($this->initial_data['expires'])) {
-            $expires = $this->initial_data['expires'];
-            $expires = trim($expires);
-            $this->validated_data["expires"] = $expires;    // Update our user's expiration date
+            # Attempt to format the expiration date if the value is not empty
+            if (!empty($this->initial_data["expires"])) {
+                # Try to format the date string, return an error if the format is invalid
+                try {
+                    $this->validated_data["expires"] = (new DateTime($this->initial_data['expires']))->format("m/d/Y");
+                } catch (Exception $e) {
+                    $this->errors[] = APIResponse\get(5040);
+                }
+            }
+            # Otherwise, if the value was blank, unset the expiration date
+            else {
+                unset($this->validated_data["expires"]);
+            }
         }
+    }
+
+    private function __validate_authorizedkeys() {
+        # Check for our optional `authorizedkeys` payload value
         if (isset($this->initial_data['authorizedkeys'])) {
-            $authorizedkeys = $this->initial_data['authorizedkeys'];
-            $authorizedkeys = trim($authorizedkeys);
-            $this->validated_data["authorizedkeys"] = $authorizedkeys;    // Update our user's authorized keys
+            $this->validated_data["authorizedkeys"] = base64_encode($this->initial_data['authorizedkeys']);
         }
+    }
+
+    private function __validate_ipsecpsk() {
+        # Check for our optional `ipsecpsk` payload value
         if (isset($this->initial_data['ipsecpsk'])) {
-            $ipsecpsk = $this->initial_data['ipsecpsk'];
-            $ipsecpsk = trim($ipsecpsk);
-            $this->validated_data["ipsecpsk"] = $ipsecpsk;    // Update our user's IPsec pre-shared key
+            # Ensure the PSK does not contain invalid characters
+            if (preg_match('/^[[:ascii:]]*$/', $_POST['ipsecpsk'])) {
+                $this->validated_data["ipsecpsk"] = $this->initial_data['ipsecpsk'];
+            } else {
+                $this->errors[] = APIResponse\get(5039);
+            }
         }
-        $this->validated_data["scope"] = "user";    // Set our new user's system scope
+    }
+
+    public function validate_payload() {
+        # Run each validation method
+        $this->__validate_username();
+        $this->__validate_password();
+        $this->__validate_priv();
+        $this->__validate_descr();
+        $this->__validate_disabled();
+        $this->__validate_expires();
+        $this->__validate_authorizedkeys();
+        $this->__validate_ipsecpsk();
     }
 }

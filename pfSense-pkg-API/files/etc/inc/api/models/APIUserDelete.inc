@@ -25,26 +25,37 @@ class APIUserDelete extends APIModel {
     }
 
     public function action() {
-        $index_id = index_users()[$this->validated_data["username"]];    // Save our user's index ID number
-        $del_user = $this->config["system"]["user"][$index_id];
-        local_user_del($this->config["system"]["user"][$index_id]);    // Delete our user on the backend
-        unset($this->config['system']['user'][$index_id]);    // Unset our user from config
-        $this->config['system']['user'] = array_values($this->config['system']['user']);    // Reindex our users
-        $this->write_config();    // Write our new config
-        return APIResponse\get(0, $del_user);
+        # Remove user from backend and remove from config
+        local_user_del($this->config["system"]["user"][$this->id]);
+        unset($this->config["system"]["user"][$this->id]);
+        $this->write_config();
+        return APIResponse\get(0, $this->validated_data);
     }
 
-    public function validate_payload() {
-        if (isset($this->initial_data["username"])) {
-            if (!array_key_exists($this->initial_data["username"], index_users())) {
+    private function __validate_username() {
+        # Check for our required `username` payload value
+        if (isset($this->initial_data['username'])) {
+            # Loop through each configured user and check if this user exists
+            foreach ($this->config["system"]["user"] as $id=>$user) {
+                if ($this->initial_data["username"] === $user["name"]) {
+                    $this->validated_data = $user;
+                    $this->id = intval($id);
+                }
+            }
+            # Set an error if no user was found
+            if (!isset($this->validated_data["uid"])) {
                 $this->errors[] = APIResponse\get(5001);
-            } else {
-                $this->validated_data["username"] = $this->initial_data['username'];
-                $this->validated_data["username"] = trim($this->validated_data["username"]);
+            }
+            # Set an error if this is a system user
+            if ($this->validated_data["scope"] !== "user") {
+                $this->errors[] = APIResponse\get(5005);
             }
         } else {
             $this->errors[] = APIResponse\get(5000);
         }
+    }
 
+    public function validate_payload() {
+        $this->__validate_username();
     }
 }

@@ -1676,7 +1676,7 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "User privilege must be type array or string"
+            "message" => "System users cannot be deleted"
         ],
         5006 => [
             "status" => "bad request",
@@ -1858,7 +1858,36 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Authentication server name is required"
         ],
-
+        5036 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid characters in username"
+        ],
+        5037 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Username is reserved by the system"
+        ],
+        5038 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Username cannot contain more than 32 characters"
+        ],
+        5039 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid characters is IPsec PSK"
+        ],
+        5040 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "User expiration date must be in MM/DD/YYYY format"
+        ],
         //6000-6999 reserved for /routing API calls
         6000 => [
             "status" => "bad request",
