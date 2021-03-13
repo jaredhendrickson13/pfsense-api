@@ -2,7 +2,7 @@ import unit_test_framework
 
 
 class APIUnitTestTunable(unit_test_framework.APIUnitTest):
-    url = "/api/v1/system/tunable"
+    uri = "/api/v1/system/tunable"
     get_tests = [{"name": "Read system tunables"}]
     post_tests = [
         {

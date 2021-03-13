@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestServicesSSHd(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/sshd"
+    uri = "/api/v1/services/sshd"
     get_tests = [{"name": "Read SSHd configuration"}]
     put_tests = [
         {

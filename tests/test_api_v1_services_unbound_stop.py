@@ -16,7 +16,7 @@ import unit_test_framework
 
 
 class APIUnitTestServicesUnboundStop(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/unbound/stop"
+    uri = "/api/v1/services/unbound/stop"
     post_tests = [{"name": "Stop the Unbound service"}]
 
 

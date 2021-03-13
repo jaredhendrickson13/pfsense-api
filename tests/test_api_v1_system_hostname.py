@@ -2,7 +2,7 @@ import unit_test_framework
 
 
 class APIUnitTestSystemHostname(unit_test_framework.APIUnitTest):
-    url = "/api/v1/system/hostname"
+    uri = "/api/v1/system/hostname"
     get_tests = [{"name": "Read the system hostname"}]
     put_tests = [
         {

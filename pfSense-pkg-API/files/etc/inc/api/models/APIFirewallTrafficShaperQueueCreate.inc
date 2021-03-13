@@ -17,7 +17,7 @@ require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
 class APIFirewallTrafficShaperQueueCreate extends APIModel {
-    public $p_sched;
+    public $parent;
 
     # Create our method constructor
     public function __construct() {
@@ -62,6 +62,18 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
         $this->__validate_buckets();
         $this->__validate_hogs();
         $this->__validate_borrow();
+        $this->__validate_upperlimit();
+        $this->__validate_upperlimit1();
+        $this->__validate_upperlimit2();
+        $this->__validate_upperlimit3();
+        $this->__validate_linkshare();
+        $this->__validate_linkshare1();
+        $this->__validate_linkshare2();
+        $this->__validate_linkshare3();
+        $this->__validate_realtime();
+        $this->__validate_realtime1();
+        $this->__validate_realtime2();
+        $this->__validate_realtime3();
     }
 
     private function __validate_interface() {
@@ -75,7 +87,8 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
                 if ($this->get_shaper_id_by_interface($this->initial_data["interface"], true)) {
                     # Set the interface this queue will be applied to
                     $this->validated_data["interface"] = $this->initial_data["interface"];
-                    $this->p_sched = $this->config["shaper"]["queue"][$this->id]["scheduler"];
+                    $this->id = $this->get_shaper_id_by_interface($this->validated_data["interface"]);
+                    $this->parent = $this->config["shaper"]["queue"][$this->id];
                 } else {
                     $this->errors[] = APIResponse\get(4122);
                 }
@@ -113,23 +126,23 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
 
     private function __validate_priority() {
         # Only validate this field if the parent shaper's scheduler is set to FAIRQ CBQ or PRIQ
-        if (in_array($this->p_sched, ["FAIRQ", "CBQ", "PRIQ"])) {
+        if (in_array($this->parent["scheduler"], ["FAIRQ", "CBQ", "PRIQ"])) {
             # Check for our optional `priority` value
             if (isset($this->initial_data["priority"])) {
                 # For FAIRQ and CBQ schedulers, force priority to be between 0 and 7
-                if (in_array($this->p_sched, ["FAIRQ", "CBQ"])) {
+                if (in_array($this->parent["scheduler"], ["FAIRQ", "CBQ"])) {
                     if (intval($this->initial_data["priority"]) < 0 or intval($this->initial_data["priority"]) > 7) {
                         $this->errors[] = APIResponse\get(4127);
                     } else {
-                        $this->validated_data = intval($this->initial_data["priority"]);
+                        $this->validated_data["priority"] = intval($this->initial_data["priority"]);
                     }
                 }
                 # For PRIQ schedulers, force priority to be between 0 and 15
-                elseif (in_array($this->p_sched, ["PRIQ"])) {
+                elseif (in_array($this->parent["scheduler"], ["PRIQ"])) {
                     if (intval($this->initial_data["priority"]) < 0 or intval($this->initial_data["priority"]) > 15) {
                         $this->errors[] = APIResponse\get(4128);
                     } else {
-                        $this->validated_data = intval($this->initial_data["priority"]);
+                        $this->validated_data["priority"] = intval($this->initial_data["priority"]);
                     }
                 }
             } else {
@@ -141,7 +154,7 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
     private function __validate_description() {
         # Check for the optional `description` payload value
         if (isset($this->initial_data["description"])) {
-            $this->validated_data = strval($this->initial_data["description"]);
+            $this->validated_data["description"] = strval($this->initial_data["description"]);
         }
     }
 
@@ -200,8 +213,8 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
     }
 
     private function __validate_bandwidthtype() {
-        # Only validate this field if the parent shaper's scheduler is set to FAIRQ or CBQ
-        if (in_array($this->p_sched, ["FAIRQ", "CBQ"])) {
+        # Only validate this field if the parent shaper's scheduler is set to HFSC FAIRQ or CBQ
+        if (in_array($this->parent["scheduler"], ["FAIRQ", "CBQ", "HFSC"])) {
             # Check for our optional `bandwidthtype` payload value
             if (isset($this->initial_data["bandwidthtype"])) {
                 # Check that the scheduler type is supported
@@ -218,7 +231,7 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
 
     private function __validate_bandwidth() {
         # Only validate this field if the parent shaper's scheduler is set to FAIRQ or CBQ
-        if (in_array($this->p_sched, ["FAIRQ", "CBQ"])) {
+        if (in_array($this->parent["scheduler"], ["FAIRQ", "CBQ"])) {
             # Check for our optional `bandwidth` payload value
             if (isset($this->initial_data["bandwidth"])) {
                 # Check that the bandwidth is 1 or greater
@@ -227,7 +240,12 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
                     if ($this->validated_data["bandwidthtype"] === "%" and intval($this->initial_data["bandwidth"]) > 100) {
                         $this->errors[] = APIResponse\get(4119);
                     } else {
-                        $this->validated_data["bandwidth"] = intval($this->initial_data["bandwidth"]);
+                        # Check if the sum of all queue's bandwidth will exceed the parent's bandwidth
+                        if (!$this->check_bw($this->initial_data["bandwidth"], $this->validated_data["bandwidthtype"], $this->validated_data["interface"])) {
+                            $this->validated_data["bandwidth"] = intval($this->initial_data["bandwidth"]);
+                        } else {
+                            $this->errors[] = APIResponse\get(4129);
+                        }
                     }
                 } else {
                     $this->errors[] = APIResponse\get(4118);
@@ -240,27 +258,27 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
 
     private function __validate_buckets() {
         # Only validate this field if the parent shaper's scheduler is set to FAIRQ
-        if (in_array($this->p_sched, ["FAIRQ"])) {
+        if (in_array($this->parent["scheduler"], ["FAIRQ"])) {
             # Check for the optional `buckets` payload value
             if (isset($this->initial_data["buckets"])) {
-                $this->validated_data = strval($this->initial_data["buckets"]);
+                $this->validated_data["buckets"] = strval($this->initial_data["buckets"]);
             }
         }
     }
 
     private function __validate_hogs() {
         # Only validate this field if the parent shaper's scheduler is set to FAIRQ
-        if (in_array($this->p_sched, ["FAIRQ"])) {
+        if (in_array($this->parent["scheduler"], ["FAIRQ"])) {
             # Check for the optional `hogs` payload value
             if (isset($this->initial_data["hogs"])) {
-                $this->validated_data = strval($this->initial_data["hogs"]);
+                $this->validated_data["hogs"] = strval($this->initial_data["hogs"]);
             }
         }
     }
 
     private function __validate_borrow() {
         # Only validate this field if the parent shaper's scheduler is set to FAIRQ
-        if (in_array($this->p_sched, ["FAIRQ"])) {
+        if (in_array($this->parent["scheduler"], ["FAIRQ"])) {
             # Set the borrows options if requested
             if ($this->initial_data["borrow"] === true) {
                 $this->validated_data["borrow"] = "yes";
@@ -268,9 +286,216 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
         }
     }
 
+    private function __validate_upperlimit() {
+        # Only validate this field if the parent shaper's scheduler is set to HFSC
+        if (in_array($this->parent["scheduler"], ["HFSC"])) {
+            # Set the upperlimit options if requested
+            if ($this->initial_data["upperlimit"] === true) {
+                $this->validated_data["upperlimit"] = "on";
+            }
+        }
+    }
+
+    private function __validate_upperlimit1() {
+        # Only validate this field if `upperlimit` as enabled
+        if ($this->validated_data["upperlimit"]) {
+            # Set the upperlimit1 options if requested
+            if (isset($this->initial_data["upperlimit1"])) {
+                # Check that the upperlimit1 value is a valid bandwidth string
+                if ($this->is_bandwidth($this->initial_data["upperlimit1"])) {
+                    $this->validated_data["upperlimit1"] = $this->initial_data["upperlimit1"];
+                } else {
+                    $this->errors[] = APIResponse\get(4130);
+                }
+            }
+        }
+    }
+
+    private function __validate_upperlimit2() {
+        # Only validate this field if `upperlimit` as enabled
+        if ($this->validated_data["upperlimit"]) {
+            # Set the upperlimit2 options if requested
+            if (isset($this->initial_data["upperlimit2"])) {
+                # Check that the upperlimit2 value is a numeric string greater than 0
+                if (is_numeric($this->initial_data["upperlimit2"]) and intval($this->initial_data["upperlimit2"]) > 0) {
+                    $this->validated_data["upperlimit2"] = intval($this->initial_data["upperlimit2"]);
+                } else {
+                    $this->errors[] = APIResponse\get(4132);
+                }
+            }
+            # If an upperlimit1 value was provided, this field will be required
+            elseif (isset($this->validated_data["upperlimit1"])) {
+                $this->errors[] = APIResponse\get(4131);
+            }
+        }
+    }
+
+    private function __validate_upperlimit3() {
+        # Only validate this field if `upperlimit` is enabled
+        if ($this->validated_data["upperlimit"]) {
+            # Set the upperlimit3 options if requested
+            if (isset($this->initial_data["upperlimit3"])) {
+                # Check that the upperlimit3 value is a valid bandwidth string
+                if ($this->is_bandwidth($this->initial_data["upperlimit3"])) {
+                    $this->validated_data["upperlimit3"] = $this->initial_data["upperlimit3"];
+                } else {
+                    $this->errors[] = APIResponse\get(4134);
+                }
+            }
+            # If upperlimit is enabled, this field will be required
+            elseif (isset($this->validated_data["upperlimit"])) {
+                $this->errors[] = APIResponse\get(4133);
+            }
+        }
+    }
+
+    private function __validate_linkshare() {
+        # Only validate this field if the parent shaper's scheduler is set to HFSC
+        if (in_array($this->parent["scheduler"], ["HFSC"])) {
+            # Set the linkshare options if requested
+            if ($this->initial_data["linkshare"] === true) {
+                $this->validated_data["linkshare"] = "on";
+            }
+        }
+    }
+
+    private function __validate_linkshare1() {
+        # Only validate this field if `linkshare` as enabled
+        if ($this->validated_data["linkshare"]) {
+            # Set the linkshare1 options if requested
+            if (isset($this->initial_data["linkshare1"])) {
+                # Check that the linkshare1 value is a valid bandwidth string
+                if ($this->is_bandwidth($this->initial_data["linkshare1"])) {
+                    $this->validated_data["linkshare1"] = $this->initial_data["linkshare1"];
+                } else {
+                    $this->errors[] = APIResponse\get(4135);
+                }
+            }
+        }
+    }
+
+    private function __validate_linkshare2() {
+        # Only validate this field if `linkshare` as enabled
+        if ($this->validated_data["linkshare"]) {
+            # Set the linkshare2 options if requested
+            if (isset($this->initial_data["linkshare2"])) {
+                # Check that the linkshare2 value is a numeric string greater than 0
+                if (is_numeric($this->initial_data["linkshare2"]) and intval($this->initial_data["linkshare2"]) > 0) {
+                    $this->validated_data["linkshare2"] = intval($this->initial_data["linkshare2"]);
+                } else {
+                    $this->errors[] = APIResponse\get(4137);
+                }
+            }
+            # If an linkshare1 value was provided, this field will be required
+            elseif (isset($this->validated_data["linkshare1"])) {
+                $this->errors[] = APIResponse\get(4136);
+            }
+        }
+    }
+
+    private function __validate_linkshare3() {
+        # Only validate this field if `linkshare` is enabled
+        if ($this->validated_data["linkshare"]) {
+            # Set the linkshare3 options if requested
+            if (isset($this->initial_data["linkshare3"])) {
+                # Check that the linkshare3 value is a valid bandwidth string
+                if ($this->is_bandwidth($this->initial_data["linkshare3"])) {
+                    $this->validated_data["linkshare3"] = $this->initial_data["linkshare3"];
+                } else {
+                    $this->errors[] = APIResponse\get(4139);
+                }
+            }
+            # If linkshare is enabled, this field will be required
+            elseif (isset($this->validated_data["linkshare"])) {
+                $this->errors[] = APIResponse\get(4138);
+            }
+        }
+    }
+
+    private function __validate_realtime() {
+        # Only validate this field if the parent shaper's scheduler is set to HFSC
+        if (in_array($this->parent["scheduler"], ["HFSC"])) {
+            # Set the realtime options if requested
+            if ($this->initial_data["realtime"] === true) {
+                $this->validated_data["realtime"] = "on";
+            }
+        }
+    }
+
+    private function __validate_realtime1() {
+        # Only validate this field if `realtime` as enabled
+        if ($this->validated_data["realtime"]) {
+            # Set the realtime1 options if requested
+            if (isset($this->initial_data["realtime1"])) {
+                # Check that the realtime1 value is a valid bandwidth string
+                if ($this->is_bandwidth($this->initial_data["realtime1"])) {
+                    $this->validated_data["realtime1"] = $this->initial_data["realtime1"];
+                } else {
+                    $this->errors[] = APIResponse\get(4140);
+                }
+            }
+        }
+    }
+
+    private function __validate_realtime2() {
+        # Only validate this field if `realtime` as enabled
+        if ($this->validated_data["realtime"]) {
+            # Set the realtime2 options if requested
+            if (isset($this->initial_data["realtime2"])) {
+                # Check that the realtime2 value is a numeric string greater than 0
+                if (is_numeric($this->initial_data["realtime2"]) and intval($this->initial_data["realtime2"]) > 0) {
+                    $this->validated_data["realtime2"] = intval($this->initial_data["realtime2"]);
+                } else {
+                    $this->errors[] = APIResponse\get(4142);
+                }
+            }
+            # If an realtime1 value was provided, this field will be required
+            elseif (isset($this->validated_data["realtime1"])) {
+                $this->errors[] = APIResponse\get(4141);
+            }
+        }
+    }
+
+    private function __validate_realtime3() {
+        # Only validate this field if `realtime` is enabled
+        if ($this->validated_data["realtime"]) {
+            # Set the realtime3 options if requested
+            if (isset($this->initial_data["realtime3"])) {
+                # Check that the realtime3 value is a valid bandwidth string
+                if ($this->is_bandwidth($this->initial_data["realtime3"])) {
+                    $this->validated_data["realtime3"] = $this->initial_data["realtime3"];
+                } else {
+                    $this->errors[] = APIResponse\get(4144);
+                }
+            }
+            # If realtime is enabled, this field will be required
+            elseif (isset($this->validated_data["realtime"])) {
+                $this->errors[] = APIResponse\get(4143);
+            }
+        }
+    }
+
+
+    # Parses a bandwidth string (e.g. 100Mb) into it's numeric value and type (e.g. 100 and Mb)
+    private function is_bandwidth($value) {
+        # Loop through each bandwidth type
+        foreach (["Kb", "Mb", "Gb", "b"] as $type) {
+            if (substr($value, -strlen($type)) === $type) {
+                # Remove the bandwidth type portion from the string
+                $num_value = str_replace($type, "", $value);
+
+                # If our expected numeric value is numeric, return a list of parsed data
+                if (is_numeric($num_value)) {
+                    return [intval($num_value), $type];
+                }
+            }
+        }
+        return false;
+    }
+
     private function __init_config() {
         # Check if there is no shaper queue array in the config
-        if (empty($this->config["shaper"]["queue"][$this->id]["queue"])) {
+        if (!isset($this->config["shaper"]["queue"][$this->id]["queue"])) {
             $this->config["shaper"]["queue"][$this->id]["queue"] = [];
         }
     }
@@ -302,4 +527,37 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
             return false;
         }
     }
+
+    # Checks if the sum of all child queue bandwidth is greater than the bandwidth limit set on the parent
+    public function check_bw($bw, $type, $interface) {
+        global $altq_list_queues;
+        read_altq_config();
+        $altq = $altq_list_queues[$interface];
+
+        # Check that a altq object exists for this interface
+        if (isset($altq)) {
+            # Don't compare % to bit-based bandwidth
+            if ($type != "%") {
+                # Get the bandwidth of our parent to initialize the sum of all bandwidth
+                $sum = $altq->GetTotalBw($altq);
+                # Add the requested bandwidth to the sum of all bandwidth
+                if ($bw > 0) {
+                    $sum += get_bandwidth($bw, $type, $altq);
+                }
+                # Check the sum of all bandwidth exceeds the limit of the parent
+                if ($sum > get_queue_bandwidth($altq)) {
+                    return true;
+                }
+            }
+
+            # Check the bandwidth of each subqueue as well
+            foreach ($altq->subqueues as $q) {
+                if ($q->CheckBandwidth(0, '')) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
 }

@@ -16,7 +16,7 @@ import unit_test_framework
 
 
 class APIUnitTestServicesStop(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/stop"
+    uri = "/api/v1/services/stop"
     post_tests = [{"name": "Stop all services"}]
 
 

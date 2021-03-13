@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestServicesDHCPd(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/dhcpd"
+    uri = "/api/v1/services/dhcpd"
     get_tests = [{"name": "Read all DHCPd configurations"}]
     put_tests = [
         {

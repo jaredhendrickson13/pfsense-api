@@ -2,7 +2,7 @@ import unit_test_framework
 
 
 class APIUnitTestUser(unit_test_framework.APIUnitTest):
-    url = "/api/v1/user"
+    uri = "/api/v1/user"
     get_tests = [{"name": "Read local users"}]
     post_tests = [
         {

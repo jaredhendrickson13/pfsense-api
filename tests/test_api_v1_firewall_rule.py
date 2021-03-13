@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
-    url = "/api/v1/firewall/rule"
+    uri = "/api/v1/firewall/rule"
     get_tests = [
         {"name": "Read all firewall rules"}
     ]

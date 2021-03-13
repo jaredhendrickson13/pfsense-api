@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestInterfaceVLAN(unit_test_framework.APIUnitTest):
-    url = "/api/v1/interface/vlan"
+    uri = "/api/v1/interface/vlan"
     get_tests = [{"name": "Read all interface VLANs"}]
     post_tests = [
         {

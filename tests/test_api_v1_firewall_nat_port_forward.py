@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestFirewallNATPortForward(unit_test_framework.APIUnitTest):
-    url = "/api/v1/firewall/nat/port_forward"
+    uri = "/api/v1/firewall/nat/port_forward"
     get_tests = [
         {"name": "Read all NAT port forwards"}
     ]

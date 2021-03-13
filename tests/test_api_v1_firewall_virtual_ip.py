@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestFirewallVirtualIP(unit_test_framework.APIUnitTest):
-    url = "/api/v1/firewall/virtual_ip"
+    uri = "/api/v1/firewall/virtual_ip"
     get_tests = [{"name": "Read all virtual IPs"}]
     post_tests = [
         {

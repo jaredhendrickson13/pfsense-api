@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestServicesNTPdTimeServer(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/ntpd/time_server"
+    uri = "/api/v1/services/ntpd/time_server"
     post_tests = [
         {
             "name": "Add an NTP time server",

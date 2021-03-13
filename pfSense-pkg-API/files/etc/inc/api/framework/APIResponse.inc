@@ -1754,6 +1754,102 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall traffic shaper queue priority must be between 0 and 15 for PRIQ schedulers"
         ],
+        4129 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Sum of firewall traffic shaper queues bandwidth exceeds parent's bandwidth limits"
+        ],
+        4130 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue upperlimit1 value must be a bandwidth formatted string"
+        ],
+        4131 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue upperlimit2 value is required"
+        ],
+        4132 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue upperlimit2 must be 1 or greater"
+        ],
+        4133 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue upperlimit3 value is required"
+        ],
+        4134 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue upperlimit3 value must be a bandwidth formatted string"
+        ],
+        4135 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue linkshare1 value must be a bandwidth formatted string"
+        ],
+        4136 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue linkshare2 value is required"
+        ],
+        4137 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue linkshare2 must be 1 or greater"
+        ],
+        4138 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue linkshare3 value is required"
+        ],
+        4139 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue linkshare3 value must be a bandwidth formatted string"
+        ],
+        4140 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue realtime1 value must be a bandwidth formatted string"
+        ],
+        4141 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue realtime2 value is required"
+        ],
+        4142 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue realtime2 must be 1 or greater"
+        ],
+        4143 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue realtime3 value is required"
+        ],
+        4144 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue realtime3 value must be a bandwidth formatted string"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [

@@ -16,7 +16,7 @@ import unit_test_framework
 
 
 class APIUnitTestStatusLogConfigHistory(unit_test_framework.APIUnitTest):
-    url = "/api/v1/status/log/config_history"
+    uri = "/api/v1/status/log/config_history"
     get_tests = [{"name": "Read configuration history"}]
 
 

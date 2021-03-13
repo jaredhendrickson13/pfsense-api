@@ -16,7 +16,7 @@ import unit_test_framework
 
 
 class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/unbound/host_override"
+    uri = "/api/v1/services/unbound/host_override"
     get_tests = [{"name": "Read all host overrides"}]
     post_tests = [
         {

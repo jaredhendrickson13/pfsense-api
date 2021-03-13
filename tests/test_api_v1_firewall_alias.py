@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestFirewallAlias(unit_test_framework.APIUnitTest):
-    url = "/api/v1/firewall/alias"
+    uri = "/api/v1/firewall/alias"
     get_tests = [
         {"name": "Read all aliases"}
     ]

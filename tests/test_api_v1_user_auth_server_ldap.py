@@ -2,7 +2,7 @@ import unit_test_framework
 
 
 class APIUnitTestUserAuthServerLDAP(unit_test_framework.APIUnitTest):
-    url = "/api/v1/user/auth_server/ldap"
+    uri = "/api/v1/user/auth_server/ldap"
     get_tests = [{"name": "Read LDAP auth servers"}]
     post_tests = [
         {

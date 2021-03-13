@@ -16,7 +16,7 @@ import unit_test_framework
 
 
 class APIUnitTestStatusSystem(unit_test_framework.APIUnitTest):
-    url = "/api/v1/status/system"
+    uri = "/api/v1/status/system"
     get_tests = [
         {
             "name": "Read the system status",

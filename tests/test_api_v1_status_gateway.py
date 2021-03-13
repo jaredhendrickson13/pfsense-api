@@ -16,7 +16,7 @@ import unit_test_framework
 
 
 class APIUnitTestStatusGateway(unit_test_framework.APIUnitTest):
-    url = "/api/v1/status/gateway"
+    uri = "/api/v1/status/gateway"
     get_tests = [{"name": "Read routing gateway statuses"}]
 
 
