@@ -105,7 +105,7 @@ class APIFirewallVirtualIPCreate extends APIModel {
         if ($this->validated_data["mode"] === "carp") {
             # Check for our optional 'vhid' payload value. Assume default if none was specified.
             if (isset($this->initial_data['vhid'])) {
-                if ($this->__vhid_exists($this->initial_data['vhid'])) {
+                if ($this->__vhid_exists($this->initial_data["interface"], $this->initial_data['vhid'])) {
                     $this->errors[] = APIResponse\get(4027);
                 } elseif (1 > $this->initial_data['vhid'] or $this->initial_data['vhid'] > 255) {
                     $this->errors[] = APIResponse\get(4028);
@@ -153,10 +153,10 @@ class APIFirewallVirtualIPCreate extends APIModel {
         $this->validated_data["type"] = "network";
     }
 
-    private function __vhid_exists($vhid) {
+    private function __vhid_exists($interface, $vhid) {
         # Loop through each virtual IP and ensure it is not using the requested vhid
         foreach ($this->config["virtualip"]["vip"] as $vip) {
-            if (intval($vhid) === intval($vip["vhid"])) {
+            if ($interface === $vip["interface"] && intval($vhid) === intval($vip["vhid"])) {
                 return true;
             }
         }
