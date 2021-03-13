@@ -3966,6 +3966,234 @@
 					"name": "TRAFFIC_SHAPER",
 					"item": [
 						{
+							"name": "QUEUE",
+							"item": [
+								{
+									"name": "Create Traffic Shaper Queue",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"interface\": \"lan\",\n    \"scheduler\": \"PRIQ\",\n    \"bandwidthtype\": \"Gb\",\n    \"bandwidth\": 1,\n    \"enabled\": false,\n    \"qlimit\": 1000,\n    \"tbrconfig\": 1000,\n    \"apply\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper?interface=string&name=string&priority=integer&description=string&enabled=boolean&default=boolean&red=boolean&rio=boolean&ecn=boolean&codel=boolean&qlimit=integer&bandwidthtype=string&bandwidth=integer&buckets=string&hogs=string&borrow=boolean&upperlimit=boolean&upperlimit1=string&upperlimit2=integer&upperlimit3=string&linkshare=boolean&linkshare1=string&linkshare2=integer&linkshare3=string&realtime=boolean&realtime1=string&realtime2=integer&realtime3=string&apply=integer",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"traffic_shaper"
+											],
+											"query": [
+												{
+													"key": "interface",
+													"value": "string",
+													"description": "Specify the parent interface to create the traffic shaper queue for. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). "
+												},
+												{
+													"key": "name",
+													"value": "string",
+													"description": "Specify a name for this queue. This name must be 15 characters or less, and unique from all other queues on the parent interface."
+												},
+												{
+													"key": "priority",
+													"value": "integer",
+													"description": "Specify the priority of this queue. This field Is only available when the parent traffic shaper's `scheduler` Is set to "
+												},
+												{
+													"key": "description",
+													"value": "string",
+													"description": "Specify a description for this queue. (optional)"
+												},
+												{
+													"key": "enabled",
+													"value": "boolean",
+													"description": "Enable or disable this traffic queue upon creation. Specify `true` to enable or `false` to disable. Defaults to `true`. (optional)"
+												},
+												{
+													"key": "default",
+													"value": "boolean",
+													"description": "Specify whether or not this queue should be set as the default queue for the parent. Set to `true` to enable. Defaults to `false`. (optional)"
+												},
+												{
+													"key": "red",
+													"value": "boolean",
+													"description": "Set the Random Early Detection option for this queue. Set `true` to enable. Defaults to `false`. (optional)"
+												},
+												{
+													"key": "rio",
+													"value": "boolean",
+													"description": "Set the Random Early Detection In and Out option for this queue. Set `true` to enable. Defaults to `false`. (optional)"
+												},
+												{
+													"key": "ecn",
+													"value": "boolean",
+													"description": "Set the Explicit Congestion Notification option for this queue. Set `true` to enable. Defaults to `false`. (optional) "
+												},
+												{
+													"key": "codel",
+													"value": "boolean",
+													"description": "Set the Codel Active Queue option for this queue. Set `true` to enable. Defaults to `false`. (optional)"
+												},
+												{
+													"key": "qlimit",
+													"value": "integer",
+													"description": "Specify the queue limit value for this queue. If set, this must be a value of `1` or greater. Defaults to no limit. (optional)"
+												},
+												{
+													"key": "bandwidthtype",
+													"value": "string",
+													"description": "Specify the bandwidth type to use when setting the bandwidth. Choices are `%` for percentage based bandwidth, `b` for bits, `Kb` for kilobits, `Mb` for megabits, and `Gb` for gigabits. Only available when the parent traffic shaper's `scheduler` Is set to `HFSC`, `CBQ`, or `FAIRQ`.  (optional)"
+												},
+												{
+													"key": "bandwidth",
+													"value": "integer",
+													"description": "Specify the bandwidth of this traffic shaper. This must be a numeric value of `1` or greater. If you have set the `bandwidthtype` to `%`, this value must be `100` or less. Only available when the parent traffic shaper's `scheduler` Is set to `HFSC`, `CBQ`, or `FAIRQ`. The sum of this value and all other child queues must be less than the parent traffic shaper's `bandwidth` value. (optional)"
+												},
+												{
+													"key": "buckets",
+													"value": "string",
+													"description": "Set the bandwidth buckets value for this queue. Only available when the parent traffic shaper's `scheduler` Is set to `FAIRQ`. (optional) "
+												},
+												{
+													"key": "hogs",
+													"value": "string",
+													"description": "Set the bandwidth hogs value for this queue. Only available when the parent traffic shaper's `scheduler` Is set to `FAIRQ`. (optional)"
+												},
+												{
+													"key": "borrow",
+													"value": "boolean",
+													"description": "Allow queue to borrow bandwidth from other queues when available. Only available when the parent traffic shaper's `scheduler` Is set to `CBQ`. (optional)"
+												},
+												{
+													"key": "upperlimit",
+													"value": "boolean",
+													"description": "Enable the upperlimit (max bandwidth) option for this queue. Set `true` to enable. Defaults to `false`. Only available when parent traffic shaper's `scheduler` is set to `HFSC`. (optional)"
+												},
+												{
+													"key": "upperlimit1",
+													"value": "string",
+													"description": "Set the first upper limit value (m1). This value must be a bandwidth formatted string (e.g. `100Mb`, `1Gb`, etc.). Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `upperlimit` value is enabled. (optional)"
+												},
+												{
+													"key": "upperlimit2",
+													"value": "integer",
+													"description": "Set the second upper limit value (d). This value must an integer of 1 or greater. This value will required If an `upperlimit1` value was specified. Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `upperlimit` value is enabled. (optional)"
+												},
+												{
+													"key": "upperlimit3",
+													"value": "string",
+													"description": "Set the third upper limit value (m2). This value must be a bandwidth formatted string (e.g. `100Mb`, `1Gb`, etc.). Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `upperlimit` value is enabled. This value Is required if the`upperlimit` value is enabled."
+												},
+												{
+													"key": "linkshare",
+													"value": "boolean",
+													"description": "Enable the linkshare (shared bandwidth) option for this queue. Set `true` to enable. Defaults to `false`. Only available when parent traffic shaper's `scheduler` is set to `HFSC`. (optional)"
+												},
+												{
+													"key": "linkshare1",
+													"value": "string",
+													"description": "Set the first linkshare value (m1). This value must be a bandwidth formatted string (e.g. `100Mb`, `1Gb`, etc.). Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `linkshare` value is enabled. (optional)"
+												},
+												{
+													"key": "linkshare2",
+													"value": "integer",
+													"description": "Set the second linkshare value (d). This value must an integer of 1 or greater. This value will required If an `linkshare1` value was specified. Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `linkshare` value is enabled. (optional)"
+												},
+												{
+													"key": "linkshare3",
+													"value": "string",
+													"description": "Set the third linkshare value (m2). This value must be a bandwidth formatted string (e.g. `100Mb`, `1Gb`, etc.). Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `linkshare` value is enabled. This value Is required if the`linkshare` value is enabled."
+												},
+												{
+													"key": "realtime",
+													"value": "boolean",
+													"description": "Enable the realtime (minimum bandwidth) option for this queue. Set `true` to enable. Defaults to `false`. Only available when parent traffic shaper's `scheduler` is set to `HFSC`. (optional)"
+												},
+												{
+													"key": "realtime1",
+													"value": "string",
+													"description": "Set the first realtime value (m1). This value must be a bandwidth formatted string (e.g. `100Mb`, `1Gb`, etc.). Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `realtime` value is enabled. (optional)"
+												},
+												{
+													"key": "realtime2",
+													"value": "integer",
+													"description": "Set the second realtime value (d). This value must an integer of 1 or greater. This value will required If an `realtime1` value was specified. Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `realtime` value is enabled. (optional)"
+												},
+												{
+													"key": "realtime3",
+													"value": "string",
+													"description": "Set the third realtime value (m2). This value must be a bandwidth formatted string (e.g. `100Mb`, `1Gb`, etc.). Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `realtime` value is enabled. This value Is required if the`linkshare` value is enabled."
+												},
+												{
+													"key": "apply",
+													"value": "integer",
+													"description": "Specify whether this traffic shaper should be applied immediately after creation. If `true`, the filter will be reloaded after creation. Otherwise, if `false`, the filter will not be reloaded and the change will not be applied until the next filter reload. Defaults to `false`. (optional)"
+												}
+											]
+										},
+										"description": "Add a queue to an traffic shaper interface.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-queues`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Traffic Shaper Queue",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"interface\": \"lan\",\n    \"scheduler\": \"PRIQ\",\n    \"bandwidthtype\": \"Gb\",\n    \"bandwidth\": 1,\n    \"enabled\": false,\n    \"qlimit\": 1000,\n    \"tbrconfig\": 1000,\n    \"apply\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper?interface=string&name=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"traffic_shaper"
+											],
+											"query": [
+												{
+													"key": "interface",
+													"value": "string",
+													"description": "Specify the parent interface to delete the traffic shaper queue from. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). "
+												},
+												{
+													"key": "name",
+													"value": "string",
+													"description": "Specify a name of the queue to delete. This must be an existing queue name configured on the parent traffic shaper."
+												}
+											]
+										},
+										"description": "Delete a queue from a traffic shaper interface.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-queues`]"
+									},
+									"response": []
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
 							"name": "Create Traffic Shaper",
 							"request": {
 								"method": "POST",

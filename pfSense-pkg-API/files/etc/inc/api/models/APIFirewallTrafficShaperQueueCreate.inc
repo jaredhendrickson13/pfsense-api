@@ -230,8 +230,8 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
     }
 
     private function __validate_bandwidth() {
-        # Only validate this field if the parent shaper's scheduler is set to FAIRQ or CBQ
-        if (in_array($this->parent["scheduler"], ["FAIRQ", "CBQ"])) {
+        # Only validate this field if the parent shaper's scheduler is set to HFSC FAIRQ or CBQ
+        if (in_array($this->parent["scheduler"], ["FAIRQ", "CBQ", "HFSC"])) {
             # Check for our optional `bandwidth` payload value
             if (isset($this->initial_data["bandwidth"])) {
                 # Check that the bandwidth is 1 or greater
@@ -277,8 +277,8 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
     }
 
     private function __validate_borrow() {
-        # Only validate this field if the parent shaper's scheduler is set to FAIRQ
-        if (in_array($this->parent["scheduler"], ["FAIRQ"])) {
+        # Only validate this field if the parent shaper's scheduler is set to CBQ
+        if (in_array($this->parent["scheduler"], ["CBQ"])) {
             # Set the borrows options if requested
             if ($this->initial_data["borrow"] === true) {
                 $this->validated_data["borrow"] = "yes";
