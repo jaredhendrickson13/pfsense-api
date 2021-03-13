@@ -1850,6 +1850,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall traffic shaper queue realtime3 value must be a bandwidth formatted string"
         ],
+        4145 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue name does not exist"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [

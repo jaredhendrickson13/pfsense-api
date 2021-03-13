@@ -415,18 +415,61 @@ class APIUnitTestFirewallTrafficShaperQueue(unit_test_framework.APIUnitTest):
                 "realtime3": "1Mb"
             }
         },
+    ]
+    delete_tests = [
+        {
+            "name": "Delete Test_Queue",
+            "payload": {
+                "interface": "lan",
+                "name": "Test_Queue"
+            }
+        },
+        {
+            "name": "Check interface requirement",
+            "status": 400,
+            "return": 4110
+        },
+        {
+            "name": "Check interface validation",
+            "status": 400,
+            "return": 4111,
+            "payload": {
+                "interface": "INVALID"
+            }
+        },
+        {
+            "name": "Check interface with no traffic shaper",
+            "status": 400,
+            "return": 4122,
+            "payload": {
+                "interface": "wan",
+            }
+        },
+        {
+            "name": "Check name requirement",
+            "status": 400,
+            "return": 4123,
+            "payload": {
+                "interface": "lan"
+            }
+        },
+        {
+            "name": "Check name validation",
+            "status": 400,
+            "return": 4145,
+            "payload": {
+                "interface": "lan",
+                "name": "INVALID"
+            }
+        },
         {
             "name": "Delete parent traffic shaper",
             "uri": "/api/v1/firewall/traffic_shaper",
-            "method": "DELETE",
             "payload": {
                 "interface": "lan",
                 "apply": True
             }
         },
-
     ]
-
-
 
 APIUnitTestFirewallTrafficShaperQueue()
