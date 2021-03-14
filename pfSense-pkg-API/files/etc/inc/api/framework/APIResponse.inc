@@ -1856,6 +1856,132 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall traffic shaper queue name does not exist"
         ],
+        4146 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule name is required"
+        ],
+        4147 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule name can only contain alphanumerics, underscores and hyphens"
+        ],
+        4148 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule name must 32 characters or less"
+        ],
+        4149 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule name already in use"
+        ],
+        4150 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule name does not exist"
+        ],
+        4151 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range month is required"
+        ],
+        4152 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range months must be between 1 and 12"
+        ],
+        4153 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range day is required"
+        ],
+        4154 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range number of days must match number of months"
+        ],
+        4155 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range days out of range for month"
+        ],
+        4156 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range hour is required"
+        ],
+        4157 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range starting hour is invalid"
+        ],
+        4158 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range ending hour is invalid"
+        ],
+        4159 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range starting hour cannot be greater than the ending hour"
+        ],
+        4160 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range positions must be between 1 and 7"
+        ],
+        4161 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range is required"
+        ],
+        4162 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "At least one firewall schedule time range is required"
+        ],
+        4163 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range ID is required"
+        ],
+        4164 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range ID does not exist"
+        ],
+        4165 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Cannot delete the last remaining firewall schedule time range"
+        ],
+        4166 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Cannot delete firewall schedule while it is in use"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [
