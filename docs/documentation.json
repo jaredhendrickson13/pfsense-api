@@ -2209,7 +2209,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/firewall/rule?type=string&interface=string&ipprotocol=string&protocol=string&icmptype=string or array&src=string&dst=string&srcport=string or integer&dstport=string or integer&gateway=string&disabled=boolean&descr=string&log=boolean&top=boolean&apply=boolean",
+									"raw": "https://{{$hostname}}/api/v1/firewall/rule?type=string&interface=string&ipprotocol=string&protocol=string&icmptype=string or array&src=string&dst=string&srcport=string or integer&dstport=string or integer&gateway=string&sched=string&disabled=boolean&descr=string&log=boolean&top=boolean&apply=boolean",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -2272,6 +2272,11 @@
 											"description": "Set the routing gateway traffic will take upon match (optional)"
 										},
 										{
+											"key": "sched",
+											"value": "string",
+											"description": "Set a firewall schedule to apply to this rule. This must be an existing firewall schedule name. (optional)"
+										},
+										{
 											"key": "disabled",
 											"value": "boolean",
 											"description": "Disable the rule upon creation (optional)"
@@ -2317,7 +2322,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/firewall/rule?tracker=string or Integer&type=string&interface=string&ipprotocol=string&protocol=string&icmptype=string or array&src=string&dst=string&srcport=string or integer&dstport=string or integer&gateway=string&disabled=boolean&descr=string&log=boolean&top=boolean&apply=boolean",
+									"raw": "https://{{$hostname}}/api/v1/firewall/rule?tracker=string or Integer&type=string&interface=string&ipprotocol=string&protocol=string&icmptype=string or array&src=string&dst=string&srcport=string or integer&dstport=string or integer&gateway=string&disabled=boolean&descr=string&log=boolean&top=boolean&apply=boolean&sched=string",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -2408,6 +2413,11 @@
 											"key": "apply",
 											"value": "boolean",
 											"description": "Specify whether or not you would like this rule update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple rules at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating a single rule, you may set this true to apply it immediately. Defaults to false. (optional)"
+										},
+										{
+											"key": "sched",
+											"value": "string",
+											"description": "Update the firewall schedule to apply to this rule. This must be an existing firewall schedule name. Provide an empty string to remove the configured schedule from the rule. (optional)"
 										}
 									]
 								},

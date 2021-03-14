@@ -239,6 +239,22 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "gateway": "INVALID"
             }
         },
+        {
+            "name": "Test schedule validation",
+            "status": 400,
+            "return": 4150,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "sched": "INVALID"
+            }
+        },
     ]
     put_tests = [
         {
@@ -383,6 +399,22 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "srcport": "any",
                 "dstport": "any",
                 "gateway": "INVALID"
+            }
+        },
+        {
+            "name": "Test schedule validation",
+            "status": 400,
+            "return": 4150,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "sched": "INVALID"
             }
         },
     ]

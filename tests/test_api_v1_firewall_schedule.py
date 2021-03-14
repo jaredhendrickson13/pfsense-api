@@ -91,8 +91,34 @@ class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
                 "timerange": []
             }
         },
+        {
+            "name": "Create firewall rule using created schedule",
+            "uri": "/api/v1/firewall/rule",
+            "payload": {
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "any",
+                "type": "pass",
+                "src": "any",
+                "dst": "any",
+                "sched": "Test_Schedule"
+            }
+        }
     ]
     delete_tests = [
+        {
+            "name": "Check deleting schedule in use",
+            "status": 400,
+            "return": 4166,
+            "payload": {
+                "name": "Test_Schedule"
+            }
+        },
+        {
+            "name": "Delete firewall rule using schedule",
+            "uri": "/api/v1/firewall/rule",
+            "payload": {}
+        },
         {
             "name": "Delete firewall schedule",
             "payload": {
@@ -114,5 +140,14 @@ class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
         }
         # TODO: Add test to check inability to delete schedules while they're in use
     ]
+
+    def post_post(self):
+        # Only proceed if we have a valid post response
+        if self.post_responses:
+            # Check if the last request was a successful firewall rule creation
+            if self.post_responses[-1] and type(self.post_responses[-1]["data"]) == dict:
+                # Add the tracker to delete payload that deletes the firewall rule using the schedule
+                if self.post_responses[-1]["data"].get("tracker", None):
+                    self.delete_tests[1]["payload"]["tracker"] = self.post_responses[-1]["data"]["tracker"]
 
 APIUnitTestFirewallSchedule()

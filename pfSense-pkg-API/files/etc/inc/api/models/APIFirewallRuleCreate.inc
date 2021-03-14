@@ -205,6 +205,24 @@ class APIFirewallRuleCreate extends APIModel {
         }
     }
 
+    private function __validate_sched() {
+        # Check for our optional 'sched' payload value
+        if (isset($this->initial_data['sched'])) {
+            # Loop through each configured schedule and check if it exists
+            foreach ($this->config["schedules"]["schedule"] as $schedule) {
+                # Check if the names match
+                if ($this->initial_data["sched"] === $schedule["name"]) {
+                    $this->validated_data["sched"] = $this->initial_data["sched"];
+                }
+            }
+
+            # Set error if no match was found
+            if (!isset($this->validated_data["sched"])) {
+                $this->errors[] = APIResponse\get(4150);
+            }
+        }
+    }
+
     private function __validate_disabled() {
         # Check for our optional 'disabled' payload value
         if ($this->initial_data['disabled'] === true) {
@@ -244,6 +262,7 @@ class APIFirewallRuleCreate extends APIModel {
         $this->__validate_srcport();
         $this->__validate_dstport();
         $this->__validate_gateway();
+        $this->__validate_sched();
         $this->__validate_disabled();
         $this->__validate_descr();
         $this->__validate_log();
