@@ -21,7 +21,7 @@ webConfigurator are required to make calls to the API endpoints
 # Installation
 To install pfSense API, simply run the following command from the pfSense shell:<br>
 ```
-pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.4-pkg-API.txz && /etc/rc.restart_webgui
+pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.5-pkg-API.txz && /etc/rc.restart_webgui
 ```
 
 To uninstall pfSense API, run the following command:<br>
@@ -36,11 +36,11 @@ pfsense-api update
 
 To revert to a previous version of pfSense API (e.g. v1.0.2), run the following command:
 ```
-pfsense-api revert v1.0.2
+pfsense-api revert v1.1.7
 ```
 
 ### Notes: 
-- pfSense API is supported on the pfSense 2.5 developer snapshots. To install the 2.5 package, simply change the `2.4` in the install URL to `2.5`.
+- To install the 2.4 package, simply change the `2.5` in the install URL to `2.4`.
 - In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package
 - If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to 
 'Diagnostics > Command Prompt' and enter the commands there
@@ -6817,3 +6817,4 @@ URL: https://{{$hostname}}/api/v1/user/privilege
 
 ---
 [Back to top](#pfsense-rest-api-documentation)
+> Made with &#9829; by [thedevsaddam](https://github.com/thedevsaddam) | Generated at: 2021-03-14 22:47:05 by [docgen](https://github.com/thedevsaddam/docgen)
