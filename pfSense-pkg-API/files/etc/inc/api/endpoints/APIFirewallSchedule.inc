@@ -28,6 +28,10 @@ class APIFirewallSchedule extends APIEndpoint {
         return (new APIFirewallScheduleCreate())->call();
     }
 
+    protected function put() {
+        return (new APIFirewallScheduleUpdate())->call();
+    }
+
     protected function delete() {
         return (new APIFirewallScheduleDelete())->call();
     }

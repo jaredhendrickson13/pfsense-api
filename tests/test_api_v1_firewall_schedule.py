@@ -16,6 +16,9 @@ import unit_test_framework
 
 class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
     uri = "/api/v1/firewall/schedule"
+    get_tests = [
+            {"name": "Read all firewall schedules"}
+        ]
     post_tests = [
         {
             "name": "Create firewall schedule",
@@ -104,6 +107,63 @@ class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
                 "sched": "Test_Schedule"
             }
         }
+    ]
+    put_tests = [
+        {
+            "name": "Update firewall schedule",
+            "payload": {
+                "name": "Test_Schedule",
+                "descr": "Updated unit test",
+                "timerange": [
+                    {
+                        "month": "1,3,5,12",
+                        "day": "10,20,25,25",
+                        "hour": "0:15-23:00",
+                        "rangedescr": "Updated unit test"
+                    },
+                    {
+                        "position": "1,3,5",
+                        "hour": "10:15-12:00",
+                        "rangedescr": "Updated unit test"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Check name requirement",
+            "status": 400,
+            "return": 4146
+        },
+        {
+            "name": "Check updating non-existent firewall schedule",
+            "status": 400,
+            "return": 4150,
+            "payload": {
+                "name": "INVALID"
+            }
+        },
+        {
+            "name": "Check update with no changes",
+            "payload": {
+                "name": "Test_Schedule"
+            }
+        },
+        {
+            "name": "Check update with changed description only",
+            "payload": {
+                "name": "Test_Schedule",
+                "descr": "Update unit test description only"
+            }
+        },
+        {
+            "name": "Check time range minimum length constraint",
+            "status": 400,
+            "return": 4162,
+            "payload": {
+                "name": "Test_Schedule",
+                "timerange": []
+            }
+        },
     ]
     delete_tests = [
         {
