@@ -2322,7 +2322,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/firewall/rule?tracker=string or Integer&type=string&interface=string&ipprotocol=string&protocol=string&icmptype=string or array&src=string&dst=string&srcport=string or integer&dstport=string or integer&gateway=string&disabled=boolean&descr=string&log=boolean&top=boolean&apply=boolean&sched=string",
+									"raw": "https://{{$hostname}}/api/v1/firewall/rule?tracker=string or Integer&type=string&interface=string&ipprotocol=string&protocol=string&icmptype=string or array&src=string&dst=string&srcport=string or integer&dstport=string or integer&gateway=string&sched=string&disabled=boolean&descr=string&log=boolean&top=boolean&apply=boolean",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -2390,6 +2390,11 @@
 											"description": "Update the routing gateway traffic will take upon match (optional)"
 										},
 										{
+											"key": "sched",
+											"value": "string",
+											"description": "Update the firewall schedule to apply to this rule. This must be an existing firewall schedule name. Provide an empty string to remove the configured schedule from the rule. (optional)"
+										},
+										{
 											"key": "disabled",
 											"value": "boolean",
 											"description": "Disable the rule upon modification (optional)"
@@ -2413,11 +2418,6 @@
 											"key": "apply",
 											"value": "boolean",
 											"description": "Specify whether or not you would like this rule update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple rules at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating a single rule, you may set this true to apply it immediately. Defaults to false. (optional)"
-										},
-										{
-											"key": "sched",
-											"value": "string",
-											"description": "Update the firewall schedule to apply to this rule. This must be an existing firewall schedule name. Provide an empty string to remove the configured schedule from the rule. (optional)"
 										}
 									]
 								},
@@ -3993,7 +3993,7 @@
 											}
 										},
 										"url": {
-											"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper?interface=string&name=string&priority=integer&description=string&enabled=boolean&default=boolean&red=boolean&rio=boolean&ecn=boolean&codel=boolean&qlimit=integer&bandwidthtype=string&bandwidth=integer&buckets=string&hogs=string&borrow=boolean&upperlimit=boolean&upperlimit1=string&upperlimit2=integer&upperlimit3=string&linkshare=boolean&linkshare1=string&linkshare2=integer&linkshare3=string&realtime=boolean&realtime1=string&realtime2=integer&realtime3=string&apply=integer",
+											"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper/queue?interface=string&name=string&priority=integer&description=string&enabled=boolean&default=boolean&red=boolean&rio=boolean&ecn=boolean&codel=boolean&qlimit=integer&bandwidthtype=string&bandwidth=integer&buckets=string&hogs=string&borrow=boolean&upperlimit=boolean&upperlimit1=string&upperlimit2=integer&upperlimit3=string&linkshare=boolean&linkshare1=string&linkshare2=integer&linkshare3=string&realtime=boolean&realtime1=string&realtime2=integer&realtime3=string&apply=integer",
 											"protocol": "https",
 											"host": [
 												"{{$hostname}}"
@@ -4002,7 +4002,8 @@
 												"api",
 												"v1",
 												"firewall",
-												"traffic_shaper"
+												"traffic_shaper",
+												"queue"
 											],
 											"query": [
 												{
@@ -4171,7 +4172,7 @@
 											}
 										},
 										"url": {
-											"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper?interface=string&name=string",
+											"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper/queue?interface=string&name=string",
 											"protocol": "https",
 											"host": [
 												"{{$hostname}}"
@@ -4180,7 +4181,8 @@
 												"api",
 												"v1",
 												"firewall",
-												"traffic_shaper"
+												"traffic_shaper",
+												"queue"
 											],
 											"query": [
 												{
@@ -4428,6 +4430,342 @@
 						}
 					],
 					"description": "API endpoints to create, read, update and delete traffic shaper configurations.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "SCHEDULE",
+					"item": [
+						{
+							"name": "TIME_RANGE",
+							"item": [
+								{
+									"name": "Create Schedule Time Range",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Test_Schedule\",\n    \"month\": \"1,3,5\",\n    \"day\": \"20,24,5\",\n    \"hour\": \"9:00-17:00\",\n    \"rangedescr\": \"Enable on Jan 20, Mar 24, and May 5 from 9AM to 5PM\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/schedule/time_range?name=string&position=string&month=string&day=string&hour=string&rangedescr=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"schedule",
+												"time_range"
+											],
+											"query": [
+												{
+													"key": "name",
+													"value": "string",
+													"description": "Specify the name of the schedule to add this time range to. This must be an existing firewall schedule name."
+												},
+												{
+													"key": "position",
+													"value": "string",
+													"description": "Specify a comma-separated list of week days the schedule will be enable for. Options are `1` for Monday, `2` for Tuesday, `3` for Wednesday, `4` for Thursday, `5` for Friday, `6` for Saturday, and `7` for Sunday. For example, all weekdays would be formatted as such `\"1,2,3,4,5\"`. (optional)"
+												},
+												{
+													"key": "month",
+													"value": "string",
+													"description": "Specify a comma-separated list of months the schedule will be enabled for. This will directly correspond with each value in the `day` field. For example, to enable this schedule on March 1st, and August 26th, the `month` field should be formatted as `\"3,8\"` and the `day` field should be formatted as `\"1,26\"`. This field will be required if the `position` field was not specified. This field cannot be set if the `position` field was set."
+												},
+												{
+													"key": "day",
+													"value": "string",
+													"description": "Specify a comma-separated list of days the schedule will be enabled for. This will directly correspond with each value in the `month` field. For example, to enable this schedule on March 1st, and August 26th, the `month` field should be formatted as `\"3,8\"` and the `day` field should be formatted as `\"1,26\"`. This field will be required if the `position` field was not specified. This field cannot be set if the `position` field was set."
+												},
+												{
+													"key": "hour",
+													"value": "string",
+													"description": "Specify the hour range this schedule will be enabled for. This must be two 24-hour time  strings formatted as either HH:MM or H:MM separated by `-` (e.g. `9:00-17:00`). The first time range must be less than the second time range. The minutes portion of the time range must be either `00`, `15`, `30`, `45`, or `59`."
+												},
+												{
+													"key": "rangedescr",
+													"value": "string",
+													"description": "Specify a description for this time range. (optional)"
+												}
+											]
+										},
+										"description": "Add a time range to an existing firewall schedule.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Schedule Time Range",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Test_Schedule\",\n    \"id\": 0\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/schedule/time_range?name=string&id=integer",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"schedule",
+												"time_range"
+											],
+											"query": [
+												{
+													"key": "name",
+													"value": "string",
+													"description": "Specify the name of the schedule to delete this time range from. This must be an existing firewall schedule name."
+												},
+												{
+													"key": "id",
+													"value": "integer",
+													"description": "Specify the ID of the time range to delete. This will be the configuration array index of the `timerange` object within the `schedule` object."
+												}
+											]
+										},
+										"description": "Delete a time range from an existing firewall schedule.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints to create and delete firewall schedule time ranges.",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "bc7723c5-9ecc-45e6-a45e-c31cd88e8905",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "6e3f72d3-05f8-499d-9464-0116ef0dee58",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Create Schedule",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Test_Schedule\",\n    \"descr\": \"Test firewall schedule\",\n    \"timerange\": [\n        {\n            \"month\": \"1,3,5\",\n            \"day\": \"10,20,25\",\n            \"hour\": \"0:15-20:00\",\n            \"rangedescr\": \"On Jan 1, March 20, and May 25 from 0:15 to 20:00\"\n        },\n        {\n            \"position\": \"1,2,3,4,5\",\n            \"hour\": \"10:15-12:00\",\n            \"rangedescr\": \"Every Mon, Tues, Wed, Thur, Fri from 10:15 to 12:00\"\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/firewall/schedule?name=string&descr=string&timerange=array",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"firewall",
+										"schedule"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "string",
+											"description": "Specify a name for this firewall schedule. This value must be between 1 and 32 characters, and can only contain alphanumerics, underscores and hyphens. This value must be unique from all other firewall schedules. "
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Specify a description for this firewall schedule (optional)"
+										},
+										{
+											"key": "timerange",
+											"value": "array",
+											"description": "Specify an array of time range objects for this schedule. Each object must contain the required fields as specified by the /api/v1/firewall/schedule/time_range endpoint. At least 1 time range object must be specified."
+										}
+									]
+								},
+								"description": "Add a firewall schedule.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Schedule",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Test_Schedule\",\n    \"descr\": \"Updated test firewall schedule\",\n    \"timerange\": [\n        {\n            \"month\": \"2,4,6\",\n            \"day\": \"10,20,25\",\n            \"hour\": \"0:15-20:00\",\n            \"rangedescr\": \"On Feb 1, Apr 20, and Jun 25 from 0:15 to 20:00\"\n        },\n        {\n            \"position\": \"6,7\",\n            \"hour\": \"10:15-12:00\",\n            \"rangedescr\": \"Every Sat, Sun from 10:15 to 12:00\"\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/firewall/schedule?name=string&descr=string&timerange=array",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"firewall",
+										"schedule"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "string",
+											"description": "Specify the name of the firewall schedule to update. This field Is used to locate the object and cannot be used to change the name of the schedule."
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Update the description for this firewall schedule (optional)"
+										},
+										{
+											"key": "timerange",
+											"value": "array",
+											"description": "Update the array of time range objects for this schedule. Each object must contain the required fields as specified by the /api/v1/firewall/schedule/time_range endpoint. If this field is passed in, at least 1 time range object must be specified. Specifying this field will overwrite any existing time ranges for this schedule. (optional)"
+										}
+									]
+								},
+								"description": "Update an existing firewall schedule.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Schedule",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Test_Schedule\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/firewall/schedule?name=string",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"firewall",
+										"schedule"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "string",
+											"description": "Specify the name of the firewall schedule to delete."
+										}
+									]
+								},
+								"description": "Delete an existing firewall schedule.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Read schedules",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/firewall/schedule",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"firewall",
+										"schedule"
+									]
+								},
+								"description": "Read all existing firewall schedules.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints to create, read, update and delete firewall schedule configurations.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e2e01cc0-d2b7-4228-b33c-70932ba335f2",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "bb8ad209-4699-4356-ad52-54bc9ab3fd94",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
 					"protocolProfileBehavior": {},
 					"_postman_isSubFolder": true
 				}
