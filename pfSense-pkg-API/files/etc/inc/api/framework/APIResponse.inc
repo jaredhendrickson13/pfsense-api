@@ -1982,6 +1982,288 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Cannot delete firewall schedule while it is in use"
         ],
+        4167 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter name is required"
+        ],
+        4168 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter name can only contain alphanumerics, hyphens and underscores"
+        ],
+        4169 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter name must be 32 characters or less"
+        ],
+        4170 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter name is already in use"
+        ],
+        4171 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall traffic shaper limiter mask"
+        ],
+        4172 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter mask bits must be numeric value between 1 and 32"
+        ],
+        4173 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter IPv6 mask bits must be numeric value between 1 and 128"
+        ],
+        4174 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter queue management algorithm (AQM) is required"
+        ],
+        4175 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall traffic shaper limiter queue management algorithm (AQM)"
+        ],
+        4176 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter ECN requested but neither the AQM nor scheduler support it"
+        ],
+        4177 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter delay must be a numeric value between 0 and 10000"
+        ],
+        4178 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter packet loss rate must be a numeric value between 0 and 1"
+        ],
+        4179 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter buckets must be a numeric value between 16 and 65535"
+        ],
+        4180 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter codel target parameter must be 0 or greater"
+        ],
+        4181 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter codel interval parameter must be 0 or greater"
+        ],
+        4182 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter pie target parameter must be 0 or greater"
+        ],
+        4183 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter pie tupdate parameter must be 0 or greater"
+        ],
+        4184 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter pie alpha parameter must be 0 or greater"
+        ],
+        4185 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter pie beta parameter must be 0 or greater"
+        ],
+        4186 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter pie max burst parameter must be 0 or greater"
+        ],
+        4187 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter pie max ecnth parameter must be 0 or greater"
+        ],
+        4188 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter red w_q parameter must be 1 or greater"
+        ],
+        4189 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter red min th parameter must be 0 or greater"
+        ],
+        4190 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter red max th parameter must be 1 or greater"
+        ],
+        4191 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter red max p parameter must be 1 or greater"
+        ],
+        4192 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter gred w_q parameter must be 1 or greater"
+        ],
+        4193 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter gred min th parameter must be 0 or greater"
+        ],
+        4194 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter gred max th parameter must be 1 or greater"
+        ],
+        4195 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter gred max p parameter must be 1 or greater"
+        ],
+        4196 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_codel target parameter must be 0 or greater"
+        ],
+        4197 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_codel interval parameter must be 0 or greater"
+        ],
+        4198 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_codel quantum parameter must be 0 or greater"
+        ],
+        4199 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_codel limit parameter must be 0 or greater"
+        ],
+        4200 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_codel flows parameter must be 0 or greater"
+        ],
+        4201 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_pie target parameter must be 0 or greater"
+        ],
+        4202 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_pie tupdate parameter must be 0 or greater"
+        ],
+        4203 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_pie alpha parameter must be 0 or greater"
+        ],
+        4204 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_pie beta parameter must be 0 or greater"
+        ],
+        4205 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_pie max burst parameter must be 0 or greater"
+        ],
+        4206 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_pie max ecnth parameter must be 0 or greater"
+        ],
+        4207 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter bandwidth is required"
+        ],
+        4208 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "At least 1 bandwidth schedule object is required"
+        ],
+        4209 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter with this name does not exist"
+        ],
+        4210 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter bandwidth is required"
+        ],
+        4211 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter bandwidth must be 1 or greater"
+        ],
+        4212 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter bandwidth scale is required"
+        ],
+        4213 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall traffic shaper limiter bandwidth scale"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [
