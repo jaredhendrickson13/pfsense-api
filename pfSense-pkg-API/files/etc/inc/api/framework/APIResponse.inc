@@ -2270,6 +2270,18 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall traffic shaper limiter and child queues cannot be deleted while in use"
         ],
+        4215 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter bandwidth ID required"
+        ],
+        4216 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter bandwidth ID does not exist"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [
