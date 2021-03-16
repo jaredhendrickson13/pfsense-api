@@ -49,6 +49,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
 
         # Validate client specified fields
         $this->__validate_name();
+        $this->__validate_bandwidth();
         $this->__validate_mask();
         $this->__validate_maskbits();
         $this->__validate_maskbitsv6();
@@ -66,6 +67,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
         $this->__validate_param_pie_target();
         $this->__validate_param_pie_tupdate();
         $this->__validate_param_pie_alpha();
+        $this->__validate_param_pie_beta();
         $this->__validate_param_pie_max_burst();
         $this->__validate_param_pie_max_ecnth();
         $this->__validate_param_red_w_q();
@@ -117,8 +119,27 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
     private function __validate_bandwidth() {
         # Check for our required `bandwidth` payload value
         if (isset($this->initial_data["bandwidth"])) {
-            # TODO: add nested API call to create limiter bandwidth objects
-            $this->errors[] = APIResponse\get(4208);
+            # Require objects to be contained within an array
+            if (is_array($this->initial_data["bandwidth"]) and count($this->initial_data["bandwidth"]) >= 1) {
+                # Initialize the validate data as an array
+                $this->validated_data["bandwidth"] = [];
+                $this->validated_data["bandwidth"]["item"] = [];
+
+                # Create an APIFirewallTrafficShaperLimiterCreate object for each item and validate the input
+                foreach ($this->initial_data["bandwidth"] as $bw_item) {
+                    $bw = new APIFirewallTrafficShaperLimiterBandwidthCreate();
+                    $bw->initial_data = $bw_item;
+                    $bw->validate_payload(true);
+                    $this->errors = $this->errors + $bw->errors;
+
+                    # Add this item to our array if it was valid
+                    if (!$bw->errors) {
+                        $this->validated_data["bandwidth"]["item"][] = $bw->validated_data;
+                    }
+                }
+            } else {
+                $this->errors[] = APIResponse\get(4208);
+            }
         } else {
             $this->errors[] = APIResponse\get(4207);
         }
@@ -329,7 +350,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4180);
                 }
             } else {
-                $this->validated_data["param_codel_target"] = 0;
+                $this->validated_data["param_codel_target"] = 5;
             }
         }
     }
@@ -351,7 +372,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4181);
                 }
             } else {
-                $this->validated_data["param_codel_interval"] = 0;
+                $this->validated_data["param_codel_interval"] = 100;
             }
         }
     }
@@ -374,7 +395,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4182);
                 }
             } else {
-                $this->validated_data["param_pie_target"] = 0;
+                $this->validated_data["param_pie_target"] = 15;
             }
         }
     }
@@ -396,7 +417,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4183);
                 }
             } else {
-                $this->validated_data["param_pie_tupdate"] = 0;
+                $this->validated_data["param_pie_tupdate"] = 15;
             }
         }
     }
@@ -418,7 +439,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4184);
                 }
             } else {
-                $this->validated_data["param_pie_alpha"] = "";
+                $this->validated_data["param_pie_alpha"] = 125;
             }
         }
     }
@@ -440,7 +461,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4185);
                 }
             } else {
-                $this->validated_data["param_pie_beta"] = "";
+                $this->validated_data["param_pie_beta"] = 1250;
             }
         }
     }
@@ -462,7 +483,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4186);
                 }
             } else {
-                $this->validated_data["param_pie_max_burst"] = "";
+                $this->validated_data["param_pie_max_burst"] = 150000;
             }
         }
     }
@@ -484,7 +505,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4187);
                 }
             } else {
-                $this->validated_data["param_pie_max_ecnth"] = "";
+                $this->validated_data["param_pie_max_ecnth"] = 99;
             }
         }
     }
@@ -581,7 +602,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
     # GRED AQM PARAMS #
     private function __validate_param_gred_w_q() {
         # Only validate this field if the AQM is set to red
-        if ($this->validated_data["aqm"] === "red") {
+        if ($this->validated_data["aqm"] === "gred") {
             # Check for our optional `param_gred_w_q` payload value
             if (isset($this->initial_data["param_gred_w_q"])) {
                 # Ensure the param_gred_w_q is numeric
@@ -686,14 +707,14 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4196);
                 }
             } else {
-                $this->validated_data["param_fq_codel_target"] = 0;
+                $this->validated_data["param_fq_codel_target"] = 5;
             }
         }
     }
 
     private function __validate_param_fq_codel_interval() {
         # Only validate this field if the AQM is set to codel
-        if ($this->validated_data["sched"] === "param_fq_codel_interval") {
+        if ($this->validated_data["sched"] === "fq_codel") {
             # Check for our optional `param_fq_codel_interval` payload value
             if (isset($this->initial_data["param_fq_codel_interval"])) {
                 # Ensure the param_fq_codel_interval is numeric
@@ -708,14 +729,14 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4197);
                 }
             } else {
-                $this->validated_data["param_fq_codel_interval"] = 0;
+                $this->validated_data["param_fq_codel_interval"] = 100;
             }
         }
     }
 
     private function __validate_param_fq_codel_quantum() {
         # Only validate this field if the AQM is set to codel
-        if ($this->validated_data["sched"] === "param_fq_codel_quantum") {
+        if ($this->validated_data["sched"] === "fq_codel") {
             # Check for our optional `param_fq_codel_quantum` payload value
             if (isset($this->initial_data["param_fq_codel_quantum"])) {
                 # Ensure the param_fq_codel_quantum is numeric
@@ -730,14 +751,14 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4198);
                 }
             } else {
-                $this->validated_data["param_fq_codel_quantum"] = "";
+                $this->validated_data["param_fq_codel_quantum"] = 1514;
             }
         }
     }
 
     private function __validate_param_fq_codel_limit() {
         # Only validate this field if the AQM is set to codel
-        if ($this->validated_data["sched"] === "param_fq_codel_limit") {
+        if ($this->validated_data["sched"] === "fq_codel") {
             # Check for our optional `param_fq_codel_limit` payload value
             if (isset($this->initial_data["param_fq_codel_limit"])) {
                 # Ensure the param_fq_codel_limit is numeric
@@ -752,14 +773,14 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4199);
                 }
             } else {
-                $this->validated_data["param_fq_codel_limit"] = "";
+                $this->validated_data["param_fq_codel_limit"] = 10240;
             }
         }
     }
 
     private function __validate_param_fq_codel_flows() {
         # Only validate this field if the AQM is set to codel
-        if ($this->validated_data["sched"] === "param_fq_codel_flows") {
+        if ($this->validated_data["sched"] === "fq_codel") {
             # Check for our optional `param_fq_codel_flows` payload value
             if (isset($this->initial_data["param_fq_codel_flows"])) {
                 # Ensure the param_fq_codel_flows is numeric
@@ -774,7 +795,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4200);
                 }
             } else {
-                $this->validated_data["param_fq_codel_flows"] = "";
+                $this->validated_data["param_fq_codel_flows"] = 1024;
             }
         }
     }
@@ -797,7 +818,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4201);
                 }
             } else {
-                $this->validated_data["param_fq_pie_target"] = 0;
+                $this->validated_data["param_fq_pie_target"] = 15;
             }
         }
     }
@@ -819,7 +840,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4202);
                 }
             } else {
-                $this->validated_data["param_fq_pie_tupdate"] = 0;
+                $this->validated_data["param_fq_pie_tupdate"] = 15;
             }
         }
     }
@@ -841,7 +862,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4203);
                 }
             } else {
-                $this->validated_data["param_fq_pie_alpha"] = "";
+                $this->validated_data["param_fq_pie_alpha"] = 125;
             }
         }
     }
@@ -863,7 +884,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4204);
                 }
             } else {
-                $this->validated_data["param_fq_pie_beta"] = "";
+                $this->validated_data["param_fq_pie_beta"] = 1250;
             }
         }
     }
@@ -885,7 +906,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4205);
                 }
             } else {
-                $this->validated_data["param_fq_pie_max_burst"] = "";
+                $this->validated_data["param_fq_pie_max_burst"] = 150000;
             }
         }
     }
@@ -907,7 +928,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                     $this->errors[] = APIResponse\get(4206);
                 }
             } else {
-                $this->validated_data["param_fq_pie_max_ecnth"] = "";
+                $this->validated_data["param_fq_pie_max_ecnth"] = 99;
             }
         }
     }

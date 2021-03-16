@@ -22,11 +22,11 @@ class APIFirewallTrafficShaperLimiterBandwidthCreate extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-trafficshaper-limiter"];
-        $this->change_note = "Added firewall limiter bandwidth via API";
+        $this->change_note = "Added firewall traffic shaper limiter bandwidth via API";
     }
 
     public function action() {
-        # Write this schedule time range to the config and reload the firewall filter
+        $this->__init_config();
         $this->config["dnshaper"]["queue"][$this->id]["bandwidth"]["item"][] = $this->validated_data;
         $this->write_config();
         filter_configure();
@@ -42,6 +42,9 @@ class APIFirewallTrafficShaperLimiterBandwidthCreate extends APIModel {
         $this->__validate_bw();
         $this->__validate_bwscale();
         $this->__validate_bwsched();
+
+        # Set static fields
+        $this->validated_data["burst"] = "";
     }
 
     private function __validate_name() {
@@ -61,7 +64,7 @@ class APIFirewallTrafficShaperLimiterBandwidthCreate extends APIModel {
         # Check for our required `bw` payload value
         if (isset($this->initial_data["bw"])) {
             if (is_numeric($this->initial_data["bw"]) and intval($this->initial_data["bw"] >= 1)) {
-                $this->validated_data["bw"] = $this->initial_data["bw"];
+                $this->validated_data["bw"] = intval($this->initial_data["bw"]);
             } else {
                 $this->errors[] = APIResponse\get(4211);
             }
@@ -118,4 +121,14 @@ class APIFirewallTrafficShaperLimiterBandwidthCreate extends APIModel {
         return false;
     }
 
+    private function __init_config() {
+        # Check if there is no dnshaper array in the config
+        if (empty($this->config["dnshaper"]["queue"][$this->id]["queue"])) {
+            $this->config["dnshaper"]["queue"][$this->id]["queue"] = [];
+        }
+        # Check if there is no dnshaper queue array in the config
+        if (empty($this->config["dnshaper"]["queue"][$this->id]["queue"]["item"])) {
+            $this->config["dnshaper"]["queue"][$this->id]["queue"]["item"] = [];
+        }
+    }
 }
