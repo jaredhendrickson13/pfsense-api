@@ -2282,6 +2282,36 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall traffic shaper limiter bandwidth ID does not exist"
         ],
+        4217 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter queue weight must be between 1 and 100"
+        ],
+        4218 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper parent limiter required"
+        ],
+        4219 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper parent limiter does not exist"
+        ],
+        4220 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter queue name required"
+        ],
+        4221 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter queue name does not exist"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [

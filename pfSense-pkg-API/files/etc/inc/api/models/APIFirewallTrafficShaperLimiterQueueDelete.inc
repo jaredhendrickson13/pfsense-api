@@ -17,18 +17,18 @@ require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
 
-class APIFirewallTrafficShaperLimiterBandwidthDelete extends APIModel {
+class APIFirewallTrafficShaperLimiterQueueDelete extends APIModel {
     private $parent_id;
 
     # Create our method constructor
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-trafficshaper-limiter"];
-        $this->change_note = "Deleted firewall traffic shaper limiter bandwidth via API";
+        $this->change_note = "Deleted firewall traffic shaper limiter queue via API";
     }
 
     public function action() {
-        unset($this->config["dnshaper"]["queue"][$this->parent_id]["bandwidth"]["item"][$this->id]);
+        unset($this->config["dnshaper"]["queue"][$this->parent_id]["queue"][$this->id]);
         $this->write_config();
         mark_subsystem_dirty('shaper');
 
@@ -45,37 +45,35 @@ class APIFirewallTrafficShaperLimiterBandwidthDelete extends APIModel {
     }
 
     public function validate_payload() {
+        $this->__validate_limiter();
         $this->__validate_name();
-        $this->__validate_id();
+    }
+
+    private function __validate_limiter() {
+        # Check for our required `limiter` payload value
+        if (isset($this->initial_data["limiter"])) {
+            if ($this->get_limiter_id_by_name($this->initial_data["limiter"], true)) {
+                $this->parent_id = $this->get_limiter_id_by_name($this->initial_data["limiter"]);
+                $this->validated_data["number"] = $this->config["dnshaper"]["queue"][$this->id]["number"];
+            } else {
+                $this->errors[] = APIResponse\get(4219);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(4218);
+        }
     }
 
     private function __validate_name() {
         # Check for our required `name` payload value
         if (isset($this->initial_data["name"])) {
-            if ($this->get_limiter_id_by_name($this->initial_data["name"], true)) {
-                $this->parent_id = $this->get_limiter_id_by_name($this->initial_data["name"]);
+            if ($this->get_limiter_queue_id_by_name($this->initial_data["name"], $this->parent_id, true)) {
+                $this->id = $this->get_limiter_queue_id_by_name($this->initial_data["name"], $this->parent_id);
+                $this->validated_data = $this->config["dnshaper"]["queue"][$this->parent_id]["queue"][$this->id];
             } else {
-                $this->errors[] = APIResponse\get(4209);
+                $this->errors[] = APIResponse\get(4221);
             }
         } else {
-            $this->errors[] = APIResponse\get(4167);
-        }
-    }
-
-    private function __validate_id() {
-        # Check for our required `id` payload value
-        if (isset($this->initial_data["id"])) {
-            $id = intval($this->initial_data["id"]);
-
-            # Ensure a bandwidth object with this ID exists
-            if (array_key_exists($id, $this->config["dnshaper"]["queue"][$this->parent_id]["bandwidth"]["item"])) {
-                $this->id = $id;
-                $this->validated_data = $this->config["dnshaper"]["queue"][$this->parent_id]["bandwidth"]["item"][$id];
-            } else {
-                $this->errors[] = APIResponse\get(4216);
-            }
-        } else {
-            $this->errors[] = APIResponse\get(4215);
+            $this->errors[] = APIResponse\get(4220);
         }
     }
 
@@ -84,6 +82,17 @@ class APIFirewallTrafficShaperLimiterBandwidthDelete extends APIModel {
         foreach ($this->config["dnshaper"]["queue"] as $id=>$limiter) {
             # Check for matching names
             if ($name === $limiter["name"]) {
+                return ($as_bool) ? true : $id;
+            }
+        }
+        return ($as_bool) ? false : null;
+    }
+
+    public function get_limiter_queue_id_by_name($name, $limiter_id, $as_bool=false) {
+        # Loop through each configured limiter queue and see if it uses this name
+        foreach ($this->config["dnshaper"]["queue"][$limiter_id]["queue"] as $id=>$queue) {
+            # Check for matching names
+            if ($name === $queue["name"]) {
                 return ($as_bool) ? true : $id;
             }
         }

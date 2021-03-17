@@ -29,8 +29,17 @@ class APIFirewallTrafficShaperLimiterBandwidthCreate extends APIModel {
         $this->__init_config();
         $this->config["dnshaper"]["queue"][$this->id]["bandwidth"]["item"][] = $this->validated_data;
         $this->write_config();
-        filter_configure();
+        mark_subsystem_dirty('shaper');
 
+        # Only reload the filter immediately if it was requested by the client
+        if ($this->initial_data["apply"] === true) {
+            # Reload the filter, reset RRD logs and mark the subsystem as applied
+            filter_configure();
+            system("rm -f /var/db/rrd/*queuedrops.rrd");
+            system("rm -f /var/db/rrd/*queues.rrd");
+            enable_rrd_graphing();
+            clear_subsystem_dirty('shaper');
+        }
         return APIResponse\get(0, $this->validated_data);
     }
 

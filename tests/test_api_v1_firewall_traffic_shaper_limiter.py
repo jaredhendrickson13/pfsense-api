@@ -14,7 +14,7 @@
 
 import unit_test_framework
 
-class APIUnitTestFirewallTrafficShaper(unit_test_framework.APIUnitTest):
+class APIUnitTestFirewallTrafficShaperLimiter(unit_test_framework.APIUnitTest):
     uri = "/api/v1/firewall/traffic_shaper/limiter"
     get_tests = [{"name": "Read all traffic shaper limiters"}]
     post_tests = [
@@ -33,6 +33,11 @@ class APIUnitTestFirewallTrafficShaper(unit_test_framework.APIUnitTest):
                 "buckets": 16,
                 "apply": True
             }
+        },
+        {
+            "name": "Check name requirement",
+            "status": 400,
+            "return": 4167
         },
         {
             "name": "Check name requirement",
@@ -1029,4 +1034,4 @@ class APIUnitTestFirewallTrafficShaper(unit_test_framework.APIUnitTest):
     ]
 
 
-APIUnitTestFirewallTrafficShaper()
+APIUnitTestFirewallTrafficShaperLimiter()
