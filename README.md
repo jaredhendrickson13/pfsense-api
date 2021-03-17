@@ -44,7 +44,7 @@ pfsense-api revert v1.1.7
 - In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package
 - If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to 
 'Diagnostics > Command Prompt' and enter the commands there
-- When updating pfSense, **_you must reinstall pfSense API afterwards_**. Unfortunately, pfSense removes all existing packages and only reinstalls packages found within pfSense's package repositories. Since pfSense API is not an official package in pfSense's repositories, it does not get reinstalled automatically.
+- When updating pfSense, **_you must reinstall pfSense API afterwards_**. Unfortunately, pfSense removes all existing packages and only re-installs packages found within pfSense's package repositories. Since pfSense API is not an official package in pfSense's repositories, it does not get reinstalled automatically.
 - The `pfsense-api` command line tool was introduced in v1.1.0. Refer to the corresponding documentation for earlier releases.
 
 
@@ -184,7 +184,7 @@ A full list of error codes can be found by navigating to /api/v1/system/api/erro
 # Queries
 pfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field. 
 <details>
-    <summary>Targetting Objects</summary>
+    <summary>Targeting Objects</summary>
     
 You may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns this response without a query:
 
@@ -581,6 +581,22 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Delete Traffic Shaper](#2-delete-traffic-shaper)
   * [Read Traffic Shapers](#3-read-traffic-shapers)
   * [Update Traffic Shaper](#4-update-traffic-shaper)
+
+* [FIREWALL/TRAFFIC_SHAPER/LIMITER](#firewalltraffic_shaperlimiter)
+
+  * [Create Limiter](#1-create-limiter)
+  * [Delete limiter](#2-delete-limiter)
+  * [Read Limiters](#3-read-limiters)
+
+* [FIREWALL/TRAFFIC_SHAPER/LIMITER/BANDWIDTH](#firewalltraffic_shaperlimiterbandwidth)
+
+  * [Create Limiter Bandwidth](#1-create-limiter-bandwidth)
+  * [Delete Limiter Bandwidth](#2-delete-limiter-bandwidth)
+
+* [FIREWALL/TRAFFIC_SHAPER/LIMITER/QUEUE](#firewalltraffic_shaperlimiterqueue)
+
+  * [Create Limiter Queue](#1-create-limiter-queue)
+  * [Delete Limiter Queue](#2-delete-limiter-queue)
 
 * [FIREWALL/TRAFFIC_SHAPER/QUEUE](#firewalltraffic_shaperqueue)
 
@@ -1135,7 +1151,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
 | Key | Value | Description |
 | --- | ------|-------------|
 | interface | string | Set which interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported.  |
-| src | string | Set the source address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
+| src | string | Set the source address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
 | dst | string | Set the destination address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To only use interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
 | external | string | Specify IPv4 or IPv6 external address to map Inside traffic to. This Is typically an address on an uplink Interface. |
 | natreflection | string | Set the NAT reflection mode explicitly. Options are `enable` or `disable`. (optional) |
@@ -1255,7 +1271,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
 | --- | ------|-------------|
 | id | integer | Specify the ID of the 1:1 mapping to update. |
 | interface | string | Update which interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). (optional) |
-| src | string | Update the source address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
+| src | string | Update the source address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
 | dst | string | Update the destination address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To only use interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional) |
 | external | string | Update the IPv4 or IPv6 external address to map Inside traffic to. This Is typically an address on an uplink Interface. (optional) |
 | natreflection | string | Update the NAT reflection mode explicitly. Options are `enable` or `disable`. (optional) |
@@ -1340,7 +1356,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/outbound
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| mode | string | Update the outbound NAT mode. Options are `automatic` to automatically generate outbound NAT rules, `hybrid` to support both automatiic and manual outbound NAT rules , `advanced` to require all rules to be entered manually, or `disabled` to disable outbound NAT altogether. If updating to `advanced` from `automatic` or `hybrid`, the API will automatically create manual entries for each automatically generated outbound NAT entry. |
+| mode | string | Update the outbound NAT mode. Options are `automatic` to automatically generate outbound NAT rules, `hybrid` to support both automatic and manual outbound NAT rules , `advanced` to require all rules to be entered manually, or `disabled` to disable outbound NAT altogether. If updating to `advanced` from `automatic` or `hybrid`, the API will automatically create manual entries for each automatically generated outbound NAT entry. |
 
 
 
@@ -1587,7 +1603,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 | --- | ------|-------------|
 | interface | string | Set which interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported.  |
 | protocol | string | Set which transfer protocol the rule will apply to. If `tcp`, `udp`, `tcp/udp`, you must define a source and destination port |
-| src | string | Set the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
+| src | string | Set the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
 | dst | string | Set the destination address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To only use interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
 | srcport | string or integer | Set the TCP and/or UDP source port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` |
 | dstport | string or integer | Set the TCP and/or UDP destination port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` |
@@ -1713,12 +1729,12 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 | Id | Integer | Specify the ID of the port forward rule to update. |
 | interface | string | Update the interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported. (optional) |
 | protocol | string | Update which transfer protocol the rule will apply to. If `tcp`, `udp`, `tcp/udp`, you must define a source and destination port. (optional) |
-| src | string | Update the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional) |
+| src | string | Update the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional) |
 | dst | string | Update the destination address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To only use interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional) |
 | srcport | string or integer | Update the TCP and/or UDP source port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` (optional) |
 | dstport | string or integer | Update the TCP and/or UDP destination port of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` (optional) |
 | target | string | Update the IP to forward traffic to (optional) |
-| local-port | string | Udate the TCP and/or UDP  port to forward traffic to. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp`. Port ranges may be specified using colon or hyphen. (optional) |
+| local-port | string | Update the TCP and/or UDP  port to forward traffic to. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp`. Port ranges may be specified using colon or hyphen. (optional) |
 | natreflection | string | Update the NAT reflection mode explicitly (optional) |
 | descr | string | Update a description for the rule (optional) |
 | disabled | boolean | Enable or disable the rule upon creation. True to disable, false to enable (optional) |
@@ -1779,7 +1795,7 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | ipprotocol | string | Set which IP protocol(s) the rule will apply to (`inet`, `inet6`, `inet46`) |
 | protocol | string | Set which transfer protocol the rule will apply to. If `tcp`, `udp`, `tcp/udp`, you must define a source and destination port |
 | icmptype | string or array | Set the ICMP subtype of the firewall rule. Multiple values may be passed in as array, single values may be passed as string. _Only available when `protocol` is set to `icmp`. If `icmptype` is not specified all subtypes are assumed_ |
-| src | string | Set the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
+| src | string | Set the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
 | dst | string | Set the destination address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To only use interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
 | srcport | string or integer | Set the TCP and/or UDP source port or port alias of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` |
 | dstport | string or integer | Set the TCP and/or UDP destination port or port alias of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` |
@@ -1787,7 +1803,7 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | sched | string | Set a firewall schedule to apply to this rule. This must be an existing firewall schedule name. (optional) |
 | disabled | boolean | Disable the rule upon creation (optional) |
 | descr | string | Set a description for the rule (optional) |
-| log | boolean | Enabling rule matche logging (optional) |
+| log | boolean | Enabling rule matched logging (optional) |
 | top | boolean | Add firewall rule to top of access control list (optional) |
 | apply | boolean | Specify whether or not you would like this rule to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple rules at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single rule, you may set this true to apply it immediately. Defaults to false. (optional) |
 
@@ -1907,7 +1923,7 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | ipprotocol | string | Update which IP protocol(s) the rule will apply to (`inet`, `inet6`, `inet46`) (optional) |
 | protocol | string | Update the transfer protocol the rule will apply to. If `tcp`, `udp`, `tcp/udp`, you must define a source and destination port. (optional) |
 | icmptype | string or array | Update the ICMP subtype of the firewall rule. Multiple values may be passed in as array, single values may be passed as string. _Only available when `protocol` is set to `icmp`. If `icmptype` is not specified all subtypes are assumed_ (optional) |
-| src | string | Update the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional) |
+| src | string | Update the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional) |
 | dst | string | Update the destination address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To only use interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional) |
 | srcport | string or integer | Update the TCP and/or UDP source port or port alias of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` (optional) |
 | dstport | string or integer | Update the TCP and/or UDP destination port or port alias of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` |
@@ -2295,7 +2311,7 @@ URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper
 | Key | Value | Description |
 | --- | ------|-------------|
 | interface | string | Specify the interface to create the traffic shaper policy for. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0).  |
-| scheduler | string | Specify the scheduler typr for this traffic shaper. Choices are `HFSC`, `CBQ`, `FAIRQ`, `CODELQ`, and `PRIQ`. |
+| scheduler | string | Specify the scheduler type for this traffic shaper. Choices are `HFSC`, `CBQ`, `FAIRQ`, `CODELQ`, and `PRIQ`. |
 | bandwidthtype | string | Specify the bandwidth type to use when setting the bandwidth. Choices are `%` for percentage based bandwidth, `b` for bits, `Kb` for kilobits, `Mb` for megabits, and `Gb` for gigabits. |
 | bandwidth | integer | Specify the bandwidth of this traffic shaper. This must be a numeric value of `1` or greater. If you have set the `bandwidthtype` to `%`, this value must be `100` or less. |
 | enabled | boolean | Enable or disable this traffic shaper upon creation. Specify `true` to enable or `false` to disable. Defaults to `true`. (optional) |
@@ -2400,7 +2416,7 @@ URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper
 | Key | Value | Description |
 | --- | ------|-------------|
 | interface | string | Specify the interface of the traffic shaper policy to update. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0).  |
-| scheduler | string | Update the scheduler typr for this traffic shaper. Choices are `HFSC`, `CBQ`, `FAIRQ`, `CODELQ`, and `PRIQ`. (optional) |
+| scheduler | string | Update the scheduler type for this traffic shaper. Choices are `HFSC`, `CBQ`, `FAIRQ`, `CODELQ`, and `PRIQ`. (optional) |
 | bandwidthtype | string | Update the bandwidth type to use when setting the bandwidth. Choices are `%` for percentage based bandwidth, `b` for bits, `Kb` for kilobits, `Mb` for megabits, and `Gb` for gigabits. If the bandwidth type is changed, a new `bandwidth` value will also be required. (optional) |
 | bandwidth | integer | Update the bandwidth of this traffic shaper. This must be a numeric value of `1` or greater. If you have set the `bandwidthtype` to `%`, this value must be `100` or less. If the `bandwidthtype` value has been changed, this field will be required. (optional)  |
 | enabled | boolean | Enable or disable this traffic shaper. Specify `true` to enable or `false` to disable.  (optional) |
@@ -2422,6 +2438,345 @@ URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper
     "qlimit": 10000,
     "tbrconfig": 10000,
     "apply": true
+}
+```
+
+
+
+## FIREWALL/TRAFFIC_SHAPER/LIMITER
+
+
+
+### 1. Create Limiter
+
+
+Add a traffic shaper limiter.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| name | string | Specify a name for this limiter. This value must only contain alphanumerics, underscore and/or hyphens, must be 32 characters or less, and must be unique from all other limiters Including child queues. |
+| bandwidth | array | Specify an array of bandwidth objects to assign to this limiter. Each object will require the fields as specified by the /api/v1/firewall/traffic_shaper/limiter/bandwidth endpoint documentation. At least one bandwidth object must be specified to create the limiter. |
+| mask | string | Specify a limiter address mask type. Options are `none` for no mask, `srcaddress` for source addresses, or `dstaddress` for destination addresses. Defaults to `none`. (optional) |
+| maskbits | integer | Specify the subnet bitmask to apply the limiter to. This value must be between 1 and 32. This field is only available when `mask` is set to `srcaddress` or `dstaddress`. Defaults to `32`. (optional) |
+| maskbitsv6 | integer | Specify the IPv6 subnet bitmask to apply the limiter to. This value must be between 1 and 128. This field is only available when `mask` is set to `srcaddress` or `dstaddress`. Defaults to `128`. (optional) |
+| description | string | Specify a description for this limiter. (optional) |
+| aqm | string | Specify the Queue Management Algorithm for this limiter to use. Options are `droptail`, `codel`, `pie`, `red`, or `gred`.  |
+| sched | string | Specify the scheduler for this limiter to use. Options are `wf2q+`, `fifo`, `qfq`, `rr`, `prio`, `fq_codel` or `fq_pie`. |
+| enabled | boolean | Enable or disable this limiter upon creation. If `true`, the limiter will be enabled. If `false`, the limiter will be disabled. Defaults to `true`. (optional) |
+| ecn | boolean | Enable Explicit Congestion Notification (ECN). If `true`, the limiter will be enabled. If `false`, the limiter will be disabled. Defaults to `false`. Note: not every AQM and/or scheduler supports ECN. (optional) |
+| qlimit | integer | Specify the queue limit value for this limiter. This must be a numeric value of 1 or greater. (optional) |
+| delay | integer | Specify the delay value for this limiter. This must be a numeric value between 0 and 10000. Defaults to 0. (optional) |
+| plr | float | Specify the packet loss rate value for this limiter. This must be a numeric value between 0 and 1. Defaults to 0. (optional) |
+| buckets | integer | Specify the buckets value for this limiter. This must be a numeric value between 16 and 65535.  (optional) |
+| param_codel_target | integer | Specify the CoDel target parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `codel`. Defaults to `5`. (optional) |
+| param_codel_interval | integer | Specify the CoDel interval parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `codel`. Defaults to `100`. (optional) |
+| param_pie_target | integer | Specify the PIE target parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `15`. (optional) |
+| param_pie_tupdate | integer | Specify the PIE tupdate parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `15`. (optional) |
+| param_pie_alpha | integer | Specify the PIE alpha parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `125`. (optional) |
+| param_pie_beta | integer | Specify the PIE beta parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `1250`. (optional) |
+| param_pie_max_burst | integer | Specify the PIE max burst parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `150000`. (optional) |
+| param_pie_max_ecnth | integer | Specify the PIE max ecnth parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `99`. (optional) |
+| param_red_w_q | integer | Specify the RED w_q parameter for this limiter. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `red`. Defaults to `1`. (optional) |
+| param_red_min_th | integer | Specify the RED min_th parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `red`. Defaults to `0`. (optional) |
+| param_red_max_th | integer | Specify the RED max_th parameter for this limiter. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `red`. Defaults to `1`. (optional) |
+| param_red_max_p | integer | Specify the RED max_p parameter for this limiter. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `red`. Defaults to `1`. (optional) |
+| param_gred_w_q | integer | Specify the GRED w_q parameter for this limiter. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `gred`. Defaults to `1`. (optional) |
+| param_gred_min_th | integer | Specify the GRED min_th parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `gred`. Defaults to `0`. (optional) |
+| param_gred_max_th | integer | Specify the GRED max_th parameter for this limiter. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `gred`. Defaults to `1`. (optional) |
+| param_gred_max_p | integer | Specify the GRED max_p parameter for this limiter. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `gred`. Defaults to `1`. (optional) |
+| param_fq_codel_target | integer | Specify the FQ_CoDel target parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_codel`. Defaults to `5`. (optional) |
+| param_fq_codel_interval | integer | Specify the FQ_CoDel interval parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_codel`. Defaults to `100`. (optional) |
+| param_fq_codel_quantum | integer | Specify the FQ_CoDel quantum parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_codel`. Defaults to `1514`. (optional) |
+| param_fq_codel_limit | integer | Specify the FQ_CoDel limit parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_codel`. Defaults to `10240`. (optional) |
+| param_fq_codel_flow | integer | Specify the FQ_CoDel flow parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_codel`. Defaults to `1024`. (optional) |
+| param_fq_pie_target | integer | Specify the FQ_PIE target parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_pie`. Defaults to `15`. (optional) |
+| param_fq_pie_tupdate | integer | Specify the FQ_PIE tupdate parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_pie`. Defaults to `15`. (optional) |
+| param_fq_pie_alpha | integer | Specify the FQ_PIE alpha parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_pie`. Defaults to `125`. (optional) |
+| param_fq_pie_beta | integer | Specify the FQ_PIE beta parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_pie`. Defaults to `1250`. (optional) |
+| param_fq_pie_max_burst | integer | Specify the FQ_PIE max burst parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_pie`. Defaults to `150000`. (optional) |
+| param_fq_pie_max_burst | integer | Specify the FQ_PIE max ecnth parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_pie`. Defaults to `99`. (optional) |
+| apply | boolean | Specify whether or not this limiter should be applied immediately after creation. If set to `true`, the firewall filter will reload and the limiter will be applied. If set to`false`, the firewall filter will not be reloaded and the limiter will not be applied until the filter Is reloaded. Defaults to `false`. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+    "name": "Test_Limiter",
+    "bandwidth": [{"bw": 100, "bwscale": "Mb"}],
+    "mask": "srcaddress",
+    "maskbits": 31,
+    "description": "Unit test",
+    "aqm": "codel",
+    "sched": "fq_pie",
+    "delay": 1,
+    "plr": 0.01,
+    "buckets": 16,
+    "apply": true
+}
+```
+
+
+
+### 2. Delete limiter
+
+
+Delete traffic shaper limiter.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| name | string | Specify the name of the limiter to delete. |
+| apply | boolean | Specify whether or not this change should be applied immediately after deletion. If set to `true`, the firewall filter will reload. If set to`false`, the firewall filter will not be reloaded and the limiter deletion will not be applied until the filter Is reloaded. Defaults to `false`. (optional) |
+
+
+
+### 3. Read Limiters
+
+
+Read all traffic shaper limiters.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter
+```
+
+
+
+## FIREWALL/TRAFFIC_SHAPER/LIMITER/BANDWIDTH
+
+
+
+### 1. Create Limiter Bandwidth
+
+
+Create a limiter bandwidth setting.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/bandwidth
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| name | string | Specify the name of the parent limiter to add this bandwidth object to.  |
+| bw | integer | Specify the amount of bandwidth allotted to the parent limiter. This must be a numeric value of 1 or greater. |
+| bwscale | string | Specify the bandwidth scale type. Options are `b` for b/s, `Kb` for Kb/s, or `Mb` for Mb/s. |
+| bwsched | string | Specify a schedule for this bandwidth setting. This must be an existing firewall schedule name. Defaults to `none`. (optional) |
+| apply | boolean | Specify whether this bandwidth object should be applied immediately after creation. If set to `true`, the firewall filter will reload  immediately after creation. If set to `false`, the firewall filter will not be reloaded the and bandwidth object will not be applied to the backend configuration until the filter Is reloaded. Defaults to `false`. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+    "name": "Test_Limiter",
+    "bw": 100,
+    "bwscale": "Mb",
+    "bwsched": "Test_Schedule"
+}
+```
+
+
+
+### 2. Delete Limiter Bandwidth
+
+
+Delete a limiter bandwidth setting.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/bandwidth
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| name | string | Specify the name of the parent limiter to delete this bandwidth object from.  |
+| id | integer | Specify the ID of the bandwidth object to delete. The ID will be the array index of the object to delete within the limiter's bandwith-items array.  |
+| apply | boolean | Specify whether this bandwidth object deletion should be applied immediately. If set to `true`, the firewall filter will reload  immediately after deletion. If set to `false`, the firewall filter will not be reloaded the and bandwidth object will not be removed from the backend configuration until the filter Is reloaded. Defaults to `false`. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+    "name": "Test_Limiter",
+    "id": 0
+}
+```
+
+
+
+## FIREWALL/TRAFFIC_SHAPER/LIMITER/QUEUE
+
+
+
+### 1. Create Limiter Queue
+
+
+Add a child queue to an existing traffic shaper limiter.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/queue
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| limiter | string | Specify the name of the parent limiter to add this queue to.  |
+| name | string | Specify a name for this limiter queue. This value must only contain alphanumerics, underscore and/or hyphens, must be 32 characters or less, and must be unique from all other limiters Including child queues. |
+| mask | string | Specify a limiter address mask type. Options are `none` for no mask, `srcaddress` for source addresses, or `dstaddress` for destination addresses. Defaults to `none`. (optional) |
+| maskbits | integer | Specify the subnet bitmask to apply the limiter queue to. This value must be between 1 and 32. This field is only available when `mask` is set to `srcaddress` or `dstaddress`. Defaults to `32`. (optional) |
+| maskbitsv6 | integer | Specify the IPv6 subnet bitmask to apply the limiter queue to. This value must be between 1 and 128. This field is only available when `mask` is set to `srcaddress` or `dstaddress`. Defaults to `128`. (optional) |
+| description | string | Specify a description for this limiter queue. (optional) |
+| aqm | string | Specify the Queue Management Algorithm for this limiter queue to use. Options are `droptail`, `codel`, `pie`, `red`, or `gred`.  |
+| enabled | boolean | Enable or disable this limiter queue upon creation. If `true`, the limiter will be enabled. If `false`, the limiter will be disabled. Defaults to `true`. (optional) |
+| ecn | boolean | Enable Explicit Congestion Notification (ECN). If `true`, the limiter queue will be enabled. If `false`, the limiter will be disabled. Defaults to `false`. Note: not every AQM and/or scheduler supports ECN. (optional) |
+| qlimit | integer | Specify the queue limit value for this limiter queue. This must be a numeric value of 1 or greater. (optional) |
+| weight | integer | Specify the weight value for this limiter queue. This must be a numeric value between 1 and 100. (optional) |
+| plr | float | Specify the packet loss rate value for this limiter queue. This must be a numeric value between 0 and 1. Defaults to 0. (optional) |
+| buckets | integer | Specify the buckets value for this limiter queue. This must be a numeric value between 16 and 65535.  (optional) |
+| param_codel_target | integer | Specify the CoDel target parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `codel`. Defaults to `5`. (optional) |
+| param_codel_interval | integer | Specify the CoDel interval parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `codel`. Defaults to `100`. (optional) |
+| param_pie_target | integer | Specify the PIE target parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `15`. (optional) |
+| param_pie_tupdate | integer | Specify the PIE tupdate parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `15`. (optional) |
+| param_pie_alpha | integer | Specify the PIE alpha parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `125`. (optional) |
+| param_pie_beta | integer | Specify the PIE beta parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `1250`. (optional) |
+| param_pie_max_burst | integer | Specify the PIE max burst parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `150000`. (optional) |
+| param_pie_max_ecnth | integer | Specify the PIE max ecnth parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `99`. (optional) |
+| param_red_w_q | integer | Specify the RED w_q parameter for this limiter queue. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `red`. Defaults to `1`. (optional) |
+| param_red_min_th | integer | Specify the RED min_th parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `red`. Defaults to `0`. (optional) |
+| param_red_max_th | integer | Specify the RED max_th parameter for this limiter queue. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `red`. Defaults to `1`. (optional) |
+| param_red_max_p | integer | Specify the RED max_p parameter for this limiter queue. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `red`. Defaults to `1`. (optional) |
+| param_gred_w_q | integer | Specify the GRED w_q parameter for this limiter queue. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `gred`. Defaults to `1`. (optional) |
+| param_gred_min_th | integer | Specify the GRED min_th parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `gred`. Defaults to `0`. (optional) |
+| param_gred_max_th | integer | Specify the GRED max_th parameter for this limiter queue. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `gred`. Defaults to `1`. (optional) |
+| param_gred_max_p | integer | Specify the GRED max_p parameter for this limiter queue. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `gred`. Defaults to `1`. (optional) |
+| apply | boolean | Specify whether or not this limiter queue should be applied immediately after creation. If set to `true`, the firewall filter will reload and the limiter queue will be applied. If set to`false`, the firewall filter will not be reloaded and the limiter queue will not be applied until the filter Is reloaded. Defaults to `false`. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+    "limiter": "Test_Limiter",
+    "name": "Test_Queue",
+    "mask": "srcaddress",
+    "maskbits": 31,
+    "description": "Unit test",
+    "aqm": "codel",
+    "weight": 1,
+    "plr": 0.01,
+    "buckets": 16,
+    "apply": true
+}
+```
+
+
+
+### 2. Delete Limiter Queue
+
+
+Delete a queue from an existing traffic shaper limiter.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+Type: RAW
+URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/queue
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| limiter | string | Specify the name of the parent limiter to delete this queue from. |
+| name | string | Specify the name of the queue to delete.  |
+| apply | boolean | Specify whether or not this limiter queue removal should be applied immediately after deletion. If set to `true`, the firewall filter will reload and the limiter queue will be deleted forever. If set to`false`, the firewall filter will not be reloaded and the limiter queue will not be removed until the filter is reloaded. Defaults to `false`. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+    "limiter": "Test_Limiter",
+    "name": "Test_Queue"
 }
 ```
 
@@ -2757,7 +3112,7 @@ URL: https://{{$hostname}}/api/v1/interface
 | gatewayv6 | string | Set the interface network's upstream IPv6 gateway. This is only necessary on WAN/UPLINK interfaces (optional) |
 | ipv6usev4iface | boolean | Allow IPv6 to use IPv4 uplink connection (optional) |
 | dhcphostname | string | Set the IPv4 DHCP hostname. Only available when `type` is set to `dhcp` (optional) |
-| dhcprejectfrom | string or array | Set the IPv4 DHCP rejected servers. You may pass values in as array or as comma seperated string. Only available when `type` is set to `dhcp` (optional) |
+| dhcprejectfrom | string or array | Set the IPv4 DHCP rejected servers. You may pass values in as array or as comma separated string. Only available when `type` is set to `dhcp` (optional) |
 | alias-address | string | Set the IPv4 DHCP address alias. The value in this field is used as a fixed alias IPv4 address by the DHCP client (optional) |
 | alias-subnet | string or integer | Set the IPv4 DHCP address aliases subnet (optional) |
 | adv_dhcp_pt_timeout | string or integer | Set the IPv4 DHCP protocol timeout interval. Must be numeric value greater than 1 (optional) |
@@ -2839,7 +3194,7 @@ URL: https://{{$hostname}}/api/v1/interface
 ### 3. Read Interfaces
 
 
-Read interface assignements and configuration.<br><br>
+Read interface assignments and configuration.<br><br>
 
 _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]
 
@@ -2903,7 +3258,7 @@ URL: https://{{$hostname}}/api/v1/interface
 | gatewayv6 | string | Update the interface network's upstream IPv6 gateway. This is only necessary on WAN/UPLINK interfaces (optional) |
 | ipv6usev4iface | boolean | Enable or disable IPv6 over IPv4 uplink connection (optional) |
 | dhcphostname | string | Update the IPv4 DHCP hostname. Only available when `type` is set to `dhcp` (optional) |
-| dhcprejectfrom | string or array | Update the IPv4 DHCP rejected servers. You may pass values in as array or as comma seperated string. Only available when `type` is set to `dhcp` (optional) |
+| dhcprejectfrom | string or array | Update the IPv4 DHCP rejected servers. You may pass values in as array or as comma separated string. Only available when `type` is set to `dhcp` (optional) |
 | alias-address | string | Update the IPv4 DHCP address alias. The value in this field is used as a fixed alias IPv4 address by the DHCP client (optional) |
 | alias-subnet | string or integer | Update the IPv4 DHCP address aliases subnet (optional) |
 | adv_dhcp_pt_timeout | string or integer | Update the IPv4 DHCP protocol timeout interval. Must be numeric value greater than 1 (optional) |
@@ -2916,7 +3271,7 @@ URL: https://{{$hostname}}/api/v1/interface
 | adv_dhcp_send_options | string | Update the IPv4 `send` option (optional) |
 | adv_dhcp_request_options | string | Update the IPv4 `request` option (optional) |
 | adv_dhcp_request_options | string | Update the IPv4 `required` option (optional) |
-| adv_dhcp_option_modifiers | string | Update the IPv4 optionamodifier (optional) |
+| adv_dhcp_option_modifiers | string | Update the IPv4 option modifier (optional) |
 | adv_dhcp_config_file_override | boolean | Enable or disable local DHCP configuration file override (optional) |
 | adv_dhcp_config_file_override_file | string | Update the custom DHCP configuration file's absolute path. This file must exist beforehand (optional) |
 | dhcpvlanenable | boolean | Enable or disable DHCP VLAN prioritization (optional) |
@@ -3062,7 +3417,7 @@ URL: https://{{$hostname}}/api/v1/interface/vlan
 ### 3. Read Interface VLANs
 
 
-Read VLAN assignements and configuration.<br><br>
+Read VLAN assignments and configuration.<br><br>
 
 _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-vlan`, `page-interfaces-vlan-edit`]
 
@@ -3818,7 +4173,7 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd
 | range_to | string | Update the DHCP pool's end IPv4 address. This must be an available address within the Interface's subnet and be greater than the `range_from` value. (optional) |
 | dnsserver | string or array | Update the DNS servers to include In DHCP leases. Multiple values may be passed in as an array or single values may be passed in as a string. Each value must be a valid IPv4 address. Alternatively, you may pass In an empty array to revert to the system default. (optional) |
 | domain | string | Update the domain name to Include In the DHCP lease. This must be a valid domain name or an empty string to assume the system default (optional) |
-| domainsearchlist | string or array | Update the search domains to include In the DHCP lease. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid doman name. (optional) |
+| domainsearchlist | string or array | Update the search domains to include In the DHCP lease. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid domain name. (optional) |
 | mac_allow | string or array | Update the list of allowed MAC addresses. You may pass In an array for multiple entries or a string for single entries. Each entry must be a full or partial MAC address. Alternatively, you may specify an empty array to revert to default (optional) |
 | mac_deny | string or array | Update the list of denied MAC addresses. You may pass In an array for multiple entries or a string for single entries. Each entry must be a full or partial MAC address. Alternatively, you may specify an empty array to revert to default (optional) |
 | gateway | string | Update the gateway to include In DHCP leases. This value must be a valid IPv4 address within the Interface's subnet. Alternatively, you can pass In an empty string to revert to the system default. (optional) |
@@ -3916,7 +4271,7 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd/static_mapping
 | domain | string | Specify a domain for this host (optional) |
 | descr | string | Specify a description for this mapping (optional) |
 | dnsserver | string or array | Specify the DNS servers to assign this client. Multiple values may be passed in as an array or single values may be passed in as a string. Each value must be a valid IPv4 address. Alternatively, you may pass In an empty array to revert to the system default. (optional) |
-| domainsearchlist | string or array  | Specify the search domains to assign to this host. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid doman name. (optional) |
+| domainsearchlist | string or array  | Specify the search domains to assign to this host. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid domain name. (optional) |
 | gateway | string | Specify the gateway to assign this host. This value must be a valid IPv4 address within the Interface's subnet. Alternatively, you can pass In an empty string to revert to the system default. (optional) |
 | arp_table_static_entry | boolean | Specify whether or not a static ARP entry should be created for this host (optional) |
 
@@ -4050,7 +4405,7 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd/static_mapping
 | domain | string | Update the domain for this host (optional) |
 | descr | string | Update the description for this mapping (optional) |
 | dnsserver | string or array | Update the DNS servers to assign this client. Multiple values may be passed in as an array or single values may be passed in as a string. Each value must be a valid IPv4 address. Alternatively, you may pass In an empty array to revert to the system default. (optional) |
-| domainsearchlist | string or array  | Update the search domains to assign to this host. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid doman name. (optional) |
+| domainsearchlist | string or array  | Update the search domains to assign to this host. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid domain name. (optional) |
 | gateway | string | Update the gateway to assign this host. This value must be a valid IPv4 address within the Interface's subnet. Alternatively, you can pass In an empty string to revert to the system default. (optional) |
 | arp_table_static_entry | boolean | Update whether or not a static ARP entry should be created for this host (optional) |
 
@@ -5387,7 +5742,7 @@ URL: https://{{$hostname}}/api/v1/system/api
 | Key | Value | Description |
 | --- | ------|-------------|
 | enable | boolean | Disable the API. If set to `false`, the API will be disable and no further API requests can be made. In most cases this Is not necessary. (optional) |
-| persist | boolean | Enable/disable persistant API configuration. If set to `true`, pfSense API will store a copy of the API configuration In the case a system update or package update Is needed and/or the API configuration must be restored. If set to `false`, all API configuration will be lost whenever the system updates, the package Is updated, or the package Is deleted. It Is recommended to keep this feature enabled. (optional) |
+| persist | boolean | Enable/disable persistent API configuration. If set to `true`, pfSense API will store a copy of the API configuration In the case a system update or package update Is needed and/or the API configuration must be restored. If set to `false`, all API configuration will be lost whenever the system updates, the package Is updated, or the package Is deleted. It Is recommended to keep this feature enabled. (optional) |
 | readonly | boolean | Enable read only mode. If set to `true`, the API will only answer read (GET) requests. This also means you will not be able to disable read only mode from the API.  |
 | allow_options | boolean | Enable/disable the OPTIONS request method from API responses. If set to `true`, the API will answer OPTIONS requests. If set to `false`, the API will return a 405 Method Not Allowed response. (optional) |
 | available_interfaces | array | Update the Interfaces that are allowed to answer API requests. Each Item In the array must be a valid physical Interface ID (e.g. `"em0"`), pfSense Interface ID, (e.g. `"opt1"`),  or descriptive Interface name (e.g. `"WAN"`). Additionally you may add `"localhost"` to allow local API requests, or add `"any"` to allow any Interface to answer API requests. It Is best practice to only allow Inside Interfaces to answer API requests, or use firewall rules to filter requests made to outside Interfaces. (optional) |
@@ -6405,7 +6760,7 @@ URL: https://{{$hostname}}/api/v1/user/auth_server/radius
 | radius_auth_port | integer | Specify the remote RADIUS authentication server's authentication port. If no value is specified, the authentication service on the remote RADIUS server will not be used. This field is optional if a `radius_acct_port` value is specified. (optional) |
 | radius_acct_port | integer | Specify the remote RADIUS authentication server's accounting port. If no value is specified, the accounting service on the remote RADIUS server will not be used. This field is optional if a `radius_auth_port` value is specified.(optional) |
 | radius_timeout | integer | Specify the amount of time (in seconds) to wait for the remote RADIUS server to respond before timing out. This value must be `1` or greater. Defaults to `5`. (optional) |
-| radis_nasip_attribute | string | Specify which Interface's IP address to send in the NAS IP RADIUS attribute. You may specify either the physical Interface ID, the pfSense Interface ID or the descriptive Interface name. Defaults to `wan`. (optional) |
+| radius_nasip_attribute | string |  |
 | active | boolean | Specify whether pfSense should use this authentication server by default after creation.  (optional) |
 | radius_protocol | string | Specify the RADIUS authentication protocol to use when communicating with the remote RADIUS server. Options are `PAP`, `CHAP_MD5`, `MSCHAPv1` or `MSCHAPv2`. Defaults to `MSCHAPv2`. (optional) |
 
@@ -6755,7 +7110,7 @@ URL: https://{{$hostname}}/api/v1/user/privilege
 | Key | Value | Description |
 | --- | ------|-------------|
 | username | string | Username to grant new privilege |
-| priv | string | Name of new privilege to assign. Multiple priviileges may be assigned at once if passed in as  array. Privilege name will match the POST data name found in the webConfigurator.  |
+| priv | string | Name of new privilege to assign. Multiple privileges may be assigned at once if passed in as  array. Privilege name will match the POST data name found in the webConfigurator.  |
 
 
 
@@ -6800,7 +7155,7 @@ URL: https://{{$hostname}}/api/v1/user/privilege
 | Key | Value | Description |
 | --- | ------|-------------|
 | username | string | Username to remove privilege |
-| priv | string | Name of new privilege to delete. Multiple priviileges may be deleted at once if passed in as  array. Privilege name will match the POST data name found in the webConfigurator.  |
+| priv | string | Name of new privilege to delete. Multiple privileges may be deleted at once if passed in as  array. Privilege name will match the POST data name found in the webConfigurator.  |
 
 
 
