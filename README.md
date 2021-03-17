@@ -34,7 +34,7 @@ To update pfSense API to the latest stable version, run the following command:
 pfsense-api update
 ```
 
-To revert to a previous version of pfSense API (e.g. v1.0.2), run the following command:
+To revert to a previous version of pfSense API (e.g. v1.1.7), run the following command:
 ```
 pfsense-api revert v1.1.7
 ```
