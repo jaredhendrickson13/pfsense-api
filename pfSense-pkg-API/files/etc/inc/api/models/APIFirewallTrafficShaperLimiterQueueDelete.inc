@@ -67,8 +67,13 @@ class APIFirewallTrafficShaperLimiterQueueDelete extends APIModel {
         # Check for our required `name` payload value
         if (isset($this->initial_data["name"])) {
             if ($this->get_limiter_queue_id_by_name($this->initial_data["name"], $this->parent_id, true)) {
-                $this->id = $this->get_limiter_queue_id_by_name($this->initial_data["name"], $this->parent_id);
-                $this->validated_data = $this->config["dnshaper"]["queue"][$this->parent_id]["queue"][$this->id];
+                # Ensure limiter queue is not in use
+                if (!$this->is_limiter_queue_in_use($this->initial_data["name"])) {
+                    $this->id = $this->get_limiter_queue_id_by_name($this->initial_data["name"], $this->parent_id);
+                    $this->validated_data = $this->config["dnshaper"]["queue"][$this->parent_id]["queue"][$this->id];
+                } else {
+                    $this->errors[] = APIResponse\get(4214);
+                }
             } else {
                 $this->errors[] = APIResponse\get(4221);
             }
@@ -97,6 +102,17 @@ class APIFirewallTrafficShaperLimiterQueueDelete extends APIModel {
             }
         }
         return ($as_bool) ? false : null;
+    }
+
+    public function is_limiter_queue_in_use($name) {
+        # Loop through each configured firewall rule and check if it's using this limiter
+        foreach ($this->config["filter"]["rule"] as $rule) {
+            # Check for matches
+            if ($rule["dnpipe"] === $name or $rule["pdnpipe"] === $name) {
+                return true;
+            };
+        }
+        return false;
     }
 
 }

@@ -2312,6 +2312,60 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall traffic shaper limiter queue name does not exist"
         ],
+        4222 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall rule dnpipe or pdnpipe"
+        ],
+        4223 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rule dnpipe is required for pdnpipe"
+        ],
+        4224 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rule dnpipe and pdnpipe queues cannot be the same"
+        ],
+        4225 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rule dnpipe and pdnpip queue and a virtual interface cannot be selected"
+        ],
+        4226 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall rule default queue"
+        ],
+        4227 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rule default queue required for ackqueue"
+        ],
+        4228 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall rule ackqueue"
+        ],
+        4229 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rule default queue and ackqueue cannot be the same"
+        ],
+        4230 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper child queue cannot be deleted while in use"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [

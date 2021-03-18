@@ -57,9 +57,14 @@ class APIFirewallTrafficShaperDelete extends APIModel {
             if ($this->initial_data["interface"]) {
                 # Check that a traffic shaper does not already exist for this interface
                 if ($this->get_shaper_id_by_interface($this->initial_data["interface"], true)) {
-                    # Fetch the traffic shaper object associated with this interface
-                    $this->id = $this->get_shaper_id_by_interface($this->initial_data["interface"]);
-                    $this->validated_data = $this->config["shaper"]["queue"][$this->id];
+                    # Ensure no child queues are in use before deleting
+                    if (!$this->is_child_queue_in_use($this->initial_data["interface"])) {
+                        # Fetch the traffic shaper object associated with this interface
+                        $this->id = $this->get_shaper_id_by_interface($this->initial_data["interface"]);
+                        $this->validated_data = $this->config["shaper"]["queue"][$this->id];
+                    } else {
+                        $this->errors[] = APIResponse\get(4230);
+                    }
                 } else {
                     $this->errors[] = APIResponse\get(4122);
                 }
@@ -80,5 +85,22 @@ class APIFirewallTrafficShaperDelete extends APIModel {
             }
         }
         return ($as_bool) ? false : null;
+    }
+
+    public function is_child_queue_in_use($interface) {
+        # Get our traffic shaper ID
+        $id = $this->get_shaper_id_by_interface($interface);
+
+        # Loop through each child queue to check if it is in use
+        foreach ($this->config["shaper"]["queue"][$id]["queue"] as $child) {
+            # Loop through each firewall rule to check if the child queue is configured in the rule
+            foreach ($this->config["filter"]["rule"] as $rule) {
+                # It is in use if the defaultqueue or ackqueue use this queue
+                if ($child["name"] === $rule["defaultqueue"] or $child["name"] === $rule["ackqueue"]) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

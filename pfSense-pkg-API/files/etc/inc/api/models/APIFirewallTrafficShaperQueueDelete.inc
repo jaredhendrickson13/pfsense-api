@@ -77,8 +77,13 @@ class APIFirewallTrafficShaperQueueDelete extends APIModel {
             foreach ($this->config["shaper"]["queue"][$this->parent_id]["queue"] as $id=>$queue) {
                 # Check if this queue matches the requested queue to delete
                 if ($this->initial_data["name"] === $queue["name"]) {
-                    $this->id = intval($id);
-                    $this->validated_data = $this->config["shaper"]["queue"][$this->parent_id]["queue"][$this->id];
+                    # Ensure this queue is not in use
+                    if (!$this->is_queue_in_use($this->initial_data["name"])) {
+                        $this->id = intval($id);
+                        $this->validated_data = $this->config["shaper"]["queue"][$this->parent_id]["queue"][$this->id];
+                    } else {
+                        $this->errors[] = APIResponse\get(4230);
+                    }
                 }
             }
             # If no ID was found set does not exist error
@@ -99,5 +104,16 @@ class APIFirewallTrafficShaperQueueDelete extends APIModel {
             }
         }
         return ($as_bool) ? false : null;
+    }
+
+    public function is_queue_in_use($name) {
+        # Loop through each firewall rule and check if it uses this queue
+        foreach ($this->config["filter"]["rule"] as $rule) {
+            # It is in use if the defaultqueue or ackqueue use this queue
+            if ($name === $rule["defaultqueue"] or $name === $rule["ackqueue"]) {
+                return true;
+            }
+        }
+        return false;
     }
 }

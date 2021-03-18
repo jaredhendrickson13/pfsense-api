@@ -982,6 +982,5 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
                 return $counter;
             }
         }
-
     }
 }

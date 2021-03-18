@@ -77,10 +77,12 @@ class APIFirewallTrafficShaperLimiterDelete extends APIModel {
     }
 
     public function is_limiter_in_use($name) {
+        # Get our limiters ID and config
+        $id = $this->get_limiter_id_by_name($name);
+        $limiter = $this->config["dnshaper"]["queue"][$id];
+
         # Loop through each configured firewall rule and check if it's using this limiter
         foreach ($this->config["filter"]["rule"] as $rule) {
-            # Loop through each configured limiter
-            foreach ($this->config["dnshaper"]["queue"] as $limiter) {
                 # Check for matches
                 if ($rule["dnpipe"] === $limiter["name"] or $rule["pdnpipe"] === $limiter["name"]) {
                     return true;
@@ -93,9 +95,7 @@ class APIFirewallTrafficShaperLimiterDelete extends APIModel {
                         return true;
                     };
                 }
-            }
         }
         return false;
     }
-
 }

@@ -1801,6 +1801,10 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | dstport | string or integer | Set the TCP and/or UDP destination port or port alias of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` |
 | gateway | string | Set the routing gateway traffic will take upon match (optional) |
 | sched | string | Set a firewall schedule to apply to this rule. This must be an existing firewall schedule name. (optional) |
+| dnpipe | string | Specify a traffic shaper limiter (in) queue for this rule. This must be an existing traffic shaper limiter or queue. This field is required if a `pdnpipe` value is provided.Ioptional) |
+| pdnpipe | string | Specify a traffic shaper limiter (out) queue for this rule. This must be an existing traffic shaper limiter or queue. This value cannot match the `dnpipe` value and must be a child queue if `dnpipe` is a child queue, or a parent limiiter if `dnpipe` is a parent limiter. (optional) |
+| defaultqueue | string | Specify a default traffic shaper queue to apply to this rule. This must be an existing traffic shaper queue name. This field is required when an `ackqueue` value is provided. (optional) |
+| ackqueue | string | Specify an acknowledge traffic shaper queue to apply to this rule. This must be an existing traffic shaper queue and cannot match the `defaultqueue` value. (optional) |
 | disabled | boolean | Disable the rule upon creation (optional) |
 | descr | string | Set a description for the rule (optional) |
 | log | boolean | Enabling rule matched logging (optional) |
@@ -1929,6 +1933,10 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | dstport | string or integer | Update the TCP and/or UDP destination port or port alias of the firewall rule. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp` |
 | gateway | string | Update the routing gateway traffic will take upon match (optional) |
 | sched | string | Update the firewall schedule to apply to this rule. This must be an existing firewall schedule name. Provide an empty string to remove the configured schedule from the rule. (optional) |
+| dnpipe | string | Update the traffic shaper limiter (in) queue for this rule. This must be an existing traffic shaper limiter or queue. This field is required if a `pdnpipe` value is provided. To unset this value, pass in an empty string. This will also unset the existing `pdnpipe` value. (optional) |
+| pdnpipe | string | Update the traffic shaper limiter (out) queue for this rule. This must be an existing traffic shaper limiter or queue. This value cannot match the `dnpipe` value and must be a child queue if `dnpipe` is a child queue, or a parent limiiter if `dnpipe` is a parent limiter. To unset this value, pass in an empty string. (optional) |
+| defaultqueue | string | Update the default traffic shaper queue to apply to this rule. This must be an existing traffic shaper queue name. This field is required when an `ackqueue` value is provided. To unset this field, pass in an empty string. This will also unset the existing `ackqueue` value. (optional) |
+| ackqueue | string | Update acknowledge traffic shaper queue to apply to this rule. This must be an existing traffic shaper queue and cannot match the `defaultqueue` value. To unset this field, pass in an empty string. (optional) |
 | disabled | boolean | Disable the rule upon modification (optional) |
 | descr | string | Update the description of the rule (optional) |
 | log | boolean | Enable rule matched logging (optional) |

@@ -54,6 +54,23 @@ class APIUnitTestFirewallTrafficShaperLimiterQueue(unit_test_framework.APIUnitTe
             }
         },
         {
+            "name": "Create another firewall traffic shaper limiter queue",
+            "payload": {
+                "limiter": "Test_Limiter",
+                "name": "Test_Queue2",
+                "mask": "srcaddress",
+                "maskbits": 31,
+                "description": "Unit test",
+                "aqm": "codel",
+                "qlimit": 7000,
+                "weight": 1,
+                "plr": 0.01,
+                "buckets": 16,
+                "ecn": True,
+                "apply": True
+            }
+        },
+        {
             "name": "Check limiter requirement",
             "status": 400,
             "return": 4218
@@ -697,7 +714,7 @@ class APIUnitTestFirewallTrafficShaperLimiterQueue(unit_test_framework.APIUnitTe
                 "aqm": "gred",
                 "param_gred_max_p": "INVALID"
             }
-        },
+        }
     ]
     delete_tests = [
         {
