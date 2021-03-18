@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestServicesRestart(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/restart"
+    uri = "/api/v1/services/restart"
     post_tests = [
         {
             "name": "Restart all services",

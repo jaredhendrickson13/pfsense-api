@@ -16,7 +16,7 @@ import unit_test_framework
 
 
 class APIUnitTestServicesSyslogdStop(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/syslogd/stop"
+    uri = "/api/v1/services/syslogd/stop"
     post_tests = [{"name": "Stop the syslogd service"}]
 
 

@@ -2,7 +2,7 @@ import unit_test_framework
 
 
 class APIUnitTestUserPrivilege(unit_test_framework.APIUnitTest):
-    url = "/api/v1/user/privilege"
+    uri = "/api/v1/user/privilege"
     post_tests = [
         {
             "name": "Grant user privileges",

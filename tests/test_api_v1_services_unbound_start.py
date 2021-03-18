@@ -16,7 +16,7 @@ import unit_test_framework
 
 
 class APIUnitTestServicesUnboundStart(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/unbound/start"
+    uri = "/api/v1/services/unbound/start"
     post_tests = [
         {
             "name": "Start the Unbound service",

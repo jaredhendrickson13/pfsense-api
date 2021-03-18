@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestRoutingStaticRoute(unit_test_framework.APIUnitTest):
-    url = "/api/v1/routing/static_route"
+    uri = "/api/v1/routing/static_route"
     get_tests = [{"name": "Read all static routes"}]
     post_tests = [
         {

@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestFirewallNATOneToOne(unit_test_framework.APIUnitTest):
-    url = "/api/v1/firewall/nat/one_to_one"
+    uri = "/api/v1/firewall/nat/one_to_one"
     get_tests = [
         {"name": "Read all 1:1 NAT mappings"}
     ]

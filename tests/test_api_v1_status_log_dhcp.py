@@ -16,7 +16,7 @@ import unit_test_framework
 
 
 class APIUnitTestStatusLogDHCP(unit_test_framework.APIUnitTest):
-    url = "/api/v1/status/log/dhcp"
+    uri = "/api/v1/status/log/dhcp"
     get_tests = [{"name": "Read the DHCP log"}]
 
 

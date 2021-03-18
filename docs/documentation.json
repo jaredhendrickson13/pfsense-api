@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "3c9386e2-aa20-4f27-8851-a5f6bc57e8eb",
 		"name": "pfSense REST API Documentation",
-		"description": "---\n\n# Introduction\npfSense API is a fast, safe, REST API package for pfSense firewalls. This works by leveraging the same PHP functions and processes used \nby pfSense's webConfigurator into API endpoints to create, read, update and delete pfSense configurations. All API \nendpoints enforce input validation to prevent invalid configurations from being made. Configurations made via API are \nproperly written to the master XML configuration and the correct backend configurations are made preventing the need for\n a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!\n\n\n# Requirements\n- pfSense 2.4.4 or later is supported\n- pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the \nwebConfigurator are required to make calls to the API endpoints\n- While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit\n\n\n# Installation\nTo install pfSense API, simply run the following command from the pfSense shell:<br>\n```\npkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.4-pkg-API.txz && /etc/rc.restart_webgui\n```\n\nTo uninstall pfSense API, run the following command:<br>\n```\npfsense-api delete\n```\n\nTo update pfSense API to the latest stable version, run the following command:\n```\npfsense-api update\n```\n\nTo revert to a previous version of pfSense API (e.g. v1.0.2), run the following command:\n```\npfsense-api revert v1.0.2\n```\n\n### Notes: \n- pfSense API is supported on the pfSense 2.5 developer snapshots. To install the 2.5 package, simply change the `2.4` in the install URL to `2.5`.\n- In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package\n- If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to \n'Diagnostics > Command Prompt' and enter the commands there\n- When updating pfSense, **_you must reinstall pfSense API afterwards_**. Unfortunately, pfSense removes all existing packages and only reinstalls packages found within pfSense's package repositories. Since pfSense API is not an official package in pfSense's repositories, it does not get reinstalled automatically.\n- The `pfsense-api` command line tool was introduced in v1.1.0. Refer to the corresponding documentation for earlier releases.\n\n\n# UI Settings & Documentation\nAfter installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System > API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation in context to your pfSense instance.\n\n### Notes: \n- Users must hold the `page-all` or `page-system-api` privileges to access the API page within the webConfigurator\n\n\n# Authentication & Authorization\nBy default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense \nfrom the API out of the box, and user passwords may be changed from the API to immediately add additional security if \nneeded. After installation, you can navigate to System > API in the pfSense webConfigurator to configure API\nauthentication. Please note that external authentication servers like LDAP or RADIUS are not supported with any \nAPI authentication method at this time. \n\nTo authenticate your API call, follow the instructions for your configured authentication mode:\n\n<details>\n    <summary>Local Database (default)</summary>\n\nUses the same credentials as the pfSense webConfigurator. To authenticate API calls, simply add a `client-id` value containing your username and a `client-token` value containing your password to your payload. For example `{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}`\n\n</details>\n\n<details>\n    <summary>JWT</summary>\n\nRequires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a `client-id` value containing your pfSense username and a `client-token` value containing your pfSense password to your payload. For example `{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}`. Once you have your bearer token, you can authenticate your API call by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)\n</details>\n\n<details>\n    <summary>API Token</summary>\n\nUses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication; not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by specifying your client-id and client-token within an `Authorization` header, these values must be separated by a space. (e.g. `Authorization: client-id-here client-token-here`)\n\n_Note: In previous versions of pfSense API, the client-id and client-token were provided via the request payload. This functionality is still supported but is not recommended. It will be removed in a future release._\n\n</details>\n\n### Authorization\npfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.\n\n\n# Content Types\npfSense API can handle a few different content types. Please note, if a `Content-Type` header is not specified in your request, pfSense API will attempt to determine the\ncontent type which may have undesired results. It is recommended you specify your preferred `Content-Type` on each request. While several content types may be enabled,\n`application/json` is the recommended content type. Supported content types are:\n\n<details>\n    <summary>application/json</summary>\n\nParses the request body as a JSON formatted string. This is the recommended content type.\n\nExample:\n\n```\ncurl -s -H \"Content-Type: application/json\" -d '{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}' -X GET https://pfsense.example.com/api/v1/system/arp\n{\n  \"status\": \"ok\",\n  \"code\": 200,\n  \"return\": 0,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"ip\": \"192.168.1.1\",\n      \"mac\": \"00:0c:29:f6:be:d9\",\n      \"interface\": \"em1\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    },\n    {\n      \"ip\": \"172.16.209.139\",\n      \"mac\": \"00:0c:29:f6:be:cf\",\n      \"interface\": \"em0\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    }\n  ]\n}\n```\n\n</details>\n\n<details>\n    <summary>application/x-www-form-urlencoded</summary>\n\nParses the request body as URL encoded parameters. Note: boolean and integer types may not be parsed using this content type.\n\nExample:\n\n```\ncurl -s -H \"Content-Type: application/x-www-form-urlencoded\" -X GET \"https://pfsense.example.com/api/v1/system/arp?client-id=admin&client-token=pfsense\"\n{\n  \"status\": \"ok\",\n  \"code\": 200,\n  \"return\": 0,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"ip\": \"192.168.1.1\",\n      \"mac\": \"00:0c:29:f6:be:d9\",\n      \"interface\": \"em1\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    },\n    {\n      \"ip\": \"172.16.209.139\",\n      \"mac\": \"00:0c:29:f6:be:cf\",\n      \"interface\": \"em0\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    }\n  ]\n}\n```\n\n</details>\n\n# Response Codes\n`200 (OK)` : API call succeeded<br>\n`400 (Bad Request)` : An error was found within your requested parameters<br>\n`401 (Unauthorized)` : API client has not completed authentication or authorization successfully<br>\n`403 (Forbidden)` : The API endpoint has refused your call. Commonly due to your access settings found in System > API<br>\n`404 (Not found)` : Either the API endpoint or requested data was not found<br>\n`500 (Server error)` : The API endpoint encountered an unexpected error processing your API request<br>\n\n\n# Error Codes\nA full list of error codes can be found by navigating to /api/v1/system/api/error after installation. This will return\n JSON data containing each error code and their corresponding error message. No authentication is required to view the \n error code library. This also makes API integration with third-party software easy as the API error codes and messages \n are always just an HTTP call away!\n\n\n# Queries\npfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field. \n<details>\n    <summary>Targetting Objects</summary>\n    \nYou may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns this response without a query:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you want the endpoint to only return the objects that have their `type` value set to `type1` you could add `{\"type\": \"type1\"}` to your payload. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n    ]\n}\n```\n\nAdditionally, if you need to target values that are nested within an array, you can add `{\"extra__tag\": 100}` to recursively target the `tag` value within the `extra` array. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n</details>\n\n<details>\n    <summary>Query Filters</summary>\n    \nQuery filters allow you to apply logic to the objects you target. This makes it easy to target data that meets specific criteria:\n\n### Starts With\n    \nThe `startswith` filter allows you to target objects whose values start with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names started with `Other`, you could use the payload `{\"name__startswith\": \"Other\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n### Ends With\n    \nThe `endswith` filter allows you to target objects whose values end with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names ended with `er Test`, you could use the payload `{\"name__endswith\" \"er Test\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}    \n    ]\n}\n```\n\n### Contains\n    \nThe `contains` filter allows you to target objects whose values contain a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names contain `ther`, you could use the payload `{\"name__contains\": \"ther\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}    \n    ]\n}\n```\n\n### Less Than\n    \nThe `lt` filter allows you to target objects whose values are less than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is less than `100`, you could use the payload `{\"extra__tag__lt\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}  \n    ]\n}\n```\n\n### Less Than or Equal To\n    \nThe `lte` filter allows you to target objects whose values are less than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is less than or equal to `100`, you could use the payload `{\"extra__tag__lte\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}},\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n### Greater Than\n    \nThe `gt` filter allows you to target objects whose values are greater than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is greater than `100`, you could use the payload `{\"extra__tag__gt\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}  \n    ]\n}\n```\n\n### Greater Than or Equal To\n    \nThe `lte` filter allows you to target objects whose values are greater than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is greater than or equal to `100`, you could use the payload `{\"extra__tag__gte\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n    ]\n}\n```\n\n</details>\n\n### Obtaining Object IDs\nYou may notice some API endpoints require an object `id` to update or delete objects. These IDs are not stored values, rather pfSense uses the object's array index value to locate and identify objects. Unless specified otherwise, API endpoints will use the same array index value (as returned in the `data` response field) to locate objects when updating or deleting. Some important items to note about these IDs:\n\n- pfSense starts arrays with an index of 0. If you use a loop counter to determine the ID of a specific object, you must start that counter at 0.\n- These IDs are dynamic. For example, if you have 3 static route objects stored (IDs `0`, `1`, and `2`) and you _delete_ the object with ID `1`, pfSense will resort the array so the object with ID `2` will now have an ID of `1`.\n- API queries will retain the object's ID in the response. In the event that the `data` response field is no longer a sequential array due to the query, the `data` field will be represented as an associative array with the array items` key being the objects ID.\n\n### Requirements for queries:\n- API call must be successful and return `0` in the `return` field.\n- Endpoints must return an array of objects in the data field (e.g. `[{\"id\": 0, \"name\": \"Test\"}, {\"id\": 1, \"name\": \"Other Test\"}]`).\n- At least two objects must be present within the data field to support queries.\n\n### Notes:\n- For those using the Local database or API token authentication types, `client-id` and `client-token` are excluded from queries by default\n- Both recursive queries and query filters are separated by double underscores (`__`)\n\n\n# Rate limit\nThere is no limit to API calls at this time but is important to note that pfSense's XML configuration was not designed for quick simultaneous writes like a traditional database. It may be necessary to delay API calls in sequence to prevent unexpected behavior. Alternatively, you may limit the API to read-only mode to only allow endpoints with read (GET) access within the webConfigurator's System > API page.\n\n\n# Endpoints",
+		"description": "---\n\n# Introduction\npfSense API is a fast, safe, REST API package for pfSense firewalls. This works by leveraging the same PHP functions and processes used \nby pfSense's webConfigurator into API endpoints to create, read, update and delete pfSense configurations. All API \nendpoints enforce input validation to prevent invalid configurations from being made. Configurations made via API are \nproperly written to the master XML configuration and the correct backend configurations are made preventing the need for\n a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!\n\n\n# Requirements\n- pfSense 2.4.4 or later is supported\n- pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the \nwebConfigurator are required to make calls to the API endpoints\n- While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit\n\n\n# Installation\nTo install pfSense API, simply run the following command from the pfSense shell:<br>\n```\npkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.5-pkg-API.txz && /etc/rc.restart_webgui\n```\n\nTo uninstall pfSense API, run the following command:<br>\n```\npfsense-api delete\n```\n\nTo update pfSense API to the latest stable version, run the following command:\n```\npfsense-api update\n```\n\nTo revert to a previous version of pfSense API (e.g. v1.1.7), run the following command:\n```\npfsense-api revert v1.1.7\n```\n\n### Notes: \n- To install the 2.4 package, simply change the `2.5` in the install URL to `2.4`.\n- In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package\n- If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to \n'Diagnostics > Command Prompt' and enter the commands there\n- When updating pfSense, **_you must reinstall pfSense API afterwards_**. Unfortunately, pfSense removes all existing packages and only re-installs packages found within pfSense's package repositories. Since pfSense API is not an official package in pfSense's repositories, it does not get reinstalled automatically.\n- The `pfsense-api` command line tool was introduced in v1.1.0. Refer to the corresponding documentation for earlier releases.\n\n\n# UI Settings & Documentation\nAfter installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System > API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation in context to your pfSense instance.\n\n### Notes: \n- Users must hold the `page-all` or `page-system-api` privileges to access the API page within the webConfigurator\n\n\n# Authentication & Authorization\nBy default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense \nfrom the API out of the box, and user passwords may be changed from the API to immediately add additional security if \nneeded. After installation, you can navigate to System > API in the pfSense webConfigurator to configure API\nauthentication. Please note that external authentication servers like LDAP or RADIUS are not supported with any \nAPI authentication method at this time. \n\nTo authenticate your API call, follow the instructions for your configured authentication mode:\n\n<details>\n    <summary>Local Database (default)</summary>\n\nUses the same credentials as the pfSense webConfigurator. To authenticate API calls, simply add a `client-id` value containing your username and a `client-token` value containing your password to your payload. For example `{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}`\n\n</details>\n\n<details>\n    <summary>JWT</summary>\n\nRequires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a `client-id` value containing your pfSense username and a `client-token` value containing your pfSense password to your payload. For example `{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}`. Once you have your bearer token, you can authenticate your API call by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)\n</details>\n\n<details>\n    <summary>API Token</summary>\n\nUses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication; not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by specifying your client-id and client-token within an `Authorization` header, these values must be separated by a space. (e.g. `Authorization: client-id-here client-token-here`)\n\n_Note: In previous versions of pfSense API, the client-id and client-token were provided via the request payload. This functionality is still supported but is not recommended. It will be removed in a future release._\n\n</details>\n\n### Authorization\npfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.\n\n\n# Content Types\npfSense API can handle a few different content types. Please note, if a `Content-Type` header is not specified in your request, pfSense API will attempt to determine the\ncontent type which may have undesired results. It is recommended you specify your preferred `Content-Type` on each request. While several content types may be enabled,\n`application/json` is the recommended content type. Supported content types are:\n\n<details>\n    <summary>application/json</summary>\n\nParses the request body as a JSON formatted string. This is the recommended content type.\n\nExample:\n\n```\ncurl -s -H \"Content-Type: application/json\" -d '{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}' -X GET https://pfsense.example.com/api/v1/system/arp\n{\n  \"status\": \"ok\",\n  \"code\": 200,\n  \"return\": 0,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"ip\": \"192.168.1.1\",\n      \"mac\": \"00:0c:29:f6:be:d9\",\n      \"interface\": \"em1\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    },\n    {\n      \"ip\": \"172.16.209.139\",\n      \"mac\": \"00:0c:29:f6:be:cf\",\n      \"interface\": \"em0\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    }\n  ]\n}\n```\n\n</details>\n\n<details>\n    <summary>application/x-www-form-urlencoded</summary>\n\nParses the request body as URL encoded parameters. Note: boolean and integer types may not be parsed using this content type.\n\nExample:\n\n```\ncurl -s -H \"Content-Type: application/x-www-form-urlencoded\" -X GET \"https://pfsense.example.com/api/v1/system/arp?client-id=admin&client-token=pfsense\"\n{\n  \"status\": \"ok\",\n  \"code\": 200,\n  \"return\": 0,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"ip\": \"192.168.1.1\",\n      \"mac\": \"00:0c:29:f6:be:d9\",\n      \"interface\": \"em1\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    },\n    {\n      \"ip\": \"172.16.209.139\",\n      \"mac\": \"00:0c:29:f6:be:cf\",\n      \"interface\": \"em0\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    }\n  ]\n}\n```\n\n</details>\n\n# Response Codes\n`200 (OK)` : API call succeeded<br>\n`400 (Bad Request)` : An error was found within your requested parameters<br>\n`401 (Unauthorized)` : API client has not completed authentication or authorization successfully<br>\n`403 (Forbidden)` : The API endpoint has refused your call. Commonly due to your access settings found in System > API<br>\n`404 (Not found)` : Either the API endpoint or requested data was not found<br>\n`500 (Server error)` : The API endpoint encountered an unexpected error processing your API request<br>\n\n\n# Error Codes\nA full list of error codes can be found by navigating to /api/v1/system/api/error after installation. This will return\n JSON data containing each error code and their corresponding error message. No authentication is required to view the \n error code library. This also makes API integration with third-party software easy as the API error codes and messages \n are always just an HTTP call away!\n\n\n# Queries\npfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field. \n<details>\n    <summary>Targeting Objects</summary>\n    \nYou may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns this response without a query:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you want the endpoint to only return the objects that have their `type` value set to `type1` you could add `{\"type\": \"type1\"}` to your payload. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n    ]\n}\n```\n\nAdditionally, if you need to target values that are nested within an array, you can add `{\"extra__tag\": 100}` to recursively target the `tag` value within the `extra` array. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n</details>\n\n<details>\n    <summary>Query Filters</summary>\n    \nQuery filters allow you to apply logic to the objects you target. This makes it easy to target data that meets specific criteria:\n\n### Starts With\n    \nThe `startswith` filter allows you to target objects whose values start with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names started with `Other`, you could use the payload `{\"name__startswith\": \"Other\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n### Ends With\n    \nThe `endswith` filter allows you to target objects whose values end with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names ended with `er Test`, you could use the payload `{\"name__endswith\" \"er Test\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}    \n    ]\n}\n```\n\n### Contains\n    \nThe `contains` filter allows you to target objects whose values contain a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names contain `ther`, you could use the payload `{\"name__contains\": \"ther\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}    \n    ]\n}\n```\n\n### Less Than\n    \nThe `lt` filter allows you to target objects whose values are less than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is less than `100`, you could use the payload `{\"extra__tag__lt\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}  \n    ]\n}\n```\n\n### Less Than or Equal To\n    \nThe `lte` filter allows you to target objects whose values are less than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is less than or equal to `100`, you could use the payload `{\"extra__tag__lte\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}},\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n### Greater Than\n    \nThe `gt` filter allows you to target objects whose values are greater than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is greater than `100`, you could use the payload `{\"extra__tag__gt\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}  \n    ]\n}\n```\n\n### Greater Than or Equal To\n    \nThe `lte` filter allows you to target objects whose values are greater than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is greater than or equal to `100`, you could use the payload `{\"extra__tag__gte\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n    ]\n}\n```\n\n</details>\n\n### Obtaining Object IDs\nYou may notice some API endpoints require an object `id` to update or delete objects. These IDs are not stored values, rather pfSense uses the object's array index value to locate and identify objects. Unless specified otherwise, API endpoints will use the same array index value (as returned in the `data` response field) to locate objects when updating or deleting. Some important items to note about these IDs:\n\n- pfSense starts arrays with an index of 0. If you use a loop counter to determine the ID of a specific object, you must start that counter at 0.\n- These IDs are dynamic. For example, if you have 3 static route objects stored (IDs `0`, `1`, and `2`) and you _delete_ the object with ID `1`, pfSense will resort the array so the object with ID `2` will now have an ID of `1`.\n- API queries will retain the object's ID in the response. In the event that the `data` response field is no longer a sequential array due to the query, the `data` field will be represented as an associative array with the array items` key being the objects ID.\n\n### Requirements for queries:\n- API call must be successful and return `0` in the `return` field.\n- Endpoints must return an array of objects in the data field (e.g. `[{\"id\": 0, \"name\": \"Test\"}, {\"id\": 1, \"name\": \"Other Test\"}]`).\n- At least two objects must be present within the data field to support queries.\n\n### Notes:\n- For those using the Local database or API token authentication types, `client-id` and `client-token` are excluded from queries by default\n- Both recursive queries and query filters are separated by double underscores (`__`)\n\n\n# Rate limit\nThere is no limit to API calls at this time but is important to note that pfSense's XML configuration was not designed for quick simultaneous writes like a traditional database. It may be necessary to delay API calls in sequence to prevent unexpected behavior. Alternatively, you may limit the API to read-only mode to only allow endpoints with read (GET) access within the webConfigurator's System > API page.\n\n\n# Endpoints",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -63,7 +63,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \n}"
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/ldap",
@@ -97,7 +100,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"TEST_AUTHSERVER\",\n\t\"host\": \"ldap.com\",\n\t\"ldap_port\": 636,\n\t\"ldap_urltype\": \"encrypted\",\n\t\"ldap_protver\": \"3\",\n\t\"ldap_timeout\": 12,\n\t\"ldap_scope\": \"subtree\",\n\t\"ldap_basedn\": \"dc=test,dc=com\",\n    \"ldap_authcn\": \"ou=people,dc=test,dc=com;ou=groups,dc=test,dc=com\",\n    \"ldap_attr_user\": \"uid\",\n    \"ldap_attr_group\": \"cn\",\n    \"ldap_attr_member\": \"memberof\",\n    \"ldap_attr_groupobj\": \"posixGroup\",\n    \"ldap_binddn\": \"cn=pfsense,dc=test,dc=com\",\n    \"ldap_bindpw\": \"asdf\",\n    \"active\": false\n}"
+									"raw": "{\n\t\"name\": \"TEST_AUTHSERVER\",\n\t\"host\": \"ldap.com\",\n\t\"ldap_port\": 636,\n\t\"ldap_urltype\": \"encrypted\",\n\t\"ldap_protver\": \"3\",\n\t\"ldap_timeout\": 12,\n\t\"ldap_scope\": \"subtree\",\n\t\"ldap_basedn\": \"dc=test,dc=com\",\n    \"ldap_authcn\": \"ou=people,dc=test,dc=com;ou=groups,dc=test,dc=com\",\n    \"ldap_attr_user\": \"uid\",\n    \"ldap_attr_group\": \"cn\",\n    \"ldap_attr_member\": \"memberof\",\n    \"ldap_attr_groupobj\": \"posixGroup\",\n    \"ldap_binddn\": \"cn=pfsense,dc=test,dc=com\",\n    \"ldap_bindpw\": \"asdf\",\n    \"active\": false\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/ldap?name=string&host=string&ldap_port=string or integer&ldap_urltype=string&ldap_protver=string or integer&ldap_scope=string&ldap_basedn=string&ldap_authcn=string&ldap_extended_query=string&ldap_binddn=string&ldap_bindpw=string&ldap_attr_user=string&ldap_attr_group=string&ldap_attr_member=string&ldap_attr_groupobj=string&ldap_utf8=boolean&ldap_timeout=string or integer&active=boolean",
@@ -223,7 +229,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"LDAP_AUTHSERVER_0\"\n}"
+									"raw": "{\n\t\"name\": \"LDAP_AUTHSERVER_0\"\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/ldap?name=string",
@@ -264,7 +273,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"test\"\n}"
+									"raw": "{\n\t\"name\": \"test\"\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/radius?name=string",
@@ -293,6 +305,18 @@
 						},
 						{
 							"name": "Create RADIUS Auth Servers",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"id": "8bf571f6-7cc1-486b-892b-ca669be8a49d",
+										"exec": [
+											""
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
 							"request": {
 								"method": "POST",
 								"header": [
@@ -305,10 +329,13 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\": \"TEST_RADIUS\",\n    \"host\": \"123\",\n    \"radius_secret\": \"testsecret\",\n    \"radius_auth_port\": 1812,\n    \"radius_acct_port\": 1813,\n    \"radius_protocol\": \"MSCHAPv2\",\n    \"radius_timeout\": 5,\n    \"radius_nasip_attribute\": \"wan\"\n}"
+									"raw": "{\n    \"name\": \"TEST_RADIUS\",\n    \"host\": \"123\",\n    \"radius_secret\": \"testsecret\",\n    \"radius_auth_port\": 1812,\n    \"radius_acct_port\": 1813,\n    \"radius_protocol\": \"MSCHAPv2\",\n    \"radius_timeout\": 5,\n    \"radius_nasip_attribute\": \"wan\"\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/user/auth_server/radius?name=string&host=string&radius_secret=string&radius_auth_port=integer&radius_acct_port=integer&radius_timeout=integer&radis_nasip_attribute=string&active=boolean&radius_protocol=string",
+									"raw": "https://{{$hostname}}/api/v1/user/auth_server/radius?name=string&host=string&radius_secret=string&radius_auth_port=integer&radius_acct_port=integer&radius_timeout=integer&radius_nasip_attribute=string&active=boolean&radius_protocol=string",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -352,9 +379,8 @@
 											"description": "Specify the amount of time (in seconds) to wait for the remote RADIUS server to respond before timing out. This value must be `1` or greater. Defaults to `5`. (optional)"
 										},
 										{
-											"key": "radis_nasip_attribute",
-											"value": "string",
-											"description": "Specify which Interface's IP address to send in the NAS IP RADIUS attribute. You may specify either the physical Interface ID, the pfSense Interface ID or the descriptive Interface name. Defaults to `wan`. (optional)"
+											"key": "radius_nasip_attribute",
+											"value": "string"
 										},
 										{
 											"key": "active",
@@ -386,7 +412,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"test\"\n}"
+									"raw": "{\n\t\"name\": \"test\"\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server?name=string",
@@ -453,6 +482,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "fdf6fdf8-da76-4ff2-a22d-ae99527a107c",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -462,13 +492,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "85540dd7-2448-4cbc-a4de-1c7dbda99c8b",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "PRIVILEGE",
@@ -508,7 +541,7 @@
 										{
 											"key": "priv",
 											"value": "string",
-											"description": "Name of new privilege to assign. Multiple priviileges may be assigned at once if passed in as  array. Privilege name will match the POST data name found in the webConfigurator. "
+											"description": "Name of new privilege to assign. Multiple privileges may be assigned at once if passed in as  array. Privilege name will match the POST data name found in the webConfigurator. "
 										}
 									]
 								},
@@ -558,7 +591,7 @@
 										{
 											"key": "priv",
 											"value": "string",
-											"description": "Name of new privilege to delete. Multiple priviileges may be deleted at once if passed in as  array. Privilege name will match the POST data name found in the webConfigurator. "
+											"description": "Name of new privilege to delete. Multiple privileges may be deleted at once if passed in as  array. Privilege name will match the POST data name found in the webConfigurator. "
 										}
 									]
 								},
@@ -572,6 +605,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "62e05f62-734b-4c35-94c3-a901f7ba2d2f",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -581,13 +615,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "9a32c25c-37a0-433c-bcb4-2aa58790b430",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "GROUP",
@@ -684,6 +721,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "33b0502f-6582-4449-bda8-9a3476693037",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -693,13 +731,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "c2dd868d-b0e6-4aad-9d15-3f868b84b5b7",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "Read Users",
@@ -911,6 +952,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "639886c4-e154-4e81-967b-0798710e9a4b",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -920,13 +962,15 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "5dd2e6ac-99f7-40ea-a60a-5f5d0b29d547",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "INTERFACE",
@@ -964,7 +1008,7 @@
 										"vlan"
 									]
 								},
-								"description": "Read VLAN assignements and configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-vlan`, `page-interfaces-vlan-edit`]"
+								"description": "Read VLAN assignments and configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-vlan`, `page-interfaces-vlan-edit`]"
 							},
 							"response": []
 						},
@@ -1133,6 +1177,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "c6fe9ffe-9de5-4644-9768-5aa2772e092c",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1142,13 +1187,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "8c6f77f1-b2f2-442d-b71f-467e723ca398",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "APPLY",
@@ -1185,7 +1233,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints to apply pending interface configurations."
+					"description": "API endpoints to apply pending interface configurations.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "Read Interfaces",
@@ -1216,7 +1266,7 @@
 								"interface"
 							]
 						},
-						"description": "Read interface assignements and configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]"
+						"description": "Read interface assignments and configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]"
 					},
 					"response": []
 				},
@@ -1334,7 +1384,7 @@
 								{
 									"key": "dhcprejectfrom",
 									"value": "string or array",
-									"description": "Set the IPv4 DHCP rejected servers. You may pass values in as array or as comma seperated string. Only available when `type` is set to `dhcp` (optional)"
+									"description": "Set the IPv4 DHCP rejected servers. You may pass values in as array or as comma separated string. Only available when `type` is set to `dhcp` (optional)"
 								},
 								{
 									"key": "alias-address",
@@ -1576,7 +1626,7 @@
 								{
 									"key": "dhcprejectfrom",
 									"value": "string or array",
-									"description": "Update the IPv4 DHCP rejected servers. You may pass values in as array or as comma seperated string. Only available when `type` is set to `dhcp` (optional)"
+									"description": "Update the IPv4 DHCP rejected servers. You may pass values in as array or as comma separated string. Only available when `type` is set to `dhcp` (optional)"
 								},
 								{
 									"key": "alias-address",
@@ -1641,7 +1691,7 @@
 								{
 									"key": "adv_dhcp_option_modifiers",
 									"value": "string",
-									"description": "Update the IPv4 optionamodifier (optional)"
+									"description": "Update the IPv4 option modifier (optional)"
 								},
 								{
 									"key": "adv_dhcp_config_file_override",
@@ -1742,6 +1792,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "051f1e68-4918-490a-addb-4382498fb266",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -1751,13 +1802,15 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "73d9e12e-9407-4ac8-b744-58c5ddea0ee7",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "FIREWALL",
@@ -1867,6 +1920,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "e3665f54-6a1c-4070-b6b1-527a8652ec94",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -1876,13 +1930,16 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "ec5bb151-6296-4ab0-9ec7-96401cf46b9d",
 										"type": "text/javascript",
 										"exec": [
 											""
 										]
 									}
 								}
-							]
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "Read Firewall Aliases",
@@ -2090,6 +2147,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "30fa8fba-175e-4220-a8ed-934990d70b48",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -2099,13 +2157,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "e3f16763-d677-41b2-b3d2-a8db318f7a7e",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "RULE",
@@ -2159,7 +2220,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/firewall/rule?type=string&interface=string&ipprotocol=string&protocol=string&icmptype=string or array&src=string&dst=string&srcport=string or integer&dstport=string or integer&gateway=string&disabled=boolean&descr=string&log=boolean&top=boolean&apply=boolean",
+									"raw": "https://{{$hostname}}/api/v1/firewall/rule?type=string&interface=string&ipprotocol=string&protocol=string&icmptype=string or array&src=string&dst=string&srcport=string or integer&dstport=string or integer&gateway=string&sched=string&dnpipe=string&pdnpipe=string&defaultqueue=string&ackqueue=string&disabled=boolean&descr=string&log=boolean&top=boolean&apply=boolean",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -2199,7 +2260,7 @@
 										{
 											"key": "src",
 											"value": "string",
-											"description": "Set the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!`"
+											"description": "Set the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!`"
 										},
 										{
 											"key": "dst",
@@ -2222,6 +2283,31 @@
 											"description": "Set the routing gateway traffic will take upon match (optional)"
 										},
 										{
+											"key": "sched",
+											"value": "string",
+											"description": "Set a firewall schedule to apply to this rule. This must be an existing firewall schedule name. (optional)"
+										},
+										{
+											"key": "dnpipe",
+											"value": "string",
+											"description": "Specify a traffic shaper limiter (in) queue for this rule. This must be an existing traffic shaper limiter or queue. This field is required if a `pdnpipe` value is provided.Ioptional)"
+										},
+										{
+											"key": "pdnpipe",
+											"value": "string",
+											"description": "Specify a traffic shaper limiter (out) queue for this rule. This must be an existing traffic shaper limiter or queue. This value cannot match the `dnpipe` value and must be a child queue if `dnpipe` is a child queue, or a parent limiiter if `dnpipe` is a parent limiter. (optional)"
+										},
+										{
+											"key": "defaultqueue",
+											"value": "string",
+											"description": "Specify a default traffic shaper queue to apply to this rule. This must be an existing traffic shaper queue name. This field is required when an `ackqueue` value is provided. (optional)"
+										},
+										{
+											"key": "ackqueue",
+											"value": "string",
+											"description": "Specify an acknowledge traffic shaper queue to apply to this rule. This must be an existing traffic shaper queue and cannot match the `defaultqueue` value. (optional)"
+										},
+										{
 											"key": "disabled",
 											"value": "boolean",
 											"description": "Disable the rule upon creation (optional)"
@@ -2234,7 +2320,7 @@
 										{
 											"key": "log",
 											"value": "boolean",
-											"description": "Enabling rule matche logging (optional)"
+											"description": "Enabling rule matched logging (optional)"
 										},
 										{
 											"key": "top",
@@ -2267,7 +2353,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/firewall/rule?tracker=string or Integer&type=string&interface=string&ipprotocol=string&protocol=string&icmptype=string or array&src=string&dst=string&srcport=string or integer&dstport=string or integer&gateway=string&disabled=boolean&descr=string&log=boolean&top=boolean&apply=boolean",
+									"raw": "https://{{$hostname}}/api/v1/firewall/rule?tracker=string or Integer&type=string&interface=string&ipprotocol=string&protocol=string&icmptype=string or array&src=string&dst=string&srcport=string or integer&dstport=string or integer&gateway=string&sched=string&dnpipe=string&pdnpipe=string&defaultqueue=string&ackqueue=string&disabled=boolean&descr=string&log=boolean&top=boolean&apply=boolean",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -2312,7 +2398,7 @@
 										{
 											"key": "src",
 											"value": "string",
-											"description": "Update the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional)"
+											"description": "Update the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional)"
 										},
 										{
 											"key": "dst",
@@ -2333,6 +2419,31 @@
 											"key": "gateway",
 											"value": "string",
 											"description": "Update the routing gateway traffic will take upon match (optional)"
+										},
+										{
+											"key": "sched",
+											"value": "string",
+											"description": "Update the firewall schedule to apply to this rule. This must be an existing firewall schedule name. Provide an empty string to remove the configured schedule from the rule. (optional)"
+										},
+										{
+											"key": "dnpipe",
+											"value": "string",
+											"description": "Update the traffic shaper limiter (in) queue for this rule. This must be an existing traffic shaper limiter or queue. This field is required if a `pdnpipe` value is provided. To unset this value, pass in an empty string. This will also unset the existing `pdnpipe` value. (optional)"
+										},
+										{
+											"key": "pdnpipe",
+											"value": "string",
+											"description": "Update the traffic shaper limiter (out) queue for this rule. This must be an existing traffic shaper limiter or queue. This value cannot match the `dnpipe` value and must be a child queue if `dnpipe` is a child queue, or a parent limiiter if `dnpipe` is a parent limiter. To unset this value, pass in an empty string. (optional)"
+										},
+										{
+											"key": "defaultqueue",
+											"value": "string",
+											"description": "Update the default traffic shaper queue to apply to this rule. This must be an existing traffic shaper queue name. This field is required when an `ackqueue` value is provided. To unset this field, pass in an empty string. This will also unset the existing `ackqueue` value. (optional)"
+										},
+										{
+											"key": "ackqueue",
+											"value": "string",
+											"description": "Update acknowledge traffic shaper queue to apply to this rule. This must be an existing traffic shaper queue and cannot match the `defaultqueue` value. To unset this field, pass in an empty string. (optional)"
 										},
 										{
 											"key": "disabled",
@@ -2414,6 +2525,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "80ac8792-4f2a-435a-9c3a-1083f3c2d71c",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -2423,13 +2535,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "2757293a-580d-4867-8243-897524979e46",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "VIRTUAL_IP",
@@ -2673,6 +2788,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "b9cf2b38-f7c4-4972-8cb8-c2bce5bb8693",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -2682,13 +2798,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "896f04ee-79d4-4060-b027-639080d36672",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "NAT",
@@ -2772,7 +2891,7 @@
 												{
 													"key": "src",
 													"value": "string",
-													"description": "Set the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!`"
+													"description": "Set the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!`"
 												},
 												{
 													"key": "dst",
@@ -2876,7 +2995,7 @@
 												{
 													"key": "src",
 													"value": "string",
-													"description": "Update the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional)"
+													"description": "Update the source address of the firewall rule. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` (optional)"
 												},
 												{
 													"key": "dst",
@@ -2901,7 +3020,7 @@
 												{
 													"key": "local-port",
 													"value": "string",
-													"description": "Udate the TCP and/or UDP  port to forward traffic to. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp`. Port ranges may be specified using colon or hyphen. (optional)"
+													"description": "Update the TCP and/or UDP  port to forward traffic to. This is only necessary if you have specified the `protocol` to `tcp`, `udp`, `tcp/udp`. Port ranges may be specified using colon or hyphen. (optional)"
 												},
 												{
 													"key": "natreflection",
@@ -2984,6 +3103,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "154dbf38-a398-440f-997f-73172e9491b7",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -2993,13 +3113,16 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "43d387ab-3594-4074-b923-aa0aa226d74e",
 										"type": "text/javascript",
 										"exec": [
 											""
 										]
 									}
 								}
-							]
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "ONE_TO_ONE",
@@ -3075,7 +3198,7 @@
 												{
 													"key": "src",
 													"value": "string",
-													"description": "Set the source address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!`"
+													"description": "Set the source address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!`"
 												},
 												{
 													"key": "dst",
@@ -3164,7 +3287,7 @@
 												{
 													"key": "src",
 													"value": "string",
-													"description": "Update the source address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interfance name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!`"
+													"description": "Update the source address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!`"
 												},
 												{
 													"key": "dst",
@@ -3262,6 +3385,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "b651d13f-bac6-4972-b51b-e809a66de831",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -3271,13 +3395,16 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "e47f7092-4987-458a-9712-e6073c33a4f7",
 										"type": "text/javascript",
 										"exec": [
 											""
 										]
 									}
 								}
-							]
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "OUTBOUND",
@@ -3602,7 +3729,9 @@
 											"response": []
 										}
 									],
-									"description": "API endpoints that create, read, update and delete outbound NAT mappings."
+									"description": "API endpoints that create, read, update and delete outbound NAT mappings.",
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
 								},
 								{
 									"name": "Read Outbound NAT Settings",
@@ -3670,7 +3799,7 @@
 												{
 													"key": "mode",
 													"value": "string",
-													"description": "Update the outbound NAT mode. Options are `automatic` to automatically generate outbound NAT rules, `hybrid` to support both automatiic and manual outbound NAT rules , `advanced` to require all rules to be entered manually, or `disabled` to disable outbound NAT altogether. If updating to `advanced` from `automatic` or `hybrid`, the API will automatically create manual entries for each automatically generated outbound NAT entry."
+													"description": "Update the outbound NAT mode. Options are `automatic` to automatically generate outbound NAT rules, `hybrid` to support both automatic and manual outbound NAT rules , `advanced` to require all rules to be entered manually, or `disabled` to disable outbound NAT altogether. If updating to `advanced` from `automatic` or `hybrid`, the API will automatically create manual entries for each automatically generated outbound NAT entry."
 												}
 											]
 										},
@@ -3679,7 +3808,9 @@
 									"response": []
 								}
 							],
-							"description": "API endpoints that create, read, update and delete outbound NAT settings."
+							"description": "API endpoints that create, read, update and delete outbound NAT settings.",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						}
 					],
 					"description": "API endpoints that create, read, update and delete NAT configuration.",
@@ -3687,6 +3818,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "adf0dfcf-4885-45b1-a152-aab0f7920d13",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -3696,13 +3828,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "715ed88d-fe9e-4729-9964-3e60d7678b88",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "STATES",
@@ -3784,7 +3919,9 @@
 									},
 									"response": []
 								}
-							]
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "Read Firewall States",
@@ -3826,6 +3963,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "54944956-2f1a-4f21-9e84-5110a7769cad",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -3835,13 +3973,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "6ff93881-ede4-4985-95b0-583350219a90",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "APPLY",
@@ -3878,7 +4019,1498 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints that apply pending firewall changes."
+					"description": "API endpoints that apply pending firewall changes.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "TRAFFIC_SHAPER",
+					"item": [
+						{
+							"name": "QUEUE",
+							"item": [
+								{
+									"name": "Create Traffic Shaper Queue",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"interface\": \"lan\",\n    \"scheduler\": \"PRIQ\",\n    \"bandwidthtype\": \"Gb\",\n    \"bandwidth\": 1,\n    \"enabled\": false,\n    \"qlimit\": 1000,\n    \"tbrconfig\": 1000,\n    \"apply\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper/queue?interface=string&name=string&priority=integer&description=string&enabled=boolean&default=boolean&red=boolean&rio=boolean&ecn=boolean&codel=boolean&qlimit=integer&bandwidthtype=string&bandwidth=integer&buckets=string&hogs=string&borrow=boolean&upperlimit=boolean&upperlimit1=string&upperlimit2=integer&upperlimit3=string&linkshare=boolean&linkshare1=string&linkshare2=integer&linkshare3=string&realtime=boolean&realtime1=string&realtime2=integer&realtime3=string&apply=integer",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"traffic_shaper",
+												"queue"
+											],
+											"query": [
+												{
+													"key": "interface",
+													"value": "string",
+													"description": "Specify the parent interface to create the traffic shaper queue for. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). "
+												},
+												{
+													"key": "name",
+													"value": "string",
+													"description": "Specify a name for this queue. This name must be 15 characters or less, and unique from all other queues on the parent interface."
+												},
+												{
+													"key": "priority",
+													"value": "integer",
+													"description": "Specify the priority of this queue. This field Is only available when the parent traffic shaper's `scheduler` Is set to "
+												},
+												{
+													"key": "description",
+													"value": "string",
+													"description": "Specify a description for this queue. (optional)"
+												},
+												{
+													"key": "enabled",
+													"value": "boolean",
+													"description": "Enable or disable this traffic queue upon creation. Specify `true` to enable or `false` to disable. Defaults to `true`. (optional)"
+												},
+												{
+													"key": "default",
+													"value": "boolean",
+													"description": "Specify whether or not this queue should be set as the default queue for the parent. Set to `true` to enable. Defaults to `false`. (optional)"
+												},
+												{
+													"key": "red",
+													"value": "boolean",
+													"description": "Set the Random Early Detection option for this queue. Set `true` to enable. Defaults to `false`. (optional)"
+												},
+												{
+													"key": "rio",
+													"value": "boolean",
+													"description": "Set the Random Early Detection In and Out option for this queue. Set `true` to enable. Defaults to `false`. (optional)"
+												},
+												{
+													"key": "ecn",
+													"value": "boolean",
+													"description": "Set the Explicit Congestion Notification option for this queue. Set `true` to enable. Defaults to `false`. (optional) "
+												},
+												{
+													"key": "codel",
+													"value": "boolean",
+													"description": "Set the Codel Active Queue option for this queue. Set `true` to enable. Defaults to `false`. (optional)"
+												},
+												{
+													"key": "qlimit",
+													"value": "integer",
+													"description": "Specify the queue limit value for this queue. If set, this must be a value of `1` or greater. Defaults to no limit. (optional)"
+												},
+												{
+													"key": "bandwidthtype",
+													"value": "string",
+													"description": "Specify the bandwidth type to use when setting the bandwidth. Choices are `%` for percentage based bandwidth, `b` for bits, `Kb` for kilobits, `Mb` for megabits, and `Gb` for gigabits. Only available when the parent traffic shaper's `scheduler` Is set to `HFSC`, `CBQ`, or `FAIRQ`.  (optional)"
+												},
+												{
+													"key": "bandwidth",
+													"value": "integer",
+													"description": "Specify the bandwidth of this traffic shaper. This must be a numeric value of `1` or greater. If you have set the `bandwidthtype` to `%`, this value must be `100` or less. Only available when the parent traffic shaper's `scheduler` Is set to `HFSC`, `CBQ`, or `FAIRQ`. The sum of this value and all other child queues must be less than the parent traffic shaper's `bandwidth` value. (optional)"
+												},
+												{
+													"key": "buckets",
+													"value": "string",
+													"description": "Set the bandwidth buckets value for this queue. Only available when the parent traffic shaper's `scheduler` Is set to `FAIRQ`. (optional) "
+												},
+												{
+													"key": "hogs",
+													"value": "string",
+													"description": "Set the bandwidth hogs value for this queue. Only available when the parent traffic shaper's `scheduler` Is set to `FAIRQ`. (optional)"
+												},
+												{
+													"key": "borrow",
+													"value": "boolean",
+													"description": "Allow queue to borrow bandwidth from other queues when available. Only available when the parent traffic shaper's `scheduler` Is set to `CBQ`. (optional)"
+												},
+												{
+													"key": "upperlimit",
+													"value": "boolean",
+													"description": "Enable the upperlimit (max bandwidth) option for this queue. Set `true` to enable. Defaults to `false`. Only available when parent traffic shaper's `scheduler` is set to `HFSC`. (optional)"
+												},
+												{
+													"key": "upperlimit1",
+													"value": "string",
+													"description": "Set the first upper limit value (m1). This value must be a bandwidth formatted string (e.g. `100Mb`, `1Gb`, etc.). Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `upperlimit` value is enabled. (optional)"
+												},
+												{
+													"key": "upperlimit2",
+													"value": "integer",
+													"description": "Set the second upper limit value (d). This value must an integer of 1 or greater. This value will required If an `upperlimit1` value was specified. Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `upperlimit` value is enabled. (optional)"
+												},
+												{
+													"key": "upperlimit3",
+													"value": "string",
+													"description": "Set the third upper limit value (m2). This value must be a bandwidth formatted string (e.g. `100Mb`, `1Gb`, etc.). Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `upperlimit` value is enabled. This value Is required if the`upperlimit` value is enabled."
+												},
+												{
+													"key": "linkshare",
+													"value": "boolean",
+													"description": "Enable the linkshare (shared bandwidth) option for this queue. Set `true` to enable. Defaults to `false`. Only available when parent traffic shaper's `scheduler` is set to `HFSC`. (optional)"
+												},
+												{
+													"key": "linkshare1",
+													"value": "string",
+													"description": "Set the first linkshare value (m1). This value must be a bandwidth formatted string (e.g. `100Mb`, `1Gb`, etc.). Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `linkshare` value is enabled. (optional)"
+												},
+												{
+													"key": "linkshare2",
+													"value": "integer",
+													"description": "Set the second linkshare value (d). This value must an integer of 1 or greater. This value will required If an `linkshare1` value was specified. Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `linkshare` value is enabled. (optional)"
+												},
+												{
+													"key": "linkshare3",
+													"value": "string",
+													"description": "Set the third linkshare value (m2). This value must be a bandwidth formatted string (e.g. `100Mb`, `1Gb`, etc.). Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `linkshare` value is enabled. This value Is required if the`linkshare` value is enabled."
+												},
+												{
+													"key": "realtime",
+													"value": "boolean",
+													"description": "Enable the realtime (minimum bandwidth) option for this queue. Set `true` to enable. Defaults to `false`. Only available when parent traffic shaper's `scheduler` is set to `HFSC`. (optional)"
+												},
+												{
+													"key": "realtime1",
+													"value": "string",
+													"description": "Set the first realtime value (m1). This value must be a bandwidth formatted string (e.g. `100Mb`, `1Gb`, etc.). Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `realtime` value is enabled. (optional)"
+												},
+												{
+													"key": "realtime2",
+													"value": "integer",
+													"description": "Set the second realtime value (d). This value must an integer of 1 or greater. This value will required If an `realtime1` value was specified. Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `realtime` value is enabled. (optional)"
+												},
+												{
+													"key": "realtime3",
+													"value": "string",
+													"description": "Set the third realtime value (m2). This value must be a bandwidth formatted string (e.g. `100Mb`, `1Gb`, etc.). Only available when the parent traffic shaper's `scheduler` is set to `HFSC` and the `realtime` value is enabled. This value Is required if the`linkshare` value is enabled."
+												},
+												{
+													"key": "apply",
+													"value": "integer",
+													"description": "Specify whether this traffic shaper should be applied immediately after creation. If `true`, the filter will be reloaded after creation. Otherwise, if `false`, the filter will not be reloaded and the change will not be applied until the next filter reload. Defaults to `false`. (optional)"
+												}
+											]
+										},
+										"description": "Add a queue to an traffic shaper interface.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-queues`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Traffic Shaper Queue",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"interface\": \"lan\",\n    \"scheduler\": \"PRIQ\",\n    \"bandwidthtype\": \"Gb\",\n    \"bandwidth\": 1,\n    \"enabled\": false,\n    \"qlimit\": 1000,\n    \"tbrconfig\": 1000,\n    \"apply\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper/queue?interface=string&name=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"traffic_shaper",
+												"queue"
+											],
+											"query": [
+												{
+													"key": "interface",
+													"value": "string",
+													"description": "Specify the parent interface to delete the traffic shaper queue from. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). "
+												},
+												{
+													"key": "name",
+													"value": "string",
+													"description": "Specify a name of the queue to delete. This must be an existing queue name configured on the parent traffic shaper."
+												}
+											]
+										},
+										"description": "Delete a queue from a traffic shaper interface.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-queues`]"
+									},
+									"response": []
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "LIMITER",
+							"item": [
+								{
+									"name": "BANDWIDTH",
+									"item": [
+										{
+											"name": "Create Limiter Bandwidth",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"name\": \"Test_Limiter\",\n    \"bw\": 100,\n    \"bwscale\": \"Mb\",\n    \"bwsched\": \"Test_Schedule\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/bandwidth?name=string&bw=integer&bwscale=string&bwsched=string&apply=boolean",
+													"protocol": "https",
+													"host": [
+														"{{$hostname}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"firewall",
+														"traffic_shaper",
+														"limiter",
+														"bandwidth"
+													],
+													"query": [
+														{
+															"key": "name",
+															"value": "string",
+															"description": "Specify the name of the parent limiter to add this bandwidth object to. "
+														},
+														{
+															"key": "bw",
+															"value": "integer",
+															"description": "Specify the amount of bandwidth allotted to the parent limiter. This must be a numeric value of 1 or greater."
+														},
+														{
+															"key": "bwscale",
+															"value": "string",
+															"description": "Specify the bandwidth scale type. Options are `b` for b/s, `Kb` for Kb/s, or `Mb` for Mb/s."
+														},
+														{
+															"key": "bwsched",
+															"value": "string",
+															"description": "Specify a schedule for this bandwidth setting. This must be an existing firewall schedule name. Defaults to `none`. (optional)"
+														},
+														{
+															"key": "apply",
+															"value": "boolean",
+															"description": "Specify whether this bandwidth object should be applied immediately after creation. If set to `true`, the firewall filter will reload  immediately after creation. If set to `false`, the firewall filter will not be reloaded the and bandwidth object will not be applied to the backend configuration until the filter Is reloaded. Defaults to `false`. (optional)"
+														}
+													]
+												},
+												"description": "Create a limiter bandwidth setting.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]"
+											},
+											"response": []
+										},
+										{
+											"name": "Delete Limiter Bandwidth",
+											"request": {
+												"method": "DELETE",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"name\": \"Test_Limiter\",\n    \"id\": 0\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/bandwidth?name=string&id=integer&apply=boolean",
+													"protocol": "https",
+													"host": [
+														"{{$hostname}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"firewall",
+														"traffic_shaper",
+														"limiter",
+														"bandwidth"
+													],
+													"query": [
+														{
+															"key": "name",
+															"value": "string",
+															"description": "Specify the name of the parent limiter to delete this bandwidth object from. "
+														},
+														{
+															"key": "id",
+															"value": "integer",
+															"description": "Specify the ID of the bandwidth object to delete. The ID will be the array index of the object to delete within the limiter's bandwith-items array. "
+														},
+														{
+															"key": "apply",
+															"value": "boolean",
+															"description": "Specify whether this bandwidth object deletion should be applied immediately. If set to `true`, the firewall filter will reload  immediately after deletion. If set to `false`, the firewall filter will not be reloaded the and bandwidth object will not be removed from the backend configuration until the filter Is reloaded. Defaults to `false`. (optional)"
+														}
+													]
+												},
+												"description": "Delete a limiter bandwidth setting.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]"
+											},
+											"response": []
+										}
+									],
+									"description": "API endpoints to create and delete limiter bandwidth settings.",
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
+								},
+								{
+									"name": "QUEUE",
+									"item": [
+										{
+											"name": "Create Limiter Queue",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"limiter\": \"Test_Limiter\",\n    \"name\": \"Test_Queue\",\n    \"mask\": \"srcaddress\",\n    \"maskbits\": 31,\n    \"description\": \"Unit test\",\n    \"aqm\": \"codel\",\n    \"weight\": 1,\n    \"plr\": 0.01,\n    \"buckets\": 16,\n    \"apply\": true\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/queue?limiter=string&name=string&mask=string&maskbits=integer&maskbitsv6=integer&description=string&aqm=string&enabled=boolean&ecn=boolean&qlimit=integer&weight=integer&plr=float&buckets=integer&param_codel_target=integer&param_codel_interval=integer&param_pie_target=integer&param_pie_tupdate=integer&param_pie_alpha=integer&param_pie_beta=integer&param_pie_max_burst=integer&param_pie_max_ecnth=integer&param_red_w_q=integer&param_red_min_th=integer&param_red_max_th=integer&param_red_max_p=integer&param_gred_w_q=integer&param_gred_min_th=integer&param_gred_max_th=integer&param_gred_max_p=integer&apply=boolean",
+													"protocol": "https",
+													"host": [
+														"{{$hostname}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"firewall",
+														"traffic_shaper",
+														"limiter",
+														"queue"
+													],
+													"query": [
+														{
+															"key": "limiter",
+															"value": "string",
+															"description": "Specify the name of the parent limiter to add this queue to. "
+														},
+														{
+															"key": "name",
+															"value": "string",
+															"description": "Specify a name for this limiter queue. This value must only contain alphanumerics, underscore and/or hyphens, must be 32 characters or less, and must be unique from all other limiters Including child queues."
+														},
+														{
+															"key": "mask",
+															"value": "string",
+															"description": "Specify a limiter address mask type. Options are `none` for no mask, `srcaddress` for source addresses, or `dstaddress` for destination addresses. Defaults to `none`. (optional)"
+														},
+														{
+															"key": "maskbits",
+															"value": "integer",
+															"description": "Specify the subnet bitmask to apply the limiter queue to. This value must be between 1 and 32. This field is only available when `mask` is set to `srcaddress` or `dstaddress`. Defaults to `32`. (optional)"
+														},
+														{
+															"key": "maskbitsv6",
+															"value": "integer",
+															"description": "Specify the IPv6 subnet bitmask to apply the limiter queue to. This value must be between 1 and 128. This field is only available when `mask` is set to `srcaddress` or `dstaddress`. Defaults to `128`. (optional)"
+														},
+														{
+															"key": "description",
+															"value": "string",
+															"description": "Specify a description for this limiter queue. (optional)"
+														},
+														{
+															"key": "aqm",
+															"value": "string",
+															"description": "Specify the Queue Management Algorithm for this limiter queue to use. Options are `droptail`, `codel`, `pie`, `red`, or `gred`. "
+														},
+														{
+															"key": "enabled",
+															"value": "boolean",
+															"description": "Enable or disable this limiter queue upon creation. If `true`, the limiter will be enabled. If `false`, the limiter will be disabled. Defaults to `true`. (optional)"
+														},
+														{
+															"key": "ecn",
+															"value": "boolean",
+															"description": "Enable Explicit Congestion Notification (ECN). If `true`, the limiter queue will be enabled. If `false`, the limiter will be disabled. Defaults to `false`. Note: not every AQM and/or scheduler supports ECN. (optional)"
+														},
+														{
+															"key": "qlimit",
+															"value": "integer",
+															"description": "Specify the queue limit value for this limiter queue. This must be a numeric value of 1 or greater. (optional)"
+														},
+														{
+															"key": "weight",
+															"value": "integer",
+															"description": "Specify the weight value for this limiter queue. This must be a numeric value between 1 and 100. (optional)"
+														},
+														{
+															"key": "plr",
+															"value": "float",
+															"description": "Specify the packet loss rate value for this limiter queue. This must be a numeric value between 0 and 1. Defaults to 0. (optional)"
+														},
+														{
+															"key": "buckets",
+															"value": "integer",
+															"description": "Specify the buckets value for this limiter queue. This must be a numeric value between 16 and 65535.  (optional)"
+														},
+														{
+															"key": "param_codel_target",
+															"value": "integer",
+															"description": "Specify the CoDel target parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `codel`. Defaults to `5`. (optional)"
+														},
+														{
+															"key": "param_codel_interval",
+															"value": "integer",
+															"description": "Specify the CoDel interval parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `codel`. Defaults to `100`. (optional)"
+														},
+														{
+															"key": "param_pie_target",
+															"value": "integer",
+															"description": "Specify the PIE target parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `15`. (optional)"
+														},
+														{
+															"key": "param_pie_tupdate",
+															"value": "integer",
+															"description": "Specify the PIE tupdate parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `15`. (optional)"
+														},
+														{
+															"key": "param_pie_alpha",
+															"value": "integer",
+															"description": "Specify the PIE alpha parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `125`. (optional)"
+														},
+														{
+															"key": "param_pie_beta",
+															"value": "integer",
+															"description": "Specify the PIE beta parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `1250`. (optional)"
+														},
+														{
+															"key": "param_pie_max_burst",
+															"value": "integer",
+															"description": "Specify the PIE max burst parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `150000`. (optional)"
+														},
+														{
+															"key": "param_pie_max_ecnth",
+															"value": "integer",
+															"description": "Specify the PIE max ecnth parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `99`. (optional)"
+														},
+														{
+															"key": "param_red_w_q",
+															"value": "integer",
+															"description": "Specify the RED w_q parameter for this limiter queue. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `red`. Defaults to `1`. (optional)"
+														},
+														{
+															"key": "param_red_min_th",
+															"value": "integer",
+															"description": "Specify the RED min_th parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `red`. Defaults to `0`. (optional)"
+														},
+														{
+															"key": "param_red_max_th",
+															"value": "integer",
+															"description": "Specify the RED max_th parameter for this limiter queue. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `red`. Defaults to `1`. (optional)"
+														},
+														{
+															"key": "param_red_max_p",
+															"value": "integer",
+															"description": "Specify the RED max_p parameter for this limiter queue. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `red`. Defaults to `1`. (optional)"
+														},
+														{
+															"key": "param_gred_w_q",
+															"value": "integer",
+															"description": "Specify the GRED w_q parameter for this limiter queue. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `gred`. Defaults to `1`. (optional)"
+														},
+														{
+															"key": "param_gred_min_th",
+															"value": "integer",
+															"description": "Specify the GRED min_th parameter for this limiter queue. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `gred`. Defaults to `0`. (optional)"
+														},
+														{
+															"key": "param_gred_max_th",
+															"value": "integer",
+															"description": "Specify the GRED max_th parameter for this limiter queue. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `gred`. Defaults to `1`. (optional)"
+														},
+														{
+															"key": "param_gred_max_p",
+															"value": "integer",
+															"description": "Specify the GRED max_p parameter for this limiter queue. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `gred`. Defaults to `1`. (optional)"
+														},
+														{
+															"key": "apply",
+															"value": "boolean",
+															"description": "Specify whether or not this limiter queue should be applied immediately after creation. If set to `true`, the firewall filter will reload and the limiter queue will be applied. If set to`false`, the firewall filter will not be reloaded and the limiter queue will not be applied until the filter Is reloaded. Defaults to `false`. (optional)"
+														}
+													]
+												},
+												"description": "Add a child queue to an existing traffic shaper limiter.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]"
+											},
+											"response": []
+										},
+										{
+											"name": "Delete Limiter Queue",
+											"request": {
+												"method": "DELETE",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"limiter\": \"Test_Limiter\",\n    \"name\": \"Test_Queue\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/queue?limiter=string&name=string&apply=boolean",
+													"protocol": "https",
+													"host": [
+														"{{$hostname}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"firewall",
+														"traffic_shaper",
+														"limiter",
+														"queue"
+													],
+													"query": [
+														{
+															"key": "limiter",
+															"value": "string",
+															"description": "Specify the name of the parent limiter to delete this queue from."
+														},
+														{
+															"key": "name",
+															"value": "string",
+															"description": "Specify the name of the queue to delete. "
+														},
+														{
+															"key": "apply",
+															"value": "boolean",
+															"description": "Specify whether or not this limiter queue removal should be applied immediately after deletion. If set to `true`, the firewall filter will reload and the limiter queue will be deleted forever. If set to`false`, the firewall filter will not be reloaded and the limiter queue will not be removed until the filter is reloaded. Defaults to `false`. (optional)"
+														}
+													]
+												},
+												"description": "Delete a queue from an existing traffic shaper limiter.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]"
+											},
+											"response": []
+										}
+									],
+									"description": "API endpoints to create and delete limiter child queues.",
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
+								},
+								{
+									"name": "Create Limiter",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Test_Limiter\",\n    \"bandwidth\": [{\"bw\": 100, \"bwscale\": \"Mb\"}],\n    \"mask\": \"srcaddress\",\n    \"maskbits\": 31,\n    \"description\": \"Unit test\",\n    \"aqm\": \"codel\",\n    \"sched\": \"fq_pie\",\n    \"delay\": 1,\n    \"plr\": 0.01,\n    \"buckets\": 16,\n    \"apply\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter?name=string&bandwidth=array&mask=string&maskbits=integer&maskbitsv6=integer&description=string&aqm=string&sched=string&enabled=boolean&ecn=boolean&qlimit=integer&delay=integer&plr=float&buckets=integer&param_codel_target=integer&param_codel_interval=integer&param_pie_target=integer&param_pie_tupdate=integer&param_pie_alpha=integer&param_pie_beta=integer&param_pie_max_burst=integer&param_pie_max_ecnth=integer&param_red_w_q=integer&param_red_min_th=integer&param_red_max_th=integer&param_red_max_p=integer&param_gred_w_q=integer&param_gred_min_th=integer&param_gred_max_th=integer&param_gred_max_p=integer&param_fq_codel_target=integer&param_fq_codel_interval=integer&param_fq_codel_quantum=integer&param_fq_codel_limit=integer&param_fq_codel_flow=integer&param_fq_pie_target=integer&param_fq_pie_tupdate=integer&param_fq_pie_alpha=integer&param_fq_pie_beta=integer&param_fq_pie_max_burst=integer&param_fq_pie_max_burst=integer&apply=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"traffic_shaper",
+												"limiter"
+											],
+											"query": [
+												{
+													"key": "name",
+													"value": "string",
+													"description": "Specify a name for this limiter. This value must only contain alphanumerics, underscore and/or hyphens, must be 32 characters or less, and must be unique from all other limiters Including child queues."
+												},
+												{
+													"key": "bandwidth",
+													"value": "array",
+													"description": "Specify an array of bandwidth objects to assign to this limiter. Each object will require the fields as specified by the /api/v1/firewall/traffic_shaper/limiter/bandwidth endpoint documentation. At least one bandwidth object must be specified to create the limiter."
+												},
+												{
+													"key": "mask",
+													"value": "string",
+													"description": "Specify a limiter address mask type. Options are `none` for no mask, `srcaddress` for source addresses, or `dstaddress` for destination addresses. Defaults to `none`. (optional)"
+												},
+												{
+													"key": "maskbits",
+													"value": "integer",
+													"description": "Specify the subnet bitmask to apply the limiter to. This value must be between 1 and 32. This field is only available when `mask` is set to `srcaddress` or `dstaddress`. Defaults to `32`. (optional)"
+												},
+												{
+													"key": "maskbitsv6",
+													"value": "integer",
+													"description": "Specify the IPv6 subnet bitmask to apply the limiter to. This value must be between 1 and 128. This field is only available when `mask` is set to `srcaddress` or `dstaddress`. Defaults to `128`. (optional)"
+												},
+												{
+													"key": "description",
+													"value": "string",
+													"description": "Specify a description for this limiter. (optional)"
+												},
+												{
+													"key": "aqm",
+													"value": "string",
+													"description": "Specify the Queue Management Algorithm for this limiter to use. Options are `droptail`, `codel`, `pie`, `red`, or `gred`. "
+												},
+												{
+													"key": "sched",
+													"value": "string",
+													"description": "Specify the scheduler for this limiter to use. Options are `wf2q+`, `fifo`, `qfq`, `rr`, `prio`, `fq_codel` or `fq_pie`."
+												},
+												{
+													"key": "enabled",
+													"value": "boolean",
+													"description": "Enable or disable this limiter upon creation. If `true`, the limiter will be enabled. If `false`, the limiter will be disabled. Defaults to `true`. (optional)"
+												},
+												{
+													"key": "ecn",
+													"value": "boolean",
+													"description": "Enable Explicit Congestion Notification (ECN). If `true`, the limiter will be enabled. If `false`, the limiter will be disabled. Defaults to `false`. Note: not every AQM and/or scheduler supports ECN. (optional)"
+												},
+												{
+													"key": "qlimit",
+													"value": "integer",
+													"description": "Specify the queue limit value for this limiter. This must be a numeric value of 1 or greater. (optional)"
+												},
+												{
+													"key": "delay",
+													"value": "integer",
+													"description": "Specify the delay value for this limiter. This must be a numeric value between 0 and 10000. Defaults to 0. (optional)"
+												},
+												{
+													"key": "plr",
+													"value": "float",
+													"description": "Specify the packet loss rate value for this limiter. This must be a numeric value between 0 and 1. Defaults to 0. (optional)"
+												},
+												{
+													"key": "buckets",
+													"value": "integer",
+													"description": "Specify the buckets value for this limiter. This must be a numeric value between 16 and 65535.  (optional)"
+												},
+												{
+													"key": "param_codel_target",
+													"value": "integer",
+													"description": "Specify the CoDel target parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `codel`. Defaults to `5`. (optional)"
+												},
+												{
+													"key": "param_codel_interval",
+													"value": "integer",
+													"description": "Specify the CoDel interval parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `codel`. Defaults to `100`. (optional)"
+												},
+												{
+													"key": "param_pie_target",
+													"value": "integer",
+													"description": "Specify the PIE target parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `15`. (optional)"
+												},
+												{
+													"key": "param_pie_tupdate",
+													"value": "integer",
+													"description": "Specify the PIE tupdate parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `15`. (optional)"
+												},
+												{
+													"key": "param_pie_alpha",
+													"value": "integer",
+													"description": "Specify the PIE alpha parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `125`. (optional)"
+												},
+												{
+													"key": "param_pie_beta",
+													"value": "integer",
+													"description": "Specify the PIE beta parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `1250`. (optional)"
+												},
+												{
+													"key": "param_pie_max_burst",
+													"value": "integer",
+													"description": "Specify the PIE max burst parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `150000`. (optional)"
+												},
+												{
+													"key": "param_pie_max_ecnth",
+													"value": "integer",
+													"description": "Specify the PIE max ecnth parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `pie`. Defaults to `99`. (optional)"
+												},
+												{
+													"key": "param_red_w_q",
+													"value": "integer",
+													"description": "Specify the RED w_q parameter for this limiter. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `red`. Defaults to `1`. (optional)"
+												},
+												{
+													"key": "param_red_min_th",
+													"value": "integer",
+													"description": "Specify the RED min_th parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `red`. Defaults to `0`. (optional)"
+												},
+												{
+													"key": "param_red_max_th",
+													"value": "integer",
+													"description": "Specify the RED max_th parameter for this limiter. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `red`. Defaults to `1`. (optional)"
+												},
+												{
+													"key": "param_red_max_p",
+													"value": "integer",
+													"description": "Specify the RED max_p parameter for this limiter. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `red`. Defaults to `1`. (optional)"
+												},
+												{
+													"key": "param_gred_w_q",
+													"value": "integer",
+													"description": "Specify the GRED w_q parameter for this limiter. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `gred`. Defaults to `1`. (optional)"
+												},
+												{
+													"key": "param_gred_min_th",
+													"value": "integer",
+													"description": "Specify the GRED min_th parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `aqm` is set to `gred`. Defaults to `0`. (optional)"
+												},
+												{
+													"key": "param_gred_max_th",
+													"value": "integer",
+													"description": "Specify the GRED max_th parameter for this limiter. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `gred`. Defaults to `1`. (optional)"
+												},
+												{
+													"key": "param_gred_max_p",
+													"value": "integer",
+													"description": "Specify the GRED max_p parameter for this limiter. This must be a numeric value of 1 or greater. Only available when the `aqm` is set to `gred`. Defaults to `1`. (optional)"
+												},
+												{
+													"key": "param_fq_codel_target",
+													"value": "integer",
+													"description": "Specify the FQ_CoDel target parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_codel`. Defaults to `5`. (optional)"
+												},
+												{
+													"key": "param_fq_codel_interval",
+													"value": "integer",
+													"description": "Specify the FQ_CoDel interval parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_codel`. Defaults to `100`. (optional)"
+												},
+												{
+													"key": "param_fq_codel_quantum",
+													"value": "integer",
+													"description": "Specify the FQ_CoDel quantum parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_codel`. Defaults to `1514`. (optional)"
+												},
+												{
+													"key": "param_fq_codel_limit",
+													"value": "integer",
+													"description": "Specify the FQ_CoDel limit parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_codel`. Defaults to `10240`. (optional)"
+												},
+												{
+													"key": "param_fq_codel_flow",
+													"value": "integer",
+													"description": "Specify the FQ_CoDel flow parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_codel`. Defaults to `1024`. (optional)"
+												},
+												{
+													"key": "param_fq_pie_target",
+													"value": "integer",
+													"description": "Specify the FQ_PIE target parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_pie`. Defaults to `15`. (optional)"
+												},
+												{
+													"key": "param_fq_pie_tupdate",
+													"value": "integer",
+													"description": "Specify the FQ_PIE tupdate parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_pie`. Defaults to `15`. (optional)"
+												},
+												{
+													"key": "param_fq_pie_alpha",
+													"value": "integer",
+													"description": "Specify the FQ_PIE alpha parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_pie`. Defaults to `125`. (optional)"
+												},
+												{
+													"key": "param_fq_pie_beta",
+													"value": "integer",
+													"description": "Specify the FQ_PIE beta parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_pie`. Defaults to `1250`. (optional)"
+												},
+												{
+													"key": "param_fq_pie_max_burst",
+													"value": "integer",
+													"description": "Specify the FQ_PIE max burst parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_pie`. Defaults to `150000`. (optional)"
+												},
+												{
+													"key": "param_fq_pie_max_burst",
+													"value": "integer",
+													"description": "Specify the FQ_PIE max ecnth parameter for this limiter. This must be a numeric value of 0 or greater. Only available when the `sched` is set to `fq_pie`. Defaults to `99`. (optional)"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not this limiter should be applied immediately after creation. If set to `true`, the firewall filter will reload and the limiter will be applied. If set to`false`, the firewall filter will not be reloaded and the limiter will not be applied until the filter Is reloaded. Defaults to `false`. (optional)"
+												}
+											]
+										},
+										"description": "Add a traffic shaper limiter.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Read Limiters",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"traffic_shaper",
+												"limiter"
+											]
+										},
+										"description": "Read all traffic shaper limiters.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete limiter",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter?name=string&apply=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"traffic_shaper",
+												"limiter"
+											],
+											"query": [
+												{
+													"key": "name",
+													"value": "string",
+													"description": "Specify the name of the limiter to delete."
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not this change should be applied immediately after deletion. If set to `true`, the firewall filter will reload. If set to`false`, the firewall filter will not be reloaded and the limiter deletion will not be applied until the filter Is reloaded. Defaults to `false`. (optional)"
+												}
+											]
+										},
+										"description": "Delete traffic shaper limiter.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints to create, read and delete traffic shaper limiters.",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Create Traffic Shaper",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"interface\": \"lan\",\n    \"scheduler\": \"PRIQ\",\n    \"bandwidthtype\": \"Gb\",\n    \"bandwidth\": 1,\n    \"enabled\": false,\n    \"qlimit\": 1000,\n    \"tbrconfig\": 1000,\n    \"apply\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper?interface=string&scheduler=string&bandwidthtype=string&bandwidth=integer&enabled=boolean&qlimit=integer&tbrconfig=integer&apply=integer",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"firewall",
+										"traffic_shaper"
+									],
+									"query": [
+										{
+											"key": "interface",
+											"value": "string",
+											"description": "Specify the interface to create the traffic shaper policy for. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). "
+										},
+										{
+											"key": "scheduler",
+											"value": "string",
+											"description": "Specify the scheduler type for this traffic shaper. Choices are `HFSC`, `CBQ`, `FAIRQ`, `CODELQ`, and `PRIQ`."
+										},
+										{
+											"key": "bandwidthtype",
+											"value": "string",
+											"description": "Specify the bandwidth type to use when setting the bandwidth. Choices are `%` for percentage based bandwidth, `b` for bits, `Kb` for kilobits, `Mb` for megabits, and `Gb` for gigabits."
+										},
+										{
+											"key": "bandwidth",
+											"value": "integer",
+											"description": "Specify the bandwidth of this traffic shaper. This must be a numeric value of `1` or greater. If you have set the `bandwidthtype` to `%`, this value must be `100` or less."
+										},
+										{
+											"key": "enabled",
+											"value": "boolean",
+											"description": "Enable or disable this traffic shaper upon creation. Specify `true` to enable or `false` to disable. Defaults to `true`. (optional)"
+										},
+										{
+											"key": "qlimit",
+											"value": "integer",
+											"description": "Specify the queue limit value for this traffic shaper. If set, this must be a value of `1` or greater. Defaults to no limit. (optional)"
+										},
+										{
+											"key": "tbrconfig",
+											"value": "integer",
+											"description": "Specify the TBR size  for this traffic shaper. If set, this must be a value of `1` or greater. (optional)"
+										},
+										{
+											"key": "apply",
+											"value": "integer",
+											"description": "Specify whether this traffic shaper should be applied immediately after creation. If `true`, the filter will be reloaded after creation. Otherwise, if `false`, the filter will not be reloaded and the change will not be applied until the next filter reload. Defaults to `false`. (optional)"
+										}
+									]
+								},
+								"description": "Add a traffic shaper policy to an interface.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Traffic Shaper",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"interface\": \"lan\",\n    \"scheduler\": \"PRIQ\",\n    \"bandwidthtype\": \"%\",\n    \"bandwidth\": 50,\n    \"enabled\": true,\n    \"qlimit\": 10000,\n    \"tbrconfig\": 10000,\n    \"apply\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper?interface=string&scheduler=string&bandwidthtype=string&bandwidth=integer&enabled=boolean&qlimit=integer&tbrconfig=integer&apply=integer",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"firewall",
+										"traffic_shaper"
+									],
+									"query": [
+										{
+											"key": "interface",
+											"value": "string",
+											"description": "Specify the interface of the traffic shaper policy to update. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). "
+										},
+										{
+											"key": "scheduler",
+											"value": "string",
+											"description": "Update the scheduler type for this traffic shaper. Choices are `HFSC`, `CBQ`, `FAIRQ`, `CODELQ`, and `PRIQ`. (optional)"
+										},
+										{
+											"key": "bandwidthtype",
+											"value": "string",
+											"description": "Update the bandwidth type to use when setting the bandwidth. Choices are `%` for percentage based bandwidth, `b` for bits, `Kb` for kilobits, `Mb` for megabits, and `Gb` for gigabits. If the bandwidth type is changed, a new `bandwidth` value will also be required. (optional)"
+										},
+										{
+											"key": "bandwidth",
+											"value": "integer",
+											"description": "Update the bandwidth of this traffic shaper. This must be a numeric value of `1` or greater. If you have set the `bandwidthtype` to `%`, this value must be `100` or less. If the `bandwidthtype` value has been changed, this field will be required. (optional) "
+										},
+										{
+											"key": "enabled",
+											"value": "boolean",
+											"description": "Enable or disable this traffic shaper. Specify `true` to enable or `false` to disable.  (optional)"
+										},
+										{
+											"key": "qlimit",
+											"value": "integer",
+											"description": "Update the queue limit value for this traffic shaper. If set, this must be a value of `1` or greater. (optional)"
+										},
+										{
+											"key": "tbrconfig",
+											"value": "integer",
+											"description": "Update the TBR size  for this traffic shaper. If set, this must be a value of `1` or greater. (optional)"
+										},
+										{
+											"key": "apply",
+											"value": "integer",
+											"description": "Specify whether this traffic shaper should be applied immediately after updating. If `true`, the filter will be reloaded after creation. Otherwise, if `false`, the filter will not be reloaded and the change will not be applied until the next filter reload. Defaults to `false`. (optional)"
+										}
+									]
+								},
+								"description": "Update an existing traffic shaper policy for an interface.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Read Traffic Shapers",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"firewall",
+										"traffic_shaper"
+									]
+								},
+								"description": "Read all configured traffic shapers.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Traffic Shaper",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"interface\": \"wan\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/firewall/traffic_shaper?interface=string&apply=boolean",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"firewall",
+										"traffic_shaper"
+									],
+									"query": [
+										{
+											"key": "interface",
+											"value": "string",
+											"description": "Specify the interface of the traffic shaper policy to delete. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). "
+										},
+										{
+											"key": "apply",
+											"value": "boolean",
+											"description": "Specify whether this traffic shaper deletion should be applied immediately after deleting. If `true`, the filter will be reloaded after deleting. Otherwise, if `false`, the filter will not be reloaded and the change will not be applied until the next filter reload. Defaults to `false`. (optional)"
+										}
+									]
+								},
+								"description": "Delete the traffic shaper policy for a specific interface.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints to create, read, update and delete traffic shaper configurations.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "SCHEDULE",
+					"item": [
+						{
+							"name": "TIME_RANGE",
+							"item": [
+								{
+									"name": "Create Schedule Time Range",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Test_Schedule\",\n    \"month\": \"1,3,5\",\n    \"day\": \"20,24,5\",\n    \"hour\": \"9:00-17:00\",\n    \"rangedescr\": \"Enable on Jan 20, Mar 24, and May 5 from 9AM to 5PM\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/schedule/time_range?name=string&position=string&month=string&day=string&hour=string&rangedescr=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"schedule",
+												"time_range"
+											],
+											"query": [
+												{
+													"key": "name",
+													"value": "string",
+													"description": "Specify the name of the schedule to add this time range to. This must be an existing firewall schedule name."
+												},
+												{
+													"key": "position",
+													"value": "string",
+													"description": "Specify a comma-separated list of week days the schedule will be enable for. Options are `1` for Monday, `2` for Tuesday, `3` for Wednesday, `4` for Thursday, `5` for Friday, `6` for Saturday, and `7` for Sunday. For example, all weekdays would be formatted as such `\"1,2,3,4,5\"`. (optional)"
+												},
+												{
+													"key": "month",
+													"value": "string",
+													"description": "Specify a comma-separated list of months the schedule will be enabled for. This will directly correspond with each value in the `day` field. For example, to enable this schedule on March 1st, and August 26th, the `month` field should be formatted as `\"3,8\"` and the `day` field should be formatted as `\"1,26\"`. This field will be required if the `position` field was not specified. This field cannot be set if the `position` field was set."
+												},
+												{
+													"key": "day",
+													"value": "string",
+													"description": "Specify a comma-separated list of days the schedule will be enabled for. This will directly correspond with each value in the `month` field. For example, to enable this schedule on March 1st, and August 26th, the `month` field should be formatted as `\"3,8\"` and the `day` field should be formatted as `\"1,26\"`. This field will be required if the `position` field was not specified. This field cannot be set if the `position` field was set."
+												},
+												{
+													"key": "hour",
+													"value": "string",
+													"description": "Specify the hour range this schedule will be enabled for. This must be two 24-hour time  strings formatted as either HH:MM or H:MM separated by `-` (e.g. `9:00-17:00`). The first time range must be less than the second time range. The minutes portion of the time range must be either `00`, `15`, `30`, `45`, or `59`."
+												},
+												{
+													"key": "rangedescr",
+													"value": "string",
+													"description": "Specify a description for this time range. (optional)"
+												}
+											]
+										},
+										"description": "Add a time range to an existing firewall schedule.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Schedule Time Range",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"name\": \"Test_Schedule\",\n    \"id\": 0\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/schedule/time_range?name=string&id=integer",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"schedule",
+												"time_range"
+											],
+											"query": [
+												{
+													"key": "name",
+													"value": "string",
+													"description": "Specify the name of the schedule to delete this time range from. This must be an existing firewall schedule name."
+												},
+												{
+													"key": "id",
+													"value": "integer",
+													"description": "Specify the ID of the time range to delete. This will be the configuration array index of the `timerange` object within the `schedule` object."
+												}
+											]
+										},
+										"description": "Delete a time range from an existing firewall schedule.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints to create and delete firewall schedule time ranges.",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "bc7723c5-9ecc-45e6-a45e-c31cd88e8905",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "6e3f72d3-05f8-499d-9464-0116ef0dee58",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Create Schedule",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Test_Schedule\",\n    \"descr\": \"Test firewall schedule\",\n    \"timerange\": [\n        {\n            \"month\": \"1,3,5\",\n            \"day\": \"10,20,25\",\n            \"hour\": \"0:15-20:00\",\n            \"rangedescr\": \"On Jan 1, March 20, and May 25 from 0:15 to 20:00\"\n        },\n        {\n            \"position\": \"1,2,3,4,5\",\n            \"hour\": \"10:15-12:00\",\n            \"rangedescr\": \"Every Mon, Tues, Wed, Thur, Fri from 10:15 to 12:00\"\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/firewall/schedule?name=string&descr=string&timerange=array",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"firewall",
+										"schedule"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "string",
+											"description": "Specify a name for this firewall schedule. This value must be between 1 and 32 characters, and can only contain alphanumerics, underscores and hyphens. This value must be unique from all other firewall schedules. "
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Specify a description for this firewall schedule (optional)"
+										},
+										{
+											"key": "timerange",
+											"value": "array",
+											"description": "Specify an array of time range objects for this schedule. Each object must contain the required fields as specified by the /api/v1/firewall/schedule/time_range endpoint. At least 1 time range object must be specified."
+										}
+									]
+								},
+								"description": "Add a firewall schedule.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Schedule",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Test_Schedule\",\n    \"descr\": \"Updated test firewall schedule\",\n    \"timerange\": [\n        {\n            \"month\": \"2,4,6\",\n            \"day\": \"10,20,25\",\n            \"hour\": \"0:15-20:00\",\n            \"rangedescr\": \"On Feb 1, Apr 20, and Jun 25 from 0:15 to 20:00\"\n        },\n        {\n            \"position\": \"6,7\",\n            \"hour\": \"10:15-12:00\",\n            \"rangedescr\": \"Every Sat, Sun from 10:15 to 12:00\"\n        }\n    ]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/firewall/schedule?name=string&descr=string&timerange=array",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"firewall",
+										"schedule"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "string",
+											"description": "Specify the name of the firewall schedule to update. This field Is used to locate the object and cannot be used to change the name of the schedule."
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Update the description for this firewall schedule (optional)"
+										},
+										{
+											"key": "timerange",
+											"value": "array",
+											"description": "Update the array of time range objects for this schedule. Each object must contain the required fields as specified by the /api/v1/firewall/schedule/time_range endpoint. If this field is passed in, at least 1 time range object must be specified. Specifying this field will overwrite any existing time ranges for this schedule. (optional)"
+										}
+									]
+								},
+								"description": "Update an existing firewall schedule.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Schedule",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"name\": \"Test_Schedule\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/firewall/schedule?name=string",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"firewall",
+										"schedule"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "string",
+											"description": "Specify the name of the firewall schedule to delete."
+										}
+									]
+								},
+								"description": "Delete an existing firewall schedule.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Read schedules",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/firewall/schedule",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"firewall",
+										"schedule"
+									]
+								},
+								"description": "Read all existing firewall schedules.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints to create, read, update and delete firewall schedule configurations.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "e2e01cc0-d2b7-4228-b33c-70932ba335f2",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "bb8ad209-4699-4356-ad52-54bc9ab3fd94",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"description": "API endpoints that create, read, update and delete firewall services.",
@@ -3886,6 +5518,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "8057ca15-3393-4032-8e34-fc3ca8bbe35b",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -3895,13 +5528,15 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "6aa58c0e-7c8d-40d3-be38-806d00c848d7",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "SYSTEM",
@@ -3949,6 +5584,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "aa6a7687-73dc-4390-95ff-175f15bdc7ae",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -3958,13 +5594,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "3dc5bad6-bfae-4ba2-a13d-19619f718e39",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "ARP",
@@ -4047,6 +5686,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "2b421eba-fcaf-47cf-9efa-f426478ad160",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -4056,13 +5696,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "83a09631-ec1e-462b-971c-763c6bed3224",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "CONFIG",
@@ -4107,6 +5750,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "0641eeac-731e-4efc-9cf1-742625e059bf",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -4116,13 +5760,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "ba7bd0b8-fbe9-4bfc-a444-cd56cc72d66c",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "HOSTNAME",
@@ -4210,6 +5857,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "46076357-0d6d-48a5-9637-80746c062d49",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -4219,13 +5867,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "91a6543c-3dcc-4d7c-854e-bf347054cd91",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "CERTIFICATE",
@@ -4376,6 +6027,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "ae501696-89ce-4113-9ac2-fad15f5bee68",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -4385,13 +6037,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "1df86559-6031-4647-8cc0-4570403630fd",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "API",
@@ -4465,7 +6120,7 @@
 										{
 											"key": "persist",
 											"value": "boolean",
-											"description": "Enable/disable persistant API configuration. If set to `true`, pfSense API will store a copy of the API configuration In the case a system update or package update Is needed and/or the API configuration must be restored. If set to `false`, all API configuration will be lost whenever the system updates, the package Is updated, or the package Is deleted. It Is recommended to keep this feature enabled. (optional)"
+											"description": "Enable/disable persistent API configuration. If set to `true`, pfSense API will store a copy of the API configuration In the case a system update or package update Is needed and/or the API configuration must be restored. If set to `false`, all API configuration will be lost whenever the system updates, the package Is updated, or the package Is deleted. It Is recommended to keep this feature enabled. (optional)"
 										},
 										{
 											"key": "readonly",
@@ -4554,6 +6209,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "a8a9f71d-05ef-4c42-a923-9e921334924f",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -4563,13 +6219,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "09048044-bc38-4584-b39c-a381f7e47d90",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "DNS",
@@ -4661,6 +6320,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "c38238a2-cace-4470-abf4-c69da1fb78b4",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -4670,13 +6330,16 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "95ca5850-5142-48bb-b02a-19b772d39ffb",
 										"type": "text/javascript",
 										"exec": [
 											""
 										]
 									}
 								}
-							]
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "Read System DNS",
@@ -4766,6 +6429,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "595dbf29-b5d2-46b2-9ee6-efa4f4c3ad4b",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -4775,13 +6439,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "2021dac8-de75-4803-9413-ced9f979627c",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "TUNABLE",
@@ -4965,6 +6632,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "ee2185da-d90b-4a56-9e6a-0ca5d95c5a23",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -4974,13 +6642,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "fdfc1ce7-5cfd-4aaf-9063-6f0bd3d1c7f6",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "TABLE",
@@ -5025,6 +6696,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "5f486b95-03c2-4ad5-96ed-04203dc66d6a",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -5034,13 +6706,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "a5518858-8338-4a94-bce5-8657f68132fb",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "REBOOT",
@@ -5077,7 +6752,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints that reboot the pfSense system."
+					"description": "API endpoints that reboot the pfSense system.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "HALT",
@@ -5114,7 +6791,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints that halt/shutdown the pfSense system."
+					"description": "API endpoints that halt/shutdown the pfSense system.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"description": "API calls that create, read, update and delete system configuration.",
@@ -5122,6 +6801,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "e1ea68dd-1600-4470-bc37-96f467d8f555",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -5131,13 +6811,15 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "6d40c170-669d-4c44-8300-9170d7289e6f",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "ROUTING",
@@ -5499,6 +7181,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "49c0369d-6aa5-4518-ab63-950e778eb77a",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -5508,13 +7191,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "c4e1d017-46cc-4839-b5ab-9fd35e23571f",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "STATIC_ROUTE",
@@ -5718,6 +7404,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "babba450-0bb7-4fef-843e-6e6d97064a93",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -5727,13 +7414,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "4db4f333-c729-4d77-b74f-4db889c1355d",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "APPLY",
@@ -5775,6 +7465,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "022f36c2-10c1-4710-9340-24fbecd06b49",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -5784,13 +7475,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "140625c3-4808-4005-b6dc-62203c44f08b",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"description": "API endpoints that create, read, update and delete network routing configuration.",
@@ -5798,6 +7492,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "26a35da0-1635-4ed2-81b1-f569d61040d4",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -5807,13 +7502,15 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "1e955518-2769-4068-a087-a28aeedb7dbb",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "STATUS",
@@ -5914,6 +7611,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "90281281-1373-469f-b2c8-3532f2c65604",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -5923,13 +7621,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "64f03429-ed78-47d1-b454-d1c325641ca5",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "LOG",
@@ -6120,6 +7821,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "90f859fe-7a45-47b2-8a40-b20b2e8842a3",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -6129,13 +7831,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "c59f49b7-85c9-4df1-abe5-7e9aeac8658b",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "GATEWAY",
@@ -6185,7 +7890,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints that read gateway statuses."
+					"description": "API endpoints that read gateway statuses.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "INTERFACE",
@@ -6235,7 +7942,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints that read interface statuses and metrics."
+					"description": "API endpoints that read interface statuses and metrics.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "SYSTEM",
@@ -6285,7 +7994,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints that read system statuses."
+					"description": "API endpoints that read system statuses.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"description": "API endpoints that read and update system statuses.",
@@ -6293,6 +8004,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "1727112a-71b6-435a-95c9-0fb059835a00",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -6302,13 +8014,15 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "a9fe9c8a-2abe-4cfe-a18e-b2832927254c",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "SERVICES",
@@ -6383,7 +8097,9 @@
 											"response": []
 										}
 									],
-									"description": "API endpoints to create, read, update and delete DNS Resolver (Unbound) host override aliases."
+									"description": "API endpoints to create, read, update and delete DNS Resolver (Unbound) host override aliases.",
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
 								},
 								{
 									"name": "Create Unbound Host Override",
@@ -6603,6 +8319,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "4205151b-76ad-4b91-9157-da313755145d",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -6612,13 +8329,16 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "edeba871-80af-4178-b1e0-98fe8fe00c72",
 										"type": "text/javascript",
 										"exec": [
 											""
 										]
 									}
 								}
-							]
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "Read Unbound Configuration",
@@ -6788,6 +8508,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "2aeccc85-4dc8-41de-9d74-fdfe10345b9a",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -6797,13 +8518,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "c8a9f88e-9dd1-45ba-9d79-5ed0a8ceb165",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "DHCPD",
@@ -6924,7 +8648,7 @@
 												{
 													"key": "domainsearchlist",
 													"value": "string or array ",
-													"description": "Specify the search domains to assign to this host. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid doman name. (optional)"
+													"description": "Specify the search domains to assign to this host. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid domain name. (optional)"
 												},
 												{
 													"key": "gateway",
@@ -7018,7 +8742,7 @@
 												{
 													"key": "domainsearchlist",
 													"value": "string or array ",
-													"description": "Update the search domains to assign to this host. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid doman name. (optional)"
+													"description": "Update the search domains to assign to this host. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid domain name. (optional)"
 												},
 												{
 													"key": "gateway",
@@ -7081,7 +8805,9 @@
 									"response": []
 								}
 							],
-							"description": "API endpoints to create, read, update and delete DHCP static mappings"
+							"description": "API endpoints to create, read, update and delete DHCP static mappings",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "LEASE",
@@ -7122,7 +8848,9 @@
 									"response": []
 								}
 							],
-							"description": "API endpoints that create, read, update and delete DHCPd leases."
+							"description": "API endpoints that create, read, update and delete DHCPd leases.",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "Start DHCPd Service",
@@ -7250,7 +8978,7 @@
 										{
 											"key": "domainsearchlist",
 											"value": "string or array",
-											"description": "Update the search domains to include In the DHCP lease. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid doman name. (optional)"
+											"description": "Update the search domains to include In the DHCP lease. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid domain name. (optional)"
 										},
 										{
 											"key": "mac_allow",
@@ -7353,6 +9081,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "e5e76160-054a-49f8-9054-204857427ea4",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -7362,13 +9091,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "6533c4d0-6d62-4940-a7e2-dab884ce148e",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "DPINGER",
@@ -7475,6 +9207,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "95bb8839-86db-4899-ad74-3712fce2cd83",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -7484,13 +9217,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "f72281ec-2e69-4793-a8a2-33d76bd1fd48",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "NTPD",
@@ -7592,7 +9328,9 @@
 									"response": []
 								}
 							],
-							"description": "API endpoints that create, read, update and delete NTPd configuration."
+							"description": "API endpoints that create, read, update and delete NTPd configuration.",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "Start NTPd Service",
@@ -7813,6 +9551,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "1b2e2c7d-2132-42c1-8fa6-939ab554edcb",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -7822,13 +9561,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "e348bf30-57de-420a-bca8-e640589bdd8f",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "SSHD",
@@ -8022,6 +9764,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "e8daf510-c22a-49d5-93b3-cdad10f2a048",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -8031,13 +9774,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "ebf768a9-c9b4-406b-bee1-68fff5e5b4a3",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "SYSLOGD",
@@ -8144,6 +9890,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "35d61658-7406-42a8-9336-ab5b595ccfca",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -8153,13 +9900,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "b92c1189-a548-47e0-97df-04f90fcc1e60",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "DDNS",
@@ -8199,7 +9949,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints that create, read, update, and delete Dynamic DNS configuration."
+					"description": "API endpoints that create, read, update, and delete Dynamic DNS configuration.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "Read Services",
@@ -8341,6 +10093,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "725ba4fc-3451-4448-b930-9ecc6526f469",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -8350,13 +10103,15 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "4b5762b4-7b3d-4111-902a-89f734be7fe9",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "ACCESS_TOKEN",
@@ -8419,6 +10174,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "93f2c033-9d0a-47b1-9a5b-a1b9a0d4c305",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -8428,19 +10184,22 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "3c7c951d-7fcc-4cb8-9782-01add869eca4",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"event": [
 		{
 			"listen": "prerequest",
 			"script": {
+				"id": "2fe1e3c0-cca4-4301-9ddf-6d779102b29a",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -8450,11 +10209,13 @@
 		{
 			"listen": "test",
 			"script": {
+				"id": "c11acad6-e318-4a43-a692-e7e358695e80",
 				"type": "text/javascript",
 				"exec": [
 					""
 				]
 			}
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

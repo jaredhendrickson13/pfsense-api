@@ -16,7 +16,7 @@ import unit_test_framework
 
 
 class APIUnitTestServicesSSHdStop(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/sshd/stop"
+    uri = "/api/v1/services/sshd/stop"
     post_tests = [{"name": "Stop the SSHd service"}]
 
 

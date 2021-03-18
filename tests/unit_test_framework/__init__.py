@@ -30,6 +30,7 @@ class APIUnitTest:
     args = {}
     uid = str(uuid.uuid4())
     url = ""
+    uri = ""
     time_delay = 1
     exit_code = 0
     get_tests = []
@@ -44,7 +45,7 @@ class APIUnitTest:
     # CLASS METHODS #
     def __init__(self):
         self.__start_argparse__()
-        self.url = self.args.scheme + "://" + self.args.host + ":" + str(self.args.port) + self.url
+        self.url = self.format_url(self.uri)
         self.auth_payload = {"client-id": self.args.username, "client-token": self.args.password}
 
         # Run unit tests and exit on corresponding status code
@@ -56,6 +57,9 @@ class APIUnitTest:
             sys.exit(self.exit_code)
         except KeyboardInterrupt:
             sys.exit(1)
+
+    def format_url(self, uri):
+        return self.args.scheme + "://" + self.args.host + ":" + str(self.args.port) + uri
 
     def get(self):
         # Loop through each GET payload and check that it's response is expected
@@ -119,7 +123,10 @@ class APIUnitTest:
     def post_delete(self):
         pass
 
-    def make_request(self, method, test_params):
+    def make_request(self, method, test_params, req_only=False):
+        # Local variables
+        method = test_params.get("method", method)    # Allow custom method override
+
         # Create authentication payload for local authentication
         if self.args.auth_mode == "local":
             test_params["payload"] = test_params.get("payload", {})
@@ -137,8 +144,8 @@ class APIUnitTest:
         # Attempt to make the API call, if the request times out print timeout error
         try:
             req = requests.request(
-                method,
-                url=self.url,
+                test_params.get("method", method),
+                url=self.format_url(test_params.get("uri", self.uri)),
                 data=json.dumps(test_params.get("payload", {})),
                 verify=False,
                 timeout=self.args.timeout,
@@ -148,7 +155,11 @@ class APIUnitTest:
             print(self.__format_msg__(method, test_params, "Exceeded timeout of {t}s".format(t=self.args.timeout)))
             return None
 
-        if self.check_response(req, test_params, verbose=self.args.verbose):
+        # If this is a request only execution, just return the request/response object
+        if req_only:
+            return req
+        # Otherwise, check if the response is valid
+        elif self.check_response(req, test_params, verbose=self.args.verbose):
             return req.json()
 
     @staticmethod

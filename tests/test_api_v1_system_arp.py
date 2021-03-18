@@ -2,7 +2,7 @@ import unit_test_framework
 
 
 class APIUnitTestSystemARP(unit_test_framework.APIUnitTest):
-    url = "/api/v1/system/arp"
+    uri = "/api/v1/system/arp"
     get_tests = [{"name": "Read the ARP table"}]
     delete_tests = [
         {

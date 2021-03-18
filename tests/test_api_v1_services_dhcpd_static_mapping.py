@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestServicesDHCPdStaticMapping(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/dhcpd/static_mapping"
+    uri = "/api/v1/services/dhcpd/static_mapping"
     get_tests = [
         {
             "name": "Read all DHCPd static mappings on the LAN interface",

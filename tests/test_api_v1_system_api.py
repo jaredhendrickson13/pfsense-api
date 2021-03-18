@@ -16,7 +16,7 @@ import unit_test_framework
 
 
 class APIUnitTestSystemAPI(unit_test_framework.APIUnitTest):
-    url = "/api/v1/system/api"
+    uri = "/api/v1/system/api"
     get_tests = [{"name": "Read API configuration"}]
     put_tests = [
         {

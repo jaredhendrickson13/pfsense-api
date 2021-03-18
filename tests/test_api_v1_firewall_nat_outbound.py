@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestFirewallNATOutbound(unit_test_framework.APIUnitTest):
-    url = "/api/v1/firewall/nat/outbound"
+    uri = "/api/v1/firewall/nat/outbound"
     get_tests = [
         {"name": "Read entire outbound NAT configuration"}
     ]

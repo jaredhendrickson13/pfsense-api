@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestServicesNTPd(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/ntpd"
+    uri = "/api/v1/services/ntpd"
     get_tests = [{"name": "Read the NTPd configuration"}]
     put_tests = [
         {

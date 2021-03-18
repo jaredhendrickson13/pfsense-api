@@ -16,7 +16,7 @@ import unit_test_framework
 
 
 class APIUnitTestStatusInterface(unit_test_framework.APIUnitTest):
-    url = "/api/v1/status/interface"
+    uri = "/api/v1/status/interface"
     get_tests = [{"name": "Read interface statuses"}]
 
 APIUnitTestStatusInterface()

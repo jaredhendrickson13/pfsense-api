@@ -205,6 +205,109 @@ class APIFirewallRuleCreate extends APIModel {
         }
     }
 
+    private function __validate_sched() {
+        # Check for our optional 'sched' payload value
+        if (isset($this->initial_data['sched'])) {
+            # Loop through each configured schedule and check if it exists
+            foreach ($this->config["schedules"]["schedule"] as $schedule) {
+                # Check if the names match
+                if ($this->initial_data["sched"] === $schedule["name"]) {
+                    $this->validated_data["sched"] = $this->initial_data["sched"];
+                }
+            }
+
+            # Set error if no match was found
+            if (!isset($this->validated_data["sched"])) {
+                $this->errors[] = APIResponse\get(4150);
+            }
+        }
+    }
+
+    private function __validate_dnpipe() {
+        # Check for our optional 'dnpipe' payload value
+        if (isset($this->initial_data["dnpipe"])) {
+            # Load our dummynet config and fetch configured queues
+            read_dummynet_config();
+            $dnqueues = get_unique_dnqueue_list();
+
+            # Ensure this is a valid queue
+            if (array_key_exists($this->initial_data["dnpipe"], $dnqueues)) {
+                $this->validated_data["dnpipe"] = $this->initial_data["dnpipe"];
+            } else {
+                $this->errors[] = APIResponse\get(4222);
+            }
+        }
+    }
+
+    private function __validate_pdnpipe() {
+        # Check for our optional 'pdnpipe' payload value
+        if (isset($this->initial_data["pdnpipe"])) {
+            # Load our dummynet config and fetch configured queues
+            read_dummynet_config();
+            $dnqueues = get_unique_dnqueue_list();
+
+            # Only allow this setting if a dnpipe was set
+            if (isset($this->validated_data["dnpipe"])) {
+                # Ensure this is a valid queue
+                if (array_key_exists($this->initial_data["pdnpipe"], $dnqueues)) {
+                    # Ensure the dnpipe does not match the pdn pipe
+                    if ($this->initial_data["pdnpipe"] !== $this->validated_data["dnpipe"]) {
+                        # Determine pipe types
+                        $dnpipe_type = $dnqueues[$this->validated_data['dnpipe']][0];
+                        $pdnpipe_type = $dnqueues[$_POST['pdnpipe']][0];
+
+                        # Ensure the dnpipe and pdnpipe types do not match
+                        if (($dnpipe_type === "?" and $pdnpipe_type !== "?") or ($pdnpipe_type === "?" and $dnpipe_type !== "?")) {
+                            $this->validated_data["pdnpipe"] = $this->initial_data["pdnpipe"];
+                        } else {
+                            $this->errors[] = APIResponse\get(4225);
+                        }
+                    } else {
+                        $this->errors[] = APIResponse\get(4224);
+                    }
+                } else {
+                    $this->errors[] = APIResponse\get(4222);
+                }
+            } else {
+                $this->errors[] = APIResponse\get(4223);
+            }
+        }
+    }
+
+    private function __validate_defaultqueue() {
+        # Validate our optional 'defaultqueue' payload value
+        if (isset($this->initial_data["defaultqueue"])) {
+            # Require the value to be a known altq (traffic shaper) queue
+            if ($this->is_altq_queue($this->initial_data["defaultqueue"])) {
+                $this->validated_data["defaultqueue"] = $this->initial_data["defaultqueue"];
+            } else {
+                $this->errors[] = APIResponse\get(4226);
+            }
+        }
+    }
+
+    private function __validate_ackqueue() {
+        # Validate our optional 'ackqueue' payload value
+        if (isset($this->initial_data["ackqueue"])) {
+            # Only allow this field if a default queue was provided
+            if (isset($this->validated_data["defaultqueue"])) {
+                # Require the value to be a known altq (traffic shaper) queue
+                if ($this->is_altq_queue($this->initial_data["ackqueue"])) {
+                    # Ackqueue cannot match default queue
+                    if ($this->initial_data["ackqueue"] !== $this->validated_data["defaultqueue"]) {
+                        $this->validated_data["ackqueue"] = $this->initial_data["ackqueue"];
+                    } else {
+                        $this->errors[] = APIResponse\get(4229);
+                    }
+                } else {
+                    $this->errors[] = APIResponse\get(4228);
+                }
+            } else {
+                $this->errors[] = APIResponse\get(4227);
+            }
+        }
+    }
+
     private function __validate_disabled() {
         # Check for our optional 'disabled' payload value
         if ($this->initial_data['disabled'] === true) {
@@ -244,6 +347,11 @@ class APIFirewallRuleCreate extends APIModel {
         $this->__validate_srcport();
         $this->__validate_dstport();
         $this->__validate_gateway();
+        $this->__validate_sched();
+        $this->__validate_dnpipe();
+        $this->__validate_pdnpipe();
+        $this->__validate_defaultqueue();
+        $this->__validate_ackqueue();
         $this->__validate_disabled();
         $this->__validate_descr();
         $this->__validate_log();
@@ -262,6 +370,24 @@ class APIFirewallRuleCreate extends APIModel {
             "username" => $this->client->username."@".$this->client->ip_address." (API)"
         ];
         $this->validated_data["updated"] = $this->validated_data["created"];
+    }
+
+    public function is_altq_queue($name) {
+        # Local variables
+        read_altq_config();
+        $qlist = get_unique_queue_list();
+        $iflist = get_configured_interface_with_descr();
+        $list = [];
+
+        # Format interface queues
+        foreach ($qlist as $q => $qkey) {
+            if (isset($ifdisp[$q])) {
+                $list[$q] = $iflist[$q];
+            } else {
+                $list[$q] = $q;
+            }
+        }
+        return array_key_exists($name, $list);
     }
 
     public function apply() {

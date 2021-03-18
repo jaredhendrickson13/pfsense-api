@@ -16,7 +16,7 @@ import unit_test_framework
 
 
 class APIUnitTestServicesSyslogdRestart(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/syslogd/restart"
+    uri = "/api/v1/services/syslogd/restart"
     post_tests = [{"name": "Restart the syslogd service"}]
 
 

@@ -2,7 +2,7 @@ import unit_test_framework
 
 
 class APIUnitTestSystemDNS(unit_test_framework.APIUnitTest):
-    url = "/api/v1/system/dns"
+    uri = "/api/v1/system/dns"
     get_tests = [{"name": "Read system DNS servers"}]
     put_tests = [
         {
