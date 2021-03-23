@@ -102,8 +102,8 @@ class MakePackage:
 
         # Retrieve the built package
         if self.args.freebsd == 11:
-            src = "{u}@{h}:~/build/pfsense-api/pfSense-pkg-API/pfSense-pkg-API/pfSense-pkg-API-{v}{r}.txz"
-            src = cmd.format(
+            src = "{u}@{h}:~/build/pfsense-api/pfSense-pkg-API/pfSense-pkg-API-{v}{r}.txz"
+            src = src.format(
                 u=self.args.username,
                 h=self.args.host,
                 v=self.port_version,
@@ -111,7 +111,7 @@ class MakePackage:
             )
             self.run_scp_cmd(src, ".")
         else:
-            src = "{u}@{h}:~/build/pfsense-api/pfSense-pkg-API/pfSense-pkg-API/work/pkg/pfSense-pkg-API-{v}{r}.txz"
+            src = "{u}@{h}:~/build/pfsense-api/pfSense-pkg-API/work/pkg/pfSense-pkg-API-{v}{r}.txz"
             src = src.format(
                 u=self.args.username,
                 h=self.args.host,
