@@ -188,5 +188,7 @@ class MakePackage:
         )
         self.args = parser.parse_args()
 
-
-MakePackage()
+try:
+    MakePackage()
+except KeyboardInterrupt:
+    sys.exit(1)
