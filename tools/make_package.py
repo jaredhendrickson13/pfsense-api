@@ -25,8 +25,8 @@ import argparse
 class MakePackage:
     def __init__(self):
         self.__start_argparse__()
-        self.port_version = self.args.tag.split(".")[2]
-        self.port_revision = ".".join(self.args.tag.split(".")[0:2])
+        self.port_version = ".".join(self.args.tag.split(".")[0:2])
+        self.port_revision = self.args.tag.split(".")[2]
 
         # Run tasks for build mode
         if self.args.build:
