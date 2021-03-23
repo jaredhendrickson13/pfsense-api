@@ -3613,7 +3613,7 @@ URL: https://{{$hostname}}/api/v1/routing/gateway
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| id | integer | Specify the ID of the gateway to delete |
+| id | integer | Specify the ID of the gateway to delete. _Note: If you are obtaining the ID via GET request, the ID will be included in the response within the `attribute` field of the object._ |
 
 
 
@@ -3633,6 +3633,8 @@ URL: https://{{$hostname}}/api/v1/routing/gateway
 Read routing gateways.<br><br>
 
 _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]
+
+_Note: Currently, GET requests to this endpoint return verbose backend gateway information rather than the gateway objects as they appear in the configuration. This discrepancy makes it difficult to interact with gateway objects via API. Because of this, GET requests to this endpoint will be refactored in a future release._
 
 
 ***Endpoint:***
@@ -3677,6 +3679,7 @@ URL: https://{{$hostname}}/api/v1/routing/gateway
 
 | Key | Value | Description |
 | --- | ------|-------------|
+| id | integer | Specify the ID of the gateway to update. _Note: If you are obtaining the ID via GET request, the ID will be included in the response within the `attribute` field of the object._ |
 | interface | string | Update the interface the gateway will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). (optional) |
 | ipprotocol | string | Update the IP protocol this gateway will serve. Options are `inet` for IPv4, or `inet6` for IPv6. If you are changing the protocol, you will also be required to update the `gateway` and/or `monitor` values to match the specified protocol. (optional) |
 | name | string | Update the descriptive name for this gateway. This name must be unique, and can only contain alphanumeric characters and underscores. (optional) |

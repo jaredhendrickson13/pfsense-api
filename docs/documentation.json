@@ -6857,7 +6857,7 @@
 										"gateway"
 									]
 								},
-								"description": "Read routing gateways.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]"
+								"description": "Read routing gateways.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]\n\n_Note: Currently, GET requests to this endpoint return verbose backend gateway information rather than the gateway objects as they appear in the configuration. This discrepancy makes it difficult to interact with gateway objects via API. Because of this, GET requests to this endpoint will be refactored in a future release._"
 							},
 							"response": []
 						},
@@ -6891,7 +6891,7 @@
 										{
 											"key": "id",
 											"value": "integer",
-											"description": "Specify the ID of the gateway to delete"
+											"description": "Specify the ID of the gateway to delete. _Note: If you are obtaining the ID via GET request, the ID will be included in the response within the `attribute` field of the object._"
 										}
 									]
 								},
@@ -7064,6 +7064,11 @@
 										"gateway"
 									],
 									"query": [
+										{
+											"key": "id",
+											"value": "integer",
+											"description": "Specify the ID of the gateway to update. _Note: If you are obtaining the ID via GET request, the ID will be included in the response within the `attribute` field of the object._"
+										},
 										{
 											"key": "interface",
 											"value": "string",
