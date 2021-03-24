@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestFirewallStates(unit_test_framework.APIUnitTest):
-    url = "/api/v1/firewall/states"
-    get_payloads = [{}]
+    uri = "/api/v1/firewall/states"
+    get_tests = [{"name": "Read all firewalls states"}]
 
 APIUnitTestFirewallStates()

@@ -15,7 +15,9 @@
 import unit_test_framework
 
 class APIUnitTestServicesDHCPdStart(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/dhcpd/start"
-    post_payloads = [{}]
+    uri = "/api/v1/services/dhcpd/start"
+    post_tests = [
+        {"name": "Start the DHCPd service", "resp_time": 10}
+    ]
 
 APIUnitTestServicesDHCPdStart()

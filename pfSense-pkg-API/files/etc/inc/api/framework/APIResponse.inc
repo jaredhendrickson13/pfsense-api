@@ -212,6 +212,48 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Table name does not exist"
         ],
+        1020 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown API interface specified in allowed interfaces"
+        ],
+        1021 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown API authentication mode"
+        ],
+        1022 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "API JWT expiration threshold must be between 300 and 86400"
+        ],
+        1023 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown API token hash algorithm"
+        ],
+        1024 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unsupported API token bytes count"
+        ],
+        1025 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "API custom headers must be an array containing key-value pairs"
+        ],
+        1026 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "API custom header key-value pairs must be string types"
+        ],
 
         // 2000-2999 reserved for /services API calls
         2000 => [
@@ -501,6 +543,42 @@ function get($id, $data=[], $all=false) {
             "code" => 400,
             "return" => $id,
             "message" => "Invalid unbound domain value"
+        ],
+        2048 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "NTPd orphan value must be between 1 and 15"
+        ],
+        2049 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown NTPd interface specified"
+        ],
+        2050 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "NTPd timeserver value is required"
+        ],
+        2051 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "NTPd timeserver must be valid IP address or hostname"
+        ],
+        2052 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Maximum limit of 10 NTPd timeservers exceeded"
+        ],
+        2053 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "NTPd timeserver does not exist"
         ],
 
         // 3000-3999 reserved for /interfaces API calls
@@ -1562,6 +1640,732 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall rule gateway must match IP protocol"
         ],
+        4110 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper interface is required"
+        ],
+        4111 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall traffic shaper interface"
+        ],
+        4112 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper already exists for this interface"
+        ],
+        4113 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper scheduler is required"
+        ],
+        4114 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall traffic shaper scheduler"
+        ],
+        4115 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper bandwidth type is required"
+        ],
+        4116 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall traffic shaper bandwidth type"
+        ],
+        4117 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper bandwidth is required"
+        ],
+        4118 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper bandwidth must be 1 or greater"
+        ],
+        4119 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper bandwidth must be 100 or less with % bandwidth type"
+        ],
+        4120 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue limit must be 1 or greater"
+        ],
+        4121 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper TBR size must be 1 or greater"
+        ],
+        4122 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper does not exist for this interface"
+        ],
+        4123 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue name is required"
+        ],
+        4124 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue name must only contain alphanumerics, underscore, and hyphens"
+        ],
+        4125 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue name must be between 1 and 15 characters"
+        ],
+        4126 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue name already exists for this interface"
+        ],
+        4127 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue priority must be between 0 and 7 for CBQ and FAIRQ schedulers"
+        ],
+        4128 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue priority must be between 0 and 15 for PRIQ schedulers"
+        ],
+        4129 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Sum of firewall traffic shaper queues bandwidth exceeds parent's bandwidth limits"
+        ],
+        4130 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue upperlimit1 value must be a bandwidth formatted string"
+        ],
+        4131 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue upperlimit2 value is required"
+        ],
+        4132 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue upperlimit2 must be 1 or greater"
+        ],
+        4133 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue upperlimit3 value is required"
+        ],
+        4134 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue upperlimit3 value must be a bandwidth formatted string"
+        ],
+        4135 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue linkshare1 value must be a bandwidth formatted string"
+        ],
+        4136 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue linkshare2 value is required"
+        ],
+        4137 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue linkshare2 must be 1 or greater"
+        ],
+        4138 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue linkshare3 value is required"
+        ],
+        4139 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue linkshare3 value must be a bandwidth formatted string"
+        ],
+        4140 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue realtime1 value must be a bandwidth formatted string"
+        ],
+        4141 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue realtime2 value is required"
+        ],
+        4142 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue realtime2 must be 1 or greater"
+        ],
+        4143 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue realtime3 value is required"
+        ],
+        4144 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue realtime3 value must be a bandwidth formatted string"
+        ],
+        4145 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper queue name does not exist"
+        ],
+        4146 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule name is required"
+        ],
+        4147 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule name can only contain alphanumerics, underscores and hyphens"
+        ],
+        4148 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule name must 32 characters or less"
+        ],
+        4149 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule name already in use"
+        ],
+        4150 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule name does not exist"
+        ],
+        4151 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range month is required"
+        ],
+        4152 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range months must be between 1 and 12"
+        ],
+        4153 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range day is required"
+        ],
+        4154 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range number of days must match number of months"
+        ],
+        4155 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range days out of range for month"
+        ],
+        4156 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range hour is required"
+        ],
+        4157 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range starting hour is invalid"
+        ],
+        4158 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range ending hour is invalid"
+        ],
+        4159 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range starting hour cannot be greater than the ending hour"
+        ],
+        4160 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range positions must be between 1 and 7"
+        ],
+        4161 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range is required"
+        ],
+        4162 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "At least one firewall schedule time range is required"
+        ],
+        4163 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range ID is required"
+        ],
+        4164 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall schedule time range ID does not exist"
+        ],
+        4165 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Cannot delete the last remaining firewall schedule time range"
+        ],
+        4166 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Cannot delete firewall schedule while it is in use"
+        ],
+        4167 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter name is required"
+        ],
+        4168 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter name can only contain alphanumerics, hyphens and underscores"
+        ],
+        4169 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter name must be 32 characters or less"
+        ],
+        4170 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter name is already in use"
+        ],
+        4171 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall traffic shaper limiter mask"
+        ],
+        4172 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter mask bits must be numeric value between 1 and 32"
+        ],
+        4173 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter IPv6 mask bits must be numeric value between 1 and 128"
+        ],
+        4174 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter queue management algorithm (AQM) is required"
+        ],
+        4175 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall traffic shaper limiter queue management algorithm (AQM)"
+        ],
+        4176 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter ECN requested but neither the AQM nor scheduler support it"
+        ],
+        4177 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter delay must be a numeric value between 0 and 10000"
+        ],
+        4178 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter packet loss rate must be a numeric value between 0 and 1"
+        ],
+        4179 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter buckets must be a numeric value between 16 and 65535"
+        ],
+        4180 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter codel target parameter must be 0 or greater"
+        ],
+        4181 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter codel interval parameter must be 0 or greater"
+        ],
+        4182 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter pie target parameter must be 0 or greater"
+        ],
+        4183 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter pie tupdate parameter must be 0 or greater"
+        ],
+        4184 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter pie alpha parameter must be 0 or greater"
+        ],
+        4185 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter pie beta parameter must be 0 or greater"
+        ],
+        4186 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter pie max burst parameter must be 0 or greater"
+        ],
+        4187 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter pie max ecnth parameter must be 0 or greater"
+        ],
+        4188 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter red w_q parameter must be 1 or greater"
+        ],
+        4189 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter red min th parameter must be 0 or greater"
+        ],
+        4190 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter red max th parameter must be 1 or greater"
+        ],
+        4191 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter red max p parameter must be 1 or greater"
+        ],
+        4192 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter gred w_q parameter must be 1 or greater"
+        ],
+        4193 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter gred min th parameter must be 0 or greater"
+        ],
+        4194 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter gred max th parameter must be 1 or greater"
+        ],
+        4195 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter gred max p parameter must be 1 or greater"
+        ],
+        4196 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_codel target parameter must be 0 or greater"
+        ],
+        4197 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_codel interval parameter must be 0 or greater"
+        ],
+        4198 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_codel quantum parameter must be 0 or greater"
+        ],
+        4199 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_codel limit parameter must be 0 or greater"
+        ],
+        4200 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_codel flows parameter must be 0 or greater"
+        ],
+        4201 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_pie target parameter must be 0 or greater"
+        ],
+        4202 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_pie tupdate parameter must be 0 or greater"
+        ],
+        4203 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_pie alpha parameter must be 0 or greater"
+        ],
+        4204 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_pie beta parameter must be 0 or greater"
+        ],
+        4205 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_pie max burst parameter must be 0 or greater"
+        ],
+        4206 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter fq_pie max ecnth parameter must be 0 or greater"
+        ],
+        4207 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter bandwidth is required"
+        ],
+        4208 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "At least 1 bandwidth schedule object is required"
+        ],
+        4209 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter with this name does not exist"
+        ],
+        4210 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter bandwidth is required"
+        ],
+        4211 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter bandwidth must be 1 or greater"
+        ],
+        4212 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter bandwidth scale is required"
+        ],
+        4213 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall traffic shaper limiter bandwidth scale"
+        ],
+        4214 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter and child queues cannot be deleted while in use"
+        ],
+        4215 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter bandwidth ID required"
+        ],
+        4216 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter bandwidth ID does not exist"
+        ],
+        4217 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter queue weight must be between 1 and 100"
+        ],
+        4218 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper parent limiter required"
+        ],
+        4219 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper parent limiter does not exist"
+        ],
+        4220 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter queue name required"
+        ],
+        4221 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper limiter queue name does not exist"
+        ],
+        4222 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall rule dnpipe or pdnpipe"
+        ],
+        4223 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rule dnpipe is required for pdnpipe"
+        ],
+        4224 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rule dnpipe and pdnpipe queues cannot be the same"
+        ],
+        4225 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rule dnpipe and pdnpip queue and a virtual interface cannot be selected"
+        ],
+        4226 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall rule default queue"
+        ],
+        4227 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rule default queue required for ackqueue"
+        ],
+        4228 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall rule ackqueue"
+        ],
+        4229 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rule default queue and ackqueue cannot be the same"
+        ],
+        4230 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall traffic shaper child queue cannot be deleted while in use"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [
@@ -1634,13 +2438,13 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "LDAP authentication server hostname or IP required"
+            "message" => "Authentication server hostname or IP required"
         ],
         5012 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Invalid LDAP authentication server hostname or IP"
+            "message" => "Invalid authentication server hostname or IP"
         ],
         5013 => [
             "status" => "bad request",
@@ -1725,6 +2529,60 @@ function get($id, $data=[], $all=false) {
             "code" => 400,
             "return" => $id,
             "message" => "Authentication server name already in use"
+        ],
+        5027 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unsupported RADIUS protocol"
+        ],
+        5028 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "RADIUS secret required"
+        ],
+        5029 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "RADIUS secret must be string type"
+        ],
+        5030 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid RADIUS authentication port"
+        ],
+        5031 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid RADIUS accounting port"
+        ],
+        5032 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "RADIUS authentication and/or accounting port required"
+        ],
+        5033 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "RADIUS timeout must be an integer of 1 or greater"
+        ],
+        5034 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown RADIUS NAS-IP attribute"
+        ],
+        5035 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Authentication server name is required"
         ],
         5036 => [
             "status" => "bad request",

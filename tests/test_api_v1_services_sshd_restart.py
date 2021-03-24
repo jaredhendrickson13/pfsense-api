@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestServicesSSHdRestart(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/sshd/restart"
-    post_payloads = [{}]
+    uri = "/api/v1/services/sshd/restart"
+    post_tests = [{"name": "Restart the SSHd service"}]
 
 APIUnitTestServicesSSHdRestart()

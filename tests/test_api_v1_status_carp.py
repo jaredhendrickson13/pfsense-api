@@ -14,9 +14,16 @@
 
 import unit_test_framework
 
+
 class APIUnitTestStatusCARP(unit_test_framework.APIUnitTest):
-    url = "/api/v1/status/carp"
-    get_payloads = [{}]
-    put_payloads = [{"enable": True, "maintenance_mode": False, }]
+    uri = "/api/v1/status/carp"
+    get_tests = [{"name": "Read the CARP status"}]
+    put_tests = [
+        {
+            "name": "Update the CARP status",
+            "payload": {"enable": True, "maintenance_mode": False}
+        }
+    ]
+
 
 APIUnitTestStatusCARP()

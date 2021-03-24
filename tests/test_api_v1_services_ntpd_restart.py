@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestServicesNTPdRestart(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/ntpd/restart"
-    post_payloads = [{}]
+    uri = "/api/v1/services/ntpd/restart"
+    post_tests = [{"name": "Restart the NTPd service"}]
 
 APIUnitTestServicesNTPdRestart()

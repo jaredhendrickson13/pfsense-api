@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestServicesDpingerStart(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/dpinger/start"
-    post_payloads = [{}]
+    uri = "/api/v1/services/dpinger/start"
+    post_tests = [{"name": "Start the dpinger service"}]
 
 APIUnitTestServicesDpingerStart()

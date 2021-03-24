@@ -14,8 +14,15 @@
 
 import unit_test_framework
 
+
 class APIUnitTestServicesUnboundRestart(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/unbound/restart"
-    post_payloads = [{}]
+    uri = "/api/v1/services/unbound/restart"
+    post_tests = [
+        {
+            "name": "Restart the Unbound service",
+            "resp_time": 8
+        }
+    ]
+
 
 APIUnitTestServicesUnboundRestart()

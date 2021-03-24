@@ -15,22 +15,26 @@
 import unit_test_framework
 
 class APIUnitTestServicesDHCPd(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/dhcpd"
-    get_payloads = [{}]
-    put_payloads = [
+    uri = "/api/v1/services/dhcpd"
+    get_tests = [{"name": "Read all DHCPd configurations"}]
+    put_tests = [
         {
-            "interface": "lan",
-            "enable": True,
-            "ignorebootp": False,
-            "denyunknown": False,
-            "range_from": "192.168.1.25",
-            "range_to": "192.168.1.50",
-            "dnsserver": ["1.1.1.1"],
-            "gateway": "192.168.1.2",
-            "domainsearchlist": ["pfsense-api.jaredhendrickson.com", "pfsense-api.jh.co"],
-            "domain": "pfsense-api.jaredhendrickson.com",
-            "mac_allow": ["00:00:00:01:E5:FF", "00:00:00:01:E5"],
-            "mac_deny": []
+            "name": "Update LAN interface's DHCP configuration",
+            "payload": {
+                "interface": "lan",
+                "enable": True,
+                "ignorebootp": False,
+                "denyunknown": False,
+                "range_from": "192.168.1.25",
+                "range_to": "192.168.1.50",
+                "dnsserver": ["1.1.1.1"],
+                "gateway": "192.168.1.2",
+                "domainsearchlist": ["pfsense-api.jaredhendrickson.com", "pfsense-api.jh.co"],
+                "domain": "pfsense-api.jaredhendrickson.com",
+                "mac_allow": ["00:00:00:01:E5:FF", "00:00:00:01:E5"],
+                "mac_deny": []
+            },
+            "resp_time": 5    # Allow a few seconds to reload the DHCP service
         }
     ]
 

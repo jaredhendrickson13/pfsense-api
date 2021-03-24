@@ -14,8 +14,15 @@
 
 import unit_test_framework
 
+
 class APIUnitTestServicesStart(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/start"
-    post_payloads = [{}]
+    uri = "/api/v1/services/start"
+    post_tests = [
+        {
+            "name": "Start all services",
+            "resp_time": 10
+        }
+    ]
+
 
 APIUnitTestServicesStart()

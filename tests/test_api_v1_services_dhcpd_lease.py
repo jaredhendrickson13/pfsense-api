@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestServicesDHCPdLease(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/dhcpd/lease"
-    get_payloads = [{}]
+    uri = "/api/v1/services/dhcpd/lease"
+    get_tests = [{"name": "Read all DHCPd leases"}]
 
 APIUnitTestServicesDHCPdLease()

@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestServicesNTPdStart(unit_test_framework.APIUnitTest):
-    url = "/api/v1/services/ntpd/start"
-    post_payloads = [{}]
+    uri = "/api/v1/services/ntpd/start"
+    post_tests = [{"name": "Start the NTPd service"}]
 
 APIUnitTestServicesNTPdStart()

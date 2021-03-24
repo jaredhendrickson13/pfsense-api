@@ -15,38 +15,51 @@
 import unit_test_framework
 
 class APIUnitTestFirewallNATOneToOne(unit_test_framework.APIUnitTest):
-    url = "/api/v1/firewall/nat/one_to_one"
-    get_payloads = [{}]
-    post_payloads = [
+    uri = "/api/v1/firewall/nat/one_to_one"
+    get_tests = [
+        {"name": "Read all 1:1 NAT mappings"}
+    ]
+    post_tests = [
         {
-            "interface": "wan",
-            "src": "any",
-            "dst": "wanip",
-            "external": "192.168.1.123",
-            "natreflection": "enable",
-            "descr": "Unit Test",
-            "nobinat": True,
-            "top": True,
-            "disabled": True
+            "name": "Create 1:1 NAT mapping",
+            "payload": {
+                "interface": "wan",
+                "src": "any",
+                "dst": "wanip",
+                "external": "192.168.1.123",
+                "natreflection": "enable",
+                "descr": "Unit Test",
+                "nobinat": True,
+                "top": True,
+                "disabled": True
+            }
         }
     ]
-    put_payloads = [
+    put_tests = [
         {
-            "id": 0,
-            "interface": "wan",
-            "src": "!1.1.1.1",
-            "dst": "1.2.3.4",
-            "external": "4.3.2.1",
-            "natreflection": "disable",
-            "descr": "Updated Unit Test",
-            "disabled": False,
-            "nobinat": False,
-            "top": False,
-            "apply": True
+            "name": "Update 1:1 NAT mapping and apply",
+            "payload": {
+                "id": 0,
+                "interface": "wan",
+                "src": "!1.1.1.1",
+                "dst": "1.2.3.4",
+                "external": "4.3.2.1",
+                "natreflection": "disable",
+                "descr": "Updated Unit Test",
+                "disabled": False,
+                "nobinat": False,
+                "top": False,
+                "apply": True
+            },
+            "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         }
     ]
-    delete_payloads = [
-        {"id": 0, "apply": True}
+    delete_tests = [
+        {
+            "name": "Delete 1:1 NAT mapping and apply",
+            "payload": {"id": 0, "apply": True},
+            "resp_time": 3    # Allow a few seconds for the firewall filter to reload
+        }
     ]
 
 APIUnitTestFirewallNATOneToOne()

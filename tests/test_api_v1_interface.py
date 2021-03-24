@@ -15,36 +15,48 @@
 import unit_test_framework
 
 class APIUnitTestInterface(unit_test_framework.APIUnitTest):
-    url = "/api/v1/interface"
-    get_payloads = [{}]
-    post_payloads = [
+    uri = "/api/v1/interface"
+    get_tests = [
+        {"name": "Read all configured interfaces"}
+    ]
+    post_tests = [
         {
-            "if": "em2",
-            "descr": "UNIT_TEST",
-            "enable": True,
-            "type": "staticv4",
-            "type6": "staticv6",
-            "ipaddr": "10.250.0.1",
-            "ipaddrv6": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
-            "subnet": "24",
-            "subnetv6": "120",
-            "blockbogons": True
+            "name": "Create a staticv4/staticv6 interface",
+            "payload": {
+                "if": "em2",
+                "descr": "UNIT_TEST",
+                "enable": True,
+                "type": "staticv4",
+                "type6": "staticv6",
+                "ipaddr": "10.250.0.1",
+                "ipaddrv6": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+                "subnet": "24",
+                "subnetv6": "120",
+                "blockbogons": True
+            }
         }
     ]
-    put_payloads = [
+    put_tests = [
         {
-            "id": "em2",
-            "descr": "UNIT_TEST_UPDATED",
-            "enable": False,
-            "type": "dhcp",
-            "type6": "dhcp6",
-            "blockbogons": False,
-            "apply": True
+            "name": "Update staticv4/staticv6 interface to dhcp/dhcp6 and apply",
+            "payload": {
+                "id": "em2",
+                "descr": "UNIT_TEST_UPDATED",
+                "enable": False,
+                "type": "dhcp",
+                "type6": "dhcp6",
+                "blockbogons": False,
+                "apply": True
+            },
+            "resp_time": 5    # Allow a few seconds to bounce the interface when applying
         }
     ]
-    delete_payloads = [
+    delete_tests = [
         {
-            "if": "em2"
+            "name": "Delete interface",
+            "payload": {
+                "if": "em2"
+            }
         }
     ]
 
