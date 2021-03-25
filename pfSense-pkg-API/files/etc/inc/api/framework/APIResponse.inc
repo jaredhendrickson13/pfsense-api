@@ -580,6 +580,78 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "NTPd timeserver does not exist"
         ],
+        2054 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override already exists with this IP address type"
+        ],
+        2055 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override host value required"
+        ],
+        2056 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid dnsmasq host value"
+        ],
+        2057 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override domain value required"
+        ],
+        2058 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid dnsmasq domain value"
+        ],
+        2059 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override IP value required"
+        ],
+        2060 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid dnsmasq host override IP value"
+        ],
+        2061 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override ID required"
+        ],
+        2062 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override ID does not exist"
+        ],
+        2063 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override alias hostname required"
+        ],
+        2064 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override alias domain required"
+        ],
+        2065 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override alias already exists with this IP address type"
+        ],
 
         // 3000-3999 reserved for /interfaces API calls
         3000 => [
