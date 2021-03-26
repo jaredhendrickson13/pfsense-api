@@ -124,27 +124,18 @@ class APIServicesDnsmasqHostOverrideCreate extends APIModel {
     }
 
     public function host_override_exists() {
-        # Local variables
-        $host = $this->validated_data["host"];
-        $domain = $this->validated_data["domain"];
-        $ip = $this->validated_data["ip"];
+        # Local constants
+        $HOST = $this->validated_data["host"];
+        $DOMAIN = $this->validated_data["domain"];
+        $IP = $this->validated_data["ip"];
 
         # Loop through each host override and check if the FQDN already exists
         foreach ($this->config["dnsmasq"]["hosts"] as $ent) {
             # Check the FQDN matches this entry
-            if ($ent["host"] === $host and $ent["domain"] === $domain) {
+            if ($ent["host"] === $HOST and $ent["domain"] === $DOMAIN) {
                 # Host overrides are allowed an IPv4 and IPv6 address, check if it already has one.
-                if ((is_ipaddrv4($ent["ip"]) and is_ipaddrv4($ip)) or (is_ipaddrv6($ent["ip"]) and is_ipaddrv6($ip))){
+                if ((is_ipaddrv4($ent["ip"]) and is_ipaddrv4($IP)) or (is_ipaddrv6($ent["ip"]) and is_ipaddrv6($IP))) {
                     return true;
-                }
-            }
-
-            # Check FQDN within host override aliases as well
-            if (is_array($ent["aliases"])) {
-                foreach ($ent["aliases"]["item"] as $alias_ent) {
-                    if ($alias_ent["host"] === $host and $alias_ent["domain"] === $domain) {
-                        return true;
-                    }
                 }
             }
         }
