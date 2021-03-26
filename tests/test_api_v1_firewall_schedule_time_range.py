@@ -230,7 +230,7 @@ class APIUnitTestFirewallScheduleTimeRange(unit_test_framework.APIUnitTest):
             }
         },
         {
-            "name": "Check November day maximum constraint",
+            "name": "Check December day maximum constraint",
             "status": 400,
             "return": 4155,
             "payload": {
