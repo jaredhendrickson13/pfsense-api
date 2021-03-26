@@ -139,15 +139,6 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
                     return true;
                 }
             }
-
-            # Check FQDN within host override aliases as well
-            if (is_array($ent["aliases"])) {
-                foreach ($ent["aliases"]["item"] as $alias_ent) {
-                    if ($alias_ent["host"] === $host and $alias_ent["domain"] === $domain) {
-                        return true;
-                    }
-                }
-            }
         }
         return false;
     }
