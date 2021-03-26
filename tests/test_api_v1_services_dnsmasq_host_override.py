@@ -15,8 +15,8 @@
 import unit_test_framework
 
 
-class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
-    uri = "/api/v1/services/unbound/host_override"
+class APIUnitTestServicesDnsmasqHostOverride(unit_test_framework.APIUnitTest):
+    uri = "/api/v1/services/dnsmasq/host_override"
     get_tests = [{"name": "Read all host overrides"}]
     post_tests = [
         {
@@ -54,7 +54,7 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
         {
             "name": "Test IPv4 host override unique constraint",
             "status": 400,
-            "return": 2010,
+            "return": 2054,
             "payload": {
                 "host": "pfsense-api",
                 "domain": "unit.test",
@@ -72,7 +72,7 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
         {
             "name": "Test IPv6 host override unique constraint",
             "status": 400,
-            "return": 2010,
+            "return": 2054,
             "payload": {
                 "host": "pfsense-api",
                 "domain": "unit.test",
@@ -88,9 +88,14 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             }
         },
         {
+            "name": "Test host requirement",
+            "status": 400,
+            "return": 2055
+        },
+        {
             "name": "Test host validation",
             "status": 400,
-            "return": 2046,
+            "return": 2056,
             "payload": {
                 "host": "!@#!@#",
                 "domain": "unit.test",
@@ -98,9 +103,18 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             }
         },
         {
+            "name": "Test domain requirement",
+            "status": 400,
+            "return": 2057,
+            "payload": {
+                "host": "example",
+                "ip": "1.2.3.4"
+            }
+        },
+        {
             "name": "Test domain validation",
             "status": 400,
-            "return": 2047,
+            "return": 2058,
             "payload": {
                 "host": "pfsense-api",
                 "domain": "!@#!@#",
@@ -108,9 +122,18 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             }
         },
         {
+            "name": "Test IP requirement",
+            "status": 400,
+            "return": 2059,
+            "payload": {
+                "host": "invalid-ip",
+                "domain": "unit.test"
+            }
+        },
+        {
             "name": "Test IP validation",
             "status": 400,
-            "return": 2011,
+            "return": 2060,
             "payload": {
                 "host": "invalid-ip",
                 "domain": "unit.test",
@@ -163,12 +186,12 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
                 "descr": "Check host and domain field unique constraint tolerance",
                 "apply": True
             },
-            "resp_time": 10    # Allow a few seconds for Unbound to reload
+            "resp_time": 10    # Allow a few seconds for dnsmasq to reload
         },
         {
             "name": "Test IPv4 host override unique constraint",
             "status": 400,
-            "return": 2010,
+            "return": 2054,
             "payload": {
                 "id": 0,
                 "host": "updated-pfsense-api",
@@ -179,7 +202,7 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
         {
             "name": "Test IPv6 host override unique constraint",
             "status": 400,
-            "return": 2010,
+            "return": 2054,
             "payload": {
                 "id": 1,
                 "host": "updated-pfsense-api",
@@ -190,7 +213,7 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
         {
             "name": "Test host validation",
             "status": 400,
-            "return": 2046,
+            "return": 2056,
             "payload": {
                 "id": 0,
                 "host": "!@#!@#",
@@ -201,7 +224,7 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
         {
             "name": "Test domain validation",
             "status": 400,
-            "return": 2047,
+            "return": 2058,
             "payload": {
                 "id": 0,
                 "host": "pfsense-api",
@@ -212,7 +235,7 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
         {
             "name": "Test IP validation",
             "status": 400,
-            "return": 2011,
+            "return": 2060,
             "payload": {
                 "id": 0,
                 "host": "invalid-ip",
@@ -229,9 +252,9 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
         {
             "name": "Delete IPv6 host override",
             "payload": {"id": 0, "apply": True},
-            "resp_time": 10    # Allow a few seconds for Unbound to reload
+            "resp_time": 10    # Allow a few seconds for dnsmasq to reload
         }
     ]
 
 
-APIUnitTestServicesUnboundHostOverride()
+APIUnitTestServicesDnsmasqHostOverride()

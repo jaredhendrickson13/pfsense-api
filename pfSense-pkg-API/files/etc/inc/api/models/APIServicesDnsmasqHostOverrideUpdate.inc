@@ -45,7 +45,7 @@ class APIServicesDnsmasqHostOverrideUpdate extends APIModel {
         # If host or domain was updated, ensure this host override doesn't already exist
         if (isset($this->initial_data["host"]) or isset($this->initial_data["domain"])) {
             if ($this->host_override_exists()) {
-                $this->errors[] = APIResponse\get(2010);
+                $this->errors[] = APIResponse\get(2054);
             }
         }
     }
