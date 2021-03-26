@@ -70,6 +70,24 @@ class APIUnitTestServicesDnsmasqHostOverride(unit_test_framework.APIUnitTest):
             }
         },
         {
+            "name": "Test IPv4 host override alias unique constraint",
+            "status": 400,
+            "return": 2065,
+            "payload": {
+                "host": "pfsense-api-2",
+                "domain": "unit.test",
+                "ip": "1.2.3.4",
+                "descr": "Unit Test IPv4",
+                "aliases": [
+                    {
+                        "host": "pfsense-api",
+                        "domain": "unit.test",
+                        "description": "Unit Test"
+                    }
+                ]
+            }
+        },
+        {
             "name": "Test IPv6 host override unique constraint",
             "status": 400,
             "return": 2054,
