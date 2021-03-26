@@ -16,7 +16,7 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-function override_create_host_cmp($a, $b) {
+function unbound_override_create_host_cmp($a, $b) {
     return strcasecmp($a['host'], $b['host']);
 }
 
@@ -30,7 +30,7 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
 
     public function action() {
         $this->config["unbound"]["hosts"][] = $this->validated_data;
-        usort($this->config["unbound"]["hosts"], "override_create_host_cmp");
+        usort($this->config["unbound"]["hosts"], "unbound_override_create_host_cmp");
         $this->write_config();
         mark_subsystem_dirty("unbound");
         # If user requests immediately application

@@ -16,7 +16,7 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-function override_create_host_cmp($a, $b) {
+function dnsmasq_override_create_host_cmp($a, $b) {
     return strcasecmp($a['host'], $b['host']);
 }
 
@@ -30,7 +30,7 @@ class APIServicesDnsmasqHostOverrideCreate extends APIModel {
 
     public function action() {
         $this->config["dnsmasq"]["hosts"][] = $this->validated_data;
-        usort($this->config["dnsmasq"]["hosts"], "override_create_host_cmp");
+        usort($this->config["dnsmasq"]["hosts"], "dnsmasq_override_create_host_cmp");
         $this->write_config();
         mark_subsystem_dirty("hosts");
         $this->apply();
