@@ -40,11 +40,6 @@ class APIServicesDnsmasqHostOverrideAliasCreate extends APIModel {
         $this->validate_host();
         $this->validate_domain();
         $this->validate_description();
-
-        # Ensure alias host/domain combo isn't already used
-        if ($this->alias_exists($this->parent)) {
-            $this->errors[] = APIResponse\get(2065);
-        }
     }
 
     private function __validate_id() {
@@ -108,69 +103,6 @@ class APIServicesDnsmasqHostOverrideAliasCreate extends APIModel {
             clear_subsystem_dirty('hosts');
         }
     }
-
-    public function alias_exists() {
-        $HOST_TYPES = $this->get_hostnames_ip_types();
-        $HOSTNAME = $this->validated_data["host"].".".$this->validated_data["domain"];
-
-        # Check if the requested host override is an IPv4 type
-        if (is_ipaddrv4($this->validated_data["ip"])) {
-            # Check if this hostname already has an IPv4 override
-            if ($HOST_TYPES[$HOSTNAME]["ipv4_used"] === true) {
-                return true;
-            }
-        }
-        # Check if the requested host override is an IPv6 type
-        if (is_ipaddrv6($this->validated_data["ip"])) {
-            # Check if this hostname already has an IPv6 override
-            if ($HOST_TYPES[$HOSTNAME]["ipv6_used"] === true) {
-                return true;
-            }
-        }
-    }
-
-    /**
-     * Loops through each configured dnqmasq host override and alias and checks which IP types are in use
-     *
-     * @return array $host_types    an array of hostnames with IP types in use and their respective IDs
-     */
-    public function get_hostnames_ip_types() {
-        $host_types = [];
-
-        # Loop through each host override and check if the FQDN already exists
-        foreach ($this->config["dnsmasq"]["hosts"] as $index=>$override) {
-            $parent_hostname = $override["host"].".".$override["domain"];
-
-            # Check if this is an IPv4 address
-            if (is_ipaddrv4($override["ip"])) {
-                $host_types[$parent_hostname]["ipv4_id"] = $index;
-                $host_types[$parent_hostname]["ipv4_used"] = true;
-            }
-            # Check if this is an IPv6 address
-            if (is_ipaddrv6($override["ip"])) {
-                $host_types[$parent_hostname]["ipv6_id"] = $index;
-                $host_types[$parent_hostname]["ipv6_used"] = true;
-            }
-
-            # Loop through nested aliases and perform the same checks
-            foreach ($this->config["dnsmasq"]["hosts"] as $alias) {
-                $alias_hostname = $override["host"].".".$override["domain"];
-
-                # Check if the parent has an IPv4 address
-                if (is_ipaddrv4($override["ip"])) {
-                    $host_types[$alias_hostname]["ipv4_id"] = $index;
-                    $host_types[$alias_hostname]["ipv4_used"] = true;
-                }
-                # Check if the parent has an IPv4 address
-                if (is_ipaddrv6($override["ip"])) {
-                    $host_types[$alias_hostname]["ipv6_id"] = $index;
-                    $host_types[$alias_hostname]["ipv6_used"] = true;
-                }
-            }
-        }
-        return $host_types;
-    }
-
 
     private function __init_config() {
         # Convert aliases config value to array if not already
