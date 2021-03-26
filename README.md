@@ -676,6 +676,25 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Read DHCPd Static Mappings](#3-read-dhcpd-static-mappings)
   * [Update DHCPd Static Mappings](#4-update-dhcpd-static-mappings)
 
+* [SERVICES/DNSMASQ](#servicesdnsmasq)
+
+  * [Apply Pending dnsmasq Changes](#1-apply-pending-dnsmasq-changes)
+  * [Read dnsmasq Configuration](#2-read-dnsmasq-configuration)
+  * [Restart dnsmasq Service](#3-restart-dnsmasq-service)
+  * [Start dnsmasq Service](#4-start-dnsmasq-service)
+  * [Stop dnsmasq Service](#5-stop-dnsmasq-service)
+
+* [SERVICES/DNSMASQ/HOST_OVERRIDE](#servicesdnsmasqhost_override)
+
+  * [Create dnsmasq Host Override](#1-create-dnsmasq-host-override)
+  * [Delete dnsmasq Host Override](#2-delete-dnsmasq-host-override)
+  * [Read dnsmasq Host Override](#3-read-dnsmasq-host-override)
+  * [Update dnsmasq Host Override](#4-update-dnsmasq-host-override)
+
+* [SERVICES/DNSMASQ/HOST_OVERRIDE/ALIAS](#servicesdnsmasqhost_overridealias)
+
+  * [Create dnsmasq Host Override Alias](#1-create-dnsmasq-host-override-alias)
+
 * [SERVICES/DPINGER](#servicesdpinger)
 
   * [Restart DPINGER Service](#1-restart-dpinger-service)
@@ -4443,6 +4462,366 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd/static_mapping
 
 
 
+## SERVICES/DNSMASQ
+
+
+
+### 1. Apply Pending dnsmasq Changes
+
+
+Apply pending DNS Forwarder (dnsmasq) changes.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/apply
+```
+
+
+
+***Body:***
+
+```js        
+{
+
+}
+```
+
+
+
+### 2. Read dnsmasq Configuration
+
+
+Read DNS Forwarder (dnsmasq) configuration.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dnsmasq
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 3. Restart dnsmasq Service
+
+
+Restart the DNS Forwarder (dnsmasq) service.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/restart
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 4. Start dnsmasq Service
+
+
+Start the DNS Forwarder (dnsmasq) service.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/start
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 5. Stop dnsmasq Service
+
+
+Stop the DNS Forwarder (dnsmasq) service.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/stop
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## SERVICES/DNSMASQ/HOST_OVERRIDE
+
+
+
+### 1. Create dnsmasq Host Override
+
+
+Add a new host override to DNS Forwarder (dnsmasq).<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/host_override
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| host | string | Hostname of new DNS A record |
+| domain | string | Domain of new DNS A record |
+| ip | string | IPv4 or IPv6 of new DNS A record |
+| descr | string | Description of host override (optional) |
+| aliases | array | Hostname aliases (CNAME) for host override (optional) |
+| apply | boolean | Specify whether or not you would like this host override to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only creating a single host override, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"host": "test",
+	"domain": "example.com",
+	"ip": "127.0.0.1",
+	"descr": "This is a test host override added via pfSense API!",
+	"aliases": [
+        {
+            "host": "test2", 
+            "domain": "example.com", 
+            "descr": "This is a test host override alias that will also resolve to this IP!"
+        }
+    ]
+}
+```
+
+
+
+### 2. Delete dnsmasq Host Override
+
+
+Delete host overrides from DNS Forwarder (dnsmasq).<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/host_override
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the host override to delete |
+| apply | boolean | Specify whether or not you would like this host override deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only deleting a single host override, you may set this to true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+    "id": 0,
+    "apply": true
+}
+```
+
+
+
+### 3. Read dnsmasq Host Override
+
+
+Read host overrides from DNS Forwarder (dnsmasq).<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/host_override
+```
+
+
+
+### 4. Update dnsmasq Host Override
+
+
+Modify host overrides from DNS Forwarder (dnsmasq).<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/host_override
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the host override to update |
+| host | string | Update the hostname of this host override (optional) |
+| domain | string | Update the domain name of this host override (optional) |
+| ip | string | Update the IPv4/IPv6 address of this host override (optional) |
+| descr | string | Update the description of this host override (optional) |
+| aliases | array | Update the aliases for this host override. This will replace any existing entries. (optional) |
+| apply | boolean | Specify whether or not you would like this host override update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only updating a single host override, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"host": "updated_test",
+	"domain": "example.com",
+	"ip": "127.0.0.2",
+	"descr": "This is a test host override update via pfSense API!",
+	"aliases": [
+        {
+            "host": "test2", 
+            "domain": "example.com", 
+            "descr": "This is an updated host override alias that will also resolve to this IP!"
+        },
+        {
+            "host": "updated_to_add", 
+            "domain": "example.com", 
+            "descr": "This is a test host override alias that was also added during the update!"
+        }
+    ]
+}
+```
+
+
+
+## SERVICES/DNSMASQ/HOST_OVERRIDE/ALIAS
+
+
+
+### 1. Create dnsmasq Host Override Alias
+
+
+Add a new host override alias to DNS Forwarder (dnsmasq).<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/host_override/alias
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the host override to apply this alias to. |
+| host | string | Specify the hostname of the alias |
+| domain | string | Specify the domain name of the alias |
+| description | string | Description of alias (optional) |
+| apply | boolean | Specify whether or not you would like this host override alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host override aliases at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only updating a single host override alias, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+    "id": 0,
+	"host": "alias",
+	"domain": "example.com",
+	"descr": "This is a test host override alias added via pfSense API!",
+    "apply": true
+}
+```
+
+
+
 ## SERVICES/DPINGER
 
 
@@ -7183,4 +7562,3 @@ URL: https://{{$hostname}}/api/v1/user/privilege
 
 ---
 [Back to top](#pfsense-rest-api-documentation)
-> Made with &#9829; by [thedevsaddam](https://github.com/thedevsaddam) | Generated at: 2021-03-25 12:58:24 by [docgen](https://github.com/thedevsaddam/docgen)

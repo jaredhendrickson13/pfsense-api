@@ -8535,6 +8535,508 @@
 					"_postman_isSubFolder": true
 				},
 				{
+					"name": "DNSMASQ",
+					"item": [
+						{
+							"name": "HOST_OVERRIDE",
+							"item": [
+								{
+									"name": "ALIAS",
+									"item": [
+										{
+											"name": "Create dnsmasq Host Override Alias",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": 0,\n\t\"host\": \"alias\",\n\t\"domain\": \"example.com\",\n\t\"descr\": \"This is a test host override alias added via pfSense API!\",\n    \"apply\": true\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/host_override/alias?id=integer&host=string&domain=string&description=string&apply=boolean",
+													"protocol": "https",
+													"host": [
+														"{{$hostname}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"services",
+														"dnsmasq",
+														"host_override",
+														"alias"
+													],
+													"query": [
+														{
+															"key": "id",
+															"value": "integer",
+															"description": "Specify the ID of the host override to apply this alias to."
+														},
+														{
+															"key": "host",
+															"value": "string",
+															"description": "Specify the hostname of the alias"
+														},
+														{
+															"key": "domain",
+															"value": "string",
+															"description": "Specify the domain name of the alias"
+														},
+														{
+															"key": "description",
+															"value": "string",
+															"description": "Description of alias (optional)"
+														},
+														{
+															"key": "apply",
+															"value": "boolean",
+															"description": "Specify whether or not you would like this host override alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host override aliases at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only updating a single host override alias, you may set this true to apply it immediately. Defaults to false. (optional)"
+														}
+													]
+												},
+												"description": "Add a new host override alias to DNS Forwarder (dnsmasq).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]"
+											},
+											"response": []
+										}
+									],
+									"description": "API endpoints to create, read, update and delete DNS Forwarder (dnsmasq) host override aliases.",
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
+								},
+								{
+									"name": "Create dnsmasq Host Override",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"host\": \"test\",\n\t\"domain\": \"example.com\",\n\t\"ip\": \"127.0.0.1\",\n\t\"descr\": \"This is a test host override added via pfSense API!\",\n\t\"aliases\": [\n        {\n            \"host\": \"test2\", \n            \"domain\": \"example.com\", \n            \"descr\": \"This is a test host override alias that will also resolve to this IP!\"\n        }\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/host_override?host=string&domain=string&ip=string&descr=string&aliases=array&apply=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"dnsmasq",
+												"host_override"
+											],
+											"query": [
+												{
+													"key": "host",
+													"value": "string",
+													"description": "Hostname of new DNS A record"
+												},
+												{
+													"key": "domain",
+													"value": "string",
+													"description": "Domain of new DNS A record"
+												},
+												{
+													"key": "ip",
+													"value": "string",
+													"description": "IPv4 or IPv6 of new DNS A record"
+												},
+												{
+													"key": "descr",
+													"value": "string",
+													"description": "Description of host override (optional)"
+												},
+												{
+													"key": "aliases",
+													"value": "array",
+													"description": "Hostname aliases (CNAME) for host override (optional)"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not you would like this host override to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only creating a single host override, you may set this true to apply it immediately. Defaults to false. (optional)"
+												}
+											]
+										},
+										"description": "Add a new host override to DNS Forwarder (dnsmasq).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Update dnsmasq Host Override",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"host\": \"updated_test\",\n\t\"domain\": \"example.com\",\n\t\"ip\": \"127.0.0.2\",\n\t\"descr\": \"This is a test host override update via pfSense API!\",\n\t\"aliases\": [\n        {\n            \"host\": \"test2\", \n            \"domain\": \"example.com\", \n            \"descr\": \"This is an updated host override alias that will also resolve to this IP!\"\n        },\n        {\n            \"host\": \"updated_to_add\", \n            \"domain\": \"example.com\", \n            \"descr\": \"This is a test host override alias that was also added during the update!\"\n        }\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/host_override?id=integer&host=string&domain=string&ip=string&descr=string&aliases=array&apply=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"dnsmasq",
+												"host_override"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "integer",
+													"description": "Specify the ID of the host override to update"
+												},
+												{
+													"key": "host",
+													"value": "string",
+													"description": "Update the hostname of this host override (optional)"
+												},
+												{
+													"key": "domain",
+													"value": "string",
+													"description": "Update the domain name of this host override (optional)"
+												},
+												{
+													"key": "ip",
+													"value": "string",
+													"description": "Update the IPv4/IPv6 address of this host override (optional)"
+												},
+												{
+													"key": "descr",
+													"value": "string",
+													"description": "Update the description of this host override (optional)"
+												},
+												{
+													"key": "aliases",
+													"value": "array",
+													"description": "Update the aliases for this host override. This will replace any existing entries. (optional)"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not you would like this host override update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only updating a single host override, you may set this true to apply it immediately. Defaults to false. (optional)"
+												}
+											]
+										},
+										"description": "Modify host overrides from DNS Forwarder (dnsmasq).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete dnsmasq Host Override",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": 0,\n    \"apply\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/host_override?id=integer&apply=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"dnsmasq",
+												"host_override"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "integer",
+													"description": "Specify the ID of the host override to delete"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not you would like this host override deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only deleting a single host override, you may set this to true to apply it immediately. Defaults to false. (optional)"
+												}
+											]
+										},
+										"description": "Delete host overrides from DNS Forwarder (dnsmasq).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Read dnsmasq Host Override",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/host_override",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"dnsmasq",
+												"host_override"
+											]
+										},
+										"description": "Read host overrides from DNS Forwarder (dnsmasq).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that create, read, update and delete DNS Forwarder (dnsmasq) host overrides.",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "4205151b-76ad-4b91-9157-da313755145d",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "edeba871-80af-4178-b1e0-98fe8fe00c72",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Read dnsmasq Configuration",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/dnsmasq",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"services",
+										"dnsmasq"
+									]
+								},
+								"description": "Read DNS Forwarder (dnsmasq) configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Start dnsmasq Service",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/start",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"services",
+										"dnsmasq",
+										"start"
+									]
+								},
+								"description": "Start the DNS Forwarder (dnsmasq) service.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Restart dnsmasq Service",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/restart",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"services",
+										"dnsmasq",
+										"restart"
+									]
+								},
+								"description": "Restart the DNS Forwarder (dnsmasq) service.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Stop dnsmasq Service",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/stop",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"services",
+										"dnsmasq",
+										"stop"
+									]
+								},
+								"description": "Stop the DNS Forwarder (dnsmasq) service.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Apply Pending dnsmasq Changes",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/apply",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"services",
+										"dnsmasq",
+										"apply"
+									]
+								},
+								"description": "Apply pending DNS Forwarder (dnsmasq) changes.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that create, read, update and delete DNS Forwarder (dnsmasq) configuration.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "2aeccc85-4dc8-41de-9d74-fdfe10345b9a",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "c8a9f88e-9dd1-45ba-9d79-5ed0a8ceb165",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "DHCPD",
 					"item": [
 						{
