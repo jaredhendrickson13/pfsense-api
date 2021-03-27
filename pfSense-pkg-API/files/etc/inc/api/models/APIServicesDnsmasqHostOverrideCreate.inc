@@ -16,27 +16,26 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-function unbound_override_create_host_cmp($a, $b) {
+function dnsmasq_override_create_host_cmp($a, $b) {
     return strcasecmp($a['host'], $b['host']);
 }
 
-class APIServicesUnboundHostOverrideCreate extends APIModel {
+class APIServicesDnsmasqHostOverrideCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-services-dnsresolver-edithost"];
-        $this->change_note = "Added DNS Resolver host override via API";
+        $this->privileges = ["page-all", "page-services-dnsforwarder-edithost"];
+        $this->change_note = "Added DNS Forwarder host override via API";
     }
 
     public function action() {
-        $this->config["unbound"]["hosts"][] = $this->validated_data;
-        usort($this->config["unbound"]["hosts"], "unbound_override_create_host_cmp");
+        $this->__init_config();
+        $this->config["dnsmasq"]["hosts"][] = $this->validated_data;
+        usort($this->config["dnsmasq"]["hosts"], "dnsmasq_override_create_host_cmp");
         $this->write_config();
-        mark_subsystem_dirty("unbound");
-        # If user requests immediately application
-        if ($this->initial_data['apply'] === true) {
-            APITools\unbound_reload_config();
-        }
+        mark_subsystem_dirty("hosts");
+        $this->apply();
+
         return APIResponse\get(0, $this->validated_data);
     }
     
@@ -47,7 +46,7 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
 
         # Before proceeding, check that a host override matching this host, domain and IP type doesn't already exist
         if ($this->host_override_exists()) {
-            $this->errors[] = APIResponse\get(2010);
+            $this->errors[] = APIResponse\get(2054);
         }
 
         $this->__validate_descr();
@@ -61,10 +60,10 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
             if (is_hostname($this->initial_data["host"])) {
                 $this->validated_data["host"] = $this->initial_data['host'];
             } else {
-                $this->errors[] = APIResponse\get(2046);
+                $this->errors[] = APIResponse\get(2056);
             }
         } else {
-            $this->errors[] = APIResponse\get(2004);
+            $this->errors[] = APIResponse\get(2055);
         }
     }
 
@@ -75,10 +74,10 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
             if (is_hostname($this->initial_data["domain"])) {
                 $this->validated_data["domain"] = $this->initial_data['domain'];
             } else {
-                $this->errors[] = APIResponse\get(2047);
+                $this->errors[] = APIResponse\get(2058);
             }
         } else {
-            $this->errors[] = APIResponse\get(2005);
+            $this->errors[] = APIResponse\get(2057);
         }
     }
 
@@ -86,12 +85,12 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
         # Check for our required 'ip' payload value
         if (isset($this->initial_data['ip'])) {
             if (!is_ipaddrv4($this->initial_data["ip"]) and !is_ipaddrv6($this->initial_data["ip"])) {
-                $this->errors[] = APIResponse\get(2011);
+                $this->errors[] = APIResponse\get(2060);
             } else {
                 $this->validated_data["ip"] = trim($this->initial_data['ip']);
             }
         } else {
-            $this->errors[] = APIResponse\get(2006);
+            $this->errors[] = APIResponse\get(2059);
         }
     }
 
@@ -125,22 +124,44 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
     }
 
     public function host_override_exists() {
-        # Local variables
-        $host = $this->validated_data["host"];
-        $domain = $this->validated_data["domain"];
-        $ip = $this->validated_data["ip"];
+        # Local constants
+        $HOST = $this->validated_data["host"];
+        $DOMAIN = $this->validated_data["domain"];
+        $IP = $this->validated_data["ip"];
 
         # Loop through each host override and check if the FQDN already exists
-        foreach ($this->config["unbound"]["hosts"] as $ent) {
+        foreach ($this->config["dnsmasq"]["hosts"] as $ent) {
             # Check the FQDN matches this entry
-            if ($ent["host"] === $host and $ent["domain"] === $domain) {
+            if ($ent["host"] === $HOST and $ent["domain"] === $DOMAIN) {
                 # Host overrides are allowed an IPv4 and IPv6 address, check if it already has one.
-                if ((is_ipaddrv4($ent["ip"]) and is_ipaddrv4($ip)) or (is_ipaddrv6($ent["ip"]) and is_ipaddrv6($ip))){
+                if ((is_ipaddrv4($ent["ip"]) and is_ipaddrv4($IP)) or (is_ipaddrv6($ent["ip"]) and is_ipaddrv6($IP))) {
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    private function __init_config() {
+        # Ensure our dnsmasq and dnsmasq hosts arrays exist
+        if (empty($this->config["dnsmasq"])) {
+            $this->config["dnsmasq"] = [];
+        }
+        if (empty($this->config["dnsmasq"]["hosts"])) {
+            $this->config["dnsmasq"]["hosts"] = [];
+        }
+    }
+
+    public function apply() {
+        if ($this->initial_data['apply'] === true) {
+            services_dnsmasq_configure();
+
+            # Reload dependent services
+            filter_configure();
+            system_resolvconf_generate();
+            system_dhcpleases_configure();
+            clear_subsystem_dirty('hosts');
+        }
     }
 
 }
