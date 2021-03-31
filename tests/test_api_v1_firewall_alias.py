@@ -48,7 +48,7 @@ class APIUnitTestFirewallAlias(unit_test_framework.APIUnitTest):
                 "name": "DNS_SERVERS",
                 "type": "host",
                 "descr": "Unit Test",
-                "address": ["1.1.1.1", "8.8.8.8", "8.8.4.4"],
+                "address": ["1.1.1.1", "8.8.8.8", "8.8.4.4", "RFC1918"],
                 "detail": ["Cloudflare DNS", "Google DNS", "Secondary Google DNS"]
             },
             "resp_time": 3    # Allow a few seconds for the firewall filter to reload
@@ -143,7 +143,7 @@ class APIUnitTestFirewallAlias(unit_test_framework.APIUnitTest):
                 "type": "port",
                 "descr": "Updated Unit Test",
                 "address": [8080, 4433, 443],
-                "detail": ["HTTP-ALT", "HTTPS-ALT", "HTTPS"]
+                "detail": ["HTTP-ALT", "HTTPS-ALT"]
             },
             "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         },
@@ -192,9 +192,8 @@ class APIUnitTestFirewallAlias(unit_test_framework.APIUnitTest):
             }
         },
         {
-            "name": "Test update host to network alias address validation",
-            "status": 400,
-            "return": 4059,
+            "name": "Test update host to network alias address validation tolerance",
+            "status": 200,
             "payload": {
                 "id": "UPDATED_DNS_SERVERS",
                 "type": "network"
