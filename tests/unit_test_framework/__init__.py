@@ -202,7 +202,7 @@ class APIUnitTest:
         # Run each check and print the results
         if not APIUnitTest.has_json_response(req):
             msg = "Expected JSON response, received {content}".format(content=req.content)
-            print(self.__format_msg__(req.request.method, msg))
+            print(self.__format_msg__(req.request.method, test_params, msg))
         elif not APIUnitTest.has_correct_http_status(req, test_params):
             received_status = req.status_code
             expected_status = test_params.get("status", 200)

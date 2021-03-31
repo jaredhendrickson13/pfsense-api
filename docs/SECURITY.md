@@ -10,7 +10,6 @@ Below are versions that are currently supported and will receive security update
 | 1.2.x   | :white_check_mark: |
 | 1.1.x   | :x:                |
 
-
 ## Reporting a Vulnerability
 
 Should you discover a vulnerability in the pfSense-API code, please report the issue in one of the following ways:

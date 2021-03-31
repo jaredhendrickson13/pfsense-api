@@ -53,7 +53,7 @@ class APIFirewallAliasEntryCreate extends APIModel {
         }
     }
 
-    private function __validate_address() {
+    public function __validate_address() {
         # Require clients to pass in addresses to add to the alias
         if (isset($this->initial_data["address"])) {
             # Ensure our input and existing data is in array format
@@ -65,7 +65,7 @@ class APIFirewallAliasEntryCreate extends APIModel {
                 # If the alias is a host type, validate it accordingly
                 if ($this->validated_data["type"] === "host") {
                     # Require each address to be either IPv4 address, IPv6 address, or FQDN
-                    if (is_ipaddrv4($address) or is_ipaddrv6($address) or is_fqdn($address)) {
+                    if (is_ipaddroralias($address) or is_fqdn($address)) {
                         $this->validated_data["address"][] = $address;
                     } else {
                         $this->errors[] = APIResponse\get(4058);
@@ -74,7 +74,7 @@ class APIFirewallAliasEntryCreate extends APIModel {
                 # If the alias is a network type, validate it accordingly
                 elseif ($this->validated_data["type"] === "network") {
                     # Require each address to be either an IPv4/IPv6 subnet, or an FQDN
-                    if (is_subnet($address) or is_fqdn($address) or is_ipaddrv6($address)) {
+                    if (is_subnet($address) or is_fqdn($address) or is_ipaddroralias($address)) {
                         # If a singular IP, add /32 or /128 subnet mask
                         if (is_ipaddrv4($address)) {
                             $address = $address."/32";
@@ -88,8 +88,11 @@ class APIFirewallAliasEntryCreate extends APIModel {
                 }
                 # If the alias is a port type, validate it accordingly
                 elseif ($this->validated_data["type"] === "port") {
+                    # Replace hyphen with colon as expected for port ranges
+                    $address = str_replace("-", ":", $address);
+
                     # Require each address to be either a TCP/UDP port or range
-                    if (is_port_or_range(strval($address))) {
+                    if (is_port_or_range_or_alias(strval($address))) {
                         $this->validated_data["address"][] = $address;
                     } else {
                         $this->errors[] = APIResponse\get(4060);
@@ -100,10 +103,10 @@ class APIFirewallAliasEntryCreate extends APIModel {
         }
     }
 
-    private function __validate_detail() {
-        # Ensure our input and existing data is in array format & determine how many detail values are allowed
-        $this->validated_data["detail"] = array_filter(explode("||", $this->validated_data["detail"]));
+    public function __validate_detail() {
         $this->initial_data["detail"] = $this->__value_to_array($this->initial_data["detail"]);
+        $this->validated_data["detail"] = ($this->validated_data["detail"]) ? explode("||", $this->validated_data["detail"]) : [];
+        $this->validated_data["detail"] = $this->__value_to_array($this->validated_data["detail"]);
 
         # If we have less detail values than address values, add some defaults
         while(true) {
@@ -126,7 +129,7 @@ class APIFirewallAliasEntryCreate extends APIModel {
                 }
             }
 
-            # Convert our array to pfSense's expect XML string format
+            # Convert our array to pfSense's expected XML string format
             $this->validated_data["detail"] = implode("||", $this->validated_data["detail"]);
         } else {
             $this->errors[] = APIResponse\get(4106);

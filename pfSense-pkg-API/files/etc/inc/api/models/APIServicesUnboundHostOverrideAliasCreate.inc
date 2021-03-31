@@ -95,11 +95,9 @@ class APIServicesUnboundHostOverrideAliasCreate extends APIModel {
     }
 
     public function validate_description() {
-        # Check for our required 'domain' payload value
-        if (isset($this->initial_data["domain"])) {
-            $this->validated_data["domain"] = trim($this->initial_data["domain"]);
-        } else {
-            $this->errors[] = APIResponse\get(2008);
+        # Check for our optional 'description' payload value
+        if (isset($this->initial_data["description"])) {
+            $this->validated_data["description"] = strval($this->initial_data["description"]);
         }
     }
 
