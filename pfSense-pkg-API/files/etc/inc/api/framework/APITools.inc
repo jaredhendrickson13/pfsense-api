@@ -344,6 +344,18 @@ function get_pfsense_if_id($interface) {
         }
 
     }
+
+    # Loop on carp interfaces if carp is enable
+    if(is_carp_enabled()) {
+        foreach ($config['virtualip']['vip'] as $carp) {
+            if ($carp['mode'] == "carp") {
+                if ($interface === '_vip'.$carp['uniqid']) {
+                    return $interface;
+                }
+            }
+        }
+    }
+
 }
 
 # Check if input is valid for rule source and destination
