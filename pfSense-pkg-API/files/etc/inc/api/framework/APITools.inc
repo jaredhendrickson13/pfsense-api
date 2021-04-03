@@ -315,7 +315,7 @@ function sort_nat_rules($top=false, $data=null, $field=null) {
 }
 
 # Input a physical interface ID, or a descriptive interface name, and return the pfSense interface ID (lan,wan,optx)
-function get_pfsense_if_id($interface) {
+function get_pfsense_if_id($interface, $include_carp=false) {
     # Variables
     global $config;
     # Loop through our config and check each interface for a physical ID match
@@ -342,18 +342,19 @@ function get_pfsense_if_id($interface) {
         if ($interface === $if_id) {
             return $if_id;
         }
-
     }
 
-    # Loop on carp _vip interfaces
-    foreach ($config['virtualip']['vip'] as $carp) {
-        if ($carp['mode'] == "carp") {
-            if ($interface === '_vip'.$carp['uniqid']) {
-                return $interface;
+    # Only include CARP interfaces if they are explicitly requested
+    if ($include_carp) {
+        # Loop on carp _vip interfaces
+        foreach ($config['virtualip']['vip'] as $carp) {
+            if ($carp['mode'] == "carp") {
+                if ($interface === '_vip'.$carp['uniqid']) {
+                    return $interface;
+                }
             }
         }
     }
-
 }
 
 # Check if input is valid for rule source and destination
