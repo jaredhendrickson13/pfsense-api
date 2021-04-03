@@ -53,7 +53,7 @@ class APIFirewallVirtualIPCreate extends APIModel {
         # Validate our required 'interface' payload value
         if (isset($this->initial_data['interface'])) {
             # Convert this interface into the pfSense interface ID or set error if not found
-            $this->initial_data["interface"] = APITools\get_pfsense_if_id($this->initial_data["interface"]);
+            $this->initial_data["interface"] = APITools\get_pfsense_if_id($this->initial_data["interface"], true);
             if (is_string($this->initial_data["interface"])) {
                 $this->validated_data["interface"] = $this->initial_data["interface"];
             } else {
