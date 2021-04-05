@@ -257,7 +257,7 @@ $form->add($advanced_section);
 ($pkg_config["authmode"] === "jwt") ? $form->add($jwt_section) : null;
 
 # Add buttons below the form
-$rotate_btn = new Form_Button('rotate_server_key', 'Rotate server key', null, 'fa-level-up');
+$rotate_btn = new Form_Button('rotate_server_key', 'Rotate server key', null, 'fa-repeat');
 $rotate_btn->addClass('btn btn-sm btn-success');
 $rotate_btn->setOnclick("return confirm(\"Rotating the server key will void any existng API tokens and JWTs. Proceed?\");");
 $form->addGlobal(new Form_Button('save', 'Save', null, 'fa-save'))->addClass('btn btn-sm btn-primary api-save-btn');
