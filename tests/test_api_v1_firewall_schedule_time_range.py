@@ -401,7 +401,14 @@ class APIUnitTestFirewallScheduleTimeRange(unit_test_framework.APIUnitTest):
                 "name": "Test_Schedule",
                 "id": 0
             }
-        }
+        },
+        {
+            "name": "Delete parent firewall schedule",
+            "uri": "/api/v1/firewall/schedule",
+            "payload": {
+                "name": "Test_Schedule"
+            }
+        },
     ]
 
 APIUnitTestFirewallScheduleTimeRange()
