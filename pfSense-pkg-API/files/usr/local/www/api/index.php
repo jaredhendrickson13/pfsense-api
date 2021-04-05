@@ -189,7 +189,7 @@ $general_section->addInput(new Form_Select(
     $pkg_config["authmode"],
     ["local" => "Local Database", "token" => "API Token", "jwt" => "JWT"]
 ))->setHelp(
-    "Select the mode used to authenticate API requests See the <a href='/api/documentation/'>developer documentation</a>
+    "Select the mode used to authenticate API requests. See the <a href='/api/documentation/'>developer documentation</a>
     for more information on API authentication."
 );
 
