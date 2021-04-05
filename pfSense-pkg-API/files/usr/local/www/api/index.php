@@ -225,7 +225,7 @@ $jwt_section->addInput(new Form_Input(
     $pkg_config["jwt_exp"],
     ["min"=>300, "max"=>86400]
 ))->setHelp(
-    "How long (in seconds) the JWT is valid for. Allows a minimum is 300 seconds (5 minutes) and maximum of 
+    "How long (in seconds) the JWT is valid for. Allows a minimum of 300 seconds (5 minutes) and maximum of 
     86400 seconds (1 day)."
 );
 
