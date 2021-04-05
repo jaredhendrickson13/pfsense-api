@@ -148,7 +148,7 @@ if(isset($pkg_config["persist"]) and $_SERVER["REQUEST_METHOD"] === "POST") {
 $general_section->addInput(new Form_Checkbox(
     'enable',
     'Enable',
-    '',
+    'Enable API',
     isset($pkg_config["enable"]),
     ''
 ));
