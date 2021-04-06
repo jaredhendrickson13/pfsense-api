@@ -149,8 +149,14 @@ class APIFirewallVirtualIPCreate extends APIModel {
             }
         }
 
-        # Set virtual IP type to network. This is easier to handle than allow single IPs too.
-        $this->validated_data["type"] = "network";
+        # Set virtual IP type to network/single based on subnet and subnet_bits
+        if (is_ipaddrv4($this->validated_data["subnet"]) && $this->validated_data["subnet_bits"] == 32) {
+          $this->validated_data["type"] = "single";
+        } elseif (is_ipaddrv6($this->validated_data["subnet"]) && $this->validated_data["subnet_bits"] == 128) {
+          $this->validated_data["type"] = "single";
+        } else {
+          $this->validated_data["type"] = "network";
+        }
     }
 
     private function __vhid_exists($interface, $vhid) {

@@ -26,7 +26,7 @@ class APIFirewallApplyCreate extends APIModel {
             "page-firewall-rules",
             "page-firewall-rules-edit",
             "page-firewall-aliases",
-            "page-firewall-aliases-edit",
+            "page-firewall-alias-edit",
             "page-firewall-nat-1-1",
             "page-firewall-nat-1-1-edit",
             "page-firewall-nat-outbound",

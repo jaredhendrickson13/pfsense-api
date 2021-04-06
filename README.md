@@ -912,7 +912,7 @@ URL: https://{{$hostname}}/api/v1/access_token
 
 Add a new host, network or port firewall alias.<br><br>
 
-_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-aliases-edit`]
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-alias-edit`]
 
 
 ***Endpoint:***
@@ -956,7 +956,7 @@ URL: https://{{$hostname}}/api/v1/firewall/alias
 
 Delete an existing alias and reload filter.<br><br>
 
-_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-aliases-edit`]
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-alias-edit`]
 
 
 ***Endpoint:***
@@ -1002,7 +1002,7 @@ URL: https://{{$hostname}}/api/v1/firewall/alias
 
 Modify an existing firewall alias.<br><br>
 
-_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-aliases-edit`]
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-alias-edit`]
 
 
 ***Endpoint:***
@@ -1039,7 +1039,7 @@ URL: https://{{$hostname}}/api/v1/firewall/alias
 
 Add new entries to an existing firewall alias.<br><br>
 
-_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-aliases-edit`]
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-alias-edit`]
 
 
 ***Endpoint:***
@@ -1079,7 +1079,7 @@ URL: https://{{$hostname}}/api/v1/firewall/alias/entry
 
 Delete existing entries from an existing firewall alias.<br><br>
 
-_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-aliases-edit`]
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-alias-edit`]
 
 
 ***Endpoint:***
@@ -1121,7 +1121,7 @@ URL: https://{{$hostname}}/api/v1/firewall/alias/entry
 
 Apply pending firewall changes. This will reload all filter items. This endpoint returns no data.<br><br>
 
-_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules`, `page-firewall-rules-edit`, `page-firewall-aliases`, `page-firewall-aliases-edit`, `page-firewall-nat-1-1`, `page-firewall-nat-1-1-edit`, `page-firewall-nat-outbound`, `page-firewall-nat-outbound-edit`, `page-firewall-nat-portforward`, `page-firewall-nat-portforward-edit`]
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules`, `page-firewall-rules-edit`, `page-firewall-aliases`, `page-firewall-alias-edit`, `page-firewall-nat-1-1`, `page-firewall-nat-1-1-edit`, `page-firewall-nat-outbound`, `page-firewall-nat-outbound-edit`, `page-firewall-nat-portforward`, `page-firewall-nat-portforward-edit`]
 
 
 ***Endpoint:***
