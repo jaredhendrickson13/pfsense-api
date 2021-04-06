@@ -37,6 +37,8 @@ class APIFirewallVirtualIPCreate extends APIModel {
     }
 
     public function validate_payload() {
+        # Assign a unique ID to the virtual IP
+        $this->validated_data['uniqid'] = uniqid();
 
         # Validate our required 'mode' payload value
         if (isset($this->initial_data['mode'])) {
