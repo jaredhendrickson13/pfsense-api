@@ -328,6 +328,17 @@ class APIUnitTestFirewallVirtualIP(unit_test_framework.APIUnitTest):
                 "advbase": 4030
             }
         },
+        {
+            "name": "Check CARP password requirement when updating from non-CARP virtual IP",
+            "status": 400,
+            "return": 4022,
+            "payload": {
+                "id": 2,
+                "mode": "carp",
+                "interface": "wan",
+                "subnet": "172.16.77.234/32",
+            }
+        },
     ]
     delete_tests = [
         {
