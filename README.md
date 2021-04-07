@@ -12,7 +12,7 @@ properly written to the master XML configuration and the correct backend configu
 
 
 # Requirements
-- pfSense 2.5.0 or later is supported
+- pfSense 2.4.4 or later is supported
 - pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the 
 webConfigurator are required to make calls to the API endpoints
 - While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit
@@ -40,7 +40,7 @@ pfsense-api revert v1.1.7
 ```
 
 ### Notes: 
-- To install the 2.6 package, simply change the `2.5` in the install URL to `2.6`.
+- To install the 2.4 package, simply change the `2.5` in the install URL to `2.4`.
 - In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package
 - If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to 
 'Diagnostics > Command Prompt' and enter the commands there
@@ -7562,3 +7562,4 @@ URL: https://{{$hostname}}/api/v1/user/privilege
 
 ---
 [Back to top](#pfsense-rest-api-documentation)
+> Made with &#9829; by [thedevsaddam](https://github.com/thedevsaddam) | Generated at: 2021-04-07 09:36:42 by [docgen](https://github.com/thedevsaddam/docgen)
