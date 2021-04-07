@@ -6161,6 +6161,26 @@
 											"key": "custom_headers",
 											"value": "array",
 											"description": "Update the custom response headers for the API to return in API responses. This must be an array of key-value pairs (e.g. `{\"custom-header\": \"custom-header-value}`. To revert custom headers to the default state, simply pass in an empty array. In most cases, custom headers are not necessary. An example use case for custom headers is setting CORS policy headers required by some frontend web applications. (optional)"
+										},
+										{
+											"key": "hasync",
+											"value": "boolean",
+											"description": "Enable or disable HA sync for API configurations. (optional)"
+										},
+										{
+											"key": "hasync_hosts",
+											"value": "array",
+											"description": "Update the hosts to sync API configurations to. This must be an array of IP addresses or FQDN strings. At least one host must be specified when HA sync is enabled. (optional)"
+										},
+										{
+											"key": "hasync_username",
+											"value": "string",
+											"description": "Update the username to authenticate as for HA synchronization. This user must be present on ALL hosts specified in the `hasync_hosts` field and must hold the `page-system-api` privilege. A value must be set when HA sync is enabled. (optional)"
+										},
+										{
+											"key": "hasync_password",
+											"value": "string",
+											"description": "Update the password of the username to authenticate as for HA synchronization. A value must be set when HA sync is enabled. (optional)"
 										}
 									]
 								},

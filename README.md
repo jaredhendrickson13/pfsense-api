@@ -6141,6 +6141,10 @@ URL: https://{{$hostname}}/api/v1/system/api
 | keyhash | string | Update the hashing algorithm to use when generating API tokens. Choices are `"sha256"`, `"sha384"`, `"sha512"`, and `"md5"`. This Is only applicable when the `authmode` setting Is set to `token`. (optional) |
 | keybytes | integer | Update the key byte strength to use when generating API tokens. Choices are `16`, `32` and `64`. This Is only applicable when the `authmode` setting Is set to `token`. (optional) |
 | custom_headers | array | Update the custom response headers for the API to return in API responses. This must be an array of key-value pairs (e.g. `{"custom-header": "custom-header-value}`. To revert custom headers to the default state, simply pass in an empty array. In most cases, custom headers are not necessary. An example use case for custom headers is setting CORS policy headers required by some frontend web applications. (optional) |
+| hasync | boolean | Enable or disable HA sync for API configurations. (optional) |
+| hasync_hosts | array | Update the hosts to sync API configurations to. This must be an array of IP addresses or FQDN strings. At least one host must be specified when HA sync is enabled. (optional) |
+| hasync_username | string | Update the username to authenticate as for HA synchronization. This user must be present on ALL hosts specified in the `hasync_hosts` field and must hold the `page-system-api` privilege. A value must be set when HA sync is enabled. (optional) |
+| hasync_password | string | Update the password of the username to authenticate as for HA synchronization. A value must be set when HA sync is enabled. (optional) |
 
 
 
@@ -7562,4 +7566,3 @@ URL: https://{{$hostname}}/api/v1/user/privilege
 
 ---
 [Back to top](#pfsense-rest-api-documentation)
-> Made with &#9829; by [thedevsaddam](https://github.com/thedevsaddam) | Generated at: 2021-04-07 09:36:42 by [docgen](https://github.com/thedevsaddam/docgen)
