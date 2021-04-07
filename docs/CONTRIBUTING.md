@@ -529,7 +529,7 @@ to `tools/README.md`
 
 ## Creating or Updating Documentation ##
 Documentation is written and maintained using Postman. The JSON export of the Postman collection can be found in 
-`docs/documentation.json`. Both the README.md and embedded documentation are generated using this JSON file. To update
+`tools/templates/documentation.json`. Both the README.md and embedded documentation are generated using this JSON file. To update
 or add documentation, you can either import this collection to Postman, make your changes in Postman and then export the
 updated collection as JSON, or you may edit the JSON file directly if you are familiar with the structure. To generate
 the README.md and embedded documentation pages, you may use the `tools/make_documentation.py` script. For more info on
