@@ -254,6 +254,30 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "API custom header key-value pairs must be string types"
         ],
+        1027 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "At least one HA sync host must be specified when HA sync is enabled"
+        ],
+        1028 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "HA sync hosts must be valid IP address or hostname"
+        ],
+        1029 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "An HA sync username is required when HA sync is enabled"
+        ],
+        1030 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "An HA sync password is required when HA sync is enabled"
+        ],
 
         // 2000-2999 reserved for /services API calls
         2000 => [

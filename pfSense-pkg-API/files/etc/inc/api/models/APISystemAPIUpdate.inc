@@ -29,6 +29,11 @@ class APISystemAPIUpdate extends APIModel {
     public function action() {
         $this->config["installedpackages"]["package"][APITools\get_api_config()[0]]["conf"] = $this->validated_data;
         $this->write_config();
+
+        # Remove sensitive values
+        unset($this->validated_data["server_key"]);
+        unset($this->validated_data["hasync_password"]);
+
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -56,6 +61,15 @@ class APISystemAPIUpdate extends APIModel {
             $this->validated_data["readonly"] = "";
         } elseif ($this->initial_data['readonly'] === false) {
             unset($this->validated_data["readonly"]);
+        }
+    }
+
+    private function __validate_hasync() {
+        # Check for our optional 'hasync' payload value
+        if ($this->initial_data['hasync'] === true) {
+            $this->validated_data["hasync"] = "";
+        } elseif ($this->initial_data['hasync'] === false) {
+            unset($this->validated_data["hasync"]);
         }
     }
 
@@ -91,6 +105,48 @@ class APISystemAPIUpdate extends APIModel {
 
             # Convert value to internal XML value
             $this->validated_data["allowed_interfaces"] = implode(",", $this->validated_data["allowed_interfaces"]);
+        }
+    }
+
+    private function __validate_hasync_hosts() {
+        # Only validate this field if HA sync is enabled
+        if ($this->validated_data["hasync"]) {
+            # Validate our required 'hasync_hosts' payload value
+            if (isset($this->initial_data["hasync_hosts"]) and count($this->initial_data["hasync_hosts"]) > 0) {
+                # Loop through each host and ensure it is valid
+                foreach ($this->initial_data["hasync_hosts"] as $hasync_host) {
+                    if (!is_ipaddr($hasync_host) and !is_fqdn($hasync_host)) {
+                        $this->errors[] = APIResponse\get(1028);
+                    }
+                }
+                $this->validated_data["hasync_hosts"] = implode(" ", $this->initial_data["hasync_hosts"]);
+            } elseif (empty($this->validated_data["hasync_hosts"])) {
+                $this->errors[] = APIResponse\get(1027);
+            }
+        }
+    }
+
+    private function __validate_hasync_username() {
+        # Only validate this field if HA sync is enabled
+        if ($this->validated_data["hasync"]) {
+            # Validate our required 'hasync_username' payload value
+            if (isset($this->initial_data["hasync_username"])) {
+                $this->validated_data["hasync_username"] = strval($this->initial_data["hasync_username"]);
+            } elseif (empty($this->validated_data["hasync_username"])) {
+                $this->errors[] = APIResponse\get(1029);
+            }
+        }
+    }
+
+    private function __validate_hasync_password() {
+        # Only validate this field if HA sync is enabled
+        if ($this->validated_data["hasync"]) {
+            # Validate our required 'hasync_password' payload value
+            if (isset($this->initial_data["hasync_password"])) {
+                $this->validated_data["hasync_password"] = strval($this->initial_data["hasync_password"]);
+            } elseif (empty($this->validated_data["hasync_password"])) {
+                $this->errors[] = APIResponse\get(1029);
+            }
         }
     }
 
@@ -175,5 +231,9 @@ class APISystemAPIUpdate extends APIModel {
         $this->__validate_keyhash();
         $this->__validate_keybytes();
         $this->__validate_custom_headers();
+        $this->__validate_hasync();
+        $this->__validate_hasync_hosts();
+        $this->__validate_hasync_username();
+        $this->__validate_hasync_password();
     }
 }
