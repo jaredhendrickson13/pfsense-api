@@ -1151,7 +1151,7 @@ function sync($print=false) {
                 $resp = api_request(
                     $protocol."://".$node.":".$port."/api/v1/system/api/sync",
                     "PUT",
-                    ["client-id"=>$pkg_conf["hasync_username"], "client-token"=>$pkg_conf["hasync_password"]]
+                    ["client-id"=>$pkg_conf["hasync_username"], "client-token"=>$pkg_conf["hasync_password"]] + $pkg_conf
                 );
             } catch (\Exception $e) {
                 # Log the error
