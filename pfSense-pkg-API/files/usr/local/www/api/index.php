@@ -148,7 +148,7 @@ if(isset($pkg_config["persist"]) and $_SERVER["REQUEST_METHOD"] === "POST") {
 $general_section->addInput(new Form_Checkbox(
     'enable',
     'Enable',
-    '',
+    'Enable API',
     isset($pkg_config["enable"]),
     ''
 ));
@@ -189,7 +189,7 @@ $general_section->addInput(new Form_Select(
     $pkg_config["authmode"],
     ["local" => "Local Database", "token" => "API Token", "jwt" => "JWT"]
 ))->setHelp(
-    "Select the mode used to authenticate API requests See the <a href='/api/documentation/'>developer documentation</a>
+    "Select the mode used to authenticate API requests. See the <a href='/api/documentation/'>developer documentation</a>
     for more information on API authentication."
 );
 
@@ -225,7 +225,7 @@ $jwt_section->addInput(new Form_Input(
     $pkg_config["jwt_exp"],
     ["min"=>300, "max"=>86400]
 ))->setHelp(
-    "How long (in seconds) the JWT is valid for. Allows a minimum is 300 seconds (5 minutes) and maximum of 
+    "How long (in seconds) the JWT is valid for. Allows a minimum of 300 seconds (5 minutes) and maximum of 
     86400 seconds (1 day)."
 );
 
@@ -257,7 +257,7 @@ $form->add($advanced_section);
 ($pkg_config["authmode"] === "jwt") ? $form->add($jwt_section) : null;
 
 # Add buttons below the form
-$rotate_btn = new Form_Button('rotate_server_key', 'Rotate server key', null, 'fa-level-up');
+$rotate_btn = new Form_Button('rotate_server_key', 'Rotate server key', null, 'fa-repeat');
 $rotate_btn->addClass('btn btn-sm btn-success');
 $rotate_btn->setOnclick("return confirm(\"Rotating the server key will void any existng API tokens and JWTs. Proceed?\");");
 $form->addGlobal(new Form_Button('save', 'Save', null, 'fa-save'))->addClass('btn btn-sm btn-primary api-save-btn');

@@ -37,7 +37,22 @@ class APIFirewallVirtualIPCreate extends APIModel {
     }
 
     public function validate_payload() {
+        # Assign a unique ID to the virtual IP
+        $this->validated_data['uniqid'] = uniqid();
 
+        # Validate input data
+        $this->__validate_mode();
+        $this->__validate_interface();
+        $this->__validate_subnet();
+        $this->__validate_descr();
+        $this->__validate_noexpand();
+        $this->__validate_vhid();
+        $this->__validate_advbase();
+        $this->__validate_advskew();
+        $this->__validate_password();
+    }
+
+    private function __validate_mode() {
         # Validate our required 'mode' payload value
         if (isset($this->initial_data['mode'])) {
             $mode_options = array("ipalias", "carp", "proxyarp", "other");
@@ -49,11 +64,13 @@ class APIFirewallVirtualIPCreate extends APIModel {
         } else {
             $this->errors[] = APIResponse\get(4019);
         }
+    }
 
+    private function __validate_interface() {
         # Validate our required 'interface' payload value
         if (isset($this->initial_data['interface'])) {
             # Convert this interface into the pfSense interface ID or set error if not found
-            $this->initial_data["interface"] = APITools\get_pfsense_if_id($this->initial_data["interface"]);
+            $this->initial_data["interface"] = APITools\get_pfsense_if_id($this->initial_data["interface"], true);
             if (is_string($this->initial_data["interface"])) {
                 $this->validated_data["interface"] = $this->initial_data["interface"];
             } else {
@@ -62,7 +79,9 @@ class APIFirewallVirtualIPCreate extends APIModel {
         } else {
             $this->errors[] = APIResponse\get(4020);
         }
+    }
 
+    private function __validate_subnet() {
         # Validate our required 'subnet' payload value
         if (isset($this->initial_data['subnet'])) {
             // If a single IPv4 or IPv6, append the subnet mask for one address
@@ -80,31 +99,45 @@ class APIFirewallVirtualIPCreate extends APIModel {
                 } else {
                     $this->validated_data["subnet"] = $subnet_split[0];
                     $this->validated_data["subnet_bits"] = $subnet_split[1];
+
+                    # Set virtual IP type to network/single based on subnet and subnet_bits
+                    if (is_ipaddrv4($this->validated_data["subnet"]) && $this->validated_data["subnet_bits"] == 32) {
+                        $this->validated_data["type"] = "single";
+                    } elseif (is_ipaddrv6($this->validated_data["subnet"]) && $this->validated_data["subnet_bits"] == 128) {
+                        $this->validated_data["type"] = "single";
+                    } else {
+                        $this->validated_data["type"] = "network";
+                    }
                 }
             } else {
                 $this->errors[] = APIResponse\get(4025);
             }
-
         } else {
             $this->errors[] = APIResponse\get(4021);
         }
+    }
 
-        # Validate our required 'descr' payload value
+    private function __validate_descr() {
+        # Validate our optional 'descr' payload value
         if (isset($this->initial_data['descr'])) {
             $this->validated_data["descr"] = strval($this->initial_data['descr']);
         } else {
             $this->validated_data["descr"] = "";
         }
+    }
 
-        # Validate our required 'noexpand' payload value
+    private function __validate_noexpand() {
+        # Validate our optional 'noexpand' payload value
         if ($this->initial_data['noexpand'] === true and in_array($this->initial_data["mode"], ["proxyarp", "other"])) {
             $this->validated_data['noexpand'] = "";
         }
+    }
 
-        # Validate CARP conditional payload values
+    private function __validate_vhid() {
+        # Only validate this field if the mode was set to CARP
         if ($this->validated_data["mode"] === "carp") {
             # Check for our optional 'vhid' payload value. Assume default if none was specified.
-            if (isset($this->initial_data['vhid'])) {
+            if (isset($this->initial_data['vhid']) ) {
                 if ($this->__vhid_exists($this->initial_data["interface"], $this->initial_data['vhid'])) {
                     $this->errors[] = APIResponse\get(4027);
                 } elseif (1 > $this->initial_data['vhid'] or $this->initial_data['vhid'] > 255) {
@@ -116,7 +149,12 @@ class APIFirewallVirtualIPCreate extends APIModel {
                 # If a VHID was not specified, use the next available VHID
                 $this->validated_data["vhid"] = APITools\next_vhid();
             }
+        }
+    }
 
+    private function __validate_advskew() {
+        # Only validate this field if the mode was set to CARP
+        if ($this->validated_data["mode"] === "carp") {
             # Check for our optional 'advskew' payload value. Assume default if none was specified.
             if (isset($this->initial_data['advskew'])) {
                 # Ensure 'advskew' value is within range
@@ -128,7 +166,12 @@ class APIFirewallVirtualIPCreate extends APIModel {
             } else {
                 $this->validated_data["advskew"] = 0;
             }
+        }
+    }
 
+    private function __validate_advbase() {
+        # Only validate this field if the mode was set to CARP
+        if ($this->validated_data["mode"] === "carp") {
             # Check for our optional 'advbase' payload value. Assume default if none was specified.
             if (isset($this->initial_data['advbase'])) {
                 # Ensure 'advbase' value is within range
@@ -140,22 +183,18 @@ class APIFirewallVirtualIPCreate extends APIModel {
             } else {
                 $this->validated_data["advbase"] = 1;
             }
+        }
+    }
 
-            # Check for our require 'password' payload value. Set error if none was specified.
+    private function __validate_password() {
+        # Only validate this field if the mode was set to CARP
+        if ($this->validated_data["mode"] === "carp") {
+            # Check for the required 'password' payload value. Set error if none was specified.
             if (isset($this->initial_data['password'])) {
                 $this->validated_data["password"] = strval($this->initial_data['password']);
             } else {
                 $this->errors[] = APIResponse\get(4022);
             }
-        }
-
-        # Set virtual IP type to network/single based on subnet and subnet_bits
-        if (is_ipaddrv4($this->validated_data["subnet"]) && $this->validated_data["subnet_bits"] == 32) {
-          $this->validated_data["type"] = "single";
-        } elseif (is_ipaddrv6($this->validated_data["subnet"]) && $this->validated_data["subnet_bits"] == 128) {
-          $this->validated_data["type"] = "single";
-        } else {
-          $this->validated_data["type"] = "network";
         }
     }
 
@@ -168,5 +207,4 @@ class APIFirewallVirtualIPCreate extends APIModel {
         }
         return false;
     }
-
 }
