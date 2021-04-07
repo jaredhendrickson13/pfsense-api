@@ -1112,3 +1112,71 @@ function is_assoc_array($array, $strict_seq=false) {
 
     return false;
 }
+
+function api_request($url, $method, $data=[], $headers=[]) {
+    # Format data and headers
+    $data = json_encode($data);
+    $headers["Content-Type"] = "application/json";
+    $headers["Content-Length"] = strlen($data);
+
+    # Setup cURL options
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($method));
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+
+    # Make our request and return the response
+    $result = curl_exec($ch);
+    curl_close($ch);
+    return $result;
+}
+
+function sync($print=false) {
+    # Local variables
+    global $config;
+    $pkg_conf = get_api_config()[1];
+    $protocol = ($config["system"]["webgui"]["protocol"]) ? $config["system"]["webgui"]["protocol"] : "https";
+    $port = ($config["system"]["webgui"]["port"]) ? $config["system"]["webgui"]["port"] : "443";
+
+    # Only perform sync when HA Sync is enabled for the API
+    if (isset($pkg_conf["hasync"])) {
+        # Loop through each HA sync node and try to sync the configuration
+        foreach (explode(" ", $pkg_conf["hasync_hosts"]) as $node) {
+            # Make the API request to sync configuration
+            try {
+                $resp = api_request(
+                    $protocol."://".$node.":".$port."/api/v1/system/api/sync",
+                    "PUT",
+                    ["client-id"=>$pkg_conf["hasync_username"], "client-token"=>$pkg_conf["hasync_password"]]
+                );
+            } catch (\Exception $e) {
+                # Log the error
+                log_error("API Sync failure (".$node."): ".strval($e));
+
+                # If requested, print the error to console
+                if ($print) {
+                    echo "API Sync failure: ".strval($e).PHP_EOL;
+                }
+            }
+
+            # Ensure the sync was successful
+            if ($resp) {
+                $resp = json_decode($resp, true);
+                if ($resp["return"] !== 0) {
+                    # Log the error
+                    log_error("API Sync failure (".$node."): Sync received return code ".strval($resp["return"]));
+
+                    # If requested, print the error to console
+                    if ($print) {
+                        echo "API Sync failure: ".strval($e).PHP_EOL;
+                    }
+                }
+            }
+
+        }
+    }
+}

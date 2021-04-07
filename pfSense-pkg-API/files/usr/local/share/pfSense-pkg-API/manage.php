@@ -80,6 +80,10 @@ function restore() {
     }
 }
 
+function sync() {
+    APITools\sync(true);
+}
+
 function update() {
     $pf_version = substr(file_get_contents("/etc/version"), 0, 3);
     echo shell_exec("/usr/sbin/pkg delete -y pfSense-pkg-API");
@@ -141,6 +145,7 @@ function help() {
     echo "  rotateserverkey  : Rotate the API server key and remove all existing tokens".PHP_EOL;
     echo "  backup           : Create a backup of the API configuration".PHP_EOL;
     echo "  restore          : Restore the API configuration from the latest backup".PHP_EOL;
+    echo "  sync             : Sync this system's API configuration to configured HA nodes".PHP_EOL;
     echo PHP_EOL;
 }
 
@@ -155,6 +160,10 @@ elseif (in_array($argv[1], ["backup"])) {
 # RESTORE COMMAND
 elseif (in_array($argv[1], ["restore"])) {
     restore();
+}
+# SYNC COMMAND
+elseif (in_array($argv[1], ["sync"])) {
+    sync();
 }
 # UPDATE COMMAND
 elseif (in_array($argv[1], ["update"])) {
