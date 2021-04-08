@@ -25,11 +25,14 @@ class APISystemAPISyncUpdate extends APIModel {
         $this->privileges = ["page-all", "page-system-api"];
         $this->set_auth_mode = "local";
         $this->retain_read_mode = false;
+        $this->ignore_enabled = true;
+        $this->ignore_ifs = true;
     }
 
     public function action() {
         $pkg_index = APITools\get_api_config()[0];
         $this->config["installedpackages"]["package"][$pkg_index]["conf"] = $this->validated_data;
+        $this->write_config();
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -44,8 +47,10 @@ class APISystemAPISyncUpdate extends APIModel {
 
         # Require data to include at least a server key and auth mode
         # NOTE: This model is not intended for public use, input is created by the master node and is generally trusted
-        if (isset($this->initial_data["server_key"]) and isset($this->initial_data["auth_mode"])) {
+        if (isset($this->initial_data["server_key"]) and isset($this->initial_data["authmode"])) {
             $this->validated_data = $this->initial_data;
+        } else {
+            $this->errors[] = APIResponse\get(1);
         }
     }
 }

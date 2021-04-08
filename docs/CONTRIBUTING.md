@@ -125,6 +125,14 @@ deleting objects.
 - `$this->validate_id` : A boolean to dictate whether the model object should require validation of the configuraiton ID.
 This defaults to true, but can be useful for nested model object calls where you would like to validate a payload before
 it's parent is created. It is entirely up to you to implement this property if desired.
+- `$this->retain_read_mode` : A boolean to dictate whether this model should respect the API's read only setting if
+set. If set to `false`, the model will be considered a read only model and will be allowed to answer requests when the
+API is in read only mode, even if the request is not a GET request. Defaults to `true`.
+- `$this->ignore_ifs` : A boolean to dictate whether or not this model should respect the allowed interfaces API
+setting. If set to `true`, the model will be allowed to answer API requests regardless of the interface the request was
+received on. Defaults to `false`.
+- `$this->ignore_enabled` : A boolean to dictate whether or not this model should respect the API's enabled setting. If
+set to true, this model will be allowed to answer API requests even if the API is disabled. Defaults to `false`.
 
 #### Reading and Writing to pfSense's XML Configuration ####
 Included in the API framework are properties and methods to read and write to pfSense's XML configuration. Please note

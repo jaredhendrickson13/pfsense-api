@@ -182,6 +182,8 @@ if (isset($_POST["save"])) {
             $input_errors[] = "An HA sync password is required when enabled.";
             $has_errors = true;
         }
+    } else {
+        unset($pkg_config["hasync"]);
     }
 
     # Only write changes if no errors occurred
@@ -200,6 +202,14 @@ if (isset($_POST["save"])) {
 # Backup our configuration is persist is enabled and the request is a POST request
 if(isset($pkg_config["persist"]) and $_SERVER["REQUEST_METHOD"] === "POST") {
     shell_exec("/usr/local/share/pfSense-pkg-API/manage.php backup");
+}
+
+# Sync our configuration if HA sync is enabled
+if(isset($pkg_config["hasync"]) and $_SERVER["REQUEST_METHOD"] === "POST") {
+    # Use ob_start()/ob_end_clean() to prevent sync() from printing output
+    ob_start();
+    APITools\sync();
+    ob_end_clean();
 }
 
 # Populate the GENERAL section of the UI form
