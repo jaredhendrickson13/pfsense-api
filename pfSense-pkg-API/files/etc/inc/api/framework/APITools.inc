@@ -1144,9 +1144,6 @@ function sync() {
     $protocol = ($config["system"]["webgui"]["protocol"]) ? $config["system"]["webgui"]["protocol"] : "https";
     $port = ($config["system"]["webgui"]["port"]) ? $config["system"]["webgui"]["port"] : "443";
 
-    # Start sync
-    echo "Syncing API configuration... ";
-
     # Only perform sync when HA Sync is enabled for the API
     if (isset($pkg_conf["hasync"])) {
         # Loop through each HA sync node and try to sync the configuration
@@ -1154,6 +1151,7 @@ function sync() {
             # Populate data
             $auth_data = ["client-id"=> $pkg_conf["hasync_username"], "client-token"=> $pkg_conf["hasync_password"]];
             # Make the API request to sync configuration
+            echo "Syncing API configuration to node ".$node."... ";
             $resp = api_request(
                 $protocol."://".$node.":".$port."/api/v1/system/api/sync",
                 "PUT",
@@ -1177,21 +1175,21 @@ function sync() {
                         continue;
                     } else {
                         log_error("API sync failure (".$node."): Sync received return code ".strval($resp["return"]));
-                        echo "failed. Received return code ".strval($resp["return"])."from node. (".$node.")".PHP_EOL;
+                        echo "failed. Received return code ".strval($resp["return"]).".".PHP_EOL;
                         continue;
                     }
                 } else {
                     log_error("API sync failure (".$node."): Sync received unexpected response");
-                    echo "failed. Received unexpected response. (".$node.")".PHP_EOL;
+                    echo "failed. Received unexpected response.".PHP_EOL;
                     continue;
                 }
             } else {
                 log_error("API sync failure (".$node."): No response received from node");
-                echo "failed. No response received from node. (".$node.")".PHP_EOL;
+                echo "failed. No response received from node.".PHP_EOL;
                 continue;
             }
         }
     } else {
-        echo "failed. API sync is not configured.".PHP_EOL;
+        echo "Syncing API configuration... not configured.".PHP_EOL;
     }
 }

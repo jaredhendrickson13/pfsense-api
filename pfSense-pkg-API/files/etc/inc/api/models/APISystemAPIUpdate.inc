@@ -30,6 +30,9 @@ class APISystemAPIUpdate extends APIModel {
         $this->config["installedpackages"]["package"][APITools\get_api_config()[0]]["conf"] = $this->validated_data;
         $this->write_config();
 
+        # Sync changes to HA nodes if enabled
+        $this->__sync();
+
         # Remove sensitive values
         unset($this->validated_data["server_key"]);
         unset($this->validated_data["hasync_password"]);
@@ -218,6 +221,13 @@ class APISystemAPIUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(1024);
             }
         }
+    }
+
+    private function __sync() {
+        # Use ob_start()/ob_end_clean() to prevent sync() from printing output
+        ob_start();
+        APITools\sync();
+        ob_end_clean();
     }
 
     public function validate_payload() {

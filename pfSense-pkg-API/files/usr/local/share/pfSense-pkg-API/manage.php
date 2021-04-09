@@ -81,7 +81,7 @@ function restore() {
 }
 
 function sync() {
-    APITools\sync(true);
+    APITools\sync();
 }
 
 function update() {
@@ -124,6 +124,7 @@ function rotate_server_key() {
     echo "Rotating API server key... ";
     APITools\create_jwt_server_key(true);
     echo "done.".PHP_EOL;
+    sync();
 }
 
 function version() {
@@ -160,6 +161,7 @@ elseif (in_array($argv[1], ["backup"])) {
 # RESTORE COMMAND
 elseif (in_array($argv[1], ["restore"])) {
     restore();
+    sync();
 }
 # SYNC COMMAND
 elseif (in_array($argv[1], ["sync"])) {
@@ -192,6 +194,6 @@ elseif (in_array($argv[1], ["help", null])) {
 }
 # UNKNOWN COMMAND/DEFAULT
 else {
-    echo "Unknown command".PHP_EOL.PHP_EOL;
+    echo "Error: Unknown command".PHP_EOL.PHP_EOL;
     help();
 }
