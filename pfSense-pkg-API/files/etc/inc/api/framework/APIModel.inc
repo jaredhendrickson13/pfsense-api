@@ -106,7 +106,8 @@ class APIModel {
     }
 
     private function check_authentication() {
-        $this->client = new APIAuth($this->privileges, $this->set_auth_mode, $this->retain_read_mode);
+        $read_only = (isset(APITools\get_api_config()[1]["readonly"]) and $this->retain_read_mode) ? true : false;
+        $this->client = new APIAuth($this->privileges, $this->set_auth_mode, $read_only);
         if ($this->requires_auth === true) {
             if (!$this->client->is_authenticated) {
                 $this->errors[] = APIResponse\get(3);

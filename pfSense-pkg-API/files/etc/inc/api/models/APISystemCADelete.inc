@@ -21,43 +21,59 @@ class APISystemCADelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-certmanager"];
+        $this->privileges = ["page-all", "page-system-camanager"];
         $this->change_note = "Deleted CA certificate via API";
     }
 
     public function action() {
-        $ca_del = $this->config["ca"][$this->validated_data["id"]];    // Save our cert we are deleting
-        if (!empty($ca_del)) {
-            unset($this->config["ca"][$this->validated_data["id"]]);    // Delete our cert
-            $this->write_config();    // Apply our configuration change
-        } else {
-            return APIResponse\get(1009);
-        }
+        # Remove the CA from configuration and reapply the truststore
+        unset($this->config["ca"][$this->id]);
+        $this->write_config();
+        ca_setup_trust_store();
 
-        return APIResponse\get(0, $ca_del);
+        return APIResponse\get(0, $this->validated_data);
     }
 
     public function validate_payload() {
+        $this->__validate_refid();
+        $this->__validate_descr();
+
+        # Return an error if there was no matching CA
+        if (!isset($this->id)) {
+            $this->errors[] = APIResponse\get(1009);
+        }
+        # Return an error if the CA is in use
+        if (cert_in_use($this->validated_data["refid"])) {
+            $this->errors[] = APIResponse\get(1034);
+        }
+
+    }
+
+    private function __validate_refid() {
+        # Check for our optional 'refid' value
         if (isset($this->initial_data['refid'])) {
-            $refid = $this->initial_data['refid'];
-            // Loop through our certificates and find a match
+            # Loop through our certificates and find a match
             foreach ($this->config["ca"] as $i => $c) {
-                if ($c["refid"] === $refid) {
-                    $this->validated_data["id"] = $i;
+                if ($c["refid"] === $this->initial_data["refid"]) {
+                    $this->id = $i;
+                    $this->validated_data = $this->config["ca"][$this->id];
                     break;
                 }
             }
-        } elseif (isset($this->initial_data['descr'])) {
-            $descr = $this->initial_data['descr'];
-            // Loop through our certificates and find a match
-            foreach ($this->config["cert"] as $i => $c) {
-                if ($c["descr"] === $descr) {
-                    $this->validated_data["id"] = $i;
+        }
+    }
+
+    private function __validate_descr() {
+        # Check for our optional 'descr' value if a refid was not specified
+        if (isset($this->initial_data['descr']) and !isset($this->initial_data["refid"])) {
+            # Loop through our certificates and find a match
+            foreach ($this->config["ca"] as $i => $c) {
+                if ($c["descr"] === $this->initial_data["descr"]) {
+                    $this->id = $i;
+                    $this->validated_data = $this->config["ca"][$this->id];
                     break;
                 }
             }
-        } elseif (isset($this->initial_data['id'])) {
-            $this->validated_data["id"] = $this->initial_data['id'];
         }
     }
 }

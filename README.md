@@ -6248,7 +6248,7 @@ URL: https://{{$hostname}}/api/v1/system/arp
 
 Add a new CA certificate.<br><br>
 
-_Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]
 
 
 ***Endpoint:***
@@ -6266,9 +6266,12 @@ URL: https://{{$hostname}}/api/v1/system/ca
 | Key | Value | Description |
 | --- | ------|-------------|
 | method | string | Set the method used to add the CA. Current supported methods (`import`) |
-| cert | string | Specify the Base64 encoded PEM CA certificate to import |
-| key | string | Specify the corresponding Base64 encoded CA certificate key |
 | descr | string | Set a descriptive name for the certificate |
+| trust | boolean | Specify `true` if you would like the system to trust this CA (optional) |
+| randomserial | boolean | Specify `true` if you would like certificates signed by this CA to utilize randomized serial numbers (optional) |
+| crt | string | Specify the Base64 encoded PEM CA certificate to import |
+| prv | string | Specify the corresponding Base64 encoded CA certificate key |
+| serial | integer | Specify the serial number to be assigned to the next certificate signed by this CA. Defaults to 1. (optional) |
 
 
 
@@ -6277,10 +6280,9 @@ URL: https://{{$hostname}}/api/v1/system/ca
 ```js        
 {
 	"method": "import",
-	"cert": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZxekNDQTVPZ0F3SUJBZ0lVQi9rT2RoMzdTZnRxeHRqL1MxSTRkUTQyYXRvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWxWVU1RMHdDd1lEVlFRSERBUlBjbVZ0TVNFdwpId1lEVlFRS0RCaEpiblJsY201bGRDQlhhV1JuYVhSeklGQjBlU0JNZEdReEZ6QVZCZ05WQkFNTURuUmxjM1F1CmMyVmpiV1YwTG1Odk1CNFhEVEl3TURJd05ESXdNelV3...",
-	"key": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQ1N3d2dna29BZ0VBQW9JQ0FRREQ5RkNLU1U3SmY0QngKeWlKNkNOWGhOckI0ZVhjTk9TTm9GUVJIbXlsV2dHbEN5djMydFdicmF3RFhhQzk2aVpOSTFzNG5qWTdQT3BlWgpoNmFlaTJ5NllheS9VWWtOUkZGQmp4WlZlLzRwS2pKeXBQRlFBUlpMVko2TlNXaU5raGkwbDlqeWtacTlEbkFnCk1mclZyUEo1YktDM3JJVV...",
-	"descr": "webGui Cert",
-	"active": true
+	"crt": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZxekNDQTVPZ0F3SUJBZ0lVQi9rT2RoMzdTZnRxeHRqL1MxSTRkUTQyYXRvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWxWVU1RMHdDd1lEVlFRSERBUlBjbVZ0TVNFdwpId1lEVlFRS0RCaEpiblJsY201bGRDQlhhV1JuYVhSeklGQjBlU0JNZEdReEZ6QVZCZ05WQkFNTURuUmxjM1F1CmMyVmpiV1YwTG1Odk1CNFhEVEl3TURJd05ESXdNelV3...",
+	"prv": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQ1N3d2dna29BZ0VBQW9JQ0FRREQ5RkNLU1U3SmY0QngKeWlKNkNOWGhOckI0ZVhjTk9TTm9GUVJIbXlsV2dHbEN5djMydFdicmF3RFhhQzk2aVpOSTFzNG5qWTdQT3BlWgpoNmFlaTJ5NllheS9VWWtOUkZGQmp4WlZlLzRwS2pKeXBQRlFBUlpMVko2TlNXaU5raGkwbDlqeWtacTlEbkFnCk1mclZyUEo1YktDM3JJVV...",
+	"descr": "TEST CA",
 }
 ```
 
@@ -6291,7 +6293,7 @@ URL: https://{{$hostname}}/api/v1/system/ca
 
 Delete an existing CA.<br><br>
 
-_Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]
 
 
 ***Endpoint:***
@@ -6308,9 +6310,8 @@ URL: https://{{$hostname}}/api/v1/system/ca
 
 | Key | Value | Description |
 | --- | ------|-------------|
-| refid | string | Specify the refid of the CA to delete (required if `id` and `descr` are not defined) |
-| id | string | Specify the id number of the CA to delete (required if `refid` and `descr` are not defined) |
-| descr | string | Specify the description of the certificate to delete (required if `id` and `refid` are not defined) _Note: if multiple CA exist with the same name, only the first matching CA will be deleted_ |
+| refid | string | Specify the refid of the CA to delete (required if `descr` is  not defined) |
+| descr | string | Specify the description of the certificate to delete (required if `refid` is not defined) _Note: if multiple CA exist with the same name, only the first matching CA will be deleted_ |
 
 
 
@@ -6329,7 +6330,7 @@ URL: https://{{$hostname}}/api/v1/system/ca
 
 Read installed CAs.<br><br>
 
-_Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]
 
 
 ***Endpoint:***

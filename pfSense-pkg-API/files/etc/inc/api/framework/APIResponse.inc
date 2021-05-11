@@ -278,6 +278,30 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "An HA sync password is required when HA sync is enabled"
         ],
+        1031 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate management method is required"
+        ],
+        1032 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unsupported certificate management method specified"
+        ],
+        1033 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate serial number must be 1 or greater"
+        ],
+        1034 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate cannot be deleted while in use"
+        ],
 
         // 2000-2999 reserved for /services API calls
         2000 => [
