@@ -40,7 +40,7 @@ class APIUnitTestServicesDHCPdStaticMapping(unit_test_framework.APIUnitTest):
                 "gateway": "192.168.1.1",
                 "arp_table_static_entry": True
             },
-            "resp_time": 5    # Allow a few seconds to reload the DHCP service
+            "resp_time": 12    # Allow a few seconds to reload the DHCP service
         }
     ]
     put_tests = [
@@ -58,7 +58,7 @@ class APIUnitTestServicesDHCPdStaticMapping(unit_test_framework.APIUnitTest):
                 "dnsserver": ["8.8.8.8", "8.8.4.4", "1.1.1.1"],
                 "domainsearchlist": ["updated.example.com", "extra.example.com"],
                 "gateway": "192.168.1.2",
-                "arp_table_static_entry": False
+                "arp_table_static_entry": True
             },
             "resp_time": 5    # Allow a few seconds to reload the DHCP service
         }

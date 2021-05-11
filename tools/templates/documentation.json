@@ -6049,6 +6049,171 @@
 					"_postman_isSubFolder": true
 				},
 				{
+					"name": "CA",
+					"item": [
+						{
+							"name": "Read System CAs",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/ca",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"ca"
+									]
+								},
+								"description": "Read installed CAs.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Create System CA",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"method\": \"import\",\n\t\"cert\": \"LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZxekNDQTVPZ0F3SUJBZ0lVQi9rT2RoMzdTZnRxeHRqL1MxSTRkUTQyYXRvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWxWVU1RMHdDd1lEVlFRSERBUlBjbVZ0TVNFdwpId1lEVlFRS0RCaEpiblJsY201bGRDQlhhV1JuYVhSeklGQjBlU0JNZEdReEZ6QVZCZ05WQkFNTURuUmxjM1F1CmMyVmpiV1YwTG1Odk1CNFhEVEl3TURJd05ESXdNelV3...\",\n\t\"key\": \"LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQ1N3d2dna29BZ0VBQW9JQ0FRREQ5RkNLU1U3SmY0QngKeWlKNkNOWGhOckI0ZVhjTk9TTm9GUVJIbXlsV2dHbEN5djMydFdicmF3RFhhQzk2aVpOSTFzNG5qWTdQT3BlWgpoNmFlaTJ5NllheS9VWWtOUkZGQmp4WlZlLzRwS2pKeXBQRlFBUlpMVko2TlNXaU5raGkwbDlqeWtacTlEbkFnCk1mclZyUEo1YktDM3JJVV...\",\n\t\"descr\": \"webGui Cert\",\n\t\"active\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/ca?method=string&cert=string&key=string&descr=string&active=boolean",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"ca"
+									],
+									"query": [
+										{
+											"key": "method",
+											"value": "string",
+											"description": "Set the method used to add the CA. Current supported methods (`import`)"
+										},
+										{
+											"key": "cert",
+											"value": "string",
+											"description": "Specify the Base64 encoded PEM CA certificate to import"
+										},
+										{
+											"key": "key",
+											"value": "string",
+											"description": "Specify the corresponding Base64 encoded CA certificate key"
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Set a descriptive name for the certificate"
+										}
+									]
+								},
+								"description": "Add a new CA certificate.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete System CA",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"refid\": \"0\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/ca?refid=string&id=string&descr=string",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"ca"
+									],
+									"query": [
+										{
+											"key": "refid",
+											"value": "string",
+											"description": "Specify the refid of the CA to delete (required if `id` and `descr` are not defined)"
+										},
+										{
+											"key": "id",
+											"value": "string",
+											"description": "Specify the id number of the CA to delete (required if `refid` and `descr` are not defined)"
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Specify the description of the certificate to delete (required if `id` and `refid` are not defined) _Note: if multiple CA exist with the same name, only the first matching CA will be deleted_"
+										}
+									]
+								},
+								"description": "Delete an existing CA.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that create, read, update and delete system SSL/TLS Certificate Authorities.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae501696-89ce-4113-9ac2-fad15f5bee68",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "1df86559-6031-4647-8cc0-4570403630fd",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "API",
 					"item": [
 						{

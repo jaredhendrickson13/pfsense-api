@@ -782,6 +782,12 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Delete System ARP Table](#1-delete-system-arp-table)
   * [Read System ARP Table](#2-read-system-arp-table)
 
+* [SYSTEM/CA](#systemca)
+
+  * [Create System CA](#1-create-system-ca)
+  * [Delete System CA](#2-delete-system-ca)
+  * [Read System CAs](#3-read-system-cas)
+
 * [SYSTEM/CERTIFICATE](#systemcertificate)
 
   * [Create System Certificates](#1-create-system-certificates)
@@ -6219,6 +6225,119 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-diagnost
 Method: GET
 Type: RAW
 URL: https://{{$hostname}}/api/v1/system/arp
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## SYSTEM/CA
+
+
+
+### 1. Create System CA
+
+
+Add a new CA certificate.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/system/ca
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| method | string | Set the method used to add the CA. Current supported methods (`import`) |
+| cert | string | Specify the Base64 encoded PEM CA certificate to import |
+| key | string | Specify the corresponding Base64 encoded CA certificate key |
+| descr | string | Set a descriptive name for the certificate |
+
+
+
+***Body:***
+
+```js        
+{
+	"method": "import",
+	"cert": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZxekNDQTVPZ0F3SUJBZ0lVQi9rT2RoMzdTZnRxeHRqL1MxSTRkUTQyYXRvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWxWVU1RMHdDd1lEVlFRSERBUlBjbVZ0TVNFdwpId1lEVlFRS0RCaEpiblJsY201bGRDQlhhV1JuYVhSeklGQjBlU0JNZEdReEZ6QVZCZ05WQkFNTURuUmxjM1F1CmMyVmpiV1YwTG1Odk1CNFhEVEl3TURJd05ESXdNelV3...",
+	"key": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQ1N3d2dna29BZ0VBQW9JQ0FRREQ5RkNLU1U3SmY0QngKeWlKNkNOWGhOckI0ZVhjTk9TTm9GUVJIbXlsV2dHbEN5djMydFdicmF3RFhhQzk2aVpOSTFzNG5qWTdQT3BlWgpoNmFlaTJ5NllheS9VWWtOUkZGQmp4WlZlLzRwS2pKeXBQRlFBUlpMVko2TlNXaU5raGkwbDlqeWtacTlEbkFnCk1mclZyUEo1YktDM3JJVV...",
+	"descr": "webGui Cert",
+	"active": true
+}
+```
+
+
+
+### 2. Delete System CA
+
+
+Delete an existing CA.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+Type: RAW
+URL: https://{{$hostname}}/api/v1/system/ca
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| refid | string | Specify the refid of the CA to delete (required if `id` and `descr` are not defined) |
+| id | string | Specify the id number of the CA to delete (required if `refid` and `descr` are not defined) |
+| descr | string | Specify the description of the certificate to delete (required if `id` and `refid` are not defined) _Note: if multiple CA exist with the same name, only the first matching CA will be deleted_ |
+
+
+
+***Body:***
+
+```js        
+{
+	"refid": "0"
+}
+```
+
+
+
+### 3. Read System CAs
+
+
+Read installed CAs.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/system/ca
 ```
 
 
