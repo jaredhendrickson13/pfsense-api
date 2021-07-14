@@ -102,14 +102,7 @@ function system_get_sysctls() {
 }
 
 function activate_sysctls() {
-    global $config, $g, $sysctls, $ipsec_filter_sysctl;
-
-    if (!is_array($sysctls)) {
-        $sysctls = array();
-    }
-
-    $ipsec_filtermode = empty($config['ipsec']['filtermode']) ? 'enc' : $config['ipsec']['filtermode'];
-    $sysctls = array_merge($sysctls, $ipsec_filter_sysctl[$ipsec_filtermode]);
+    global $config, $g, $sysctls;
 
     if (is_array($config['sysctl']) && is_array($config['sysctl']['item'])) {
         foreach ($config['sysctl']['item'] as $tunable) {
@@ -2520,22 +2513,6 @@ function system_identify_specific_platform() {
     $_gb = exec('/bin/kenv -q smbios.system.product 2>/dev/null', $product);
     $_gb = exec('/bin/kenv -q smbios.system.maker 2>/dev/null', $maker);
     $_gb = exec('/bin/kenv -q smbios.bios.version 2>/dev/null', $bios);
-
-    $vm = get_single_sysctl('kern.vm_guest');
-
-    // This switch needs to be expanded to include other virtualization systems
-    switch ($vm) {
-        case "none" :
-            break;
-
-        case "kvm" :
-            return (array('name' => 'KVM', 'descr' => 'KVM Guest'));
-            break;
-    }
-
-    if ($maker[0] == "QEMU") {
-        return (array('name' => 'QEMU', 'descr' => 'QEMU'));
-    }
 
     // AWS can only be identified via the bios version
     if (stripos($bios[0], "amazon") !== false) {
