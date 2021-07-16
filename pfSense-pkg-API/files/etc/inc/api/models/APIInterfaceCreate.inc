@@ -667,12 +667,12 @@ class APIInterfaceCreate extends APIModel {
             $track_prefix = $this->initial_data["track6-prefix-id-hex"];
             // Check that our gateway is a valid IPv4 address
             if (is_numeric($track_prefix) and ctype_xdigit(strval($track_prefix))) {
-                $this->validated_data["track6-prefix-id--hex"] = intval($track_prefix);
+                $this->validated_data["track6-prefix-id"] = intval($track_prefix);
             } else {
                 $this->errors[] = APIResponse\get(3040);
             }
         } else {
-            $this->validated_data["track6-prefix-id--hex"] = 0;
+            $this->validated_data["track6-prefix-id"] = 0;
         }
     }
 
