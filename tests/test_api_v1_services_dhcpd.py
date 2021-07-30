@@ -28,7 +28,7 @@ class APIUnitTestServicesDHCPd(unit_test_framework.APIUnitTest):
                 "range_from": "192.168.1.1",
                 "range_to": "192.168.1.254",
                 "dnsserver": ["1.1.1.1"],
-                "gateway": "192.168.1.193",
+                "gateway": "192.168.1.1",
                 "domainsearchlist": ["pfsense-api.jaredhendrickson.com", "pfsense-api.jh.co"],
                 "domain": "pfsense-api.jaredhendrickson.com",
                 "mac_allow": ["00:00:00:01:E5:FF", "00:00:00:01:E5"],
