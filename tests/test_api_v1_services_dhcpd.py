@@ -25,7 +25,7 @@ class APIUnitTestServicesDHCPd(unit_test_framework.APIUnitTest):
                 "enable": True,
                 "ignorebootp": False,
                 "denyunknown": False,
-                "range_from": "192.168.1.193",
+                "range_from": "192.168.1.1",
                 "range_to": "192.168.1.254",
                 "dnsserver": ["1.1.1.1"],
                 "gateway": "192.168.1.193",
