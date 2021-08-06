@@ -26,7 +26,7 @@ class APIUnitTestServicesDHCPd(unit_test_framework.APIUnitTest):
                 "ignorebootp": False,
                 "denyunknown": False,
                 "range_from": "192.168.1.1",
-                "range_to": "192.168.1.254",
+                "range_to": "192.168.1.100",
                 "dnsserver": ["1.1.1.1"],
                 "gateway": "192.168.1.1",
                 "domainsearchlist": ["pfsense-api.jaredhendrickson.com", "pfsense-api.jh.co"],
