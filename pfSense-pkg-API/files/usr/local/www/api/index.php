@@ -16,13 +16,14 @@
 include_once("util.inc");
 include_once("guiconfig.inc");
 require_once("api/framework/APITools.inc");
+require_once("api/models/APISystemAPIVersionRead.inc");
 
 # Initialize the pfSense UI page (note: $pgtitle must be defined before including head.inc)
 $pgtitle = array(gettext('System'), gettext('API'), gettext('Settings'));
 include('head.inc');
 echo "<link rel='stylesheet' href='/css/api.css'/>";
 echo "<script type='application/javascript' src='/js/api.js'></script>";
-$tab_array = [[gettext("Settings"), true, "/api/"], [gettext("Documentation"), false, "/api/documentation/"]];
+$tab_array = [[gettext("Settings"), true, "/api/"], [gettext("Documentation"), false, "/api/documentation/"], [gettext("Update"), false, "/api/update/"]];
 display_top_tabs($tab_array, true);    # Ensure the tabs are written to the top of page
 
 # Variables
