@@ -58,6 +58,15 @@ class APISystemAPIVersionRead extends APIModel {
         return $version;
     }
 
+    public static function get_latest_api_release_date() {
+        # Pull the current API version from Github's API
+        $api_resp = shell_exec("curl -s https://api.github.com/repos/jaredhendrickson13/pfsense-api/releases/latest");
+
+        # Format the version to a standard semantic format (x.x.x)
+        $release_date = json_decode($api_resp, true)["published_at"];
+        return $release_date;
+    }
+
     public static function is_update_available() {
         # Check if the current version is less than the latest version
         $curr_ver_num = intval(str_replace(".", "", self::get_api_version()));

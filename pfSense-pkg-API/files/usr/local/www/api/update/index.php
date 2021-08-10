@@ -29,6 +29,9 @@ display_top_tabs($tab_array, true);    # Ensure the tabs are written to the top 
 # Variables
 global $config;
 $form = new Form(false);
+$curr_ver = APISystemAPIVersionRead::get_api_version();
+$latest_ver = APISystemAPIVersionRead::get_latest_api_version();
+$latest_ver_date = date("Y-m-d", strtotime(APISystemAPIVersionRead::get_latest_api_release_date()));
 
 # On POST, start the update process
 if ($_POST["confirm"]) {
@@ -39,8 +42,11 @@ if ($_POST["confirm"]) {
 
 # Populate our form
 $update_section = new Form_Section('Update Settings');
-$update_section->addInput(new Form_StaticText('Current Version', APISystemAPIVersionRead::get_api_version()));
-$update_section->addInput(new Form_StaticText('Latest Version', APISystemAPIVersionRead::get_latest_api_version()));
+$update_section->addInput(new Form_StaticText('Current Version', $curr_ver));
+$update_section->addInput(new Form_StaticText(
+    'Latest Version',
+    $latest_ver." - <a href='https://github.com/jaredhendrickson13/pfsense-api/releases/tag/v".$latest_ver."'>View Release</a>"." - Released on ".$latest_ver_date
+));
 
 # Only display the update button if an update is available
 if (APISystemAPIVersionRead::is_update_available()) {
@@ -50,4 +56,5 @@ if (APISystemAPIVersionRead::is_update_available()) {
 # Display our populated form
 $form->add($update_section);
 print $form;
+
 include('foot.inc');
