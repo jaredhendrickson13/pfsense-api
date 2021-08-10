@@ -2454,7 +2454,7 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Firewall rule dnpipe and pdnpip queue and a virtual interface cannot be selected"
+            "message" => "Firewall rule dnpipe and pdnpipe queue and a virtual interface cannot be selected"
         ],
         4226 => [
             "status" => "bad request",

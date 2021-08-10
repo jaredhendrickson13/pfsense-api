@@ -1021,6 +1021,19 @@ URL: https://{{$hostname}}/api/v1/firewall/alias
 
 
 
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | string | Name of existing alias to modify. Unlikely other endpoint, this field does NOT use the numeric pfSense ID to locate objects. |
+| name | string | Change name of alias (optional) |
+| type | string | Change type of alias. Alias type can only be changed when the targetted alias is not in use (optional) |
+| descr | string | Change alias description (optional) |
+| address | string or array | Overwrite existing alias addresses with new addresses. Multiple values may be passed in as array, singular values may be passed in as string (optional) |
+| detail | string or array | Overwrite existing alias address details with new details. Multiple values may be passed in as array, singular values may be passed in as string. Detail values must match index of alias addresses (optional) |
+
+
+
 ***Body:***
 
 ```js        

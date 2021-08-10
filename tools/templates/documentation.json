@@ -2063,38 +2063,32 @@
 										{
 											"key": "id",
 											"value": "string",
-											"description": "Name of existing alias to modify. ",
-											"disabled": true
+											"description": "Name of existing alias to modify. Unlikely other endpoint, this field does NOT use the numeric pfSense ID to locate objects."
 										},
 										{
 											"key": "name",
 											"value": "string",
-											"description": "Change name of alias (optional)",
-											"disabled": true
+											"description": "Change name of alias (optional)"
 										},
 										{
 											"key": "type",
 											"value": "string",
-											"description": "Change type of alias. Alias type can only be changed when the targetted alias is not in use (optional)",
-											"disabled": true
+											"description": "Change type of alias. Alias type can only be changed when the targetted alias is not in use (optional)"
 										},
 										{
 											"key": "descr",
 											"value": "string",
-											"description": "Change alias description (optional)",
-											"disabled": true
+											"description": "Change alias description (optional)"
 										},
 										{
 											"key": "address",
 											"value": "string or array",
-											"description": "Overwrite existing alias addresses with new addresses. Multiple values may be passed in as array, singular values may be passed in as string (optional)",
-											"disabled": true
+											"description": "Overwrite existing alias addresses with new addresses. Multiple values may be passed in as array, singular values may be passed in as string (optional)"
 										},
 										{
 											"key": "detail",
 											"value": "string or array",
-											"description": "Overwrite existing alias address details with new details. Multiple values may be passed in as array, singular values may be passed in as string. Detail values must match index of alias addresses (optional)",
-											"disabled": true
+											"description": "Overwrite existing alias address details with new details. Multiple values may be passed in as array, singular values may be passed in as string. Detail values must match index of alias addresses (optional)"
 										}
 									]
 								},

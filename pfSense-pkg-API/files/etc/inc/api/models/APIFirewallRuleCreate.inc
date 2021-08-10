@@ -254,13 +254,13 @@ class APIFirewallRuleCreate extends APIModel {
                     if ($this->initial_data["pdnpipe"] !== $this->validated_data["dnpipe"]) {
                         # Determine pipe types
                         $dnpipe_type = $dnqueues[$this->validated_data['dnpipe']][0];
-                        $pdnpipe_type = $dnqueues[$_POST['pdnpipe']][0];
+                        $pdnpipe_type = $dnqueues[$this->initial_data['pdnpipe']][0];
 
-                        # Ensure the dnpipe and pdnpipe types do not match
+                        # Ensure the dnpipe and pdnpipe types match
                         if (($dnpipe_type === "?" and $pdnpipe_type !== "?") or ($pdnpipe_type === "?" and $dnpipe_type !== "?")) {
-                            $this->validated_data["pdnpipe"] = $this->initial_data["pdnpipe"];
-                        } else {
                             $this->errors[] = APIResponse\get(4225);
+                        } else {
+                            $this->validated_data["pdnpipe"] = $this->initial_data["pdnpipe"];
                         }
                     } else {
                         $this->errors[] = APIResponse\get(4224);
