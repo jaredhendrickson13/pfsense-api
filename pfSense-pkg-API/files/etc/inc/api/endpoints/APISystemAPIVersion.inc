@@ -13,23 +13,14 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-require_once("api/framework/APIModel.inc");
-require_once("api/framework/APIResponse.inc");
+require_once("api/framework/APIEndpoint.inc");
 
-
-class APISystemAPIRead extends APIModel {
-    # Create our method constructor
+class APISystemAPIVersion extends APIEndpoint {
     public function __construct() {
-        parent::__construct();
+        $this->url = "/api/v1/system/api/version";
     }
 
-    public function action() {
-        # Retrieve our API configuration and remove sensitive values
-        $api_config = APITools\get_api_config()[1];
-
-        unset($api_config["server_key"]);
-        unset($api_config["hasync_password"]);
-
-        return APIResponse\get(0, $api_config);
+    protected function get() {
+        return (new APISystemAPIVersionRead())->call();
     }
 }

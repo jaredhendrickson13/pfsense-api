@@ -6391,6 +6391,41 @@
 								"description": "Read our error code library. This function does NOT require authentication and is intended to be used by third-party scripts/software to translate error codes to their full error message."
 							},
 							"response": []
+						},
+						{
+							"name": "Read System API Version",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/api/version",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"api",
+										"version"
+									]
+								},
+								"description": "Read the current API version and locate available version updates.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]"
+							},
+							"response": []
 						}
 					],
 					"description": "API endpoints that read our current API configuration.",

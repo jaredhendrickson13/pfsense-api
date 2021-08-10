@@ -775,7 +775,8 @@ There is no limit to API calls at this time but is important to note that pfSens
 
   * [Read System API Configuration](#1-read-system-api-configuration)
   * [Read System API Error Library](#2-read-system-api-error-library)
-  * [Update System API Configuration](#3-update-system-api-configuration)
+  * [Read System API Version](#3-read-system-api-version)
+  * [Update System API Configuration](#4-update-system-api-configuration)
 
 * [SYSTEM/ARP](#systemarp)
 
@@ -6128,7 +6129,35 @@ URL: https://{{$hostname}}/api/v1/system/api/error
 
 
 
-### 3. Update System API Configuration
+### 3. Read System API Version
+
+
+Read the current API version and locate available version updates.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/system/api/version
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 4. Update System API Configuration
 
 
 Update the API configuration.<br><br>
