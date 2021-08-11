@@ -10924,6 +10924,83 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "DIAGNOSTICS",
+			"item": [
+				{
+					"name": "Execute shell command",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"shell_cmd\": \"echo 'Test command'\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://{{$hostname}}/api/v1/diagnostics/command_prompt?client-id=string&client-token=string&shell_cmd=string",
+							"protocol": "https",
+							"host": [
+								"{{$hostname}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"diagnostics",
+								"command_prompt"
+							],
+							"query": [
+								{
+									"key": "shell_cmd",
+									"value": "string",
+									"description": "Specify the shell command to execute on pfSense."
+								}
+							]
+						},
+						"description": "Receive a temporary access token using your pfSense local database credentials.<br><br>\\n\\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-command`]"
+					},
+					"response": []
+				}
+			],
+			"description": "API endpoints used to diagnose system issues or extend pfSense functionality.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "93f2c033-9d0a-47b1-9a5b-a1b9a0d4c305",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "3c7c951d-7fcc-4cb8-9782-01add869eca4",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"event": [
