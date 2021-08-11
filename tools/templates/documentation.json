@@ -10972,7 +10972,7 @@
 								}
 							]
 						},
-						"description": "Receive a temporary access token using your pfSense local database credentials.<br><br>\\n\\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-command`]"
+						"description": "Execute a shell command.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-command`]"
 					},
 					"response": []
 				}

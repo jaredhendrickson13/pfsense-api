@@ -505,6 +505,10 @@ There is no limit to API calls at this time but is important to note that pfSens
 
   * [Request Access Token](#1-request-access-token)
 
+* [DIAGNOSTICS](#diagnostics)
+
+  * [Execute shell command](#1-execute-shell-command)
+
 * [FIREWALL/ALIAS](#firewallalias)
 
   * [Create Firewall Aliases](#1-create-firewall-aliases)
@@ -905,6 +909,47 @@ URL: https://{{$hostname}}/api/v1/access_token
 {
 	"client-id": "admin", 
 	"client-token": "pfsense"
+}
+```
+
+
+
+## DIAGNOSTICS
+API endpoints used to diagnose system issues or extend pfSense functionality.
+
+
+
+### 1. Execute shell command
+
+
+Execute a shell command.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-command`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/diagnostics/command_prompt
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| shell_cmd | string | Specify the shell command to execute on pfSense. |
+
+
+
+***Body:***
+
+```js        
+{
+	"shell_cmd": "echo 'Test command'"
 }
 ```
 
