@@ -50,22 +50,20 @@ class APISystemAPIVersionRead extends APIModel {
     }
 
     public static function get_latest_api_version() {
-        # Pull the current API version from Github's API
-        $api_resp = shell_exec("curl -s https://api.github.com/repos/jaredhendrickson13/pfsense-api/releases/latest");
-
-        # Format the version to a standard semantic format (x.x.x)
-        $version = json_decode($api_resp, true)["tag_name"];
-        $version = str_replace("v", "", $version);
-        return $version;
+        # Fetch our latest version and format it semantically (x.x.x)
+        $latest_version = array_key_first(self::get_all_available_versions());
+        $latest_version = str_replace("v", "", $latest_version);
+        return $latest_version;
     }
 
     public static function get_latest_api_release_date() {
-        # Pull the current API version from Github's API
-        $api_resp = shell_exec("curl -s https://api.github.com/repos/jaredhendrickson13/pfsense-api/releases/latest");
-
-        # Format the version to a standard semantic format (x.x.x)
-        $release_date = json_decode($api_resp, true)["published_at"];
-        return $release_date;
+        # Loop through each release and locate the latest available releases creation date
+        foreach (self::get_github_releases()["releases"] as $release) {
+            # Check if this releases is latest available for our platform
+            if ($release["tag_name"] === "v".self::get_latest_api_version()) {
+                return $release["created_at"];
+            }
+        }
     }
 
     public static function is_update_available() {
@@ -75,24 +73,43 @@ class APISystemAPIVersionRead extends APIModel {
         return $curr_ver_num < $latest_ver_num;
     }
 
+    public static function get_github_releases() {
+        # Variables
+        $releases_file = "/usr/local/share/pfSense-pkg-API/releases.json";
+        $releases = json_decode(file_get_contents($releases_file), true);
+
+        # Check if our previous releases data is older than 120 seconds
+        if ($releases["last_updated"] + 120 < time()) {
+            # Pull the releases data from Github and rewrite the releases file
+            $api_resp = shell_exec("curl -s https://api.github.com/repos/jaredhendrickson13/pfsense-api/releases");
+            $api_resp = json_decode($api_resp, true);
+            $releases = ["last_updated" => time(), "releases" => $api_resp];
+            file_put_contents($releases_file, json_encode($releases));
+        }
+        return $releases;
+    }
+
     public static function get_all_available_versions() {
         # Variables
+        $pf_version = substr(APITools\get_pfsense_version()["version"], 0, 3);
         $versions = [];
         $count = 0;
-        $api_resp = shell_exec("curl -s https://api.github.com/repos/jaredhendrickson13/pfsense-api/releases");
-        $api_resp = json_decode($api_resp, true);
+        $releases = self::get_github_releases()["releases"];
 
         # Loop through each version and populate our version data
-        foreach ($api_resp as $version) {
-            # The first item of our list is the latest release, mark it as such.
-            if ($count === 0) {
-                $versions[$version["tag_name"]] = $version["name"]." - Latest";
-            } else {
-                $versions[$version["tag_name"]] = $version["name"];
+        foreach ($releases as $release) {
+            # Loop through the assets of each release and check if our version of pfSense is supported
+            foreach ($release["assets"] as $asset) {
+                if ($asset["name"] === "pfSense-".$pf_version."-pkg-API.txz") {
+                    # The first item of our list is the latest release, mark it as such.
+                    if ($count === 0) {
+                        $versions[$release["tag_name"]] = $release["name"]." - Latest";
+                        $count++;
+                    } else {
+                        $versions[$release["tag_name"]] = $release["name"];
+                    }
+                }
             }
-
-            # Increase the counter
-            $count++;
         }
         return $versions;
     }

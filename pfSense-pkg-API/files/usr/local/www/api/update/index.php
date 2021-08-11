@@ -23,7 +23,8 @@ $pgtitle = array(gettext('System'), gettext('API'), gettext('Update'));
 include('head.inc');
 echo "<link rel='stylesheet' href='/css/api.css'/>";
 echo "<script type='application/javascript' src='/js/api.js'></script>";
-$tab_array = [[gettext("Settings"), false, "/api/"], [gettext("Documentation"), false, "/api/documentation/"], [gettext("Update"), true, "/api/update/"]];
+$update_tab = (APISystemAPIVersionRead::is_update_available()) ? "Update (New Release Available)" : "Update";
+$tab_array = [[gettext("Settings"), false, "/api/"], [gettext("Documentation"), false, "/api/documentation/"], [gettext($update_tab), true, "/api/update/"]];
 display_top_tabs($tab_array, true);    # Ensure the tabs are written to the top of page
 
 # Variables
@@ -59,8 +60,7 @@ $update_settings_section->addInput(new Form_Select(
     $latest_ver,
     $all_vers
 ))->setHelp(
-    "Selects the version you'd like to update or rollback to.\n\nNote: this page is subject to Github's API rate limitations.
-    Excessively refreshing this page may result in a temporary block on your IP by Github. Please use this tool responsibly. "
+    "Selects the version you'd like to update or rollback to."
 );
 
 
