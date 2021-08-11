@@ -42,6 +42,7 @@ class APISystemAPIVersionRead extends APIModel {
                 # Locate the version and format it to a standard semantic version format (x.x.x)
                 $version = str_replace(" ", "", $pkg_line);
                 $version = explode(":", $version)[1];
+                $version = (strlen($version) === 3) ? $version.".0" : $version;
                 $version = str_replace("_", ".", $version);
                 return $version;
             }
@@ -72,5 +73,27 @@ class APISystemAPIVersionRead extends APIModel {
         $curr_ver_num = intval(str_replace(".", "", self::get_api_version()));
         $latest_ver_num = intval(str_replace(".", "", self::get_latest_api_version()));
         return $curr_ver_num < $latest_ver_num;
+    }
+
+    public static function get_all_available_versions() {
+        # Variables
+        $versions = [];
+        $count = 0;
+        $api_resp = shell_exec("curl -s https://api.github.com/repos/jaredhendrickson13/pfsense-api/releases");
+        $api_resp = json_decode($api_resp, true);
+
+        # Loop through each version and populate our version data
+        foreach ($api_resp as $version) {
+            # The first item of our list is the latest release, mark it as such.
+            if ($count === 0) {
+                $versions[$version["tag_name"]] = $version["name"]." - Latest";
+            } else {
+                $versions[$version["tag_name"]] = $version["name"];
+            }
+
+            # Increase the counter
+            $count++;
+        }
+        return $versions;
     }
 }

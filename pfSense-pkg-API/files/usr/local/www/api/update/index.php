@@ -32,29 +32,42 @@ $form = new Form(false);
 $curr_ver = APISystemAPIVersionRead::get_api_version();
 $latest_ver = APISystemAPIVersionRead::get_latest_api_version();
 $latest_ver_date = date("Y-m-d", strtotime(APISystemAPIVersionRead::get_latest_api_release_date()));
+$all_vers = APISystemAPIVersionRead::get_all_available_versions();
+$curr_ver_msg = (APISystemAPIVersionRead::is_update_available()) ? " - Update available" : " - Up-to-date";
+
 
 # On POST, start the update process
-if ($_POST["confirm"]) {
+if ($_POST["confirm"] and !empty($_POST["version"])) {
     # Start the update process in the background and print notice
-    shell_exec("nohup pfsense-api update > /dev/null &");
+    shell_exec("nohup pfsense-api revert ".$_POST["version"]." > /dev/null &");
     print_apply_result_box(0, "\nAPI update process has started and is running in the background. Check back in a few minutes.");
 }
 
-# Populate our form
-$update_section = new Form_Section('Update Settings');
-$update_section->addInput(new Form_StaticText('Current Version', $curr_ver));
-$update_section->addInput(new Form_StaticText(
+# Populate our update status form
+$update_status_section = new Form_Section('Update Status');
+$update_status_section->addInput(new Form_StaticText('Current Version', $curr_ver.$curr_ver_msg));
+$update_status_section->addInput(new Form_StaticText(
     'Latest Version',
     $latest_ver." - <a href='https://github.com/jaredhendrickson13/pfsense-api/releases/tag/v".$latest_ver."'>View Release</a>"." - Released on ".$latest_ver_date
 ));
 
-# Only display the update button if an update is available
-if (APISystemAPIVersionRead::is_update_available()) {
-    $form->addGlobal(new Form_Button('confirm', 'Confirm Update', null, 'fa-check'))->addClass('btn btn-sm btn-success');
-}
+# Populate our update settings form
+$update_settings_section = new Form_Section('Update Settings');
+$update_settings_section->addInput(new Form_Select(
+    'version',
+    'Select Version',
+    $latest_ver,
+    $all_vers
+))->setHelp(
+    "Selects the version you'd like to update or rollback to.\n\nNote: this page is subject to Github's API rate limitations.
+    Excessively refreshing this page may result in a temporary block on your IP by Github. Please use this tool responsibly. "
+);
+
 
 # Display our populated form
-$form->add($update_section);
+$form->addGlobal(new Form_Button('confirm', 'Confirm', null, 'fa-check'))->addClass('btn btn-sm btn-success');
+$form->add($update_status_section);
+$form->add($update_settings_section);
 print $form;
 
 include('foot.inc');
