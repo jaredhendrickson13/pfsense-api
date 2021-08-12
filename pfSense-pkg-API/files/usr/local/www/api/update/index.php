@@ -30,6 +30,7 @@ display_top_tabs($tab_array, true);    # Ensure the tabs are written to the top 
 # Variables
 global $config;
 $form = new Form(false);
+$pf_ver = APITools\get_pfsense_version()["version"];
 $curr_ver = APISystemAPIVersionRead::get_api_version();
 $latest_ver = APISystemAPIVersionRead::get_latest_api_version();
 $latest_ver_date = date("Y-m-d", strtotime(APISystemAPIVersionRead::get_latest_api_release_date()));
@@ -60,7 +61,9 @@ $update_settings_section->addInput(new Form_Select(
     $latest_ver,
     $all_vers
 ))->setHelp(
-    "Selects the version you'd like to update or rollback to."
+    "Select the version you'd like to update or rollback to. Only releases supporting pfSense ".$pf_ver." are shown. Use 
+    caution when reverting to a previous version of pfSense API as this can remove some features and/or introduce 
+    vulnerabilities that have since been patched in a later release."
 );
 
 
