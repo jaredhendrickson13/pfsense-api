@@ -29,6 +29,7 @@ require_once("filter.inc");
 require_once("shaper.inc");
 require_once("auth.inc");
 require_once("functions.inc");
+require_once("openvpn.inc");
 use Firebase\JWT\JWT;
 
 # Checks our content type header and parses the content accordingly

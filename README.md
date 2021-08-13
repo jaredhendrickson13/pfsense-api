@@ -771,6 +771,10 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Read Firewall Status Log](#3-read-firewall-status-log)
   * [Read System Status Log](#4-read-system-status-log)
 
+* [STATUS/OPENVPN](#statusopenvpn)
+
+  * [Read OpenVPN Status](#1-read-openvpn-status)
+
 * [STATUS/SYSTEM](#statussystem)
 
   * [Read System Status](#1-read-system-status)
@@ -6084,6 +6088,38 @@ URL: https://{{$hostname}}/api/v1/status/log/system
 
 
 
+## STATUS/OPENVPN
+
+
+
+### 1. Read OpenVPN Status
+
+
+Read the OpenVPN status.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-openvpn`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/status/openvpn
+```
+
+
+
+***Body:***
+
+```js        
+{
+    
+}
+```
+
+
+
 ## STATUS/SYSTEM
 
 
@@ -7773,3 +7809,4 @@ URL: https://{{$hostname}}/api/v1/user/privilege
 
 ---
 [Back to top](#pfsense-rest-api-documentation)
+> Made with &#9829; by [thedevsaddam](https://github.com/thedevsaddam) | Generated at: 2021-08-12 22:49:05 by [docgen](https://github.com/thedevsaddam/docgen)
