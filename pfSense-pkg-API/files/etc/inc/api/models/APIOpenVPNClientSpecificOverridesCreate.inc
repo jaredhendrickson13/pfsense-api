@@ -39,25 +39,30 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
         $server_ids = [];
 
         foreach ($server_list as $server) {
-            $server_ids[] = $server['vpnid'];
+            $server_ids[] = (int) $server['vpnid'];
         }
 
         if (isset($this->initial_data['server_list'])) {
             $ini_data_sl = explode(',', $this->initial_data['server_list']);
 
             foreach ($init_data_sl as $server_id) {
-                if (in_array($server_id, $server_ids)) {
+                if (!is_numeric($server_id))
+                {
+                    $this->errors[] = APIResponse\get(6029);
+                    break;
+                }
+                if (in_array((int) $server_id, $server_ids)) {
                     continue;
                 } else {
                     $this->errors[] = APIResponse\get(6029);
                     break;
                 }
             }
+
+            $this->validated_data["server_list"] = $this->initial_data['server_list'];
         } else {
             $this->validated_data["server_list"] = "";
         }
-
-        $this->validated_data["server_list"] = $this->initial_data['server_list'];
     }
 
     private function __validate_custom_options() {

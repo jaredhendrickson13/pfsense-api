@@ -2807,7 +2807,24 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Unknown Netbios Node Type. Valid options are: b, p, m, h"
         ],
-
+        6032 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Missing parameter 'refid'. This parameter is needed to identify the csc to delete."
+        ],
+        6033 => [
+            "status" => "Not found",
+            "code" => 404,
+            "return" => $id,
+            "message" => "Unknown refid."
+        ],
+        6034 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Missing parameter 'refid'. This parameter is needed to identify the csc to modify."
+        ],
 
     ];
     $response = $responses[(array_key_exists($id, $responses)) ? $id : 1];

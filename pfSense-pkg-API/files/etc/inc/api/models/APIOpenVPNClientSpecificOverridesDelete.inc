@@ -30,4 +30,21 @@ class APIUserDelete extends APIModel {
         $this->write_config();
         return APIResponse\get(0, $this->validated_data);
     }
+
+    private function __validate_refid() {
+        if (isset($this->initial_data['refid'])) {
+            if (array_key_exists((int) $this->initial_data['refid'], $this->config['openvpn']['openvpn-csc'])) {
+                $this->id = (int) $this->initial_data['refid'];
+                $this->validated_data['refid'] = $this->initial_data['refid'];
+            } else {
+                $this->errors[] = APIResponse\get(6033);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(6032);
+        }
+    }
+
+    public function validate_payload() {
+        $this->__validate_refid();
+    }
 }
