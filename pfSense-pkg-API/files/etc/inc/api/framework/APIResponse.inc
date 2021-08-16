@@ -2789,6 +2789,24 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Gateway ID does not exist"
         ],
+        6029 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown server id in server list"
+        ],
+        6030 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Parameter 'common_name' is missing"
+        ],
+        6031 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown Netbios Node Type. Valid options are: b, p, m, h"
+        ],
 
 
     ];
