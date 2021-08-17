@@ -16,7 +16,7 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-class APIUserDelete extends APIModel {
+class APIOpenVPNClientSpecificOverridesDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();

@@ -15,7 +15,7 @@
 
 require_once("api/framework/APIEndpoint.inc");
 
-class APIOpenVPNClientSpeciticOverrides extends APIEndpoint {
+class APIOpenVPNClientSpecificOverrides extends APIEndpoint {
     public function __construct() {
         $this->url = "/api/v1/openvpn/csc";
     }
