@@ -254,8 +254,8 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
     }
 
     private function __validate_win_servers() {
-        if (isset($this->initial_data['win_servers'])) {
-            $win_servers = explode(',', $this->initial_data['win_servers']);
+        if (isset($this->initial_data['wins_servers'])) {
+            $win_servers = explode(',', $this->initial_data['wins_servers']);
 
             $counter = 1;
 
@@ -265,7 +265,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
                     break;
                 }
 
-                $this->validated_data["win_server" . $counter] = str_replace(" ", "", $server);
+                $this->validated_data["wins_server" . $counter] = str_replace(" ", "", $server);
                 $counter += 1;
             }
         }
