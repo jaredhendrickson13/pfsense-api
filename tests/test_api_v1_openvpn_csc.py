@@ -93,6 +93,15 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
             "status": 400
         },
         {
+            "name": "Unknown Reference ID",
+            "payload": {
+                "refid": 1000,
+                "description": "An override, that is pretty specific..."
+            },
+            "return": 6033,
+            "status": 404
+        },
+        {
             "name": "Unknown NetBIOS Node Type",
             "payload": {
                 "refid": 0,

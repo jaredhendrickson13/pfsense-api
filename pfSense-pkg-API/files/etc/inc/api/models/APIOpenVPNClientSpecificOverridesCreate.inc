@@ -43,22 +43,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
         }
 
         if (isset($this->initial_data['server_list'])) {
-            $ini_data_sl = explode(',', $this->initial_data['server_list']);
-            $server_list = "";
-
-            $last_key = end($ini_data_sl);
-
-            foreach ($init_data_sl as $key => $server_id) {
-                if (!is_numeric($server_id))
-                {
-                    continue;
-                }
-                if (in_array((int) $server_id, $server_ids)) {
-                    $server_list .= $server_id . ($key == $last_key ? "" : ", ");
-                }
-            }
-
-            $this->validated_data["server_list"] = $server_list;
+            $this->validated_data["server_list"] = (string) $this->initial_data['server_list'];
         } else {
             $this->validated_data["server_list"] = "";
         }
