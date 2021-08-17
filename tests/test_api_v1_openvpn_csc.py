@@ -34,6 +34,7 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
                 "custom_options": "ifconfig-push xxx.xxx.xxx.xxx 255.255.255.0;",
                 "description": "An override, that is specific..."
             },
+            "return": 6030,
             "status": 400
         },
         {
@@ -44,6 +45,7 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
                 "common_name": "commonname",
                 "description": "An override, that is specific..."
             },
+            "return": 6029,
             "status": 400
         },
         {
@@ -54,6 +56,7 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
                 "description": "An override, that is specific...",
                 "netbios_node_type": "q"
             },
+            "return": 6031,
             "status": 400
         },
         {
@@ -97,6 +100,7 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
             "payload": {
                 "description": "An override, that is pretty specific..."
             },
+            "return": 6034,
             "status": 400
         },
         {
@@ -105,6 +109,7 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
                 "refid": 0,
                 "server_list": "1, a, 3",
             },
+            "return": 6029,
             "status": 400
         },
         {
@@ -113,6 +118,7 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
                 "refid": 0,
                 "netbios_node_type": "q"
             },
+            "return": 6029,
             "status": 400
         },
         {

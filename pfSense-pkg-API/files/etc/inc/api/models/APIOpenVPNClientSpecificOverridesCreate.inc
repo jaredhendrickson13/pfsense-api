@@ -282,7 +282,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
             } else if ($this->initial_data['netbios_node_type'] == 'h') {
                 $this->validated_data["netbios_ntype"] = 4;
             } else {
-                $this->errors[] = APIResponse\get(6030);
+                $this->errors[] = APIResponse\get(6031);
             }
         } else {
             if (isset($this->initial_data['netbios_enable'])) {
