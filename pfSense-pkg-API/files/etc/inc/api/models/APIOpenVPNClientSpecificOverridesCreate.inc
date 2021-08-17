@@ -44,22 +44,21 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
 
         if (isset($this->initial_data['server_list'])) {
             $ini_data_sl = explode(',', $this->initial_data['server_list']);
+            $server_list = "";
 
-            foreach ($init_data_sl as $server_id) {
+            $last_key = end($ini_data_sl);
+
+            foreach ($init_data_sl as $key => $server_id) {
                 if (!is_numeric($server_id))
                 {
-                    $this->errors[] = APIResponse\get(6029);
-                    break;
+                    continue;
                 }
                 if (in_array((int) $server_id, $server_ids)) {
-                    continue;
-                } else {
-                    $this->errors[] = APIResponse\get(6029);
-                    break;
+                    $server_list .= $server_id . ($key == $last_key ? "" : ", ");
                 }
             }
 
-            $this->validated_data["server_list"] = $this->initial_data['server_list'];
+            $this->validated_data["server_list"] = $server_list;
         } else {
             $this->validated_data["server_list"] = "";
         }
@@ -253,7 +252,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
         }
     }
 
-    private function __validate_win_servers() {
+    private function __validate_wins_servers() {
         if (isset($this->initial_data['wins_servers'])) {
             $win_servers = explode(',', $this->initial_data['wins_servers']);
 
@@ -316,7 +315,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
         $this->__validate_netbios_enable();
         $this->__validate_netbios_ntype();
         $this->__validate_netbios_scope();
-        $this->__validate_win_servers();
+        $this->__validate_wins_servers();
 
         $this->validated_data["nbdd_server1"] = "";
     }

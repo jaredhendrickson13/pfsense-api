@@ -38,17 +38,6 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
             "status": 400
         },
         {
-            "name": "Non-numeric server ids",
-            "payload": {
-                "server_list": "1, a, 3",
-                "custom_options": "ifconfig-push xxx.xxx.xxx.xxx 255.255.255.0;",
-                "common_name": "commonname",
-                "description": "An override, that is specific..."
-            },
-            "return": 6029,
-            "status": 400
-        },
-        {
             "name": "Unknown NetBIOS Node Type",
             "payload": {
                 "custom_options": "ifconfig-push xxx.xxx.xxx.xxx 255.255.255.0;",
@@ -104,27 +93,18 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
             "status": 400
         },
         {
-            "name": "Non-numeric server ids",
-            "payload": {
-                "refid": 0,
-                "server_list": "1, a, 3",
-            },
-            "return": 6029,
-            "status": 400
-        },
-        {
             "name": "Unknown NetBIOS Node Type",
             "payload": {
                 "refid": 0,
                 "netbios_node_type": "q"
             },
-            "return": 6029,
+            "return": 6031,
             "status": 400
         },
         {
             "name": "All options",
             "payload": {
-                "refid": 0,
+                "refid": 1,
                 "server_list": "1, 2",
                 "custom_options": "ifconfig-push 10.10.10.1 255.255.255.0;",
                 "disable": False,

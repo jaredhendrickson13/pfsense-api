@@ -54,22 +54,21 @@ class APIOpenVPNClientSpecificOverridesUpdate extends APIModel {
 
         if (isset($this->initial_data['server_list'])) {
             $ini_data_sl = explode(',', $this->initial_data['server_list']);
+            $server_list = "";
 
-            foreach ($init_data_sl as $server_id) {
+            $last_key = end($ini_data_sl);
+
+            foreach ($init_data_sl as $key => $server_id) {
                 if (!is_numeric($server_id))
                 {
-                    $this->errors[] = APIResponse\get(6029);
-                    break;
+                    continue;
                 }
                 if (in_array((int) $server_id, $server_ids)) {
-                    continue;
-                } else {
-                    $this->errors[] = APIResponse\get(6029);
-                    break;
+                    $server_list .= $server_id . ($key == $last_key ? "" : ", ");
                 }
             }
 
-            $this->validated_data["server_list"] = $this->initial_data['server_list'];
+            $this->validated_data["server_list"] = $server_list;
         } else {
             $this->validated_data["server_list"] = $this->config['openvpn']['openvpn-csc'][$this->id]['server_list'];
         }
