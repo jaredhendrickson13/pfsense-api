@@ -88,73 +88,73 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
         },
     ]
     put_tests = [
-        {
-            "name": "Update a client specific override",
-            "payload": {
-                "refid": 0,
-                "common_name": "commonname2",
-            }
-        },
-        {
-            "name": "Missing Reference ID",
-            "payload": {
-                "description": "An override, that is pretty specific..."
-            },
-            "return": 6034,
-            "status": 400
-        },
-        {
-            "name": "Non-numeric server ids",
-            "payload": {
-                "refid": 0,
-                "server_list": "1, a, 3",
-            },
-            "return": 6029,
-            "status": 400
-        },
-        {
-            "name": "Unknown NetBIOS Node Type",
-            "payload": {
-                "refid": 0,
-                "netbios_node_type": "q"
-            },
-            "return": 6029,
-            "status": 400
-        },
-        {
-            "name": "All options",
-            "payload": {
-                "refid": 0,
-                "server_list": "1, 2",
-                "custom_options": "ifconfig-push 10.10.10.1 255.255.255.0;",
-                "disable": False,
-                "common_name": "commonname3",
-                "block": False,
-                "description": "An override, that is VERY specific...",
-                "tunnel_network": "10.0.8.6/24",
-                "tunnel_networkv6": "2001:dc9:1:1::100/64",
-                "local_network": "10.0.9.6/24, 10.0.8.5/24, 10.0.10.6/24",
-                "local_networkv6": "2001:dc9:1:1::100/64, 2002:dc9:1:1::100/64, 2003:dc9:1:1::100/64",
-                "remote_network": "10.0.9.6/24, 10.0.8.5/24, 10.0.10.6/24",
-                "remote_networkv6": "2001:dc9:1:1::100/64, 2002:dc9:1:1::100/64, 2003:dc9:1:1::100/64",
-                "redirect_gateway": False,
-                "prevent_server_definitions": False,
-                "remove_server_routes": False,
-                "dns_domain": "github.com",
-                "dns_servers": "8.8.8.7, 8.8.4.7, 8.8.3.7, 8.8.2.7",
-                "ntp_servers": "192.168.56.106, 192.168.56.107",
-                "netbios_enable": False,
-                "netbios_node_type": "m",
-                "netbios_scope": "42",
-                "win_servers": "192.168.56.108, 192.168.56.194",
-            },
-        },
+        # {
+        #     "name": "Update a client specific override",
+        #     "payload": {
+        #         "refid": 0,
+        #         "common_name": "commonname2",
+        #     }
+        # },
+        # {
+        #     "name": "Missing Reference ID",
+        #     "payload": {
+        #         "description": "An override, that is pretty specific..."
+        #     },
+        #     "return": 6034,
+        #     "status": 400
+        # },
+        # {
+        #     "name": "Non-numeric server ids",
+        #     "payload": {
+        #         "refid": 0,
+        #         "server_list": "1, a, 3",
+        #     },
+        #     "return": 6029,
+        #     "status": 400
+        # },
+        # {
+        #     "name": "Unknown NetBIOS Node Type",
+        #     "payload": {
+        #         "refid": 0,
+        #         "netbios_node_type": "q"
+        #     },
+        #     "return": 6029,
+        #     "status": 400
+        # },
+        # {
+        #     "name": "All options",
+        #     "payload": {
+        #         "refid": 0,
+        #         "server_list": "1, 2",
+        #         "custom_options": "ifconfig-push 10.10.10.1 255.255.255.0;",
+        #         "disable": False,
+        #         "common_name": "commonname3",
+        #         "block": False,
+        #         "description": "An override, that is VERY specific...",
+        #         "tunnel_network": "10.0.8.6/24",
+        #         "tunnel_networkv6": "2001:dc9:1:1::100/64",
+        #         "local_network": "10.0.9.6/24, 10.0.8.5/24, 10.0.10.6/24",
+        #         "local_networkv6": "2001:dc9:1:1::100/64, 2002:dc9:1:1::100/64, 2003:dc9:1:1::100/64",
+        #         "remote_network": "10.0.9.6/24, 10.0.8.5/24, 10.0.10.6/24",
+        #         "remote_networkv6": "2001:dc9:1:1::100/64, 2002:dc9:1:1::100/64, 2003:dc9:1:1::100/64",
+        #         "redirect_gateway": False,
+        #         "prevent_server_definitions": False,
+        #         "remove_server_routes": False,
+        #         "dns_domain": "github.com",
+        #         "dns_servers": "8.8.8.7, 8.8.4.7, 8.8.3.7, 8.8.2.7",
+        #         "ntp_servers": "192.168.56.106, 192.168.56.107",
+        #         "netbios_enable": False,
+        #         "netbios_node_type": "m",
+        #         "netbios_scope": "42",
+        #         "win_servers": "192.168.56.108, 192.168.56.194",
+        #     },
+        # },
     ]
     delete_tests = [
-        {
-            "name": "Delete client specific override",
-            "payload": {"refid": 0}
-        },
+        # {
+        #     "name": "Delete client specific override",
+        #     "payload": {"refid": 0}
+        # },
     ]
 
 APIUnitTestOpenVPNClientSpecificOverrides()

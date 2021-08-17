@@ -26,7 +26,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
 
     public function action() {
         # Add our Client Specific Override to the configuration
-        $this->config['openvpn-server']['openvpn-csc'][] = $this->validated_data;
+        $this->config['openvpn']['openvpn-csc'][] = $this->validated_data;
 
         # Write the user to configuration and set the user on the backend. Return response with created user object.
         $this->write_config();
