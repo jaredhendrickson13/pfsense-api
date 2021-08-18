@@ -9982,7 +9982,12 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\r\n    \r\n}"
+									"raw": "{\r\n    \r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/openvpn/csc",
@@ -10172,7 +10177,7 @@
 										{
 											"key": "refid",
 											"value": "int",
-											"description": "Reference id. This id indicated the id of the client specific override you want to modify. This id is not static as it is essentially the index of an entry in the config array. Best to first get all client specific overrides and get the id of the one you want to modify before calling this endpoint."
+											"description": "Reference id. This id indicates the id of the client specific override you want to modify. This id is not static as it is essentially the index of an entry in the config array. Best to first get all client specific overrides and get the id of the one you want to modify before calling this endpoint."
 										},
 										{
 											"key": "server_list",
@@ -10319,7 +10324,7 @@
 										{
 											"key": "refid",
 											"value": "int",
-											"description": "Reference id. This id indicated the id of the client specific override you want to modify. This id is not static as it is essentially the index of an entry in the config array. Best to first get all client specific overrides and get the id of the one you want to modify before calling this endpoint."
+											"description": "Reference id. This id indicates the id of the client specific override you want to delete. This id is not static as it is essentially the index of an entry in the config array. Best to first get all client specific overrides and get the id of the one you want to delete before calling this endpoint."
 										}
 									]
 								}
