@@ -144,6 +144,21 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
             "name": "Delete client specific override",
             "payload": {"refid": 0}
         },
+        {
+            "name": "Missing Reference ID",
+            "payload": {
+            },
+            "return": 6032,
+            "status": 400
+        },
+        {
+            "name": "Unknown Reference ID",
+            "payload": {
+                "refid": 1000,
+            },
+            "return": 6033,
+            "status": 404
+        },
     ]
 
 APIUnitTestOpenVPNClientSpecificOverrides()
