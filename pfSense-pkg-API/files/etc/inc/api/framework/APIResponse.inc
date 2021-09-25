@@ -1098,6 +1098,54 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Interface type6 cannot be changed while DHCPv6 server is enabled"
         ],
+        3066 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge must contain at least 1 member interface"
+        ],
+        3067 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge member does not exist"
+        ],
+        3068 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge member is already a member of another bridge"
+        ],
+        3069 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge member must be in hostap mode if wireless"
+        ],
+        3070 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge member cannot use captive portal"
+        ],
+        3071 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge ID is required"
+        ],
+        3072 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge does not exist"
+        ],
+        3073 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge cannot be deleted while it's in use"
+        ],
 
         // 4000-4999 reserved for /firewall API calls
         4000 => [

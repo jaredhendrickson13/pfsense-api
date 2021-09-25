@@ -507,7 +507,7 @@ There is no limit to API calls at this time but is important to note that pfSens
 
 * [DIAGNOSTICS](#diagnostics)
 
-  * [Execute shell command](#1-execute-shell-command)
+  * [Execute Shell Command](#1-execute-shell-command)
 
 * [FIREWALL/ALIAS](#firewallalias)
 
@@ -624,6 +624,13 @@ There is no limit to API calls at this time but is important to note that pfSens
 * [INTERFACE/APPLY](#interfaceapply)
 
   * [Apply Interfaces](#1-apply-interfaces)
+
+* [INTERFACE/BRIDGE](#interfacebridge)
+
+  * [Create Interface Bridges](#1-create-interface-bridges)
+  * [Delete Interface Bridges](#2-delete-interface-bridges)
+  * [Read Interface Bridges](#3-read-interface-bridges)
+  * [Update Interface Bridges](#4-update-interface-bridges)
 
 * [INTERFACE/VLAN](#interfacevlan)
 
@@ -809,7 +816,7 @@ There is no limit to API calls at this time but is important to note that pfSens
 
 * [SYSTEM/CONSOLE](#systemconsole)
 
-  * [Update console settings](#1-update-console-settings)
+  * [Update Console Settings](#1-update-console-settings)
 
 * [SYSTEM/DNS](#systemdns)
 
@@ -927,7 +934,7 @@ API endpoints used to diagnose system issues or extend pfSense functionality.
 
 
 
-### 1. Execute shell command
+### 1. Execute Shell Command
 
 
 Execute a shell command.<br><br>
@@ -3427,6 +3434,153 @@ URL: https://{{$hostname}}/api/v1/interface/apply
 
 ```js        
 {
+}
+```
+
+
+
+## INTERFACE/BRIDGE
+
+
+
+### 1. Create Interface Bridges
+
+
+Add a new bridge interface.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/interface/bridge
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| members | array | Specify interface members to add to this bridge. This can be the physical interface ID (e.g. em0), the pfSense interface ID (e.g. wan, lan, optx) or the interface descriptions (e.g. WAN, LAN) |
+| descr | string | Set a description for the new bridge (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"members": ["em1", "LAN"],
+	"descr": "New bridge"
+}
+```
+
+
+
+### 2. Delete Interface Bridges
+
+
+Delete bridge assignment and configuration.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+Type: RAW
+URL: https://{{$hostname}}/api/v1/interface/bridge
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | string | Specify the bridge ID to delete. Bridges cannot be deleted while in use. _Note: This uses the `bridgeif` value (e.g. bridge0, bridge2, etc.) NOT the configuration array index like other objects._ |
+
+
+
+***Body:***
+
+```js        
+{
+	"id": "bridge2"
+}
+```
+
+
+
+### 3. Read Interface Bridges
+
+
+Read bridge assignments and configuration.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge`, `page-interfaces-bridge-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/interface/bridge
+```
+
+
+
+***Body:***
+
+```js        
+{
+}
+```
+
+
+
+### 4. Update Interface Bridges
+
+
+Modify an existing bridge configuration
+
+<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/interface/bridge
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | string | Specify the bridge ID to update. _Note: This uses the `bridgeif` value (e.g. bridge0, bridge2, etc.) NOT the configuration array index like other objects._ |
+| members | array | Update interface members for this bridge. This can be the physical interface ID (e.g. em0), the pfSense interface ID (e.g. wan, lan, optx) or the interface descriptions (e.g. WAN, LAN). (optional) |
+| descr | string | Update the description of the bridge (optional) |
+
+
+
+***Body:***
+
+```js        
+{
+	"id": "bridge0",
+	"members": ["WAN", "lan", "igb2"],
+	"descr": "Updated bridge"
 }
 ```
 
@@ -6630,7 +6784,7 @@ URL: https://{{$hostname}}/api/v1/system/config
 
 
 
-### 1. Update console settings
+### 1. Update Console Settings
 
 
 Updates the console settings.<br><br>

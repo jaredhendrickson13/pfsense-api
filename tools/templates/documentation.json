@@ -976,6 +976,199 @@
 			"name": "INTERFACE",
 			"item": [
 				{
+					"name": "BRIDGE",
+					"item": [
+						{
+							"name": "Read Interface Bridges",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/interface/bridge",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"interface",
+										"bridge"
+									]
+								},
+								"description": "Read bridge assignments and configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge`, `page-interfaces-bridge-edit`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Create Interface Bridges",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"members\": [\"em1\", \"LAN\"],\n\t\"descr\": \"New bridge\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/interface/bridge",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"interface",
+										"bridge"
+									],
+									"query": [
+										{
+											"key": "members",
+											"value": "array",
+											"description": "Specify interface members to add to this bridge. This can be the physical interface ID (e.g. em0), the pfSense interface ID (e.g. wan, lan, optx) or the interface descriptions (e.g. WAN, LAN)"
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Set a description for the new bridge (optional)"
+										}
+									]
+								},
+								"description": "Add a new bridge interface.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge-edit`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Interface Bridges",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"id\": \"bridge0\",\n\t\"members\": [\"WAN\", \"lan\", \"igb2\"],\n\t\"descr\": \"Updated bridge\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/interface/bridge",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"interface",
+										"bridge"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "string",
+											"description": "Specify the bridge ID to update. _Note: This uses the `bridgeif` value (e.g. bridge0, bridge2, etc.) NOT the configuration array index like other objects._"
+										},
+										{
+											"key": "members",
+											"value": "array",
+											"description": "Update interface members for this bridge. This can be the physical interface ID (e.g. em0), the pfSense interface ID (e.g. wan, lan, optx) or the interface descriptions (e.g. WAN, LAN). (optional)"
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Update the description of the bridge (optional)"
+										}
+									]
+								},
+								"description": "Modify an existing bridge configuration\n\n<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge-edit`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Interface Bridges",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"id\": \"bridge2\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/interface/bridge",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"interface",
+										"bridge"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "string",
+											"description": "Specify the bridge ID to delete. Bridges cannot be deleted while in use. _Note: This uses the `bridgeif` value (e.g. bridge0, bridge2, etc.) NOT the configuration array index like other objects._"
+										}
+									]
+								},
+								"description": "Delete bridge assignment and configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge-edit`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that create, read, update and delete interface bridges",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c6fe9ffe-9de5-4644-9768-5aa2772e092c",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "8c6f77f1-b2f2-442d-b71f-467e723ca398",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "VLAN",
 					"item": [
 						{
@@ -11049,7 +11242,7 @@
 			"name": "DIAGNOSTICS",
 			"item": [
 				{
-					"name": "Execute shell command",
+					"name": "Execute Shell Command",
 					"request": {
 						"auth": {
 							"type": "bearer",
@@ -11073,7 +11266,7 @@
 							}
 						},
 						"url": {
-							"raw": "https://{{$hostname}}/api/v1/diagnostics/command_prompt?client-id=string&client-token=string&shell_cmd=string",
+							"raw": "https://{{$hostname}}/api/v1/diagnostics/command_prompt",
 							"protocol": "https",
 							"host": [
 								"{{$hostname}}"
