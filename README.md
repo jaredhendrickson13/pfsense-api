@@ -807,6 +807,10 @@ There is no limit to API calls at this time but is important to note that pfSens
 
   * [Read System Configuration](#1-read-system-configuration)
 
+* [SYSTEM/CONSOLE](#systemconsole)
+
+  * [Update console settings](#1-update-console-settings)
+
 * [SYSTEM/DNS](#systemdns)
 
   * [Read System DNS](#1-read-system-dns)
@@ -6622,6 +6626,46 @@ URL: https://{{$hostname}}/api/v1/system/config
 
 
 
+## SYSTEM/CONSOLE
+
+
+
+### 1. Update console settings
+
+
+Updates the console settings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-admin`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/system/console
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| disableconsolemenu | boolean | Enable or disable console password protection. `true` to enable, `false` to disable. |
+
+
+
+***Body:***
+
+```js        
+{
+	"disableconsolemenu": true
+}
+```
+
+
+
 ## SYSTEM/DNS
 
 
@@ -7809,4 +7853,3 @@ URL: https://{{$hostname}}/api/v1/user/privilege
 
 ---
 [Back to top](#pfsense-rest-api-documentation)
-> Made with &#9829; by [thedevsaddam](https://github.com/thedevsaddam) | Generated at: 2021-08-12 22:49:05 by [docgen](https://github.com/thedevsaddam/docgen)

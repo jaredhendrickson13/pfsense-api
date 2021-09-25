@@ -6942,6 +6942,52 @@
 					"_postman_isSubFolder": true
 				},
 				{
+					"name": "CONSOLE",
+					"item": [
+						{
+							"name": "Update Console Settings",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"disableconsolemenu\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/console",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"console"
+									],
+									"query": [
+										{
+											"key": "disableconsolemenu",
+											"value": "boolean",
+											"description": "Enable or disable console password protection. `true` to enable, `false` to disable."
+										}
+									]
+								},
+								"description": "Updates the console settings.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-admin`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that configure the pfSense console.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "REBOOT",
 					"item": [
 						{
