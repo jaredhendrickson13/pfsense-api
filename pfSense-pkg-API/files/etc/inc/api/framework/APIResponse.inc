@@ -700,6 +700,62 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Dnsmasq host override alias already exists with this IP address type"
         ],
+        2066 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound access list action required"
+        ],
+        2067 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown unbound access list action"
+        ],
+        2068 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound access list network required"
+        ],
+        2069 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound access list network must be valid IPv4 or IPv6 address"
+        ],
+        2070 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound access list network mask must be between 0 and 32 for IPv4 networks or 0 and 128 for IPv6 networks"
+        ],
+        2071 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound access list network mask is required"
+        ],
+        2072 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound access list ID is required"
+        ],
+        2073 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Minimum of 1 unbound access list row is required"
+        ],
+        2074 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound access list does not exist"
+        ],
+
+
 
         // 3000-3999 reserved for /interfaces API calls
         3000 => [
