@@ -171,7 +171,25 @@ def format_docs():
         html_doc = php + html_doc
         html_doc = html_doc + js + css
         html_doc = html_doc.replace("{{$hostname}}", "<?echo $_SERVER['HTTP_HOST'];?>")
+        html_doc = html_doc.replace("<h5 class=\"label label-info\">Query</h5>", "<h5 class=\"label label-info\">Fields</h5>")
+        html_doc = html_doc.replace("<small class=\"pull-right text-muted\">raw</small>", "<small class=\"pull-right text-muted\"></small>")
+        html_doc = html_doc.replace("<h5 class=\"label label-primary\">Body</h5>", "<h5 class=\"label label-primary\">Example Request</h5>")
+        html_doc = html_doc.replace("<th>Value<th>", "<th>Type<th>")
         dw.write(html_doc)
+
+    # Read the contents of the Markdown document docgen created, then delete the file
+        with open("documentation.md", "r") as mr:
+            md_doc = mr.read()
+        os.remove("documentation.md")
+
+    # Write a new Markdown document containing the Markdown created by docgen, then add custom attributes
+        with open("documentation.md", "w") as mw:
+            md_doc = md_doc.replace("Type: RAW\n", "")
+            md_doc = md_doc.replace("***Query params:***", "***Fields:***")
+            md_doc = md_doc.replace("***Body:***", "***Example Request:***")
+            md_doc = md_doc.replace("| Value |", "| Type |")
+            md_doc = "\n".join(md_doc.split("\n")[:-2] + [""])
+            mw.write(md_doc)
 
 # Moves the docs to their appropriate location
 def move_docs():

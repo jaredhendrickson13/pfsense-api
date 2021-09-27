@@ -2319,8 +2319,7 @@
 										{
 											"key": "id",
 											"value": "string",
-											"description": "Name or ID of alias to delete. This alias cannot be in use elsewhere in configuration",
-											"disabled": true
+											"description": "Name or ID of alias to delete. This alias cannot be in use elsewhere in configuration"
 										}
 									]
 								},
@@ -8575,6 +8574,74 @@
 						{
 							"name": "ACCESS_LIST",
 							"item": [
+								{
+									"name": "ROW",
+									"item": [
+										{
+											"name": "Create Unbound Access List Row",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n\t\"id\": 0,\n\t\"acl_network\": \"10.0.0.0\",\n\t\"mask\": 8,\n\t\"description\": \"Class A subnet\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "https://{{$hostname}}/api/v1/services/unbound/access_list/row",
+													"protocol": "https",
+													"host": [
+														"{{$hostname}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"services",
+														"unbound",
+														"access_list",
+														"row"
+													],
+													"query": [
+														{
+															"key": "id",
+															"value": "integer",
+															"description": "Specify the ID of the access list to apply this row to."
+														},
+														{
+															"key": "acl_network",
+															"value": "string",
+															"description": "Specify the IPv4 or IPv6 address of the network to add to the row."
+														},
+														{
+															"key": "mask",
+															"value": "integer",
+															"description": "Specify the subnet mask of the ACL network. This must be a value between 0 and 32 for IPv4 addresses or 0 and 128 or IPv6 addresses."
+														},
+														{
+															"key": "description",
+															"value": "string",
+															"description": "Description of the access list row (optional)"
+														},
+														{
+															"key": "apply",
+															"value": "boolean",
+															"description": "Specify whether or not you would like this access list row to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple access list rows at once it Is best to set this to false and apply the changes afterwards using the /api/v1/services/unbound/apply endpoint. Otherwise, If you are only adding a single access list row, you may set this true to apply it immediately. Defaults to false. (optional)"
+														}
+													]
+												},
+												"description": "Add a new row (network entry) to an existing Unbound access list.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]"
+											},
+											"response": []
+										}
+									],
+									"description": "API endpoints to create DNS Resolver (Unbound) access list rows (network entries).",
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
+								},
 								{
 									"name": "Read Unbound Access Lists",
 									"protocolProfileBehavior": {
