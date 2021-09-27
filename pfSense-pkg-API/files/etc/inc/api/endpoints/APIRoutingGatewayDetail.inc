@@ -13,24 +13,14 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-require_once("api/framework/APIModel.inc");
-require_once("api/framework/APIResponse.inc");
+require_once("api/framework/APIEndpoint.inc");
 
-class APIRoutingGatewayRead extends APIModel {
-    # Create our method constructor
+class APIRoutingGatewayDetail extends APIEndpoint {
     public function __construct() {
-        parent::__construct();
-        $this->privileges = ["page-all", "page-system-gateways"];
+        $this->url = "/api/v1/routing/gateway/detail";
     }
 
-    public function action() {
-        # Local variables
-        $gateways = [];
-
-        # Populate our gateways array if it exists
-        if (isset($this->config["gateways"]["gateway_item"])) {
-            $gateways = $this->config["gateways"]["gateway_item"];
-        }
-        return APIResponse\get(0, $gateways);
+    protected function get() {
+        return (new APIRoutingGatewayDetailRead())->call();
     }
 }

@@ -650,6 +650,10 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Read Routing Gateways](#3-read-routing-gateways)
   * [Update Routing Gateways](#4-update-routing-gateways)
 
+* [ROUTING/GATEWAY/DETAIL](#routinggatewaydetail)
+
+  * [Read Routing Gateway Details](#1-read-routing-gateway-details)
+
 * [ROUTING/STATIC_ROUTE](#routingstatic_route)
 
   * [Create Static Routes](#1-create-static-routes)
@@ -3830,7 +3834,7 @@ Read routing gateways.<br><br>
 
 _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]
 
-_Note: Currently, GET requests to this endpoint return verbose backend gateway information rather than the gateway objects as they appear in the configuration. This discrepancy makes it difficult to interact with gateway objects via API. Because of this, GET requests to this endpoint will be refactored in a future release._
+_Note: This endpoint originally returned verbose routing gateway details. This functionality has moved to /api/v1/routing/gateway/detail._
 
 
 ***Endpoint:***
@@ -3921,6 +3925,37 @@ URL: https://{{$hostname}}/api/v1/routing/gateway
     "time_period": 66000,
     "losslow": 5,
     "losshigh": 10
+}
+```
+
+
+
+## ROUTING/GATEWAY/DETAIL
+
+
+
+### 1. Read Routing Gateway Details
+
+
+Read verbose routing gateway details about both dynamic/system gateways and static gateways.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/routing/gateway/detail
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+
 }
 ```
 

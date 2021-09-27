@@ -39,7 +39,7 @@ css = """
     body {
         display: block;
         width: 90%;
-        max-width: 1500px;
+        max-width: 1700px;
         margin: 0 auto;
     }
     footer {

@@ -16,7 +16,7 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-class APIRoutingGatewayRead extends APIModel {
+class APIRoutingGatewayDetailRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
@@ -24,13 +24,6 @@ class APIRoutingGatewayRead extends APIModel {
     }
 
     public function action() {
-        # Local variables
-        $gateways = [];
-
-        # Populate our gateways array if it exists
-        if (isset($this->config["gateways"]["gateway_item"])) {
-            $gateways = $this->config["gateways"]["gateway_item"];
-        }
-        return APIResponse\get(0, $gateways);
+        return APIResponse\get(0, return_gateways_array(true, true));
     }
 }

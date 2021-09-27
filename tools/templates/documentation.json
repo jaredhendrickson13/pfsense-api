@@ -7290,6 +7290,71 @@
 					"name": "GATEWAY",
 					"item": [
 						{
+							"name": "DETAIL",
+							"item": [
+								{
+									"name": "Read Routing Gateway Details",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/routing/gateway/detail",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"routing",
+												"gateway",
+												"detail"
+											]
+										},
+										"description": "Read verbose routing gateway details about both dynamic/system gateways and static gateways.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that read verbose routing gateway details.",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "49c0369d-6aa5-4518-ab63-950e778eb77a",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "c4e1d017-46cc-4839-b5ab-9fd35e23571f",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
 							"name": "Read Routing Gateways",
 							"protocolProfileBehavior": {
 								"disableBodyPruning": true
@@ -7319,7 +7384,7 @@
 										"gateway"
 									]
 								},
-								"description": "Read routing gateways.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]\n\n_Note: Currently, GET requests to this endpoint return verbose backend gateway information rather than the gateway objects as they appear in the configuration. This discrepancy makes it difficult to interact with gateway objects via API. Because of this, GET requests to this endpoint will be refactored in a future release._"
+								"description": "Read routing gateways.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]\n\n_Note: This endpoint originally returned verbose routing gateway details. This functionality has moved to /api/v1/routing/gateway/detail._"
 							},
 							"response": []
 						},
