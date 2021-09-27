@@ -73,7 +73,7 @@ class APISystemTunableUpdate extends APIModel {
         }
 
         # Ensure we have a tunable value and that it is a string or integer
-        if (!empty($this->initial_data["value"])) {
+        if (isset($this->initial_data["value"])) {
             if (!preg_match("/[^a-zA-Z0-9.\-_%\/]/", $this->initial_data['value'])) {
                 $this->validated_data["value"] = $this->initial_data["value"];
             } else {
@@ -82,7 +82,7 @@ class APISystemTunableUpdate extends APIModel {
         }
 
         # Optionally allow a tunable description, ensure it is a string if entered
-        if (!empty($this->initial_data["descr"])) {
+        if (isset($this->initial_data["descr"])) {
             if (is_string($this->initial_data["descr"])) {
                 $this->validated_data["descr"] = $this->initial_data["descr"];
             } else {

@@ -7,7 +7,7 @@ class APIUnitTestTunable(unit_test_framework.APIUnitTest):
     post_tests = [
         {
             "name": "Create system tunable",
-            "payload": {"tunable": unit_test_framework.APIUnitTest.uid, "value": 1, "descr": "Unit test"}
+            "payload": {"tunable": unit_test_framework.APIUnitTest.uid, "value": 0, "descr": "Unit test"}
         }
     ]
     put_tests = [
