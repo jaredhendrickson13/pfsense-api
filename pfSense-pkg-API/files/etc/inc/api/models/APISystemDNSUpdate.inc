@@ -47,22 +47,11 @@ class APISystemDNSUpdate extends APIModel {
     }
 
     private function __validate_dnslocalhost() {
-        # Validate this field as needed for pfSense 2.4.x
-        # TODO: remove this conditional once pfSense 2.4 nears EOL
-        if (APITools\get_pfsense_version()["program"] < 250) {
-            if ($this->initial_data['dnslocalhost'] === true) {
-                $this->config["system"]["dnslocalhost"] = "";
-            } elseif ($this->initial_data['dnslocalhost'] === false) {
-                unset($this->config["system"]["dnslocalhost"]);
-            }
-        }
         # Validate this field as needed for pfSense 2.5+
-        else {
-            if ($this->initial_data['dnslocalhost'] === true) {
-                unset($this->config["system"]["dnslocalhost"]);
-            } elseif ($this->initial_data['dnslocalhost'] === false) {
-                $this->config["system"]["dnslocalhost"] = "remote";
-            }
+        if ($this->initial_data['dnslocalhost'] === true) {
+            unset($this->config["system"]["dnslocalhost"]);
+        } elseif ($this->initial_data['dnslocalhost'] === false) {
+            $this->config["system"]["dnslocalhost"] = "remote";
         }
     }
 
