@@ -747,6 +747,13 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Start Unbound Service](#4-start-unbound-service)
   * [Stop Unbound Service](#5-stop-unbound-service)
 
+* [SERVICES/UNBOUND/ACCESS_LIST](#servicesunboundaccess_list)
+
+  * [Create Unbound Access List](#1-create-unbound-access-list)
+  * [Delete Unbound Access List](#2-delete-unbound-access-list)
+  * [Read Unbound Access Lists](#3-read-unbound-access-lists)
+  * [Update Unbound Access List](#4-update-unbound-access-list)
+
 * [SERVICES/UNBOUND/HOST_OVERRIDE](#servicesunboundhost_override)
 
   * [Create Unbound Host Override](#1-create-unbound-host-override)
@@ -5775,6 +5782,176 @@ URL: https://{{$hostname}}/api/v1/services/unbound/stop
 ```js        
 {
     
+}
+```
+
+
+
+## SERVICES/UNBOUND/ACCESS_LIST
+
+
+
+### 1. Create Unbound Access List
+
+
+Add a new Unbound access list.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/unbound/access_list
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| aclname | string | Specify a name for this access list (optional). |
+| aclaction | string | Set the access list action. Options are `allow`, `deny`, `reject`, `allow spoof`, `deny nonlocal`, `reject nonlocal`. |
+| description | string | Specify a detailed description for this access list (optional). |
+| row | array | Set networks to match for this access list. This must be an array of access list row objects and must contain at least one object. For more information on access list object fields, see documentation for /api/v1/services/unbound/access_list/row. |
+| apply | boolean | Specify whether or not the Unbound configuration should be reloaded immediately after creating. `true` to apply immediately, `false` to keep the changes pending. If `false`, the Unbound configuration must be reloaded manually by calling the /api/v1/services/unbound/apply endpoint. Defaults to `false` (optional). |
+
+
+
+***Body:***
+
+```js        
+{
+	"aclname": "Allow_All",
+	"aclaction": "allow",
+	"description": "Test ACL",
+	"row": [
+		{
+			"acl_network": "0.0.0.0",
+			"mask": 0,
+			"description": "Test ACL entry"
+		}
+	]
+}
+```
+
+
+
+### 2. Delete Unbound Access List
+
+
+Delete Unbound access list.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/unbound/access_list
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | string | Specify the access list ID to delete. |
+| apply | boolean | Specify whether or not the Unbound configuration should be reloaded immediately after deleting. `true` to apply immediately, `false` to keep the changes pending. If `false`, the Unbound configuration must be reloaded manually by calling the /api/v1/services/unbound/apply endpoint. Defaults to `false` (optional). |
+
+
+
+***Body:***
+
+```js        
+{
+	"id": 0
+}
+```
+
+
+
+### 3. Read Unbound Access Lists
+
+
+Read configured Unbound access lists.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/unbound/access_list
+```
+
+
+
+***Body:***
+
+```js        
+{
+}
+```
+
+
+
+### 4. Update Unbound Access List
+
+
+Modify an existing Unbound access list
+
+<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: RAW
+URL: https://{{$hostname}}/api/v1/services/unbound/access_list
+```
+
+
+
+***Query params:***
+
+| Key | Value | Description |
+| --- | ------|-------------|
+| id | string | Specify the access list ID to update. |
+| aclname | string | Specify a name for this access list (optional). |
+| aclaction | string | Set the access list action. Options are `allow`, `deny`, `reject`, `allow spoof`, `deny nonlocal`, `reject nonlocal`. (optional) |
+| description | string | Specify a detailed description for this access list (optional). |
+| row | array | Set networks to match for this access list. This must be an array of access list row objects and must contain at least one object. For more information on access list object fields, see documentation for /api/v1/services/unbound/access_list/row (optional). |
+| apply | boolean | Specify whether or not the Unbound configuration should be reloaded immediately after updating. `true` to apply immediately, `false` to keep the changes pending. If `false`, the Unbound configuration must be reloaded manually by calling the /api/v1/services/unbound/apply endpoint. Defaults to `false` (optional). |
+
+
+
+***Body:***
+
+```js        
+{
+	"id": 0,
+	"aclname": "Updated_Allow_All",
+	"aclaction": "deny",
+	"description": "Updated test ACL",
+	"row": [
+		{
+			"acl_network": "0::",
+			"mask": 0,
+			"description": "Updated test ACL entry"
+		}
+	]
 }
 ```
 

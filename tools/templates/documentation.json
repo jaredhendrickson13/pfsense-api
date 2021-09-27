@@ -8573,6 +8573,238 @@
 					"name": "UNBOUND",
 					"item": [
 						{
+							"name": "ACCESS_LIST",
+							"item": [
+								{
+									"name": "Read Unbound Access Lists",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/unbound/access_list",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"unbound",
+												"access_list"
+											]
+										},
+										"description": "Read configured Unbound access lists.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Create Unbound Access List",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"aclname\": \"Allow_All\",\n\t\"aclaction\": \"allow\",\n\t\"description\": \"Test ACL\",\n\t\"row\": [\n\t\t{\n\t\t\t\"acl_network\": \"0.0.0.0\",\n\t\t\t\"mask\": 0,\n\t\t\t\"description\": \"Test ACL entry\"\n\t\t}\n\t]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/unbound/access_list",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"unbound",
+												"access_list"
+											],
+											"query": [
+												{
+													"key": "aclname",
+													"value": "string",
+													"description": "Specify a name for this access list (optional)."
+												},
+												{
+													"key": "aclaction",
+													"value": "string",
+													"description": "Set the access list action. Options are `allow`, `deny`, `reject`, `allow spoof`, `deny nonlocal`, `reject nonlocal`."
+												},
+												{
+													"key": "description",
+													"value": "string",
+													"description": "Specify a detailed description for this access list (optional)."
+												},
+												{
+													"key": "row",
+													"value": "array",
+													"description": "Set networks to match for this access list. This must be an array of access list row objects and must contain at least one object. For more information on access list object fields, see documentation for /api/v1/services/unbound/access_list/row."
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not the Unbound configuration should be reloaded immediately after creating. `true` to apply immediately, `false` to keep the changes pending. If `false`, the Unbound configuration must be reloaded manually by calling the /api/v1/services/unbound/apply endpoint. Defaults to `false` (optional)."
+												}
+											]
+										},
+										"description": "Add a new Unbound access list.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Update Unbound Access List",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"id\": 0,\n\t\"aclname\": \"Updated_Allow_All\",\n\t\"aclaction\": \"deny\",\n\t\"description\": \"Updated test ACL\",\n\t\"row\": [\n\t\t{\n\t\t\t\"acl_network\": \"0::\",\n\t\t\t\"mask\": 0,\n\t\t\t\"description\": \"Updated test ACL entry\"\n\t\t}\n\t]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/unbound/access_list",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"unbound",
+												"access_list"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "string",
+													"description": "Specify the access list ID to update."
+												},
+												{
+													"key": "aclname",
+													"value": "string",
+													"description": "Specify a name for this access list (optional)."
+												},
+												{
+													"key": "aclaction",
+													"value": "string",
+													"description": "Set the access list action. Options are `allow`, `deny`, `reject`, `allow spoof`, `deny nonlocal`, `reject nonlocal`. (optional)"
+												},
+												{
+													"key": "description",
+													"value": "string",
+													"description": "Specify a detailed description for this access list (optional)."
+												},
+												{
+													"key": "row",
+													"value": "array",
+													"description": "Set networks to match for this access list. This must be an array of access list row objects and must contain at least one object. For more information on access list object fields, see documentation for /api/v1/services/unbound/access_list/row (optional)."
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not the Unbound configuration should be reloaded immediately after updating. `true` to apply immediately, `false` to keep the changes pending. If `false`, the Unbound configuration must be reloaded manually by calling the /api/v1/services/unbound/apply endpoint. Defaults to `false` (optional)."
+												}
+											]
+										},
+										"description": "Modify an existing Unbound access list\n\n<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Unbound Access List",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"id\": 0\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/unbound/access_list",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"unbound",
+												"access_list"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "string",
+													"description": "Specify the access list ID to delete."
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not the Unbound configuration should be reloaded immediately after deleting. `true` to apply immediately, `false` to keep the changes pending. If `false`, the Unbound configuration must be reloaded manually by calling the /api/v1/services/unbound/apply endpoint. Defaults to `false` (optional)."
+												}
+											]
+										},
+										"description": "Delete Unbound access list.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that create, read, update and delete Unbound access lists",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "c6fe9ffe-9de5-4644-9768-5aa2772e092c",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "8c6f77f1-b2f2-442d-b71f-467e723ca398",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
 							"name": "HOST_OVERRIDE",
 							"item": [
 								{

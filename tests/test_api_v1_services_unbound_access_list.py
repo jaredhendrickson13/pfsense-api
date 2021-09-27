@@ -27,11 +27,12 @@ class APIUnitTestServicesUnboundAccessList(unit_test_framework.APIUnitTest):
                 "descr": "Unbound allow ACL unit test",
                 "row": [
                     {
-                        "acl_network": "8.8.8.8",
-                        "mask": 32,
+                        "acl_network": "0.0.0.0",
+                        "mask": 0,
                         "description": "Unbound access list row unit test"
                     }
-                ]
+                ],
+                "apply": True
             }
         },
         {
