@@ -30,30 +30,28 @@ class APISystemDNSRead extends APIModel {
     }
 
     public function validate_payload() {
+        # Initialize DNS items
         $this->validated_data["dnsserver"] = [];
         $this->validated_data["dnsallowoverride"] = false;
         $this->validated_data["dnslocalhost"] = false;
+
+        # Populate our system DNS servers if they exist
         if (!empty($this->config["system"]["dnsserver"])) {
             $this->validated_data["dnsserver"] = $this->config["system"]["dnsserver"];
         }
+
+        # Format our DNS allow override on WAN
         if (array_key_exists("dnsallowoverride", $this->config["system"])) {
             $this->validated_data["dnsallowoverride"] = true;
         }
 
-        # Validate this field as needed for pfSense 2.4.x
-        # TODO: remove this conditional once pfSense 2.4 nears EOL
-        if (APITools\get_pfsense_version()["program"] < 250) {
-            if (array_key_exists("dnslocalhost", $this->config["system"])) {
-                $this->validated_data["dnslocalhost"] = true;
-            }
+        # Format our DNS local host value
+        if ($this->config["system"]["dnslocalhost"] === "remote") {
+            $this->validated_data["dnslocalhost"] = false;
+        } else {
+            $this->validated_data["dnslocalhost"] = true;
         }
-        else {
-            if ($this->config["system"]["dnslocalhost"] === "remote") {
-                $this->validated_data["dnslocalhost"] = false;
-            } else {
-                $this->validated_data["dnslocalhost"] = true;
-            }
-        }
+
 
     }
 }
