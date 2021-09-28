@@ -302,6 +302,108 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Certificate cannot be deleted while in use"
         ],
+        1035 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate does not appear to be a CA certificate"
+        ],
+        1036 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Encrypted private keys are not supported"
+        ],
+        1037 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate description contains invalid characters"
+        ],
+        1038 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate key type is required"
+        ],
+        1039 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unsupported certificate key type specified"
+        ],
+        1040 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate key length is required"
+        ],
+        1041 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unsupported certificate key length specified"
+        ],
+        1042 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate key elliptic curve name is required"
+        ],
+        1043 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unsupported certificate elliptic curve name specified"
+        ],
+        1044 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate digest algorithm is required"
+        ],
+        1045 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unsupported certificate digest algorithm specified"
+        ],
+        1046 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certifiate lifetime is greater than allowed maximum"
+        ],
+        1047 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Intermediate CA signing CA reference ID is required"
+        ],
+        1048 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Intermediate CA signing CA reference ID does not exist"
+        ],
+        1049 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate and private key are not matching keypair"
+        ],
+        1050 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "An error occurred attempting to generate certificate. Please check your DN values."
+        ],
+        1051 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown certificate country"
+        ],
 
         // 2000-2999 reserved for /services API calls
         2000 => [
