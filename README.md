@@ -558,6 +558,10 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Read Firewall Rules](#3-read-firewall-rules)
   * [Update Firewall Rules](#4-update-firewall-rules)
 
+* [FIREWALL/RULE/FLUSH](#firewallruleflush)
+
+  * [Delete All Firewall Rules](#1-delete-all-firewall-rules)
+
 * [FIREWALL/SCHEDULE](#firewallschedule)
 
   * [Create Schedule](#1-create-schedule)
@@ -2053,6 +2057,36 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 	"dst": "em0ip",
 	"descr": "This is an updated test rule added via API",
 	"top": true
+}
+```
+
+
+
+## FIREWALL/RULE/FLUSH
+
+
+
+### 1. Delete All Firewall Rules
+
+
+Deletes all existing firewall rules. This is useful for scripts that need to setup the firewall rules from scratch.<br><br>_Note: this endpoint will not reload the firewall filter automatically, you must make another API call to the /api/v1/firewall/apply endpoint to do so. Ensure firewall rules are created before reloading the filter to prevent lockout!_.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/firewall/rule/flush
+```
+
+
+
+***Example Request:***
+
+```js        
+{
 }
 ```
 

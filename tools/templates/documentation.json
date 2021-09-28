@@ -2358,6 +2358,45 @@
 					"name": "RULE",
 					"item": [
 						{
+							"name": "FLUSH",
+							"item": [
+								{
+									"name": "Delete All Firewall Rules",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/rule/flush",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"rule"
+											]
+										},
+										"description": "Deletes all existing firewall rules. This is useful for scripts that need to setup the firewall rules from scratch.<br><br>_Note: this endpoint will not reload the firewall filter automatically, you must make another API call to the /api/v1/firewall/apply endpoint to do so. Ensure firewall rules are created before reloading the filter to prevent lockout!_.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules-edit`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that flush existing firewall rule configurations.",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
 							"name": "Read Firewall Rules",
 							"protocolProfileBehavior": {
 								"disableBodyPruning": true
