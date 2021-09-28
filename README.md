@@ -6701,13 +6701,25 @@ URL: https://{{$hostname}}/api/v1/system/ca
 
 | Key | Type | Description |
 | --- | ------|-------------|
-| method | string | Set the method used to add the CA. Current supported methods (`import`) |
+| method | string | Set the method used to add the CA. Current supported methods are `existing`, `internal`, and `intermediate`. _Note: previous releases referred to the `existing` method as `import`. You may use `existing` or `import` interchangeably._ |
 | descr | string | Set a descriptive name for the certificate |
 | trust | boolean | Specify `true` if you would like the system to trust this CA (optional) |
 | randomserial | boolean | Specify `true` if you would like certificates signed by this CA to utilize randomized serial numbers (optional) |
-| crt | string | Specify the Base64 encoded PEM CA certificate to import |
-| prv | string | Specify the corresponding Base64 encoded CA certificate key |
-| serial | integer | Specify the serial number to be assigned to the next certificate signed by this CA. Defaults to 1. (optional) |
+| crt | string | Specify the Base64 encoded PEM CA certificate to import. This field is required when `method` is set to `existing`. |
+| prv | string | Specify the corresponding Base64 encoded CA certificate key. This field is only available when `method` is set to `existing`. (optional) |
+| serial | integer | Specify the serial number to be assigned to the next certificate signed by this CA. Defaults to 1. This field is only available when `method` is set to `existing`. (optional) |
+| caref | string | Specify the unique reference ID of the certificate signing authority for the intermediate certificate. This field is required when `method` is set to `intermediate`. |
+| keytype | string | Specify the private key type to generate. Options are `RSA` or `ECDSA`. This field is required when `method` is set to `internal` or `intermediate`. |
+| keylen | integer | Specify the private key length to generate. Options are `1024`, `2048`, `3072`, `4096`, `6144`, `7680`, `8192`, `15360`, `16384`. This field is required when `method` is set to `internal` or `intermediate` AND `keytype` is set to `RSA`. |
+| ecname | string | Specify the elliptic curve name to use when generating the private key. It is recommended to view options and compatibility within the pfSense webConfigurator or manually through OpenSSL as certain curves are not compatible in some circumstances. This field is required when `method` is set to `internal` or `intermediate` AND `keytype` is set to `ECDSA`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._ |
+| digest_alg | string | Specify the digest algorithm to use. Options are `sha1`, `sha224`, `sha256`, `sha384` and `sha512`. This field is required when `method` is set to `internal` or `intermediate`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._ |
+| lifetime | integer | Specify the number of days you would like this CA to be valid for. This must be below OpenSSL's maximum lifetime value (around `12000` days). Defaults to `3650` days. This field is required when `method` is set to `internal` or `intermediate`. _Note: maximum value is subject to change, when in doubt, check the pfSense webConfigurator options for this field._ |
+| dn_commonname | string | Specify the common name of this CA. In mose cases, this will be a hostname. This field is required when `method` is set to `internal` or `intermediate`. |
+| dn_country | string | Specify the country code for this CA. This must be a known 2-digit country code. This field is only available when `method` is set to `internal` or `intermediate`. (optional) |
+| dn_state | string | Specify the state or province for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional) |
+| dn_city | string | Specify the city or locale for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional) |
+| dn_organization | string | Specify the managing organization for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional) |
+| dn_organizationunit | string | Specify the managing organizational unit or team for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional) |
 
 
 
@@ -6715,10 +6727,10 @@ URL: https://{{$hostname}}/api/v1/system/ca
 
 ```js        
 {
-	"method": "import",
+	"method": "existing",
 	"crt": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZxekNDQTVPZ0F3SUJBZ0lVQi9rT2RoMzdTZnRxeHRqL1MxSTRkUTQyYXRvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWxWVU1RMHdDd1lEVlFRSERBUlBjbVZ0TVNFdwpId1lEVlFRS0RCaEpiblJsY201bGRDQlhhV1JuYVhSeklGQjBlU0JNZEdReEZ6QVZCZ05WQkFNTURuUmxjM1F1CmMyVmpiV1YwTG1Odk1CNFhEVEl3TURJd05ESXdNelV3...",
 	"prv": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQ1N3d2dna29BZ0VBQW9JQ0FRREQ5RkNLU1U3SmY0QngKeWlKNkNOWGhOckI0ZVhjTk9TTm9GUVJIbXlsV2dHbEN5djMydFdicmF3RFhhQzk2aVpOSTFzNG5qWTdQT3BlWgpoNmFlaTJ5NllheS9VWWtOUkZGQmp4WlZlLzRwS2pKeXBQRlFBUlpMVko2TlNXaU5raGkwbDlqeWtacTlEbkFnCk1mclZyUEo1YktDM3JJVV...",
-	"descr": "TEST CA",
+	"descr": "TEST CA"
 }
 ```
 
