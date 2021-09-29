@@ -244,6 +244,30 @@ class APIUnitTestSystemCertificate(unit_test_framework.APIUnitTest):
             "name": "Delete CA certificate",
             "uri": "/api/v1/system/ca",
             "payload": {"descr": "INTERNAL_CA_RSA"}
+        },
+        {
+            "name": "Check deleting non-existing certificate ID",
+            "status": 400,
+            "return": 1009,
+            "payload": {"id": "INVALID"}
+        },
+        {
+            "name": "Check deleting non-existing certificate reference ID",
+            "status": 400,
+            "return": 1009,
+            "payload": {"refid": "INVALID"}
+        },
+        {
+            "name": "Check deleting non-existing certificate description",
+            "status": 400,
+            "return": 1009,
+            "payload": {"descr": "INVALID"}
+        },
+        {
+            "name": "Check deleting certificate in use",
+            "status": 400,
+            "return": 1005,
+            "payload": {"id": 0}
         }
     ]
 
