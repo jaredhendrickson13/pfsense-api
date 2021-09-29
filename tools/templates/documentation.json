@@ -812,9 +812,29 @@
 									"description": "Password to assign new user"
 								},
 								{
+									"key": "disabled",
+									"value": "boolean",
+									"description": "Disable user account upon creation. `true` to disable, `false` to keep enabled. Defaults to `false` (optional)"
+								},
+								{
 									"key": "descr",
 									"value": "string",
 									"description": "Descriptive name to assign new user (optional)"
+								},
+								{
+									"key": "expires",
+									"value": "string",
+									"description": "Expiration date for user account in  MM/DD/YYYY format (optional)"
+								},
+								{
+									"key": "priv",
+									"value": "array",
+									"description": "Assign privileges to this user. This must be an array of corresponding pfSense privileges (e.g. `page-firewall-rule`). (optional)"
+								},
+								{
+									"key": "cert",
+									"value": "array",
+									"description": "Assign user certificates to this user. This must be an array of corresponding user certificate's `refid` values. (optional)"
 								},
 								{
 									"key": "authorizedkeys",
@@ -825,17 +845,8 @@
 									"key": "ipsecpsk",
 									"value": "string",
 									"description": "IPsec pre-shared key to assign new user (optional)"
-								},
-								{
-									"key": "disabled",
-									"value": "boolean",
-									"description": "Disable user account upon creation. Do not include to leave enabled. (optional)"
-								},
-								{
-									"key": "expires",
-									"value": "string",
-									"description": "Expiration date for user account in  MM/DD/YYYY format (optional)"
 								}
+
 							]
 						},
 						"description": "Add a new pfSense user to the local database.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-usermanager`]"
@@ -884,16 +895,6 @@
 									"description": "Descriptive name to assign the user (optional)"
 								},
 								{
-									"key": "authorizedkeys",
-									"value": "string",
-									"description": "Base64 encoded authorized keys to add to user (optional)"
-								},
-								{
-									"key": "ipsecpsk",
-									"value": "string",
-									"description": "IPsec pre-shared key to assign to user (optional)"
-								},
-								{
 									"key": "disabled",
 									"value": "boolean",
 									"description": "Disable user account  (optional)"
@@ -902,6 +903,26 @@
 									"key": "expires",
 									"value": "string",
 									"description": "Expiration date for user account in  MM/DD/YYYY format (optional)"
+								},
+								{
+									"key": "priv",
+									"value": "array",
+									"description": "Update privileges assigned to this user. This must be an array of corresponding pfSense privileges (e.g. `page-firewall-rule`). To remove all privileges from a user use an empty array. (optional)"
+								},
+								{
+									"key": "cert",
+									"value": "array",
+									"description": "Update user certificates assigned to this user. This must be an array of corresponding user certificate's `refid` values. To remove all user certificate assignments, use empty array. (optional)"
+								},
+								{
+									"key": "authorizedkeys",
+									"value": "string",
+									"description": "Base64 encoded authorized keys to add to user (optional)"
+								},
+								{
+									"key": "ipsecpsk",
+									"value": "string",
+									"description": "IPsec pre-shared key to assign to user (optional)"
 								}
 							]
 						},
@@ -6255,7 +6276,7 @@
 										{
 											"key": "altnames",
 											"value": "array",
-											"description": "Specify subject alternative names to list in this certificate. This must be an array of objects with each object containing a alt name type as the key and the alt name value as the value. Supported alt name types are `dns` for FQDNs, `ip` for IP addresses, `uri` for URLs, and `email` for email addresses. This field is only available when `method` is set to `internal`. An example of a valid `altnames` array is `[{\"dns\": \"example.com\"}, {\"ip\": \"127.0.0.1\"}, {\"uri\": \"http://example.com/test\"}, {\"email\": \"example@example.com\"}]` (optional)"
+											"description": "Specify subject alternative names to list in this certificate. This must be an array of objects with each object containing a alt name type as the key and the alt name value as the value. Supported alt name types are `dns` for FQDNs, `ip` for IP addresses, `uri` for URLs, and `email` for email addresses. This field is only available when `method` is set to `internal`. An example of a valid `altnames` array is:\n\n `[{\"dns\": \"example.com\"}, {\"ip\": \"127.0.0.1\"}, {\"uri\": \"http://example.com/test\"}, {\"email\": \"example@example.com\"}]`\n\n (optional)"
 										},
 										{
 											"key": "active",

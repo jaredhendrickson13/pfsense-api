@@ -6841,8 +6841,12 @@ URL: https://{{$hostname}}/api/v1/system/certificate
 | dn_organization | string | Specify the managing organization for this certificate. This field is only available when `method` is set to `internal`. (optional) |
 | dn_organizationalunit | string | Specify the managing organizational unit or team for this certificate. This field is only available when `method` is set to `internal`. (optional) |
 | type | string | Specify the certificate type. Options are `server` and `user`. This field is only available when `method` is set to `internal`. |
-| altnames | array | Specify subject alternative names to list in this certificate. This must be an array of objects with each object containing a alt name type as the key and the alt name value as the value. Supported alt name types are `dns` for FQDNs, `ip` for IP addresses, `uri` for URLs, and `email` for email addresses. This field is only available when `method` is set to `internal`. An example of a valid `altnames` array is `[{"dns": "example.com"}, {"ip": "127.0.0.1"}, {"uri": "http://example.com/test"}, {"email": "example@example.com"}]` (optional) |
-| active | boolean | Set this certificate as the active certificate used by the webConfigurator (optional) |
+| altnames | array | Specify subject alternative names to list in this certificate. This must be an array of objects with each object containing a alt name type as the key and the alt name value as the value. Supported alt name types are `dns` for FQDNs, `ip` for IP addresses, `uri` for URLs, and `email` for email addresses. This field is only available when `method` is set to `internal`. An example of a valid `altnames` array is:
+
+ `[{"dns": "example.com"}, {"ip": "127.0.0.1"}, {"uri": "http://example.com/test"}, {"email": "example@example.com"}]`
+
+ (optional) |
+| active | boolean | Set this certificate as the active certificate used by the webConfigurator. Only available when `type` is set to `server` or `method` is set to `existing`. (optional) |
 
 
 
@@ -6882,7 +6886,7 @@ URL: https://{{$hostname}}/api/v1/system/certificate
 | Key | Type | Description |
 | --- | ------|-------------|
 | refid | string | Specify the refid of the certificate to delete (required if `id` and `descr` are not defined) |
-| id | string | Specify the id number of the certificate to delete (required if `refid` and `descr` are not defined) |
+| id | string | Specify the configuration ID number of the certificate to delete (required if `refid` and `descr` are not defined) |
 | descr | string | Specify the description of the certificate to delete (required if `id` and `refid` are not defined) _Note: if multiple certificates exist with the same name, only the first matching certificate will be deleted_ |
 
 
@@ -7504,11 +7508,13 @@ URL: https://{{$hostname}}/api/v1/user
 | --- | ------|-------------|
 | username | string | Username to assign new user |
 | password | string | Password to assign new user |
+| disabled | boolean | Disable user account upon creation. `true` to disable, `false` to keep enabled. Defaults to `false` (optional) |
 | descr | string | Descriptive name to assign new user (optional) |
+| expires | string | Expiration date for user account in  MM/DD/YYYY format (optional) |
+| priv | array | Assign privileges to this user. This must be an array of corresponding pfSense privileges (e.g. `page-firewall-rule`). (optional) |
+| cert | array | Assign user certificates to this user. This must be an array of corresponding user certificate's `refid` values. (optional) |
 | authorizedkeys | string | Base64 encoded authorized SSH keys to assign new user (optional) |
 | ipsecpsk | string | IPsec pre-shared key to assign new user (optional) |
-| disabled | boolean | Disable user account upon creation. Do not include to leave enabled. (optional) |
-| expires | string | Expiration date for user account in  MM/DD/YYYY format (optional) |
 
 
 
@@ -7614,10 +7620,12 @@ URL: https://{{$hostname}}/api/v1/user
 | username | string | Username to modify |
 | password | string | Change user password (optional) |
 | descr | string | Descriptive name to assign the user (optional) |
-| authorizedkeys | string | Base64 encoded authorized keys to add to user (optional) |
-| ipsecpsk | string | IPsec pre-shared key to assign to user (optional) |
 | disabled | boolean | Disable user account  (optional) |
 | expires | string | Expiration date for user account in  MM/DD/YYYY format (optional) |
+| priv | array | Update privileges assigned to this user. This must be an array of corresponding pfSense privileges (e.g. `page-firewall-rule`). To remove all privileges from a user use an empty array. (optional) |
+| cert | array | Update user certificates assigned to this user. This must be an array of corresponding user certificate's `refid` values. To remove all user certificate assignments, use empty array. (optional) |
+| authorizedkeys | string | Base64 encoded authorized keys to add to user (optional) |
+| ipsecpsk | string | IPsec pre-shared key to assign to user (optional) |
 
 
 

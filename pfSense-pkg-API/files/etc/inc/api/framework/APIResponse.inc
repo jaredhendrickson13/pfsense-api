@@ -2994,6 +2994,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "User expiration date must be in MM/DD/YYYY format"
         ],
+        5041 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "User certificate does not exist"
+        ],
         // 6000-6999 reserved for /routing API calls
         6000 => [
             "status" => "bad request",
