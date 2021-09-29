@@ -6170,22 +6170,92 @@
 										{
 											"key": "method",
 											"value": "string",
-											"description": "Set the method used to add the certificate. Current supported methods (`import`)"
-										},
-										{
-											"key": "cert",
-											"value": "string",
-											"description": "Specify the Base64 encoded PEM certificate to import"
-										},
-										{
-											"key": "key",
-											"value": "string",
-											"description": "Specify the corresponding Base64 encoded certificate key"
+											"description": "Set the method used to add the certificate. Current supported methods are `existing` to import an existing PEM certificate and `internal` to generate a certificate using a CA object. _Note: previous releases referred to the `existing` method as `import`. You may use `existing` or `import` interchangeably._"
 										},
 										{
 											"key": "descr",
 											"value": "string",
 											"description": "Set a descriptive name for the certificate"
+										},
+										{
+											"key": "crt",
+											"value": "string",
+											"description": "Specify the Base64 encoded PEM certificate to import. This field is required when `method` is set to `existing`. _Note: previous releases referred to the `crt` field as `cert`. Both `crt` and `cert` can be used interchangeably._"
+										},
+										{
+											"key": "prv",
+											"value": "string",
+											"description": "Specify the corresponding Base64 encoded certificate key. This field is required when `method` is set to `existing`. _Note: previous releases referred to the `prv` field as `key`. Both `prv` and `key` can be used interchangeably._"
+										},
+										{
+											"key": "caref",
+											"value": "string",
+											"description": "Specify the unique reference ID of the certificate signing authority for the certificate. This field is required when `method` is set to `internal`."
+										},
+										{
+											"key": "keytype",
+											"value": "string",
+											"description": "Specify the private key type to generate. Options are `RSA` or `ECDSA`. This field is required when `method` is set to `internal`."
+										},
+										{
+											"key": "keylen",
+											"value": "integer",
+											"description": "Specify the private key length to generate. Options are `1024`, `2048`, `3072`, `4096`, `6144`, `7680`, `8192`, `15360`, `16384`. This field is required when `method` is set to `internal` AND `keytype` is set to `RSA`."
+										},
+										{
+											"key": "ecname",
+											"value": "string",
+											"description": "Specify the elliptic curve name to use when generating the private key. It is recommended to view options and compatibility within the pfSense webConfigurator or manually through OpenSSL as certain curves are not compatible in some circumstances. This field is required when `method` is set to `internal` AND `keytype` is set to `ECDSA`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._"
+										},
+										{
+											"key": "digest_alg",
+											"value": "string",
+											"description": "Specify the digest algorithm to use. Options are `sha1`, `sha224`, `sha256`, `sha384` and `sha512`. This field is required when `method` is set to `internal`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._"
+										},
+										{
+											"key": "lifetime",
+											"value": "integer",
+											"description": "Specify the number of days you would like this certificate to be valid for. This must be below OpenSSL's maximum lifetime value (around `12000` days). Defaults to `3650` days. This field is required when `method` is set to `internal`. _Note: maximum value is subject to change, when in doubt, check the pfSense webConfigurator options for this field._"
+										},
+										{
+											"key": "dn_commonname",
+											"value": "string",
+											"description": "Specify the common name of this certificate. In mose cases, this will be a hostname. This field is required when `method` is set to `internal`."
+										},
+										{
+											"key": "dn_country",
+											"value": "string",
+											"description": "Specify the country code for this certificate. This must be a known 2-digit country code. This field is only available when `method` is set to `internal`. (optional)"
+										},
+										{
+											"key": "dn_state",
+											"value": "string",
+											"description": "Specify the state or province for this certificate. This field is only available when `method` is set to `internal`. (optional)"
+										},
+										{
+											"key": "dn_city",
+											"value": "string",
+											"description": "Specify the city or locale for this certificate. This field is only available when `method` is set to `internal`. (optional)"
+										},
+										{
+											"key": "dn_organization",
+											"value": "string",
+											"description": "Specify the managing organization for this certificate. This field is only available when `method` is set to `internal`. (optional)"
+										},
+										{
+											"key": "dn_organizationalunit",
+											"value": "string",
+											"description": "Specify the managing organizational unit or team for this certificate. This field is only available when `method` is set to `internal`. (optional)"
+										},
+										{
+											"key": "type",
+											"value": "string",
+											"description": "Specify the certificate type. Options are `server` and `user`. This field is only available when `method` is set to `internal`."
+										},
+										{
+											"key": "altnames",
+											"value": "array",
+											"description": "Specify subject alternative names to list in this certificate. This must be an array of objects with each object containing a alt name type as the key and the alt name value as the value. Supported alt name types are `dns` for FQDNs, `ip` for IP addresses, `uri` for URLs, and `email` for email addresses. This field is only available when `method` is set to `internal`. An example of a valid `altnames` array is `[{\"dns\": \"example.com\"}, {\"ip\": \"127.0.0.1\"}, {\"uri\": \"http://example.com/test\"}, {\"email\": \"example@example.com\"}]` (optional)"
 										},
 										{
 											"key": "active",
