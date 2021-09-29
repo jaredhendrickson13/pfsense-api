@@ -23,7 +23,7 @@ class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
         {
             "name": "Create firewall schedule",
             "payload": {
-                "name": "Test_Schedule",
+                "name": "Test_Create_Schedule",
                 "descr": "Unit test",
                 "timerange": [
                     {
@@ -74,7 +74,7 @@ class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
             "status": 400,
             "return": 4149,
             "payload": {
-                "name": "Test_Schedule"
+                "name": "Test_Create_Schedule"
             }
         },
         {
@@ -104,7 +104,7 @@ class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
                 "type": "pass",
                 "src": "any",
                 "dst": "any",
-                "sched": "Test_Schedule"
+                "sched": "Test_Create_Schedule"
             }
         }
     ]
@@ -112,7 +112,7 @@ class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
         {
             "name": "Update firewall schedule",
             "payload": {
-                "name": "Test_Schedule",
+                "name": "Test_Create_Schedule",
                 "descr": "Updated unit test",
                 "timerange": [
                     {
@@ -145,13 +145,13 @@ class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
         {
             "name": "Check update with no changes",
             "payload": {
-                "name": "Test_Schedule"
+                "name": "Test_Create_Schedule"
             }
         },
         {
             "name": "Check update with changed description only",
             "payload": {
-                "name": "Test_Schedule",
+                "name": "Test_Create_Schedule",
                 "descr": "Update unit test description only"
             }
         },
@@ -160,7 +160,7 @@ class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
             "status": 400,
             "return": 4162,
             "payload": {
-                "name": "Test_Schedule",
+                "name": "Test_Create_Schedule",
                 "timerange": []
             }
         },
@@ -171,7 +171,7 @@ class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
             "status": 400,
             "return": 4166,
             "payload": {
-                "name": "Test_Schedule"
+                "name": "Test_Create_Schedule"
             }
         },
         {
@@ -182,7 +182,7 @@ class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
         {
             "name": "Delete firewall schedule",
             "payload": {
-                "name": "Test_Schedule"
+                "name": "Test_Create_Schedule"
             }
         },
         {

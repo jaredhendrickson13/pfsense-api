@@ -1,8 +1,8 @@
 {
 	"info": {
-		"_postman_id": "3dcf10cc-745b-41ed-97dc-136ed69509e4",
+		"_postman_id": "3c9386e2-aa20-4f27-8851-a5f6bc57e8eb",
 		"name": "pfSense REST API Documentation",
-		"description": "---\n\n# Introduction\npfSense API is a fast, safe, REST API package for pfSense firewalls. This works by leveraging the same PHP functions and processes used \nby pfSense's webConfigurator into API endpoints to create, read, update and delete pfSense configurations. All API \nendpoints enforce input validation to prevent invalid configurations from being made. Configurations made via API are \nproperly written to the master XML configuration and the correct backend configurations are made preventing the need for\n a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!\n\n\n# Requirements\n- pfSense 2.4.4 or later is supported\n- pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the \nwebConfigurator are required to make calls to the API endpoints\n- While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit\n\n\n# Installation\nTo install pfSense API, simply run the following command from the pfSense shell:<br>\n```\npkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.5-pkg-API.txz && /etc/rc.restart_webgui\n```\n\nTo uninstall pfSense API, run the following command:<br>\n```\npfsense-api delete\n```\n\nTo update pfSense API to the latest stable version, run the following command:\n```\npfsense-api update\n```\n\nTo revert to a previous version of pfSense API (e.g. v1.1.7), run the following command:\n```\npfsense-api revert v1.1.7\n```\n\n### Notes: \n- To install the 2.4 package, simply change the `2.5` in the install URL to `2.4`.\n- In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package\n- If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to \n'Diagnostics > Command Prompt' and enter the commands there\n- When updating pfSense, **_you must reinstall pfSense API afterwards_**. Unfortunately, pfSense removes all existing packages and only re-installs packages found within pfSense's package repositories. Since pfSense API is not an official package in pfSense's repositories, it does not get reinstalled automatically.\n- The `pfsense-api` command line tool was introduced in v1.1.0. Refer to the corresponding documentation for earlier releases.\n\n\n# UI Settings & Documentation\nAfter installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System > API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation in context to your pfSense instance.\n\n### Notes: \n- Users must hold the `page-all` or `page-system-api` privileges to access the API page within the webConfigurator\n\n\n# Authentication & Authorization\nBy default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense \nfrom the API out of the box, and user passwords may be changed from the API to immediately add additional security if \nneeded. After installation, you can navigate to System > API in the pfSense webConfigurator to configure API\nauthentication. Please note that external authentication servers like LDAP or RADIUS are not supported with any \nAPI authentication method at this time. \n\nTo authenticate your API call, follow the instructions for your configured authentication mode:\n\n<details>\n    <summary>Local Database (default)</summary>\n\nUses the same credentials as the pfSense webConfigurator. To authenticate API calls, simply add a `client-id` value containing your username and a `client-token` value containing your password to your payload. For example `{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}`\n\n</details>\n\n<details>\n    <summary>JWT</summary>\n\nRequires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a `client-id` value containing your pfSense username and a `client-token` value containing your pfSense password to your payload. For example `{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}`. Once you have your bearer token, you can authenticate your API call by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)\n</details>\n\n<details>\n    <summary>API Token</summary>\n\nUses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication; not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by specifying your client-id and client-token within an `Authorization` header, these values must be separated by a space. (e.g. `Authorization: client-id-here client-token-here`)\n\n_Note: In previous versions of pfSense API, the client-id and client-token were provided via the request payload. This functionality is still supported but is not recommended. It will be removed in a future release._\n\n</details>\n\n### Authorization\npfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.\n\n\n# Content Types\npfSense API can handle a few different content types. Please note, if a `Content-Type` header is not specified in your request, pfSense API will attempt to determine the\ncontent type which may have undesired results. It is recommended you specify your preferred `Content-Type` on each request. While several content types may be enabled,\n`application/json` is the recommended content type. Supported content types are:\n\n<details>\n    <summary>application/json</summary>\n\nParses the request body as a JSON formatted string. This is the recommended content type.\n\nExample:\n\n```\ncurl -s -H \"Content-Type: application/json\" -d '{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}' -X GET https://pfsense.example.com/api/v1/system/arp\n{\n  \"status\": \"ok\",\n  \"code\": 200,\n  \"return\": 0,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"ip\": \"192.168.1.1\",\n      \"mac\": \"00:0c:29:f6:be:d9\",\n      \"interface\": \"em1\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    },\n    {\n      \"ip\": \"172.16.209.139\",\n      \"mac\": \"00:0c:29:f6:be:cf\",\n      \"interface\": \"em0\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    }\n  ]\n}\n```\n\n</details>\n\n<details>\n    <summary>application/x-www-form-urlencoded</summary>\n\nParses the request body as URL encoded parameters. Note: boolean and integer types may not be parsed using this content type.\n\nExample:\n\n```\ncurl -s -H \"Content-Type: application/x-www-form-urlencoded\" -X GET \"https://pfsense.example.com/api/v1/system/arp?client-id=admin&client-token=pfsense\"\n{\n  \"status\": \"ok\",\n  \"code\": 200,\n  \"return\": 0,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"ip\": \"192.168.1.1\",\n      \"mac\": \"00:0c:29:f6:be:d9\",\n      \"interface\": \"em1\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    },\n    {\n      \"ip\": \"172.16.209.139\",\n      \"mac\": \"00:0c:29:f6:be:cf\",\n      \"interface\": \"em0\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    }\n  ]\n}\n```\n\n</details>\n\n# Response Codes\n`200 (OK)` : API call succeeded<br>\n`400 (Bad Request)` : An error was found within your requested parameters<br>\n`401 (Unauthorized)` : API client has not completed authentication or authorization successfully<br>\n`403 (Forbidden)` : The API endpoint has refused your call. Commonly due to your access settings found in System > API<br>\n`404 (Not found)` : Either the API endpoint or requested data was not found<br>\n`500 (Server error)` : The API endpoint encountered an unexpected error processing your API request<br>\n\n\n# Error Codes\nA full list of error codes can be found by navigating to /api/v1/system/api/error after installation. This will return\n JSON data containing each error code and their corresponding error message. No authentication is required to view the \n error code library. This also makes API integration with third-party software easy as the API error codes and messages \n are always just an HTTP call away!\n\n\n# Queries\npfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field. \n<details>\n    <summary>Targeting Objects</summary>\n    \nYou may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns this response without a query:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you want the endpoint to only return the objects that have their `type` value set to `type1` you could add `{\"type\": \"type1\"}` to your payload. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n    ]\n}\n```\n\nAdditionally, if you need to target values that are nested within an array, you can add `{\"extra__tag\": 100}` to recursively target the `tag` value within the `extra` array. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n</details>\n\n<details>\n    <summary>Query Filters</summary>\n    \nQuery filters allow you to apply logic to the objects you target. This makes it easy to target data that meets specific criteria:\n\n### Starts With\n    \nThe `startswith` filter allows you to target objects whose values start with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names started with `Other`, you could use the payload `{\"name__startswith\": \"Other\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n### Ends With\n    \nThe `endswith` filter allows you to target objects whose values end with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names ended with `er Test`, you could use the payload `{\"name__endswith\" \"er Test\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}    \n    ]\n}\n```\n\n### Contains\n    \nThe `contains` filter allows you to target objects whose values contain a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names contain `ther`, you could use the payload `{\"name__contains\": \"ther\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}    \n    ]\n}\n```\n\n### Less Than\n    \nThe `lt` filter allows you to target objects whose values are less than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is less than `100`, you could use the payload `{\"extra__tag__lt\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}  \n    ]\n}\n```\n\n### Less Than or Equal To\n    \nThe `lte` filter allows you to target objects whose values are less than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is less than or equal to `100`, you could use the payload `{\"extra__tag__lte\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}},\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n### Greater Than\n    \nThe `gt` filter allows you to target objects whose values are greater than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is greater than `100`, you could use the payload `{\"extra__tag__gt\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}  \n    ]\n}\n```\n\n### Greater Than or Equal To\n    \nThe `lte` filter allows you to target objects whose values are greater than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is greater than or equal to `100`, you could use the payload `{\"extra__tag__gte\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n    ]\n}\n```\n\n</details>\n\n### Obtaining Object IDs\nYou may notice some API endpoints require an object `id` to update or delete objects. These IDs are not stored values, rather pfSense uses the object's array index value to locate and identify objects. Unless specified otherwise, API endpoints will use the same array index value (as returned in the `data` response field) to locate objects when updating or deleting. Some important items to note about these IDs:\n\n- pfSense starts arrays with an index of 0. If you use a loop counter to determine the ID of a specific object, you must start that counter at 0.\n- These IDs are dynamic. For example, if you have 3 static route objects stored (IDs `0`, `1`, and `2`) and you _delete_ the object with ID `1`, pfSense will resort the array so the object with ID `2` will now have an ID of `1`.\n- API queries will retain the object's ID in the response. In the event that the `data` response field is no longer a sequential array due to the query, the `data` field will be represented as an associative array with the array items` key being the objects ID.\n\n### Requirements for queries:\n- API call must be successful and return `0` in the `return` field.\n- Endpoints must return an array of objects in the data field (e.g. `[{\"id\": 0, \"name\": \"Test\"}, {\"id\": 1, \"name\": \"Other Test\"}]`).\n- At least two objects must be present within the data field to support queries.\n\n### Notes:\n- For those using the Local database or API token authentication types, `client-id` and `client-token` are excluded from queries by default\n- Both recursive queries and query filters are separated by double underscores (`__`)\n\n\n# Rate limit\nThere is no limit to API calls at this time but is important to note that pfSense's XML configuration was not designed for quick simultaneous writes like a traditional database. It may be necessary to delay API calls in sequence to prevent unexpected behavior. Alternatively, you may limit the API to read-only mode to only allow endpoints with read (GET) access within the webConfigurator's System > API page.\n\n\n# Endpoints",
+		"description": "---\n\n# Introduction\npfSense API is a fast, safe, REST API package for pfSense firewalls. This works by leveraging the same PHP functions and processes used \nby pfSense's webConfigurator into API endpoints to create, read, update and delete pfSense configurations. All API \nendpoints enforce input validation to prevent invalid configurations from being made. Configurations made via API are \nproperly written to the master XML configuration and the correct backend configurations are made preventing the need for\n a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!\n\n\n# Requirements\n- pfSense 2.5.0 or later is supported (older pfSense versions may be compatible with older versions of pfSense API)\n- pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the \nwebConfigurator are required to make calls to the API endpoints\n- While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit\n\n\n# Installation\nTo install pfSense API, simply run the following command from the pfSense shell:<br>\n```\npkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.5-pkg-API.txz && /etc/rc.restart_webgui\n```\n\nTo uninstall pfSense API, run the following command:<br>\n```\npfsense-api delete\n```\n\nTo update pfSense API to the latest stable version, run the following command:\n```\npfsense-api update\n```\n\nTo revert to a previous version of pfSense API (e.g. v1.1.7), run the following command:\n```\npfsense-api revert v1.1.7\n```\n\n### Notes: \n- To install the 2.6 package, simply change the `2.5` in the install URL to `2.6`.\n- In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package\n- If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to \n'Diagnostics > Command Prompt' and enter the commands there\n- When updating pfSense, **_you must reinstall pfSense API afterwards_**. Unfortunately, pfSense removes all existing packages and only re-installs packages found within pfSense's package repositories. Since pfSense API is not an official package in pfSense's repositories, it does not get reinstalled automatically.\n- The `pfsense-api` command line tool was introduced in v1.1.0. Refer to the corresponding documentation for earlier releases.\n\n\n# UI Settings & Documentation\nAfter installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System > API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation in context to your pfSense instance.\n\n### Notes: \n- Users must hold the `page-all` or `page-system-api` privileges to access the API page within the webConfigurator\n\n\n# Authentication & Authorization\nBy default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense \nfrom the API out of the box, and user passwords may be changed from the API to immediately add additional security if \nneeded. After installation, you can navigate to System > API in the pfSense webConfigurator to configure API\nauthentication. Please note that external authentication servers like LDAP or RADIUS are not supported with any \nAPI authentication method at this time. \n\nTo authenticate your API call, follow the instructions for your configured authentication mode:\n\n<details>\n    <summary>Local Database (default)</summary>\n\nUses the same credentials as the pfSense webConfigurator. To authenticate API calls, simply add a `client-id` value containing your username and a `client-token` value containing your password to your payload. For example `{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}`\n\n</details>\n\n<details>\n    <summary>JWT</summary>\n\nRequires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a `client-id` value containing your pfSense username and a `client-token` value containing your pfSense password to your payload. For example `{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}`. Once you have your bearer token, you can authenticate your API call by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)\n</details>\n\n<details>\n    <summary>API Token</summary>\n\nUses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication; not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by specifying your client-id and client-token within an `Authorization` header, these values must be separated by a space. (e.g. `Authorization: client-id-here client-token-here`)\n\n_Note: In previous versions of pfSense API, the client-id and client-token were provided via the request payload. This functionality is still supported but is not recommended. It will be removed in a future release._\n\n</details>\n\n### Authorization\npfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.\n\n\n# Content Types\npfSense API can handle a few different content types. Please note, if a `Content-Type` header is not specified in your request, pfSense API will attempt to determine the\ncontent type which may have undesired results. It is recommended you specify your preferred `Content-Type` on each request. While several content types may be enabled,\n`application/json` is the recommended content type. Supported content types are:\n\n<details>\n    <summary>application/json</summary>\n\nParses the request body as a JSON formatted string. This is the recommended content type.\n\nExample:\n\n```\ncurl -s -H \"Content-Type: application/json\" -d '{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}' -X GET https://pfsense.example.com/api/v1/system/arp\n{\n  \"status\": \"ok\",\n  \"code\": 200,\n  \"return\": 0,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"ip\": \"192.168.1.1\",\n      \"mac\": \"00:0c:29:f6:be:d9\",\n      \"interface\": \"em1\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    },\n    {\n      \"ip\": \"172.16.209.139\",\n      \"mac\": \"00:0c:29:f6:be:cf\",\n      \"interface\": \"em0\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    }\n  ]\n}\n```\n\n</details>\n\n<details>\n    <summary>application/x-www-form-urlencoded</summary>\n\nParses the request body as URL encoded parameters. Note: boolean and integer types may not be parsed using this content type.\n\nExample:\n\n```\ncurl -s -H \"Content-Type: application/x-www-form-urlencoded\" -X GET \"https://pfsense.example.com/api/v1/system/arp?client-id=admin&client-token=pfsense\"\n{\n  \"status\": \"ok\",\n  \"code\": 200,\n  \"return\": 0,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"ip\": \"192.168.1.1\",\n      \"mac\": \"00:0c:29:f6:be:d9\",\n      \"interface\": \"em1\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    },\n    {\n      \"ip\": \"172.16.209.139\",\n      \"mac\": \"00:0c:29:f6:be:cf\",\n      \"interface\": \"em0\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    }\n  ]\n}\n```\n\n</details>\n\n# Response Codes\n`200 (OK)` : API call succeeded<br>\n`400 (Bad Request)` : An error was found within your requested parameters<br>\n`401 (Unauthorized)` : API client has not completed authentication or authorization successfully<br>\n`403 (Forbidden)` : The API endpoint has refused your call. Commonly due to your access settings found in System > API<br>\n`404 (Not found)` : Either the API endpoint or requested data was not found<br>\n`500 (Server error)` : The API endpoint encountered an unexpected error processing your API request<br>\n\n\n# Error Codes\nA full list of error codes can be found by navigating to /api/v1/system/api/error after installation. This will return\n JSON data containing each error code and their corresponding error message. No authentication is required to view the \n error code library. This also makes API integration with third-party software easy as the API error codes and messages \n are always just an HTTP call away!\n\n\n# Queries\npfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field. \n<details>\n    <summary>Targeting Objects</summary>\n    \nYou may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns this response without a query:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you want the endpoint to only return the objects that have their `type` value set to `type1` you could add `{\"type\": \"type1\"}` to your payload. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n    ]\n}\n```\n\nAdditionally, if you need to target values that are nested within an array, you can add `{\"extra__tag\": 100}` to recursively target the `tag` value within the `extra` array. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n</details>\n\n<details>\n    <summary>Query Filters</summary>\n    \nQuery filters allow you to apply logic to the objects you target. This makes it easy to target data that meets specific criteria:\n\n### Starts With\n    \nThe `startswith` filter allows you to target objects whose values start with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names started with `Other`, you could use the payload `{\"name__startswith\": \"Other\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n### Ends With\n    \nThe `endswith` filter allows you to target objects whose values end with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names ended with `er Test`, you could use the payload `{\"name__endswith\" \"er Test\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}    \n    ]\n}\n```\n\n### Contains\n    \nThe `contains` filter allows you to target objects whose values contain a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names contain `ther`, you could use the payload `{\"name__contains\": \"ther\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}    \n    ]\n}\n```\n\n### Less Than\n    \nThe `lt` filter allows you to target objects whose values are less than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is less than `100`, you could use the payload `{\"extra__tag__lt\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}  \n    ]\n}\n```\n\n### Less Than or Equal To\n    \nThe `lte` filter allows you to target objects whose values are less than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is less than or equal to `100`, you could use the payload `{\"extra__tag__lte\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}},\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n### Greater Than\n    \nThe `gt` filter allows you to target objects whose values are greater than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is greater than `100`, you could use the payload `{\"extra__tag__gt\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}  \n    ]\n}\n```\n\n### Greater Than or Equal To\n    \nThe `lte` filter allows you to target objects whose values are greater than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is greater than or equal to `100`, you could use the payload `{\"extra__tag__gte\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n    ]\n}\n```\n\n</details>\n\n### Obtaining Object IDs\nYou may notice some API endpoints require an object `id` to update or delete objects. These IDs are not stored values, rather pfSense uses the object's array index value to locate and identify objects. Unless specified otherwise, API endpoints will use the same array index value (as returned in the `data` response field) to locate objects when updating or deleting. Some important items to note about these IDs:\n\n- pfSense starts arrays with an index of 0. If you use a loop counter to determine the ID of a specific object, you must start that counter at 0.\n- These IDs are dynamic. For example, if you have 3 static route objects stored (IDs `0`, `1`, and `2`) and you _delete_ the object with ID `1`, pfSense will resort the array so the object with ID `2` will now have an ID of `1`.\n- API queries will retain the object's ID in the response. In the event that the `data` response field is no longer a sequential array due to the query, the `data` field will be represented as an associative array with the array items` key being the objects ID.\n\n### Requirements for queries:\n- API call must be successful and return `0` in the `return` field.\n- Endpoints must return an array of objects in the data field (e.g. `[{\"id\": 0, \"name\": \"Test\"}, {\"id\": 1, \"name\": \"Other Test\"}]`).\n- At least two objects must be present within the data field to support queries.\n\n### Notes:\n- For those using the Local database or API token authentication types, `client-id` and `client-token` are excluded from queries by default\n- Both recursive queries and query filters are separated by double underscores (`__`)\n\n\n# Rate limit\nThere is no limit to API calls at this time but is important to note that pfSense's XML configuration was not designed for quick simultaneous writes like a traditional database. It may be necessary to delay API calls in sequence to prevent unexpected behavior. Alternatively, you may limit the API to read-only mode to only allow endpoints with read (GET) access within the webConfigurator's System > API page.\n\n\n# Endpoints",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -63,7 +63,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \n}"
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/ldap",
@@ -97,7 +100,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"TEST_AUTHSERVER\",\n\t\"host\": \"ldap.com\",\n\t\"ldap_port\": 636,\n\t\"ldap_urltype\": \"encrypted\",\n\t\"ldap_protver\": \"3\",\n\t\"ldap_timeout\": 12,\n\t\"ldap_scope\": \"subtree\",\n\t\"ldap_basedn\": \"dc=test,dc=com\",\n    \"ldap_authcn\": \"ou=people,dc=test,dc=com;ou=groups,dc=test,dc=com\",\n    \"ldap_attr_user\": \"uid\",\n    \"ldap_attr_group\": \"cn\",\n    \"ldap_attr_member\": \"memberof\",\n    \"ldap_attr_groupobj\": \"posixGroup\",\n    \"ldap_binddn\": \"cn=pfsense,dc=test,dc=com\",\n    \"ldap_bindpw\": \"asdf\",\n    \"active\": false\n}"
+									"raw": "{\n\t\"name\": \"TEST_AUTHSERVER\",\n\t\"host\": \"ldap.com\",\n\t\"ldap_port\": 636,\n\t\"ldap_urltype\": \"encrypted\",\n\t\"ldap_protver\": \"3\",\n\t\"ldap_timeout\": 12,\n\t\"ldap_scope\": \"subtree\",\n\t\"ldap_basedn\": \"dc=test,dc=com\",\n    \"ldap_authcn\": \"ou=people,dc=test,dc=com;ou=groups,dc=test,dc=com\",\n    \"ldap_attr_user\": \"uid\",\n    \"ldap_attr_group\": \"cn\",\n    \"ldap_attr_member\": \"memberof\",\n    \"ldap_attr_groupobj\": \"posixGroup\",\n    \"ldap_binddn\": \"cn=pfsense,dc=test,dc=com\",\n    \"ldap_bindpw\": \"asdf\",\n    \"active\": false\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/ldap?name=string&host=string&ldap_port=string or integer&ldap_urltype=string&ldap_protver=string or integer&ldap_scope=string&ldap_basedn=string&ldap_authcn=string&ldap_extended_query=string&ldap_binddn=string&ldap_bindpw=string&ldap_attr_user=string&ldap_attr_group=string&ldap_attr_member=string&ldap_attr_groupobj=string&ldap_utf8=boolean&ldap_timeout=string or integer&active=boolean",
@@ -223,7 +229,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"LDAP_AUTHSERVER_0\"\n}"
+									"raw": "{\n\t\"name\": \"LDAP_AUTHSERVER_0\"\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/ldap?name=string",
@@ -264,7 +273,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"test\"\n}"
+									"raw": "{\n\t\"name\": \"test\"\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/radius?name=string",
@@ -297,6 +309,7 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "8bf571f6-7cc1-486b-892b-ca669be8a49d",
 										"exec": [
 											""
 										],
@@ -316,7 +329,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"name\": \"TEST_RADIUS\",\n    \"host\": \"123\",\n    \"radius_secret\": \"testsecret\",\n    \"radius_auth_port\": 1812,\n    \"radius_acct_port\": 1813,\n    \"radius_protocol\": \"MSCHAPv2\",\n    \"radius_timeout\": 5,\n    \"radius_nasip_attribute\": \"wan\"\n}"
+									"raw": "{\n    \"name\": \"TEST_RADIUS\",\n    \"host\": \"123\",\n    \"radius_secret\": \"testsecret\",\n    \"radius_auth_port\": 1812,\n    \"radius_acct_port\": 1813,\n    \"radius_protocol\": \"MSCHAPv2\",\n    \"radius_timeout\": 5,\n    \"radius_nasip_attribute\": \"wan\"\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server/radius?name=string&host=string&radius_secret=string&radius_auth_port=integer&radius_acct_port=integer&radius_timeout=integer&radius_nasip_attribute=string&active=boolean&radius_protocol=string",
@@ -396,7 +412,10 @@
 								],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"name\": \"test\"\n}"
+									"raw": "{\n\t\"name\": \"test\"\n}",
+									"options": {
+										"raw": {}
+									}
 								},
 								"url": {
 									"raw": "https://{{$hostname}}/api/v1/user/auth_server?name=string",
@@ -463,6 +482,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "fdf6fdf8-da76-4ff2-a22d-ae99527a107c",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -472,13 +492,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "85540dd7-2448-4cbc-a4de-1c7dbda99c8b",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "PRIVILEGE",
@@ -582,6 +605,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "62e05f62-734b-4c35-94c3-a901f7ba2d2f",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -591,13 +615,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "9a32c25c-37a0-433c-bcb4-2aa58790b430",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "GROUP",
@@ -694,6 +721,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "33b0502f-6582-4449-bda8-9a3476693037",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -703,13 +731,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "c2dd868d-b0e6-4aad-9d15-3f868b84b5b7",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "Read Users",
@@ -781,9 +812,29 @@
 									"description": "Password to assign new user"
 								},
 								{
+									"key": "disabled",
+									"value": "boolean",
+									"description": "Disable user account upon creation. `true` to disable, `false` to keep enabled. Defaults to `false` (optional)"
+								},
+								{
 									"key": "descr",
 									"value": "string",
 									"description": "Descriptive name to assign new user (optional)"
+								},
+								{
+									"key": "expires",
+									"value": "string",
+									"description": "Expiration date for user account in  MM/DD/YYYY format (optional)"
+								},
+								{
+									"key": "priv",
+									"value": "array",
+									"description": "Assign privileges to this user. This must be an array of corresponding pfSense privileges (e.g. `page-firewall-rule`). (optional)"
+								},
+								{
+									"key": "cert",
+									"value": "array",
+									"description": "Assign user certificates to this user. This must be an array of corresponding user certificate's `refid` values. (optional)"
 								},
 								{
 									"key": "authorizedkeys",
@@ -794,17 +845,8 @@
 									"key": "ipsecpsk",
 									"value": "string",
 									"description": "IPsec pre-shared key to assign new user (optional)"
-								},
-								{
-									"key": "disabled",
-									"value": "boolean",
-									"description": "Disable user account upon creation. Do not include to leave enabled. (optional)"
-								},
-								{
-									"key": "expires",
-									"value": "string",
-									"description": "Expiration date for user account in  MM/DD/YYYY format (optional)"
 								}
+
 							]
 						},
 						"description": "Add a new pfSense user to the local database.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-usermanager`]"
@@ -853,16 +895,6 @@
 									"description": "Descriptive name to assign the user (optional)"
 								},
 								{
-									"key": "authorizedkeys",
-									"value": "string",
-									"description": "Base64 encoded authorized keys to add to user (optional)"
-								},
-								{
-									"key": "ipsecpsk",
-									"value": "string",
-									"description": "IPsec pre-shared key to assign to user (optional)"
-								},
-								{
 									"key": "disabled",
 									"value": "boolean",
 									"description": "Disable user account  (optional)"
@@ -871,6 +903,26 @@
 									"key": "expires",
 									"value": "string",
 									"description": "Expiration date for user account in  MM/DD/YYYY format (optional)"
+								},
+								{
+									"key": "priv",
+									"value": "array",
+									"description": "Update privileges assigned to this user. This must be an array of corresponding pfSense privileges (e.g. `page-firewall-rule`). To remove all privileges from a user use an empty array. (optional)"
+								},
+								{
+									"key": "cert",
+									"value": "array",
+									"description": "Update user certificates assigned to this user. This must be an array of corresponding user certificate's `refid` values. To remove all user certificate assignments, use empty array. (optional)"
+								},
+								{
+									"key": "authorizedkeys",
+									"value": "string",
+									"description": "Base64 encoded authorized keys to add to user (optional)"
+								},
+								{
+									"key": "ipsecpsk",
+									"value": "string",
+									"description": "IPsec pre-shared key to assign to user (optional)"
 								}
 							]
 						},
@@ -921,6 +973,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "639886c4-e154-4e81-967b-0798710e9a4b",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -930,17 +983,212 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "5dd2e6ac-99f7-40ea-a60a-5f5d0b29d547",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "INTERFACE",
 			"item": [
+				{
+					"name": "BRIDGE",
+					"item": [
+						{
+							"name": "Read Interface Bridges",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/interface/bridge",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"interface",
+										"bridge"
+									]
+								},
+								"description": "Read bridge assignments and configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge`, `page-interfaces-bridge-edit`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Create Interface Bridges",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"members\": [\"em1\", \"LAN\"],\n\t\"descr\": \"New bridge\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/interface/bridge",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"interface",
+										"bridge"
+									],
+									"query": [
+										{
+											"key": "members",
+											"value": "array",
+											"description": "Specify interface members to add to this bridge. This can be the physical interface ID (e.g. em0), the pfSense interface ID (e.g. wan, lan, optx) or the interface descriptions (e.g. WAN, LAN)"
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Set a description for the new bridge (optional)"
+										}
+									]
+								},
+								"description": "Add a new bridge interface.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge-edit`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Update Interface Bridges",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"id\": \"bridge0\",\n\t\"members\": [\"WAN\", \"lan\", \"igb2\"],\n\t\"descr\": \"Updated bridge\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/interface/bridge",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"interface",
+										"bridge"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "string",
+											"description": "Specify the bridge ID to update. _Note: This uses the `bridgeif` value (e.g. bridge0, bridge2, etc.) NOT the configuration array index like other objects._"
+										},
+										{
+											"key": "members",
+											"value": "array",
+											"description": "Update interface members for this bridge. This can be the physical interface ID (e.g. em0), the pfSense interface ID (e.g. wan, lan, optx) or the interface descriptions (e.g. WAN, LAN). (optional)"
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Update the description of the bridge (optional)"
+										}
+									]
+								},
+								"description": "Modify an existing bridge configuration\n\n<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge-edit`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete Interface Bridges",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"id\": \"bridge2\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/interface/bridge",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"interface",
+										"bridge"
+									],
+									"query": [
+										{
+											"key": "id",
+											"value": "string",
+											"description": "Specify the bridge ID to delete. Bridges cannot be deleted while in use. _Note: This uses the `bridgeif` value (e.g. bridge0, bridge2, etc.) NOT the configuration array index like other objects._"
+										}
+									]
+								},
+								"description": "Delete bridge assignment and configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge-edit`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that create, read, update and delete interface bridges",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "c6fe9ffe-9de5-4644-9768-5aa2772e092c",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "8c6f77f1-b2f2-442d-b71f-467e723ca398",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
 				{
 					"name": "VLAN",
 					"item": [
@@ -1143,6 +1391,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "c6fe9ffe-9de5-4644-9768-5aa2772e092c",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -1152,13 +1401,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "8c6f77f1-b2f2-442d-b71f-467e723ca398",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "APPLY",
@@ -1195,7 +1447,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints to apply pending interface configurations."
+					"description": "API endpoints to apply pending interface configurations.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "Read Interfaces",
@@ -1752,6 +2006,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "051f1e68-4918-490a-addb-4382498fb266",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -1761,13 +2016,15 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "73d9e12e-9407-4ac8-b744-58c5ddea0ee7",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "FIREWALL",
@@ -1877,6 +2134,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "e3665f54-6a1c-4070-b6b1-527a8652ec94",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -1886,13 +2144,16 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "ec5bb151-6296-4ab0-9ec7-96401cf46b9d",
 										"type": "text/javascript",
 										"exec": [
 											""
 										]
 									}
 								}
-							]
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "Read Firewall Aliases",
@@ -2001,7 +2262,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/firewall/alias?id=string&name=string&type=string&descr=string&address=string or array&detail=string or array",
+									"raw": "https://{{$hostname}}/api/v1/firewall/alias",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -2079,8 +2340,7 @@
 										{
 											"key": "id",
 											"value": "string",
-											"description": "Name or ID of alias to delete. This alias cannot be in use elsewhere in configuration",
-											"disabled": true
+											"description": "Name or ID of alias to delete. This alias cannot be in use elsewhere in configuration"
 										}
 									]
 								},
@@ -2094,6 +2354,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "30fa8fba-175e-4220-a8ed-934990d70b48",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -2103,17 +2364,59 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "e3f16763-d677-41b2-b3d2-a8db318f7a7e",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "RULE",
 					"item": [
+						{
+							"name": "FLUSH",
+							"item": [
+								{
+									"name": "Delete All Firewall Rules",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/rule/flush",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"rule"
+											]
+										},
+										"description": "Deletes all existing firewall rules. This is useful for scripts that need to setup the firewall rules from scratch.<br><br>_Note: this endpoint will not reload the firewall filter automatically, you must make another API call to the /api/v1/firewall/apply endpoint to do so. Ensure firewall rules are created before reloading the filter to prevent lockout!_.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules-edit`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that flush existing firewall rule configurations.",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
 						{
 							"name": "Read Firewall Rules",
 							"protocolProfileBehavior": {
@@ -2468,6 +2771,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "80ac8792-4f2a-435a-9c3a-1083f3c2d71c",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -2477,13 +2781,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "2757293a-580d-4867-8243-897524979e46",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "VIRTUAL_IP",
@@ -2727,6 +3034,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "b9cf2b38-f7c4-4972-8cb8-c2bce5bb8693",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -2736,13 +3044,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "896f04ee-79d4-4060-b027-639080d36672",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "NAT",
@@ -3038,6 +3349,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "154dbf38-a398-440f-997f-73172e9491b7",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -3047,13 +3359,16 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "43d387ab-3594-4074-b923-aa0aa226d74e",
 										"type": "text/javascript",
 										"exec": [
 											""
 										]
 									}
 								}
-							]
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "ONE_TO_ONE",
@@ -3316,6 +3631,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "b651d13f-bac6-4972-b51b-e809a66de831",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -3325,13 +3641,16 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "e47f7092-4987-458a-9712-e6073c33a4f7",
 										"type": "text/javascript",
 										"exec": [
 											""
 										]
 									}
 								}
-							]
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "OUTBOUND",
@@ -3656,7 +3975,9 @@
 											"response": []
 										}
 									],
-									"description": "API endpoints that create, read, update and delete outbound NAT mappings."
+									"description": "API endpoints that create, read, update and delete outbound NAT mappings.",
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
 								},
 								{
 									"name": "Read Outbound NAT Settings",
@@ -3733,7 +4054,9 @@
 									"response": []
 								}
 							],
-							"description": "API endpoints that create, read, update and delete outbound NAT settings."
+							"description": "API endpoints that create, read, update and delete outbound NAT settings.",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						}
 					],
 					"description": "API endpoints that create, read, update and delete NAT configuration.",
@@ -3741,6 +4064,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "adf0dfcf-4885-45b1-a152-aab0f7920d13",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -3750,13 +4074,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "715ed88d-fe9e-4729-9964-3e60d7678b88",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "STATES",
@@ -3838,7 +4165,9 @@
 									},
 									"response": []
 								}
-							]
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "Read Firewall States",
@@ -3880,6 +4209,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "54944956-2f1a-4f21-9e84-5110a7769cad",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -3889,13 +4219,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "6ff93881-ede4-4985-95b0-583350219a90",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "APPLY",
@@ -3932,7 +4265,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints that apply pending firewall changes."
+					"description": "API endpoints that apply pending firewall changes.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "TRAFFIC_SHAPER",
@@ -4163,7 +4498,9 @@
 									},
 									"response": []
 								}
-							]
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "LIMITER",
@@ -4282,7 +4619,9 @@
 											"response": []
 										}
 									],
-									"description": "API endpoints to create and delete limiter bandwidth settings."
+									"description": "API endpoints to create and delete limiter bandwidth settings.",
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
 								},
 								{
 									"name": "QUEUE",
@@ -4523,7 +4862,9 @@
 											"response": []
 										}
 									],
-									"description": "API endpoints to create and delete limiter child queues."
+									"description": "API endpoints to create and delete limiter child queues.",
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
 								},
 								{
 									"name": "Create Limiter",
@@ -4849,7 +5190,9 @@
 									"response": []
 								}
 							],
-							"description": "API endpoints to create, read and delete traffic shaper limiters."
+							"description": "API endpoints to create, read and delete traffic shaper limiters.",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "Create Traffic Shaper",
@@ -5075,7 +5418,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints to create, read, update and delete traffic shaper configurations."
+					"description": "API endpoints to create, read, update and delete traffic shaper configurations.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "SCHEDULE",
@@ -5197,6 +5542,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "bc7723c5-9ecc-45e6-a45e-c31cd88e8905",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -5206,13 +5552,16 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "6e3f72d3-05f8-499d-9464-0116ef0dee58",
 										"type": "text/javascript",
 										"exec": [
 											""
 										]
 									}
 								}
-							]
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "Create Schedule",
@@ -5388,6 +5737,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "e2e01cc0-d2b7-4228-b33c-70932ba335f2",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -5397,13 +5747,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "bb8ad209-4699-4356-ad52-54bc9ab3fd94",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"description": "API endpoints that create, read, update and delete firewall services.",
@@ -5411,6 +5764,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "8057ca15-3393-4032-8e34-fc3ca8bbe35b",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -5420,13 +5774,15 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "6aa58c0e-7c8d-40d3-be38-806d00c848d7",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "SYSTEM",
@@ -5474,6 +5830,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "aa6a7687-73dc-4390-95ff-175f15bdc7ae",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -5483,13 +5840,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "3dc5bad6-bfae-4ba2-a13d-19619f718e39",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "ARP",
@@ -5572,6 +5932,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "2b421eba-fcaf-47cf-9efa-f426478ad160",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -5581,13 +5942,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "83a09631-ec1e-462b-971c-763c6bed3224",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "CONFIG",
@@ -5632,6 +5996,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "0641eeac-731e-4efc-9cf1-742625e059bf",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -5641,13 +6006,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "ba7bd0b8-fbe9-4bfc-a444-cd56cc72d66c",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "HOSTNAME",
@@ -5735,6 +6103,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "46076357-0d6d-48a5-9637-80746c062d49",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -5744,13 +6113,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "91a6543c-3dcc-4d7c-854e-bf347054cd91",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "CERTIFICATE",
@@ -5819,17 +6191,7 @@
 										{
 											"key": "method",
 											"value": "string",
-											"description": "Set the method used to add the certificate. Current supported methods (`import`)"
-										},
-										{
-											"key": "cert",
-											"value": "string",
-											"description": "Specify the Base64 encoded PEM certificate to import"
-										},
-										{
-											"key": "key",
-											"value": "string",
-											"description": "Specify the corresponding Base64 encoded certificate key"
+											"description": "Set the method used to add the certificate. Current supported methods are `existing` to import an existing PEM certificate and `internal` to generate a certificate using a CA object. _Note: previous releases referred to the `existing` method as `import`. You may use `existing` or `import` interchangeably._"
 										},
 										{
 											"key": "descr",
@@ -5837,9 +6199,89 @@
 											"description": "Set a descriptive name for the certificate"
 										},
 										{
+											"key": "crt",
+											"value": "string",
+											"description": "Specify the Base64 encoded PEM certificate to import. This field is required when `method` is set to `existing`. _Note: previous releases referred to the `crt` field as `cert`. Both `crt` and `cert` can be used interchangeably._"
+										},
+										{
+											"key": "prv",
+											"value": "string",
+											"description": "Specify the corresponding Base64 encoded certificate key. This field is required when `method` is set to `existing`. _Note: previous releases referred to the `prv` field as `key`. Both `prv` and `key` can be used interchangeably._"
+										},
+										{
+											"key": "caref",
+											"value": "string",
+											"description": "Specify the unique reference ID of the certificate signing authority for the certificate. This field is required when `method` is set to `internal`."
+										},
+										{
+											"key": "keytype",
+											"value": "string",
+											"description": "Specify the private key type to generate. Options are `RSA` or `ECDSA`. This field is required when `method` is set to `internal`."
+										},
+										{
+											"key": "keylen",
+											"value": "integer",
+											"description": "Specify the private key length to generate. Options are `1024`, `2048`, `3072`, `4096`, `6144`, `7680`, `8192`, `15360`, `16384`. This field is required when `method` is set to `internal` AND `keytype` is set to `RSA`."
+										},
+										{
+											"key": "ecname",
+											"value": "string",
+											"description": "Specify the elliptic curve name to use when generating the private key. It is recommended to view options and compatibility within the pfSense webConfigurator or manually through OpenSSL as certain curves are not compatible in some circumstances. This field is required when `method` is set to `internal` AND `keytype` is set to `ECDSA`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._"
+										},
+										{
+											"key": "digest_alg",
+											"value": "string",
+											"description": "Specify the digest algorithm to use. Options are `sha1`, `sha224`, `sha256`, `sha384` and `sha512`. This field is required when `method` is set to `internal`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._"
+										},
+										{
+											"key": "lifetime",
+											"value": "integer",
+											"description": "Specify the number of days you would like this certificate to be valid for. This must be below OpenSSL's maximum lifetime value (around `12000` days). Defaults to `3650` days. This field is required when `method` is set to `internal`. _Note: maximum value is subject to change, when in doubt, check the pfSense webConfigurator options for this field._"
+										},
+										{
+											"key": "dn_commonname",
+											"value": "string",
+											"description": "Specify the common name of this certificate. In mose cases, this will be a hostname. This field is required when `method` is set to `internal`."
+										},
+										{
+											"key": "dn_country",
+											"value": "string",
+											"description": "Specify the country code for this certificate. This must be a known 2-digit country code. This field is only available when `method` is set to `internal`. (optional)"
+										},
+										{
+											"key": "dn_state",
+											"value": "string",
+											"description": "Specify the state or province for this certificate. This field is only available when `method` is set to `internal`. (optional)"
+										},
+										{
+											"key": "dn_city",
+											"value": "string",
+											"description": "Specify the city or locale for this certificate. This field is only available when `method` is set to `internal`. (optional)"
+										},
+										{
+											"key": "dn_organization",
+											"value": "string",
+											"description": "Specify the managing organization for this certificate. This field is only available when `method` is set to `internal`. (optional)"
+										},
+										{
+											"key": "dn_organizationalunit",
+											"value": "string",
+											"description": "Specify the managing organizational unit or team for this certificate. This field is only available when `method` is set to `internal`. (optional)"
+										},
+										{
+											"key": "type",
+											"value": "string",
+											"description": "Specify the certificate type. Options are `server` and `user`. This field is only available when `method` is set to `internal`."
+										},
+										{
+											"key": "altnames",
+											"value": "array",
+											"description": "Specify subject alternative names to list in this certificate. This must be an array of objects with each object containing a alt name type as the key and the alt name value as the value. Supported alt name types are `dns` for FQDNs, `ip` for IP addresses, `uri` for URLs, and `email` for email addresses. This field is only available when `method` is set to `internal`. An example of a valid `altnames` array is:\n\n `[{\"dns\": \"example.com\"}, {\"ip\": \"127.0.0.1\"}, {\"uri\": \"http://example.com/test\"}, {\"email\": \"example@example.com\"}]`\n\n (optional)"
+										},
+										{
 											"key": "active",
 											"value": "boolean",
-											"description": "Set this certificate as the active certificate used by the webConfigurator (optional)"
+											"description": "Set this certificate as the active certificate used by the webConfigurator. Only available when `type` is set to `server` or `method` is set to `existing`. (optional)"
 										}
 									]
 								},
@@ -5862,7 +6304,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/system/certificate?refid=string&id=string&descr=string",
+									"raw": "https://{{$hostname}}/api/v1/system/certificate",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -5882,7 +6324,7 @@
 										{
 											"key": "id",
 											"value": "string",
-											"description": "Specify the id number of the certificate to delete (required if `refid` and `descr` are not defined)"
+											"description": "Specify the configuration ID number of the certificate to delete (required if `refid` and `descr` are not defined)"
 										},
 										{
 											"key": "descr",
@@ -5901,6 +6343,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "ae501696-89ce-4113-9ac2-fad15f5bee68",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -5910,13 +6353,251 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "1df86559-6031-4647-8cc0-4570403630fd",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "CA",
+					"item": [
+						{
+							"name": "Read System CAs",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/ca",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"ca"
+									]
+								},
+								"description": "Read installed CAs.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Create System CA",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"method\": \"existing\",\n\t\"crt\": \"LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZxekNDQTVPZ0F3SUJBZ0lVQi9rT2RoMzdTZnRxeHRqL1MxSTRkUTQyYXRvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWxWVU1RMHdDd1lEVlFRSERBUlBjbVZ0TVNFdwpId1lEVlFRS0RCaEpiblJsY201bGRDQlhhV1JuYVhSeklGQjBlU0JNZEdReEZ6QVZCZ05WQkFNTURuUmxjM1F1CmMyVmpiV1YwTG1Odk1CNFhEVEl3TURJd05ESXdNelV3...\",\n\t\"prv\": \"LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQ1N3d2dna29BZ0VBQW9JQ0FRREQ5RkNLU1U3SmY0QngKeWlKNkNOWGhOckI0ZVhjTk9TTm9GUVJIbXlsV2dHbEN5djMydFdicmF3RFhhQzk2aVpOSTFzNG5qWTdQT3BlWgpoNmFlaTJ5NllheS9VWWtOUkZGQmp4WlZlLzRwS2pKeXBQRlFBUlpMVko2TlNXaU5raGkwbDlqeWtacTlEbkFnCk1mclZyUEo1YktDM3JJVV...\",\n\t\"descr\": \"TEST CA\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/ca",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"ca"
+									],
+									"query": [
+										{
+											"key": "method",
+											"value": "string",
+											"description": "Set the method used to add the CA. Current supported methods are `existing`, `internal`, and `intermediate`. _Note: previous releases referred to the `existing` method as `import`. You may use `existing` or `import` interchangeably._"
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Set a descriptive name for the certificate"
+										},
+										{
+											"key": "trust",
+											"value": "boolean",
+											"description": "Specify `true` if you would like the system to trust this CA (optional)"
+										},
+										{
+											"key": "randomserial",
+											"value": "boolean",
+											"description": "Specify `true` if you would like certificates signed by this CA to utilize randomized serial numbers (optional)"
+										},
+										{
+											"key": "crt",
+											"value": "string",
+											"description": "Specify the Base64 encoded PEM CA certificate to import. This field is required when `method` is set to `existing`."
+										},
+										{
+											"key": "prv",
+											"value": "string",
+											"description": "Specify the corresponding Base64 encoded CA certificate key. This field is only available when `method` is set to `existing`. (optional)"
+										},
+										{
+											"key": "serial",
+											"value": "integer",
+											"description": "Specify the serial number to be assigned to the next certificate signed by this CA. Defaults to 1. This field is only available when `method` is set to `existing`. (optional)"
+										},
+										{
+											"key": "caref",
+											"value": "string",
+											"description": "Specify the unique reference ID of the certificate signing authority for the intermediate certificate. This field is required when `method` is set to `intermediate`."
+										},
+										{
+											"key": "keytype",
+											"value": "string",
+											"description": "Specify the private key type to generate. Options are `RSA` or `ECDSA`. This field is required when `method` is set to `internal` or `intermediate`."
+										},
+										{
+											"key": "keylen",
+											"value": "integer",
+											"description": "Specify the private key length to generate. Options are `1024`, `2048`, `3072`, `4096`, `6144`, `7680`, `8192`, `15360`, `16384`. This field is required when `method` is set to `internal` or `intermediate` AND `keytype` is set to `RSA`."
+										},
+										{
+											"key": "ecname",
+											"value": "string",
+											"description": "Specify the elliptic curve name to use when generating the private key. It is recommended to view options and compatibility within the pfSense webConfigurator or manually through OpenSSL as certain curves are not compatible in some circumstances. This field is required when `method` is set to `internal` or `intermediate` AND `keytype` is set to `ECDSA`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._"
+										},
+										{
+											"key": "digest_alg",
+											"value": "string",
+											"description": "Specify the digest algorithm to use. Options are `sha1`, `sha224`, `sha256`, `sha384` and `sha512`. This field is required when `method` is set to `internal` or `intermediate`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._"
+										},
+										{
+											"key": "lifetime",
+											"value": "integer",
+											"description": "Specify the number of days you would like this CA to be valid for. This must be below OpenSSL's maximum lifetime value (around `12000` days). Defaults to `3650` days. This field is required when `method` is set to `internal` or `intermediate`. _Note: maximum value is subject to change, when in doubt, check the pfSense webConfigurator options for this field._"
+										},
+										{
+											"key": "dn_commonname",
+											"value": "string",
+											"description": "Specify the common name of this CA. In mose cases, this will be a hostname. This field is required when `method` is set to `internal` or `intermediate`."
+										},
+										{
+											"key": "dn_country",
+											"value": "string",
+											"description": "Specify the country code for this CA. This must be a known 2-digit country code. This field is only available when `method` is set to `internal` or `intermediate`. (optional)"
+										},
+										{
+											"key": "dn_state",
+											"value": "string",
+											"description": "Specify the state or province for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional)"
+										},
+										{
+											"key": "dn_city",
+											"value": "string",
+											"description": "Specify the city or locale for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional)"
+										},
+										{
+											"key": "dn_organization",
+											"value": "string",
+											"description": "Specify the managing organization for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional)"
+										},
+										{
+											"key": "dn_organizationalunit",
+											"value": "string",
+											"description": "Specify the managing organizational unit or team for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional)"
+										}
+									]
+								},
+								"description": "Add a new CA certificate.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete System CA",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"refid\": \"0\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/ca?refid=string&descr=string",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"ca"
+									],
+									"query": [
+										{
+											"key": "refid",
+											"value": "string",
+											"description": "Specify the refid of the CA to delete (required if `descr` is  not defined)"
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Specify the description of the certificate to delete (required if `refid` is not defined) _Note: if multiple CA exist with the same name, only the first matching CA will be deleted_"
+										}
+									]
+								},
+								"description": "Delete an existing CA.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that create, read, update and delete system SSL/TLS Certificate Authorities.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae501696-89ce-4113-9ac2-fad15f5bee68",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "1df86559-6031-4647-8cc0-4570403630fd",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "API",
@@ -6031,6 +6712,26 @@
 											"key": "custom_headers",
 											"value": "array",
 											"description": "Update the custom response headers for the API to return in API responses. This must be an array of key-value pairs (e.g. `{\"custom-header\": \"custom-header-value}`. To revert custom headers to the default state, simply pass in an empty array. In most cases, custom headers are not necessary. An example use case for custom headers is setting CORS policy headers required by some frontend web applications. (optional)"
+										},
+										{
+											"key": "hasync",
+											"value": "boolean",
+											"description": "Enable or disable HA sync for API configurations. (optional)"
+										},
+										{
+											"key": "hasync_hosts",
+											"value": "array",
+											"description": "Update the hosts to sync API configurations to. This must be an array of IP addresses or FQDN strings. At least one host must be specified when HA sync is enabled. (optional)"
+										},
+										{
+											"key": "hasync_username",
+											"value": "string",
+											"description": "Update the username to authenticate as for HA synchronization. This user must be present on ALL hosts specified in the `hasync_hosts` field and must hold the `page-system-api` privilege. A value must be set when HA sync is enabled. (optional)"
+										},
+										{
+											"key": "hasync_password",
+											"value": "string",
+											"description": "Update the password of the username to authenticate as for HA synchronization. A value must be set when HA sync is enabled. (optional)"
 										}
 									]
 								},
@@ -6072,6 +6773,41 @@
 								"description": "Read our error code library. This function does NOT require authentication and is intended to be used by third-party scripts/software to translate error codes to their full error message."
 							},
 							"response": []
+						},
+						{
+							"name": "Read System API Version",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/api/version",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"api",
+										"version"
+									]
+								},
+								"description": "Read the current API version and locate available version updates.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]"
+							},
+							"response": []
 						}
 					],
 					"description": "API endpoints that read our current API configuration.",
@@ -6079,6 +6815,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "a8a9f71d-05ef-4c42-a923-9e921334924f",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -6088,13 +6825,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "09048044-bc38-4584-b39c-a381f7e47d90",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "DNS",
@@ -6186,6 +6926,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "c38238a2-cace-4470-abf4-c69da1fb78b4",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -6195,13 +6936,16 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "95ca5850-5142-48bb-b02a-19b772d39ffb",
 										"type": "text/javascript",
 										"exec": [
 											""
 										]
 									}
 								}
-							]
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "Read System DNS",
@@ -6291,6 +7035,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "595dbf29-b5d2-46b2-9ee6-efa4f4c3ad4b",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -6300,13 +7045,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "2021dac8-de75-4803-9413-ced9f979627c",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "TUNABLE",
@@ -6490,6 +7238,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "ee2185da-d90b-4a56-9e6a-0ca5d95c5a23",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -6499,13 +7248,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "fdfc1ce7-5cfd-4aaf-9063-6f0bd3d1c7f6",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "TABLE",
@@ -6550,6 +7302,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "5f486b95-03c2-4ad5-96ed-04203dc66d6a",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -6559,13 +7312,62 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "a5518858-8338-4a94-bce5-8657f68132fb",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "CONSOLE",
+					"item": [
+						{
+							"name": "Update Console Settings",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"disableconsolemenu\": true\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/console",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"console"
+									],
+									"query": [
+										{
+											"key": "disableconsolemenu",
+											"value": "boolean",
+											"description": "Enable or disable console password protection. `true` to enable, `false` to disable."
+										}
+									]
+								},
+								"description": "Updates the console settings.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-admin`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that configure the pfSense console.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "REBOOT",
@@ -6602,7 +7404,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints that reboot the pfSense system."
+					"description": "API endpoints that reboot the pfSense system.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "HALT",
@@ -6639,7 +7443,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints that halt/shutdown the pfSense system."
+					"description": "API endpoints that halt/shutdown the pfSense system.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"description": "API calls that create, read, update and delete system configuration.",
@@ -6647,6 +7453,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "e1ea68dd-1600-4470-bc37-96f467d8f555",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -6656,13 +7463,15 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "6d40c170-669d-4c44-8300-9170d7289e6f",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "ROUTING",
@@ -6670,6 +7479,71 @@
 				{
 					"name": "GATEWAY",
 					"item": [
+						{
+							"name": "DETAIL",
+							"item": [
+								{
+									"name": "Read Routing Gateway Details",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/routing/gateway/detail",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"routing",
+												"gateway",
+												"detail"
+											]
+										},
+										"description": "Read verbose routing gateway details about both dynamic/system gateways and static gateways.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that read verbose routing gateway details.",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "49c0369d-6aa5-4518-ab63-950e778eb77a",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "c4e1d017-46cc-4839-b5ab-9fd35e23571f",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
 						{
 							"name": "Read Routing Gateways",
 							"protocolProfileBehavior": {
@@ -6700,7 +7574,7 @@
 										"gateway"
 									]
 								},
-								"description": "Read routing gateways.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]\n\n_Note: Currently, GET requests to this endpoint return verbose backend gateway information rather than the gateway objects as they appear in the configuration. This discrepancy makes it difficult to interact with gateway objects via API. Because of this, GET requests to this endpoint will be refactored in a future release._"
+								"description": "Read routing gateways.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]\n\n_Note: This endpoint originally returned verbose routing gateway details. This functionality has moved to /api/v1/routing/gateway/detail._"
 							},
 							"response": []
 						},
@@ -6895,7 +7769,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/routing/gateway?id=integer&interface=string&ipprotocol=string&name=string&gateway=string&monitor=string&disabled=boolean&monitor_disable=boolean&action_disable=boolean&force_down=boolean&descr=string&weight=integer&data_payload=integer&latencylow=integer&latencyhigh=integer&losslow=integer&losshigh=integer&interval=integer&loss_interval=integer&time_period=integer&alert_interval=integer&apply=boolean",
+									"raw": "https://{{$hostname}}/api/v1/routing/gateway?interface=string&ipprotocol=string&name=string&gateway=string&monitor=string&disabled=boolean&monitor_disable=boolean&action_disable=boolean&force_down=boolean&descr=string&weight=integer&data_payload=integer&latencylow=integer&latencyhigh=integer&losslow=integer&losshigh=integer&interval=integer&loss_interval=integer&time_period=integer&alert_interval=integer&apply=boolean",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -7029,6 +7903,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "49c0369d-6aa5-4518-ab63-950e778eb77a",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -7038,13 +7913,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "c4e1d017-46cc-4839-b5ab-9fd35e23571f",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "STATIC_ROUTE",
@@ -7248,6 +8126,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "babba450-0bb7-4fef-843e-6e6d97064a93",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -7257,13 +8136,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "4db4f333-c729-4d77-b74f-4db889c1355d",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "APPLY",
@@ -7305,6 +8187,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "022f36c2-10c1-4710-9340-24fbecd06b49",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -7314,13 +8197,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "140625c3-4808-4005-b6dc-62203c44f08b",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"description": "API endpoints that create, read, update and delete network routing configuration.",
@@ -7328,6 +8214,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "26a35da0-1635-4ed2-81b1-f569d61040d4",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -7337,13 +8224,15 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "1e955518-2769-4068-a087-a28aeedb7dbb",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "STATUS",
@@ -7444,6 +8333,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "90281281-1373-469f-b2c8-3532f2c65604",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -7453,13 +8343,90 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "64f03429-ed78-47d1-b454-d1c325641ca5",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "OPENVPN",
+					"item": [
+						{
+							"name": "Read OpenVPN Status",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJwZlNlbnNlIiwiZXhwIjoxNTk4MDcwMTAzLCJuYmYiOjE1OTgwNjE3MDMsImRhdGEiOiJhZG1pbiJ9.hgvNu96Bvsehcq6ygTa9LPB8eymiLnxYu4V6J8_h0-o",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/status/openvpn",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"status",
+										"openvpn"
+									]
+								},
+								"description": "Read the OpenVPN status.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-status-openvpn`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that read the OpenVPN status.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "90281281-1373-469f-b2c8-3532f2c65604",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "64f03429-ed78-47d1-b454-d1c325641ca5",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "LOG",
@@ -7650,6 +8617,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "90f859fe-7a45-47b2-8a40-b20b2e8842a3",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -7659,13 +8627,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "c59f49b7-85c9-4df1-abe5-7e9aeac8658b",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "GATEWAY",
@@ -7715,7 +8686,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints that read gateway statuses."
+					"description": "API endpoints that read gateway statuses.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "INTERFACE",
@@ -7765,7 +8738,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints that read interface statuses and metrics."
+					"description": "API endpoints that read interface statuses and metrics.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "SYSTEM",
@@ -7815,7 +8790,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints that read system statuses."
+					"description": "API endpoints that read system statuses.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				}
 			],
 			"description": "API endpoints that read and update system statuses.",
@@ -7823,6 +8800,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "1727112a-71b6-435a-95c9-0fb059835a00",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -7832,20 +8810,693 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "a9fe9c8a-2abe-4cfe-a18e-b2832927254c",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "SERVICES",
 			"item": [
 				{
+					"name": "OpenVPN",
+					"item": [
+						{
+							"name": "Client Specific Overrides",
+							"item": [
+								{
+									"name": "Read OpenVPN Client Specific Overrides",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/openvpn/csc",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"openvpn",
+												"csc"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create OpenVPN Client Specific Overrides",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"server_list\": \"1, 2, 3\",\r\n    \"custom_options\": \"ifconfig-push xxx.xxx.xxx.xxx 255.255.255.0;\",\r\n    \"disable\": true,\r\n    \"common_name\": \"commonname\",\r\n    \"block\": true,\r\n    \"description\": \"An override, that is specific...\",\r\n    \"tunnel_network\": \"10.0.8.5/24\",\r\n    \"tunnel_networkv6\": \"2001:db9:1:1::100/64\",\r\n    \"local_network\": \"10.0.9.5/24, 10.0.8.5/24, 10.0.10.5/24\",\r\n    \"local_networkv6\": \"2001:db9:1:1::100/64, 2002:db9:1:1::100/64, 2003:db9:1:1::100/64\",\r\n    \"remote_network\": \"10.0.9.5/24, 10.0.8.5/24, 10.0.10.5/24\",\r\n    \"remote_networkv6\": \"2001:db9:1:1::100/64, 2002:db9:1:1::100/64, 2003:db9:1:1::100/64\",\r\n    \"redirect_gateway\": true,\r\n    \"prevent_server_definitions\": true,\r\n    \"remove_server_routes\": true,\r\n    \"dns_domain\": \"google.com\",\r\n    \"dns_servers\": \"8.8.8.8, 8.8.4.4, 8.8.3.3, 8.8.2.2\",\r\n    \"ntp_servers\": \"192.168.56.101, 192.168.56.102\",\r\n    \"netbios_enable\": true,\r\n    \"netbios_node_type\": \"p\",\r\n    \"netbios_scope\": \"5\",\r\n    \"wins_servers\": \"192.168.56.103, 192.168.56.104\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/openvpn/csc?server_list=string&custom_options=string&disable=boolean&common_name=string&block=boolean&description=string&tunnel_network=string&tunnel_networkv6=string&local_network=string&local_networkv6=string&remote_network=string&remote_networkv6=string&redirect_gateway=boolean&prevent_server_definitions=boolean&remove_server_routes=boolean&dns_domain=string&dns_servers=string&ntp_servers=string&netbios_enable=boolean&netbios_node_type=string&netbios_scope=string&wins_servers=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"openvpn",
+												"csc"
+											],
+											"query": [
+												{
+													"key": "server_list",
+													"value": "string",
+													"description": "A comma separated string containing the ids of the OpenVPN servers that use this override. Omitting this activates the override for all servers."
+												},
+												{
+													"key": "custom_options",
+													"value": "string",
+													"description": "Enter any additional options to add for this client specific override, separated by a semicolon.\nEXAMPLE: push \"route 10.0.0.0 255.255.255.0\";"
+												},
+												{
+													"key": "disable",
+													"value": "boolean",
+													"description": "Whether to disable this override without removing it."
+												},
+												{
+													"key": "common_name",
+													"value": "string",
+													"description": "Enter the X.509 common name for the client certificate, or the username for VPNs utilizing password authentication. This match is case sensitive."
+												},
+												{
+													"key": "block",
+													"value": "boolean",
+													"description": "Prevents the client from connecting to this server. Do not use this option to permanently disable a client due to a compromised key or password. Use a CRL (certificate revocation list) instead."
+												},
+												{
+													"key": "description",
+													"value": "string",
+													"description": "A description for administrative reference (not parsed)."
+												},
+												{
+													"key": "tunnel_network",
+													"value": "string",
+													"description": "The virtual IPv4 network used for private communications between this client and the server expressed using CIDR (e.g. 10.0.8.5/24).\nWith subnet topology, enter the client IP address and the subnet mask must match the IPv4 Tunnel Network on the server.\nWith net30 topology, the first network address of the /30 is assumed to be the server address and the second network address will be assigned to the client."
+												},
+												{
+													"key": "tunnel_networkv6",
+													"value": "string",
+													"description": "The virtual IPv6 network used for private communications between this client and the server expressed using prefix (e.g. 2001:db9:1:1::100/64).\nEnter the client IPv6 address and prefix. The prefix must match the IPv6 Tunnel Network prefix on the server."
+												},
+												{
+													"key": "local_network",
+													"value": "string",
+													"description": "These are the IPv4 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more CIDR networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
+												},
+												{
+													"key": "local_networkv6",
+													"value": "string",
+													"description": "These are the IPv6 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more IP/PREFIX networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
+												},
+												{
+													"key": "remote_network",
+													"value": "string",
+													"description": "These are the IPv4 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more CIDR ranges. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv4 Remote Networks list on the corresponding OpenVPN server settings."
+												},
+												{
+													"key": "remote_networkv6",
+													"value": "string",
+													"description": "These are the IPv6 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more IP/PREFIX networks. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv6 Remote Networks list on the corresponding OpenVPN server settings."
+												},
+												{
+													"key": "redirect_gateway",
+													"value": "boolean",
+													"description": "Force all client generated traffic through the tunnel."
+												},
+												{
+													"key": "prevent_server_definitions",
+													"value": "boolean",
+													"description": "Prevent this client from receiving any server-defined client settings."
+												},
+												{
+													"key": "remove_server_routes",
+													"value": "boolean",
+													"description": "Prevent this client from receiving any server-defined routes without removing any other options."
+												},
+												{
+													"key": "dns_domain",
+													"value": "string",
+													"description": "Domain name for DNS to provide to the client."
+												},
+												{
+													"key": "dns_servers",
+													"value": "string",
+													"description": "A comma-separated list of no more than 4 DNS server IP addresses (i.e. 8.8.8.8). Any more than the first four are ignored. This list is provided to the clent."
+												},
+												{
+													"key": "ntp_servers",
+													"value": "string",
+													"description": "A comma-separated list of no more than 2 NTP server IP addresses. Any more than the first two are ignored."
+												},
+												{
+													"key": "netbios_enable",
+													"value": "boolean",
+													"description": "Enable NetBIOS over TCP/IP. If this option is not set, all NetBIOS-over-TCP/IP options (including WINS) will be disabled."
+												},
+												{
+													"key": "netbios_node_type",
+													"value": "string",
+													"description": "Possible options: b (broadcasts), p (point-to-point name queries to a WINS server), m (broadcast then query name server), and h (query name server, then broadcast). This parameter takes a single letter either b, p, m, or h. Any other string will result in this option being set to none."
+												},
+												{
+													"key": "netbios_scope",
+													"value": "string",
+													"description": "A NetBIOS Scope ID provides an extended naming service for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS traffic on a single network to only those nodes with the same NetBIOS scope ID."
+												},
+												{
+													"key": "wins_servers",
+													"value": "string",
+													"description": "A comma-separated list of no more than 2 WINS server IP addresses. Any more than the first two are ignored."
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update OpenVPN Client Specific Overrides",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"refid\": 0,\r\n    \"server_list\": \"1, 2\",\r\n    \"custom_options\": \"ifconfig-push 10.10.10.1 255.255.255.0;\",\r\n    \"disable\": false,\r\n    \"common_name\": \"commonname2\",\r\n    \"block\": false,\r\n    \"description\": \"An override, that is VERY specific...\",\r\n    \"tunnel_network\": \"10.0.8.6/24\",\r\n    \"tunnel_networkv6\": \"2001:dc9:1:1::100/64\",\r\n    \"local_network\": \"10.0.9.6/24, 10.0.8.5/24, 10.0.10.6/24\",\r\n    \"local_networkv6\": \"2001:dc9:1:1::100/64, 2002:dc9:1:1::100/64, 2003:dc9:1:1::100/64\",\r\n    \"remote_network\": \"10.0.9.6/24, 10.0.8.5/24, 10.0.10.6/24\",\r\n    \"remote_networkv6\": \"2001:dc9:1:1::100/64, 2002:dc9:1:1::100/64, 2003:dc9:1:1::100/64\",\r\n    \"redirect_gateway\": false,\r\n    \"prevent_server_definitions\": false,\r\n    \"remove_server_routes\": false,\r\n    \"dns_domain\": \"github.com\",\r\n    \"dns_servers\": \"8.8.8.7, 8.8.4.7, 8.8.3.7, 8.8.2.7\",\r\n    \"ntp_servers\": \"192.168.56.106, 192.168.56.107\",\r\n    \"netbios_enable\": false,\r\n    \"netbios_node_type\": \"m\",\r\n    \"netbios_scope\": \"42\",\r\n    \"wins_servers\": \"192.168.56.108, 192.168.56.194\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/openvpn/csc?refid=int&server_list=string&custom_options=string&disable=boolean&common_name=string&block=boolean&description=string&tunnel_network=string&tunnel_networkv6=string&local_network=string&local_networkv6=string&remote_network=string&remote_networkv6=string&redirect_gateway=boolean&prevent_server_definitions=boolean&remove_server_routes=boolean&dns_domain=string&dns_servers=string&ntp_servers=string&netbios_enable=boolean&netbios_node_type=string&netbios_scope=string&wins_servers=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"openvpn",
+												"csc"
+											],
+											"query": [
+												{
+													"key": "refid",
+													"value": "int",
+													"description": "Reference id. This id indicates the id of the client specific override you want to modify. This id is not static as it is essentially the index of an entry in the config array. Best to first get all client specific overrides and get the id of the one you want to modify before calling this endpoint."
+												},
+												{
+													"key": "server_list",
+													"value": "string",
+													"description": "A comma separated string containing the ids of the OpenVPN servers that use this override. Omitting this activates the override for all servers."
+												},
+												{
+													"key": "custom_options",
+													"value": "string",
+													"description": "Enter any additional options to add for this client specific override, separated by a semicolon.\nEXAMPLE: push \"route 10.0.0.0 255.255.255.0\";"
+												},
+												{
+													"key": "disable",
+													"value": "boolean",
+													"description": "Whether to disable this override without removing it."
+												},
+												{
+													"key": "common_name",
+													"value": "string",
+													"description": "Enter the X.509 common name for the client certificate, or the username for VPNs utilizing password authentication. This match is case sensitive."
+												},
+												{
+													"key": "block",
+													"value": "boolean",
+													"description": "Prevents the client from connecting to this server. Do not use this option to permanently disable a client due to a compromised key or password. Use a CRL (certificate revocation list) instead."
+												},
+												{
+													"key": "description",
+													"value": "string",
+													"description": "A description for administrative reference (not parsed)."
+												},
+												{
+													"key": "tunnel_network",
+													"value": "string",
+													"description": "The virtual IPv4 network used for private communications between this client and the server expressed using CIDR (e.g. 10.0.8.5/24).\nWith subnet topology, enter the client IP address and the subnet mask must match the IPv4 Tunnel Network on the server.\nWith net30 topology, the first network address of the /30 is assumed to be the server address and the second network address will be assigned to the client."
+												},
+												{
+													"key": "tunnel_networkv6",
+													"value": "string",
+													"description": "The virtual IPv6 network used for private communications between this client and the server expressed using prefix (e.g. 2001:db9:1:1::100/64).\nEnter the client IPv6 address and prefix. The prefix must match the IPv6 Tunnel Network prefix on the server."
+												},
+												{
+													"key": "local_network",
+													"value": "string",
+													"description": "These are the IPv4 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more CIDR networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
+												},
+												{
+													"key": "local_networkv6",
+													"value": "string",
+													"description": "These are the IPv6 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more IP/PREFIX networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
+												},
+												{
+													"key": "remote_network",
+													"value": "string",
+													"description": "These are the IPv4 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more CIDR ranges. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv4 Remote Networks list on the corresponding OpenVPN server settings."
+												},
+												{
+													"key": "remote_networkv6",
+													"value": "string",
+													"description": "These are the IPv6 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more IP/PREFIX networks. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv6 Remote Networks list on the corresponding OpenVPN server settings."
+												},
+												{
+													"key": "redirect_gateway",
+													"value": "boolean",
+													"description": "Force all client generated traffic through the tunnel."
+												},
+												{
+													"key": "prevent_server_definitions",
+													"value": "boolean",
+													"description": "Prevent this client from receiving any server-defined client settings."
+												},
+												{
+													"key": "remove_server_routes",
+													"value": "boolean",
+													"description": "Prevent this client from receiving any server-defined routes without removing any other options."
+												},
+												{
+													"key": "dns_domain",
+													"value": "string",
+													"description": "Domain name for DNS to provide to the client."
+												},
+												{
+													"key": "dns_servers",
+													"value": "string",
+													"description": "A comma-separated list of no more than 4 DNS server IP addresses (i.e. 8.8.8.8). Any more than the first four are ignored. This list is provided to the clent."
+												},
+												{
+													"key": "ntp_servers",
+													"value": "string",
+													"description": "A comma-separated list of no more than 2 NTP server IP addresses. Any more than the first two are ignored."
+												},
+												{
+													"key": "netbios_enable",
+													"value": "boolean",
+													"description": "Enable NetBIOS over TCP/IP. If this option is not set, all NetBIOS-over-TCP/IP options (including WINS) will be disabled."
+												},
+												{
+													"key": "netbios_node_type",
+													"value": "string",
+													"description": "Possible options: b (broadcasts), p (point-to-point name queries to a WINS server), m (broadcast then query name server), and h (query name server, then broadcast). This parameter takes a single letter either b, p, m, or h. Any other string will result in this option being set to none."
+												},
+												{
+													"key": "netbios_scope",
+													"value": "string",
+													"description": "A NetBIOS Scope ID provides an extended naming service for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS traffic on a single network to only those nodes with the same NetBIOS scope ID."
+												},
+												{
+													"key": "wins_servers",
+													"value": "string",
+													"description": "A comma-separated list of no more than 2 WINS server IP addresses. Any more than the first two are ignored."
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete OpenVPN Client Specific Override",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"refid\": 0\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/openvpn/csc?refid=int",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"openvpn",
+												"csc"
+											],
+											"query": [
+												{
+													"key": "refid",
+													"value": "int",
+													"description": "Reference id. This id indicates the id of the client specific override you want to delete. This id is not static as it is essentially the index of an entry in the config array. Best to first get all client specific overrides and get the id of the one you want to delete before calling this endpoint."
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "UNBOUND",
 					"item": [
+						{
+							"name": "ACCESS_LIST",
+							"item": [
+								{
+									"name": "ROW",
+									"item": [
+										{
+											"name": "Create Unbound Access List Row",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n\t\"id\": 0,\n\t\"acl_network\": \"10.0.0.0\",\n\t\"mask\": 8,\n\t\"description\": \"Class A subnet\"\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "https://{{$hostname}}/api/v1/services/unbound/access_list/row",
+													"protocol": "https",
+													"host": [
+														"{{$hostname}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"services",
+														"unbound",
+														"access_list",
+														"row"
+													],
+													"query": [
+														{
+															"key": "id",
+															"value": "integer",
+															"description": "Specify the ID of the access list to apply this row to."
+														},
+														{
+															"key": "acl_network",
+															"value": "string",
+															"description": "Specify the IPv4 or IPv6 address of the network to add to the row."
+														},
+														{
+															"key": "mask",
+															"value": "integer",
+															"description": "Specify the subnet mask of the ACL network. This must be a value between 0 and 32 for IPv4 addresses or 0 and 128 or IPv6 addresses."
+														},
+														{
+															"key": "description",
+															"value": "string",
+															"description": "Description of the access list row (optional)"
+														},
+														{
+															"key": "apply",
+															"value": "boolean",
+															"description": "Specify whether or not you would like this access list row to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple access list rows at once it Is best to set this to false and apply the changes afterwards using the /api/v1/services/unbound/apply endpoint. Otherwise, If you are only adding a single access list row, you may set this true to apply it immediately. Defaults to false. (optional)"
+														}
+													]
+												},
+												"description": "Add a new row (network entry) to an existing Unbound access list.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]"
+											},
+											"response": []
+										}
+									],
+									"description": "API endpoints to create DNS Resolver (Unbound) access list rows (network entries).",
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
+								},
+								{
+									"name": "Read Unbound Access Lists",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/unbound/access_list",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"unbound",
+												"access_list"
+											]
+										},
+										"description": "Read configured Unbound access lists.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Create Unbound Access List",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"aclname\": \"Allow_All\",\n\t\"aclaction\": \"allow\",\n\t\"description\": \"Test ACL\",\n\t\"row\": [\n\t\t{\n\t\t\t\"acl_network\": \"0.0.0.0\",\n\t\t\t\"mask\": 0,\n\t\t\t\"description\": \"Test ACL entry\"\n\t\t}\n\t]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/unbound/access_list",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"unbound",
+												"access_list"
+											],
+											"query": [
+												{
+													"key": "aclname",
+													"value": "string",
+													"description": "Specify a name for this access list (optional)."
+												},
+												{
+													"key": "aclaction",
+													"value": "string",
+													"description": "Set the access list action. Options are `allow`, `deny`, `reject`, `allow spoof`, `deny nonlocal`, `reject nonlocal`."
+												},
+												{
+													"key": "description",
+													"value": "string",
+													"description": "Specify a detailed description for this access list (optional)."
+												},
+												{
+													"key": "row",
+													"value": "array",
+													"description": "Set networks to match for this access list. This must be an array of access list row objects and must contain at least one object. For more information on access list object fields, see documentation for /api/v1/services/unbound/access_list/row."
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not the Unbound configuration should be reloaded immediately after creating. `true` to apply immediately, `false` to keep the changes pending. If `false`, the Unbound configuration must be reloaded manually by calling the /api/v1/services/unbound/apply endpoint. Defaults to `false` (optional)."
+												}
+											]
+										},
+										"description": "Add a new Unbound access list.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Update Unbound Access List",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"id\": 0,\n\t\"aclname\": \"Updated_Allow_All\",\n\t\"aclaction\": \"deny\",\n\t\"description\": \"Updated test ACL\",\n\t\"row\": [\n\t\t{\n\t\t\t\"acl_network\": \"0::\",\n\t\t\t\"mask\": 0,\n\t\t\t\"description\": \"Updated test ACL entry\"\n\t\t}\n\t]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/unbound/access_list",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"unbound",
+												"access_list"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "string",
+													"description": "Specify the access list ID to update."
+												},
+												{
+													"key": "aclname",
+													"value": "string",
+													"description": "Specify a name for this access list (optional)."
+												},
+												{
+													"key": "aclaction",
+													"value": "string",
+													"description": "Set the access list action. Options are `allow`, `deny`, `reject`, `allow spoof`, `deny nonlocal`, `reject nonlocal`. (optional)"
+												},
+												{
+													"key": "description",
+													"value": "string",
+													"description": "Specify a detailed description for this access list (optional)."
+												},
+												{
+													"key": "row",
+													"value": "array",
+													"description": "Set networks to match for this access list. This must be an array of access list row objects and must contain at least one object. For more information on access list object fields, see documentation for /api/v1/services/unbound/access_list/row (optional)."
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not the Unbound configuration should be reloaded immediately after updating. `true` to apply immediately, `false` to keep the changes pending. If `false`, the Unbound configuration must be reloaded manually by calling the /api/v1/services/unbound/apply endpoint. Defaults to `false` (optional)."
+												}
+											]
+										},
+										"description": "Modify an existing Unbound access list\n\n<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete Unbound Access List",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"id\": 0\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/unbound/access_list",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"unbound",
+												"access_list"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "string",
+													"description": "Specify the access list ID to delete."
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not the Unbound configuration should be reloaded immediately after deleting. `true` to apply immediately, `false` to keep the changes pending. If `false`, the Unbound configuration must be reloaded manually by calling the /api/v1/services/unbound/apply endpoint. Defaults to `false` (optional)."
+												}
+											]
+										},
+										"description": "Delete Unbound access list.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that create, read, update and delete Unbound access lists",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "c6fe9ffe-9de5-4644-9768-5aa2772e092c",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "8c6f77f1-b2f2-442d-b71f-467e723ca398",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
 						{
 							"name": "HOST_OVERRIDE",
 							"item": [
@@ -7913,7 +9564,9 @@
 											"response": []
 										}
 									],
-									"description": "API endpoints to create, read, update and delete DNS Resolver (Unbound) host override aliases."
+									"description": "API endpoints to create, read, update and delete DNS Resolver (Unbound) host override aliases.",
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
 								},
 								{
 									"name": "Create Unbound Host Override",
@@ -8133,6 +9786,7 @@
 								{
 									"listen": "prerequest",
 									"script": {
+										"id": "4205151b-76ad-4b91-9157-da313755145d",
 										"type": "text/javascript",
 										"exec": [
 											""
@@ -8142,13 +9796,16 @@
 								{
 									"listen": "test",
 									"script": {
+										"id": "edeba871-80af-4178-b1e0-98fe8fe00c72",
 										"type": "text/javascript",
 										"exec": [
 											""
 										]
 									}
 								}
-							]
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "Read Unbound Configuration",
@@ -8318,6 +9975,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "2aeccc85-4dc8-41de-9d74-fdfe10345b9a",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -8327,13 +9985,518 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "c8a9f88e-9dd1-45ba-9d79-5ed0a8ceb165",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "DNSMASQ",
+					"item": [
+						{
+							"name": "HOST_OVERRIDE",
+							"item": [
+								{
+									"name": "ALIAS",
+									"item": [
+										{
+											"name": "Create dnsmasq Host Override Alias",
+											"request": {
+												"method": "POST",
+												"header": [],
+												"body": {
+													"mode": "raw",
+													"raw": "{\n    \"id\": 0,\n\t\"host\": \"alias\",\n\t\"domain\": \"example.com\",\n\t\"descr\": \"This is a test host override alias added via pfSense API!\",\n    \"apply\": true\n}",
+													"options": {
+														"raw": {
+															"language": "json"
+														}
+													}
+												},
+												"url": {
+													"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/host_override/alias?id=integer&host=string&domain=string&description=string&apply=boolean",
+													"protocol": "https",
+													"host": [
+														"{{$hostname}}"
+													],
+													"path": [
+														"api",
+														"v1",
+														"services",
+														"dnsmasq",
+														"host_override",
+														"alias"
+													],
+													"query": [
+														{
+															"key": "id",
+															"value": "integer",
+															"description": "Specify the ID of the host override to apply this alias to."
+														},
+														{
+															"key": "host",
+															"value": "string",
+															"description": "Specify the hostname of the alias"
+														},
+														{
+															"key": "domain",
+															"value": "string",
+															"description": "Specify the domain name of the alias"
+														},
+														{
+															"key": "description",
+															"value": "string",
+															"description": "Description of alias (optional)"
+														},
+														{
+															"key": "apply",
+															"value": "boolean",
+															"description": "Specify whether or not you would like this host override alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host override aliases at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only updating a single host override alias, you may set this true to apply it immediately. Defaults to false. (optional)"
+														}
+													]
+												},
+												"description": "Add a new host override alias to DNS Forwarder (dnsmasq).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]"
+											},
+											"response": []
+										}
+									],
+									"description": "API endpoints to create, read, update and delete DNS Forwarder (dnsmasq) host override aliases.",
+									"protocolProfileBehavior": {},
+									"_postman_isSubFolder": true
+								},
+								{
+									"name": "Create dnsmasq Host Override",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"host\": \"test\",\n\t\"domain\": \"example.com\",\n\t\"ip\": \"127.0.0.1\",\n\t\"descr\": \"This is a test host override added via pfSense API!\",\n\t\"aliases\": [\n        {\n            \"host\": \"test2\", \n            \"domain\": \"example.com\", \n            \"descr\": \"This is a test host override alias that will also resolve to this IP!\"\n        }\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/host_override?host=string&domain=string&ip=string&descr=string&aliases=array&apply=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"dnsmasq",
+												"host_override"
+											],
+											"query": [
+												{
+													"key": "host",
+													"value": "string",
+													"description": "Hostname of new DNS A record"
+												},
+												{
+													"key": "domain",
+													"value": "string",
+													"description": "Domain of new DNS A record"
+												},
+												{
+													"key": "ip",
+													"value": "string",
+													"description": "IPv4 or IPv6 of new DNS A record"
+												},
+												{
+													"key": "descr",
+													"value": "string",
+													"description": "Description of host override (optional)"
+												},
+												{
+													"key": "aliases",
+													"value": "array",
+													"description": "Hostname aliases (CNAME) for host override (optional)"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not you would like this host override to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only creating a single host override, you may set this true to apply it immediately. Defaults to false. (optional)"
+												}
+											]
+										},
+										"description": "Add a new host override to DNS Forwarder (dnsmasq).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Update dnsmasq Host Override",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"host\": \"updated_test\",\n\t\"domain\": \"example.com\",\n\t\"ip\": \"127.0.0.2\",\n\t\"descr\": \"This is a test host override update via pfSense API!\",\n\t\"aliases\": [\n        {\n            \"host\": \"test2\", \n            \"domain\": \"example.com\", \n            \"descr\": \"This is an updated host override alias that will also resolve to this IP!\"\n        },\n        {\n            \"host\": \"updated_to_add\", \n            \"domain\": \"example.com\", \n            \"descr\": \"This is a test host override alias that was also added during the update!\"\n        }\n    ]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/host_override?id=integer&host=string&domain=string&ip=string&descr=string&aliases=array&apply=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"dnsmasq",
+												"host_override"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "integer",
+													"description": "Specify the ID of the host override to update"
+												},
+												{
+													"key": "host",
+													"value": "string",
+													"description": "Update the hostname of this host override (optional)"
+												},
+												{
+													"key": "domain",
+													"value": "string",
+													"description": "Update the domain name of this host override (optional)"
+												},
+												{
+													"key": "ip",
+													"value": "string",
+													"description": "Update the IPv4/IPv6 address of this host override (optional)"
+												},
+												{
+													"key": "descr",
+													"value": "string",
+													"description": "Update the description of this host override (optional)"
+												},
+												{
+													"key": "aliases",
+													"value": "array",
+													"description": "Update the aliases for this host override. This will replace any existing entries. (optional)"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not you would like this host override update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only updating a single host override, you may set this true to apply it immediately. Defaults to false. (optional)"
+												}
+											]
+										},
+										"description": "Modify host overrides from DNS Forwarder (dnsmasq).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Delete dnsmasq Host Override",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \"id\": 0,\n    \"apply\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/host_override?id=integer&apply=boolean",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"dnsmasq",
+												"host_override"
+											],
+											"query": [
+												{
+													"key": "id",
+													"value": "integer",
+													"description": "Specify the ID of the host override to delete"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not you would like this host override deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only deleting a single host override, you may set this to true to apply it immediately. Defaults to false. (optional)"
+												}
+											]
+										},
+										"description": "Delete host overrides from DNS Forwarder (dnsmasq).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Read dnsmasq Host Override",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/host_override",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"dnsmasq",
+												"host_override"
+											]
+										},
+										"description": "Read host overrides from DNS Forwarder (dnsmasq).<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that create, read, update and delete DNS Forwarder (dnsmasq) host overrides.",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "4205151b-76ad-4b91-9157-da313755145d",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "edeba871-80af-4178-b1e0-98fe8fe00c72",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "Read dnsmasq Configuration",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/dnsmasq",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"services",
+										"dnsmasq"
+									]
+								},
+								"description": "Read DNS Forwarder (dnsmasq) configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Start dnsmasq Service",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/start",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"services",
+										"dnsmasq",
+										"start"
+									]
+								},
+								"description": "Start the DNS Forwarder (dnsmasq) service.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Restart dnsmasq Service",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/restart",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"services",
+										"dnsmasq",
+										"restart"
+									]
+								},
+								"description": "Restart the DNS Forwarder (dnsmasq) service.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Stop dnsmasq Service",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/stop",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"services",
+										"dnsmasq",
+										"stop"
+									]
+								},
+								"description": "Stop the DNS Forwarder (dnsmasq) service.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Apply Pending dnsmasq Changes",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/dnsmasq/apply",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"services",
+										"dnsmasq",
+										"apply"
+									]
+								},
+								"description": "Apply pending DNS Forwarder (dnsmasq) changes.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that create, read, update and delete DNS Forwarder (dnsmasq) configuration.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "2aeccc85-4dc8-41de-9d74-fdfe10345b9a",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "c8a9f88e-9dd1-45ba-9d79-5ed0a8ceb165",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "DHCPD",
@@ -8611,7 +10774,9 @@
 									"response": []
 								}
 							],
-							"description": "API endpoints to create, read, update and delete DHCP static mappings"
+							"description": "API endpoints to create, read, update and delete DHCP static mappings",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "LEASE",
@@ -8652,7 +10817,9 @@
 									"response": []
 								}
 							],
-							"description": "API endpoints that create, read, update and delete DHCPd leases."
+							"description": "API endpoints that create, read, update and delete DHCPd leases.",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "Start DHCPd Service",
@@ -8883,6 +11050,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "e5e76160-054a-49f8-9054-204857427ea4",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -8892,13 +11060,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "6533c4d0-6d62-4940-a7e2-dab884ce148e",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "DPINGER",
@@ -9005,6 +11176,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "95bb8839-86db-4899-ad74-3712fce2cd83",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -9014,13 +11186,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "f72281ec-2e69-4793-a8a2-33d76bd1fd48",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "NTPD",
@@ -9122,7 +11297,9 @@
 									"response": []
 								}
 							],
-							"description": "API endpoints that create, read, update and delete NTPd configuration."
+							"description": "API endpoints that create, read, update and delete NTPd configuration.",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						},
 						{
 							"name": "Start NTPd Service",
@@ -9343,6 +11520,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "1b2e2c7d-2132-42c1-8fa6-939ab554edcb",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -9352,13 +11530,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "e348bf30-57de-420a-bca8-e640589bdd8f",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "SSHD",
@@ -9552,6 +11733,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "e8daf510-c22a-49d5-93b3-cdad10f2a048",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -9561,13 +11743,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "ebf768a9-c9b4-406b-bee1-68fff5e5b4a3",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "SYSLOGD",
@@ -9674,6 +11859,7 @@
 						{
 							"listen": "prerequest",
 							"script": {
+								"id": "35d61658-7406-42a8-9336-ab5b595ccfca",
 								"type": "text/javascript",
 								"exec": [
 									""
@@ -9683,13 +11869,16 @@
 						{
 							"listen": "test",
 							"script": {
+								"id": "b92c1189-a548-47e0-97df-04f90fcc1e60",
 								"type": "text/javascript",
 								"exec": [
 									""
 								]
 							}
 						}
-					]
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "DDNS",
@@ -9729,7 +11918,9 @@
 							"response": []
 						}
 					],
-					"description": "API endpoints that create, read, update, and delete Dynamic DNS configuration."
+					"description": "API endpoints that create, read, update, and delete Dynamic DNS configuration.",
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
 				},
 				{
 					"name": "Read Services",
@@ -9871,6 +12062,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "725ba4fc-3451-4448-b930-9ecc6526f469",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -9880,13 +12072,15 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "4b5762b4-7b3d-4111-902a-89f734be7fe9",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
 			"name": "ACCESS_TOKEN",
@@ -9949,6 +12143,7 @@
 				{
 					"listen": "prerequest",
 					"script": {
+						"id": "93f2c033-9d0a-47b1-9a5b-a1b9a0d4c305",
 						"type": "text/javascript",
 						"exec": [
 							""
@@ -9958,388 +12153,99 @@
 				{
 					"listen": "test",
 					"script": {
+						"id": "3c7c951d-7fcc-4cb8-9782-01add869eca4",
 						"type": "text/javascript",
 						"exec": [
 							""
 						]
 					}
 				}
-			]
+			],
+			"protocolProfileBehavior": {}
 		},
 		{
-			"name": "OpenVPN",
+			"name": "DIAGNOSTICS",
 			"item": [
 				{
-					"name": "Client Specific Overrides",
-					"item": [
-						{
-							"name": "Read OpenVPN Client Specific Overrides",
-							"protocolProfileBehavior": {
-								"disableBodyPruning": true
-							},
-							"request": {
-								"method": "GET",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://{{$hostname}}/api/v1/openvpn/csc",
-									"protocol": "https",
-									"host": [
-										"{{$hostname}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"openvpn",
-										"csc"
-									]
+					"name": "Execute Shell Command",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "",
+									"type": "string"
 								}
-							},
-							"response": []
+							]
 						},
-						{
-							"name": "Create OpenVPN Client Specific Overrides",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"server_list\": \"1, 2, 3\",\r\n    \"custom_options\": \"ifconfig-push xxx.xxx.xxx.xxx 255.255.255.0;\",\r\n    \"disable\": true,\r\n    \"common_name\": \"commonname\",\r\n    \"block\": true,\r\n    \"description\": \"An override, that is specific...\",\r\n    \"tunnel_network\": \"10.0.8.5/24\",\r\n    \"tunnel_networkv6\": \"2001:db9:1:1::100/64\",\r\n    \"local_network\": \"10.0.9.5/24, 10.0.8.5/24, 10.0.10.5/24\",\r\n    \"local_networkv6\": \"2001:db9:1:1::100/64, 2002:db9:1:1::100/64, 2003:db9:1:1::100/64\",\r\n    \"remote_network\": \"10.0.9.5/24, 10.0.8.5/24, 10.0.10.5/24\",\r\n    \"remote_networkv6\": \"2001:db9:1:1::100/64, 2002:db9:1:1::100/64, 2003:db9:1:1::100/64\",\r\n    \"redirect_gateway\": true,\r\n    \"prevent_server_definitions\": true,\r\n    \"remove_server_routes\": true,\r\n    \"dns_domain\": \"google.com\",\r\n    \"dns_servers\": \"8.8.8.8, 8.8.4.4, 8.8.3.3, 8.8.2.2\",\r\n    \"ntp_servers\": \"192.168.56.101, 192.168.56.102\",\r\n    \"netbios_enable\": true,\r\n    \"netbios_node_type\": \"p\",\r\n    \"netbios_scope\": \"5\",\r\n    \"wins_servers\": \"192.168.56.103, 192.168.56.104\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://{{$hostname}}/api/v1/openvpn/csc?server_list=string&custom_options=string&disable=boolean&common_name=string&block=boolean&description=string&tunnel_network=string&tunnel_networkv6=string&local_network=string&local_networkv6=string&remote_network=string&remote_networkv6=string&redirect_gateway=boolean&prevent_server_definitions=boolean&remove_server_routes=boolean&dns_domain=string&dns_servers=string&ntp_servers=string&netbios_enable=boolean&netbios_node_type=string&netbios_scope=string&wins_servers=string",
-									"protocol": "https",
-									"host": [
-										"{{$hostname}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"openvpn",
-										"csc"
-									],
-									"query": [
-										{
-											"key": "server_list",
-											"value": "string",
-											"description": "A comma separated string containing the ids of the OpenVPN servers that use this override. Omitting this activates the override for all servers."
-										},
-										{
-											"key": "custom_options",
-											"value": "string",
-											"description": "Enter any additional options to add for this client specific override, separated by a semicolon.\nEXAMPLE: push \"route 10.0.0.0 255.255.255.0\";"
-										},
-										{
-											"key": "disable",
-											"value": "boolean",
-											"description": "Whether to disable this override without removing it."
-										},
-										{
-											"key": "common_name",
-											"value": "string",
-											"description": "Enter the X.509 common name for the client certificate, or the username for VPNs utilizing password authentication. This match is case sensitive."
-										},
-										{
-											"key": "block",
-											"value": "boolean",
-											"description": "Prevents the client from connecting to this server. Do not use this option to permanently disable a client due to a compromised key or password. Use a CRL (certificate revocation list) instead."
-										},
-										{
-											"key": "description",
-											"value": "string",
-											"description": "A description for administrative reference (not parsed)."
-										},
-										{
-											"key": "tunnel_network",
-											"value": "string",
-											"description": "The virtual IPv4 network used for private communications between this client and the server expressed using CIDR (e.g. 10.0.8.5/24).\nWith subnet topology, enter the client IP address and the subnet mask must match the IPv4 Tunnel Network on the server.\nWith net30 topology, the first network address of the /30 is assumed to be the server address and the second network address will be assigned to the client."
-										},
-										{
-											"key": "tunnel_networkv6",
-											"value": "string",
-											"description": "The virtual IPv6 network used for private communications between this client and the server expressed using prefix (e.g. 2001:db9:1:1::100/64).\nEnter the client IPv6 address and prefix. The prefix must match the IPv6 Tunnel Network prefix on the server."
-										},
-										{
-											"key": "local_network",
-											"value": "string",
-											"description": "These are the IPv4 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more CIDR networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
-										},
-										{
-											"key": "local_networkv6",
-											"value": "string",
-											"description": "These are the IPv6 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more IP/PREFIX networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
-										},
-										{
-											"key": "remote_network",
-											"value": "string",
-											"description": "These are the IPv4 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more CIDR ranges. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv4 Remote Networks list on the corresponding OpenVPN server settings."
-										},
-										{
-											"key": "remote_networkv6",
-											"value": "string",
-											"description": "These are the IPv6 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more IP/PREFIX networks. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv6 Remote Networks list on the corresponding OpenVPN server settings."
-										},
-										{
-											"key": "redirect_gateway",
-											"value": "boolean",
-											"description": "Force all client generated traffic through the tunnel."
-										},
-										{
-											"key": "prevent_server_definitions",
-											"value": "boolean",
-											"description": "Prevent this client from receiving any server-defined client settings."
-										},
-										{
-											"key": "remove_server_routes",
-											"value": "boolean",
-											"description": "Prevent this client from receiving any server-defined routes without removing any other options."
-										},
-										{
-											"key": "dns_domain",
-											"value": "string",
-											"description": "Domain name for DNS to provide to the client."
-										},
-										{
-											"key": "dns_servers",
-											"value": "string",
-											"description": "A comma-separated list of no more than 4 DNS server IP addresses (i.e. 8.8.8.8). Any more than the first four are ignored. This list is provided to the clent."
-										},
-										{
-											"key": "ntp_servers",
-											"value": "string",
-											"description": "A comma-separated list of no more than 2 NTP server IP addresses. Any more than the first two are ignored."
-										},
-										{
-											"key": "netbios_enable",
-											"value": "boolean",
-											"description": "Enable NetBIOS over TCP/IP. If this option is not set, all NetBIOS-over-TCP/IP options (including WINS) will be disabled."
-										},
-										{
-											"key": "netbios_node_type",
-											"value": "string",
-											"description": "Possible options: b (broadcasts), p (point-to-point name queries to a WINS server), m (broadcast then query name server), and h (query name server, then broadcast). This parameter takes a single letter either b, p, m, or h. Any other string will result in this option being set to none."
-										},
-										{
-											"key": "netbios_scope",
-											"value": "string",
-											"description": "A NetBIOS Scope ID provides an extended naming service for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS traffic on a single network to only those nodes with the same NetBIOS scope ID."
-										},
-										{
-											"key": "wins_servers",
-											"value": "string",
-											"description": "A comma-separated list of no more than 2 WINS server IP addresses. Any more than the first two are ignored."
-										}
-									]
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"shell_cmd\": \"echo 'Test command'\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
 								}
-							},
-							"response": []
+							}
 						},
-						{
-							"name": "Update OpenVPN Client Specific Overrides",
-							"request": {
-								"method": "PUT",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"refid\": 0,\r\n    \"server_list\": \"1, 2\",\r\n    \"custom_options\": \"ifconfig-push 10.10.10.1 255.255.255.0;\",\r\n    \"disable\": false,\r\n    \"common_name\": \"commonname2\",\r\n    \"block\": false,\r\n    \"description\": \"An override, that is VERY specific...\",\r\n    \"tunnel_network\": \"10.0.8.6/24\",\r\n    \"tunnel_networkv6\": \"2001:dc9:1:1::100/64\",\r\n    \"local_network\": \"10.0.9.6/24, 10.0.8.5/24, 10.0.10.6/24\",\r\n    \"local_networkv6\": \"2001:dc9:1:1::100/64, 2002:dc9:1:1::100/64, 2003:dc9:1:1::100/64\",\r\n    \"remote_network\": \"10.0.9.6/24, 10.0.8.5/24, 10.0.10.6/24\",\r\n    \"remote_networkv6\": \"2001:dc9:1:1::100/64, 2002:dc9:1:1::100/64, 2003:dc9:1:1::100/64\",\r\n    \"redirect_gateway\": false,\r\n    \"prevent_server_definitions\": false,\r\n    \"remove_server_routes\": false,\r\n    \"dns_domain\": \"github.com\",\r\n    \"dns_servers\": \"8.8.8.7, 8.8.4.7, 8.8.3.7, 8.8.2.7\",\r\n    \"ntp_servers\": \"192.168.56.106, 192.168.56.107\",\r\n    \"netbios_enable\": false,\r\n    \"netbios_node_type\": \"m\",\r\n    \"netbios_scope\": \"42\",\r\n    \"wins_servers\": \"192.168.56.108, 192.168.56.194\"\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://{{$hostname}}/api/v1/openvpn/csc?refid=int&server_list=string&custom_options=string&disable=boolean&common_name=string&block=boolean&description=string&tunnel_network=string&tunnel_networkv6=string&local_network=string&local_networkv6=string&remote_network=string&remote_networkv6=string&redirect_gateway=boolean&prevent_server_definitions=boolean&remove_server_routes=boolean&dns_domain=string&dns_servers=string&ntp_servers=string&netbios_enable=boolean&netbios_node_type=string&netbios_scope=string&wins_servers=string",
-									"protocol": "https",
-									"host": [
-										"{{$hostname}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"openvpn",
-										"csc"
-									],
-									"query": [
-										{
-											"key": "refid",
-											"value": "int",
-											"description": "Reference id. This id indicates the id of the client specific override you want to modify. This id is not static as it is essentially the index of an entry in the config array. Best to first get all client specific overrides and get the id of the one you want to modify before calling this endpoint."
-										},
-										{
-											"key": "server_list",
-											"value": "string",
-											"description": "A comma separated string containing the ids of the OpenVPN servers that use this override. Omitting this activates the override for all servers."
-										},
-										{
-											"key": "custom_options",
-											"value": "string",
-											"description": "Enter any additional options to add for this client specific override, separated by a semicolon.\nEXAMPLE: push \"route 10.0.0.0 255.255.255.0\";"
-										},
-										{
-											"key": "disable",
-											"value": "boolean",
-											"description": "Whether to disable this override without removing it."
-										},
-										{
-											"key": "common_name",
-											"value": "string",
-											"description": "Enter the X.509 common name for the client certificate, or the username for VPNs utilizing password authentication. This match is case sensitive."
-										},
-										{
-											"key": "block",
-											"value": "boolean",
-											"description": "Prevents the client from connecting to this server. Do not use this option to permanently disable a client due to a compromised key or password. Use a CRL (certificate revocation list) instead."
-										},
-										{
-											"key": "description",
-											"value": "string",
-											"description": "A description for administrative reference (not parsed)."
-										},
-										{
-											"key": "tunnel_network",
-											"value": "string",
-											"description": "The virtual IPv4 network used for private communications between this client and the server expressed using CIDR (e.g. 10.0.8.5/24).\nWith subnet topology, enter the client IP address and the subnet mask must match the IPv4 Tunnel Network on the server.\nWith net30 topology, the first network address of the /30 is assumed to be the server address and the second network address will be assigned to the client."
-										},
-										{
-											"key": "tunnel_networkv6",
-											"value": "string",
-											"description": "The virtual IPv6 network used for private communications between this client and the server expressed using prefix (e.g. 2001:db9:1:1::100/64).\nEnter the client IPv6 address and prefix. The prefix must match the IPv6 Tunnel Network prefix on the server."
-										},
-										{
-											"key": "local_network",
-											"value": "string",
-											"description": "These are the IPv4 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more CIDR networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
-										},
-										{
-											"key": "local_networkv6",
-											"value": "string",
-											"description": "These are the IPv6 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more IP/PREFIX networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
-										},
-										{
-											"key": "remote_network",
-											"value": "string",
-											"description": "These are the IPv4 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more CIDR ranges. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv4 Remote Networks list on the corresponding OpenVPN server settings."
-										},
-										{
-											"key": "remote_networkv6",
-											"value": "string",
-											"description": "These are the IPv6 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more IP/PREFIX networks. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv6 Remote Networks list on the corresponding OpenVPN server settings."
-										},
-										{
-											"key": "redirect_gateway",
-											"value": "boolean",
-											"description": "Force all client generated traffic through the tunnel."
-										},
-										{
-											"key": "prevent_server_definitions",
-											"value": "boolean",
-											"description": "Prevent this client from receiving any server-defined client settings."
-										},
-										{
-											"key": "remove_server_routes",
-											"value": "boolean",
-											"description": "Prevent this client from receiving any server-defined routes without removing any other options."
-										},
-										{
-											"key": "dns_domain",
-											"value": "string",
-											"description": "Domain name for DNS to provide to the client."
-										},
-										{
-											"key": "dns_servers",
-											"value": "string",
-											"description": "A comma-separated list of no more than 4 DNS server IP addresses (i.e. 8.8.8.8). Any more than the first four are ignored. This list is provided to the clent."
-										},
-										{
-											"key": "ntp_servers",
-											"value": "string",
-											"description": "A comma-separated list of no more than 2 NTP server IP addresses. Any more than the first two are ignored."
-										},
-										{
-											"key": "netbios_enable",
-											"value": "boolean",
-											"description": "Enable NetBIOS over TCP/IP. If this option is not set, all NetBIOS-over-TCP/IP options (including WINS) will be disabled."
-										},
-										{
-											"key": "netbios_node_type",
-											"value": "string",
-											"description": "Possible options: b (broadcasts), p (point-to-point name queries to a WINS server), m (broadcast then query name server), and h (query name server, then broadcast). This parameter takes a single letter either b, p, m, or h. Any other string will result in this option being set to none."
-										},
-										{
-											"key": "netbios_scope",
-											"value": "string",
-											"description": "A NetBIOS Scope ID provides an extended naming service for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS traffic on a single network to only those nodes with the same NetBIOS scope ID."
-										},
-										{
-											"key": "wins_servers",
-											"value": "string",
-											"description": "A comma-separated list of no more than 2 WINS server IP addresses. Any more than the first two are ignored."
-										}
-									]
+						"url": {
+							"raw": "https://{{$hostname}}/api/v1/diagnostics/command_prompt",
+							"protocol": "https",
+							"host": [
+								"{{$hostname}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"diagnostics",
+								"command_prompt"
+							],
+							"query": [
+								{
+									"key": "shell_cmd",
+									"value": "string",
+									"description": "Specify the shell command to execute on pfSense."
 								}
-							},
-							"response": []
+							]
 						},
-						{
-							"name": "Delete OpenVPN Client Specific Override",
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\r\n    \"refid\": 0\r\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
-									}
-								},
-								"url": {
-									"raw": "https://{{$hostname}}/api/v1/openvpn/csc?refid=int",
-									"protocol": "https",
-									"host": [
-										"{{$hostname}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"openvpn",
-										"csc"
-									],
-									"query": [
-										{
-											"key": "refid",
-											"value": "int",
-											"description": "Reference id. This id indicates the id of the client specific override you want to delete. This id is not static as it is essentially the index of an entry in the config array. Best to first get all client specific overrides and get the id of the one you want to delete before calling this endpoint."
-										}
-									]
-								}
-							},
-							"response": []
-						}
-					]
+						"description": "Execute a shell command.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-command`]"
+					},
+					"response": []
 				}
-			]
+			],
+			"description": "API endpoints used to diagnose system issues or extend pfSense functionality.",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "93f2c033-9d0a-47b1-9a5b-a1b9a0d4c305",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "3c7c951d-7fcc-4cb8-9782-01add869eca4",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
 		}
 	],
 	"event": [
 		{
 			"listen": "prerequest",
 			"script": {
+				"id": "2fe1e3c0-cca4-4301-9ddf-6d779102b29a",
 				"type": "text/javascript",
 				"exec": [
 					""
@@ -10349,11 +12255,13 @@
 		{
 			"listen": "test",
 			"script": {
+				"id": "c11acad6-e318-4a43-a692-e7e358695e80",
 				"type": "text/javascript",
 				"exec": [
 					""
 				]
 			}
 		}
-	]
+	],
+	"protocolProfileBehavior": {}
 }

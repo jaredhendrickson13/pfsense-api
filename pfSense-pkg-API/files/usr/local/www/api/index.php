@@ -16,13 +16,15 @@
 include_once("util.inc");
 include_once("guiconfig.inc");
 require_once("api/framework/APITools.inc");
+require_once("api/models/APISystemAPIVersionRead.inc");
 
 # Initialize the pfSense UI page (note: $pgtitle must be defined before including head.inc)
 $pgtitle = array(gettext('System'), gettext('API'), gettext('Settings'));
 include('head.inc');
 echo "<link rel='stylesheet' href='/css/api.css'/>";
 echo "<script type='application/javascript' src='/js/api.js'></script>";
-$tab_array = [[gettext("Settings"), true, "/api/"], [gettext("Documentation"), false, "/api/documentation/"]];
+$update_tab = (APISystemAPIVersionRead::is_update_available()) ? "Update (New Release Available)" : "Update";
+$tab_array = [[gettext("Settings"), true, "/api/"], [gettext("Documentation"), false, "/api/documentation/"], [gettext($update_tab), false, "/api/update/"]];
 display_top_tabs($tab_array, true);    # Ensure the tabs are written to the top of page
 
 # Variables
@@ -34,6 +36,7 @@ $jwt_section = new Form_Section('JWT Settings');
 $advanced_section = new Form_Section('Advanced Settings', 'api-advanced-settings');
 $pkg_index = APITools\get_api_config()[0];
 $pkg_config = APITools\get_api_config()[1];
+$input_errors = [];
 
 # Generate new API token if requested
 if ($_POST["gen"] === "1") {
@@ -65,26 +68,32 @@ if (isset($_POST["save"])) {
     } else {
         unset($pkg_config["enable"]);
     }
+
     # Save allowed interface value to config
     if (isset($_POST["allowed_interfaces"])) {
         $pkg_config["allowed_interfaces"] = implode(",", $_POST["allowed_interfaces"]);
     }
+
     # Save authentication mode to config
     if (isset($_POST["authmode"])) {
         $pkg_config["authmode"] = $_POST["authmode"];
     }
+
     # Save JWT expiration value to config
     if (isset($_POST["jwt_exp"])) {
         $pkg_config["jwt_exp"] = $_POST["jwt_exp"];
     }
+
     # Save key hash algos to config
     if (isset($_POST["keyhash"])) {
         $pkg_config["keyhash"] = $_POST["keyhash"];
     }
+
     # Save key bit strength to config
     if (isset($_POST["keybytes"])) {
         $pkg_config["keybytes"] = $_POST["keybytes"];
     }
+
     # Save persist value to config
     if (isset($_POST["persist"])) {
         $pkg_config["persist"] = "";
@@ -92,18 +101,21 @@ if (isset($_POST["save"])) {
         unlink("/usr/local/share/pfSense-pkg-API/backup.json");
         unset($pkg_config["persist"]);
     }
+
     # Save our read only value
     if (isset($_POST["readonly"])) {
         $pkg_config["readonly"] = "";
     } else {
         unset($pkg_config["readonly"]);
     }
+
     # Save our allow OPTIONS value
     if (isset($_POST["allow_options"])) {
         $pkg_config["allow_options"] = "";
     } else {
         unset($pkg_config["allow_options"]);
     }
+
     # Save any custom headers specified
     if (!empty($_POST["custom_headers"])) {
         # Decode the JSON string to ensure it is valid
@@ -114,18 +126,66 @@ if (isset($_POST["save"])) {
             # Loop through each requested header and ensure types are valid
             foreach ($headers as $key=>$value) {
                 if (!is_string($key) or !is_string($value)) {
-                    print_input_errors(["Custom headers key-value pairs must be string types."]);
+                    $input_errors[] = "Custom headers key-value pairs must be string types.";
                     $has_errors = true;
                     break;
                 }
             }
             $pkg_config["custom_headers"] = $headers;
         } else {
-            print_input_errors(["Custom headers must be a JSON string containing key-value pairs."]);
+            $input_errors[] = "Custom headers must be a JSON string containing key-value pairs.";
             $has_errors = true;
         }
     } else {
         unset($pkg_config["custom_headers"]);
+    }
+
+    # Validate HA Sync settings if enabled
+    if (!empty($_POST["hasync"])) {
+        $pkg_config["hasync"] = "";
+
+        # Validate HA Sync Hosts
+        $hosts = array_filter(explode(" ", $_POST["hasync_hosts"]));
+        # Ensure at least one host was set
+        if (count($hosts) > 0) {
+            foreach ($hosts as $host) {
+                if (!is_ipaddr($host) and !is_fqdn($host)) {
+                    $input_errors[] = "Invalid HA Sync host ".$host;
+                    $has_errors = true;
+                }
+            }
+            # Write our hosts if valid
+            if (!$has_errors) {
+                $pkg_config["hasync_hosts"] = $_POST["hasync_hosts"];
+            }
+        } else {
+            $input_errors[] = "At least 1 HA Sync host is required when enabled.";
+            $has_errors = true;
+        }
+
+        # Validate HA Sync username
+        if (!empty($_POST["hasync_username"])) {
+            $pkg_config["hasync_username"] = $_POST["hasync_username"];
+        } else {
+            $input_errors[] = "An HA sync username is required when enabled.";
+            $has_errors = true;
+        }
+
+        # Validate HA Sync password
+        if (!empty($_POST["hasync_password"])) {
+            # Ensure password confirmation matches
+            if ($_POST["hasync_password"] === $_POST["hasync_password_confirm"]) {
+                $pkg_config["hasync_password"] = $_POST["hasync_password"];
+            } else {
+                $input_errors[] = "HA Sync password confirmation does not match.";
+                $has_errors = true;
+            }
+        } elseif (empty($pkg_config["hasync_password"])) {
+            $input_errors[] = "An HA sync password is required when enabled.";
+            $has_errors = true;
+        }
+    } else {
+        unset($pkg_config["hasync"]);
     }
 
     # Only write changes if no errors occurred
@@ -136,12 +196,22 @@ if (isset($_POST["save"])) {
         write_config(sprintf(gettext($change_note)));
         APITools\create_jwt_server_key();
         print_apply_result_box(0);
+    } else {
+        print_input_errors($input_errors);
     }
 }
 
 # Backup our configuration is persist is enabled and the request is a POST request
 if(isset($pkg_config["persist"]) and $_SERVER["REQUEST_METHOD"] === "POST") {
     shell_exec("/usr/local/share/pfSense-pkg-API/manage.php backup");
+}
+
+# Sync our configuration if HA sync is enabled
+if(isset($pkg_config["hasync"]) and $_SERVER["REQUEST_METHOD"] === "POST") {
+    # Use ob_start()/ob_end_clean() to prevent sync() from printing output
+    ob_start();
+    APITools\sync();
+    ob_end_clean();
 }
 
 # Populate the GENERAL section of the UI form
@@ -231,6 +301,40 @@ $jwt_section->addInput(new Form_Input(
 
 ### Populate the ADVANCED section of the UI form
 $advanced_section->addClass("hide-api-advanced-settings");
+$advanced_section->addInput(new Form_Checkbox(
+    'hasync',
+    'Sync API Configuration',
+    'Enable HA Sync',
+    isset($pkg_config["hasync"])
+))->setHelp("Automatically sync API configuration, keys, and tokens to HA peers.");
+$advanced_section->addInput(new Form_Input(
+    'hasync_hosts',
+    'HA Sync Hosts',
+    'text',
+    $pkg_config['hasync_hosts']
+))->setHelp(
+    "Enter the host(s) to sync API configurations to. Multiple hosts may be specified separated by a single space. Each
+    host must use the same webConfigurator protocol and port."
+);
+$advanced_section->addInput(new Form_Input(
+    'hasync_username',
+    'HA Sync Username',
+    'text',
+    $pkg_config['hasync_username']
+))->setHelp(
+    "Enter the username of user to authenticate with when syncing. This user must have access to the API settings page."
+);
+$advanced_section->addPassword(new Form_Input(
+    'hasync_password',
+    'HA Sync Password',
+    'password',
+    ''
+))->setHelp(
+    'Enter the password of the HA sync user listed above. After saving, the password will be hidden and this field will 
+    be blank. '
+);
+
+
 $advanced_section->addInput(new Form_Checkbox(
     'allow_options',
     'OPTIONS Method',

@@ -12,7 +12,7 @@ properly written to the master XML configuration and the correct backend configu
 
 
 # Requirements
-- pfSense 2.4.4 or later is supported
+- pfSense 2.5.0 or later is supported (older pfSense versions may be compatible with older versions of pfSense API)
 - pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the 
 webConfigurator are required to make calls to the API endpoints
 - While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit
@@ -40,7 +40,7 @@ pfsense-api revert v1.1.7
 ```
 
 ### Notes: 
-- To install the 2.4 package, simply change the `2.5` in the install URL to `2.4`.
+- To install the 2.6 package, simply change the `2.5` in the install URL to `2.6`.
 - In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package
 - If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to 
 'Diagnostics > Command Prompt' and enter the commands there
@@ -505,6 +505,10 @@ There is no limit to API calls at this time but is important to note that pfSens
 
   * [Request Access Token](#1-request-access-token)
 
+* [DIAGNOSTICS](#diagnostics)
+
+  * [Execute Shell Command](#1-execute-shell-command)
+
 * [FIREWALL/ALIAS](#firewallalias)
 
   * [Create Firewall Aliases](#1-create-firewall-aliases)
@@ -553,6 +557,10 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Delete Firewall Rules](#2-delete-firewall-rules)
   * [Read Firewall Rules](#3-read-firewall-rules)
   * [Update Firewall Rules](#4-update-firewall-rules)
+
+* [FIREWALL/RULE/FLUSH](#firewallruleflush)
+
+  * [Delete All Firewall Rules](#1-delete-all-firewall-rules)
 
 * [FIREWALL/SCHEDULE](#firewallschedule)
 
@@ -621,6 +629,13 @@ There is no limit to API calls at this time but is important to note that pfSens
 
   * [Apply Interfaces](#1-apply-interfaces)
 
+* [INTERFACE/BRIDGE](#interfacebridge)
+
+  * [Create Interface Bridges](#1-create-interface-bridges)
+  * [Delete Interface Bridges](#2-delete-interface-bridges)
+  * [Read Interface Bridges](#3-read-interface-bridges)
+  * [Update Interface Bridges](#4-update-interface-bridges)
+
 * [INTERFACE/VLAN](#interfacevlan)
 
   * [Create Interface VLANs](#1-create-interface-vlans)
@@ -638,6 +653,10 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Delete Routing Gateways](#2-delete-routing-gateways)
   * [Read Routing Gateways](#3-read-routing-gateways)
   * [Update Routing Gateways](#4-update-routing-gateways)
+
+* [ROUTING/GATEWAY/DETAIL](#routinggatewaydetail)
+
+  * [Read Routing Gateway Details](#1-read-routing-gateway-details)
 
 * [ROUTING/STATIC_ROUTE](#routingstatic_route)
 
@@ -675,6 +694,25 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Delete DHCPd Static Mappings](#2-delete-dhcpd-static-mappings)
   * [Read DHCPd Static Mappings](#3-read-dhcpd-static-mappings)
   * [Update DHCPd Static Mappings](#4-update-dhcpd-static-mappings)
+
+* [SERVICES/DNSMASQ](#servicesdnsmasq)
+
+  * [Apply Pending dnsmasq Changes](#1-apply-pending-dnsmasq-changes)
+  * [Read dnsmasq Configuration](#2-read-dnsmasq-configuration)
+  * [Restart dnsmasq Service](#3-restart-dnsmasq-service)
+  * [Start dnsmasq Service](#4-start-dnsmasq-service)
+  * [Stop dnsmasq Service](#5-stop-dnsmasq-service)
+
+* [SERVICES/DNSMASQ/HOST_OVERRIDE](#servicesdnsmasqhost_override)
+
+  * [Create dnsmasq Host Override](#1-create-dnsmasq-host-override)
+  * [Delete dnsmasq Host Override](#2-delete-dnsmasq-host-override)
+  * [Read dnsmasq Host Override](#3-read-dnsmasq-host-override)
+  * [Update dnsmasq Host Override](#4-update-dnsmasq-host-override)
+
+* [SERVICES/DNSMASQ/HOST_OVERRIDE/ALIAS](#servicesdnsmasqhost_overridealias)
+
+  * [Create dnsmasq Host Override Alias](#1-create-dnsmasq-host-override-alias)
 
 * [SERVICES/DPINGER](#servicesdpinger)
 
@@ -717,6 +755,17 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Start Unbound Service](#4-start-unbound-service)
   * [Stop Unbound Service](#5-stop-unbound-service)
 
+* [SERVICES/UNBOUND/ACCESS_LIST](#servicesunboundaccess_list)
+
+  * [Create Unbound Access List](#1-create-unbound-access-list)
+  * [Delete Unbound Access List](#2-delete-unbound-access-list)
+  * [Read Unbound Access Lists](#3-read-unbound-access-lists)
+  * [Update Unbound Access List](#4-update-unbound-access-list)
+
+* [SERVICES/UNBOUND/ACCESS_LIST/ROW](#servicesunboundaccess_listrow)
+
+  * [Create Unbound Access List Row](#1-create-unbound-access-list-row)
+
 * [SERVICES/UNBOUND/HOST_OVERRIDE](#servicesunboundhost_override)
 
   * [Create Unbound Host Override](#1-create-unbound-host-override)
@@ -748,6 +797,10 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Read Firewall Status Log](#3-read-firewall-status-log)
   * [Read System Status Log](#4-read-system-status-log)
 
+* [STATUS/OPENVPN](#statusopenvpn)
+
+  * [Read OpenVPN Status](#1-read-openvpn-status)
+
 * [STATUS/SYSTEM](#statussystem)
 
   * [Read System Status](#1-read-system-status)
@@ -756,12 +809,19 @@ There is no limit to API calls at this time but is important to note that pfSens
 
   * [Read System API Configuration](#1-read-system-api-configuration)
   * [Read System API Error Library](#2-read-system-api-error-library)
-  * [Update System API Configuration](#3-update-system-api-configuration)
+  * [Read System API Version](#3-read-system-api-version)
+  * [Update System API Configuration](#4-update-system-api-configuration)
 
 * [SYSTEM/ARP](#systemarp)
 
   * [Delete System ARP Table](#1-delete-system-arp-table)
   * [Read System ARP Table](#2-read-system-arp-table)
+
+* [SYSTEM/CA](#systemca)
+
+  * [Create System CA](#1-create-system-ca)
+  * [Delete System CA](#2-delete-system-ca)
+  * [Read System CAs](#3-read-system-cas)
 
 * [SYSTEM/CERTIFICATE](#systemcertificate)
 
@@ -772,6 +832,10 @@ There is no limit to API calls at this time but is important to note that pfSens
 * [SYSTEM/CONFIG](#systemconfig)
 
   * [Read System Configuration](#1-read-system-configuration)
+
+* [SYSTEM/CONSOLE](#systemconsole)
+
+  * [Update Console Settings](#1-update-console-settings)
 
 * [SYSTEM/DNS](#systemdns)
 
@@ -858,27 +922,66 @@ Receive a temporary access token using your pfSense local database credentials.
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/access_token
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | client-id | string | Specify the client's pfSense username |
 | client-token | string | Specify the client's pfSense password |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
 	"client-id": "admin", 
 	"client-token": "pfsense"
+}
+```
+
+
+
+## DIAGNOSTICS
+API endpoints used to diagnose system issues or extend pfSense functionality.
+
+
+
+### 1. Execute Shell Command
+
+
+Execute a shell command.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-command`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/diagnostics/command_prompt
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| shell_cmd | string | Specify the shell command to execute on pfSense. |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"shell_cmd": "echo 'Test command'"
 }
 ```
 
@@ -900,15 +1003,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/alias
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Name of new alias. _Only alpha-numeric and underscore characters are allowed, other characters will be replaced_ |
 | type | string | Alias type. Current supported alias types are`host`, `network`, and `port` aliases. |
@@ -918,7 +1020,7 @@ URL: https://{{$hostname}}/api/v1/firewall/alias
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -944,13 +1046,20 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/alias
 ```
 
 
 
-***Body:***
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | string | Name or ID of alias to delete. This alias cannot be in use elsewhere in configuration |
+
+
+
+***Example Request:***
 
 ```js        
 {
@@ -972,7 +1081,6 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/alias
 ```
 
@@ -990,15 +1098,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/alias
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | string | Name of existing alias to modify. Unlikely other endpoint, this field does NOT use the numeric pfSense ID to locate objects. |
 | name | string | Change name of alias (optional) |
@@ -1009,7 +1116,7 @@ URL: https://{{$hostname}}/api/v1/firewall/alias
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1040,15 +1147,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/alias/entry
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Name of alias to add new address values |
 | address | string or array | Array of values to add to alias. A single value may be specified as string. |
@@ -1056,7 +1162,7 @@ URL: https://{{$hostname}}/api/v1/firewall/alias/entry
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1080,22 +1186,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/alias/entry
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Name of alias to delete address values from |
 | address | string | Array of values to delete from alias. A single value may be specified as string. |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1122,13 +1227,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/apply
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1153,15 +1257,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | interface | string | Set which interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported.  |
 | src | string | Set the source address of the mapping. This may be a single IP, network CIDR, alias name, or interface. When specifying an interface, you may use the physical interface ID, the descriptive interface name, or the pfSense ID. To use only interface address, add `ip` to the end of the interface name otherwise the entire interface's subnet is implied. To negate the context of the source address, you may prepend the address with `!` |
@@ -1176,7 +1279,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1206,22 +1309,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | string or integer | Specify the 1:1 NAT mapping ID to delete |
 | apply | boolean | Specify whether or not you would like this 1:1 mapping deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple 1:1 mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single 1:1 mapping, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1244,13 +1346,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1272,15 +1373,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | integer | Specify the ID of the 1:1 mapping to update. |
 | interface | string | Update which interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). (optional) |
@@ -1296,7 +1396,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/one_to_one
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1331,13 +1431,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/nat/outbound
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1359,21 +1458,20 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/nat/outbound
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | mode | string | Update the outbound NAT mode. Options are `automatic` to automatically generate outbound NAT rules, `hybrid` to support both automatic and manual outbound NAT rules , `advanced` to require all rules to be entered manually, or `disabled` to disable outbound NAT altogether. If updating to `advanced` from `automatic` or `hybrid`, the API will automatically create manual entries for each automatically generated outbound NAT entry. |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1399,15 +1497,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | interface | string | Set which interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0).  |
 | protocol | string | Set which transfer protocol the mapping will apply to.  |
@@ -1428,7 +1525,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1461,22 +1558,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | integer | Specify the ID of the outbound NAT mapping to update |
 | apply | boolean | Specify whether or not you would like this outbound NAT mapping deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple outbound NAT mappings at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single outbound NAT mapping, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1509,13 +1605,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1537,15 +1632,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | integer | Specify the ID of the outbound NAT mapping to update |
 | interface | string | Update the interface the mapping will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). (optional) |
@@ -1567,7 +1661,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/outbound/mapping
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1604,15 +1698,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | interface | string | Set which interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported.  |
 | protocol | string | Set which transfer protocol the rule will apply to. If `tcp`, `udp`, `tcp/udp`, you must define a source and destination port |
@@ -1630,7 +1723,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1664,22 +1757,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | string or integer | Specify the rule ID to delete |
 | apply | boolean | Specify whether or not you would like this port forward deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple port forwards at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single port forward, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1701,13 +1793,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1729,15 +1820,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | Id | Integer | Specify the ID of the port forward rule to update. |
 | interface | string | Update the interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported. (optional) |
@@ -1756,7 +1846,7 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/port_forward
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1793,15 +1883,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/rule
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | type | string | Set a firewall rule type (`pass`, `block`, `reject`) |
 | interface | string | Set which interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported.  |
@@ -1826,7 +1915,7 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1858,22 +1947,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/rule
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | tracker | string or integer | Specify the rule tracker ID to delete |
 | apply | boolean | Specify whether or not you would like this rule deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple rules at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only deleting a single rule, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1895,13 +1983,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/rule
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1924,15 +2011,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/rule
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | tracker | string or Integer | Specify the tracker ID of the rule to update |
 | type | string | Update the firewall rule type (`pass`, `block`, `reject`) (optional) |
@@ -1958,7 +2044,7 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -1971,6 +2057,36 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 	"dst": "em0ip",
 	"descr": "This is an updated test rule added via API",
 	"top": true
+}
+```
+
+
+
+## FIREWALL/RULE/FLUSH
+
+
+
+### 1. Delete All Firewall Rules
+
+
+Deletes all existing firewall rules. This is useful for scripts that need to setup the firewall rules from scratch.<br><br>_Note: this endpoint will not reload the firewall filter automatically, you must make another API call to the /api/v1/firewall/apply endpoint to do so. Ensure firewall rules are created before reloading the filter to prevent lockout!_.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/firewall/rule/flush
+```
+
+
+
+***Example Request:***
+
+```js        
+{
 }
 ```
 
@@ -1992,15 +2108,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/schedule
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Specify a name for this firewall schedule. This value must be between 1 and 32 characters, and can only contain alphanumerics, underscores and hyphens. This value must be unique from all other firewall schedules.  |
 | descr | string | Specify a description for this firewall schedule (optional) |
@@ -2008,7 +2123,7 @@ URL: https://{{$hostname}}/api/v1/firewall/schedule
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2044,21 +2159,20 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/schedule
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Specify the name of the firewall schedule to delete. |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2080,7 +2194,6 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/schedule
 ```
 
@@ -2098,15 +2211,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/schedule
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Specify the name of the firewall schedule to update. This field Is used to locate the object and cannot be used to change the name of the schedule. |
 | descr | string | Update the description for this firewall schedule (optional) |
@@ -2114,7 +2226,7 @@ URL: https://{{$hostname}}/api/v1/firewall/schedule
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2154,15 +2266,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/schedule/time_range
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Specify the name of the schedule to add this time range to. This must be an existing firewall schedule name. |
 | position | string | Specify a comma-separated list of week days the schedule will be enable for. Options are `1` for Monday, `2` for Tuesday, `3` for Wednesday, `4` for Thursday, `5` for Friday, `6` for Saturday, and `7` for Sunday. For example, all weekdays would be formatted as such `"1,2,3,4,5"`. (optional) |
@@ -2173,7 +2284,7 @@ URL: https://{{$hostname}}/api/v1/firewall/schedule/time_range
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2199,22 +2310,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/schedule/time_range
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Specify the name of the schedule to delete this time range from. This must be an existing firewall schedule name. |
 | id | integer | Specify the ID of the time range to delete. This will be the configuration array index of the `timerange` object within the `schedule` object. |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2241,7 +2351,6 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-diagnost
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/states
 ```
 
@@ -2263,7 +2372,6 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-diagnost
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/states/size
 ```
 
@@ -2281,21 +2389,20 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/states/size
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | maximumstates | string or integer | Set the maximum number of firewall state entries. Specify an integer above 10, or string "default" to revert to the system default size |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2321,15 +2428,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | interface | string | Specify the interface to create the traffic shaper policy for. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0).  |
 | scheduler | string | Specify the scheduler type for this traffic shaper. Choices are `HFSC`, `CBQ`, `FAIRQ`, `CODELQ`, and `PRIQ`. |
@@ -2342,7 +2448,7 @@ URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2371,22 +2477,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | interface | string | Specify the interface of the traffic shaper policy to delete. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0).  |
 | apply | boolean | Specify whether this traffic shaper deletion should be applied immediately after deleting. If `true`, the filter will be reloaded after deleting. Otherwise, if `false`, the filter will not be reloaded and the change will not be applied until the next filter reload. Defaults to `false`. (optional) |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2408,7 +2513,6 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper
 ```
 
@@ -2426,15 +2530,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | interface | string | Specify the interface of the traffic shaper policy to update. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0).  |
 | scheduler | string | Update the scheduler type for this traffic shaper. Choices are `HFSC`, `CBQ`, `FAIRQ`, `CODELQ`, and `PRIQ`. (optional) |
@@ -2447,7 +2550,7 @@ URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2480,15 +2583,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Specify a name for this limiter. This value must only contain alphanumerics, underscore and/or hyphens, must be 32 characters or less, and must be unique from all other limiters Including child queues. |
 | bandwidth | array | Specify an array of bandwidth objects to assign to this limiter. Each object will require the fields as specified by the /api/v1/firewall/traffic_shaper/limiter/bandwidth endpoint documentation. At least one bandwidth object must be specified to create the limiter. |
@@ -2535,7 +2637,7 @@ URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2567,15 +2669,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Specify the name of the limiter to delete. |
 | apply | boolean | Specify whether or not this change should be applied immediately after deletion. If set to `true`, the firewall filter will reload. If set to`false`, the firewall filter will not be reloaded and the limiter deletion will not be applied until the filter Is reloaded. Defaults to `false`. (optional) |
@@ -2594,7 +2695,6 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter
 ```
 
@@ -2616,15 +2716,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/bandwidth
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Specify the name of the parent limiter to add this bandwidth object to.  |
 | bw | integer | Specify the amount of bandwidth allotted to the parent limiter. This must be a numeric value of 1 or greater. |
@@ -2634,7 +2733,7 @@ URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/bandwidth
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2659,15 +2758,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/bandwidth
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Specify the name of the parent limiter to delete this bandwidth object from.  |
 | id | integer | Specify the ID of the bandwidth object to delete. The ID will be the array index of the object to delete within the limiter's bandwith-items array.  |
@@ -2675,7 +2773,7 @@ URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/bandwidth
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2702,15 +2800,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/queue
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | limiter | string | Specify the name of the parent limiter to add this queue to.  |
 | name | string | Specify a name for this limiter queue. This value must only contain alphanumerics, underscore and/or hyphens, must be 32 characters or less, and must be unique from all other limiters Including child queues. |
@@ -2745,7 +2842,7 @@ URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/queue
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2776,15 +2873,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/queue
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | limiter | string | Specify the name of the parent limiter to delete this queue from. |
 | name | string | Specify the name of the queue to delete.  |
@@ -2792,7 +2888,7 @@ URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/limiter/queue
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2819,15 +2915,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/queue
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | interface | string | Specify the parent interface to create the traffic shaper queue for. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0).  |
 | name | string | Specify a name for this queue. This name must be 15 characters or less, and unique from all other queues on the parent interface. |
@@ -2861,7 +2956,7 @@ URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/queue
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2890,22 +2985,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/traffic_shaper/queue
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | interface | string | Specify the parent interface to delete the traffic shaper queue from. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0).  |
 | name | string | Specify a name of the queue to delete. This must be an existing queue name configured on the parent traffic shaper. |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2938,15 +3032,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/virtual_ip
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | mode | string | Set our virtual IP mode (`ipalias`, `carp`, `proxyarp`, `other`) |
 | interface | string | Set the interface that will listen for the virtual IP. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0) |
@@ -2960,7 +3053,7 @@ URL: https://{{$hostname}}/api/v1/firewall/virtual_ip
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -2986,21 +3079,20 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/virtual_ip
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | string or integer | Specify the virtual IP ID to delete |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3022,13 +3114,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/virtual_ip
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3050,15 +3141,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-firewall
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/firewall/virtual_ip
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | integer | Specify the virtual IP ID to update |
 | mode | string | Update the virtual IP mode (`ipalias`, `carp`, `proxyarp`, `other`) (optional) |
@@ -3073,7 +3163,7 @@ URL: https://{{$hostname}}/api/v1/firewall/virtual_ip
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3106,15 +3196,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-interfac
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/interface
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | if | string | Specify the physical interface to configure |
 | descr | string | Set a descriptive name for the new interface |
@@ -3160,7 +3249,7 @@ URL: https://{{$hostname}}/api/v1/interface
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3188,21 +3277,20 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-interfac
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/interface
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | if | string | Specify the interface to delete. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0) |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3224,13 +3312,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-interfac
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/interface
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3251,15 +3338,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-interfac
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/interface
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | string | Specify the Interface to update. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0) |
 | if | string | Update the physical interface configured (optional) |
@@ -3306,7 +3392,7 @@ URL: https://{{$hostname}}/api/v1/interface
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3338,16 +3424,158 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-interfac
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/interface/apply
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
+}
+```
+
+
+
+## INTERFACE/BRIDGE
+
+
+
+### 1. Create Interface Bridges
+
+
+Add a new bridge interface.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/interface/bridge
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| members | array | Specify interface members to add to this bridge. This can be the physical interface ID (e.g. em0), the pfSense interface ID (e.g. wan, lan, optx) or the interface descriptions (e.g. WAN, LAN) |
+| descr | string | Set a description for the new bridge (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"members": ["em1", "LAN"],
+	"descr": "New bridge"
+}
+```
+
+
+
+### 2. Delete Interface Bridges
+
+
+Delete bridge assignment and configuration.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/interface/bridge
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | string | Specify the bridge ID to delete. Bridges cannot be deleted while in use. _Note: This uses the `bridgeif` value (e.g. bridge0, bridge2, etc.) NOT the configuration array index like other objects._ |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"id": "bridge2"
+}
+```
+
+
+
+### 3. Read Interface Bridges
+
+
+Read bridge assignments and configuration.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge`, `page-interfaces-bridge-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/interface/bridge
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+}
+```
+
+
+
+### 4. Update Interface Bridges
+
+
+Modify an existing bridge configuration
+
+<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge-edit`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/interface/bridge
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | string | Specify the bridge ID to update. _Note: This uses the `bridgeif` value (e.g. bridge0, bridge2, etc.) NOT the configuration array index like other objects._ |
+| members | array | Update interface members for this bridge. This can be the physical interface ID (e.g. em0), the pfSense interface ID (e.g. wan, lan, optx) or the interface descriptions (e.g. WAN, LAN). (optional) |
+| descr | string | Update the description of the bridge (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"id": "bridge0",
+	"members": ["WAN", "lan", "igb2"],
+	"descr": "Updated bridge"
 }
 ```
 
@@ -3369,15 +3597,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-interfac
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/interface/vlan
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | if | string | Set the parent interface to add the new VLAN to |
 | tag | string or integer | Set the VLAN tag to add to the parent interface |
@@ -3386,7 +3613,7 @@ URL: https://{{$hostname}}/api/v1/interface/vlan
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3410,22 +3637,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-interfac
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/interface/vlan
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | vlanif | string | Delete VLAN by full interface name (e.g. `em0.2`).  |
 | id | string or integer | Delete VLAN by pfSense ID. Required if `vlanif` was not specified previously. If `vlanif` is specified, this value will be overwritten. |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3447,13 +3673,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-interfac
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/interface/vlan
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3476,15 +3701,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-interfac
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/interface/vlan
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | vlanif | string | Select VLAN to modify by full interface ID (e.g. `em0.2`) |
 | id | string or integer | Select VLAN to modify by pfSense ID. Required if `vlanif` was not specified previously. If `vlanif` is specified, this value will be overwritten. |
@@ -3495,7 +3719,7 @@ URL: https://{{$hostname}}/api/v1/interface/vlan
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3524,13 +3748,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-g
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/routing/apply
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3555,15 +3778,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-g
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/routing/gateway
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | interface | string | Set which interface the gateway will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0).  |
 | ipprotocol | string | Set what IP protocol this gateway will serve. Options are `inet` for IPv4, or `inet6` for IPv6. |
@@ -3589,7 +3811,7 @@ URL: https://{{$hostname}}/api/v1/routing/gateway
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3616,21 +3838,20 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-g
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/routing/gateway
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | integer | Specify the ID of the gateway to delete. _Note: If you are obtaining the ID via GET request, the ID will be included in the response within the `attribute` field of the object._ |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3647,20 +3868,19 @@ Read routing gateways.<br><br>
 
 _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]
 
-_Note: Currently, GET requests to this endpoint return verbose backend gateway information rather than the gateway objects as they appear in the configuration. This discrepancy makes it difficult to interact with gateway objects via API. Because of this, GET requests to this endpoint will be refactored in a future release._
+_Note: This endpoint originally returned verbose routing gateway details. This functionality has moved to /api/v1/routing/gateway/detail._
 
 
 ***Endpoint:***
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/routing/gateway
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3682,15 +3902,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-g
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/routing/gateway
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | integer | Specify the ID of the gateway to update. _Note: If you are obtaining the ID via GET request, the ID will be included in the response within the `attribute` field of the object._ |
 | interface | string | Update the interface the gateway will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). (optional) |
@@ -3717,7 +3936,7 @@ URL: https://{{$hostname}}/api/v1/routing/gateway
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3745,6 +3964,37 @@ URL: https://{{$hostname}}/api/v1/routing/gateway
 
 
 
+## ROUTING/GATEWAY/DETAIL
+
+
+
+### 1. Read Routing Gateway Details
+
+
+Read verbose routing gateway details about both dynamic/system gateways and static gateways.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/routing/gateway/detail
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+
+}
+```
+
+
+
 ## ROUTING/STATIC_ROUTE
 
 
@@ -3762,15 +4012,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/routing/static_route
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | network | string | Specify an IPv4 CIDR, IPv6 CIDR or network alias this route will apply to |
 | gateway | string | Specify the name of the gateway traffic matching this route will use |
@@ -3780,7 +4029,7 @@ URL: https://{{$hostname}}/api/v1/routing/static_route
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3804,21 +4053,20 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-s
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/routing/static_route
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | Integer | Specify the ID of the static route to delete |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3840,13 +4088,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-s
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/routing/static_route
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3869,15 +4116,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-s
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/routing/static_route
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | Integer | Specify the ID of the static route to update |
 | network | string | Update the IPv4 CIDR, IPv6 CIDR or network alias this route will apply to (optional) |
@@ -3888,7 +4134,7 @@ URL: https://{{$hostname}}/api/v1/routing/static_route
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3919,13 +4165,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3947,13 +4192,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/restart
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -3975,13 +4219,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/start
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4003,13 +4246,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/stop
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4035,13 +4277,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/ddns
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4068,13 +4309,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/dhcpd
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4096,13 +4336,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/dhcpd/restart
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4124,13 +4363,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/dhcpd/start
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4152,13 +4390,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/dhcpd/stop
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4181,15 +4418,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/dhcpd
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | interface | string | Specify which interface's DHCP configuration to update. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). This Interface must host a static IPv4 subnet that has more than one available within the subnet. |
 | enable | boolean | Enable or disable the DHCP server for this Interface (optional) |
@@ -4206,7 +4442,7 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4244,13 +4480,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-d
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/dhcpd/lease
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4277,15 +4512,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/dhcpd/static_mapping
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | interface | string | Specify which interface to create the static mapping |
 | mac | string | Specify the full MAC address of the host this static mapping Is for |
@@ -4301,7 +4535,7 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd/static_mapping
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4334,22 +4568,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/dhcpd/static_mapping
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | integer | Specify the ID of the static mapping to delete |
 | interface | string | Specify which interface to update the static mapping |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4373,21 +4606,20 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/dhcpd/static_mapping
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | interface | string | Specify which interface to read static mappings from |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4410,15 +4642,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/dhcpd/static_mapping
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | integer | Specify the ID of the static mapping to update |
 | interface | string | Specify which interface to update the static mapping |
@@ -4435,7 +4666,7 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd/static_mapping
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4451,6 +4682,356 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd/static_mapping
     "domainsearchlist": ["updated.example.com", "extra.example.com"],
     "gateway": "192.168.1.2",
     "arp_table_static_entry": false
+}
+```
+
+
+
+## SERVICES/DNSMASQ
+
+
+
+### 1. Apply Pending dnsmasq Changes
+
+
+Apply pending DNS Forwarder (dnsmasq) changes.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/apply
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+
+}
+```
+
+
+
+### 2. Read dnsmasq Configuration
+
+
+Read DNS Forwarder (dnsmasq) configuration.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/services/dnsmasq
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 3. Restart dnsmasq Service
+
+
+Restart the DNS Forwarder (dnsmasq) service.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/restart
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 4. Start dnsmasq Service
+
+
+Start the DNS Forwarder (dnsmasq) service.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/start
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 5. Stop dnsmasq Service
+
+
+Stop the DNS Forwarder (dnsmasq) service.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/stop
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## SERVICES/DNSMASQ/HOST_OVERRIDE
+
+
+
+### 1. Create dnsmasq Host Override
+
+
+Add a new host override to DNS Forwarder (dnsmasq).<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/host_override
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| host | string | Hostname of new DNS A record |
+| domain | string | Domain of new DNS A record |
+| ip | string | IPv4 or IPv6 of new DNS A record |
+| descr | string | Description of host override (optional) |
+| aliases | array | Hostname aliases (CNAME) for host override (optional) |
+| apply | boolean | Specify whether or not you would like this host override to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only creating a single host override, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"host": "test",
+	"domain": "example.com",
+	"ip": "127.0.0.1",
+	"descr": "This is a test host override added via pfSense API!",
+	"aliases": [
+        {
+            "host": "test2", 
+            "domain": "example.com", 
+            "descr": "This is a test host override alias that will also resolve to this IP!"
+        }
+    ]
+}
+```
+
+
+
+### 2. Delete dnsmasq Host Override
+
+
+Delete host overrides from DNS Forwarder (dnsmasq).<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/host_override
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the host override to delete |
+| apply | boolean | Specify whether or not you would like this host override deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only deleting a single host override, you may set this to true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "id": 0,
+    "apply": true
+}
+```
+
+
+
+### 3. Read dnsmasq Host Override
+
+
+Read host overrides from DNS Forwarder (dnsmasq).<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/host_override
+```
+
+
+
+### 4. Update dnsmasq Host Override
+
+
+Modify host overrides from DNS Forwarder (dnsmasq).<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/host_override
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the host override to update |
+| host | string | Update the hostname of this host override (optional) |
+| domain | string | Update the domain name of this host override (optional) |
+| ip | string | Update the IPv4/IPv6 address of this host override (optional) |
+| descr | string | Update the description of this host override (optional) |
+| aliases | array | Update the aliases for this host override. This will replace any existing entries. (optional) |
+| apply | boolean | Specify whether or not you would like this host override update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only updating a single host override, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"host": "updated_test",
+	"domain": "example.com",
+	"ip": "127.0.0.2",
+	"descr": "This is a test host override update via pfSense API!",
+	"aliases": [
+        {
+            "host": "test2", 
+            "domain": "example.com", 
+            "descr": "This is an updated host override alias that will also resolve to this IP!"
+        },
+        {
+            "host": "updated_to_add", 
+            "domain": "example.com", 
+            "descr": "This is a test host override alias that was also added during the update!"
+        }
+    ]
+}
+```
+
+
+
+## SERVICES/DNSMASQ/HOST_OVERRIDE/ALIAS
+
+
+
+### 1. Create dnsmasq Host Override Alias
+
+
+Add a new host override alias to DNS Forwarder (dnsmasq).<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/services/dnsmasq/host_override/alias
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the host override to apply this alias to. |
+| host | string | Specify the hostname of the alias |
+| domain | string | Specify the domain name of the alias |
+| description | string | Description of alias (optional) |
+| apply | boolean | Specify whether or not you would like this host override alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host override aliases at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/dnsmasq/apply` endpoint. Otherwise, If you are only updating a single host override alias, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "id": 0,
+	"host": "alias",
+	"domain": "example.com",
+	"descr": "This is a test host override alias added via pfSense API!",
+    "apply": true
 }
 ```
 
@@ -4472,13 +5053,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/dpinger/restart
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4500,13 +5080,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/dpinger/start
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4528,13 +5107,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/dpinger/stop
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4560,13 +5138,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/ntpd
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4588,13 +5165,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/ntpd/restart
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4616,13 +5192,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/ntpd/start
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4644,13 +5219,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/ntpd/stop
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4672,15 +5246,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/ntpd
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | interface | array | Update the Interfaces NTPd will listen on. This must be an array of strings. You may specify either the physical Interface ID, the pfSense Interface ID or the descriptive Interface name. To match any Interface, simply pass In an empty array. e.g. `["wan", "em1", "lo0", "LAN"]` (optional) |
 | time_servers | array | Update the time servers used by the system. This must be an array of objects. Each object may use the parameters available In the /api/v1/services/ntpd/time_server endpoint. To revert to the default timeserver, you may pass In an empty array. Specifying this field will overwrite any existing time servers. To simply add or remove time servers, use the /api/v1/services/ntpd/time_server endpoint as it Is less taxing on the system. e.g. `[{"timeserver": "pool.ntp.org", "ispool": true", "prefer": true, "noselect": false}]` (optional) |
@@ -4695,7 +5268,7 @@ URL: https://{{$hostname}}/api/v1/services/ntpd
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4731,15 +5304,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/ntpd/time_server
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | timeserver | string | Specify the IP or hostname of the NTP time server to add. |
 | ispool | boolean | Specify whether or not this time server represents an NTP server pool or a single NTP server.  |
@@ -4748,7 +5320,7 @@ URL: https://{{$hostname}}/api/v1/services/ntpd/time_server
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4773,21 +5345,20 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/ntpd/time_server
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | timeserver | string | Specify the IP or hostname of the NTP time server to delete. If more than one time server exists with this value, only the first match will be deleted. In the case that all time servers were deleted, the default time server `pool.ntp.org` will be written. |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4813,13 +5384,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/sshd
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4841,13 +5411,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/sshd/restart
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4869,13 +5438,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/sshd/start
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4897,13 +5465,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/sshd/stop
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4925,15 +5492,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/sshd
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | enable | boolean | Enable or disable sshd. Do not specify to retain existing value (optional) |
 | sshdkeyonly | string | Set the sshd auth type. Use `disabled` for password or pubkey, `enabled` for pubkey only, or `both` to require both a password and pubkey. Do not specify to retain existing value (optional) |
@@ -4942,7 +5508,7 @@ URL: https://{{$hostname}}/api/v1/services/sshd
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4971,13 +5537,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/syslogd/restart
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -4999,13 +5564,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/syslogd/start
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5027,13 +5591,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/syslogd/stop
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5059,13 +5622,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/unbound/apply
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5087,13 +5649,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/unbound
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5115,13 +5676,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/unbound/restart
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5143,13 +5703,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/unbound/start
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5171,17 +5730,228 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-s
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/unbound/stop
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
     
+}
+```
+
+
+
+## SERVICES/UNBOUND/ACCESS_LIST
+
+
+
+### 1. Create Unbound Access List
+
+
+Add a new Unbound access list.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/services/unbound/access_list
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| aclname | string | Specify a name for this access list (optional). |
+| aclaction | string | Set the access list action. Options are `allow`, `deny`, `reject`, `allow spoof`, `deny nonlocal`, `reject nonlocal`. |
+| description | string | Specify a detailed description for this access list (optional). |
+| row | array | Set networks to match for this access list. This must be an array of access list row objects and must contain at least one object. For more information on access list object fields, see documentation for /api/v1/services/unbound/access_list/row. |
+| apply | boolean | Specify whether or not the Unbound configuration should be reloaded immediately after creating. `true` to apply immediately, `false` to keep the changes pending. If `false`, the Unbound configuration must be reloaded manually by calling the /api/v1/services/unbound/apply endpoint. Defaults to `false` (optional). |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"aclname": "Allow_All",
+	"aclaction": "allow",
+	"description": "Test ACL",
+	"row": [
+		{
+			"acl_network": "0.0.0.0",
+			"mask": 0,
+			"description": "Test ACL entry"
+		}
+	]
+}
+```
+
+
+
+### 2. Delete Unbound Access List
+
+
+Delete Unbound access list.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/services/unbound/access_list
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | string | Specify the access list ID to delete. |
+| apply | boolean | Specify whether or not the Unbound configuration should be reloaded immediately after deleting. `true` to apply immediately, `false` to keep the changes pending. If `false`, the Unbound configuration must be reloaded manually by calling the /api/v1/services/unbound/apply endpoint. Defaults to `false` (optional). |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"id": 0
+}
+```
+
+
+
+### 3. Read Unbound Access Lists
+
+
+Read configured Unbound access lists.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/services/unbound/access_list
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+}
+```
+
+
+
+### 4. Update Unbound Access List
+
+
+Modify an existing Unbound access list
+
+<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/services/unbound/access_list
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | string | Specify the access list ID to update. |
+| aclname | string | Specify a name for this access list (optional). |
+| aclaction | string | Set the access list action. Options are `allow`, `deny`, `reject`, `allow spoof`, `deny nonlocal`, `reject nonlocal`. (optional) |
+| description | string | Specify a detailed description for this access list (optional). |
+| row | array | Set networks to match for this access list. This must be an array of access list row objects and must contain at least one object. For more information on access list object fields, see documentation for /api/v1/services/unbound/access_list/row (optional). |
+| apply | boolean | Specify whether or not the Unbound configuration should be reloaded immediately after updating. `true` to apply immediately, `false` to keep the changes pending. If `false`, the Unbound configuration must be reloaded manually by calling the /api/v1/services/unbound/apply endpoint. Defaults to `false` (optional). |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"id": 0,
+	"aclname": "Updated_Allow_All",
+	"aclaction": "deny",
+	"description": "Updated test ACL",
+	"row": [
+		{
+			"acl_network": "0::",
+			"mask": 0,
+			"description": "Updated test ACL entry"
+		}
+	]
+}
+```
+
+
+
+## SERVICES/UNBOUND/ACCESS_LIST/ROW
+
+
+
+### 1. Create Unbound Access List Row
+
+
+Add a new row (network entry) to an existing Unbound access list.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/services/unbound/access_list/row
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the access list to apply this row to. |
+| acl_network | string | Specify the IPv4 or IPv6 address of the network to add to the row. |
+| mask | integer | Specify the subnet mask of the ACL network. This must be a value between 0 and 32 for IPv4 addresses or 0 and 128 or IPv6 addresses. |
+| description | string | Description of the access list row (optional) |
+| apply | boolean | Specify whether or not you would like this access list row to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple access list rows at once it Is best to set this to false and apply the changes afterwards using the /api/v1/services/unbound/apply endpoint. Otherwise, If you are only adding a single access list row, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"id": 0,
+	"acl_network": "10.0.0.0",
+	"mask": 8,
+	"description": "Class A subnet"
 }
 ```
 
@@ -5203,15 +5973,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | host | string | Hostname of new DNS A record |
 | domain | string | Domain of new DNS A record |
@@ -5222,7 +5991,7 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5254,22 +6023,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | integer | Specify the ID of the host override to delete |
 | apply | boolean | Specify whether or not you would like this host override deletion to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are deleting multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only deleting a single host override, you may set this to true to apply it immediately. Defaults to false. (optional) |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5292,7 +6060,6 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 ```
 
@@ -5310,15 +6077,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | integer | Specify the ID of the host override to update |
 | host | string | Update the hostname of this host override (optional) |
@@ -5330,7 +6096,7 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5371,15 +6137,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-services
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/services/unbound/host_override/alias
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | integer | Specify the ID of the host override to apply this alias to. |
 | host | string | Specify the hostname of the alias |
@@ -5389,7 +6154,7 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override/alias
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5419,13 +6184,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-c
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/status/carp
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5447,22 +6211,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-c
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/status/carp
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | enable | boolean | Enable or disable CARP. Requires bool (optional) |
 | maintenance_mode | boolean | Enable or disable CARP maintenance mode. Requires bool (optional) |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5489,13 +6252,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-g
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/status/gateway
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5521,13 +6283,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-status-i
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/status/interface
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5553,13 +6314,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-diagnost
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/status/log/config_history
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5581,13 +6341,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-diagnost
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/status/log/dhcp
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5609,13 +6368,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-diagnost
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/status/log/firewall
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5637,17 +6395,47 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-diagnost
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/status/log/system
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
 
+}
+```
+
+
+
+## STATUS/OPENVPN
+
+
+
+### 1. Read OpenVPN Status
+
+
+Read the OpenVPN status.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-openvpn`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/status/openvpn
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
 }
 ```
 
@@ -5669,13 +6457,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-dashboar
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/status/system
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5701,13 +6488,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/api
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5727,13 +6513,12 @@ Read our error code library. This function does NOT require authentication and i
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/api/error
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5743,7 +6528,34 @@ URL: https://{{$hostname}}/api/v1/system/api/error
 
 
 
-### 3. Update System API Configuration
+### 3. Read System API Version
+
+
+Read the current API version and locate available version updates.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/api/version
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 4. Update System API Configuration
 
 
 Update the API configuration.<br><br>
@@ -5755,15 +6567,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/api
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | enable | boolean | Disable the API. If set to `false`, the API will be disable and no further API requests can be made. In most cases this Is not necessary. (optional) |
 | persist | boolean | Enable/disable persistent API configuration. If set to `true`, pfSense API will store a copy of the API configuration In the case a system update or package update Is needed and/or the API configuration must be restored. If set to `false`, all API configuration will be lost whenever the system updates, the package Is updated, or the package Is deleted. It Is recommended to keep this feature enabled. (optional) |
@@ -5775,10 +6586,14 @@ URL: https://{{$hostname}}/api/v1/system/api
 | keyhash | string | Update the hashing algorithm to use when generating API tokens. Choices are `"sha256"`, `"sha384"`, `"sha512"`, and `"md5"`. This Is only applicable when the `authmode` setting Is set to `token`. (optional) |
 | keybytes | integer | Update the key byte strength to use when generating API tokens. Choices are `16`, `32` and `64`. This Is only applicable when the `authmode` setting Is set to `token`. (optional) |
 | custom_headers | array | Update the custom response headers for the API to return in API responses. This must be an array of key-value pairs (e.g. `{"custom-header": "custom-header-value}`. To revert custom headers to the default state, simply pass in an empty array. In most cases, custom headers are not necessary. An example use case for custom headers is setting CORS policy headers required by some frontend web applications. (optional) |
+| hasync | boolean | Enable or disable HA sync for API configurations. (optional) |
+| hasync_hosts | array | Update the hosts to sync API configurations to. This must be an array of IP addresses or FQDN strings. At least one host must be specified when HA sync is enabled. (optional) |
+| hasync_username | string | Update the username to authenticate as for HA synchronization. This user must be present on ALL hosts specified in the `hasync_hosts` field and must hold the `page-system-api` privilege. A value must be set when HA sync is enabled. (optional) |
+| hasync_password | string | Update the password of the username to authenticate as for HA synchronization. A value must be set when HA sync is enabled. (optional) |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5811,21 +6626,20 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-diagnost
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/arp
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | ip | string | IPv4 address to delete from ARP table |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5847,13 +6661,135 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-diagnost
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/arp
 ```
 
 
 
-***Body:***
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## SYSTEM/CA
+
+
+
+### 1. Create System CA
+
+
+Add a new CA certificate.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/system/ca
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| method | string | Set the method used to add the CA. Current supported methods are `existing`, `internal`, and `intermediate`. _Note: previous releases referred to the `existing` method as `import`. You may use `existing` or `import` interchangeably._ |
+| descr | string | Set a descriptive name for the certificate |
+| trust | boolean | Specify `true` if you would like the system to trust this CA (optional) |
+| randomserial | boolean | Specify `true` if you would like certificates signed by this CA to utilize randomized serial numbers (optional) |
+| crt | string | Specify the Base64 encoded PEM CA certificate to import. This field is required when `method` is set to `existing`. |
+| prv | string | Specify the corresponding Base64 encoded CA certificate key. This field is only available when `method` is set to `existing`. (optional) |
+| serial | integer | Specify the serial number to be assigned to the next certificate signed by this CA. Defaults to 1. This field is only available when `method` is set to `existing`. (optional) |
+| caref | string | Specify the unique reference ID of the certificate signing authority for the intermediate certificate. This field is required when `method` is set to `intermediate`. |
+| keytype | string | Specify the private key type to generate. Options are `RSA` or `ECDSA`. This field is required when `method` is set to `internal` or `intermediate`. |
+| keylen | integer | Specify the private key length to generate. Options are `1024`, `2048`, `3072`, `4096`, `6144`, `7680`, `8192`, `15360`, `16384`. This field is required when `method` is set to `internal` or `intermediate` AND `keytype` is set to `RSA`. |
+| ecname | string | Specify the elliptic curve name to use when generating the private key. It is recommended to view options and compatibility within the pfSense webConfigurator or manually through OpenSSL as certain curves are not compatible in some circumstances. This field is required when `method` is set to `internal` or `intermediate` AND `keytype` is set to `ECDSA`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._ |
+| digest_alg | string | Specify the digest algorithm to use. Options are `sha1`, `sha224`, `sha256`, `sha384` and `sha512`. This field is required when `method` is set to `internal` or `intermediate`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._ |
+| lifetime | integer | Specify the number of days you would like this CA to be valid for. This must be below OpenSSL's maximum lifetime value (around `12000` days). Defaults to `3650` days. This field is required when `method` is set to `internal` or `intermediate`. _Note: maximum value is subject to change, when in doubt, check the pfSense webConfigurator options for this field._ |
+| dn_commonname | string | Specify the common name of this CA. In mose cases, this will be a hostname. This field is required when `method` is set to `internal` or `intermediate`. |
+| dn_country | string | Specify the country code for this CA. This must be a known 2-digit country code. This field is only available when `method` is set to `internal` or `intermediate`. (optional) |
+| dn_state | string | Specify the state or province for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional) |
+| dn_city | string | Specify the city or locale for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional) |
+| dn_organization | string | Specify the managing organization for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional) |
+| dn_organizationalunit | string | Specify the managing organizational unit or team for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"method": "existing",
+	"crt": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZxekNDQTVPZ0F3SUJBZ0lVQi9rT2RoMzdTZnRxeHRqL1MxSTRkUTQyYXRvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWxWVU1RMHdDd1lEVlFRSERBUlBjbVZ0TVNFdwpId1lEVlFRS0RCaEpiblJsY201bGRDQlhhV1JuYVhSeklGQjBlU0JNZEdReEZ6QVZCZ05WQkFNTURuUmxjM1F1CmMyVmpiV1YwTG1Odk1CNFhEVEl3TURJd05ESXdNelV3...",
+	"prv": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQ1N3d2dna29BZ0VBQW9JQ0FRREQ5RkNLU1U3SmY0QngKeWlKNkNOWGhOckI0ZVhjTk9TTm9GUVJIbXlsV2dHbEN5djMydFdicmF3RFhhQzk2aVpOSTFzNG5qWTdQT3BlWgpoNmFlaTJ5NllheS9VWWtOUkZGQmp4WlZlLzRwS2pKeXBQRlFBUlpMVko2TlNXaU5raGkwbDlqeWtacTlEbkFnCk1mclZyUEo1YktDM3JJVV...",
+	"descr": "TEST CA"
+}
+```
+
+
+
+### 2. Delete System CA
+
+
+Delete an existing CA.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/system/ca
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| refid | string | Specify the refid of the CA to delete (required if `descr` is  not defined) |
+| descr | string | Specify the description of the certificate to delete (required if `refid` is not defined) _Note: if multiple CA exist with the same name, only the first matching CA will be deleted_ |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"refid": "0"
+}
+```
+
+
+
+### 3. Read System CAs
+
+
+Read installed CAs.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/ca
+```
+
+
+
+***Example Request:***
 
 ```js        
 {
@@ -5879,25 +6815,42 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-c
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/certificate
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
-| method | string | Set the method used to add the certificate. Current supported methods (`import`) |
-| cert | string | Specify the Base64 encoded PEM certificate to import |
-| key | string | Specify the corresponding Base64 encoded certificate key |
+| method | string | Set the method used to add the certificate. Current supported methods are `existing` to import an existing PEM certificate and `internal` to generate a certificate using a CA object. _Note: previous releases referred to the `existing` method as `import`. You may use `existing` or `import` interchangeably._ |
 | descr | string | Set a descriptive name for the certificate |
-| active | boolean | Set this certificate as the active certificate used by the webConfigurator (optional) |
+| crt | string | Specify the Base64 encoded PEM certificate to import. This field is required when `method` is set to `existing`. _Note: previous releases referred to the `crt` field as `cert`. Both `crt` and `cert` can be used interchangeably._ |
+| prv | string | Specify the corresponding Base64 encoded certificate key. This field is required when `method` is set to `existing`. _Note: previous releases referred to the `prv` field as `key`. Both `prv` and `key` can be used interchangeably._ |
+| caref | string | Specify the unique reference ID of the certificate signing authority for the certificate. This field is required when `method` is set to `internal`. |
+| keytype | string | Specify the private key type to generate. Options are `RSA` or `ECDSA`. This field is required when `method` is set to `internal`. |
+| keylen | integer | Specify the private key length to generate. Options are `1024`, `2048`, `3072`, `4096`, `6144`, `7680`, `8192`, `15360`, `16384`. This field is required when `method` is set to `internal` AND `keytype` is set to `RSA`. |
+| ecname | string | Specify the elliptic curve name to use when generating the private key. It is recommended to view options and compatibility within the pfSense webConfigurator or manually through OpenSSL as certain curves are not compatible in some circumstances. This field is required when `method` is set to `internal` AND `keytype` is set to `ECDSA`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._ |
+| digest_alg | string | Specify the digest algorithm to use. Options are `sha1`, `sha224`, `sha256`, `sha384` and `sha512`. This field is required when `method` is set to `internal`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._ |
+| lifetime | integer | Specify the number of days you would like this certificate to be valid for. This must be below OpenSSL's maximum lifetime value (around `12000` days). Defaults to `3650` days. This field is required when `method` is set to `internal`. _Note: maximum value is subject to change, when in doubt, check the pfSense webConfigurator options for this field._ |
+| dn_commonname | string | Specify the common name of this certificate. In mose cases, this will be a hostname. This field is required when `method` is set to `internal`. |
+| dn_country | string | Specify the country code for this certificate. This must be a known 2-digit country code. This field is only available when `method` is set to `internal`. (optional) |
+| dn_state | string | Specify the state or province for this certificate. This field is only available when `method` is set to `internal`. (optional) |
+| dn_city | string | Specify the city or locale for this certificate. This field is only available when `method` is set to `internal`. (optional) |
+| dn_organization | string | Specify the managing organization for this certificate. This field is only available when `method` is set to `internal`. (optional) |
+| dn_organizationalunit | string | Specify the managing organizational unit or team for this certificate. This field is only available when `method` is set to `internal`. (optional) |
+| type | string | Specify the certificate type. Options are `server` and `user`. This field is only available when `method` is set to `internal`. |
+| altnames | array | Specify subject alternative names to list in this certificate. This must be an array of objects with each object containing a alt name type as the key and the alt name value as the value. Supported alt name types are `dns` for FQDNs, `ip` for IP addresses, `uri` for URLs, and `email` for email addresses. This field is only available when `method` is set to `internal`. An example of a valid `altnames` array is:
+
+ `[{"dns": "example.com"}, {"ip": "127.0.0.1"}, {"uri": "http://example.com/test"}, {"email": "example@example.com"}]`
+
+ (optional) |
+| active | boolean | Set this certificate as the active certificate used by the webConfigurator. Only available when `type` is set to `server` or `method` is set to `existing`. (optional) |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5923,23 +6876,22 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-c
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/certificate
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | refid | string | Specify the refid of the certificate to delete (required if `id` and `descr` are not defined) |
-| id | string | Specify the id number of the certificate to delete (required if `refid` and `descr` are not defined) |
+| id | string | Specify the configuration ID number of the certificate to delete (required if `refid` and `descr` are not defined) |
 | descr | string | Specify the description of the certificate to delete (required if `id` and `refid` are not defined) _Note: if multiple certificates exist with the same name, only the first matching certificate will be deleted_ |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5961,13 +6913,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-c
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/certificate
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -5993,17 +6944,55 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-diagnost
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/config
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
     
+}
+```
+
+
+
+## SYSTEM/CONSOLE
+
+
+
+### 1. Update Console Settings
+
+
+Updates the console settings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-admin`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/system/console
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| disableconsolemenu | boolean | Enable or disable console password protection. `true` to enable, `false` to disable. |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"disableconsolemenu": true
 }
 ```
 
@@ -6025,13 +7014,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system`]
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/dns
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6053,15 +7041,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system`]
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/dns
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | dnsserver | array or string | Specify which DNS servers to assign the system. Single values may be passed in as string, multiple values may be passed in as array of strings. Any existing configuration will be overwritten (optional) |
 | dnsallowoverride | boolean | Enable or disable DNS override on WAN interfaces configured using DHCP (optional) |
@@ -6069,7 +7056,7 @@ URL: https://{{$hostname}}/api/v1/system/dns
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6097,21 +7084,20 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system`]
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/dns/server
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | dnsserver | array or string | Specify the IP(s) of the DNS servers to add. Single values may be specified as string, multiple values may be specified as array |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6133,21 +7119,20 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system`]
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/dns/server
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | dnsserver | array or string | Specify the IP(s) of the DNS servers to delete. Single values may be specified as string, multiple values may be specified as array |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6173,13 +7158,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-diagnost
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/halt
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6205,13 +7189,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system`]
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/hostname
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6233,22 +7216,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system`]
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/hostname
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | hostname | string | Set the hostname portion of the system hostname. Do not specify to retain existing value (optional) |
 | domain | string | Set the domain portion of the system hostname. Do not specify to retain existing value (optional) |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6275,13 +7257,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-diagnost
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/reboot
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6307,13 +7288,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-diagnost
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/table
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6339,15 +7319,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/tunable
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | tunable | string | Specify the name of this tunable. This should be a value recognized by sysctl |
 | value | string or Integer | Specify the value to set this tunable |
@@ -6355,7 +7334,7 @@ URL: https://{{$hostname}}/api/v1/system/tunable
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6379,21 +7358,20 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/tunable
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | string | Specify the name of the tunable to delete |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6415,13 +7393,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/tunable
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6443,15 +7420,14 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/tunable
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | id | string | Specify the name of the tunable to update |
 | tunable | string | Update the name of this tunable. This should be a value recognized by sysctl. (optional) |
@@ -6460,7 +7436,7 @@ URL: https://{{$hostname}}/api/v1/system/tunable
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6489,13 +7465,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-dashboar
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/system/version
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6522,27 +7497,28 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-u
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | username | string | Username to assign new user |
 | password | string | Password to assign new user |
+| disabled | boolean | Disable user account upon creation. `true` to disable, `false` to keep enabled. Defaults to `false` (optional) |
 | descr | string | Descriptive name to assign new user (optional) |
+| expires | string | Expiration date for user account in  MM/DD/YYYY format (optional) |
+| priv | array | Assign privileges to this user. This must be an array of corresponding pfSense privileges (e.g. `page-firewall-rule`). (optional) |
+| cert | array | Assign user certificates to this user. This must be an array of corresponding user certificate's `refid` values. (optional) |
 | authorizedkeys | string | Base64 encoded authorized SSH keys to assign new user (optional) |
 | ipsecpsk | string | IPsec pre-shared key to assign new user (optional) |
-| disabled | boolean | Disable user account upon creation. Do not include to leave enabled. (optional) |
-| expires | string | Expiration date for user account in  MM/DD/YYYY format (optional) |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6570,21 +7546,20 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-u
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | username | string | Username to to delete |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6606,13 +7581,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-u
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6634,27 +7608,28 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-u
 
 ```bash
 Method: PUT
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | username | string | Username to modify |
 | password | string | Change user password (optional) |
 | descr | string | Descriptive name to assign the user (optional) |
-| authorizedkeys | string | Base64 encoded authorized keys to add to user (optional) |
-| ipsecpsk | string | IPsec pre-shared key to assign to user (optional) |
 | disabled | boolean | Disable user account  (optional) |
 | expires | string | Expiration date for user account in  MM/DD/YYYY format (optional) |
+| priv | array | Update privileges assigned to this user. This must be an array of corresponding pfSense privileges (e.g. `page-firewall-rule`). To remove all privileges from a user use an empty array. (optional) |
+| cert | array | Update user certificates assigned to this user. This must be an array of corresponding user certificate's `refid` values. To remove all user certificate assignments, use empty array. (optional) |
+| authorizedkeys | string | Base64 encoded authorized keys to add to user (optional) |
+| ipsecpsk | string | IPsec pre-shared key to assign to user (optional) |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6686,22 +7661,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user/auth_server/ldap
 ```
 
 
 ***Headers:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | Content-Type | application/json |  |
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Specify a descriptive name for the authentication server |
 | host | string | Specify the remote hostname or IP of the LDAP server to query |
@@ -6724,7 +7698,7 @@ URL: https://{{$hostname}}/api/v1/user/auth_server/ldap
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6761,22 +7735,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user/auth_server/radius
 ```
 
 
 ***Headers:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | Content-Type | application/json |  |
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Specify a descriptive name for the RADIUS authentication server to create. This name must be unique from all other authentication servers on the system. |
 | host | string | Specify the IP or hostname of the remote RADIUS authentication server. |
@@ -6790,7 +7763,7 @@ URL: https://{{$hostname}}/api/v1/user/auth_server/radius
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6819,28 +7792,27 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user/auth_server
 ```
 
 
 ***Headers:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | Content-Type | application/json |  |
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Specify the name of the  authentication server to delete |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6862,28 +7834,27 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user/auth_server/ldap
 ```
 
 
 ***Headers:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | Content-Type | application/json |  |
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Specify the name of the LDAP authentication server to delete |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6905,28 +7876,27 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user/auth_server/radius
 ```
 
 
 ***Headers:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | Content-Type | application/json |  |
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | name | string | Specify the name of the RADIUS authentication server to delete |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6948,13 +7918,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user/auth_server
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -6976,20 +7945,19 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user/auth_server/ldap
 ```
 
 
 ***Headers:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | Content-Type | application/json |  |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -7011,13 +7979,12 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-a
 
 ```bash
 Method: GET
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user/auth_server/radius
 ```
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -7043,22 +8010,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-g
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user/group
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | username | string | Username to grant new privilege |
 | group | string | Name of group to assign. Multiple groups may be assigned at once if passed in as array. Group name must match exactly as is displayed in webConfigurator. |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -7081,22 +8047,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-g
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user/group
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | username | string | Username to remove from group |
 | group | string | Name of group to delete. Multiple groups may be deleted at once if passed in as array. Group name must match exactly as is displayed in webConfigurator. |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -7123,22 +8088,21 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-u
 
 ```bash
 Method: POST
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user/privilege
 ```
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | username | string | Username to grant new privilege |
 | priv | string | Name of new privilege to assign. Multiple privileges may be assigned at once if passed in as  array. Privilege name will match the POST data name found in the webConfigurator.  |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {
@@ -7161,29 +8125,28 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-u
 
 ```bash
 Method: DELETE
-Type: RAW
 URL: https://{{$hostname}}/api/v1/user/privilege
 ```
 
 
 ***Headers:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | Content-Type | application/json |  |
 
 
 
-***Query params:***
+***Fields:***
 
-| Key | Value | Description |
+| Key | Type | Description |
 | --- | ------|-------------|
 | username | string | Username to remove privilege |
 | priv | string | Name of new privilege to delete. Multiple privileges may be deleted at once if passed in as  array. Privilege name will match the POST data name found in the webConfigurator.  |
 
 
 
-***Body:***
+***Example Request:***
 
 ```js        
 {

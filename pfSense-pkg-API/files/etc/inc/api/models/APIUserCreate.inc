@@ -124,6 +124,30 @@ class APIUserCreate extends APIModel {
         }
     }
 
+    private function __validate_cert() {
+        # Check for our optional `cert` payload value
+        if (isset($this->initial_data["cert"])) {
+            # Default validated user certificates
+            $this->validated_data["cert"] = [];
+
+            # Convert single values to array
+            if (!is_array($this->initial_data["cert"])) {
+                $this->initial_data["cert"] = [$this->initial_data["cert"]];
+            }
+
+            # Loop through requested user certificates and validate accordingly
+            foreach ($this->initial_data["cert"] as $cert) {
+                # Check if this cert is a user certificate
+                if ($this->is_user_certificate($cert)) {
+                    $this->validated_data["cert"][] = $cert;
+                } else {
+                    $this->errors[] = APIResponse\get(5041);
+                    break;
+                }
+            }
+        }
+    }
+
     private function __validate_authorizedkeys() {
         # Check for our optional `authorizedkeys` payload value
         if (isset($this->initial_data['authorizedkeys'])) {
@@ -155,6 +179,7 @@ class APIUserCreate extends APIModel {
         $this->__validate_descr();
         $this->__validate_disabled();
         $this->__validate_expires();
+        $this->__validate_cert();
         $this->__validate_authorizedkeys();
         $this->__validate_ipsecpsk();
     }
@@ -171,5 +196,18 @@ class APIUserCreate extends APIModel {
             }
         }
         return false;
+    }
+
+    public function is_user_certificate($cert_ref_id) {
+        # Loop through all certificates and check for matches
+        foreach ($this->config["cert"] as $cert) {
+            # Check if this is a user certificate and that ref ID matches
+            if ($cert["type"] === "user" and $cert["refid"] === $cert_ref_id) {
+                return true;
+            }
+        }
+        
+        return false;
+        
     }
 }

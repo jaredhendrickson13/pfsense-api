@@ -31,7 +31,9 @@ class APIModel {
     public $change_note;
     public $requires_auth;
     public $set_auth_mode;
-    public $bypass_read_mode;
+    public $retain_read_mode;
+    public $ignore_ifs;
+    public $ignore_enabled;
 
     public function __construct() {
         global $config;
@@ -45,6 +47,9 @@ class APIModel {
         $this->validated_data = [];
         $this->errors = [];
         $this->type_map = [];
+        $this->retain_read_mode = true;
+        $this->ignore_ifs = false;
+        $this->ignore_enabled = false;
     }
 
     public function action() {
@@ -101,7 +106,8 @@ class APIModel {
     }
 
     private function check_authentication() {
-        $this->client = new APIAuth($this->privileges, $this->set_auth_mode, $this->bypass_read_mode);
+        $read_only = (isset(APITools\get_api_config()[1]["readonly"]) and $this->retain_read_mode) ? true : false;
+        $this->client = new APIAuth($this->privileges, $this->set_auth_mode, $read_only);
         if ($this->requires_auth === true) {
             if (!$this->client->is_authenticated) {
                 $this->errors[] = APIResponse\get(3);
@@ -118,7 +124,7 @@ class APIModel {
     # Check if the API is enabled before answering calls, if not, redirect to wc login
     private function check_enable() {
         $api_config = APITools\get_api_config()[1];
-        if (!isset($api_config["enable"])) {
+        if (!isset($api_config["enable"]) and !$this->ignore_enabled) {
             header("Location: /");
             die();
         }
@@ -152,6 +158,8 @@ class APIModel {
             } elseif (in_array($_SERVER["SERVER_ADDR"], ["::1", "127.0.0.1", "localhost"]) and $wif === "localhost") {
                 return;
             } elseif ($wif === "any") {
+                return;
+            } elseif ($this->ignore_ifs === true) {
                 return;
             }
         }

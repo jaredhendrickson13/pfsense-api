@@ -223,11 +223,11 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
     ]
     delete_tests = [
         {
-            "name": "Delete IPv4 host overrride",
+            "name": "Delete IPv4 host override",
             "payload": {"id": 0}
         },
         {
-            "name": "Delete IPv6 host overrride",
+            "name": "Delete IPv6 host override",
             "payload": {"id": 0, "apply": True},
             "resp_time": 10    # Allow a few seconds for Unbound to reload
         }

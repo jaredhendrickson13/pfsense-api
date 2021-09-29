@@ -24,6 +24,13 @@ class APIRoutingGatewayRead extends APIModel {
     }
 
     public function action() {
-        return APIResponse\get(0, return_gateways_array(true, true));
+        # Local variables
+        $gateways = [];
+
+        # Populate our gateways array if it exists
+        if (isset($this->config["gateways"]["gateway_item"])) {
+            $gateways = $this->config["gateways"]["gateway_item"];
+        }
+        return APIResponse\get(0, $gateways);
     }
 }

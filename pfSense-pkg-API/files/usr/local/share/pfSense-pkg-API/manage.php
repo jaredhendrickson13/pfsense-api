@@ -80,6 +80,10 @@ function restore() {
     }
 }
 
+function sync() {
+    APITools\sync();
+}
+
 function update() {
     $pf_version = substr(file_get_contents("/etc/version"), 0, 3);
     echo shell_exec("/usr/sbin/pkg delete -y pfSense-pkg-API");
@@ -120,6 +124,7 @@ function rotate_server_key() {
     echo "Rotating API server key... ";
     APITools\create_jwt_server_key(true);
     echo "done.".PHP_EOL;
+    sync();
 }
 
 function version() {
@@ -141,6 +146,7 @@ function help() {
     echo "  rotateserverkey  : Rotate the API server key and remove all existing tokens".PHP_EOL;
     echo "  backup           : Create a backup of the API configuration".PHP_EOL;
     echo "  restore          : Restore the API configuration from the latest backup".PHP_EOL;
+    echo "  sync             : Sync this system's API configuration to configured HA nodes".PHP_EOL;
     echo PHP_EOL;
 }
 
@@ -155,6 +161,11 @@ elseif (in_array($argv[1], ["backup"])) {
 # RESTORE COMMAND
 elseif (in_array($argv[1], ["restore"])) {
     restore();
+    sync();
+}
+# SYNC COMMAND
+elseif (in_array($argv[1], ["sync"])) {
+    sync();
 }
 # UPDATE COMMAND
 elseif (in_array($argv[1], ["update"])) {
@@ -183,6 +194,6 @@ elseif (in_array($argv[1], ["help", null])) {
 }
 # UNKNOWN COMMAND/DEFAULT
 else {
-    echo "Unknown command".PHP_EOL.PHP_EOL;
+    echo "Error: Unknown command".PHP_EOL.PHP_EOL;
     help();
 }
