@@ -17,6 +17,8 @@ require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
 class APIServicesOpenVPNClientSpecificOverridesUpdate extends APIModel {
+    public $original_csc;
+
     # Create our method constructor
     public function __construct() {
         parent::__construct();
@@ -28,6 +30,10 @@ class APIServicesOpenVPNClientSpecificOverridesUpdate extends APIModel {
         # Update our new user in the config and set the user on the backend
         $this->config["openvpn"]["openvpn-csc"][$this->id] = $this->validated_data;
         $this->write_config();
+
+        # Remove the old csc values and sync the new ones
+        openvpn_delete_csc($this->original_csc);
+        openvpn_resync_csc($this->validated_data);
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -35,6 +41,9 @@ class APIServicesOpenVPNClientSpecificOverridesUpdate extends APIModel {
         if (isset($this->initial_data['refid'])) {
             if (array_key_exists((int) $this->initial_data['refid'], $this->config['openvpn']['openvpn-csc'])) {
                 $this->id = (int) $this->initial_data['refid'];
+                $this->validated_data = $this->config['openvpn']['openvpn-csc'][$this->id];
+                $this->original_csc = $this->config['openvpn']['openvpn-csc'][$this->id];
+
             } else {
                 $this->errors[] = APIResponse\get(2078);
             }

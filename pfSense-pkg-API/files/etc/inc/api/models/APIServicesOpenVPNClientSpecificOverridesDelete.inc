@@ -26,6 +26,7 @@ class APIServicesOpenVPNClientSpecificOverridesDelete extends APIModel {
 
     public function action() {
         # Remove user from backend and remove from config
+        openvpn_delete_csc($this->config["openvpn"]["openvpn-csc"][$this->id]);
         unset($this->config["openvpn"]["openvpn-csc"][$this->id]);
         $this->write_config();
         return APIResponse\get(0, $this->validated_data);

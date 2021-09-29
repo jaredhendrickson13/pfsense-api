@@ -28,8 +28,9 @@ class APIServicesOpenVPNClientSpecificOverridesCreate extends APIModel {
         # Initialize expected configuration arrays
         $this->__init_config();
 
-        # Add our Client Specific Override to the configuration
+        # Add our Client Specific Override to the configuration and resync OpenVPN to use new CSC
         $this->config['openvpn']['openvpn-csc'][] = $this->validated_data;
+        openvpn_resync_csc($this->validated_data);
 
         # Write the user to configuration and set the user on the backend. Return response with created user object.
         $this->write_config();
@@ -310,13 +311,13 @@ class APIServicesOpenVPNClientSpecificOverridesCreate extends APIModel {
 
     private function __init_config() {
         # Ensure the OpenVPN configuration array exists
-        if (!isset($this->config["openvpn"])) {
+        if (empty($this->config["openvpn"])) {
             $this->config["openvpn"] = [];
         }
 
         # Ensure the OpenVPN csc configuration array exists
-        if (!isset($this->config["openvpn"]["openvpn-csc"])) {
-            $this->config["openvpn"]["openvpn-csc"] = [];
+        if (empty($this->config['openvpn']['openvpn-csc'])) {
+            $this->config['openvpn']['openvpn-csc'] = [];
         }
     }
 }
