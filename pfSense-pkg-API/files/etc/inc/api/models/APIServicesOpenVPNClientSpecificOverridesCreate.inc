@@ -25,6 +25,9 @@ class APIServicesOpenVPNClientSpecificOverridesCreate extends APIModel {
     }
 
     public function action() {
+        # Initialize expected configuration arrays
+        $this->__init_config();
+
         # Add our Client Specific Override to the configuration
         $this->config['openvpn']['openvpn-csc'][] = $this->validated_data;
 
@@ -303,5 +306,17 @@ class APIServicesOpenVPNClientSpecificOverridesCreate extends APIModel {
         $this->__validate_wins_servers();
 
         $this->validated_data["nbdd_server1"] = "";
+    }
+
+    private function __init_config() {
+        # Ensure the OpenVPN configuration array exists
+        if (!isset($this->config["openvpn"])) {
+            $this->config["openvpn"] = [];
+        }
+
+        # Ensure the OpenVPN csc configuration array exists
+        if (!isset($this->config["openvpn"]["openvpn-csc"])) {
+            $this->config["openvpn"]["openvpn-csc"] = [];
+        }
     }
 }
