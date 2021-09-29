@@ -41,7 +41,7 @@ class APIUnitTestSystemCA(unit_test_framework.APIUnitTest):
                 "dn_city": "Salt Lake City",
                 "dn_state": "Utah",
                 "dn_organization": "Test Company",
-                "dn_organizationunit": "IT"
+                "dn_organizationalunit": "IT"
             },
         },
         {
@@ -59,7 +59,7 @@ class APIUnitTestSystemCA(unit_test_framework.APIUnitTest):
                 "dn_city": "Salt Lake City",
                 "dn_state": "Utah",
                 "dn_organization": "Test Company",
-                "dn_organizationunit": "IT"
+                "dn_organizationalunit": "IT"
             },
         },
         {

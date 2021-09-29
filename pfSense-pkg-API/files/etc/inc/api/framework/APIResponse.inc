@@ -378,13 +378,13 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Intermediate CA signing CA reference ID is required"
+            "message" => "Signing CA reference ID is required"
         ],
         1048 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Intermediate CA signing CA reference ID does not exist"
+            "message" => "Signing CA reference ID does not exist"
         ],
         1049 => [
             "status" => "bad request",
@@ -403,6 +403,60 @@ function get($id, $data=[], $all=false) {
             "code" => 400,
             "return" => $id,
             "message" => "Unknown certificate country"
+        ],
+        1052 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate common name is required"
+        ],
+        1053 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate type is required"
+        ],
+        1054 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate type is invalid"
+        ],
+        1055 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate alternative names must be contained within an array"
+        ],
+        1056 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate alternative name type is invalid"
+        ],
+        1057 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate DNS alternative names must be valid hostname or FQDN"
+        ],
+        1058 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate IP alternative names must be valid IP address"
+        ],
+        1059 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate URI alternative names must be valid URI"
+        ],
+        1060 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate email alternative names must be valid email address"
         ],
 
         // 2000-2999 reserved for /services API calls

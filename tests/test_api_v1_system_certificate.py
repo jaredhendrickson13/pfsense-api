@@ -8,22 +8,255 @@ class APIUnitTestSystemCertificate(unit_test_framework.APIUnitTest):
     get_tests = [{"name": "Read system certificates"}]
     post_tests = [
         {
+            "name": "Create RSA internal CA",
+            "uri": "/api/v1/system/ca",
+            "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
+            "payload": {
+                "method": "internal",
+                "descr": "INTERNAL_CA_RSA",
+                "trust": True,
+                "keytype": "RSA",
+                "keylen": 2048,
+                "digest_alg": "sha256",
+                "lifetime": 3650,
+                "dn_commonname": "internal-ca-unit-test.example.com",
+                "dn_country": "US",
+                "dn_city": "Salt Lake City",
+                "dn_state": "Utah",
+                "dn_organization": "Test Company",
+                "dn_organizationalunit": "IT"
+            },
+        },
+        {
             "name": "Import an existing PEM certificate",
             "payload": {
-                "method": "import",
-                "cert": crt,
-                "key": key,
+                "method": "existing",
+                "crt": crt,
+                "prv": key,
                 "descr": "Unit Test",
                 "active": False
-            },
+            }
+        },
+        {
+            "name": "Create internal certificate with RSA key",
+            "payload": {
+                "method": "internal",
+                "descr": "INTERNAL_CERT_RSA",
+                "keytype": "RSA",
+                "keylen": 2048,
+                "digest_alg": "sha256",
+                "lifetime": 3650,
+                "dn_commonname": "internal-cert-unit-test.example.com",
+                "dn_country": "US",
+                "dn_city": "Salt Lake City",
+                "dn_state": "Utah",
+                "dn_organization": "Test Company",
+                "dn_organizationalunit": "IT",
+                "type": "server",
+                "altnames": [
+                    {"dns": "test-altname.example.com"},
+                    {"ip": "1.1.1.1"},
+                    {"uri": "http://example.com/example/uri"},
+                    {"email": "example@example.com"}
+                ]
+            }
+        },
+        {
+            "name": "Check method requirement",
+            "status": 400,
+            "return": 1031
+        },
+        {
+            "name": "Check unsupported method",
+            "status": 400,
+            "return": 1032,
+            "payload": {"method": "INVALID_METHOD"}
+        },
+        {
+            "name": "Check description requirement",
+            "status": 400,
+            "return": 1002,
+            "payload": {"method": "internal"}
+        },
+        {
+            "name": "Check description character validation",
+            "status": 400,
+            "return": 1037,
+            "payload": {"method": "internal", "descr": "<>?&>"}
+        },
+        {
+            "name": "Check certificate requirement with existing method",
+            "status": 400,
+            "return": 1003,
+            "payload": {"method": "existing", "descr": "TestCA"}
+        },
+        {
+            "name": "Check encrypted key rejection",
+            "status": 400,
+            "return": 1036,
+            "payload": {"method": "existing", "descr": "TestCA", "crt": crt, "prv": "RU5DUllQVEVECg=="}
+        },
+        {
+            "name": "Check certificate key matching with existing method",
+            "status": 400,
+            "return": 1049,
+            "payload": {"method": "existing", "descr": "TestCA", "crt": crt, "prv": "INVALID KEY"}
+        },
+        {
+            "name": "Check signing CA reference ID requirement for internal method",
+            "status": 400,
+            "return": 1047,
+            "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
+            "payload": {"method": "internal", "descr": "TestCA"}
+        },
+        {
+            "name": "Check non-existing signing CA reference ID for internal method",
+            "status": 400,
+            "return": 1048,
+            "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
+            "payload": {"method": "internal", "descr": "TestCA", "caref": "invalid"}
+        },
+        {
+            "name": "Check key type requirement for internal method",
+            "status": 400,
+            "return": 1038,
+            "payload": {"method": "internal", "descr": "TestCA"}
+        },
+        {
+            "name": "Check unknown key type for internal method",
+            "status": 400,
+            "return": 1039,
+            "payload": {"method": "internal", "descr": "TestCA", "keytype": "invalid"}
+        },
+        {
+            "name": "Check key length requirement for internal method",
+            "status": 400,
+            "return": 1040,
+            "payload": {"method": "internal", "descr": "TestCA", "keytype": "RSA"}
+        },
+        {
+            "name": "Check unknown key length for internal method",
+            "status": 400,
+            "return": 1041,
+            "payload": {"method": "internal", "descr": "TestCA", "keytype": "RSA", "keylen": "invalid"}
+        },
+        {
+            "name": "Check EC name requirement for internal method",
+            "status": 400,
+            "return": 1042,
+            "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA"}
+        },
+        {
+            "name": "Check unknown EC name for internal method",
+            "status": 400,
+            "return": 1043,
+            "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "invalid"}
+        },
+        {
+            "name": "Check digest algorithm requirement for internal method",
+            "status": 400,
+            "return": 1044,
+            "payload": {"method": "internal", "descr": "TestCA", "keytype": "RSA", "keylen": 2048}
+        },
+        {
+            "name": "Check unknown digest algorithm for internal method",
+            "status": 400,
+            "return": 1045,
+            "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1", "digest_alg": "invalid"}
+        },
+        {
+            "name": "Check lifetime maximum constraint for internal method",
+            "status": 400,
+            "return": 1046,
+            "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1", "digest_alg": "sha256", "lifetime": 50000}
+        },
+        {
+            "name": "Check common name required for internal method",
+            "status": 400,
+            "return": 1052,
+            "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1", "digest_alg": "sha256", "lifetime": 365}
+        },
+        {
+            "name": "Check unknown country for internal method",
+            "status": 400,
+            "return": 1051,
+            "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1", "digest_alg": "sha256", "lifetime": 365, "dn_commonname": "test.example.com", "dn_country": "invalid"}
+        },
+        {
+            "name": "Check type requirement for internal method",
+            "status": 400,
+            "return": 1053,
+            "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1", "digest_alg": "sha256", "lifetime": 365, "dn_commonname": "test.example.com", "dn_country": "US"}
+        },
+        {
+            "name": "Check type choice constraint for internal method",
+            "status": 400,
+            "return": 1054,
+            "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1", "digest_alg": "sha256", "lifetime": 365, "dn_commonname": "test.example.com", "dn_country": "US", "type": "INVALID"}
+        },
+        {
+            "name": "Check invalid altnames data type for internal method",
+            "status": 400,
+            "return": 1055,
+            "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1", "digest_alg": "sha256", "lifetime": 365, "dn_commonname": "test.example.com", "dn_country": "US", "type": "user", "altnames": False}
+        },
+        {
+            "name": "Check invalid altname type for internal method",
+            "status": 400,
+            "return": 1056,
+            "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1", "digest_alg": "sha256", "lifetime": 365, "dn_commonname": "test.example.com", "dn_country": "US", "type": "user", "altnames": [{"INVALID": "test"}]}
+        },
+        {
+         "name": "Check DNS altname type validation for internal method",
+         "status": 400,
+         "return": 1057,
+         "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1", "digest_alg": "sha256", "lifetime": 365, "dn_commonname": "test.example.com", "dn_country": "US", "type": "user", "altnames": [{"dns": "!@#BADFQDN#@!"}]}
+        },
+        {
+         "name": "Check IP altname type validation for internal method",
+         "status": 400,
+         "return": 1058,
+         "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1", "digest_alg": "sha256", "lifetime": 365, "dn_commonname": "test.example.com", "dn_country": "US", "type": "user", "altnames": [{"ip": "INVALID IP"}]}
+        },
+        {
+         "name": "Check URI altname type validation for internal method",
+         "status": 400,
+         "return": 1059,
+         "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1", "digest_alg": "sha256", "lifetime": 365, "dn_commonname": "test.example.com", "dn_country": "US", "type": "user", "altnames": [{"uri": "INVALID URI"}]}
+        },
+        {
+         "name": "Check email altname type validation for internal method",
+         "status": 400,
+         "return": 1059,
+         "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1", "digest_alg": "sha256", "lifetime": 365, "dn_commonname": "test.example.com", "dn_country": "US", "type": "user", "altnames": [{"email": "#@!INVALIDEMAIL!@#"}]}
         }
     ]
     delete_tests = [
         {
             "name": "Delete certificate",
             "payload": {"descr": "Unit Test"}
+        },
+        {
+            "name": "Delete internal certificate",
+            "payload": {"descr": "INTERNAL_CERT_RSA"}
+        },
+        {
+            "name": "Delete CA certificate",
+            "uri": "/api/v1/system/ca",
+            "payload": {"descr": "INTERNAL_CA_RSA"}
         }
     ]
+
+    def post_post(self):
+        # Check our first POST response for the created CA's refid
+        if len(self.post_responses) == 1:
+            # Variables
+            counter = 0
+            # Loop through all tests and auto-add the caref ID to tests that do not have the no_caref key set
+            for test in self.post_tests:
+                if "payload" in test.keys() and "no_caref" not in test.keys():
+                    self.post_tests[counter]["payload"]["caref"] = self.post_responses[0]["data"]["refid"]
+                counter = counter + 1
 
 
 APIUnitTestSystemCertificate()

@@ -6428,7 +6428,7 @@
 											"description": "Specify the managing organization for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional)"
 										},
 										{
-											"key": "dn_organizationunit",
+											"key": "dn_organizationalunit",
 											"value": "string",
 											"description": "Specify the managing organizational unit or team for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional)"
 										}
