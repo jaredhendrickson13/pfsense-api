@@ -19,6 +19,7 @@ require_once("api/framework/APIResponse.inc");
 
 class APISystemCertificateDelete extends APIModel {
     public $cert_ref_id;
+
     # Create our method constructor
     public function __construct() {
         parent::__construct();

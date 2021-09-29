@@ -6260,7 +6260,7 @@
 										{
 											"key": "active",
 											"value": "boolean",
-											"description": "Set this certificate as the active certificate used by the webConfigurator (optional)"
+											"description": "Set this certificate as the active certificate used by the webConfigurator. Only available when `type` is set to `server` or `method` is set to `existing`. (optional)"
 										}
 									]
 								},
@@ -6283,7 +6283,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/system/certificate?refid=string&id=string&descr=string",
+									"raw": "https://{{$hostname}}/api/v1/system/certificate",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -6303,7 +6303,7 @@
 										{
 											"key": "id",
 											"value": "string",
-											"description": "Specify the id number of the certificate to delete (required if `refid` and `descr` are not defined)"
+											"description": "Specify the configuration ID number of the certificate to delete (required if `refid` and `descr` are not defined)"
 										},
 										{
 											"key": "descr",
