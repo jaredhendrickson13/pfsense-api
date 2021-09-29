@@ -458,6 +458,72 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Certificate email alternative names must be valid email address"
         ],
+        1061 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification IP address is required"
+        ],
+        1062 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification IP address must be valid IP address or hostname"
+        ],
+        1063 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification port is required"
+        ],
+        1064 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification SMTP port must be between 1 and 65535"
+        ],
+        1065 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification timeout must be a number greater than 0"
+        ],
+        1066 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification From Email Address is required"
+        ],
+        1067 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification From Email Address must be valid email address"
+        ],
+        1068 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification Notify Email Address is required"
+        ],
+        1069 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification Notify Email Address must be valid email address"
+        ],
+        1070 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification authentication mechanism is required"
+        ],
+        1071 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification authentication mechanism must be PLAIN or LOGIN"
+        ],
 
         // 2000-2999 reserved for /services API calls
         2000 => [
