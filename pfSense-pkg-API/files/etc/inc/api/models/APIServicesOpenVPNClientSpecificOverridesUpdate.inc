@@ -16,21 +16,31 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
+class APIServicesOpenVPNClientSpecificOverridesUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-openvpn-server"];
-        $this->change_note = "Added OpenVPN client specific override via API";
+        $this->change_note = "Modified OpenVPN client specific override via API";
     }
 
     public function action() {
-        # Add our Client Specific Override to the configuration
-        $this->config['openvpn']['openvpn-csc'][] = $this->validated_data;
-
-        # Write the user to configuration and set the user on the backend. Return response with created user object.
+        # Update our new user in the config and set the user on the backend
+        $this->config["openvpn"]["openvpn-csc"][$this->id] = $this->validated_data;
         $this->write_config();
         return APIResponse\get(0, $this->validated_data);
+    }
+
+    private function __validate_refid() {
+        if (isset($this->initial_data['refid'])) {
+            if (array_key_exists((int) $this->initial_data['refid'], $this->config['openvpn']['openvpn-csc'])) {
+                $this->id = (int) $this->initial_data['refid'];
+            } else {
+                $this->errors[] = APIResponse\get(2078);
+            }
+        } else {
+            $this->errors[] = APIResponse\get(2079);
+        }
     }
 
     private function __validate_server_list() {
@@ -45,7 +55,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
         if (isset($this->initial_data['server_list'])) {
             $this->validated_data["server_list"] = (string) $this->initial_data['server_list'];
         } else {
-            $this->validated_data["server_list"] = "";
+            $this->validated_data["server_list"] = $this->config['openvpn']['openvpn-csc'][$this->id]['server_list'];
         }
     }
 
@@ -53,7 +63,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
         if (isset($this->initial_data['custom_options'])) {
             $this->validated_data["custom_options"] = $this->initial_data['custom_options'];
         } else {
-            $this->validated_data["custom_options"] = "";
+            $this->validated_data["custom_options"] = $this->config['openvpn']['openvpn-csc'][$this->id]['custom_options'];
         }
     }
 
@@ -61,24 +71,34 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
         if (isset($this->initial_data['common_name'])) {
             $this->validated_data["common_name"] = $this->initial_data['common_name'];
         } else {
-            $this->errors[] = APIResponse\get(6030);
+            $this->validated_data["common_name"] = $this->config['openvpn']['openvpn-csc'][$this->id]['common_name'];
         }
     }
 
     private function __validate_disabled() {
         # Check for our optional `disabled` payload value
-        if ($this->initial_data["disable"] === true) {
-            $this->validated_data["disable"] = "";
+        if (isset($this->initial_data["disable"])) {
+            if ($this->initial_data["disable"] === true) {
+                $this->validated_data["disable"] = "";
+            }
+        } else {
+            if (isset($this->config['openvpn']['openvpn-csc'][$this->id]['disable'])) {
+                $this->validated_data["disable"] = "";
+            }
         }
     }
 
     private function __validate_block() {
         # Check for our optional `disabled` payload value
-        if ($this->initial_data["block"] === true) {
-            $this->validated_data["block"] = "yes";
-        }
-        else {
-            $this->validated_data["block"] = "";
+        if (isset($this->initial_data["block"])) {
+            if ($this->initial_data["block"] === true) {
+                $this->validated_data["block"] = "yes";
+            }
+            else {
+                $this->validated_data["block"] = "";
+            }
+        } else {
+            $this->validated_data["block"] = $this->config['openvpn']['openvpn-csc'][$this->id]['block'];
         }
     }
 
@@ -88,7 +108,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
             $this->validated_data["description"] = $this->initial_data['description'];
         }
         else {
-            $this->validated_data["description"] = "";
+            $this->validated_data["description"] = $this->config['openvpn']['openvpn-csc'][$this->id]['description'];
         }
     }
 
@@ -98,7 +118,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
             $this->validated_data["tunnel_network"] = $this->initial_data['tunnel_network'];
         }
         else {
-            $this->validated_data["tunnel_network"] = "";
+            $this->validated_data["tunnel_network"] = $this->config['openvpn']['openvpn-csc'][$this->id]['tunnel_network'];
         }
     }
 
@@ -107,7 +127,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
             $this->validated_data["tunnel_networkv6"] = $this->initial_data['tunnel_networkv6'];
         }
         else {
-            $this->validated_data["tunnel_networkv6"] = "";
+            $this->validated_data["tunnel_networkv6"] = $this->config['openvpn']['openvpn-csc'][$this->id]['tunnel_networkv6'];
         }
     }
 
@@ -116,7 +136,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
             $this->validated_data["local_network"] = $this->initial_data['local_network'];
         }
         else {
-            $this->validated_data["local_network"] = "";
+            $this->validated_data["local_network"] = $this->config['openvpn']['openvpn-csc'][$this->id]['local_network'];
         }
     }
 
@@ -125,7 +145,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
             $this->validated_data["local_networkv6"] = $this->initial_data['local_networkv6'];
         }
         else {
-            $this->validated_data["local_networkv6"] = "";
+            $this->validated_data["local_networkv6"] = $this->config['openvpn']['openvpn-csc'][$this->id]['local_networkv6'];
         }
     }
 
@@ -134,7 +154,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
             $this->validated_data["remote_network"] = $this->initial_data['remote_network'];
         }
         else {
-            $this->validated_data["remote_network"] = "";
+            $this->validated_data["remote_network"] = $this->config['openvpn']['openvpn-csc'][$this->id]['remote_network'];
         }
     }
 
@@ -143,34 +163,46 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
             $this->validated_data["remote_networkv6"] = $this->initial_data['remote_networkv6'];
         }
         else {
-            $this->validated_data["remote_networkv6"] = "";
+            $this->validated_data["remote_networkv6"] = $this->config['openvpn']['openvpn-csc'][$this->id]['remote_networkv6'];
         }
     }
 
     private function __validate_redirect_gateway() {
-        if ($this->initial_data['redirect_gateway'] === true) {
-            $this->validated_data["gwredir"] = "yes";
-        }
-        else {
-            $this->validated_data["gwredir"] = "";
+        if (isset($this->initial_data['redirect_gateway'])) {
+            if ($this->initial_data['redirect_gateway'] === true) {
+                $this->validated_data["gwredir"] = "yes";
+            }
+            else {
+                $this->validated_data["gwredir"] = "";
+            }
+        } else {
+            $this->validated_data["gwredir"] = $this->config['openvpn']['openvpn-csc'][$this->id]['gwredir'];
         }
     }
 
     private function __validate_prevent_server_definitions() {
-        if ($this->initial_data['prevent_server_definitions'] === true) {
-            $this->validated_data["push_reset"] = "yes";
-        }
-        else {
-            $this->validated_data["push_reset"] = "";
+        if (isset($this->initial_data['prevent_server_definitions'])) {
+            if ($this->initial_data['prevent_server_definitions'] === true) {
+                $this->validated_data["push_reset"] = "yes";
+            }
+            else {
+                $this->validated_data["push_reset"] = "";
+            }
+        } else {
+            $this->validated_data["push_reset"] = $this->config['openvpn']['openvpn-csc'][$this->id]['push_reset'];
         }
     }
 
     private function __validate_remove_server_routes() {
-        if ($this->initial_data['remove_server_routes'] === true) {
-            $this->validated_data["remove_route"] = "yes";
-        }
-        else {
-            $this->validated_data["remove_route"] = "";
+        if (isset($this->initial_data['remove_server_routes'])) {
+            if ($this->initial_data['remove_server_routes'] === true) {
+                $this->validated_data["remove_route"] = "yes";
+            }
+            else {
+                $this->validated_data["remove_route"] = "";
+            }
+        } else {
+            $this->validated_data["remote_route"] = $this->config['openvpn']['openvpn-csc'][$this->id]['remove_route'];
         }
     }
 
@@ -179,16 +211,20 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
             $this->validated_data["dns_domain"] = $this->initial_data['dns_domain'];
         }
         else {
-            $this->validated_data["dns_domain"] = "";
+            $this->validated_data["dns_domain"] = $this->config['openvpn']['openvpn-csc'][$this->id]['dns_domain'];
         }
     }
 
     private function __validate_netbios_enable() {
-        if ($this->initial_data['netbios_enable'] === true) {
-            $this->validated_data["netbios_enable"] = "yes";
-        }
-        else {
-            $this->validated_data["netbios_enable"] = "";
+        if (isset($this->initial_data['remove_server_routes'])) {
+            if ($this->initial_data['netbios_enable'] === true) {
+                $this->validated_data["netbios_enable"] = "yes";
+            }
+            else {
+                $this->validated_data["netbios_enable"] = "";
+            }
+        } else {
+            $this->validated_data["netbios_enable"] = $this->config['openvpn']['openvpn-csc'][$this->id]['netbios_enable'];
         }
     }
 
@@ -197,7 +233,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
             $this->validated_data["netbios_scope"] = $this->initial_data['netbios_scope'];
         }
         else {
-            $this->validated_data["netbios_scope"] = "";
+            $this->validated_data["netbios_scope"] = $this->config['openvpn']['openvpn-csc'][$this->id]['netbios_scope'];
         }
     }
 
@@ -215,6 +251,23 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
 
                 $this->validated_data["dns_server" . $counter] = str_replace(" ", "", $server);
                 $counter += 1;
+            }
+        } else {
+            if (isset($this->config['openvpn']['openvpn-csc'][$this->id]['dns_server1']))
+            {
+                $this->validated_data["dns_server1"] = $this->config['openvpn']['openvpn-csc'][$this->id]['dns_server1'];
+            }
+            if (isset($this->config['openvpn']['openvpn-csc'][$this->id]['dns_server2']))
+            {
+                $this->validated_data["dns_server2"] = $this->config['openvpn']['openvpn-csc'][$this->id]['dns_server2'];
+            }
+            if (isset($this->config['openvpn']['openvpn-csc'][$this->id]['dns_server3']))
+            {
+                $this->validated_data["dns_server3"] = $this->config['openvpn']['openvpn-csc'][$this->id]['dns_server3'];
+            }
+            if (isset($this->config['openvpn']['openvpn-csc'][$this->id]['dns_server4']))
+            {
+                $this->validated_data["dns_server4"] = $this->config['openvpn']['openvpn-csc'][$this->id]['dns_server4'];
             }
         }
     }
@@ -234,10 +287,19 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
                 $this->validated_data["ntp_server" . $counter] = str_replace(" ", "", $server);
                 $counter += 1;
             }
+        } else {
+            if (isset($this->config['openvpn']['openvpn-csc'][$this->id]['ntp_server1']))
+            {
+                $this->validated_data["ntp_server1"] = $this->config['openvpn']['openvpn-csc'][$this->id]['ntp_server1'];
+            }
+            if (isset($this->config['openvpn']['openvpn-csc'][$this->id]['ntp_server2']))
+            {
+                $this->validated_data["ntp_server2"] = $this->config['openvpn']['openvpn-csc'][$this->id]['ntp_server2'];
+            }
         }
     }
 
-    private function __validate_wins_servers() {
+    private function __validate_win_servers() {
         if (isset($this->initial_data['wins_servers'])) {
             $win_servers = explode(',', $this->initial_data['wins_servers']);
 
@@ -251,6 +313,15 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
 
                 $this->validated_data["wins_server" . $counter] = str_replace(" ", "", $server);
                 $counter += 1;
+            }
+        } else {
+            if (isset($this->config['openvpn']['openvpn-csc'][$this->id]['wins_server1']))
+            {
+                $this->validated_data["wins_server1"] = $this->config['openvpn']['openvpn-csc'][$this->id]['wins_server1'];
+            }
+            if (isset($this->config['openvpn']['openvpn-csc'][$this->id]['wins_server2']))
+            {
+                $this->validated_data["wins_server2"] = $this->config['openvpn']['openvpn-csc'][$this->id]['wins_server2'];
             }
         }
     }
@@ -266,8 +337,10 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
             } else if ($this->initial_data['netbios_node_type'] == 'h') {
                 $this->validated_data["netbios_ntype"] = 4;
             } else {
-                $this->errors[] = APIResponse\get(6031);
+                $this->errors[] = APIResponse\get(2076);
             }
+        } else if (!empty($this->config['openvpn']['openvpn-csc'][$this->id]['netbios_ntype'])) {
+            $this->validated_data["netbios_ntype"] = $this->config['openvpn']['openvpn-csc'][$this->id]['netbios_ntype'];
         } else {
             if (isset($this->initial_data['netbios_enable'])) {
                 $this->validated_data["netbios_ntype"] = 1;
@@ -279,6 +352,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
 
     public function validate_payload() {
         # Run each validation method
+        $this->__validate_refid();
         $this->__validate_server_list();
         $this->__validate_custom_options();
         $this->__validate_disabled();
@@ -300,7 +374,7 @@ class APIOpenVPNClientSpecificOverridesCreate extends APIModel {
         $this->__validate_netbios_enable();
         $this->__validate_netbios_ntype();
         $this->__validate_netbios_scope();
-        $this->__validate_wins_servers();
+        $this->__validate_win_servers();
 
         $this->validated_data["nbdd_server1"] = "";
     }

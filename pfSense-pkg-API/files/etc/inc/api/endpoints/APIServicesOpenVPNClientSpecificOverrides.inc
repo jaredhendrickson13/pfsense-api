@@ -15,24 +15,24 @@
 
 require_once("api/framework/APIEndpoint.inc");
 
-class APIOpenVPNClientSpecificOverrides extends APIEndpoint {
+class APIServicesOpenVPNClientSpecificOverrides extends APIEndpoint {
     public function __construct() {
-        $this->url = "/api/v1/openvpn/csc";
+        $this->url = "/api/v1/services/openvpn/csc";
     }
 
     protected function get() {
-        return (new APIOpenVPNClientSpecificOverridesRead())->call();
+        return (new APIServicesOpenVPNClientSpecificOverridesRead())->call();
     }
 
     protected function post() {
-        return (new APIOpenVPNClientSpecificOverridesCreate())->call();
+        return (new APIServicesOpenVPNClientSpecificOverridesCreate())->call();
     }
 
     protected function put() {
-        return (new APIOpenVPNClientSpecificOverridesUpdate())->call();
+        return (new APIServicesOpenVPNClientSpecificOverridesUpdate())->call();
     }
 
     protected function delete() {
-        return (new APIOpenVPNClientSpecificOverridesDelete())->call();
+        return (new APIServicesOpenVPNClientSpecificOverridesDelete())->call();
     }
 }

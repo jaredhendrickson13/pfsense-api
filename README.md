@@ -733,6 +733,13 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Create NTPd Time Server](#1-create-ntpd-time-server)
   * [Delete NTPd Time Server](#2-delete-ntpd-time-server)
 
+* [SERVICES/OPENVPN/CSC](#servicesopenvpncsc)
+
+  * [Create OpenVPN Client Specific Overrides](#1-create-openvpn-client-specific-overrides)
+  * [Delete OpenVPN Client Specific Override](#2-delete-openvpn-client-specific-override)
+  * [Read OpenVPN Client Specific Overrides](#3-read-openvpn-client-specific-overrides)
+  * [Update OpenVPN Client Specific Overrides](#4-update-openvpn-client-specific-overrides)
+
 * [SERVICES/SSHD](#servicessshd)
 
   * [Read SSHd Configuration](#1-read-sshd-configuration)
@@ -5363,6 +5370,228 @@ URL: https://{{$hostname}}/api/v1/services/ntpd/time_server
 ```js        
 {
     "timeserver": "ntp.pool.org"
+}
+```
+
+
+
+## SERVICES/OPENVPN/CSC
+
+
+
+### 1. Create OpenVPN Client Specific Overrides
+
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/services/openvpn/csc
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| server_list | string | A comma separated string containing the ids of the OpenVPN servers that use this override. Omitting this activates the override for all servers. |
+| custom_options | string | Enter any additional options to add for this client specific override, separated by a semicolon.
+EXAMPLE: push "route 10.0.0.0 255.255.255.0"; |
+| disable | boolean | Whether to disable this override without removing it. |
+| common_name | string | Enter the X.509 common name for the client certificate, or the username for VPNs utilizing password authentication. This match is case sensitive. |
+| block | boolean | Prevents the client from connecting to this server. Do not use this option to permanently disable a client due to a compromised key or password. Use a CRL (certificate revocation list) instead. |
+| description | string | A description for administrative reference (not parsed). |
+| tunnel_network | string | The virtual IPv4 network used for private communications between this client and the server expressed using CIDR (e.g. 10.0.8.5/24).
+With subnet topology, enter the client IP address and the subnet mask must match the IPv4 Tunnel Network on the server.
+With net30 topology, the first network address of the /30 is assumed to be the server address and the second network address will be assigned to the client. |
+| tunnel_networkv6 | string | The virtual IPv6 network used for private communications between this client and the server expressed using prefix (e.g. 2001:db9:1:1::100/64).
+Enter the client IPv6 address and prefix. The prefix must match the IPv6 Tunnel Network prefix on the server. |
+| local_network | string | These are the IPv4 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more CIDR networks.
+NOTE: Networks do not need to be specified here if they have already been defined on the main server configuration. |
+| local_networkv6 | string | These are the IPv6 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more IP/PREFIX networks.
+NOTE: Networks do not need to be specified here if they have already been defined on the main server configuration. |
+| remote_network | string | These are the IPv4 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more CIDR ranges. May be left blank if there are no client-side networks to be routed.
+NOTE: Remember to add these subnets to the IPv4 Remote Networks list on the corresponding OpenVPN server settings. |
+| remote_networkv6 | string | These are the IPv6 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more IP/PREFIX networks. May be left blank if there are no client-side networks to be routed.
+NOTE: Remember to add these subnets to the IPv6 Remote Networks list on the corresponding OpenVPN server settings. |
+| redirect_gateway | boolean | Force all client generated traffic through the tunnel. |
+| prevent_server_definitions | boolean | Prevent this client from receiving any server-defined client settings. |
+| remove_server_routes | boolean | Prevent this client from receiving any server-defined routes without removing any other options. |
+| dns_domain | string | Domain name for DNS to provide to the client. |
+| dns_servers | string | A comma-separated list of no more than 4 DNS server IP addresses (i.e. 8.8.8.8). Any more than the first four are ignored. This list is provided to the clent. |
+| ntp_servers | string | A comma-separated list of no more than 2 NTP server IP addresses. Any more than the first two are ignored. |
+| netbios_enable | boolean | Enable NetBIOS over TCP/IP. If this option is not set, all NetBIOS-over-TCP/IP options (including WINS) will be disabled. |
+| netbios_node_type | string | Possible options: b (broadcasts), p (point-to-point name queries to a WINS server), m (broadcast then query name server), and h (query name server, then broadcast). This parameter takes a single letter either b, p, m, or h. Any other string will result in this option being set to none. |
+| netbios_scope | string | A NetBIOS Scope ID provides an extended naming service for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS traffic on a single network to only those nodes with the same NetBIOS scope ID. |
+| wins_servers | string | A comma-separated list of no more than 2 WINS server IP addresses. Any more than the first two are ignored. |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "server_list": "1, 2, 3",
+    "custom_options": "ifconfig-push xxx.xxx.xxx.xxx 255.255.255.0;",
+    "disable": true,
+    "common_name": "commonname",
+    "block": true,
+    "description": "An override, that is specific...",
+    "tunnel_network": "10.0.8.5/24",
+    "tunnel_networkv6": "2001:db9:1:1::100/64",
+    "local_network": "10.0.9.5/24, 10.0.8.5/24, 10.0.10.5/24",
+    "local_networkv6": "2001:db9:1:1::100/64, 2002:db9:1:1::100/64, 2003:db9:1:1::100/64",
+    "remote_network": "10.0.9.5/24, 10.0.8.5/24, 10.0.10.5/24",
+    "remote_networkv6": "2001:db9:1:1::100/64, 2002:db9:1:1::100/64, 2003:db9:1:1::100/64",
+    "redirect_gateway": true,
+    "prevent_server_definitions": true,
+    "remove_server_routes": true,
+    "dns_domain": "google.com",
+    "dns_servers": "8.8.8.8, 8.8.4.4, 8.8.3.3, 8.8.2.2",
+    "ntp_servers": "192.168.56.101, 192.168.56.102",
+    "netbios_enable": true,
+    "netbios_node_type": "p",
+    "netbios_scope": "5",
+    "wins_servers": "192.168.56.103, 192.168.56.104"
+}
+```
+
+
+
+### 2. Delete OpenVPN Client Specific Override
+
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/services/openvpn/csc
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| refid | int | Reference id. This id indicates the id of the client specific override you want to delete. This id is not static as it is essentially the index of an entry in the config array. Best to first get all client specific overrides and get the id of the one you want to delete before calling this endpoint. |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "refid": 0
+}
+```
+
+
+
+### 3. Read OpenVPN Client Specific Overrides
+
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/services/openvpn/csc
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 4. Update OpenVPN Client Specific Overrides
+
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/services/openvpn/csc
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| refid | int | Reference id. This id indicates the id of the client specific override you want to modify. This id is not static as it is essentially the index of an entry in the config array. Best to first get all client specific overrides and get the id of the one you want to modify before calling this endpoint. |
+| server_list | string | A comma separated string containing the ids of the OpenVPN servers that use this override. Omitting this activates the override for all servers. |
+| custom_options | string | Enter any additional options to add for this client specific override, separated by a semicolon.
+EXAMPLE: push "route 10.0.0.0 255.255.255.0"; |
+| disable | boolean | Whether to disable this override without removing it. |
+| common_name | string | Enter the X.509 common name for the client certificate, or the username for VPNs utilizing password authentication. This match is case sensitive. |
+| block | boolean | Prevents the client from connecting to this server. Do not use this option to permanently disable a client due to a compromised key or password. Use a CRL (certificate revocation list) instead. |
+| description | string | A description for administrative reference (not parsed). |
+| tunnel_network | string | The virtual IPv4 network used for private communications between this client and the server expressed using CIDR (e.g. 10.0.8.5/24).
+With subnet topology, enter the client IP address and the subnet mask must match the IPv4 Tunnel Network on the server.
+With net30 topology, the first network address of the /30 is assumed to be the server address and the second network address will be assigned to the client. |
+| tunnel_networkv6 | string | The virtual IPv6 network used for private communications between this client and the server expressed using prefix (e.g. 2001:db9:1:1::100/64).
+Enter the client IPv6 address and prefix. The prefix must match the IPv6 Tunnel Network prefix on the server. |
+| local_network | string | These are the IPv4 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more CIDR networks.
+NOTE: Networks do not need to be specified here if they have already been defined on the main server configuration. |
+| local_networkv6 | string | These are the IPv6 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more IP/PREFIX networks.
+NOTE: Networks do not need to be specified here if they have already been defined on the main server configuration. |
+| remote_network | string | These are the IPv4 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more CIDR ranges. May be left blank if there are no client-side networks to be routed.
+NOTE: Remember to add these subnets to the IPv4 Remote Networks list on the corresponding OpenVPN server settings. |
+| remote_networkv6 | string | These are the IPv6 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more IP/PREFIX networks. May be left blank if there are no client-side networks to be routed.
+NOTE: Remember to add these subnets to the IPv6 Remote Networks list on the corresponding OpenVPN server settings. |
+| redirect_gateway | boolean | Force all client generated traffic through the tunnel. |
+| prevent_server_definitions | boolean | Prevent this client from receiving any server-defined client settings. |
+| remove_server_routes | boolean | Prevent this client from receiving any server-defined routes without removing any other options. |
+| dns_domain | string | Domain name for DNS to provide to the client. |
+| dns_servers | string | A comma-separated list of no more than 4 DNS server IP addresses (i.e. 8.8.8.8). Any more than the first four are ignored. This list is provided to the clent. |
+| ntp_servers | string | A comma-separated list of no more than 2 NTP server IP addresses. Any more than the first two are ignored. |
+| netbios_enable | boolean | Enable NetBIOS over TCP/IP. If this option is not set, all NetBIOS-over-TCP/IP options (including WINS) will be disabled. |
+| netbios_node_type | string | Possible options: b (broadcasts), p (point-to-point name queries to a WINS server), m (broadcast then query name server), and h (query name server, then broadcast). This parameter takes a single letter either b, p, m, or h. Any other string will result in this option being set to none. |
+| netbios_scope | string | A NetBIOS Scope ID provides an extended naming service for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS traffic on a single network to only those nodes with the same NetBIOS scope ID. |
+| wins_servers | string | A comma-separated list of no more than 2 WINS server IP addresses. Any more than the first two are ignored. |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "refid": 0,
+    "server_list": "1, 2",
+    "custom_options": "ifconfig-push 10.10.10.1 255.255.255.0;",
+    "disable": false,
+    "common_name": "commonname2",
+    "block": false,
+    "description": "An override, that is VERY specific...",
+    "tunnel_network": "10.0.8.6/24",
+    "tunnel_networkv6": "2001:dc9:1:1::100/64",
+    "local_network": "10.0.9.6/24, 10.0.8.5/24, 10.0.10.6/24",
+    "local_networkv6": "2001:dc9:1:1::100/64, 2002:dc9:1:1::100/64, 2003:dc9:1:1::100/64",
+    "remote_network": "10.0.9.6/24, 10.0.8.5/24, 10.0.10.6/24",
+    "remote_networkv6": "2001:dc9:1:1::100/64, 2002:dc9:1:1::100/64, 2003:dc9:1:1::100/64",
+    "redirect_gateway": false,
+    "prevent_server_definitions": false,
+    "remove_server_routes": false,
+    "dns_domain": "github.com",
+    "dns_servers": "8.8.8.7, 8.8.4.7, 8.8.3.7, 8.8.2.7",
+    "ntp_servers": "192.168.56.106, 192.168.56.107",
+    "netbios_enable": false,
+    "netbios_node_type": "m",
+    "netbios_scope": "42",
+    "wins_servers": "192.168.56.108, 192.168.56.194"
 }
 ```
 

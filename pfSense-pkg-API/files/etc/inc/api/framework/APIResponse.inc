@@ -910,6 +910,36 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Unbound access list does not exist"
         ],
+        2075 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "OpenVPN client specific override parameter 'common_name' is missing"
+        ],
+        2076 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown OpenVPN client specific override Netbios Node Type. Valid options are: b, p, m, h"
+        ],
+        2077 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Missing OpenVPN client specific override parameter 'refid'. This parameter is needed to identify the csc to delete."
+        ],
+        2078 => [
+            "status" => "Not found",
+            "code" => 404,
+            "return" => $id,
+            "message" => "Unknown OpenVPN client specific override refid."
+        ],
+        2079 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Missing OpenVPN client specific override parameter 'refid'. This parameter is needed to identify the csc to modify."
+        ],
 
 
 
@@ -3174,36 +3204,6 @@ function get($id, $data=[], $all=false) {
             "code" => 400,
             "return" => $id,
             "message" => "Gateway ID does not exist"
-        ],
-        6030 => [
-            "status" => "bad request",
-            "code" => 400,
-            "return" => $id,
-            "message" => "Parameter 'common_name' is missing"
-        ],
-        6031 => [
-            "status" => "bad request",
-            "code" => 400,
-            "return" => $id,
-            "message" => "Unknown Netbios Node Type. Valid options are: b, p, m, h"
-        ],
-        6032 => [
-            "status" => "bad request",
-            "code" => 400,
-            "return" => $id,
-            "message" => "Missing parameter 'refid'. This parameter is needed to identify the csc to delete."
-        ],
-        6033 => [
-            "status" => "Not found",
-            "code" => 404,
-            "return" => $id,
-            "message" => "Unknown refid."
-        ],
-        6034 => [
-            "status" => "bad request",
-            "code" => 400,
-            "return" => $id,
-            "message" => "Missing parameter 'refid'. This parameter is needed to identify the csc to modify."
         ],
 
         // 7000-7999 reserved for /diagnostics API calls

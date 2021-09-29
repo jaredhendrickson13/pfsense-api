@@ -16,7 +16,7 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-class APIOpenVPNClientSpecificOverridesDelete extends APIModel {
+class APIServicesOpenVPNClientSpecificOverridesDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
@@ -37,10 +37,10 @@ class APIOpenVPNClientSpecificOverridesDelete extends APIModel {
                 $this->id = (int) $this->initial_data['refid'];
                 $this->validated_data['refid'] = $this->initial_data['refid'];
             } else {
-                $this->errors[] = APIResponse\get(6033);
+                $this->errors[] = APIResponse\get(2078);
             }
         } else {
-            $this->errors[] = APIResponse\get(6032);
+            $this->errors[] = APIResponse\get(2077);
         }
     }
 

@@ -8824,10 +8824,10 @@
 			"name": "SERVICES",
 			"item": [
 				{
-					"name": "OpenVPN",
+					"name": "OPENVPN",
 					"item": [
 						{
-							"name": "Client Specific Overrides",
+							"name": "CSC",
 							"item": [
 								{
 									"name": "Read OpenVPN Client Specific Overrides",
@@ -8847,7 +8847,7 @@
 											}
 										},
 										"url": {
-											"raw": "https://{{$hostname}}/api/v1/openvpn/csc",
+											"raw": "https://{{$hostname}}/api/v1/services/openvpn/csc",
 											"protocol": "https",
 											"host": [
 												"{{$hostname}}"
@@ -8877,7 +8877,7 @@
 											}
 										},
 										"url": {
-											"raw": "https://{{$hostname}}/api/v1/openvpn/csc?server_list=string&custom_options=string&disable=boolean&common_name=string&block=boolean&description=string&tunnel_network=string&tunnel_networkv6=string&local_network=string&local_networkv6=string&remote_network=string&remote_networkv6=string&redirect_gateway=boolean&prevent_server_definitions=boolean&remove_server_routes=boolean&dns_domain=string&dns_servers=string&ntp_servers=string&netbios_enable=boolean&netbios_node_type=string&netbios_scope=string&wins_servers=string",
+											"raw": "https://{{$hostname}}/api/v1/services/openvpn/csc?server_list=string&custom_options=string&disable=boolean&common_name=string&block=boolean&description=string&tunnel_network=string&tunnel_networkv6=string&local_network=string&local_networkv6=string&remote_network=string&remote_networkv6=string&redirect_gateway=boolean&prevent_server_definitions=boolean&remove_server_routes=boolean&dns_domain=string&dns_servers=string&ntp_servers=string&netbios_enable=boolean&netbios_node_type=string&netbios_scope=string&wins_servers=string",
 											"protocol": "https",
 											"host": [
 												"{{$hostname}}"
@@ -9019,7 +9019,7 @@
 											}
 										},
 										"url": {
-											"raw": "https://{{$hostname}}/api/v1/openvpn/csc?refid=int&server_list=string&custom_options=string&disable=boolean&common_name=string&block=boolean&description=string&tunnel_network=string&tunnel_networkv6=string&local_network=string&local_networkv6=string&remote_network=string&remote_networkv6=string&redirect_gateway=boolean&prevent_server_definitions=boolean&remove_server_routes=boolean&dns_domain=string&dns_servers=string&ntp_servers=string&netbios_enable=boolean&netbios_node_type=string&netbios_scope=string&wins_servers=string",
+											"raw": "https://{{$hostname}}/api/v1/services/openvpn/csc?refid=int&server_list=string&custom_options=string&disable=boolean&common_name=string&block=boolean&description=string&tunnel_network=string&tunnel_networkv6=string&local_network=string&local_networkv6=string&remote_network=string&remote_networkv6=string&redirect_gateway=boolean&prevent_server_definitions=boolean&remove_server_routes=boolean&dns_domain=string&dns_servers=string&ntp_servers=string&netbios_enable=boolean&netbios_node_type=string&netbios_scope=string&wins_servers=string",
 											"protocol": "https",
 											"host": [
 												"{{$hostname}}"
@@ -9166,7 +9166,7 @@
 											}
 										},
 										"url": {
-											"raw": "https://{{$hostname}}/api/v1/openvpn/csc?refid=int",
+											"raw": "https://{{$hostname}}/api/v1/services/openvpn/csc?refid=int",
 											"protocol": "https",
 											"host": [
 												"{{$hostname}}"

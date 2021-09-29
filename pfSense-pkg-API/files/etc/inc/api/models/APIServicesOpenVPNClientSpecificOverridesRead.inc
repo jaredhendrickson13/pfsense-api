@@ -16,7 +16,7 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-class APIOpenVPNClientSpecificOverridesRead extends APIModel {
+class APIServicesOpenVPNClientSpecificOverridesRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();

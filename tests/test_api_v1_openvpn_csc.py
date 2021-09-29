@@ -15,7 +15,7 @@
 import unit_test_framework
 
 class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest):
-    uri = "/api/v1/openvpn/csc"
+    uri = "/api/v1/services/openvpn/csc"
     get_tests = [
         {"name": "Read all OpenVPN client specific overrides"}
     ]
@@ -34,7 +34,7 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
                 "custom_options": "ifconfig-push xxx.xxx.xxx.xxx 255.255.255.0;",
                 "description": "An override, that is specific..."
             },
-            "return": 6030,
+            "return": 2075,
             "status": 400
         },
         {
@@ -45,7 +45,7 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
                 "description": "An override, that is specific...",
                 "netbios_node_type": "q"
             },
-            "return": 6031,
+            "return": 2076,
             "status": 400
         },
         {
@@ -89,7 +89,7 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
             "payload": {
                 "description": "An override, that is pretty specific..."
             },
-            "return": 6034,
+            "return": 2079,
             "status": 400
         },
         {
@@ -98,7 +98,7 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
                 "refid": 1000,
                 "description": "An override, that is pretty specific..."
             },
-            "return": 6033,
+            "return": 2078,
             "status": 404
         },
         {
@@ -107,7 +107,7 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
                 "refid": 0,
                 "netbios_node_type": "q"
             },
-            "return": 6031,
+            "return": 2076,
             "status": 400
         },
         {
@@ -148,7 +148,7 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
             "name": "Missing Reference ID",
             "payload": {
             },
-            "return": 6032,
+            "return": 2077,
             "status": 400
         },
         {
@@ -156,7 +156,7 @@ class APIUnitTestOpenVPNClientSpecificOverrides(unit_test_framework.APIUnitTest)
             "payload": {
                 "refid": 1000,
             },
-            "return": 6033,
+            "return": 2078,
             "status": 404
         },
     ]
