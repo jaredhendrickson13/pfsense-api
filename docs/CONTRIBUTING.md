@@ -122,7 +122,7 @@ changes to the configuration by updating it's values. If you do make changes to 
 `$this->write_config()` to apply them. 
 - `$this->id` : A property to track the current instances configuration ID. This is primarily helpful for updating and 
 deleting objects.
-- `$this->validate_id` : A boolean to dictate whether the model object should require validation of the configuraiton ID.
+- `$this->validate_id` : A boolean to dictate whether the model object should require validation of the configuration ID.
 This defaults to true, but can be useful for nested model object calls where you would like to validate a payload before
 it's parent is created. It is entirely up to you to implement this property if desired.
 - `$this->retain_read_mode` : A boolean to dictate whether this model should respect the API's read only setting if

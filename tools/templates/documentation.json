@@ -8824,6 +8824,377 @@
 			"name": "SERVICES",
 			"item": [
 				{
+					"name": "OpenVPN",
+					"item": [
+						{
+							"name": "Client Specific Overrides",
+							"item": [
+								{
+									"name": "Read OpenVPN Client Specific Overrides",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/openvpn/csc",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"openvpn",
+												"csc"
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Create OpenVPN Client Specific Overrides",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"server_list\": \"1, 2, 3\",\r\n    \"custom_options\": \"ifconfig-push xxx.xxx.xxx.xxx 255.255.255.0;\",\r\n    \"disable\": true,\r\n    \"common_name\": \"commonname\",\r\n    \"block\": true,\r\n    \"description\": \"An override, that is specific...\",\r\n    \"tunnel_network\": \"10.0.8.5/24\",\r\n    \"tunnel_networkv6\": \"2001:db9:1:1::100/64\",\r\n    \"local_network\": \"10.0.9.5/24, 10.0.8.5/24, 10.0.10.5/24\",\r\n    \"local_networkv6\": \"2001:db9:1:1::100/64, 2002:db9:1:1::100/64, 2003:db9:1:1::100/64\",\r\n    \"remote_network\": \"10.0.9.5/24, 10.0.8.5/24, 10.0.10.5/24\",\r\n    \"remote_networkv6\": \"2001:db9:1:1::100/64, 2002:db9:1:1::100/64, 2003:db9:1:1::100/64\",\r\n    \"redirect_gateway\": true,\r\n    \"prevent_server_definitions\": true,\r\n    \"remove_server_routes\": true,\r\n    \"dns_domain\": \"google.com\",\r\n    \"dns_servers\": \"8.8.8.8, 8.8.4.4, 8.8.3.3, 8.8.2.2\",\r\n    \"ntp_servers\": \"192.168.56.101, 192.168.56.102\",\r\n    \"netbios_enable\": true,\r\n    \"netbios_node_type\": \"p\",\r\n    \"netbios_scope\": \"5\",\r\n    \"wins_servers\": \"192.168.56.103, 192.168.56.104\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/openvpn/csc?server_list=string&custom_options=string&disable=boolean&common_name=string&block=boolean&description=string&tunnel_network=string&tunnel_networkv6=string&local_network=string&local_networkv6=string&remote_network=string&remote_networkv6=string&redirect_gateway=boolean&prevent_server_definitions=boolean&remove_server_routes=boolean&dns_domain=string&dns_servers=string&ntp_servers=string&netbios_enable=boolean&netbios_node_type=string&netbios_scope=string&wins_servers=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"openvpn",
+												"csc"
+											],
+											"query": [
+												{
+													"key": "server_list",
+													"value": "string",
+													"description": "A comma separated string containing the ids of the OpenVPN servers that use this override. Omitting this activates the override for all servers."
+												},
+												{
+													"key": "custom_options",
+													"value": "string",
+													"description": "Enter any additional options to add for this client specific override, separated by a semicolon.\nEXAMPLE: push \"route 10.0.0.0 255.255.255.0\";"
+												},
+												{
+													"key": "disable",
+													"value": "boolean",
+													"description": "Whether to disable this override without removing it."
+												},
+												{
+													"key": "common_name",
+													"value": "string",
+													"description": "Enter the X.509 common name for the client certificate, or the username for VPNs utilizing password authentication. This match is case sensitive."
+												},
+												{
+													"key": "block",
+													"value": "boolean",
+													"description": "Prevents the client from connecting to this server. Do not use this option to permanently disable a client due to a compromised key or password. Use a CRL (certificate revocation list) instead."
+												},
+												{
+													"key": "description",
+													"value": "string",
+													"description": "A description for administrative reference (not parsed)."
+												},
+												{
+													"key": "tunnel_network",
+													"value": "string",
+													"description": "The virtual IPv4 network used for private communications between this client and the server expressed using CIDR (e.g. 10.0.8.5/24).\nWith subnet topology, enter the client IP address and the subnet mask must match the IPv4 Tunnel Network on the server.\nWith net30 topology, the first network address of the /30 is assumed to be the server address and the second network address will be assigned to the client."
+												},
+												{
+													"key": "tunnel_networkv6",
+													"value": "string",
+													"description": "The virtual IPv6 network used for private communications between this client and the server expressed using prefix (e.g. 2001:db9:1:1::100/64).\nEnter the client IPv6 address and prefix. The prefix must match the IPv6 Tunnel Network prefix on the server."
+												},
+												{
+													"key": "local_network",
+													"value": "string",
+													"description": "These are the IPv4 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more CIDR networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
+												},
+												{
+													"key": "local_networkv6",
+													"value": "string",
+													"description": "These are the IPv6 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more IP/PREFIX networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
+												},
+												{
+													"key": "remote_network",
+													"value": "string",
+													"description": "These are the IPv4 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more CIDR ranges. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv4 Remote Networks list on the corresponding OpenVPN server settings."
+												},
+												{
+													"key": "remote_networkv6",
+													"value": "string",
+													"description": "These are the IPv6 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more IP/PREFIX networks. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv6 Remote Networks list on the corresponding OpenVPN server settings."
+												},
+												{
+													"key": "redirect_gateway",
+													"value": "boolean",
+													"description": "Force all client generated traffic through the tunnel."
+												},
+												{
+													"key": "prevent_server_definitions",
+													"value": "boolean",
+													"description": "Prevent this client from receiving any server-defined client settings."
+												},
+												{
+													"key": "remove_server_routes",
+													"value": "boolean",
+													"description": "Prevent this client from receiving any server-defined routes without removing any other options."
+												},
+												{
+													"key": "dns_domain",
+													"value": "string",
+													"description": "Domain name for DNS to provide to the client."
+												},
+												{
+													"key": "dns_servers",
+													"value": "string",
+													"description": "A comma-separated list of no more than 4 DNS server IP addresses (i.e. 8.8.8.8). Any more than the first four are ignored. This list is provided to the clent."
+												},
+												{
+													"key": "ntp_servers",
+													"value": "string",
+													"description": "A comma-separated list of no more than 2 NTP server IP addresses. Any more than the first two are ignored."
+												},
+												{
+													"key": "netbios_enable",
+													"value": "boolean",
+													"description": "Enable NetBIOS over TCP/IP. If this option is not set, all NetBIOS-over-TCP/IP options (including WINS) will be disabled."
+												},
+												{
+													"key": "netbios_node_type",
+													"value": "string",
+													"description": "Possible options: b (broadcasts), p (point-to-point name queries to a WINS server), m (broadcast then query name server), and h (query name server, then broadcast). This parameter takes a single letter either b, p, m, or h. Any other string will result in this option being set to none."
+												},
+												{
+													"key": "netbios_scope",
+													"value": "string",
+													"description": "A NetBIOS Scope ID provides an extended naming service for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS traffic on a single network to only those nodes with the same NetBIOS scope ID."
+												},
+												{
+													"key": "wins_servers",
+													"value": "string",
+													"description": "A comma-separated list of no more than 2 WINS server IP addresses. Any more than the first two are ignored."
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Update OpenVPN Client Specific Overrides",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"refid\": 0,\r\n    \"server_list\": \"1, 2\",\r\n    \"custom_options\": \"ifconfig-push 10.10.10.1 255.255.255.0;\",\r\n    \"disable\": false,\r\n    \"common_name\": \"commonname2\",\r\n    \"block\": false,\r\n    \"description\": \"An override, that is VERY specific...\",\r\n    \"tunnel_network\": \"10.0.8.6/24\",\r\n    \"tunnel_networkv6\": \"2001:dc9:1:1::100/64\",\r\n    \"local_network\": \"10.0.9.6/24, 10.0.8.5/24, 10.0.10.6/24\",\r\n    \"local_networkv6\": \"2001:dc9:1:1::100/64, 2002:dc9:1:1::100/64, 2003:dc9:1:1::100/64\",\r\n    \"remote_network\": \"10.0.9.6/24, 10.0.8.5/24, 10.0.10.6/24\",\r\n    \"remote_networkv6\": \"2001:dc9:1:1::100/64, 2002:dc9:1:1::100/64, 2003:dc9:1:1::100/64\",\r\n    \"redirect_gateway\": false,\r\n    \"prevent_server_definitions\": false,\r\n    \"remove_server_routes\": false,\r\n    \"dns_domain\": \"github.com\",\r\n    \"dns_servers\": \"8.8.8.7, 8.8.4.7, 8.8.3.7, 8.8.2.7\",\r\n    \"ntp_servers\": \"192.168.56.106, 192.168.56.107\",\r\n    \"netbios_enable\": false,\r\n    \"netbios_node_type\": \"m\",\r\n    \"netbios_scope\": \"42\",\r\n    \"wins_servers\": \"192.168.56.108, 192.168.56.194\"\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/openvpn/csc?refid=int&server_list=string&custom_options=string&disable=boolean&common_name=string&block=boolean&description=string&tunnel_network=string&tunnel_networkv6=string&local_network=string&local_networkv6=string&remote_network=string&remote_networkv6=string&redirect_gateway=boolean&prevent_server_definitions=boolean&remove_server_routes=boolean&dns_domain=string&dns_servers=string&ntp_servers=string&netbios_enable=boolean&netbios_node_type=string&netbios_scope=string&wins_servers=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"openvpn",
+												"csc"
+											],
+											"query": [
+												{
+													"key": "refid",
+													"value": "int",
+													"description": "Reference id. This id indicates the id of the client specific override you want to modify. This id is not static as it is essentially the index of an entry in the config array. Best to first get all client specific overrides and get the id of the one you want to modify before calling this endpoint."
+												},
+												{
+													"key": "server_list",
+													"value": "string",
+													"description": "A comma separated string containing the ids of the OpenVPN servers that use this override. Omitting this activates the override for all servers."
+												},
+												{
+													"key": "custom_options",
+													"value": "string",
+													"description": "Enter any additional options to add for this client specific override, separated by a semicolon.\nEXAMPLE: push \"route 10.0.0.0 255.255.255.0\";"
+												},
+												{
+													"key": "disable",
+													"value": "boolean",
+													"description": "Whether to disable this override without removing it."
+												},
+												{
+													"key": "common_name",
+													"value": "string",
+													"description": "Enter the X.509 common name for the client certificate, or the username for VPNs utilizing password authentication. This match is case sensitive."
+												},
+												{
+													"key": "block",
+													"value": "boolean",
+													"description": "Prevents the client from connecting to this server. Do not use this option to permanently disable a client due to a compromised key or password. Use a CRL (certificate revocation list) instead."
+												},
+												{
+													"key": "description",
+													"value": "string",
+													"description": "A description for administrative reference (not parsed)."
+												},
+												{
+													"key": "tunnel_network",
+													"value": "string",
+													"description": "The virtual IPv4 network used for private communications between this client and the server expressed using CIDR (e.g. 10.0.8.5/24).\nWith subnet topology, enter the client IP address and the subnet mask must match the IPv4 Tunnel Network on the server.\nWith net30 topology, the first network address of the /30 is assumed to be the server address and the second network address will be assigned to the client."
+												},
+												{
+													"key": "tunnel_networkv6",
+													"value": "string",
+													"description": "The virtual IPv6 network used for private communications between this client and the server expressed using prefix (e.g. 2001:db9:1:1::100/64).\nEnter the client IPv6 address and prefix. The prefix must match the IPv6 Tunnel Network prefix on the server."
+												},
+												{
+													"key": "local_network",
+													"value": "string",
+													"description": "These are the IPv4 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more CIDR networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
+												},
+												{
+													"key": "local_networkv6",
+													"value": "string",
+													"description": "These are the IPv6 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more IP/PREFIX networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
+												},
+												{
+													"key": "remote_network",
+													"value": "string",
+													"description": "These are the IPv4 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more CIDR ranges. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv4 Remote Networks list on the corresponding OpenVPN server settings."
+												},
+												{
+													"key": "remote_networkv6",
+													"value": "string",
+													"description": "These are the IPv6 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more IP/PREFIX networks. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv6 Remote Networks list on the corresponding OpenVPN server settings."
+												},
+												{
+													"key": "redirect_gateway",
+													"value": "boolean",
+													"description": "Force all client generated traffic through the tunnel."
+												},
+												{
+													"key": "prevent_server_definitions",
+													"value": "boolean",
+													"description": "Prevent this client from receiving any server-defined client settings."
+												},
+												{
+													"key": "remove_server_routes",
+													"value": "boolean",
+													"description": "Prevent this client from receiving any server-defined routes without removing any other options."
+												},
+												{
+													"key": "dns_domain",
+													"value": "string",
+													"description": "Domain name for DNS to provide to the client."
+												},
+												{
+													"key": "dns_servers",
+													"value": "string",
+													"description": "A comma-separated list of no more than 4 DNS server IP addresses (i.e. 8.8.8.8). Any more than the first four are ignored. This list is provided to the clent."
+												},
+												{
+													"key": "ntp_servers",
+													"value": "string",
+													"description": "A comma-separated list of no more than 2 NTP server IP addresses. Any more than the first two are ignored."
+												},
+												{
+													"key": "netbios_enable",
+													"value": "boolean",
+													"description": "Enable NetBIOS over TCP/IP. If this option is not set, all NetBIOS-over-TCP/IP options (including WINS) will be disabled."
+												},
+												{
+													"key": "netbios_node_type",
+													"value": "string",
+													"description": "Possible options: b (broadcasts), p (point-to-point name queries to a WINS server), m (broadcast then query name server), and h (query name server, then broadcast). This parameter takes a single letter either b, p, m, or h. Any other string will result in this option being set to none."
+												},
+												{
+													"key": "netbios_scope",
+													"value": "string",
+													"description": "A NetBIOS Scope ID provides an extended naming service for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS traffic on a single network to only those nodes with the same NetBIOS scope ID."
+												},
+												{
+													"key": "wins_servers",
+													"value": "string",
+													"description": "A comma-separated list of no more than 2 WINS server IP addresses. Any more than the first two are ignored."
+												}
+											]
+										}
+									},
+									"response": []
+								},
+								{
+									"name": "Delete OpenVPN Client Specific Override",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\r\n    \"refid\": 0\r\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/openvpn/csc?refid=int",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"openvpn",
+												"csc"
+											],
+											"query": [
+												{
+													"key": "refid",
+													"value": "int",
+													"description": "Reference id. This id indicates the id of the client specific override you want to delete. This id is not static as it is essentially the index of an entry in the config array. Best to first get all client specific overrides and get the id of the one you want to delete before calling this endpoint."
+												}
+											]
+										}
+									},
+									"response": []
+								}
+							],
+							"_postman_isSubFolder": true
+						}
+					],
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "UNBOUND",
 					"item": [
 						{

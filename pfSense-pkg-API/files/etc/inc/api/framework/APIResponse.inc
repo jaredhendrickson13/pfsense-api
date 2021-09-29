@@ -3175,6 +3175,36 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Gateway ID does not exist"
         ],
+        6030 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Parameter 'common_name' is missing"
+        ],
+        6031 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown Netbios Node Type. Valid options are: b, p, m, h"
+        ],
+        6032 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Missing parameter 'refid'. This parameter is needed to identify the csc to delete."
+        ],
+        6033 => [
+            "status" => "Not found",
+            "code" => 404,
+            "return" => $id,
+            "message" => "Unknown refid."
+        ],
+        6034 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Missing parameter 'refid'. This parameter is needed to identify the csc to modify."
+        ],
 
         // 7000-7999 reserved for /diagnostics API calls
         7000 => [
