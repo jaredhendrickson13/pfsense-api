@@ -23,4 +23,8 @@ class APISystemConfig extends APIEndpoint {
     protected function get() {
         return (new APISystemConfigRead())->call();
     }
+
+    protected function put() {
+        return (new APISystemConfigUpdate())->call();
+    }
 }

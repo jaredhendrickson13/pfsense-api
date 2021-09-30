@@ -2287,7 +2287,7 @@
 										{
 											"key": "type",
 											"value": "string",
-											"description": "Change type of alias. Alias type can only be changed when the targetted alias is not in use (optional)"
+											"description": "Change type of alias. Alias type can only be changed when the targeted alias is not in use (optional)"
 										},
 										{
 											"key": "descr",
@@ -2541,7 +2541,7 @@
 										{
 											"key": "pdnpipe",
 											"value": "string",
-											"description": "Specify a traffic shaper limiter (out) queue for this rule. This must be an existing traffic shaper limiter or queue. This value cannot match the `dnpipe` value and must be a child queue if `dnpipe` is a child queue, or a parent limiiter if `dnpipe` is a parent limiter. (optional)"
+											"description": "Specify a traffic shaper limiter (out) queue for this rule. This must be an existing traffic shaper limiter or queue. This value cannot match the `dnpipe` value and must be a child queue if `dnpipe` is a child queue, or a parent limiter if `dnpipe` is a parent limiter. (optional)"
 										},
 										{
 											"key": "defaultqueue",
@@ -2679,7 +2679,7 @@
 										{
 											"key": "pdnpipe",
 											"value": "string",
-											"description": "Update the traffic shaper limiter (out) queue for this rule. This must be an existing traffic shaper limiter or queue. This value cannot match the `dnpipe` value and must be a child queue if `dnpipe` is a child queue, or a parent limiiter if `dnpipe` is a parent limiter. To unset this value, pass in an empty string. (optional)"
+											"description": "Update the traffic shaper limiter (out) queue for this rule. This must be an existing traffic shaper limiter or queue. This value cannot match the `dnpipe` value and must be a child queue if `dnpipe` is a child queue, or a parent limiter if `dnpipe` is a parent limiter. To unset this value, pass in an empty string. (optional)"
 										},
 										{
 											"key": "defaultqueue",
@@ -5788,6 +5788,193 @@
 			"name": "SYSTEM",
 			"item": [
 				{
+					"name": "NOTIFICATIONS",
+					"item": [
+						{
+							"name": "EMAIL",
+							"item": [
+								{
+									"name": "Read System Email Notification Settings",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "GET",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n    \n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/system/notifications/email",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"system",
+												"notifications",
+												"email"
+											]
+										},
+										"description": "Read the current system email notification settings.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-notifications`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Update System Email Notification Settings",
+									"protocolProfileBehavior": {
+										"disableBodyPruning": true
+									},
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"disabled\": true,\n\t\"ipaddress\": \"smtp.example.com\",\n\t\"port\": 25,\n\t\"timeout\": 10,\n\t\"ssl\": true,\n\t\"sslvalidate\": true,\n\t\"fromaddress\": \"noreply@example.com\",\n\t\"notifyemailaddress\": \"recipient@example.com\",\n\t\"username\": \"testuser\",\n\t\"password\": \"testpassword\",\n\t\"authentication_mechanism\": \"LOGIN\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/system/notifications/email",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"system",
+												"notifications",
+												"email"
+											],
+											"query": [
+												{
+													"key": "disabled",
+													"value": "boolean",
+													"description": "Specify whether email notifications should be disabled. Set `true` to disable, or `false` to enable. Defaults to `false`. (optional)"
+												},
+												{
+													"key": "ipaddress",
+													"value": "string",
+													"description": "Specify the IP address or hostname of the remote SMTP server."
+												},
+												{
+													"key": "port",
+													"value": "integer",
+													"description": "Specify the port of the remote SMTP server."
+												},
+												{
+													"key": "timeout",
+													"value": "integer",
+													"description": "Specify the timeout (in seconds) for connections to the remote SMTP server. This value must be greater than 0. Defaults to `20`. (optional)"
+												},
+												{
+													"key": "ssl",
+													"value": "boolean",
+													"description": "Enable or disable SMTP over SSL/TLS. Set `true` to enable, `false` to disable. Defaults to `false`. (optional)"
+												},
+												{
+													"key": "sslvalidate",
+													"value": "boolean",
+													"description": "Enable or disable certificate verification requirements for SSL/TLS connections. Set `true` to enable, `false` to disable. Defaults to `false`. (optional)"
+												},
+												{
+													"key": "fromaddress",
+													"value": "string",
+													"description": "Set the email address email notifications will be sent from. This must be a valid email address."
+												},
+												{
+													"key": "notifyemailaddress",
+													"value": "string",
+													"description": "Set the email address email notifications will be sent to. This must be a valid email address."
+												},
+												{
+													"key": "authentication_mechanism",
+													"value": "string",
+													"description": "Specify the authentication type to use for connections to the remote SMTP server. Options are `PLAIN` for no authentication, or `LOGIN` for authenticated connections."
+												},
+												{
+													"key": "username",
+													"value": "string",
+													"description": "Set the username to use during authentication. This field is only available when `authentication_mechanism` is set to `LOGIN`. (optional)"
+												},
+												{
+													"key": "password",
+													"value": "string",
+													"description": "Set the password to use during authentication. This field is only available when `authentication_mechanism` is set to `LOGIN`. (optional)"
+												}
+											]
+										},
+										"description": "Update the system email notification settings.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-notifications`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that read and update email notification settings.",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "aa6a7687-73dc-4390-95ff-175f15bdc7ae",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								},
+								{
+									"listen": "test",
+									"script": {
+										"id": "3dc5bad6-bfae-4ba2-a13d-19619f718e39",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
+									}
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						}
+					],
+					"description": "API endpoints that read and update notification settings.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "aa6a7687-73dc-4390-95ff-175f15bdc7ae",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "3dc5bad6-bfae-4ba2-a13d-19619f718e39",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "VERSION",
 					"item": [
 						{
@@ -5989,9 +6176,34 @@
 								"description": "Reads entire pfSense configuration.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-backup-restore`, `page-diagnostics-command`]"
 							},
 							"response": []
+						},
+						{
+							"name": "Update System Configuration",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/config",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"config"
+									]
+								},
+								"description": "Updates entire pfSense configuration. This endpoint simply replaces the entire configuration with the values submitted in your request. This can be used to restore a configuration backup or interface with configuration areas that may not be available to the API. Use extreme caution when utilizing this endpoint as it offers no input validation and has potential for configuration loss.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-backup-restore`]"
+							},
+							"response": []
 						}
 					],
-					"description": "API endpoints that read the entire pfSense configuration.",
+					"description": "API endpoints that read and update the entire pfSense configuration.",
 					"event": [
 						{
 							"listen": "prerequest",

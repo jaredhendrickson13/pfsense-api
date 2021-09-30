@@ -839,6 +839,7 @@ There is no limit to API calls at this time but is important to note that pfSens
 * [SYSTEM/CONFIG](#systemconfig)
 
   * [Read System Configuration](#1-read-system-configuration)
+  * [Update System Configuration](#2-update-system-configuration)
 
 * [SYSTEM/CONSOLE](#systemconsole)
 
@@ -862,6 +863,11 @@ There is no limit to API calls at this time but is important to note that pfSens
 
   * [Read System Hostname](#1-read-system-hostname)
   * [Update System Hostname](#2-update-system-hostname)
+
+* [SYSTEM/NOTIFICATIONS/EMAIL](#systemnotificationsemail)
+
+  * [Read System Email Notification Settings](#1-read-system-email-notification-settings)
+  * [Update System Email Notification Settings](#2-update-system-email-notification-settings)
 
 * [SYSTEM/REBOOT](#systemreboot)
 
@@ -1116,7 +1122,7 @@ URL: https://{{$hostname}}/api/v1/firewall/alias
 | --- | ------|-------------|
 | id | string | Name of existing alias to modify. Unlikely other endpoint, this field does NOT use the numeric pfSense ID to locate objects. |
 | name | string | Change name of alias (optional) |
-| type | string | Change type of alias. Alias type can only be changed when the targetted alias is not in use (optional) |
+| type | string | Change type of alias. Alias type can only be changed when the targeted alias is not in use (optional) |
 | descr | string | Change alias description (optional) |
 | address | string or array | Overwrite existing alias addresses with new addresses. Multiple values may be passed in as array, singular values may be passed in as string (optional) |
 | detail | string or array | Overwrite existing alias address details with new details. Multiple values may be passed in as array, singular values may be passed in as string. Detail values must match index of alias addresses (optional) |
@@ -1911,7 +1917,7 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | gateway | string | Set the routing gateway traffic will take upon match (optional) |
 | sched | string | Set a firewall schedule to apply to this rule. This must be an existing firewall schedule name. (optional) |
 | dnpipe | string | Specify a traffic shaper limiter (in) queue for this rule. This must be an existing traffic shaper limiter or queue. This field is required if a `pdnpipe` value is provided.Ioptional) |
-| pdnpipe | string | Specify a traffic shaper limiter (out) queue for this rule. This must be an existing traffic shaper limiter or queue. This value cannot match the `dnpipe` value and must be a child queue if `dnpipe` is a child queue, or a parent limiiter if `dnpipe` is a parent limiter. (optional) |
+| pdnpipe | string | Specify a traffic shaper limiter (out) queue for this rule. This must be an existing traffic shaper limiter or queue. This value cannot match the `dnpipe` value and must be a child queue if `dnpipe` is a child queue, or a parent limiter if `dnpipe` is a parent limiter. (optional) |
 | defaultqueue | string | Specify a default traffic shaper queue to apply to this rule. This must be an existing traffic shaper queue name. This field is required when an `ackqueue` value is provided. (optional) |
 | ackqueue | string | Specify an acknowledge traffic shaper queue to apply to this rule. This must be an existing traffic shaper queue and cannot match the `defaultqueue` value. (optional) |
 | disabled | boolean | Disable the rule upon creation (optional) |
@@ -2040,7 +2046,7 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | gateway | string | Update the routing gateway traffic will take upon match (optional) |
 | sched | string | Update the firewall schedule to apply to this rule. This must be an existing firewall schedule name. Provide an empty string to remove the configured schedule from the rule. (optional) |
 | dnpipe | string | Update the traffic shaper limiter (in) queue for this rule. This must be an existing traffic shaper limiter or queue. This field is required if a `pdnpipe` value is provided. To unset this value, pass in an empty string. This will also unset the existing `pdnpipe` value. (optional) |
-| pdnpipe | string | Update the traffic shaper limiter (out) queue for this rule. This must be an existing traffic shaper limiter or queue. This value cannot match the `dnpipe` value and must be a child queue if `dnpipe` is a child queue, or a parent limiiter if `dnpipe` is a parent limiter. To unset this value, pass in an empty string. (optional) |
+| pdnpipe | string | Update the traffic shaper limiter (out) queue for this rule. This must be an existing traffic shaper limiter or queue. This value cannot match the `dnpipe` value and must be a child queue if `dnpipe` is a child queue, or a parent limiter if `dnpipe` is a parent limiter. To unset this value, pass in an empty string. (optional) |
 | defaultqueue | string | Update the default traffic shaper queue to apply to this rule. This must be an existing traffic shaper queue name. This field is required when an `ackqueue` value is provided. To unset this field, pass in an empty string. This will also unset the existing `ackqueue` value. (optional) |
 | ackqueue | string | Update acknowledge traffic shaper queue to apply to this rule. This must be an existing traffic shaper queue and cannot match the `defaultqueue` value. To unset this field, pass in an empty string. (optional) |
 | disabled | boolean | Disable the rule upon modification (optional) |
@@ -7188,6 +7194,24 @@ URL: https://{{$hostname}}/api/v1/system/config
 
 
 
+### 2. Update System Configuration
+
+
+Updates entire pfSense configuration. This endpoint simply replaces the entire configuration with the values submitted in your request. This can be used to restore a configuration backup or interface with configuration areas that may not be available to the API. Use extreme caution when utilizing this endpoint as it offers no input validation and has potential for configuration loss.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-backup-restore`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: 
+URL: https://{{$hostname}}/api/v1/system/config
+```
+
+
+
 ## SYSTEM/CONSOLE
 
 
@@ -7465,6 +7489,92 @@ URL: https://{{$hostname}}/api/v1/system/hostname
 {
 	"hostname": "hostname",
 	"domain": "domain.com"
+}
+```
+
+
+
+## SYSTEM/NOTIFICATIONS/EMAIL
+
+
+
+### 1. Read System Email Notification Settings
+
+
+Read the current system email notification settings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-notifications`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/notifications/email
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Update System Email Notification Settings
+
+
+Update the system email notification settings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-notifications`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/system/notifications/email
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| disabled | boolean | Specify whether email notifications should be disabled. Set `true` to disable, or `false` to enable. Defaults to `false`. (optional) |
+| ipaddress | string | Specify the IP address or hostname of the remote SMTP server. |
+| port | integer | Specify the port of the remote SMTP server. |
+| timeout | integer | Specify the timeout (in seconds) for connections to the remote SMTP server. This value must be greater than 0. Defaults to `20`. (optional) |
+| ssl | boolean | Enable or disable SMTP over SSL/TLS. Set `true` to enable, `false` to disable. Defaults to `false`. (optional) |
+| sslvalidate | boolean | Enable or disable certificate verification requirements for SSL/TLS connections. Set `true` to enable, `false` to disable. Defaults to `false`. (optional) |
+| fromaddress | string | Set the email address email notifications will be sent from. This must be a valid email address. |
+| notifyemailaddress | string | Set the email address email notifications will be sent to. This must be a valid email address. |
+| authentication_mechanism | string | Specify the authentication type to use for connections to the remote SMTP server. Options are `PLAIN` for no authentication, or `LOGIN` for authenticated connections. |
+| username | string | Set the username to use during authentication. This field is only available when `authentication_mechanism` is set to `LOGIN`. (optional) |
+| password | string | Set the password to use during authentication. This field is only available when `authentication_mechanism` is set to `LOGIN`. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"disabled": true,
+	"ipaddress": "smtp.example.com",
+	"port": 25,
+	"timeout": 10,
+	"ssl": true,
+	"sslvalidate": true,
+	"fromaddress": "noreply@example.com",
+	"notifyemailaddress": "recipient@example.com",
+	"username": "testuser",
+	"password": "testpassword",
+	"authentication_mechanism": "LOGIN"
 }
 ```
 

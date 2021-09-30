@@ -81,7 +81,7 @@ class APISystemNotificationsEmailUpdate extends APIModel {
         # Validate our required 'port' field
         if (isset($this->initial_data["port"])) {
             # Ensure value is valid port
-            if (is_port($this->initial_data["port"])) {
+            if (is_port(strval($this->initial_data["port"]))) {
                 $this->validated_data["port"] = $this->initial_data["port"];
             } else {
                 $this->errors[] = APIResponse\get(1064);

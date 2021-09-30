@@ -24,7 +24,7 @@ class APISystemNotificationsEmail extends APIEndpoint {
         return (new APISystemNotificationsEmailRead())->call();
     }
 
-    protected function update() {
+    protected function put() {
         return (new APISystemNotificationsEmailUpdate())->call();
     }
 }
