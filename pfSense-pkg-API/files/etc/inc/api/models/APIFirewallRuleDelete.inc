@@ -25,27 +25,35 @@ class APIFirewallRuleDelete extends APIModel {
     }
 
     public function action() {
-        # Capture the rule data, remove it from config, sort and apply filter
-        $del_rule = $this->config["filter"]["rule"][$this->id];
+        # Remove rule from config, sort and apply filter if requested
         unset($this->config["filter"]["rule"][$this->id]);
         APITools\sort_firewall_rules();
         $this->write_config();
         $this->apply();
-        return APIResponse\get(0, $del_rule);
+        return APIResponse\get(0, $this->validated_data);
     }
     
     public function validate_payload() {
+        $this->__validate_tracker();
+    }
+
+    private function __validate_tracker() {
         # Check for our required 'tracker' payload value
         if (isset($this->initial_data['tracker'])) {
-            # Loop through each rule and check if our tracker matches
-            foreach ($this->config["filter"]["rule"] as $id=>$rule) {
-                if (intval($rule["tracker"]) === intval($this->initial_data['tracker'])) {
-                    $this->id = $id;
-                    break;
+            # Ensure the tracker provided is a numeric
+            if (is_numeric($this->initial_data["tracker"])) {
+                # Loop through each rule and check if our tracker matches
+                foreach ($this->config["filter"]["rule"] as $id => $rule) {
+                    if (intval($rule["tracker"]) === intval($this->initial_data['tracker'])) {
+                        $this->id = $id;
+                        $this->validated_data = $this->config["filter"]["rule"][$this->id];
+                        break;
+                    }
                 }
             }
-            # Return not found error if no match was found
-            if (!is_int($this->id)) {
+
+            # Return error if no matching rule was found
+            if (!isset($this->id)) {
                 $this->errors[] = APIResponse\get(4032);
             }
         } else {

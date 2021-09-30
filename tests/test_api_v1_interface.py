@@ -21,6 +21,13 @@ class APIUnitTestInterface(unit_test_framework.APIUnitTest):
     ]
     post_tests = [
         {
+            "name": "Create interface bridge",
+            "uri": "/api/v1/interface/bridge",
+            "payload": {
+                "members": "em1"
+            }
+        },
+        {
             "name": "Create a staticv4/staticv6 interface",
             "payload": {
                 "if": "em2",
@@ -32,6 +39,16 @@ class APIUnitTestInterface(unit_test_framework.APIUnitTest):
                 "ipaddrv6": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
                 "subnet": "24",
                 "subnetv6": "120",
+                "blockbogons": True
+            }
+        },
+        {
+            "name": "Create a static interface on the bridge",
+            "payload": {
+                "if": "bridge0",
+                "descr": "BRIDGE_TEST",
+                "enable": False,
+                "type": "dhcp",
                 "blockbogons": True
             }
         }
@@ -56,6 +73,28 @@ class APIUnitTestInterface(unit_test_framework.APIUnitTest):
             "name": "Delete interface",
             "payload": {
                 "if": "em2"
+            }
+        },
+        {
+            "name": "Check cannot delete interface bridge in use constraint",
+            "uri": "/api/v1/interface/bridge",
+            "status": 400,
+            "return": 3073,
+            "payload": {
+                "id": "bridge0"
+            }
+        },
+        {
+            "name": "Delete bridged interface",
+            "payload": {
+                "if": "bridge0"
+            }
+        },
+        {
+            "name": "Delete interface bridge",
+            "uri": "/api/v1/interface/bridge",
+            "payload": {
+                "id": "bridge0"
             }
         }
     ]

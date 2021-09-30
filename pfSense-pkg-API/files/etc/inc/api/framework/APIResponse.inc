@@ -254,6 +254,276 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "API custom header key-value pairs must be string types"
         ],
+        1027 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "At least one HA sync host must be specified when HA sync is enabled"
+        ],
+        1028 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "HA sync hosts must be valid IP address or hostname"
+        ],
+        1029 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "An HA sync username is required when HA sync is enabled"
+        ],
+        1030 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "An HA sync password is required when HA sync is enabled"
+        ],
+        1031 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate management method is required"
+        ],
+        1032 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unsupported certificate management method specified"
+        ],
+        1033 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate serial number must be 1 or greater"
+        ],
+        1034 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate cannot be deleted while in use"
+        ],
+        1035 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate does not appear to be a CA certificate"
+        ],
+        1036 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Encrypted private keys are not supported"
+        ],
+        1037 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate description contains invalid characters"
+        ],
+        1038 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate key type is required"
+        ],
+        1039 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unsupported certificate key type specified"
+        ],
+        1040 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate key length is required"
+        ],
+        1041 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unsupported certificate key length specified"
+        ],
+        1042 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate key elliptic curve name is required"
+        ],
+        1043 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unsupported certificate elliptic curve name specified"
+        ],
+        1044 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate digest algorithm is required"
+        ],
+        1045 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unsupported certificate digest algorithm specified"
+        ],
+        1046 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certifiate lifetime is greater than allowed maximum"
+        ],
+        1047 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Signing CA reference ID is required"
+        ],
+        1048 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Signing CA reference ID does not exist"
+        ],
+        1049 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate and private key are not matching keypair"
+        ],
+        1050 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "An error occurred attempting to generate certificate. Please check your DN values."
+        ],
+        1051 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown certificate country"
+        ],
+        1052 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate common name is required"
+        ],
+        1053 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate type is required"
+        ],
+        1054 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate type is invalid"
+        ],
+        1055 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate alternative names must be contained within an array"
+        ],
+        1056 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate alternative name type is invalid"
+        ],
+        1057 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate DNS alternative names must be valid hostname or FQDN"
+        ],
+        1058 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate IP alternative names must be valid IP address"
+        ],
+        1059 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate URI alternative names must be valid URI"
+        ],
+        1060 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate email alternative names must be valid email address"
+        ],
+        1061 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification IP address is required"
+        ],
+        1062 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification IP address must be valid IP address or hostname"
+        ],
+        1063 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification port is required"
+        ],
+        1064 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification SMTP port must be between 1 and 65535"
+        ],
+        1065 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification timeout must be a number greater than 0"
+        ],
+        1066 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification From Email Address is required"
+        ],
+        1067 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification From Email Address must be valid email address"
+        ],
+        1068 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification Notify Email Address is required"
+        ],
+        1069 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification Notify Email Address must be valid email address"
+        ],
+        1070 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification authentication mechanism is required"
+        ],
+        1071 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System email notification authentication mechanism must be PLAIN or LOGIN"
+        ],
 
         // 2000-2999 reserved for /services API calls
         2000 => [
@@ -580,6 +850,164 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "NTPd timeserver does not exist"
         ],
+        2054 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override already exists with this IP address type"
+        ],
+        2055 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override host value required"
+        ],
+        2056 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid dnsmasq host value"
+        ],
+        2057 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override domain value required"
+        ],
+        2058 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid dnsmasq domain value"
+        ],
+        2059 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override IP value required"
+        ],
+        2060 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid dnsmasq host override IP value"
+        ],
+        2061 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override ID required"
+        ],
+        2062 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override ID does not exist"
+        ],
+        2063 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override alias hostname required"
+        ],
+        2064 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override alias domain required"
+        ],
+        2065 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Dnsmasq host override alias already exists with this IP address type"
+        ],
+        2066 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound access list action required"
+        ],
+        2067 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown unbound access list action"
+        ],
+        2068 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound access list network required"
+        ],
+        2069 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound access list network must be valid IPv4 or IPv6 address"
+        ],
+        2070 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound access list network mask must be between 0 and 32 for IPv4 networks or 0 and 128 for IPv6 networks"
+        ],
+        2071 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound access list network mask is required"
+        ],
+        2072 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound access list ID is required"
+        ],
+        2073 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Minimum of 1 unbound access list row is required"
+        ],
+        2074 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unbound access list does not exist"
+        ],
+        2075 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "OpenVPN client specific override parameter 'common_name' is missing"
+        ],
+        2076 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown OpenVPN client specific override Netbios Node Type. Valid options are: b, p, m, h"
+        ],
+        2077 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Missing OpenVPN client specific override parameter 'refid'. This parameter is needed to identify the csc to delete."
+        ],
+        2078 => [
+            "status" => "Not found",
+            "code" => 404,
+            "return" => $id,
+            "message" => "Unknown OpenVPN client specific override refid."
+        ],
+        2079 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Missing OpenVPN client specific override parameter 'refid'. This parameter is needed to identify the csc to modify."
+        ],
+
+
 
         // 3000-3999 reserved for /interfaces API calls
         3000 => [
@@ -977,6 +1405,54 @@ function get($id, $data=[], $all=false) {
             "code" => 400,
             "return" => $id,
             "message" => "Interface type6 cannot be changed while DHCPv6 server is enabled"
+        ],
+        3066 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge must contain at least 1 member interface"
+        ],
+        3067 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge member does not exist"
+        ],
+        3068 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge member is already a member of another bridge"
+        ],
+        3069 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge member must be in hostap mode if wireless"
+        ],
+        3070 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge member cannot use captive portal"
+        ],
+        3071 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge ID is required"
+        ],
+        3072 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge does not exist"
+        ],
+        3073 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface bridge cannot be deleted while it's in use"
         ],
 
         // 4000-4999 reserved for /firewall API calls
@@ -2614,7 +3090,13 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "User expiration date must be in MM/DD/YYYY format"
         ],
-        //6000-6999 reserved for /routing API calls
+        5041 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "User certificate does not exist"
+        ],
+        // 6000-6999 reserved for /routing API calls
         6000 => [
             "status" => "bad request",
             "code" => 400,
@@ -2789,6 +3271,15 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Gateway ID does not exist"
         ],
+
+        // 7000-7999 reserved for /diagnostics API calls
+        7000 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Shell command is required"
+        ],
+
 
 
     ];

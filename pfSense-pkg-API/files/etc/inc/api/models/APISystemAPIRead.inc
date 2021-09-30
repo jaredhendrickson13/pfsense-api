@@ -24,6 +24,12 @@ class APISystemAPIRead extends APIModel {
     }
 
     public function action() {
-        return APIResponse\get(0, APITools\get_api_config()[1]);
+        # Retrieve our API configuration and remove sensitive values
+        $api_config = APITools\get_api_config()[1];
+
+        unset($api_config["server_key"]);
+        unset($api_config["hasync_password"]);
+
+        return APIResponse\get(0, $api_config);
     }
 }

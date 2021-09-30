@@ -26,6 +26,7 @@ class APIServicesDHCPdUpdate extends APIModel {
     }
 
     public function action() {
+        $this->__init_config();
         $this->config["dhcpd"][$this->id] = $this->validated_data;
         $this->write_config();
         $this->reload_dhcpd();
@@ -307,5 +308,12 @@ class APIServicesDHCPdUpdate extends APIModel {
             }
         }
         filter_configure();
+    }
+
+    private function __init_config() {
+        # Initialize the DHCP configuration if it does not exist
+        if (!isset($this->config["dhcpd"])) {
+            $this->config["dhcpd"] = [];
+        }
     }
 }
