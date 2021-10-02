@@ -80,13 +80,28 @@ class APIRoutingGatewayCreate extends APIModel {
     private function __validate_gateway() {
         # Require client to pass in a gateway address
         if (isset($this->initial_data["gateway"])) {
-            # Require gateway address to be valid IPv4 or IPv6 address depending on the protocol
+            # Always set non-local gateway to reduce conditions
             $this->validated_data["nonlocalgateway"] = "";
+
+            # Gateway can be valid IPv4 address
             if ($this->validated_data["ipprotocol"] === "inet" and is_ipaddrv4($this->initial_data["gateway"])) {
                 $this->validated_data["gateway"] = $this->initial_data["gateway"];
-            } elseif ($this->validated_data["ipprotocol"] === "inet6" and is_ipaddrv6($this->initial_data["gateway"])) {
+            }
+            # Gateway can be valid IPv6 address
+            elseif ($this->validated_data["ipprotocol"] === "inet6" and is_ipaddrv6($this->initial_data["gateway"])) {
                 $this->validated_data["gateway"] = $this->initial_data["gateway"];
-            } else {
+            }
+            # Gateway can be dynamic if one does not already exist and a dynamic gateway is supported
+            elseif ($this->initial_data["gateway"] === "dynamic") {
+                # Check if this interface and IP protocol combo is eligible for a dynamic interface
+                if ($this->allow_dynamic_gw($this->validated_data["interface"], $this->validated_data["ipprotocol"])) {
+                    $this->validated_data["gateway"] = $this->initial_data["gateway"];
+                } else {
+                    $this->errors[] = APIResponse\get(6029);
+                }
+            }
+            # Otherwise this gateway is not valid
+            else {
                 $this->errors[] = APIResponse\get(6014);
             }
         } else {
@@ -105,7 +120,9 @@ class APIRoutingGatewayCreate extends APIModel {
             } else {
                 $this->errors[] = APIResponse\get(6025);
             }
-        } else {
+        }
+        # Automatically assume the gateway address unless it is a dynamic gateway
+        elseif($this->validated_data["gateway"] !== "dynamic") {
             $this->validated_data["monitor"] = $this->validated_data["gateway"];
         }
     }
@@ -307,6 +324,36 @@ class APIRoutingGatewayCreate extends APIModel {
         $this->__validate_loss_interval();
         $this->__validate_time_period();
         $this->__validate_alert_interval();
+    }
+
+    # Checks if this interface already has a saved configuration for a dynamic gateway using this IP protocol
+    public function allow_dynamic_gw($interface, $ipprotocol) {
+        # Local variables
+        $gateway_details = return_gateways_array(true, true);
+        $interface = APITools\get_pfsense_if_id($interface);
+        $dyn_gw = false;
+        $dyn_gw_exists = false;
+
+        # Loop through each system gateway and see if this interface is dynamic
+        foreach ($gateway_details as $gateway) {
+            if ($gateway["friendlyiface"] === $interface and $gateway["ipprotocol"] === $ipprotocol and $gateway["dynamic"]) {
+                $dyn_gw = true;
+            }
+        }
+
+        # Loop through each configured gateway and check if this interface already has a dynamic gateway set
+        foreach ($this->config["gateways"]["gateway_item"] as $gateway) {
+            if ($gateway["interface"] === $interface and $gateway["ipprotocol"] === $ipprotocol and $gateway["gateway"] === "dynamic") {
+                $dyn_gw_exists = true;
+            }
+        }
+
+        # Check if dynamic gateways should be supported and if one already exists
+        if ($dyn_gw and !$dyn_gw_exists) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private function __init_config() {
