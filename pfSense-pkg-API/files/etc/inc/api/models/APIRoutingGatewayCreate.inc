@@ -336,7 +336,7 @@ class APIRoutingGatewayCreate extends APIModel {
 
         # Loop through each system gateway and see if this interface is dynamic
         foreach ($gateway_details as $gateway) {
-            if ($gateway["friendlyiface"] === $interface and $gateway["ipprotocol"] === $ipprotocol and $gateway["dynamic"]) {
+            if ($gateway["friendlyiface"] === $interface and $gateway["ipprotocol"] === $ipprotocol and isset($gateway["dynamic"])) {
                 $dyn_gw = true;
             }
         }

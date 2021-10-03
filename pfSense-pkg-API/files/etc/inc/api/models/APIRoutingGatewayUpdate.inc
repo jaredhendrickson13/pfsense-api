@@ -141,7 +141,7 @@ class APIRoutingGatewayUpdate extends APIModel {
                 $this->validated_data["monitor"] = $this->initial_data["monitor"];
             } elseif ($this->validated_data["ipprotocol"] === "inet6" and is_ipaddrv6($this->initial_data["monitor"])) {
                 $this->validated_data["monitor"] = $this->initial_data["monitor"];
-            } else {
+            } elseif ($this->initial_data["monitor"] !== "dynamic") {
                 $this->errors[] = APIResponse\get(6025);
             }
         }
