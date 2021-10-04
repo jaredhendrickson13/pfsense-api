@@ -39,7 +39,12 @@ class APIFirewallNATPortForwardCreate extends APIModel {
         $this->config["nat"]["rule"][$this->id] = $this->validated_data;
         APITools\sort_nat_rules($this->initial_data["top"], $this->id);
         $this->write_config();
-        $this->apply();
+        mark_subsystem_dirty('natconf');
+
+        # Only reload the firewall filter if it was requested by the client
+        if ($this->initial_data["apply"] === true) {
+            APIFirewallApplyCreate::apply();
+        }
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -225,18 +230,6 @@ class APIFirewallNATPortForwardCreate extends APIModel {
         $this->validated_data["associated-rule-id"] = "pass";
         $this->validated_data["created"] = array("time" => time(), "username" => $this->created_by_msg);
         $this->validated_data["updated"] = $this->validated_data["created"];
-    }
-
-    public function apply() {
-        # Mark the NAT subsystem as changed, this will be cleared if applied
-        mark_subsystem_dirty('natconf');
-
-        # Allow clients to apply this rule immediately if they passed in an apply value
-        if ($this->initial_data["apply"] === true) {
-            filter_configure();
-            clear_subsystem_dirty('natconf');
-            clear_subsystem_dirty('filter');
-        }
     }
 
     private function __init_config() {

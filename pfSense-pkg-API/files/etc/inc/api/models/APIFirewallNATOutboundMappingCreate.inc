@@ -41,7 +41,12 @@ class APIFirewallNATOutboundMappingCreate extends APIModel {
         $this->config["nat"]["outbound"]["rule"][$this->id] = $this->validated_data;
         APITools\sort_nat_rules($this->initial_data["top"], $this->id, "outbound");
         $this->write_config();
-        $this->apply();
+        mark_subsystem_dirty('natconf');
+
+        # Only reload the firewall filter if it was requested by the client
+        if ($this->initial_data["apply"] === true) {
+            APIFirewallApplyCreate::apply();
+        }
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -294,17 +299,4 @@ class APIFirewallNATOutboundMappingCreate extends APIModel {
         $this->config["nat"]["outbound"] = (is_array($this->config["nat"]["outbound"])) ? $this->config["nat"]["outbound"] : [];
         $this->config["nat"]["outbound"]["rule"] = (is_array($this->config["nat"]["outbound"]["rule"])) ? $this->config["nat"]["outbound"]["rule"] : [];
     }
-
-    public function apply() {
-        # Mark the NAT subsystem as changed, clear if applied
-        mark_subsystem_dirty('natconf');
-
-        # Allow clients to apply this rule immediately if they passed in an apply value
-        if ($this->initial_data["apply"] === true) {
-            filter_configure();
-            clear_subsystem_dirty('natconf');
-            clear_subsystem_dirty('filter');
-        }
-    }
-
 }

@@ -29,7 +29,12 @@ class APIFirewallRuleCreate extends APIModel {
         $this->config["filter"]["rule"][] = $this->validated_data;    // Write to our master config
         APITools\sort_firewall_rules($this->initial_data["top"], $next_rule_id);    // Sort our firewall rules
         $this->write_config();    // Apply our configuration change
-        $this->apply();
+        mark_subsystem_dirty('filter');
+
+        # Only reload the firewall filter if it was requested by the client
+        if ($this->initial_data["apply"] === true) {
+            APIFirewallApplyCreate::apply();
+        }
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -388,16 +393,5 @@ class APIFirewallRuleCreate extends APIModel {
             }
         }
         return array_key_exists($name, $list);
-    }
-
-    public function apply() {
-        # Mark the firewall subsystem as changed, this will be cleared if applied
-        mark_subsystem_dirty('filter');
-
-        # Optionally allow clients to apply this rule immediately if they passed in a true apply value
-        if ($this->initial_data["apply"] === true) {
-            filter_configure();
-            clear_subsystem_dirty('filter');
-        }
     }
 }

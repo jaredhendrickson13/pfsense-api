@@ -32,7 +32,14 @@ class APIFirewallNATOutboundUpdate extends APIModel {
         $this->create_automatic_rules();
         $this->config["nat"]["outbound"]["mode"] = $this->validated_data["mode"];
         $this->write_config();
-        filter_configure();
+        mark_subsystem_dirty('natconf');
+
+        # Only reload the firewall filter if a false value was not passed in
+        # TODO: This condition applies the changes by default to stay backwards compatible with v1.3.0
+        # TODO: this should be refactored in a future release to not apply by default
+        if ($this->initial_data["apply"] !== false) {
+            APIFirewallApplyCreate::apply();
+        }
 
         return APIResponse\get(0, $this->validated_data);
     }
