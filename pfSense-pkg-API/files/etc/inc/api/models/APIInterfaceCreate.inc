@@ -31,9 +31,15 @@ class APIInterfaceCreate extends APIModel {
     }
 
     public function action() {
+        # Add the new interface to our configuration and write the pending changes for application
         $this->config["interfaces"][$this->next_if] = $this->validated_data;
         $this->write_config();
-        $this->apply();
+        APIInterfaceApplyCreate::serialize_changes($this->next_if, $this->validated_data);
+
+        # Only apply the interface configuration if client requested
+        if ($this->initial_data["apply"] === true) {
+            APIInterfaceApplyCreate::apply();
+        }
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -239,6 +245,8 @@ class APIInterfaceCreate extends APIModel {
                     $dhcpaliasnet = strval($this->initial_data["alias-subnet"]);
                     if (is_subnet($this->validated_data["alias-address"]."/".$dhcpaliasnet)) {
                         $this->validated_data["alias-subnet"] = $dhcpaliasnet;
+                    } else {
+                        $this->errors[] = APIResponse\get(3015);
                     }
                 } else {
                     $this->validated_data["alias-subnet"] = 32;
@@ -280,12 +288,12 @@ class APIInterfaceCreate extends APIModel {
     private function __validate_type_dhcp_protocol_timing() {
         // Check for our DHCP protocol timing
         $timing_protocols = array(
-            "adv_dhcp_pt_timeout" => ["keyword" => "timeout", "return" => 134, "min" => 1],
-            "adv_dhcp_pt_retry" => ["keyword" => "retry", "return" => 135, "min" => 1],
-            "adv_dhcp_pt_select_timeout" => ["keyword" => "select timeout", "return" => 136, "min" => 0],
-            "adv_dhcp_pt_reboot" => ["keyword" => "reboot", "return" => 137, "min" => 1],
-            "adv_dhcp_pt_backoff_cutoff" => ["keyword" => "backoff cutoff", "return" => 138, "min" => 1],
-            "adv_dhcp_pt_initial_interval" => ["keyword" => "initial interval", "return" => 139, "min" => 1],
+            "adv_dhcp_pt_timeout" => ["keyword" => "timeout", "return" => 3017, "min" => 1],
+            "adv_dhcp_pt_retry" => ["keyword" => "retry", "return" => 3018, "min" => 1],
+            "adv_dhcp_pt_select_timeout" => ["keyword" => "select timeout", "return" => 3019, "min" => 0],
+            "adv_dhcp_pt_reboot" => ["keyword" => "reboot", "return" => 3020, "min" => 1],
+            "adv_dhcp_pt_backoff_cutoff" => ["keyword" => "backoff cutoff", "return" => 3021, "min" => 1],
+            "adv_dhcp_pt_initial_interval" => ["keyword" => "initial interval", "return" => 3022, "min" => 1],
         );
         // Loop through each timing attribute and see if it's valid
         foreach ($timing_protocols as $tp => $data) {
@@ -296,19 +304,7 @@ class APIInterfaceCreate extends APIModel {
                     $this->validated_data[$tp] = $dhcp_attr;
                     $this->validated_data["adv_dhcp_pt_values"] = "SavedCfg";
                 } else {
-                    if ($data["keyword"] === "timeout") {
-                        $this->errors[] = APIResponse\get(3017);
-                    } elseif ($data["keyword"] === "retry") {
-                        $this->errors[] = APIResponse\get(3018);
-                    } elseif ($data["keyword"] === "select timeout") {
-                        $this->errors[] = APIResponse\get(3019);
-                    } elseif ($data["keyword"] === "reboot") {
-                        $this->errors[] = APIResponse\get(3020);
-                    } elseif ($data["keyword"] === "backoff cutoff") {
-                        $this->errors[] = APIResponse\get(3021);
-                    } elseif ($data["keyword"] === "initial interval") {
-                        $this->errors[] = APIResponse\get(3022);
-                    }
+                    $this->errors[] = APIResponse\get($data["return"]);
                 }
             }
         }
@@ -740,17 +736,6 @@ class APIInterfaceCreate extends APIModel {
                     $this->errors[] = APIResponse\get(3041);
                     break;
             }
-        }
-    }
-
-    public function apply() {
-        # Mark the interfaces subsystem as changed, clear if applied
-        mark_subsystem_dirty('interfaces');
-
-        # Only apply the interface configuration if client requested
-        if ($this->initial_data["apply"] === true) {
-            APITools\apply_interface_config($this->id, $this->validated_data);
-            clear_subsystem_dirty('interfaces');
         }
     }
 }
