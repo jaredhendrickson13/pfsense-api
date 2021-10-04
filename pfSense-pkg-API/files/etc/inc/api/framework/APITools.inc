@@ -900,11 +900,6 @@ function get_ipv6_if_list() {
     return($dyn_v6_ifs);
 }
 
-// Apply a new interface configuration
-function apply_interface_config($if_id, $if_conf) {
-
-}
-
 function delete_static_route($id) {
     global $config;
     $a_routes = &$config['staticroutes']['route'];
