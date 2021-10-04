@@ -2077,6 +2077,16 @@
 													"key": "detail",
 													"value": "string or array",
 													"description": "Array of descriptions for alias values. Descriptions must match the order the that they are specified in the `address` array. Single descriptions may be specified as string. If you pass In less `detail` values than `address` values, a default auto-created detail will be applied to the remaining values. (optional)"
+												},
+												{
+													"key": "detail",
+													"value": "string or array",
+													"description": "Array of descriptions for alias values. Descriptions must match the order the that they are specified in the `address` array. Single descriptions may be specified as string. If you pass In less `detail` values than `address` values, a default auto-created detail will be applied to the remaining values. (optional)"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not you would like this alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple aliases at once it is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single alias, you may set this true to apply it immediately. Defaults to true. (optional)\n\n_Note: currently this defaults to always reload the firewall filter after in order to remain backwards compatible with previous releases, this will be changed to not reload the filter by default in a future release._"
 												}
 											]
 										},
@@ -2121,6 +2131,11 @@
 													"key": "address",
 													"value": "string",
 													"description": "Array of values to delete from alias. A single value may be specified as string."
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not you would like this alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple aliases at once it is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single alias, you may set this true to apply it immediately. Defaults to true. (optional)\n\n_Note: currently this defaults to always reload the firewall filter after in order to remain backwards compatible with previous releases, this will be changed to not reload the filter by default in a future release._"
 												}
 											]
 										},
@@ -2240,6 +2255,11 @@
 											"key": "detail",
 											"value": "string or array",
 											"description": "Array of descriptions for alias values. Descriptions must match the order the that they are specified in the `address` array. Single descriptions may be specified as string"
+										},
+										{
+											"key": "apply",
+											"value": "boolean",
+											"description": "Specify whether or not you would like this alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple aliases at once it is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single alias, you may set this true to apply it immediately. Defaults to true. (optional)\n\n_Note: currently this defaults to always reload the firewall filter after in order to remain backwards compatible with previous releases, this will be changed to not reload the filter by default in a future release._"
 										}
 									]
 								},
@@ -2303,6 +2323,11 @@
 											"key": "detail",
 											"value": "string or array",
 											"description": "Overwrite existing alias address details with new details. Multiple values may be passed in as array, singular values may be passed in as string. Detail values must match index of alias addresses (optional)"
+										},
+										{
+											"key": "apply",
+											"value": "boolean",
+											"description": "Specify whether or not you would like this alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple aliases at once it is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single alias, you may set this true to apply it immediately. Defaults to true. (optional)\n\n_Note: currently this defaults to always reload the firewall filter after in order to remain backwards compatible with previous releases, this will be changed to not reload the filter by default in a future release._"
 										}
 									]
 								},
@@ -2341,6 +2366,11 @@
 											"key": "id",
 											"value": "string",
 											"description": "Name or ID of alias to delete. This alias cannot be in use elsewhere in configuration"
+										},
+										{
+											"key": "apply",
+											"value": "boolean",
+											"description": "Specify whether or not you would like this alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple aliases at once it is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single alias, you may set this true to apply it immediately. Defaults to true. (optional)\n\n_Note: currently this defaults to always reload the firewall filter after in order to remain backwards compatible with previous releases, this will be changed to not reload the filter by default in a future release._"
 										}
 									]
 								},
@@ -4046,6 +4076,11 @@
 													"key": "mode",
 													"value": "string",
 													"description": "Update the outbound NAT mode. Options are `automatic` to automatically generate outbound NAT rules, `hybrid` to support both automatic and manual outbound NAT rules , `advanced` to require all rules to be entered manually, or `disabled` to disable outbound NAT altogether. If updating to `advanced` from `automatic` or `hybrid`, the API will automatically create manual entries for each automatically generated outbound NAT entry."
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not you would like this setting to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple firewall related objects at once it is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating the outbound NAT settings, you may set this true to apply it immediately. Defaults to true. (optional)\n\n_Note: currently this defaults to always reload the firewall filter after in order to remain backwards compatible with previous releases, this will be changed to not reload the filter by default in a future release._"
 												}
 											]
 										},
