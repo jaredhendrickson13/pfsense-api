@@ -37,9 +37,14 @@ class APIFirewallApplyCreate extends APIModel {
     }
 
     public function action() {
+        $this->apply();
+        return APIResponse\get(0);
+    }
+
+    public static function apply() {
         filter_configure();
+        clear_subsystem_dirty('aliases');
         clear_subsystem_dirty('natconf');
         clear_subsystem_dirty('filter');
-        return APIResponse\get(0);
     }
 }
