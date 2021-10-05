@@ -46,7 +46,6 @@ class APIInterfaceApplyCreate extends APIModel {
         $pending_ifs[$id]['ifcfg'] = $interface;
         file_put_contents($g['tmp_path']."/.interfaces.apply", serialize($pending_ifs));
         mark_subsystem_dirty('interfaces');
-
     }
 
     public static function apply() {
@@ -60,7 +59,7 @@ class APIInterfaceApplyCreate extends APIModel {
         # Check that there are even pending interface changes to apply
         if (file_exists("{$g['tmp_path']}/.interfaces.apply")) {
             # Load our pending interface file
-            $pending_ifs = unserialize(file_get_contents("{$g['tmp_path']}/.interfaces.apply"));
+            $pending_ifs = unserialize(file_get_contents($g['tmp_path']."/.interfaces.apply"));
 
             # Loop through each pending interface configuration and apply it accordingly
             foreach ($pending_ifs as $if_to_apply => $if_conf) {

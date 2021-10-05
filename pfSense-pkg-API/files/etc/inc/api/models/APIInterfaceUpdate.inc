@@ -31,7 +31,7 @@ class APIInterfaceUpdate extends APIModel {
     public function action() {
         $this->config["interfaces"][$this->id] = $this->validated_data;
         $this->write_config();
-        APIInterfaceApplyCreate::serialize_changes($this->next_if, $this->validated_data);
+        APIInterfaceApplyCreate::serialize_changes($this->id, $this->validated_data);
 
         # Only apply the interface configuration if client requested
         if ($this->initial_data["apply"] === true) {
