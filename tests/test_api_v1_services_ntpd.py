@@ -20,6 +20,7 @@ class APIUnitTestServicesNTPd(unit_test_framework.APIUnitTest):
     put_tests = [
         {
             "name": "Update the NTPd configuration to enable all options",
+            "resp_time": 3,
             "payload": {
                 "interface": ["WAN", "em1", "lo0"],
                 "orphan": 15,
@@ -35,6 +36,7 @@ class APIUnitTestServicesNTPd(unit_test_framework.APIUnitTest):
         },
         {
             "name": "Update the NTPd configuration to disable all options",
+            "resp_time": 3,
             "payload": {
                 "interface": ["wan", "lo0"],
                 "orphan": 12,

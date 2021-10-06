@@ -510,6 +510,7 @@ class APIUnitTestInterface(unit_test_framework.APIUnitTest):
         {
             "name": "Create interface VLAN for testing",
             "uri": "/api/v1/interface/vlan",
+            "resp_time": 5,
             "payload": {
                 "if": "em2",
                 "tag": 2
