@@ -29,7 +29,12 @@ class APIFirewallRuleDelete extends APIModel {
         unset($this->config["filter"]["rule"][$this->id]);
         APITools\sort_firewall_rules();
         $this->write_config();
-        $this->apply();
+        mark_subsystem_dirty('filter');
+
+        # Only reload the firewall filter if it was requested by the client
+        if ($this->initial_data["apply"] === true) {
+            APIFirewallApplyCreate::apply();
+        }
         return APIResponse\get(0, $this->validated_data);
     }
     
@@ -58,17 +63,6 @@ class APIFirewallRuleDelete extends APIModel {
             }
         } else {
             $this->errors[] = APIResponse\get(4031);
-        }
-    }
-
-    public function apply() {
-        # Mark the firewall subsystem as changed, this will be cleared if applied
-        mark_subsystem_dirty('filter');
-
-        # Optionally allow clients to apply this rule immediately if they passed in a true apply value
-        if ($this->initial_data["apply"] === true) {
-            filter_configure();
-            clear_subsystem_dirty('filter');
         }
     }
 }

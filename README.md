@@ -1030,6 +1030,9 @@ URL: https://{{$hostname}}/api/v1/firewall/alias
 | descr | string | Description of new alias (optional) |
 | address | string or array | Array of values to add to alias. A single value may be specified as string. |
 | detail | string or array | Array of descriptions for alias values. Descriptions must match the order the that they are specified in the `address` array. Single descriptions may be specified as string |
+| apply | boolean | Specify whether or not you would like this alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple aliases at once it is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single alias, you may set this true to apply it immediately. Defaults to true. (optional)
+
+_Note: currently this defaults to always reload the firewall filter after in order to remain backwards compatible with previous releases, this will be changed to not reload the filter by default in a future release._ |
 
 
 
@@ -1069,6 +1072,9 @@ URL: https://{{$hostname}}/api/v1/firewall/alias
 | Key | Type | Description |
 | --- | ------|-------------|
 | id | string | Name or ID of alias to delete. This alias cannot be in use elsewhere in configuration |
+| apply | boolean | Specify whether or not you would like this alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple aliases at once it is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single alias, you may set this true to apply it immediately. Defaults to true. (optional)
+
+_Note: currently this defaults to always reload the firewall filter after in order to remain backwards compatible with previous releases, this will be changed to not reload the filter by default in a future release._ |
 
 
 
@@ -1126,6 +1132,9 @@ URL: https://{{$hostname}}/api/v1/firewall/alias
 | descr | string | Change alias description (optional) |
 | address | string or array | Overwrite existing alias addresses with new addresses. Multiple values may be passed in as array, singular values may be passed in as string (optional) |
 | detail | string or array | Overwrite existing alias address details with new details. Multiple values may be passed in as array, singular values may be passed in as string. Detail values must match index of alias addresses (optional) |
+| apply | boolean | Specify whether or not you would like this alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple aliases at once it is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single alias, you may set this true to apply it immediately. Defaults to true. (optional)
+
+_Note: currently this defaults to always reload the firewall filter after in order to remain backwards compatible with previous releases, this will be changed to not reload the filter by default in a future release._ |
 
 
 
@@ -1172,6 +1181,10 @@ URL: https://{{$hostname}}/api/v1/firewall/alias/entry
 | name | string | Name of alias to add new address values |
 | address | string or array | Array of values to add to alias. A single value may be specified as string. |
 | detail | string or array | Array of descriptions for alias values. Descriptions must match the order the that they are specified in the `address` array. Single descriptions may be specified as string. If you pass In less `detail` values than `address` values, a default auto-created detail will be applied to the remaining values. (optional) |
+| detail | string or array | Array of descriptions for alias values. Descriptions must match the order the that they are specified in the `address` array. Single descriptions may be specified as string. If you pass In less `detail` values than `address` values, a default auto-created detail will be applied to the remaining values. (optional) |
+| apply | boolean | Specify whether or not you would like this alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple aliases at once it is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single alias, you may set this true to apply it immediately. Defaults to true. (optional)
+
+_Note: currently this defaults to always reload the firewall filter after in order to remain backwards compatible with previous releases, this will be changed to not reload the filter by default in a future release._ |
 
 
 
@@ -1210,6 +1223,9 @@ URL: https://{{$hostname}}/api/v1/firewall/alias/entry
 | --- | ------|-------------|
 | name | string | Name of alias to delete address values from |
 | address | string | Array of values to delete from alias. A single value may be specified as string. |
+| apply | boolean | Specify whether or not you would like this alias to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple aliases at once it is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single alias, you may set this true to apply it immediately. Defaults to true. (optional)
+
+_Note: currently this defaults to always reload the firewall filter after in order to remain backwards compatible with previous releases, this will be changed to not reload the filter by default in a future release._ |
 
 
 
@@ -1481,6 +1497,9 @@ URL: https://{{$hostname}}/api/v1/firewall/nat/outbound
 | Key | Type | Description |
 | --- | ------|-------------|
 | mode | string | Update the outbound NAT mode. Options are `automatic` to automatically generate outbound NAT rules, `hybrid` to support both automatic and manual outbound NAT rules , `advanced` to require all rules to be entered manually, or `disabled` to disable outbound NAT altogether. If updating to `advanced` from `automatic` or `hybrid`, the API will automatically create manual entries for each automatically generated outbound NAT entry. |
+| apply | boolean | Specify whether or not you would like this setting to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple firewall related objects at once it is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating the outbound NAT settings, you may set this true to apply it immediately. Defaults to true. (optional)
+
+_Note: currently this defaults to always reload the firewall filter after in order to remain backwards compatible with previous releases, this will be changed to not reload the filter by default in a future release._ |
 
 
 

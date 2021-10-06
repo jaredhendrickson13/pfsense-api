@@ -900,55 +900,6 @@ function get_ipv6_if_list() {
     return($dyn_v6_ifs);
 }
 
-// Apply a new interface configuration
-function apply_interface_config($if_id, $if_conf) {
-    // Local variables
-    global $config;
-    $vlan_redo = false;
-    // Check that our if configuration is an array
-    if (is_array($if_conf)) {
-        if (isset($config['interfaces'][$if_id]['enable'])) {
-            interface_bring_down($if_id, false, $if_conf);
-            interface_configure($if_id, true);
-            if ($config['interfaces'][$if_id]['ipaddrv6'] == "track6") {
-                // Configure IPv6 track6 type if present
-                $wan_cfg = $config['interfaces'][$if_id];
-                interface_track6_configure($if_id, $wan_cfg, true);
-            }
-        } else {
-            interface_bring_down($if_id, true, $if_conf);
-            // Restart DHCPD if enabled
-            if (isset($config['dhcpd'][$if_id]['enable']) ||
-                isset($config['dhcpdv6'][$if_id]['enable'])) {
-                services_dhcpd_configure();
-            }
-        }
-        // Check if VLANs are configured for this interface, if so, reapply them
-        if (interface_has_clones(get_real_interface($if_id))) {
-            $vlan_redo = true;
-        }
-    }
-    // Check if DHCP needs to be reloaded
-    if ($if_conf['ipaddr'] == "dhcp") {
-        kill_dhclient_process($if_conf['if']);
-    }
-    if ($if_conf['ipaddrv6'] == "dhcp6") {
-        kill_dhcp6client_process($if_conf['if'],true);
-    }
-    // Reapply VLANs if necessary
-    if ($vlan_redo) {
-        interfaces_vlan_configure();
-    }
-    // Restart services that may reference IP
-    services_snmpd_configure();
-    setup_gateways_monitor();
-    filter_configure();
-    enable_rrd_graphing();
-    system_routing_configure();
-    // Return true or false if configuration was successful
-    return true;
-}
-
 function delete_static_route($id) {
     global $config;
     $a_routes = &$config['staticroutes']['route'];

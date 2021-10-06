@@ -1,15 +1,18 @@
 #!/bin/sh
-if [ "${2}" != "POST-DEINSTALL" ]; then
-    rm -rf /usr/local/www/api/v1/*
+
+if [ "${2}" != "DEINSTALL" ]; then
 	exit 0
 fi
 
+# Remove endpoints
+rm -rf /usr/local/www/api/v1
+
 # Unlink this package from pfSense
-/usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% ${2}
+/usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% POST-DEINSTALL
 
 # Remove the pfsense-api command line tool
 /bin/rm /usr/local/bin/pfsense-api
 
-# Restore overriden files to their original state
+# Restore overridden files to their original state
 /bin/mv /etc/inc/system.inc.original /etc/inc/system.inc
 echo "Restoring file overrides to their original state... done."

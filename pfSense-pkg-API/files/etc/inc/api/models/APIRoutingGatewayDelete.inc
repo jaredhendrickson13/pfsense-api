@@ -28,11 +28,7 @@ class APIRoutingGatewayDelete extends APIModel {
         $this->validated_data = $this->config["gateways"]["gateway_item"][$this->id];
         $this->delete_gateway_item();
         $this->write_config();
-        system_routing_configure();
-        system_resolvconf_generate();
-        filter_configure();
-        setup_gateways_monitor();
-        send_event("service reload dyndnsall");
+        $this->apply();
 
         return APIResponse\get(0, $this->validated_data);
     }
@@ -111,5 +107,20 @@ class APIRoutingGatewayDelete extends APIModel {
             unset($this->config['interfaces'][$backend_gw['friendlyiface']]['gateway']);
         }
         unset($this->config['gateways']['gateway_item'][$backend_gw['attribute']]);
+    }
+
+    public function apply() {
+        # Mark the routing subsystem as changed, clear if applied
+        mark_subsystem_dirty("staticroutes");
+
+        # Optionally allow clients to apply this gateway immediately if they passed in a true apply value
+        if ($this->initial_data["apply"] === true) {
+            system_routing_configure();
+            system_resolvconf_generate();
+            filter_configure();
+            setup_gateways_monitor();
+            send_event("service reload dyndnsall");
+            clear_subsystem_dirty("staticroutes");
+        }
     }
 }
