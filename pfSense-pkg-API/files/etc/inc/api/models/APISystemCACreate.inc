@@ -168,7 +168,7 @@ class APISystemCACreate extends APIModel {
             $this->errors[] = APIResponse\get(1035);
         }
         else {
-            $this->validated_data["crt"] = $this->initial_data["crt"];
+            $this->validated_data["crt"] = $crt;
         }
     }
 
@@ -187,7 +187,7 @@ class APISystemCACreate extends APIModel {
                 $this->errors[] = APIResponse\get(1049);
             }
             else {
-                $this->validated_data["prv"] = $this->initial_data["prv"];
+                $this->validated_data["prv"] = $key;
             }
         }
     }
