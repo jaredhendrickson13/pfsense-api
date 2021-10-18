@@ -154,18 +154,7 @@ class APIUnitTestUser(unit_test_framework.APIUnitTest):
                 "password": "changeme",
                 "cert": "INVALID"
             }
-        },
-        {
-            "name": "Check inability to add server certificate as a user certificate",
-            "status": 400,
-            "return": 5041,
-            "server_cert": True,
-            "payload": {
-                "username": "another_user",
-                "password": "changeme"
-            }
-        },
-
+        }
     ]
     put_tests = [
         {
@@ -300,22 +289,15 @@ class APIUnitTestUser(unit_test_framework.APIUnitTest):
                 post_counter = 0
                 put_counter = 0
 
-                # Loop through all tests and auto-add the refid to payloads that have the user_cert or server_cert set
+                # Loop through all tests and auto-add the refid to payloads that have the user_cert set
                 for test in self.post_tests:
                     if "payload" in test.keys() and "user_cert" in test.keys():
                         self.post_tests[post_counter]["payload"]["cert"] = [self.post_responses[1]["data"]["refid"]]
 
-                    if "payload" in test.keys() and "server_cert" in test.keys():
-                        self.post_tests[post_counter]["payload"]["cert"] = [self.post_responses[2]["data"]["refid"]]
-                    post_counter = post_counter + 1
 
                 # Do the same for PUT tests
                 for test in self.put_tests:
                     if "payload" in test.keys() and "user_cert" in test.keys():
                         self.put_tests[put_counter]["payload"]["cert"] = [self.post_responses[1]["data"]["refid"]]
-
-                    if "payload" in test.keys() and "server_cert" in test.keys():
-                        self.put_tests[put_counter]["payload"]["cert"] = [self.post_responses[2]["data"]["refid"]]
-                    put_counter = put_counter + 1
 
 APIUnitTestUser()
