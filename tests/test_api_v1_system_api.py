@@ -26,7 +26,8 @@ class APIUnitTestSystemAPI(unit_test_framework.APIUnitTest):
                 "jwt_exp": 86400,
                 "keyhash": "sha512",
                 "keybytes": 64,
-                "allowed_interfaces": ["WAN"]
+                "allowed_interfaces": ["WAN"],
+                "access_list": ["0::/0", "0.0.0.0/0"]
             },
         },
         {
@@ -36,7 +37,8 @@ class APIUnitTestSystemAPI(unit_test_framework.APIUnitTest):
                 "jwt_exp": 3600,
                 "keyhash": "sha256",
                 "keybytes": 16,
-                "allowed_interfaces": ["any"]
+                "allowed_interfaces": ["any"],
+                "access_list": []
             },
         },
         {
@@ -79,7 +81,14 @@ class APIUnitTestSystemAPI(unit_test_framework.APIUnitTest):
                 "allowed_interfaces": ["INVALID"]
             }
         },
-
+        {
+            "name": "Test invalid access list",
+            "status": 400,
+            "return": 1072,
+            "payload": {
+                "access_list": ["INVALID"]
+            }
+        },
     ]
 
 

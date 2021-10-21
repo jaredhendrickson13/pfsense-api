@@ -6961,6 +6961,11 @@
 											"description": "Update the custom response headers for the API to return in API responses. This must be an array of key-value pairs (e.g. `{\"custom-header\": \"custom-header-value}`. To revert custom headers to the default state, simply pass in an empty array. In most cases, custom headers are not necessary. An example use case for custom headers is setting CORS policy headers required by some frontend web applications. (optional)"
 										},
 										{
+											"key": "access_list",
+											"value": "array",
+											"description": "Update the API access list. This must be an array of IPv4 or IPv6 subnets in CIDR notation. If left blank, all subnets will be allowed. (optional)"
+										},
+										{
 											"key": "hasync",
 											"value": "boolean",
 											"description": "Enable or disable HA sync for API configurations. (optional)"
