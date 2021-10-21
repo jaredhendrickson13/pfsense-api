@@ -127,7 +127,7 @@ js = """
     $(document).ready(function() {
         document.title = 'pfSense REST API Documentation';
         var curr_year = new Date().getFullYear();
-        document.querySelector('footer').innerHTML = "<a href='/api/'>Back to pfSense</a> | <a href='https://github.com/jaredhendrickson13/pfsense-api'>View on Github</a> | <a href='https://github.com/jaredhendrickson13/pfsense-api/issues/new'>Report an Issue</a><p>Copyright &copy; " + curr_year + " - Jared Hendrickson</p>";
+        document.querySelector('footer').innerHTML = "<a href='/api/'>Back to pfSense</a> | <a href='https://github.com/jaredhendrickson13/pfsense-api'>View on Github</a> | <a href='https://github.com/jaredhendrickson13/pfsense-api/issues/new/choose'>Report an Issue</a><p>Copyright &copy; " + curr_year + " - Jared Hendrickson</p>";
     });
 
 </script>

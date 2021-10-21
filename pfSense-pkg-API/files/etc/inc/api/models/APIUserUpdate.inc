@@ -179,12 +179,13 @@ class APIUserUpdate extends APIModel {
     public function is_user_certificate($cert_ref_id) {
         # Loop through all certificates and check for matches
         foreach ($this->config["cert"] as $cert) {
-            # Check if this is a user certificate and that ref ID matches
-            if ($cert["type"] === "user" and $cert["refid"] === $cert_ref_id) {
+            # Check if this certificate matches the specified ref id
+            if ($cert["refid"] === $cert_ref_id) {
                 return true;
             }
         }
 
         return false;
+
     }
 }
