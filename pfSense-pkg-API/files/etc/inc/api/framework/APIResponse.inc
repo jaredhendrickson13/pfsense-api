@@ -524,6 +524,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "System email notification authentication mechanism must be PLAIN or LOGIN"
         ],
+        1072 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System API access list must be array of IPv4 or IPv6 subnets in CIDR notation"
+        ],
 
         // 2000-2999 reserved for /services API calls
         2000 => [

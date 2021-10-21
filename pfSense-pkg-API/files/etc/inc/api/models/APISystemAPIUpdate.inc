@@ -175,6 +175,23 @@ class APISystemAPIUpdate extends APIModel {
         }
     }
 
+    private function __validate_access_list() {
+        # Validate subnets within the specified access list
+        if (!empty($this->initial_data["access_list"])) {
+            # Check each subnet within the access list to ensure it is valid
+            foreach ($this->initial_data["access_list"] as $subnet) {
+                if (!is_subnet($subnet)) {
+                    $this->errors[] = APIResponse\get(1072);
+                    break;
+                }
+            }
+            $this->validated_data["access_list"] = implode(" ", $this->initial_data["access_list"]);
+        }
+        elseif ($this->initial_data["access_list"] === []) {
+            $this->validated_data["access_list"]["access_list"] = "";
+        }
+    }
+
     private function __validate_authmode() {
         # Check for our option 'authmode' payload value
         if (isset($this->initial_data["authmode"])) {
@@ -241,6 +258,7 @@ class APISystemAPIUpdate extends APIModel {
         $this->__validate_keyhash();
         $this->__validate_keybytes();
         $this->__validate_custom_headers();
+        $this->__validate_access_list();
         $this->__validate_hasync();
         $this->__validate_hasync_hosts();
         $this->__validate_hasync_username();

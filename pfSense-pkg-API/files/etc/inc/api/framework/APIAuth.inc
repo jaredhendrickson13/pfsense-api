@@ -129,13 +129,16 @@ class APIAuth {
 
         # If no require privileges were given, assume call is always authorized
         if (!empty($this->req_privs)) {
-            # If API is in readonly mode, only allow GET requests
-            if (!$this->read_mode or ($this->read_mode and $_SERVER['REQUEST_METHOD'] === "GET")) {
-                # Loop through each of our req privs and ensure the client has them, also check if access is read only
-                foreach ($this->req_privs as &$priv) {
-                    if (in_array($priv, $this->privs)) {
-                        $authorized = true;
-                        break;
+            # Check that client's IP is authorized
+            if ($this->__is_ip_authorized()) {
+                # If API is in readonly mode, only allow GET requests
+                if (!$this->read_mode or ($this->read_mode and $_SERVER['REQUEST_METHOD'] === "GET")) {
+                    # Loop through each of our req privs and ensure client has them, also check if access is read only
+                    foreach ($this->req_privs as &$priv) {
+                        if (in_array($priv, $this->privs)) {
+                            $authorized = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -146,5 +149,25 @@ class APIAuth {
         # Set our class is_authorized attribute to our authorization resp and return the resp
         $this->is_authorized = $authorized;
         return $authorized;
+    }
+
+    # Check if our client's IP is within our API access list
+    private function __is_ip_authorized() {
+        # Check if we have any API access list entries
+        if (!empty($this->api_config["access_list"])) {
+            # Check if the client's IP is within any of the allowed subnets
+            foreach (explode(" ", $this->api_config["access_list"]) as $subnet) {
+                # This IP is authorized if it's within this subnet
+                if (APITools\is_ip_in_cidr($this->ip_address, $subnet)) {
+                    return true;
+                }
+            }
+            # IP is not authorized if it's not within any configured subnet
+            return false;
+        }
+        # The API access list is not configured, authorize any IP
+        else {
+            return true;
+        }
     }
 }

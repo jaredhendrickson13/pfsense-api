@@ -143,16 +143,19 @@ if (isset($_POST["save"])) {
     # Validate subnets within the specified access list
     if (!empty($_POST["access_list"])) {
         # Convert access list to array and remove line breaks
-        $access_list = explode(" ", str_replace(PHP_EOL, "", $_POST["access_list"]));
+        $access_list = explode(" ", $_POST["access_list"]);
 
         # Check each subnet within the access list to ensure it is valid
         foreach ($access_list as $subnet) {
             if (!is_subnet($subnet)) {
                 $input_errors[] = "Access list entry '".$subnet."' is not a valid IPv4 or IPv6 CIDR.";
                 $has_errors = true;
+                break;
             }
         }
-        $pkg_config["access_list"] = $access_list;
+        $pkg_config["access_list"] = $_POST["access_list"];
+    } else {
+        $pkg_config["access_list"] = "";
     }
 
     # Validate HA Sync settings if enabled
@@ -372,11 +375,12 @@ $advanced_section->addInput(new Form_Textarea(
 $advanced_section->addInput(new Form_Textarea(
     'access_list',
     'Allowed Networks',
-    implode(" ", $pkg_config["access_list"])
+    $pkg_config["access_list"]
 ))->setHelp(
     'Specify IPv4 or IPv6 subnets (in CIDR notation) that are allowed to interact with the API. Subnets must
     use the network address in the CIDR and not any other address within the subnet. Multiple subnets may be specified
-    separated by a space. If left blank, all IPs will be allowed and the access list will essentially be bypassed.'
+    separated by a space. If a client tries to invoke an API call that is not within an allowed subnet, a 403 error will
+    be returned. If left blank, all IPs will be allowed and the access list will essentially be bypassed.'
 );
 
 # Populate the entire form
