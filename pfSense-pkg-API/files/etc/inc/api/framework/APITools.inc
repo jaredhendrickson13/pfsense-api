@@ -1016,7 +1016,7 @@ function is_ip_subnet_or_alias($value) {
 }
 
 # Checks if a given IPv4 address is within a given CIDR
-function is_ip_in_cidr($ip, $cidr) {
+function is_ipv4_in_cidr($ip, $cidr) {
     # Use IP2Long to determine if a specified IP is within a specified cidr
     $subnet = explode('/', $cidr)[0];
     $subnet = ip2long($subnet);
@@ -1050,6 +1050,20 @@ function is_ipv6_in_cidr($ip, $cidr) {
     $mask_bits = str_pad($mask_bits, 32, '0');
     $mask_bits = pack("H*" , $mask_bits);
     return (inet_pton($ip) & $mask_bits) == $subnet;
+}
+
+# Check if a given IPv4 or IPv6 address is within a given CIDR
+function is_ip_in_cidr($ip, $cidr) {
+    # Run the CIDR function for the corresponding IP version
+    if (is_ipaddrv4($ip) and is_subnetv4($cidr)) {
+        return is_ipv4_in_cidr($ip, $cidr);
+    }
+    if (is_ipaddrv6($ip) and is_subnetv6($cidr)) {
+        return is_ipv6_in_cidr($ip, $cidr);
+    }
+
+    # Default to false if no condition was met previously
+    return false;
 }
 
 # Check if a specified IP is a configured virtual IP
