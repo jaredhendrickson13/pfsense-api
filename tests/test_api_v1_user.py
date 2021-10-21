@@ -154,18 +154,7 @@ class APIUnitTestUser(unit_test_framework.APIUnitTest):
                 "password": "changeme",
                 "cert": "INVALID"
             }
-        },
-        {
-            "name": "Check inability to add server certificate as a user certificate",
-            "status": 400,
-            "return": 5041,
-            "server_cert": True,
-            "payload": {
-                "username": "another_user",
-                "password": "changeme"
-            }
-        },
-
+        }
     ]
     put_tests = [
         {
@@ -213,9 +202,7 @@ class APIUnitTestUser(unit_test_framework.APIUnitTest):
             }
         },
         {
-            "name": "Check inability to add server certificate as a user certificate",
-            "status": 400,
-            "return": 5041,
+            "name": "Check ability to add server certificate as a user certificate",
             "server_cert": True,
             "payload": {
                 "username": "new_user",
@@ -246,11 +233,6 @@ class APIUnitTestUser(unit_test_framework.APIUnitTest):
             "payload": {"descr": "USER_CERT"}
         },
         {
-            "name": "Delete server certificate used for testing",
-            "uri": "/api/v1/system/certificate",
-            "payload": {"descr": "SERVER_CERT"}
-        },
-        {
             "name": "Delete local user",
             "payload": {"username": "new_user"}
         },
@@ -274,6 +256,11 @@ class APIUnitTestUser(unit_test_framework.APIUnitTest):
             "name": "Check ability to delete user certificate after user was deleted",
             "uri": "/api/v1/system/certificate",
             "payload": {"descr": "USER_CERT"}
+        },
+        {
+            "name": "Delete server certificate used for testing",
+            "uri": "/api/v1/system/certificate",
+            "payload": {"descr": "SERVER_CERT"}
         },
         {
             "name": "Delete CA used for testing",
