@@ -1,4 +1,5 @@
 import unit_test_framework
+import base64
 
 
 class APIUnitTestSystemCA(unit_test_framework.APIUnitTest):
@@ -207,5 +208,26 @@ class APIUnitTestSystemCA(unit_test_framework.APIUnitTest):
         },
         # TODO: add test to check that CAs in use cannot be deleted
     ]
+
+    def post_post(self):
+        # Check if this is after the first POST test
+        if len(self.post_responses) == 1:
+            self.is_return_crt_base64(self.post_responses[0])
+
+
+    def is_return_crt_base64(self, response):
+        """
+        Takes a test response and checks if the return 'crt' data field is a Base64 encoded certificate
+        """
+        # Variables
+        test_params = {"name": "Ensure cert is Base64 encoded"}
+        crt = base64.b64decode(response["data"]["crt"])
+
+        # Ensure the returned Base64 decoded crt value is a certificate
+        if "BEGIN CERTIFICATE" not in crt.decode():
+            self.exit_code = 1
+            print(self.__format_msg__("POST", test_params, "Returned certificate is not Base64 encoded"))
+        else:
+            print(self.__format_msg__("POST", test_params, "Response is valid", "ok"))
 
 APIUnitTestSystemCA()

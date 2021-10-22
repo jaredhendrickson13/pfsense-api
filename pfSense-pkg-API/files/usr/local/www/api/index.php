@@ -395,7 +395,7 @@ $rotate_btn->addClass('btn btn-sm btn-success');
 $rotate_btn->setOnclick("return confirm(\"Rotating the server key will void any existng API tokens and JWTs. Proceed?\");");
 $form->addGlobal(new Form_Button('save', 'Save', null, 'fa-save'))->addClass('btn btn-sm btn-primary api-save-btn');
 (in_array($pkg_config["authmode"], ["token", "jwt"])) ? $form->addGlobal($rotate_btn) : null;
-$form->addGlobal(new Form_Button('report', 'Report an Issue', 'https://github.com/jaredhendrickson13/pfsense-api/issues/new', ''))->addClass('fa fa-question-circle api-report');
+$form->addGlobal(new Form_Button('report', 'Report an Issue', 'https://github.com/jaredhendrickson13/pfsense-api/issues/new/choose', ''))->addClass('fa fa-question-circle api-report');
 
 # Display the populated configuration form
 print $form;
