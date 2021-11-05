@@ -44,9 +44,12 @@ class APIAuth {
     # AUTHENTICATION #
     # Attempts to authenticate using local database authentication
     private function authenticate_local_database() {
-        $this->username = $this->request["client-id"];
+        //$this->username = $this->request["client-id"];
+        $this->username = $_SERVER['PHP_AUTH_USER'];
         // Authenticate against local database
-        if (authenticate_user($this->username, $this->request["client-token"])) {
+        // if (authenticate_user($this->username, $this->request["client-token"])) {
+        if (authenticate_user($this->username, $_SERVER['PHP_AUTH_PW'])) {
+
             // Ensure user is not disabled
             if (APITools\is_user_disabled($this->username) === false) {
                 unset($_SESSION["Username"]);
