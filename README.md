@@ -1925,7 +1925,7 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | Key | Type | Description |
 | --- | ------|-------------|
 | type | string | Set a firewall rule type (`pass`, `block`, `reject`) |
-| interface | string | Set which interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported.  |
+| interface | string | Set which interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). |
 | ipprotocol | string | Set which IP protocol(s) the rule will apply to (`inet`, `inet6`, `inet46`) |
 | protocol | string | Set which transfer protocol the rule will apply to. If `tcp`, `udp`, `tcp/udp`, you must define a source and destination port |
 | icmptype | string or array | Set the ICMP subtype of the firewall rule. Multiple values may be passed in as array, single values may be passed as string. _Only available when `protocol` is set to `icmp`. If `icmptype` is not specified all subtypes are assumed_ |
@@ -1943,6 +1943,8 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | descr | string | Set a description for the rule (optional) |
 | log | boolean | Enabling rule matched logging (optional) |
 | top | boolean | Add firewall rule to top of access control list (optional) |
+| floating | boolean | Set firewall rule is floating rule (optional) |
+| direction | string | Set the direction of firewall floating rule, This is only necessary when `floating` is set. Set a firewall rule direction (`in`, `out`, `any`), if not set default to (`any`) (optional) |
 | apply | boolean | Specify whether or not you would like this rule to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple rules at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only creating a single rule, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
