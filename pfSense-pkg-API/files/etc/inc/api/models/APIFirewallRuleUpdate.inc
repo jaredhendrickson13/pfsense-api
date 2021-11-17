@@ -401,6 +401,8 @@ class APIFirewallRuleUpdate extends APIModel {
         # Check for floating rule
         if ($this->initial_data["floating"] === true) {
             $this->validated_data["floating"] = "yes";
+        } else {
+            $this->validated_data["floating"] = "no";
         }
     }
 
