@@ -352,6 +352,7 @@ class APIFirewallRuleCreate extends APIModel {
         # Validate our optional 'floating' payload value
         if ($this->initial_data["floating"] === true) {
             if (isset($this->initial_data["direction"])) {
+                # Validate our optional 'direction' payload value
                 if (in_array($this->initial_data["direction"], ["in", "out", "any"])) {
                     $this->validated_data["direction"] = $this->initial_data["direction"];
                 } else {

@@ -133,6 +133,22 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
             "resp_time": 3    # Accommodate the mandatory 1 second delay for firewall rule creations
         },
         {
+            "name": "Create floating firewall rule",
+            "payload": {
+                "type": "block",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "172.16.77.121",
+                "srcport": "any",
+                "dst": "127.0.0.1",
+                "dstport": "443",
+                "descr": "Unit test",
+                "floating": True
+            },
+            "resp_time": 3    # Accommodate the mandatory 1 second delay for firewall rule creations
+        },
+        {
             "name": "Test type requirement",
             "status": 400,
             "return": 4033
@@ -482,6 +498,23 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "ackqueue": "Test_Altq"
             }
         },
+        {
+            "name": "Test unknown floating direction",
+            "status": 400,
+            "return": 6030,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "floating": True,
+                "direction": "Test_Direction"
+            }
+        },
     ]
     put_tests = [
         {
@@ -500,6 +533,22 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "log": False,
                 "top": True,
                 "apply": True
+            },
+            "resp_time": 3    # Allow a few seconds for the firewall filter to reload
+        },
+        {
+            "name": "Update floating firewall rule",
+            "payload": {
+                "type": "block",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "172.16.77.121",
+                "srcport": "any",
+                "dst": "127.0.0.1",
+                "dstport": "443",
+                "descr": "Unit test",
+                "direction": "out"
             },
             "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         },
@@ -644,9 +693,26 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "sched": "INVALID"
             }
         },
+        {
+            "name": "Test unknown floating direction",
+            "status": 400,
+            "return": 6030,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "direction": "Test_Direction"
+            }
+        },
     ]
     delete_tests = [
         {"name": "Delete firewall rule", "payload": {}},    # Tracker ID gets populated by post_post() method
+        {"name": "Delete floating firewall rule", "payload": {}},    # Tracker ID gets populated by post_post() method
         {
             "name": "Delete traffic shaper queue used to test",
             "uri": "/api/v1/firewall/traffic_shaper/queue",
@@ -682,15 +748,16 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
 
     # Override our PRE/POST methods
     def post_post(self):
-        # We create a firewall rule in the 7th test, ensure we have run at least 7 tests
-        if len(self.post_responses) == 7:
+        # We create a firewall rule in the 7th and 8th test, ensure we have run at least 8 tests
+        if len(self.post_responses) == 8:
             # Assign the required tracker ID created in the POST request to the PUT and DELETE payloads
             self.delete_tests[0]["payload"]["tracker"] = self.post_responses[6]["data"]["tracker"]
-
+            self.delete_tests[1]["payload"]["tracker"] = self.post_responses[7]["data"]["tracker"]
             key = 0
             for value in self.put_tests:
                 if "payload" in self.put_tests[key].keys():
                     self.put_tests[key]["payload"]["tracker"] = self.post_responses[6]["data"]["tracker"]
+                    self.put_tests[key]["payload"]["tracker"] = self.post_responses[7]["data"]["tracker"]
                 key += 1
 
 APIUnitTestFirewallRule()

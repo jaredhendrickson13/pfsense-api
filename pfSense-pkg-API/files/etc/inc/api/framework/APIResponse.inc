@@ -3281,7 +3281,7 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Unknown API floating rule direction specified"
+            "message" => "Invalid Firewall floating rule direction specified"
         ],
 
         // 7000-7999 reserved for /diagnostics API calls

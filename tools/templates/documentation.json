@@ -2566,7 +2566,7 @@
 										{
 											"key": "dnpipe",
 											"value": "string",
-											"description": "Specify a traffic shaper limiter (in) queue for this rule. This must be an existing traffic shaper limiter or queue. This field is required if a `pdnpipe` value is provided.Ioptional)"
+											"description": "Specify a traffic shaper limiter (in) queue for this rule. This must be an existing traffic shaper limiter or queue. This field is required if a `pdnpipe` value is provided. (optional)"
 										},
 										{
 											"key": "pdnpipe",
@@ -2602,6 +2602,16 @@
 											"key": "top",
 											"value": "boolean",
 											"description": "Add firewall rule to top of access control list (optional)"
+										},
+										{
+											"key": "floating",
+											"value": "boolean",
+											"description": "Set firewall rule is floating rule (optional)"
+										},
+										{
+											"key": "direction",
+											"value": "string",
+											"description": "Set the direction of firewall floating rule, This is only necessary when `floating` is set. Set a firewall rule direction (`in`, `out`, `any`), if not set default to (`any`) (optional)"
 										},
 										{
 											"key": "apply",
