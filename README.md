@@ -2074,6 +2074,8 @@ URL: https://{{$hostname}}/api/v1/firewall/rule
 | descr | string | Update the description of the rule (optional) |
 | log | boolean | Enable rule matched logging (optional) |
 | top | boolean | Move firewall rule to top of access control list (optional) |
+| floating | boolean | Set firewall rule is floating rule (optional) |
+| direction | string | Set the direction of firewall floating rule, This is only necessary when `floating` is set. Set a firewall rule direction (`in`, `out`, `any`), if not set default to (`any`) (optional) |
 | apply | boolean | Specify whether or not you would like this rule update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple rules at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/firewall/apply` endpoint. Otherwise, If you are only updating a single rule, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
