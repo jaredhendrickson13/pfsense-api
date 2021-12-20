@@ -11179,12 +11179,12 @@
 										{
 											"key": "range_from",
 											"value": "string",
-											"description": "Update the DHCP pool's start IPv4 address. This must be an available address within the Interface's subnet and be less than the `range_to` value. (optional)"
+											"description": "Update the DHCP pool's start IPv4 address. This must be an available address within the Interface's subnet and be less than the `range_to` value. This field is required if no DHCP range has been set previously. (conditional)"
 										},
 										{
 											"key": "range_to",
 											"value": "string",
-											"description": "Update the DHCP pool's end IPv4 address. This must be an available address within the Interface's subnet and be greater than the `range_from` value. (optional)"
+											"description": "Update the DHCP pool's end IPv4 address. This must be an available address within the Interface's subnet and be greater than the `range_from` value. This field is required if no DHCP range has been set previously. (conditional)"
 										},
 										{
 											"key": "dnsserver",
@@ -11217,6 +11217,11 @@
 											"description": "Update the gateway to include In DHCP leases. This value must be a valid IPv4 address within the Interface's subnet. Alternatively, you can pass In an empty string to revert to the system default. (optional)"
 										},
 										{
+											"key": "staticarp",
+											"value": "boolean",
+											"description": "Update whether the system should use static ARP entries on the associated interface. This option will persist even when DHCP is disabled. *Note: issues have been reported when interacting with this field via API, a separate call to initiate `/etc/rc.reload_interfaces` may be required afterwards which can be done via the /api/v1/diagnostics/command_prompt endpoint.* (optional)"
+										},
+										{
 											"key": "ignorebootp",
 											"value": "boolean",
 											"description": "Update whether or not to ignore BOOTP requests. True to Ignore, false to allow. (optional)"
@@ -11228,7 +11233,7 @@
 										}
 									]
 								},
-								"description": "Update the current DHCPd configuration.<br>\n\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserverpage-services-dhcpserver`]"
+								"description": "Update the current DHCPd configuration.<br>\n\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver`]"
 							},
 							"response": []
 						},
