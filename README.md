@@ -4443,7 +4443,7 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd/stop
 Update the current DHCPd configuration.<br>
 
 
-_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserverpage-services-dhcpserver`]
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver`]
 
 
 ***Endpoint:***

@@ -11228,7 +11228,7 @@
 										}
 									]
 								},
-								"description": "Update the current DHCPd configuration.<br>\n\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserverpage-services-dhcpserver`]"
+								"description": "Update the current DHCPd configuration.<br>\n\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver`]"
 							},
 							"response": []
 						},
