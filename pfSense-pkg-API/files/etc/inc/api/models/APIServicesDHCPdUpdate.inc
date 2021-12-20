@@ -45,6 +45,7 @@ class APIServicesDHCPdUpdate extends APIModel {
         $this->__validate_domainsearchlist();
         $this->__validate_gateway();
         $this->__validate_dnsserver();
+        $this->__validate_staticarp();
         $this->__validate_ignorebootp();
         $this->__validate_denyunknown();
     }
@@ -264,6 +265,15 @@ class APIServicesDHCPdUpdate extends APIModel {
             } else {
                 $this->errors[] = APIResponse\get(2026);
             }
+        }
+    }
+
+    private function __validate_staticarp() {
+        # Check for our optional 'staticarp' payload value
+        if ($this->initial_data["staticarp"] === true) {
+            $this->validated_data["staticarp"] = true;
+        } elseif ($this->initial_data["staticarp"] === false) {
+            $this->validated_data["staticarp"] = false;
         }
     }
 
