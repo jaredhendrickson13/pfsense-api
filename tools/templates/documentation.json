@@ -11174,12 +11174,12 @@
 										{
 											"key": "range_from",
 											"value": "string",
-											"description": "Update the DHCP pool's start IPv4 address. This must be an available address within the Interface's subnet and be less than the `range_to` value. (optional)"
+											"description": "Update the DHCP pool's start IPv4 address. This must be an available address within the Interface's subnet and be less than the `range_to` value. This field is required if no DHCP range has been set previously. (conditional)"
 										},
 										{
 											"key": "range_to",
 											"value": "string",
-											"description": "Update the DHCP pool's end IPv4 address. This must be an available address within the Interface's subnet and be greater than the `range_from` value. (optional)"
+											"description": "Update the DHCP pool's end IPv4 address. This must be an available address within the Interface's subnet and be greater than the `range_from` value. This field is required if no DHCP range has been set previously. (conditional)"
 										},
 										{
 											"key": "dnsserver",

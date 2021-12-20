@@ -4461,8 +4461,8 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd
 | --- | ------|-------------|
 | interface | string | Specify which interface's DHCP configuration to update. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). This Interface must host a static IPv4 subnet that has more than one available within the subnet. |
 | enable | boolean | Enable or disable the DHCP server for this Interface (optional) |
-| range_from | string | Update the DHCP pool's start IPv4 address. This must be an available address within the Interface's subnet and be less than the `range_to` value. (optional) |
-| range_to | string | Update the DHCP pool's end IPv4 address. This must be an available address within the Interface's subnet and be greater than the `range_from` value. (optional) |
+| range_from | string | Update the DHCP pool's start IPv4 address. This must be an available address within the Interface's subnet and be less than the `range_to` value. This field is required if no DHCP range has been set previously. (conditional) |
+| range_to | string | Update the DHCP pool's end IPv4 address. This must be an available address within the Interface's subnet and be greater than the `range_from` value. This field is required if no DHCP range has been set previously. (conditional) |
 | dnsserver | string or array | Update the DNS servers to include In DHCP leases. Multiple values may be passed in as an array or single values may be passed in as a string. Each value must be a valid IPv4 address. Alternatively, you may pass In an empty array to revert to the system default. (optional) |
 | domain | string | Update the domain name to Include In the DHCP lease. This must be a valid domain name or an empty string to assume the system default (optional) |
 | domainsearchlist | string or array | Update the search domains to include In the DHCP lease. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid domain name. (optional) |
