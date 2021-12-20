@@ -11214,7 +11214,7 @@
 										{
 											"key": "staticarp",
 											"value": "boolean",
-											"description": "Update whether the system should use static ARP entries on the associated interface. This option will persist even when DHCP is disabled. _Note: issues have been reported when interacting with this field via API, a separate call to initiate `/etc/rc.reload_interfaces` may be required afterwards which can be done via the /api/v1/diagnostics/command_prompt endpoint._ (optional)"
+											"description": "Update whether the system should use static ARP entries on the associated interface. This option will persist even when DHCP is disabled. *Note: issues have been reported when interacting with this field via API, a separate call to initiate `/etc/rc.reload_interfaces` may be required afterwards which can be done via the /api/v1/diagnostics/command_prompt endpoint.* (optional)"
 										},
 										{
 											"key": "ignorebootp",
