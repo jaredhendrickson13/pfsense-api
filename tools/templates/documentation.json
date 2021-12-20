@@ -11212,6 +11212,11 @@
 											"description": "Update the gateway to include In DHCP leases. This value must be a valid IPv4 address within the Interface's subnet. Alternatively, you can pass In an empty string to revert to the system default. (optional)"
 										},
 										{
+											"key": "staticarp",
+											"value": "boolean",
+											"description": "Update whether the system should use static ARP entries on the associated interface. This option will persist even when DHCP is disabled. _Note: issues have been reported when interacting with this field via API, a separate call to initiate `/etc/rc.reload_interfaces` may be required afterwards which can be done via the /api/v1/diagnostics/command_prompt endpoint._ (optional)"
+										},
+										{
 											"key": "ignorebootp",
 											"value": "boolean",
 											"description": "Update whether or not to ignore BOOTP requests. True to Ignore, false to allow. (optional)"

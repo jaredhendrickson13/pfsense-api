@@ -270,7 +270,7 @@ class APIServicesDHCPdUpdate extends APIModel {
 
     private function __validate_staticarp() {
         # TODO: issues with DHCP reloads and this field have been reported that may be fixed by calling
-        # TODO: reload_interfaces() which does not seem to be present within pfSense itself. Current workaround
+        # TODO: reload_interfaces() which does not seem to be present within pfSense itself (#129). Current workaround
         # TODO: is to call rc.reload_interfaces after interacting with this field until a root cause can be verified.
         # Check for our optional 'staticarp' payload value
         if ($this->initial_data["staticarp"] === true) {
