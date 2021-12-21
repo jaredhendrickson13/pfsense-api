@@ -1012,6 +1012,24 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Missing OpenVPN client specific override parameter 'refid'. This parameter is needed to identify the csc to modify."
         ],
+        2080 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd default lease time must be a value greater than 60"
+        ],
+        2081 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd default lease time cannot be greater than the maximum lease time"
+        ],
+        2082 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd max lease time must be a value greater than 60"
+        ],
 
 
 

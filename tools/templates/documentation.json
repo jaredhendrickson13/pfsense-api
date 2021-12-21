@@ -11202,6 +11202,16 @@
 											"description": "Update the search domains to include In the DHCP lease. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid domain name. (optional)"
 										},
 										{
+											"key": "defaultleasetime",
+											"value": "string or integer",
+											"description": "Update the default DHCP lease time. This must be a value of 60 or greater and must be less than the maximum DHCP lease time. This field can be unset to the system default by passing in an empty string. (optional)"
+										},
+										{
+											"key": "maxleasetime",
+											"value": "string or integer",
+											"description": "Update the maximum DHCP lease time. This must be a value of 60 or greater and must be greater than the default DHCP lease time. This field can be unset to the system default by passing in an empty string. (optional)"
+										},
+										{
 											"key": "mac_allow",
 											"value": "string or array",
 											"description": "Update the list of allowed MAC addresses. You may pass In an array for multiple entries or a string for single entries. Each entry must be a full or partial MAC address. Alternatively, you may specify an empty array to revert to default (optional)"
