@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
+class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/firewall/rule"
     get_tests = [
         {"name": "Read all firewall rules"}
@@ -41,7 +41,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "interface": "wan",
                 "name": "Test_Altq",
                 "priority": 14,
-                "description": "Traffic Shaper Queue unit test",
+                "description": "Traffic Shaper Queue E2E test",
                 "default": True
             }
         },
@@ -52,7 +52,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "interface": "wan",
                 "name": "Test_Altq2",
                 "priority": 15,
-                "description": "Traffic Shaper Queue unit test",
+                "description": "Traffic Shaper Queue E2E test",
                 "default": False
             }
         },
@@ -64,7 +64,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "bandwidth": [{"bw": 100, "bwscale": "Mb"}],
                 "mask": "srcaddress",
                 "maskbits": 31,
-                "description": "Unit test",
+                "description": "E2E test",
                 "aqm": "codel",
                 "sched": "fq_pie",
                 "qlimit": 7000,
@@ -83,7 +83,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "name": "Test_DNQueue",
                 "mask": "srcaddress",
                 "maskbits": 31,
-                "description": "Unit test",
+                "description": "E2E test",
                 "aqm": "codel",
                 "qlimit": 7000,
                 "weight": 1,
@@ -101,7 +101,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "name": "Test_DNQueue2",
                 "mask": "srcaddress",
                 "maskbits": 31,
-                "description": "Unit test",
+                "description": "E2E test",
                 "aqm": "codel",
                 "qlimit": 7000,
                 "weight": 1,
@@ -122,7 +122,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "srcport": "any",
                 "dst": "127.0.0.1",
                 "dstport": "443",
-                "descr": "Unit test",
+                "descr": "E2E test",
                 "dnpipe": "Test_DNQueue",
                 "pdnpipe": "Test_DNQueue2",
                 "defaultqueue": "Test_Altq",
@@ -495,7 +495,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "srcport": "8080-8081",
                 "dst": "(self)",
                 "dstport": "2222-4444",
-                "descr": "Updated Unit test",
+                "descr": "Updated E2E test",
                 "gateway": "WAN_DHCP",
                 "log": False,
                 "top": True,
@@ -693,4 +693,4 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                     self.put_tests[key]["payload"]["tracker"] = self.post_responses[6]["data"]["tracker"]
                 key += 1
 
-APIUnitTestFirewallRule()
+APIE2ETestFirewallRule()

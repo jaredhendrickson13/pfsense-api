@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestServicesUnboundAccessList(unit_test_framework.APIUnitTest):
+class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/unbound/access_list"
     get_tests = [{"name": "Read Unbound access lists"}]
     post_tests = [
@@ -25,12 +25,12 @@ class APIUnitTestServicesUnboundAccessList(unit_test_framework.APIUnitTest):
             "payload": {
                 "aclname": "Test Allow ACL",
                 "aclaction": "allow",
-                "descr": "Unbound allow ACL unit test",
+                "descr": "Unbound allow ACL E2E test",
                 "row": [
                     {
                         "acl_network": "0.0.0.0",
                         "mask": 0,
-                        "description": "Unbound access list row unit test"
+                        "description": "Unbound access list row E2E test"
                     }
                 ],
                 "apply": True
@@ -41,12 +41,12 @@ class APIUnitTestServicesUnboundAccessList(unit_test_framework.APIUnitTest):
             "payload": {
                 "aclname": "Test Deny ACL",
                 "aclaction": "deny",
-                "descr": "Unbound deny ACL unit test",
+                "descr": "Unbound deny ACL E2E test",
                 "row": [
                     {
                         "acl_network": "8.8.8.8",
                         "mask": 32,
-                        "description": "Unbound access list row unit test"
+                        "description": "Unbound access list row E2E test"
                     }
                 ]
             }
@@ -56,12 +56,12 @@ class APIUnitTestServicesUnboundAccessList(unit_test_framework.APIUnitTest):
             "payload": {
                 "aclname": "Test Refuse ACL",
                 "aclaction": "refuse",
-                "descr": "Unbound refuse ACL unit test",
+                "descr": "Unbound refuse ACL E2E test",
                 "row": [
                     {
                         "acl_network": "8.8.8.8",
                         "mask": 32,
-                        "description": "Unbound access list row unit test"
+                        "description": "Unbound access list row E2E test"
                     }
                 ]
             }
@@ -71,12 +71,12 @@ class APIUnitTestServicesUnboundAccessList(unit_test_framework.APIUnitTest):
             "payload": {
                 "aclname": "Test Allow Snoop ACL",
                 "aclaction": "allow snoop",
-                "descr": "Unbound allow snoop ACL unit test",
+                "descr": "Unbound allow snoop ACL E2E test",
                 "row": [
                     {
                         "acl_network": "0::",
                         "mask": 128,
-                        "description": "Unbound access list row unit test"
+                        "description": "Unbound access list row E2E test"
                     }
                 ]
             }
@@ -86,12 +86,12 @@ class APIUnitTestServicesUnboundAccessList(unit_test_framework.APIUnitTest):
             "payload": {
                 "aclname": "Test Refuse Nonlocal ACL",
                 "aclaction": "refuse nonlocal",
-                "descr": "Unbound refuse nonlocal ACL unit test",
+                "descr": "Unbound refuse nonlocal ACL E2E test",
                 "row": [
                     {
                         "acl_network": "8.8.8.8",
                         "mask": 32,
-                        "description": "Unbound access list row unit test"
+                        "description": "Unbound access list row E2E test"
                     }
                 ]
             }
@@ -101,12 +101,12 @@ class APIUnitTestServicesUnboundAccessList(unit_test_framework.APIUnitTest):
             "payload": {
                 "aclname": "Test Deny Nonlocal ACL",
                 "aclaction": "deny nonlocal",
-                "descr": "Unbound deny nonlocal ACL unit test",
+                "descr": "Unbound deny nonlocal ACL E2E test",
                 "row": [
                     {
                         "acl_network": "8.8.8.8",
                         "mask": 32,
-                        "description": "Unbound access list row unit test"
+                        "description": "Unbound access list row E2E test"
                     }
                 ]
             }
@@ -240,12 +240,12 @@ class APIUnitTestServicesUnboundAccessList(unit_test_framework.APIUnitTest):
                 "id": 0,
                 "aclname": "Updated Test Deny ACL",
                 "aclaction": "deny",
-                "descr": "Updated unbound deny ACL unit test",
+                "descr": "Updated unbound deny ACL E2E test",
                 "row": [
                     {
                         "acl_network": "1.1.1.1",
                         "mask": 32,
-                        "description": "Updated unbound access list row unit test"
+                        "description": "Updated unbound access list row E2E test"
                     }
                 ]
             }
@@ -436,4 +436,4 @@ class APIUnitTestServicesUnboundAccessList(unit_test_framework.APIUnitTest):
     ]
 
 
-APIUnitTestServicesUnboundAccessList()
+APIE2ETestServicesUnboundAccessList()

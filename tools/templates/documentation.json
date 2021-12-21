@@ -4668,7 +4668,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"limiter\": \"Test_Limiter\",\n    \"name\": \"Test_Queue\",\n    \"mask\": \"srcaddress\",\n    \"maskbits\": 31,\n    \"description\": \"Unit test\",\n    \"aqm\": \"codel\",\n    \"weight\": 1,\n    \"plr\": 0.01,\n    \"buckets\": 16,\n    \"apply\": true\n}",
+													"raw": "{\n    \"limiter\": \"Test_Limiter\",\n    \"name\": \"Test_Queue\",\n    \"mask\": \"srcaddress\",\n    \"maskbits\": 31,\n    \"description\": \"E2E test\",\n    \"aqm\": \"codel\",\n    \"weight\": 1,\n    \"plr\": 0.01,\n    \"buckets\": 16,\n    \"apply\": true\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -4908,7 +4908,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"name\": \"Test_Limiter\",\n    \"bandwidth\": [{\"bw\": 100, \"bwscale\": \"Mb\"}],\n    \"mask\": \"srcaddress\",\n    \"maskbits\": 31,\n    \"description\": \"Unit test\",\n    \"aqm\": \"codel\",\n    \"sched\": \"fq_pie\",\n    \"delay\": 1,\n    \"plr\": 0.01,\n    \"buckets\": 16,\n    \"apply\": true\n}",
+											"raw": "{\n    \"name\": \"Test_Limiter\",\n    \"bandwidth\": [{\"bw\": 100, \"bwscale\": \"Mb\"}],\n    \"mask\": \"srcaddress\",\n    \"maskbits\": 31,\n    \"description\": \"E2E test\",\n    \"aqm\": \"codel\",\n    \"sched\": \"fq_pie\",\n    \"delay\": 1,\n    \"plr\": 0.01,\n    \"buckets\": 16,\n    \"apply\": true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -8013,7 +8013,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"id\": 0,\n    \"name\": \"UPDATED_TEST_GATEWAY\",\n    \"ipprotocol\": \"inet6\",\n    \"gateway\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n    \"monitor\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n    \"descr\": \"Updated Unit Test\",\n    \"disabled\": true,\n    \"action_disable\": true,\n    \"monitor_disable\": true,\n    \"weight\": 2,\n    \"data_payload\": 5,\n    \"latencylow\": 300,\n    \"latencyhigh\": 600,\n    \"interval\": 2100,\n    \"loss_interval\": 2500,\n    \"action_interval\": 1040,\n    \"time_period\": 66000,\n    \"losslow\": 5,\n    \"losshigh\": 10\n}",
+									"raw": "{\n    \"id\": 0,\n    \"name\": \"UPDATED_TEST_GATEWAY\",\n    \"ipprotocol\": \"inet6\",\n    \"gateway\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n    \"monitor\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n    \"descr\": \"Updated E2E Test\",\n    \"disabled\": true,\n    \"action_disable\": true,\n    \"monitor_disable\": true,\n    \"weight\": 2,\n    \"data_payload\": 5,\n    \"latencylow\": 300,\n    \"latencyhigh\": 600,\n    \"interval\": 2100,\n    \"loss_interval\": 2500,\n    \"action_interval\": 1040,\n    \"time_period\": 66000,\n    \"losslow\": 5,\n    \"losshigh\": 10\n}",
 									"options": {
 										"raw": {
 											"language": "json"

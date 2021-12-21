@@ -1,7 +1,7 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestSystemConsole(unit_test_framework.APIUnitTest):
+class APIE2ETestSystemConsole(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/system/console"
     put_tests = [
         {
@@ -14,4 +14,4 @@ class APIUnitTestSystemConsole(unit_test_framework.APIUnitTest):
         }
     ]
 
-APIUnitTestSystemConsole()
+APIE2ETestSystemConsole()

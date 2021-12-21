@@ -1,7 +1,7 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestUserGroup(unit_test_framework.APIUnitTest):
+class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/user/group"
     post_tests = [
         {
@@ -23,4 +23,4 @@ class APIUnitTestUserGroup(unit_test_framework.APIUnitTest):
     ]
 
 
-APIUnitTestUserGroup()
+APIE2ETestUserGroup()

@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestSystemAPI(unit_test_framework.APIUnitTest):
+class APIE2ETestSystemAPI(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/system/api"
     get_tests = [{"name": "Read API configuration"}]
     put_tests = [
@@ -92,4 +92,4 @@ class APIUnitTestSystemAPI(unit_test_framework.APIUnitTest):
     ]
 
 
-APIUnitTestSystemAPI()
+APIE2ETestSystemAPI()

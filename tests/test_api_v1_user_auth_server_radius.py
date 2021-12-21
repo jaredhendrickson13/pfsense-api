@@ -1,14 +1,14 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestUserAuthServerRadius(unit_test_framework.APIUnitTest):
+class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/user/auth_server/radius"
     get_tests = [{"name": "Read RADIUS auth servers"}]
     post_tests = [
         {
             "name": "Create RADIUS auth server",
             "payload": {
-                "name": "UNIT_TEST_RADIUS",
+                "name": "e2e_test_RADIUS",
                 "host": "123",
                 "radius_secret": "testsecret",
                 "radius_auth_port": 1812,
@@ -27,14 +27,14 @@ class APIUnitTestUserAuthServerRadius(unit_test_framework.APIUnitTest):
             "name": "Test name unique constraint",
             "status": 400,
             "return": 5026,
-            "payload": {"name": "UNIT_TEST_RADIUS"}
+            "payload": {"name": "e2e_test_RADIUS"}
         },
         {
             "name": "Test host requirement",
             "status": 400,
             "return": 5011,
             "payload": {
-                "name": "UNIT_TEST_RADIUS_2"
+                "name": "e2e_test_RADIUS_2"
             }
         },
         {
@@ -42,7 +42,7 @@ class APIUnitTestUserAuthServerRadius(unit_test_framework.APIUnitTest):
             "status": 400,
             "return": 5012,
             "payload": {
-                "name": "UNIT_TEST_RADIUS_2",
+                "name": "e2e_test_RADIUS_2",
                 "host": "!@#$@#$$#@!"
             }
         },
@@ -51,7 +51,7 @@ class APIUnitTestUserAuthServerRadius(unit_test_framework.APIUnitTest):
             "status": 400,
             "return": 5028,
             "payload": {
-                "name": "UNIT_TEST_RADIUS_2",
+                "name": "e2e_test_RADIUS_2",
                 "host": "example.com"
             }
         },
@@ -60,7 +60,7 @@ class APIUnitTestUserAuthServerRadius(unit_test_framework.APIUnitTest):
             "status": 400,
             "return": 5029,
             "payload": {
-                "name": "UNIT_TEST_RADIUS_2",
+                "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": ["INVALID"]
             }
@@ -70,7 +70,7 @@ class APIUnitTestUserAuthServerRadius(unit_test_framework.APIUnitTest):
             "status": 400,
             "return": 5032,
             "payload": {
-                "name": "UNIT_TEST_RADIUS_2",
+                "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret"
             }
@@ -80,7 +80,7 @@ class APIUnitTestUserAuthServerRadius(unit_test_framework.APIUnitTest):
             "status": 400,
             "return": 5030,
             "payload": {
-                "name": "UNIT_TEST_RADIUS_2",
+                "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret",
                 "radius_auth_port": 0
@@ -91,7 +91,7 @@ class APIUnitTestUserAuthServerRadius(unit_test_framework.APIUnitTest):
             "status": 400,
             "return": 5030,
             "payload": {
-                "name": "UNIT_TEST_RADIUS_2",
+                "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret",
                 "radius_auth_port": 65536
@@ -102,7 +102,7 @@ class APIUnitTestUserAuthServerRadius(unit_test_framework.APIUnitTest):
             "status": 400,
             "return": 5031,
             "payload": {
-                "name": "UNIT_TEST_RADIUS_2",
+                "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret",
                 "radius_acct_port": 0
@@ -113,7 +113,7 @@ class APIUnitTestUserAuthServerRadius(unit_test_framework.APIUnitTest):
             "status": 400,
             "return": 5031,
             "payload": {
-                "name": "UNIT_TEST_RADIUS_2",
+                "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret",
                 "radius_acct_port": 65536
@@ -124,7 +124,7 @@ class APIUnitTestUserAuthServerRadius(unit_test_framework.APIUnitTest):
             "status": 400,
             "return": 5027,
             "payload": {
-                "name": "UNIT_TEST_RADIUS_2",
+                "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret",
                 "radius_auth_port": 1812,
@@ -136,7 +136,7 @@ class APIUnitTestUserAuthServerRadius(unit_test_framework.APIUnitTest):
             "status": 400,
             "return": 5033,
             "payload": {
-                "name": "UNIT_TEST_RADIUS_2",
+                "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret",
                 "radius_auth_port": 1812,
@@ -148,7 +148,7 @@ class APIUnitTestUserAuthServerRadius(unit_test_framework.APIUnitTest):
             "status": 400,
             "return": 5034,
             "payload": {
-                "name": "UNIT_TEST_RADIUS_2",
+                "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret",
                 "radius_auth_port": 1812,
@@ -159,9 +159,9 @@ class APIUnitTestUserAuthServerRadius(unit_test_framework.APIUnitTest):
     delete_tests = [
         {
             "name": "Delete LDAP auth server",
-            "payload": {"name": "UNIT_TEST_RADIUS"}
+            "payload": {"name": "e2e_test_RADIUS"}
         }
     ]
 
 
-APIUnitTestUserAuthServerRadius()
+APIE2ETestUserAuthServerRadius()

@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
+class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/unbound/host_override"
     get_tests = [{"name": "Read all host overrides"}]
     post_tests = [
@@ -23,14 +23,14 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             "name": "Create IPv4 host override",
             "payload": {
                 "host": "pfsense-api",
-                "domain": "unit.test",
+                "domain": "e2e.test",
                 "ip": "1.2.3.4",
-                "descr": "Unit Test IPv4",
+                "descr": "E2E Test IPv4",
                 "aliases": [
                     {
                         "host": "pfsense-api-alias",
-                        "domain": "unit.test",
-                        "description": "Unit Test"
+                        "domain": "e2e.test",
+                        "description": "E2E Test"
                     }
                 ]
             }
@@ -39,14 +39,14 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             "name": "Create IPv6 host override",
             "payload": {
                 "host": "pfsense-api",
-                "domain": "unit.test",
+                "domain": "e2e.test",
                 "ip": "fd00:abcd::",
-                "descr": "Unit Test IPv6",
+                "descr": "E2E Test IPv6",
                 "aliases": [
                     {
                         "host": "pfsense-api-alias",
-                        "domain": "unit.test",
-                        "description": "Unit Test"
+                        "domain": "e2e.test",
+                        "description": "E2E Test"
                     }
                 ]
             }
@@ -57,14 +57,14 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             "return": 2010,
             "payload": {
                 "host": "pfsense-api",
-                "domain": "unit.test",
+                "domain": "e2e.test",
                 "ip": "1.2.3.4",
-                "descr": "Unit Test IPv4",
+                "descr": "E2E Test IPv4",
                 "aliases": [
                     {
                         "host": "pfsense-api-alias",
-                        "domain": "unit.test",
-                        "description": "Unit Test"
+                        "domain": "e2e.test",
+                        "description": "E2E Test"
                     }
                 ]
             }
@@ -75,14 +75,14 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             "return": 2010,
             "payload": {
                 "host": "pfsense-api",
-                "domain": "unit.test",
+                "domain": "e2e.test",
                 "ip": "fd00:abcd::",
-                "descr": "Unit Test IPv6",
+                "descr": "E2E Test IPv6",
                 "aliases": [
                     {
                         "host": "pfsense-api-alias",
-                        "domain": "unit.test",
-                        "description": "Unit Test"
+                        "domain": "e2e.test",
+                        "description": "E2E Test"
                     }
                 ]
             }
@@ -93,7 +93,7 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             "return": 2046,
             "payload": {
                 "host": "!@#!@#",
-                "domain": "unit.test",
+                "domain": "e2e.test",
                 "ip": "1.2.3.4"
             }
         },
@@ -113,7 +113,7 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             "return": 2011,
             "payload": {
                 "host": "invalid-ip",
-                "domain": "unit.test",
+                "domain": "e2e.test",
                 "ip": "INVALID",
             }
         },
@@ -124,14 +124,14 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             "payload": {
                 "id": 0,
                 "host": "updated-pfsense-api",
-                "domain": "updated-unit.test",
+                "domain": "updated-e2e.test",
                 "ip": "4.3.2.1",
-                "descr": "Updated Unit Test",
+                "descr": "Updated E2E Test",
                 "aliases": [
                     {
                         "host": "updated-pfsense-api-alias",
-                        "domain": "updated-unit.test",
-                        "description": "Updated Unit Test"
+                        "domain": "updated-e2e.test",
+                        "description": "Updated E2E Test"
                     }
                 ],
             }
@@ -141,14 +141,14 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             "payload": {
                 "id": 1,
                 "host": "updated-pfsense-api",
-                "domain": "updated-unit.test",
+                "domain": "updated-e2e.test",
                 "ip": "abcd:fd00::",
-                "descr": "Updated Unit Test IPv6",
+                "descr": "Updated E2E Test IPv6",
                 "aliases": [
                     {
                         "host": "updated-pfsense-api-alias",
-                        "domain": "updated-unit.test",
-                        "description": "Updated Unit Test"
+                        "domain": "updated-e2e.test",
+                        "description": "Updated E2E Test"
                     }
                 ]
             }
@@ -158,7 +158,7 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             "payload": {
                 "id": 0,
                 "host": "updated-pfsense-api",
-                "domain": "updated-unit.test",
+                "domain": "updated-e2e.test",
                 "ip": "2.4.6.8",
                 "descr": "Check host and domain field unique constraint tolerance",
                 "apply": True
@@ -172,7 +172,7 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             "payload": {
                 "id": 0,
                 "host": "updated-pfsense-api",
-                "domain": "updated-unit.test",
+                "domain": "updated-e2e.test",
                 "ip": "0::",
             }
         },
@@ -183,7 +183,7 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             "payload": {
                 "id": 1,
                 "host": "updated-pfsense-api",
-                "domain": "updated-unit.test",
+                "domain": "updated-e2e.test",
                 "ip": "4.3.2.1",
             }
         },
@@ -194,7 +194,7 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             "payload": {
                 "id": 0,
                 "host": "!@#!@#",
-                "domain": "unit.test",
+                "domain": "e2e.test",
                 "ip": "1.2.3.4"
             }
         },
@@ -216,7 +216,7 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
             "payload": {
                 "id": 0,
                 "host": "invalid-ip",
-                "domain": "unit.test",
+                "domain": "e2e.test",
                 "ip": "INVALID",
             }
         },
@@ -234,4 +234,4 @@ class APIUnitTestServicesUnboundHostOverride(unit_test_framework.APIUnitTest):
     ]
 
 
-APIUnitTestServicesUnboundHostOverride()
+APIE2ETestServicesUnboundHostOverride()

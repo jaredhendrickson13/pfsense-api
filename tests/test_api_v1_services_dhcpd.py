@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestServicesDHCPd(unit_test_framework.APIUnitTest):
+class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/dhcpd"
     get_tests = [{"name": "Read all DHCPd configurations"}]
     put_tests = [
@@ -189,4 +189,4 @@ class APIUnitTestServicesDHCPd(unit_test_framework.APIUnitTest):
         },
     ]
 
-APIUnitTestServicesDHCPd()
+APIE2ETestServicesDHCPd()

@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestServicesDnsmasqRestart(unit_test_framework.APIUnitTest):
+class APIE2ETestServicesDnsmasqRestart(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/dnsmasq/restart"
     post_tests = [
         {
@@ -23,4 +23,4 @@ class APIUnitTestServicesDnsmasqRestart(unit_test_framework.APIUnitTest):
         }
     ]
 
-APIUnitTestServicesDnsmasqRestart()
+APIE2ETestServicesDnsmasqRestart()

@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestRoutingStaticRoute(unit_test_framework.APIUnitTest):
+class APIE2ETestRoutingStaticRoute(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/routing/static_route"
     get_tests = [{"name": "Read all static routes"}]
     post_tests = [
         {
             "name": "Create static route",
-            "payload": {"network": "172.16.172.0/29", "gateway": "WAN_DHCP", "disabled": True, "descr": "Unit Test"}
+            "payload": {"network": "172.16.172.0/29", "gateway": "WAN_DHCP", "disabled": True, "descr": "E2E Test"}
         }
     ]
     put_tests = [
@@ -31,7 +31,7 @@ class APIUnitTestRoutingStaticRoute(unit_test_framework.APIUnitTest):
                 "network": "172.16.173.0/29",
                 "gateway": "WAN_DHCP",
                 "disabled": True,
-                "descr": "Updated Unit Test"
+                "descr": "Updated E2E Test"
             },
             "resp_time": 5    # Allow a few seconds to reload the routing table
         },
@@ -44,4 +44,4 @@ class APIUnitTestRoutingStaticRoute(unit_test_framework.APIUnitTest):
         }
     ]
 
-APIUnitTestRoutingStaticRoute()
+APIE2ETestRoutingStaticRoute()
