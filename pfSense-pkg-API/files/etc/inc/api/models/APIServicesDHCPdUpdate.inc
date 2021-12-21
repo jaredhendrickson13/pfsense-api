@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2021 Jared Hendrickson
+//   Copyright 2022 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -18,15 +18,16 @@ require_once("api/framework/APIResponse.inc");
 
 
 class APIServicesDHCPdUpdate extends APIModel {
-    # Create our method constructor
+    private $__if_conf;
+
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dhcpserver"];
         $this->change_note = "Modified DHCP server via API";
+        $this->__if_conf = [];
     }
 
     public function action() {
-        $this->__init_config();
         $this->config["dhcpd"][$this->id] = $this->validated_data;
         $this->write_config();
         $this->reload_dhcpd();
@@ -34,15 +35,32 @@ class APIServicesDHCPdUpdate extends APIModel {
     }
 
     public function validate_payload() {
+        $this->__validate_interface();
+        $this->__validate_enable();
+        $this->__validate_range_from();
+        $this->__validate_range_to();
+        $this->__validate_domain();
+        $this->__validate_mac_allow();
+        $this->__validate_mac_deny();
+        $this->__validate_domainsearchlist();
+        $this->__validate_gateway();
+        $this->__validate_dnsserver();
+        $this->__validate_staticarp();
+        $this->__validate_ignorebootp();
+        $this->__validate_denyunknown();
+    }
+
+    private function __validate_interface() {
         # Check for our required 'interface' payload value
         if (isset($this->initial_data["interface"])) {
             $this->initial_data["interface"] = APITools\get_pfsense_if_id($this->initial_data["interface"]);
             # Check that interface exists
             if (is_string($this->initial_data["interface"])) {
-                $if_conf = $this->config["interfaces"][$this->initial_data["interface"]];
+                $this->__if_conf = $this->config["interfaces"][$this->initial_data["interface"]];
                 # Check that interface hosts a static network with multiple addresses
-                if (isset($if_conf["enable"]) and is_ipaddrv4($if_conf["ipaddr"]) and $if_conf["subnet"] <= 31) {
+                if (isset($this->__if_conf["enable"]) and is_ipaddrv4($this->__if_conf["ipaddr"]) and $this->__if_conf["subnet"] <= 31) {
                     $this->id = $this->initial_data["interface"];
+                    $this->__init_config($this->id);
                     $this->validated_data = $this->config["dhcpd"][$this->id];
                 } else {
                     $this->errors[] = APIResponse\get(2019);
@@ -53,31 +71,24 @@ class APIServicesDHCPdUpdate extends APIModel {
         } else {
             $this->errors[] = APIResponse\get(2017);
         }
+    }
 
+    private function __validate_enable() {
         # Check for our optional 'enabled' payload value
         if ($this->initial_data["enable"] === true) {
             $this->validated_data["enable"] = true;
         } elseif ($this->initial_data["enable"] === false) {
             $this->validated_data["enable"] = false;
         }
+    }
 
-        # Format our range config arrays before validating their inputs
-        if (!is_array($this->validated_data["range"])) {
-            $this->config["range"] = [];
-        }
-        if (empty($this->initial_data["range_from"])) {
-            $this->initial_data["range_from"] = $this->validated_data["range"]["from"];
-        }
-        if (empty($this->initial_data["range_to"])) {
-            $this->initial_data["range_to"] = $this->validated_data["range"]["to"];
-        }
-
+    private function __validate_range_from() {
         # Check for our optional 'range_from' payload value
         if (isset($this->initial_data["range_from"])) {
             # Ensure our range_from is an IPv4 address
             if (is_ipaddrv4($this->initial_data["range_from"])) {
                 $ip = ip2long($this->initial_data["range_from"]);
-                $start_ip = ip2long(gen_subnetv4($if_conf["ipaddr"], $if_conf["subnet"]));
+                $start_ip = ip2long(gen_subnetv4($this->__if_conf["ipaddr"], $this->__if_conf["subnet"]));
                 $end_ip = ip2long($this->initial_data["range_to"]);
                 # Ensure our range_from is within our available range
                 if ($ip > $start_ip and $ip < $end_ip) {
@@ -91,14 +102,16 @@ class APIServicesDHCPdUpdate extends APIModel {
         } elseif (!isset($this->validated_data["range"]["from"])) {
             $this->errors[] = APIResponse\get(2020);
         }
+    }
 
+    private function __validate_range_to() {
         # Check for our optional 'range_to' payload value
         if (isset($this->initial_data["range_to"])) {
             # Ensure our range_to is an IPv4 address
             if (is_ipaddrv4($this->initial_data["range_to"])) {
                 $ip = ip2long($this->initial_data["range_to"]);
                 $start_ip = ip2long($this->validated_data["range_from"]);
-                $end_ip = ip2long(gen_subnetv4_max($if_conf["ipaddr"], $if_conf["subnet"]));
+                $end_ip = ip2long(gen_subnetv4_max($this->__if_conf["ipaddr"], $this->__if_conf["subnet"]));
                 # Ensure our range_to is within our available range
                 if ($ip > $start_ip and $ip < $end_ip) {
                     $this->validated_data["range"]["to"] = $this->initial_data["range_to"];
@@ -111,7 +124,9 @@ class APIServicesDHCPdUpdate extends APIModel {
         } elseif (!isset($this->validated_data["range"]["to"])) {
             $this->errors[] = APIResponse\get(2023);
         }
+    }
 
+    private function __validate_domain() {
         # Check for our optional 'domain' value
         if (isset($this->initial_data["domain"])) {
             # Ensure domain is a hostname or default
@@ -121,7 +136,9 @@ class APIServicesDHCPdUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(2030);
             }
         }
+    }
 
+    private function __validate_mac_allow() {
         # Check for our optional 'mac_allow' value
         if (isset($this->initial_data["mac_allow"])) {
             # Ensure value is an array
@@ -146,7 +163,9 @@ class APIServicesDHCPdUpdate extends APIModel {
                 $this->validated_data["mac_allow"] = "";
             }
         }
+    }
 
+    private function __validate_mac_deny() {
         # Check for our optional 'mac_deny' value
         if (isset($this->initial_data["mac_deny"])) {
             # Ensure value is an array
@@ -171,7 +190,9 @@ class APIServicesDHCPdUpdate extends APIModel {
                 $this->validated_data["mac_deny"] = "";
             }
         }
+    }
 
+    private function __validate_domainsearchlist() {
         # Check for our optional 'domainsearchlist' value
         if (isset($this->initial_data["domainsearchlist"])) {
             # Ensure value is an array
@@ -196,28 +217,32 @@ class APIServicesDHCPdUpdate extends APIModel {
                 $this->validated_data["domainsearchlist"] = "";
             }
         }
+    }
 
+    private function __validate_gateway() {
         # Check for our optional 'gateway' payload value
         if (isset($this->initial_data["gateway"])) {
             # Ensure our gateway is an IPv4 address
             if (is_ipaddrv4($this->initial_data["gateway"])) {
                 $ip = ip2long($this->initial_data["gateway"]);
-                $start_ip = ip2long(gen_subnetv4($if_conf["ipaddr"], $if_conf["subnet"]));
-                $end_ip = ip2long(gen_subnetv4_max($if_conf["ipaddr"], $if_conf["subnet"]));
+                $start_ip = ip2long(gen_subnetv4($this->__if_conf["ipaddr"], $this->__if_conf["subnet"]));
+                $end_ip = ip2long(gen_subnetv4_max($this->__if_conf["ipaddr"], $this->__if_conf["subnet"]));
                 # Ensure our gateway is within our available range
                 if ($ip > $start_ip and $ip < $end_ip) {
                     $this->validated_data["gateway"] = $this->initial_data["gateway"];
                 } else {
                     $this->errors[] = APIResponse\get(2029);
                 }
-            # Allow empty string to revert gateway to default
+                # Allow empty string to revert gateway to default
             } elseif ($this->initial_data["gateway"] === "") {
                 $this->validated_data["gateway"] = $this->initial_data["gateway"];
             } else {
                 $this->errors[] = APIResponse\get(2028);
             }
         }
+    }
 
+    private function __validate_dnsserver() {
         # Check for our optional 'dnsserver' payload value
         if (isset($this->initial_data["dnsserver"])) {
             # Ensure this value is an array
@@ -241,14 +266,30 @@ class APIServicesDHCPdUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(2026);
             }
         }
+    }
 
+    private function __validate_staticarp() {
+        # TODO: issues with DHCP reloads and this field have been reported that may be fixed by calling
+        # TODO: reload_interfaces() which does not seem to be present within pfSense itself (#129). Current workaround
+        # TODO: is to call rc.reload_interfaces after interacting with this field until a root cause can be verified.
+        # Check for our optional 'staticarp' payload value
+        if ($this->initial_data["staticarp"] === true) {
+            $this->validated_data["staticarp"] = true;
+        } elseif ($this->initial_data["staticarp"] === false) {
+            $this->validated_data["staticarp"] = false;
+        }
+    }
+
+    private function __validate_ignorebootp() {
         # Check for our optional 'ignorebootp' payload value
         if ($this->initial_data["ignorebootp"] === true) {
             $this->validated_data["ignorebootp"] = true;
         } elseif ($this->initial_data["ignorebootp"] === false) {
             $this->validated_data["ignorebootp"] = false;
         }
+    }
 
+    private function __validate_denyunknown() {
         # Check for our optional 'denyunknown' payload value
         if ($this->initial_data["denyunknown"] === true) {
             $this->validated_data["denyunknown"] = true;
@@ -310,10 +351,43 @@ class APIServicesDHCPdUpdate extends APIModel {
         filter_configure();
     }
 
-    private function __init_config() {
+    private function __init_config($interface) {
         # Initialize the DHCP configuration if it does not exist
-        if (!isset($this->config["dhcpd"])) {
+        if (empty($this->config["dhcpd"])) {
             $this->config["dhcpd"] = [];
+        }
+
+        # Initialize the default interface DHCP configuration if it does not exist
+        if (!isset($this->config["dhcpd"][$interface])) {
+            $this->config["dhcpd"][$interface] = [
+                "range" => ["from" => "", "to" => ""],
+                "failover_peerip" => "",
+                "defaultleasetime" => "",
+                "maxleasetime" => "",
+                "netmask" => "",
+                "gateway" => "",
+                "domain" => "",
+                "domainsearchlist" => "",
+                "ddnsdomain" => "",
+                "ddnsdomainprimary" => "",
+                "ddnsdomainsecondary" => "",
+                "ddnsdomainkeyname" => "",
+                "ddnsdomainkeyalgorithm" => "hmac-md5",
+                "ddnsdomainkey" => "",
+                "mac_allow" => "",
+                "mac_deny" => "",
+                "ddnsclientupdates" => "allow",
+                "tftp" => "",
+                "ldap" => "",
+                "nextserver" => "",
+                "filename" => "",
+                "filename32" => "",
+                "filename64" => "",
+                "filename32arm" => "",
+                "filename64arm" => "",
+                "rootpath" => "",
+                "numberoptions" => ""
+            ];
         }
     }
 }
