@@ -34,7 +34,15 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
                 "mac_allow": ["00:00:00:01:E5:FF", "00:00:00:01:E5"],
                 "mac_deny": [],
                 "defaultleasetime": 60,
-                "maxleasetime": 61
+                "maxleasetime": 61,
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "string",
+                        "value": "\"test\""
+                    }
+                ]
+
             },
             "resp_time": 5    # Allow a few seconds to reload the DHCP service
         },

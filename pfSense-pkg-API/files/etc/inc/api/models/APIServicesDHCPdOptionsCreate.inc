@@ -130,7 +130,7 @@ class APIServicesDHCPdOptionsCreate extends APIModel {
                 $this->errors[] = APIResponse\get(2089);
             }
             # Validate this field when the type is set to 'boolean'
-            elseif ($type === "boolean" and !in_array($this->initial_data["value"], $bool_opts)) {
+            elseif ($type === "boolean" and !in_array($this->initial_data["value"], $bool_opts, true)) {
                 $this->errors[] = APIResponse\get(2090);
             }
             # Validate this field when the type is set to 'unsigned integer 8'
