@@ -1070,7 +1070,7 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "DHCPd option with type string must enclosed in quotations or a hexidecimal value"
+            "message" => "DHCPd option with type string must be enclosed in quotations or a hexidecimal value"
         ],
         2090 => [
             "status" => "bad request",
@@ -1106,13 +1106,13 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "DHCPd option with type unsigned integer 16 must be between -32768 and 65535"
+            "message" => "DHCPd option with type signed integer 16 must be between -32768 and 32767"
         ],
         2096 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "DHCPd option with type unsigned integer 32 must be between -2147483648 and 2147483647"
+            "message" => "DHCPd option with type signed integer 32 must be between -2147483648 and 2147483647"
         ],
         2097 => [
             "status" => "bad request",

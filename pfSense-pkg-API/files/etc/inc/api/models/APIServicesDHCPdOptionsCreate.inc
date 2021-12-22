@@ -160,7 +160,10 @@ class APIServicesDHCPdOptionsCreate extends APIModel {
             # Validate this field when the type is set to 'ip-address'
             elseif ($type === "ip-address" and (!is_ipaddrv4($this->initial_data["value"]) or !is_hostname($this->initial_data["value"]))) {
                 $this->errors[] = APIResponse\get(2097);
-
+            }
+            # Otherwise, input is valid. Save a Base64 representation of the data as expected by pfSense
+            else {
+                $this->validated_data["value"] = base64_encode(strval($this->initial_data["value"]));
             }
         } else {
             $this->errors[] = APIResponse\get(2087);

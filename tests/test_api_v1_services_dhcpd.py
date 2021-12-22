@@ -187,6 +187,324 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
                 "dnsserver": ["INVALID"]
             }
         },
+        {
+            "status": 400,
+            "return": 2083,
+            "name": "Check numberoptions number requirement",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {}
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2084,
+            "name": "Check numberoptions number minimum constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 0
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2084,
+            "name": "Check numberoptions number maximum constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 255
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2085,
+            "name": "Check numberoptions type requirement",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2086,
+            "name": "Check numberoptions type choice constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "INVALID"
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2087,
+            "name": "Check numberoptions value requirement",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "text"
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2088,
+            "name": "Check numberoptions text value quotation constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "text",
+                        "value": "\"INVALID\""
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2089,
+            "name": "Check numberoptions string value quotation required constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "string",
+                        "value": "INVALID"
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2090,
+            "name": "Check numberoptions boolean value choice constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "boolean",
+                        "value": "INVALID"
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2091,
+            "name": "Check numberoptions unsigned integer 8 value minimum constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "unsigned integer 8",
+                        "value": -1
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2091,
+            "name": "Check numberoptions unsigned integer 8 value maximum constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "unsigned integer 8",
+                        "value": 256
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2092,
+            "name": "Check numberoptions unsigned integer 16 value minimum constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "unsigned integer 16",
+                        "value": -1
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2092,
+            "name": "Check numberoptions unsigned integer 16 value maximum constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "unsigned integer 16",
+                        "value": 65536
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2093,
+            "name": "Check numberoptions unsigned integer 32 value minimum constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "unsigned integer 32",
+                        "value": -1
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2093,
+            "name": "Check numberoptions unsigned integer 32 value maximum constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "unsigned integer 32",
+                        "value": 4294967296
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2094,
+            "name": "Check numberoptions signed integer 8 value minimum constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "signed integer 8",
+                        "value": -129
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2094,
+            "name": "Check numberoptions signed integer 8 value maximum constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "signed integer 8",
+                        "value": 128
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2095,
+            "name": "Check numberoptions signed integer 16 value minimum constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "signed integer 16",
+                        "value": -32769
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2095,
+            "name": "Check numberoptions signed integer 16 value maximum constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "signed integer 16",
+                        "value": 32768
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2096,
+            "name": "Check numberoptions signed integer 32 value minimum constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "signed integer 32",
+                        "value": -2147483649
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2096,
+            "name": "Check numberoptions signed integer 32 value maximum constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "signed integer 32",
+                        "value": 2147483648
+                    }
+                ]
+            }
+        },
+        {
+            "status": 400,
+            "return": 2097,
+            "name": "Check numberoptions ip-address value IPv4/hostname constraint",
+            "payload": {
+                "interface": "lan",
+                "numberoptions": [
+                    {
+                        "number": 55,
+                        "type": "ip-address",
+                        "value": False
+                    }
+                ]
+            }
+        },
     ]
 
 APIE2ETestServicesDHCPd()

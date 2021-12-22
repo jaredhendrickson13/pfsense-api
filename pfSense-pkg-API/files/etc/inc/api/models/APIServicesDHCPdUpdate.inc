@@ -50,6 +50,7 @@ class APIServicesDHCPdUpdate extends APIModel {
         $this->__validate_staticarp();
         $this->__validate_ignorebootp();
         $this->__validate_denyunknown();
+        $this->__validate_numberoptions();
     }
 
     private function __validate_interface() {
@@ -359,6 +360,29 @@ class APIServicesDHCPdUpdate extends APIModel {
         # Check for our optional numberoptions field
         if (isset($this->initial_data["numberoptions"])) {
             # Discard the nested 'item' array if present
+            if (array_key_exists("item", $this->initial_data["numberoptions"])) {
+                $this->initial_data["numberoptions"] = $this->initial_data["numberoptions"]["item"];
+            }
+
+            # Reset the saved number options
+            $this->validated_data["numberoptions"] = [];
+
+            # Loop through each requested number option and ensure it is valid
+            foreach ($this->initial_data["numberoptions"] as $numberoption) {
+                $options_model = new APIServicesDHCPdOptionsCreate();
+                $options_model->initial_data = $numberoption;
+                $options_model->__validate_number();
+                $options_model->__validate_type();
+                $options_model->__validate_value();
+
+                # Add any errors found in our nested model to the current model
+                $this->errors = $this->errors + $options_model->errors;
+
+                # Only save our data as validated if no errors occurred
+                if (!$options_model->errors) {
+                    $this->validated_data["numberoptions"]["item"][] = $options_model->validated_data;
+                }
+            }
         }
     }
 
