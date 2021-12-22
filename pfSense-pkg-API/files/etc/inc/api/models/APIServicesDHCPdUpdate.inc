@@ -354,6 +354,14 @@ class APIServicesDHCPdUpdate extends APIModel {
         }
     }
 
+    # This method invokes a nested API call to the APIServicesDHCPdOptionsCreate model
+    private function __validate_numberoptions() {
+        # Check for our optional numberoptions field
+        if (isset($this->initial_data["numberoptions"])) {
+            # Discard the nested 'item' array if present
+        }
+    }
+
     # Executes functions to reload DHCP and corresponding/dependent services
     public function reload_dhcpd() {
         $retvaldhcp = 0;

@@ -30,7 +30,8 @@ class APIServicesDHCPdOptionsCreate extends APIModel {
     }
 
     public function action() {
-        $this->config["dhcpd"][$this->id] = $this->validated_data;
+        $this->init_config();
+        $this->config["dhcpd"][$this->id]["numberoptions"]["item"][] = $this->validated_data;
         $this->write_config();
         $this->__parent_model->reload_dhcpd();
         return APIResponse\get(0, $this->validated_data);
@@ -38,7 +39,9 @@ class APIServicesDHCPdOptionsCreate extends APIModel {
 
     public function validate_payload() {
         $this->__validate_interface();
-
+        $this->__validate_number();
+        $this->__validate_type();
+        $this->__validate_value();
     }
 
     private function __validate_interface() {
@@ -161,6 +164,18 @@ class APIServicesDHCPdOptionsCreate extends APIModel {
             }
         } else {
             $this->errors[] = APIResponse\get(2087);
+        }
+    }
+
+    public function init_config() {
+        # Initialize the numberoptions config if it is missing
+        if (!isset($this->config["dhcpd"][$this->id]["numberoptions"])) {
+            $this->config["dhcpd"][$this->id]["numberoptions"] = [];
+        }
+
+        # Initialize the numberoptions items config if it is missing
+        if (!isset($this->config["dhcpd"][$this->id]["numberoptions"]["item"])) {
+            $this->config["dhcpd"][$this->id]["numberoptions"]["item"] = [];
         }
     }
 }
