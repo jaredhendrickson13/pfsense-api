@@ -688,6 +688,10 @@ There is no limit to API calls at this time but is important to note that pfSens
 
   * [Read DHCPd Leases](#1-read-dhcpd-leases)
 
+* [SERVICES/DHCPD/OPTIONS](#servicesdhcpdoptions)
+
+  * [Create DHCPd Options](#1-create-dhcpd-options)
+
 * [SERVICES/DHCPD/STATIC_MAPPING](#servicesdhcpdstatic_mapping)
 
   * [Create DHCPd Static Mappings](#1-create-dhcpd-static-mappings)
@@ -4474,6 +4478,7 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd
 | staticarp | boolean | Update whether the system should use static ARP entries on the associated interface. This option will persist even when DHCP is disabled. *Note: issues have been reported when interacting with this field via API, a separate call to initiate `/etc/rc.reload_interfaces` may be required afterwards which can be done via the /api/v1/diagnostics/command_prompt endpoint.* (optional) |
 | ignorebootp | boolean | Update whether or not to ignore BOOTP requests. True to Ignore, false to allow. (optional) |
 | denyunknown | boolean | Update whether or not to ignore unknown MAC addresses. If true, you must specify MAC addresses in the `mac_allow` field or add a static DHCP entry to receive DHCP requests. (optional) |
+| numberoptions | array | Update configured DHCP options. This must be an array of option objects. See documentation for the /api/v1/services/dhcpd/options endpoint to object fields. To unset DHCP options, pass in an empty array. (optional) |
 
 
 
@@ -4526,6 +4531,47 @@ URL: https://{{$hostname}}/api/v1/services/dhcpd/lease
 {
     
 }
+```
+
+
+
+## SERVICES/DHCPD/OPTIONS
+
+
+
+### 1. Create DHCPd Options
+
+
+Create new DHCPd options.<br>
+
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/services/dhcpd/options
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| interface | string | Specify which interface to create the DHCP option for. _Note: this field is not required when creating DHCP options via the `numberoptions` field of the /api/v1/services/dhcpd endpoint._ |
+| number | integer | Specify the DHCP option number to create. This must be a value between 1 and 254. |
+| type | string | Specify the DHCP option value type. Options are `text`, `string`, `boolean`, `unsigned integer 8`, `unsigned integer 16`, `unsigned integer 32`, `signed integer 8`, `signed integer 16`, `signed integer 32`, and `ip-address`. |
+| value | string or integer or boolean (conditional) | Specify the DHCP option's value. If `type` is set to `text`, this field must be string that does not contain quotations marks. If `type` is set to `string`, this field must be string enclosed in quotes or is a hexadecimal value. If `type` is set to `boolean`, this value must be `true` or `false` as a boolean OR `true`, `false`, `on` or `off` as a string. If `type` is set to `unsigned integer 8`, this field must be an integer between `1` and `255`. If `type` is set to `unsigned integer 16`, this field must be an integer between `1` and `65535`. If `type` is set to `unsigned integer 32`, this field must be an integer between `1` and `4294967295`. If `type` is set to `signed integer 8`, this field must be an integer between `-128` and `127`. If `type` is set to `signed integer 16`, this field must be an integer between `-32768` and `32767`. If `type` is set to `signed integer 32`, this field must be an integer between `-2147483648` and `2147483647`. If `type` is set to `ip-address`, this field must be a string containing a valid IPv4 address or hostname. |
+
+
+
+***Example Request:***
+
+```js        
+{}
 ```
 
 
