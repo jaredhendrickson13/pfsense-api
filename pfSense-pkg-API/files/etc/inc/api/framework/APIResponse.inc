@@ -1030,6 +1030,96 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "DHCPd max lease time must be a value greater than 60"
         ],
+        2083 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd option number is required"
+        ],
+        2084 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd option number must be a number between 1 and 254"
+        ],
+        2085 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd option type is required"
+        ],
+        2086 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unsupported DHCPd option type specified"
+        ],
+        2087 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd option value is required"
+        ],
+        2088 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd option with type text cannot contain quotation marks"
+        ],
+        2089 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd option with type string must enclosed in quotations or a hexidecimal value"
+        ],
+        2090 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd option with type boolean must be true, false, on, or off"
+        ],
+        2091 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd option with type unsigned integer 8 must be between 0 and 255"
+        ],
+        2092 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd option with type unsigned integer 16 must be between 0 and 65535"
+        ],
+        2093 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd option with type unsigned integer 32 must be between 0 and 4294967295"
+        ],
+        2094 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd option with type signed integer 8 must be between -128 and 127"
+        ],
+        2095 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd option with type unsigned integer 16 must be between -32768 and 65535"
+        ],
+        2096 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd option with type unsigned integer 32 must be between -2147483648 and 2147483647"
+        ],
+        2097 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "DHCPd option with type ip-address must be valid IPv4 address or hostname"
+        ],
 
 
 
