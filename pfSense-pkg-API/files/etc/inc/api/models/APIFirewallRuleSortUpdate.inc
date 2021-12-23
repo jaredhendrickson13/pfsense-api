@@ -34,14 +34,12 @@ class APIFirewallRuleSortUpdate extends APIModel {
     }
 
     public function action() {
-        # Sort the firewall rules based on provied criteria
-        $this->config["filter"]["rule"] = $this->sort_firewall_rules(
-            $this->validated_data["field"],
-            $this->validated_data["option"]
-        );
+        # Sort the firewall rules based on provided criteria
+        $rules = $this->sort_firewall_rules($this->validated_data["field"], $this->validated_data["option"]);
 
         # Only write and apply changes if a dry run was not requested
-        if (!$this->initial_data["dry_run"] !== true) {
+        if ($this->initial_data["dry_run"] !== true) {
+            $this->config["filter"]["rule"] = $rules;
             $this->write_config();
             mark_subsystem_dirty('filter');
 
@@ -51,7 +49,12 @@ class APIFirewallRuleSortUpdate extends APIModel {
             }
         }
 
-        return APIResponse\get(0, $this->config["filter"]["rule"]);
+        return APIResponse\get(0, $rules);
+    }
+
+    public function validate_payload() {
+        $this->__validate_field();
+        $this->__validate_option();
     }
 
     private function __validate_field() {
@@ -67,7 +70,7 @@ class APIFirewallRuleSortUpdate extends APIModel {
         # Check for the optional option field
         if (isset($this->initial_data["option"])) {
             # Ensure the option is valid
-            if (in_array(strtolower($this->initial_data["option"]), $this->options)) {
+            if (array_key_exists(strtolower($this->initial_data["option"]), $this->options)) {
                 $this->validated_data["option"] = strtolower($this->initial_data["option"]);
             } else {
                 $this->errors[] = APIResponse\get(4238);
@@ -82,11 +85,19 @@ class APIFirewallRuleSortUpdate extends APIModel {
     public function sort_firewall_rules($field, $option="ascend") {
         # Local variables
         $rules = $this->config["filter"]["rule"];
-        $criteria = array_column($rules, $field);
+        $criteria = [];
 
-        array_multisort($criteria, $this->options[$option], $rules["filter"]["rule"]);
-        return $rules;
+        # Loop through each rule and map it's sort field to our sort criteria
+        foreach ($rules as $id=>$rule) {
+            # Map the real field if it's not empty, otherwise assume an empty string
+            if (!empty($rule[$field])) {
+                $criteria[$id] = $rule[$field];
+            } else {
+                $criteria[$id] = "";
+            }
+        }
+
+        array_multisort($criteria, $this->options[$option], $rules);
+        return array_values($rules);
     }
-
-
 }
