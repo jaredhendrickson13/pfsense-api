@@ -2986,6 +2986,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall states interface does not exist"
         ],
+        4236 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall states sleep value must be a numeric value between 0 and 300"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [
