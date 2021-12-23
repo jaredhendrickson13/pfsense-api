@@ -2992,6 +2992,19 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall states sleep value must be a numeric value between 0 and 300"
         ],
+        4237 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rule sorting field is required"
+        ],
+        4238 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall rule sorting option"
+        ],
+
 
         //5000-5999 reserved for /users API calls
         5000 => [
