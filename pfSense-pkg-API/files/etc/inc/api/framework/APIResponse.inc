@@ -2956,6 +2956,36 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall traffic shaper child queue cannot be deleted while in use"
         ],
+        4231 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall states source is required"
+        ],
+        4232 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall states source must be valid IP address or CIDR"
+        ],
+        4233 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall states destination must be valid IP address or CIDR"
+        ],
+        4234 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall states protocol must be tcp, udp, icmp, or icmpv6"
+        ],
+        4235 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall states interface does not exist"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [
