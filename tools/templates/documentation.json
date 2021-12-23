@@ -4237,6 +4237,67 @@
 								"description": "Read the current firewall states.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-statessummary`]"
 							},
 							"response": []
+						},
+						{
+							"name": "Delete Firewall States",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/firewall/states",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"firewall",
+										"states"
+									],
+									"query": [
+										{
+											"key": "source",
+											"value": "string",
+											"description": "Specify the source IP address or CIDR of the firewall states to kill. This field is required unless `reset` is set to `true`."
+										},
+										{
+											"key": "destination",
+											"value": "string",
+											"description": "Specify the destination IP address or CIDR of the firewall states to kill. This field has no effect when `reset` is set to `true`. (optional)"
+										},
+										{
+											"key": "reset",
+											"value": "boolean",
+											"description":  "Specify whether or not the entire state table should be reset. If `true`, all firewall states will be killed and the `source` and `destination` fields will have no effect. Defaults to `false`. (optional) _Note: setting this field to `true` when the `async` field is set to `false` or the `sleep` field is set too low will prevent the API from sending a response._(optional)"
+										},
+										{
+											"key": "async",
+											"value": "boolean",
+											"description":  "Specify whether or not firewall states should be killed asynchronously (in the background). In most cases, this is required to prevent the state that allows the API to respond from being killed prematurely. Defaults to `true`. (optional)"
+										},
+										{
+											"key": "sleep",
+											"value": "integer",
+											"description":  "Specify the amount of time (in seconds) to wait to kill the targeted firewall states. This must be an integer between 0 and 300. Only applicable when `async` is set to `true`. (optional)"
+										}
+									]
+								},
+								"description": "Delete current firewall states.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-showstates`]"
+							},
+							"response": []
 						}
 					],
 					"description": "API endpoints that create, read, update and delete firewall states.",

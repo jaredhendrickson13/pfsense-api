@@ -19,7 +19,7 @@ class APIE2ETestFirewallStates(e2e_test_framework.APIE2ETest):
     get_tests = [{"name": "Read all firewalls states"}]
     delete_tests = [
         {
-            "name": "Check state deletion",
+            "name": "Check firewall state deletion",
             "payload": {"source": "1.2.3.4"}
         },
         {

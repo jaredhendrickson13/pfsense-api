@@ -576,7 +576,8 @@ There is no limit to API calls at this time but is important to note that pfSens
 
 * [FIREWALL/STATES](#firewallstates)
 
-  * [Read Firewall States](#1-read-firewall-states)
+  * [Delete Firewall States](#1-delete-firewall-states)
+  * [Read Firewall States](#2-read-firewall-states)
 
 * [FIREWALL/STATES/SIZE](#firewallstatessize)
 
@@ -2375,7 +2376,36 @@ URL: https://{{$hostname}}/api/v1/firewall/schedule/time_range
 
 
 
-### 1. Read Firewall States
+### 1. Delete Firewall States
+
+
+Delete current firewall states.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-showstates`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/firewall/states
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| source | string | Specify the source IP address or CIDR of the firewall states to kill. This field is required unless `reset` is set to `true`. |
+| destination | string | Specify the destination IP address or CIDR of the firewall states to kill. This field has no effect when `reset` is set to `true`. (optional) |
+| reset | boolean | Specify whether or not the entire state table should be reset. If `true`, all firewall states will be killed and the `source` and `destination` fields will have no effect. Defaults to `false`. (optional) _Note: setting this field to `true` when the `async` field is set to `false` or the `sleep` field is set too low will prevent the API from sending a response._(optional) |
+| async | boolean | Specify whether or not firewall states should be killed asynchronously (in the background). In most cases, this is required to prevent the state that allows the API to respond from being killed prematurely. Defaults to `true`. (optional) |
+| sleep | integer | Specify the amount of time (in seconds) to wait to kill the targeted firewall states. This must be an integer between 0 and 300. Only applicable when `async` is set to `true`. (optional) |
+
+
+
+### 2. Read Firewall States
 
 
 Read the current firewall states.<br><br>
