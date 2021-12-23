@@ -562,6 +562,10 @@ There is no limit to API calls at this time but is important to note that pfSens
 
   * [Delete All Firewall Rules](#1-delete-all-firewall-rules)
 
+* [FIREWALL/RULE/SORT](#firewallrulesort)
+
+  * [Sort Firewall Rules](#1-sort-firewall-rules)
+
 * [FIREWALL/SCHEDULE](#firewallschedule)
 
   * [Create Schedule](#1-create-schedule)
@@ -2124,6 +2128,50 @@ URL: https://{{$hostname}}/api/v1/firewall/rule/flush
 
 ```js        
 {
+}
+```
+
+
+
+## FIREWALL/RULE/SORT
+
+
+
+### 1. Sort Firewall Rules
+
+
+Sorts firewall rules based on specified criteria. Use caution when sorting firewall rules when block rules are present.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/firewall/rule/sort
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| field | string | Specify the firewall rule field to sort by. This field must be present on at least one firewall rules for any sorting to occur. In most cases, this will be set to `descr` to sort firewall rules by their descriptions. |
+| option | string | Specify sorting option to use when sorting rules. Options are `ascend`, `descend`, `natural`, `numeric` and `string`. See https://www.php.net/manual/en/function.array-multisort.php for more information. Defaults to `ascend`. (optional) |
+| dry_run | boolean | Specify whether or not the API should write the requested sorting to configuration. If `true`, the API will not write the sorted configuration, only return a representation of what the sort will look like. This is helpful when you are unsure if a particular sort will cause issues. If `false`, the sorted firewall rules will be written to configuration. Defaults to `false`. (optional) |
+| apply | boolean | Specify whether or not the firewall filter should be reloaded after sorting. If `true`, the firewall filter will be immediately reloaded after sorting. If `false`, the sorted configuration will be written but not applied and a separate call to /api/v1/firewall/apply will be needed to apply changes. This field has no effect when `dry_run` is set to `true`. Defaults to `false`. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"field": "descr",
+	"option": "descend"
+	"dry_run": true
 }
 ```
 

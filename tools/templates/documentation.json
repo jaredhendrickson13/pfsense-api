@@ -2435,7 +2435,8 @@
 												"api",
 												"v1",
 												"firewall",
-												"rule"
+												"rule",
+												"flush"
 											]
 										},
 										"description": "Deletes all existing firewall rules. This is useful for scripts that need to setup the firewall rules from scratch.<br><br>_Note: this endpoint will not reload the firewall filter automatically, you must make another API call to the /api/v1/firewall/apply endpoint to do so. Ensure firewall rules are created before reloading the filter to prevent lockout!_.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules-edit`]"
@@ -2444,6 +2445,68 @@
 								}
 							],
 							"description": "API endpoints that flush existing firewall rule configurations.",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "SORT",
+							"item": [
+								{
+									"name": "Sort Firewall Rules",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"field\": \"descr\",\n\t\"option\": \"descend\"\n\t\"dry_run\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/rule/sort",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"rule",
+												"sort"
+											],
+											"query": [
+												{
+													"key": "field",
+													"value": "string",
+													"description": "Specify the firewall rule field to sort by. This field must be present on at least one firewall rules for any sorting to occur. In most cases, this will be set to `descr` to sort firewall rules by their descriptions."
+												},
+												{
+													"key": "option",
+													"value": "string",
+													"description": "Specify sorting option to use when sorting rules. Options are `ascend`, `descend`, `natural`, `numeric` and `string`. See https://www.php.net/manual/en/function.array-multisort.php for more information. Defaults to `ascend`. (optional)"
+												},
+												{
+													"key": "dry_run",
+													"value": "boolean",
+													"description": "Specify whether or not the API should write the requested sorting to configuration. If `true`, the API will not write the sorted configuration, only return a representation of what the sort will look like. This is helpful when you are unsure if a particular sort will cause issues. If `false`, the sorted firewall rules will be written to configuration. Defaults to `false`. (optional)"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not the firewall filter should be reloaded after sorting. If `true`, the firewall filter will be immediately reloaded after sorting. If `false`, the sorted configuration will be written but not applied and a separate call to /api/v1/firewall/apply will be needed to apply changes. This field has no effect when `dry_run` is set to `true`. Defaults to `false`. (optional)"
+												}
+											]
+										},
+										"description": "Sorts firewall rules based on specified criteria. Use caution when sorting firewall rules when block rules are present.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that sort firewall rule configurations.",
 							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
