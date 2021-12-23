@@ -2170,7 +2170,7 @@ URL: https://{{$hostname}}/api/v1/firewall/rule/sort
 ```js        
 {
 	"field": "descr",
-	"option": "descend"
+	"option": "descend",
 	"dry_run": true
 }
 ```
