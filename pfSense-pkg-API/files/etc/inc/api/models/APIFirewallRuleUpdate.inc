@@ -417,7 +417,7 @@ class APIFirewallRuleUpdate extends APIModel {
                 } else {
                     $this->errors[] = APIResponse\get(6030);
                 }
-            } elseif (empty($this->validated_data["floating"])) {
+            } elseif (empty($this->validated_data["direction"])) {
                 $this->validated_data["direction"] = "any";
             }
         }
