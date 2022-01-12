@@ -403,30 +403,23 @@ class APIFirewallRuleUpdate extends APIModel {
             $this->validated_data["floating"] = "yes";
         } elseif ($this->initial_data["floating"] === false) {
             unset($this->validated_data["floating"]);
+            unset($this->validated_data["direction"]);
         }
     }
 
     private function __validate_direction() {
         # Validate our optional 'floating' payload value
-        #if (empty($this->initial_data["floating"])) {
-        #   if (isset($this->initial_data["direction"])) {
-        #        if (in_array($this->initial_data["direction"], ["in", "out", "any"])) {
-        #            $this->validated_data["direction"] = $this->initial_data["direction"];
-        #        } else {
-        #            $this->errors[] = APIResponse\get(6030);
-        #        }
-        #    }
-        #}
-        if ($this->initial_data["floating"] === true) {
+        if (!empty($this->validated_data["floating"])) {
             if (isset($this->initial_data["direction"])) {
+                # Validate our optional 'direction' payload value
                 if (in_array($this->initial_data["direction"], ["in", "out", "any"])) {
                     $this->validated_data["direction"] = $this->initial_data["direction"];
                 } else {
                     $this->errors[] = APIResponse\get(6030);
                 }
+            } elseif (empty($this->validated_data["direction"])) {
+                $this->validated_data["direction"] = "any";
             }
-        } else {
-            unset($this->validated_data["direction"]);
         }
     }
 

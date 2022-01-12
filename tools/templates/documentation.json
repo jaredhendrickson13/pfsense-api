@@ -2579,7 +2579,7 @@
 										{
 											"key": "interface",
 											"value": "string",
-											"description": "Set which interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported. "
+											"description": "Set which interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0)."
 										},
 										{
 											"key": "ipprotocol",
@@ -2660,6 +2660,16 @@
 											"key": "log",
 											"value": "boolean",
 											"description": "Enabling rule matched logging (optional)"
+										},	
+										{
+											"key": "floating",
+											"value": "boolean",
+											"description": "Set firewall rule is floating rule (optional)"
+										},
+										{
+											"key": "direction",
+											"value": "string",
+											"description": "Set the direction of firewall floating rule, This is only necessary when `floating` is set. Set a firewall rule direction (`in`, `out`, `any`), if not set default to (`any`) (optional)"
 										},
 										{
 											"key": "top",
@@ -2717,7 +2727,7 @@
 										{
 											"key": "interface",
 											"value": "string",
-											"description": "Update the interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported. (optional)"
+											"description": "Update the interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). (optional)"
 										},
 										{
 											"key": "ipprotocol",
@@ -2803,6 +2813,16 @@
 											"key": "top",
 											"value": "boolean",
 											"description": "Move firewall rule to top of access control list (optional)"
+										},
+										{
+											"key": "floating",
+											"value": "boolean",
+											"description": "Set firewall rule is floating rule (optional)"
+										},
+										{
+											"key": "direction",
+											"value": "string",
+											"description": "Set the direction of firewall floating rule, This is only necessary when `floating` is set. Set a firewall rule direction (`in`, `out`, `any`), if not set default to (`any`) (optional)"
 										},
 										{
 											"key": "apply",
