@@ -47,7 +47,6 @@ class APIAuth {
         $this->username = $this->request["client-id"];
         // Authenticate against local database
         if (authenticate_user($this->username, $this->request["client-token"])) {
-
             // Ensure user is not disabled
             if (APITools\is_user_disabled($this->username) === false) {
                 unset($_SESSION["Username"]);
