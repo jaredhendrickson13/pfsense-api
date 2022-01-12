@@ -341,6 +341,28 @@ class APIFirewallRuleCreate extends APIModel {
         }
     }
 
+    private function __validate_floating() {
+        # Check for floating rule
+        if ($this->initial_data["floating"] === true) {
+            $this->validated_data["floating"] = "yes";
+        }
+    }
+
+    private function __validate_direction() {
+        # Validate our optional 'floating' payload value
+        if ($this->initial_data["floating"] === true) {
+            if (isset($this->initial_data["direction"])) {
+                if (in_array($this->initial_data["direction"], ["in", "out", "any"])) {
+                    $this->validated_data["direction"] = $this->initial_data["direction"];
+                } else {
+                    $this->errors[] = APIResponse\get(6030);
+                }
+            } else {
+                $this->validated_data["direction"] = "any";
+            }
+        }
+    }
+
     public function validate_payload() {
         $this->__validate_type();
         $this->__validate_interface();
@@ -361,6 +383,8 @@ class APIFirewallRuleCreate extends APIModel {
         $this->__validate_descr();
         $this->__validate_log();
         $this->__validate_top();
+        $this->__validate_floating();
+        $this->__validate_direction();
 
         # Delay generating the tracker. Reduces the likelihood of two rules getting the same tracker in looped calls.
         # todo: this is a quick fix and still does not guarantee uniqueness, a better solution is needed
