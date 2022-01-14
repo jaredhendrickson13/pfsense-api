@@ -67,12 +67,12 @@ To authenticate your API call, follow the instructions for your configured authe
 <details>
     <summary>Local Database (default)</summary>
 
-Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, simply add a `client-id` value containing your username and a `client-token` value containing your password to your payload. For example `{"client-id": "admin", "client-token": "pfsense"}`
+Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, pass in your username and password using basic authentication. For example: `curl -u admin:pfsense https://<pfSense IP or hostname>/api/v1/firewall/rule`
 
+Note: in previous releases, local database authentication used the `client-id` and `client-token` fields in your request body to authenticate. This functionality still exists but is not recommended. It will be removed in a future release.
 </details>
 
-<details>
-    <summary>JWT</summary>
+<summary>JWT</summary>
 
 Requires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a `client-id` value containing your pfSense username and a `client-token` value containing your pfSense password to your payload. For example `{"client-id": "admin", "client-token": "pfsense"}`. Once you have your bearer token, you can authenticate your API call by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)
 </details>

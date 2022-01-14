@@ -44,8 +44,11 @@ class APIAuth {
     # AUTHENTICATION #
     # Attempts to authenticate using local database authentication
     private function authenticate_local_database() {
-        $this->username = $this->request["client-id"];
-        // Authenticate against local database
+        # Attempt to pull credentials from basic auth, fallback to original request body credentials
+        $this->username = (!empty($_SERVER['PHP_AUTH_USER'])) ? $_SERVER['PHP_AUTH_USER'] : $this->request["client-id"];
+        $this->request["client-token"] = (!empty($_SERVER['PHP_AUTH_PW'])) ? $_SERVER['PHP_AUTH_PW'] : $this->request["client-token"];
+
+        # Authenticate against local database
         if (authenticate_user($this->username, $this->request["client-token"])) {
             // Ensure user is not disabled
             if (APITools\is_user_disabled($this->username) === false) {
@@ -64,7 +67,7 @@ class APIAuth {
         $token = $auth_header[1];
         $decoded_jwt = APITools\decode_jwt($token);
 
-        // Check that the JWT from our Authorization header is valid
+        # Check that the JWT from our Authorization header is valid
         if ($token_type === "Bearer" and $decoded_jwt !== false) {
             $this->username = $decoded_jwt["data"];
             // Ensure user is not disabled
