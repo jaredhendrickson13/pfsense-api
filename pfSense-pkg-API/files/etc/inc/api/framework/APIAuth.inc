@@ -45,6 +45,7 @@ class APIAuth {
     # Attempts to authenticate using local database authentication
     private function authenticate_local_database() {
         # Attempt to pull credentials from basic auth, fallback to original request body credentials
+        # TODO: in a future release make basic authentication the only way to pass in local database credentials
         $this->username = (!empty($_SERVER['PHP_AUTH_USER'])) ? $_SERVER['PHP_AUTH_USER'] : $this->request["client-id"];
         $this->request["client-token"] = (!empty($_SERVER['PHP_AUTH_PW'])) ? $_SERVER['PHP_AUTH_PW'] : $this->request["client-token"];
 

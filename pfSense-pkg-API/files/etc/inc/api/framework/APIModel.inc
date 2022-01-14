@@ -20,6 +20,8 @@ require_once("api/framework/APIAuth.inc");
 class APIModel {
     public $client;
     public $privileges;
+    public $packages;
+    public $package_includes;
     public $initial_data;
     public $validated_data;
     public $type_map;
@@ -40,6 +42,8 @@ class APIModel {
         error_reporting(E_ERROR);    // Prevents PHP warnings from printing to API responses
         $this->config =& $config;
         $this->privileges = ["page-all"];
+        $this->packages = [];
+        $this->package_includes = [];
         $this->requires_auth = true;
         $this->change_note = "Made unknown change via API";
         $this->validate_id = true;
@@ -78,6 +82,7 @@ class APIModel {
         $this->check_enable();
         $this->check_server_ip();
         $this->check_version();
+        $this->check_packages();
 
         # Checks request data
         $this->check_request_data();
@@ -88,8 +93,10 @@ class APIModel {
             $this->check_authorization();
         }
 
+        # Attempt to validate the request
         $this->validate_payload();
 
+        # All checks pass if no errors were encountered. Otherwise, validation failed.
         if (count($this->errors) === 0) {
             return true;
         } else {
@@ -98,6 +105,7 @@ class APIModel {
     }
 
     public function call() {
+        # If the API call was valid, execute the action. Otherwise, return the first error encountered.
         if ($this->validate()) {
             return $this->action();
         } else {
@@ -139,6 +147,25 @@ class APIModel {
         if ($curr_ver < $min_ver) {
             $this->errors[] = APIResponse\get(5);
         }
+    }
+
+    # Check if all required packages are installed. Sets an error otherwise.
+    private function check_packages() {
+        # Loop through each required package and ensure it is present on the system.
+        foreach ($this->packages as $pkg) {
+            # Return an error if the package is not installed
+            if (!is_pkg_installed($pkg)) {
+                $this->errors[] = APIResponse\get(12);
+                return false;
+            }
+        }
+
+        # Loop through each package dependency and add it.
+        foreach ($this->package_includes as $include) {
+            require_once($include);
+        }
+
+        return true;
     }
 
     # Check if server IP is allowed to answer API calls. Redirects to login if not

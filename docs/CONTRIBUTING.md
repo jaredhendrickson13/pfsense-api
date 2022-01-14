@@ -92,6 +92,13 @@ utilizes the same permissions as the pfSense webConfigurator. Specify the privil
 format. Defaults to `["page-all"]` which requires client to have the 'WebCfg - All Pages' permission. A list of pfSense
 privileges can be found here: https://github.com/pfsense/pfsense/blob/master/src/etc/inc/priv.defs.inc
 
+- `$this->packages` : Allows you to specify any add-on packages required for the model to operate. This must use the
+full pfSense package name (including `pfSense-pkg-`). All packages must be present on the system in order for the API
+model to operate. If any packages are missing, the API will return a 500 error. Defaults to `[]`.
+
+- `$this->package_includes` : Allows you to specify additional PHP files to include for add-on packages. These files
+will only attempt to be included if ALL packages specified in `$this->packages` are present. Defaults to `[]`.
+
 - `$this->requires_auth` : Specify whether authentication and authorization is required for the API model. If set to 
 `false` clients will not have to authenticate or have privilege to access. Defaults to `true`.
 

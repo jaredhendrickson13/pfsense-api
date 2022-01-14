@@ -91,6 +91,13 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Specified content type is not supported"
         ],
+        12 => [
+            "status" => "server error",
+            "code" => 500,
+            "return" => $id,
+            "message" => "API endpoint requires one or more add-on packages to be installed before accepting requests",
+        ],
+
         // 1000-1999 reserved for /system API calls
         1000 => [
             "status" => "bad request",
