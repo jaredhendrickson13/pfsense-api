@@ -32,6 +32,7 @@ require_once("functions.inc");
 require_once("openvpn.inc");
 require_once("certs.inc");
 require_once("pkg-utils.inc");
+require_once("spyc-yaml/yaml.inc");
 use Firebase\JWT\JWT;
 
 # Checks our content type header and parses the content accordingly
@@ -42,6 +43,7 @@ function get_request_data() {
     $_SERVER["HTTP_CONTENT_TYPE"] = (empty($_SERVER["HTTP_CONTENT_TYPE"])) ? "application/x-www-form-urlencoded" : $_SERVER["HTTP_CONTENT_TYPE"];
     $content_types = [
         "application/json" => json_decode(file_get_contents('php://input'), true),
+        "application/yaml" => yaml_decode(file_get_contents('php://input')),
         "application/x-www-form-urlencoded" => (empty($_GET)) ? json_decode(file_get_contents('php://input'), true) : $_GET
     ];
 

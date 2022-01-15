@@ -69,7 +69,7 @@ To authenticate your API call, follow the instructions for your configured authe
 
 Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, pass in your username and password using basic authentication. For example: `curl -u admin:pfsense https://<pfSense IP or hostname>/api/v1/firewall/rule`
 
-Note: in previous releases, local database authentication used the `client-id` and `client-token` fields in your request body to authenticate. This functionality still exists but is not recommended. It will be removed in a future release.
+_Note: in previous releases, local database authentication used the `client-id` and `client-token` fields in your request body to authenticate. This functionality still exists but is not recommended. It will be removed in a future release._
 </details>
 
 <details>
@@ -128,6 +128,19 @@ curl -s -H "Content-Type: application/json" -d '{"client-id": "admin", "client-t
   ]
 }
 ```
+
+</details>
+
+<details>
+    <summary>application/yaml</summary>
+
+Parses the request body as a YAML formatted string.
+
+Example:
+
+```
+curl -s -H "Content-Type: application/yaml" --data-binary "client-id: admin
+client-token: pfsense" -X GET https://pfsense.example.com/api/v1/firewall/rule```
 
 </details>
 

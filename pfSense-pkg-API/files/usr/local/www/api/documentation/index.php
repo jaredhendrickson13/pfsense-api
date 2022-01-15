@@ -61,7 +61,7 @@ To authenticate your API call, follow the instructions for your configured authe
 <details>
 <summary>Local Database (default)</summary>
 Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, pass in your username and password using basic authentication. For example: `curl -u admin:pfsense https://<pfSense IP or hostname>/api/v1/firewall/rule`
-Note: in previous releases, local database authentication used the `client-id` and `client-token` fields in your request body to authenticate. This functionality still exists but is not recommended. It will be removed in a future release.
+_Note: in previous releases, local database authentication used the `client-id` and `client-token` fields in your request body to authenticate. This functionality still exists but is not recommended. It will be removed in a future release._
 </details>
 <details>
 <summary>JWT</summary>
@@ -107,6 +107,14 @@ curl -s -H "Content-Type: application/json" -d '{"client-id": "admin", "client-t
 ]
 }
 ```
+</details>
+<details>
+<summary>application/yaml</summary>
+Parses the request body as a YAML formatted string.
+Example:
+```
+curl -s -H "Content-Type: application/yaml" --data-binary "client-id: admin
+client-token: pfsense" -X GET https://pfsense.example.com/api/v1/firewall/rule```
 </details>
 <details>
 <summary>application/x-www-form-urlencoded</summary>
@@ -421,7 +429,7 @@ webConfigurator are required to make calls to the API endpoints<li>While not an 
 from the API out of the box, and user passwords may be changed from the API to immediately add additional security if
 needed. After installation, you can navigate to System &gt; API in the pfSense webConfigurator to configure API
 authentication. Please note that external authentication servers like LDAP or RADIUS are not supported with any
-API authentication method at this time.<p>To authenticate your API call, follow the instructions for your configured authentication mode:<p><details><summary>Local Database (default)</summary><p>Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, pass in your username and password using basic authentication. For example: <code>curl -u admin:pfsense https://&lt;pfSense IP or hostname&gt;/api/v1/firewall/rule</code><p>Note: in previous releases, local database authentication used the <code>client-id</code> and <code>client-token</code> fields in your request body to authenticate. This functionality still exists but is not recommended. It will be removed in a future release.</details><p><details><summary>JWT</summary><p>Requires a bearer token to be included in the <code>Authorization</code> header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a <code>client-id</code> value containing your pfSense username and a <code>client-token</code> value containing your pfSense password to your payload. For example <code>{&quot;client-id&quot;: &quot;admin&quot;, &quot;client-token&quot;: &quot;pfsense&quot;}</code>. Once you have your bearer token, you can authenticate your API call by adding it to the request&rsquo;s authorization header. (e.g. <code>Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx</code>)</details><p><details><summary>API Token</summary><p>Uses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication; not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System &gt; API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by specifying your client-id and client-token within an <code>Authorization</code> header, these values must be separated by a space. (e.g. <code>Authorization: client-id-here client-token-here</code>)<p><em>Note: In previous versions of pfSense API, the client-id and client-token were provided via the request payload. This functionality is still supported but is not recommended. It will be removed in a future release.</em><p></details><h3>Authorization</h3><p>pfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.<h1>Content Types</h1><p>pfSense API can handle a few different content types. Please note, if a <code>Content-Type</code> header is not specified in your request, pfSense API will attempt to determine the
+API authentication method at this time.<p>To authenticate your API call, follow the instructions for your configured authentication mode:<p><details><summary>Local Database (default)</summary><p>Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, pass in your username and password using basic authentication. For example: <code>curl -u admin:pfsense https://&lt;pfSense IP or hostname&gt;/api/v1/firewall/rule</code><p><em>Note: in previous releases, local database authentication used the <code>client-id</code> and <code>client-token</code> fields in your request body to authenticate. This functionality still exists but is not recommended. It will be removed in a future release.</em></details><p><details><summary>JWT</summary><p>Requires a bearer token to be included in the <code>Authorization</code> header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a <code>client-id</code> value containing your pfSense username and a <code>client-token</code> value containing your pfSense password to your payload. For example <code>{&quot;client-id&quot;: &quot;admin&quot;, &quot;client-token&quot;: &quot;pfsense&quot;}</code>. Once you have your bearer token, you can authenticate your API call by adding it to the request&rsquo;s authorization header. (e.g. <code>Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx</code>)</details><p><details><summary>API Token</summary><p>Uses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication; not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System &gt; API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by specifying your client-id and client-token within an <code>Authorization</code> header, these values must be separated by a space. (e.g. <code>Authorization: client-id-here client-token-here</code>)<p><em>Note: In previous versions of pfSense API, the client-id and client-token were provided via the request payload. This functionality is still supported but is not recommended. It will be removed in a future release.</em><p></details><h3>Authorization</h3><p>pfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.<h1>Content Types</h1><p>pfSense API can handle a few different content types. Please note, if a <code>Content-Type</code> header is not specified in your request, pfSense API will attempt to determine the
 content type which may have undesired results. It is recommended you specify your preferred <code>Content-Type</code> on each request. While several content types may be enabled,
 <code>application/json</code> is the recommended content type. Supported content types are:<p><details><summary>application/json</summary><p>Parses the request body as a JSON formatted string. This is the recommended content type.<p>Example:<pre><code>curl -s -H &quot;Content-Type: application/json&quot; -d '{&quot;client-id&quot;: &quot;admin&quot;, &quot;client-token&quot;: &quot;pfsense&quot;}' -X GET https://pfsense.example.com/api/v1/system/arp
 {
@@ -446,34 +454,68 @@ content type which may have undesired results. It is recommended you specify you
     }
   ]
 }
-</code></pre><p></details><p><details><summary>application/x-www-form-urlencoded</summary><p>Parses the request body as URL encoded parameters. Note: boolean and integer types may not be parsed using this content type.<p>Example:<pre><code>curl -s -H &quot;Content-Type: application/x-www-form-urlencoded&quot; -X GET &quot;https://pfsense.example.com/api/v1/system/arp?client-id=admin&amp;client-token=pfsense&quot;
+</code></pre><p></details><p><details><summary>application/yaml</summary><p>Parses the request body as a YAML formatted string.<p>Example:<pre><code>curl -s -H &quot;Content-Type: application/yaml&quot; --data-binary &quot;client-id: admin
+client-token: pfsense&quot; -X GET https://pfsense.example.com/api/v1/firewall/rule```
+
+&lt;/details&gt;
+
+&lt;details&gt;
+    &lt;summary&gt;application/x-www-form-urlencoded&lt;/summary&gt;
+
+Parses the request body as URL encoded parameters. Note: boolean and integer types may not be parsed using this content type.
+
+Example:
+
+</code></pre><p>curl -s -H &ldquo;Content-Type: application/x-www-form-urlencoded&rdquo; -X GET &ldquo;<a href='https://pfsense.example.com/api/v1/system/arp?client-id=admin&amp;client-token=pfsense"'>https://pfsense.example.com/api/v1/system/arp?client-id=admin&amp;client-token=pfsense&rdquo;</a>
 {
-  &quot;status&quot;: &quot;ok&quot;,
-  &quot;code&quot;: 200,
-  &quot;return&quot;: 0,
-  &quot;message&quot;: &quot;Success&quot;,
-  &quot;data&quot;: [
-    {
-      &quot;ip&quot;: &quot;192.168.1.1&quot;,
-      &quot;mac&quot;: &quot;00:0c:29:f6:be:d9&quot;,
-      &quot;interface&quot;: &quot;em1&quot;,
-      &quot;status&quot;: &quot;permanent&quot;,
-      &quot;linktype&quot;: &quot;ethernet&quot;
-    },
-    {
-      &quot;ip&quot;: &quot;172.16.209.139&quot;,
-      &quot;mac&quot;: &quot;00:0c:29:f6:be:cf&quot;,
-      &quot;interface&quot;: &quot;em0&quot;,
-      &quot;status&quot;: &quot;permanent&quot;,
-      &quot;linktype&quot;: &quot;ethernet&quot;
-    }
-  ]
+&ldquo;status&rdquo;: &ldquo;ok&rdquo;,
+&ldquo;code&rdquo;: 200,
+&ldquo;return&rdquo;: 0,
+&ldquo;message&rdquo;: &ldquo;Success&rdquo;,
+&ldquo;data&rdquo;: [
+{
+&ldquo;ip&rdquo;: &ldquo;192.168.1.1&rdquo;,
+&ldquo;mac&rdquo;: &ldquo;00:0c:29:f6:be:d9&rdquo;,
+&ldquo;interface&rdquo;: &ldquo;em1&rdquo;,
+&ldquo;status&rdquo;: &ldquo;permanent&rdquo;,
+&ldquo;linktype&rdquo;: &ldquo;ethernet&rdquo;
+},
+{
+&ldquo;ip&rdquo;: &ldquo;172.16.209.139&rdquo;,
+&ldquo;mac&rdquo;: &ldquo;00:0c:29:f6:be:cf&rdquo;,
+&ldquo;interface&rdquo;: &ldquo;em0&rdquo;,
+&ldquo;status&rdquo;: &ldquo;permanent&rdquo;,
+&ldquo;linktype&rdquo;: &ldquo;ethernet&rdquo;
 }
-</code></pre><p></details><h1>Response Codes</h1><p><code>200 (OK)</code> : API call succeeded<br><code>400 (Bad Request)</code> : An error was found within your requested parameters<br><code>401 (Unauthorized)</code> : API client has not completed authentication or authorization successfully<br><code>403 (Forbidden)</code> : The API endpoint has refused your call. Commonly due to your access settings found in System &gt; API<br><code>404 (Not found)</code> : Either the API endpoint or requested data was not found<br><code>500 (Server error)</code> : The API endpoint encountered an unexpected error processing your API request<br><h1>Error Codes</h1><p>A full list of error codes can be found by navigating to /api/v1/system/api/error after installation. This will return
-JSON data containing each error code and their corresponding error message. No authentication is required to view the
-error code library. This also makes API integration with third-party software easy as the API error codes and messages
-are always just an HTTP call away!<h1>Queries</h1><p>pfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting <code>GET</code> requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field.
-<details><summary>Targeting Objects</summary><p>You may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns this response without a query:<pre><code class=language-json>{
+]
+}<pre><code>
+&lt;/details&gt;
+
+# Response Codes
+`200 (OK)` : API call succeeded&lt;br&gt;
+`400 (Bad Request)` : An error was found within your requested parameters&lt;br&gt;
+`401 (Unauthorized)` : API client has not completed authentication or authorization successfully&lt;br&gt;
+`403 (Forbidden)` : The API endpoint has refused your call. Commonly due to your access settings found in System &gt; API&lt;br&gt;
+`404 (Not found)` : Either the API endpoint or requested data was not found&lt;br&gt;
+`500 (Server error)` : The API endpoint encountered an unexpected error processing your API request&lt;br&gt;
+
+
+# Error Codes
+A full list of error codes can be found by navigating to /api/v1/system/api/error after installation. This will return
+ JSON data containing each error code and their corresponding error message. No authentication is required to view the 
+ error code library. This also makes API integration with third-party software easy as the API error codes and messages 
+ are always just an HTTP call away!
+
+
+# Queries
+pfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field. 
+&lt;details&gt;
+    &lt;summary&gt;Targeting Objects&lt;/summary&gt;
+    
+You may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns this response without a query:
+
+```json
+{
     &quot;status&quot;:&quot;ok&quot;,
     &quot;code&quot;:200,
     &quot;return&quot;:0,
@@ -2334,7 +2376,7 @@ if(IsJsonString(html)){var obj=JSON.parse(html);var formattedJson=JSON.stringify
 function IsJsonString(str){try{JSON.parse(str);}catch(e){return false;}
 return true;}
 String.prototype.replaceAll=function(replaceThis,withThis){var re=new RegExp(RegExp.quote(replaceThis),"g");return this.replace(re,withThis);};RegExp.quote=function(str){return str.replace(/([.?*+^$[\]\\(){}-])/g,"\\$1");};function syntaxHighlight(json){json=json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,function(match){var cls='number';if(/^"/.test(match)){if(/:$/.test(match)){cls='key';}else{cls='string';}}else if(/true|false/.test(match)){cls='boolean';}else if(/null/.test(match)){cls='null';}
-return '<span class="'+cls+'">'+match+'</span>';});}</script><br><br><footer class="navbar-default navbar-fixed-bottom"><div class=container-fluid><div class="span12 text-center"><span data-toggle=tooltip title="If the application help you, please feel free to give a star to the project in github. Your star inspire me to work more on open-source projects like this!">Made with <em class=love-color>&#9829;</em> by <a href=https://github.com/thedevsaddam target=_blank class=text-muted>thedevsaddam</a> | Generated at: 2022-01-14 09:44:10 by <a href=https://github.com/thedevsaddam/docgen target=_blank class=text-muted>docgen</a></span></div></div></footer>
+return '<span class="'+cls+'">'+match+'</span>';});}</script><br><br><footer class="navbar-default navbar-fixed-bottom"><div class=container-fluid><div class="span12 text-center"><span data-toggle=tooltip title="If the application help you, please feel free to give a star to the project in github. Your star inspire me to work more on open-source projects like this!">Made with <em class=love-color>&#9829;</em> by <a href=https://github.com/thedevsaddam target=_blank class=text-muted>thedevsaddam</a> | Generated at: 2022-01-14 23:47:33 by <a href=https://github.com/thedevsaddam/docgen target=_blank class=text-muted>docgen</a></span></div></div></footer>
 <script type="text/javascript">
     $(document).ready(function() {
         document.title = 'pfSense REST API Documentation';
