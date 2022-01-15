@@ -67,7 +67,7 @@ To authenticate your API call, follow the instructions for your configured authe
 <details>
     <summary>Local Database (default)</summary>
 
-Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, pass in your username and password using basic authentication. For example: `curl -u admin:pfsense https://<pfSense IP or hostname>/api/v1/firewall/rule`
+Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, pass in your username and password using basic authentication. For example: `curl -u admin:pfsense https://pfsense.example.com/api/v1/firewall/rule`
 
 _Note: in previous releases, local database authentication used the `client-id` and `client-token` fields in your request body to authenticate. This functionality still exists but is not recommended. It will be removed in a future release._
 </details>
@@ -139,7 +139,7 @@ Parses the request body as a YAML formatted string.
 Example:
 
 ```
-curl-s -H "Content-Type: application/yaml" --data-binary @requestbody.yml -X GET https://localhost/api/v1/system/arp
+curl-s -H "Content-Type: application/yaml" --data-binary @requestbody.yml -X GET https://pfsense.example.com/api/v1/system/arp
 code: 200
 data:
 - interface: em1
@@ -157,7 +157,7 @@ return: 0
 status: ok
 ```
 
-_Note: request body must be contained within a properly formatted YAML file and data must be sent as binary data._
+_Note: request body must be contained within a properly formatted YAML file and data must be sent as binary data. Using the YAML content type may impact performance compared to JSON._
 
 </details>
 
