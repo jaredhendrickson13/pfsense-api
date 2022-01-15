@@ -139,10 +139,6 @@ Parses the request body as a YAML formatted string.
 Example:
 
 ```
-
-```
-
-</details>
 curl-s -H "Content-Type: application/yaml" --data-binary @requestbody.yml -X GET https://localhost/api/v1/system/arp
 code: 200
 data:

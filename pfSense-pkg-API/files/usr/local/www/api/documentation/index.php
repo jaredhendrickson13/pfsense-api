@@ -113,8 +113,6 @@ curl -s -H "Content-Type: application/json" -d '{"client-id": "admin", "client-t
 Parses the request body as a YAML formatted string.
 Example:
 ```
-```
-</details>
 curl-s -H "Content-Type: application/yaml" --data-binary @requestbody.yml -X GET https://localhost/api/v1/system/arp
 code: 200
 data:
@@ -472,84 +470,50 @@ content type which may have undesired results. It is recommended you specify you
     }
   ]
 }
-</code></pre><p></details><p><details><summary>application/yaml</summary><p>Parses the request body as a YAML formatted string.<p>Example:<pre><code>
-</code></pre><p></details>curl-s -H &ldquo;Content-Type: application/yaml&rdquo; &ndash;data-binary @requestbody.yml -X GET <a href=https://localhost/api/v1/system/arp>https://localhost/api/v1/system/arp</a>
+</code></pre><p></details><p><details><summary>application/yaml</summary><p>Parses the request body as a YAML formatted string.<p>Example:<pre><code>curl-s -H &quot;Content-Type: application/yaml&quot; --data-binary @requestbody.yml -X GET https://localhost/api/v1/system/arp
 code: 200
 data:
 - interface: em1
-ip: 192.168.1.1
-linktype: ethernet
-mac: 00:0c:29:f6:be:d9
-status: permanent
+  ip: 192.168.1.1
+  linktype: ethernet
+  mac: 00:0c:29:f6:be:d9
+  status: permanent
 - interface: em0
-ip: 172.16.209.139
-linktype: ethernet
-mac: 00:0c:29:f6:be:cf
-status: permanent
+  ip: 172.16.209.139
+  linktype: ethernet
+  mac: 00:0c:29:f6:be:cf
+  status: permanent
 message: Success
 return: 0
-status: ok<pre><code>
-_Note: request body must be contained within a properly formatted YAML file and data must be sent as binary data._
-
-&lt;/details&gt;
-
-&lt;details&gt;
-    &lt;summary&gt;application/x-www-form-urlencoded&lt;/summary&gt;
-
-Parses the request body as URL encoded parameters. Note: boolean and integer types may not be parsed using this content type.
-
-Example:
-
-</code></pre><p>curl -s -H &ldquo;Content-Type: application/x-www-form-urlencoded&rdquo; -X GET &ldquo;<a href='https://pfsense.example.com/api/v1/system/arp?client-id=admin&amp;client-token=pfsense"'>https://pfsense.example.com/api/v1/system/arp?client-id=admin&amp;client-token=pfsense&rdquo;</a>
+status: ok
+</code></pre><p><em>Note: request body must be contained within a properly formatted YAML file and data must be sent as binary data.</em><p></details><p><details><summary>application/x-www-form-urlencoded</summary><p>Parses the request body as URL encoded parameters. Note: boolean and integer types may not be parsed using this content type.<p>Example:<pre><code>curl -s -H &quot;Content-Type: application/x-www-form-urlencoded&quot; -X GET &quot;https://pfsense.example.com/api/v1/system/arp?client-id=admin&amp;client-token=pfsense&quot;
 {
-&ldquo;status&rdquo;: &ldquo;ok&rdquo;,
-&ldquo;code&rdquo;: 200,
-&ldquo;return&rdquo;: 0,
-&ldquo;message&rdquo;: &ldquo;Success&rdquo;,
-&ldquo;data&rdquo;: [
-{
-&ldquo;ip&rdquo;: &ldquo;192.168.1.1&rdquo;,
-&ldquo;mac&rdquo;: &ldquo;00:0c:29:f6:be:d9&rdquo;,
-&ldquo;interface&rdquo;: &ldquo;em1&rdquo;,
-&ldquo;status&rdquo;: &ldquo;permanent&rdquo;,
-&ldquo;linktype&rdquo;: &ldquo;ethernet&rdquo;
-},
-{
-&ldquo;ip&rdquo;: &ldquo;172.16.209.139&rdquo;,
-&ldquo;mac&rdquo;: &ldquo;00:0c:29:f6:be:cf&rdquo;,
-&ldquo;interface&rdquo;: &ldquo;em0&rdquo;,
-&ldquo;status&rdquo;: &ldquo;permanent&rdquo;,
-&ldquo;linktype&rdquo;: &ldquo;ethernet&rdquo;
+  &quot;status&quot;: &quot;ok&quot;,
+  &quot;code&quot;: 200,
+  &quot;return&quot;: 0,
+  &quot;message&quot;: &quot;Success&quot;,
+  &quot;data&quot;: [
+    {
+      &quot;ip&quot;: &quot;192.168.1.1&quot;,
+      &quot;mac&quot;: &quot;00:0c:29:f6:be:d9&quot;,
+      &quot;interface&quot;: &quot;em1&quot;,
+      &quot;status&quot;: &quot;permanent&quot;,
+      &quot;linktype&quot;: &quot;ethernet&quot;
+    },
+    {
+      &quot;ip&quot;: &quot;172.16.209.139&quot;,
+      &quot;mac&quot;: &quot;00:0c:29:f6:be:cf&quot;,
+      &quot;interface&quot;: &quot;em0&quot;,
+      &quot;status&quot;: &quot;permanent&quot;,
+      &quot;linktype&quot;: &quot;ethernet&quot;
+    }
+  ]
 }
-]
-}<pre><code>
-&lt;/details&gt;
-
-# Response Codes
-`200 (OK)` : API call succeeded&lt;br&gt;
-`400 (Bad Request)` : An error was found within your requested parameters&lt;br&gt;
-`401 (Unauthorized)` : API client has not completed authentication or authorization successfully&lt;br&gt;
-`403 (Forbidden)` : The API endpoint has refused your call. Commonly due to your access settings found in System &gt; API&lt;br&gt;
-`404 (Not found)` : Either the API endpoint or requested data was not found&lt;br&gt;
-`500 (Server error)` : The API endpoint encountered an unexpected error processing your API request&lt;br&gt;
-
-
-# Error Codes
-A full list of error codes can be found by navigating to /api/v1/system/api/error after installation. This will return
- JSON data containing each error code and their corresponding error message. No authentication is required to view the 
- error code library. This also makes API integration with third-party software easy as the API error codes and messages 
- are always just an HTTP call away!
-
-
-# Queries
-pfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field. 
-&lt;details&gt;
-    &lt;summary&gt;Targeting Objects&lt;/summary&gt;
-    
-You may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns this response without a query:
-
-```json
-{
+</code></pre><p></details><h1>Response Codes</h1><p><code>200 (OK)</code> : API call succeeded<br><code>400 (Bad Request)</code> : An error was found within your requested parameters<br><code>401 (Unauthorized)</code> : API client has not completed authentication or authorization successfully<br><code>403 (Forbidden)</code> : The API endpoint has refused your call. Commonly due to your access settings found in System &gt; API<br><code>404 (Not found)</code> : Either the API endpoint or requested data was not found<br><code>500 (Server error)</code> : The API endpoint encountered an unexpected error processing your API request<br><h1>Error Codes</h1><p>A full list of error codes can be found by navigating to /api/v1/system/api/error after installation. This will return
+JSON data containing each error code and their corresponding error message. No authentication is required to view the
+error code library. This also makes API integration with third-party software easy as the API error codes and messages
+are always just an HTTP call away!<h1>Queries</h1><p>pfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting <code>GET</code> requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field.
+<details><summary>Targeting Objects</summary><p>You may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns this response without a query:<pre><code class=language-json>{
     &quot;status&quot;:&quot;ok&quot;,
     &quot;code&quot;:200,
     &quot;return&quot;:0,
@@ -2410,7 +2374,7 @@ if(IsJsonString(html)){var obj=JSON.parse(html);var formattedJson=JSON.stringify
 function IsJsonString(str){try{JSON.parse(str);}catch(e){return false;}
 return true;}
 String.prototype.replaceAll=function(replaceThis,withThis){var re=new RegExp(RegExp.quote(replaceThis),"g");return this.replace(re,withThis);};RegExp.quote=function(str){return str.replace(/([.?*+^$[\]\\(){}-])/g,"\\$1");};function syntaxHighlight(json){json=json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,function(match){var cls='number';if(/^"/.test(match)){if(/:$/.test(match)){cls='key';}else{cls='string';}}else if(/true|false/.test(match)){cls='boolean';}else if(/null/.test(match)){cls='null';}
-return '<span class="'+cls+'">'+match+'</span>';});}</script><br><br><footer class="navbar-default navbar-fixed-bottom"><div class=container-fluid><div class="span12 text-center"><span data-toggle=tooltip title="If the application help you, please feel free to give a star to the project in github. Your star inspire me to work more on open-source projects like this!">Made with <em class=love-color>&#9829;</em> by <a href=https://github.com/thedevsaddam target=_blank class=text-muted>thedevsaddam</a> | Generated at: 2022-01-15 00:08:04 by <a href=https://github.com/thedevsaddam/docgen target=_blank class=text-muted>docgen</a></span></div></div></footer>
+return '<span class="'+cls+'">'+match+'</span>';});}</script><br><br><footer class="navbar-default navbar-fixed-bottom"><div class=container-fluid><div class="span12 text-center"><span data-toggle=tooltip title="If the application help you, please feel free to give a star to the project in github. Your star inspire me to work more on open-source projects like this!">Made with <em class=love-color>&#9829;</em> by <a href=https://github.com/thedevsaddam target=_blank class=text-muted>thedevsaddam</a> | Generated at: 2022-01-15 00:09:16 by <a href=https://github.com/thedevsaddam/docgen target=_blank class=text-muted>docgen</a></span></div></div></footer>
 <script type="text/javascript">
     $(document).ready(function() {
         document.title = 'pfSense REST API Documentation';
