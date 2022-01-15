@@ -113,9 +113,26 @@ curl -s -H "Content-Type: application/json" -d '{"client-id": "admin", "client-t
 Parses the request body as a YAML formatted string.
 Example:
 ```
-curl -s -H "Content-Type: application/yaml" --data-binary "client-id: admin
-client-token: pfsense" -X GET https://pfsense.example.com/api/v1/firewall/rule```
+```
 </details>
+curl-s -H "Content-Type: application/yaml" --data-binary @requestbody.yml -X GET https://localhost/api/v1/system/arp
+code: 200
+data:
+- interface: em1
+ip: 192.168.1.1
+linktype: ethernet
+mac: 00:0c:29:f6:be:d9
+status: permanent
+- interface: em0
+ip: 172.16.209.139
+linktype: ethernet
+mac: 00:0c:29:f6:be:cf
+status: permanent
+message: Success
+return: 0
+status: ok
+```
+_Note: request body must be contained within a properly formatted YAML file and data must be sent as binary data._
 <details>
 <summary>application/x-www-form-urlencoded</summary>
 Parses the request body as URL encoded parameters. Note: boolean and integer types may not be parsed using this content type.
@@ -454,10 +471,24 @@ content type which may have undesired results. It is recommended you specify you
     }
   ]
 }
-</code></pre><p></details><p><details><summary>application/yaml</summary><p>Parses the request body as a YAML formatted string.<p>Example:<pre><code>curl -s -H &quot;Content-Type: application/yaml&quot; --data-binary &quot;client-id: admin
-client-token: pfsense&quot; -X GET https://pfsense.example.com/api/v1/firewall/rule```
-
-&lt;/details&gt;
+</code></pre><p></details><p><details><summary>application/yaml</summary><p>Parses the request body as a YAML formatted string.<p>Example:<pre><code>
+</code></pre><p></details>curl-s -H &ldquo;Content-Type: application/yaml&rdquo; &ndash;data-binary @requestbody.yml -X GET <a href=https://localhost/api/v1/system/arp>https://localhost/api/v1/system/arp</a>
+code: 200
+data:
+- interface: em1
+ip: 192.168.1.1
+linktype: ethernet
+mac: 00:0c:29:f6:be:d9
+status: permanent
+- interface: em0
+ip: 172.16.209.139
+linktype: ethernet
+mac: 00:0c:29:f6:be:cf
+status: permanent
+message: Success
+return: 0
+status: ok<pre><code>
+_Note: request body must be contained within a properly formatted YAML file and data must be sent as binary data._
 
 &lt;details&gt;
     &lt;summary&gt;application/x-www-form-urlencoded&lt;/summary&gt;
@@ -2376,7 +2407,7 @@ if(IsJsonString(html)){var obj=JSON.parse(html);var formattedJson=JSON.stringify
 function IsJsonString(str){try{JSON.parse(str);}catch(e){return false;}
 return true;}
 String.prototype.replaceAll=function(replaceThis,withThis){var re=new RegExp(RegExp.quote(replaceThis),"g");return this.replace(re,withThis);};RegExp.quote=function(str){return str.replace(/([.?*+^$[\]\\(){}-])/g,"\\$1");};function syntaxHighlight(json){json=json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,function(match){var cls='number';if(/^"/.test(match)){if(/:$/.test(match)){cls='key';}else{cls='string';}}else if(/true|false/.test(match)){cls='boolean';}else if(/null/.test(match)){cls='null';}
-return '<span class="'+cls+'">'+match+'</span>';});}</script><br><br><footer class="navbar-default navbar-fixed-bottom"><div class=container-fluid><div class="span12 text-center"><span data-toggle=tooltip title="If the application help you, please feel free to give a star to the project in github. Your star inspire me to work more on open-source projects like this!">Made with <em class=love-color>&#9829;</em> by <a href=https://github.com/thedevsaddam target=_blank class=text-muted>thedevsaddam</a> | Generated at: 2022-01-14 23:47:33 by <a href=https://github.com/thedevsaddam/docgen target=_blank class=text-muted>docgen</a></span></div></div></footer>
+return '<span class="'+cls+'">'+match+'</span>';});}</script><br><br><footer class="navbar-default navbar-fixed-bottom"><div class=container-fluid><div class="span12 text-center"><span data-toggle=tooltip title="If the application help you, please feel free to give a star to the project in github. Your star inspire me to work more on open-source projects like this!">Made with <em class=love-color>&#9829;</em> by <a href=https://github.com/thedevsaddam target=_blank class=text-muted>thedevsaddam</a> | Generated at: 2022-01-15 00:06:42 by <a href=https://github.com/thedevsaddam/docgen target=_blank class=text-muted>docgen</a></span></div></div></footer>
 <script type="text/javascript">
     $(document).ready(function() {
         document.title = 'pfSense REST API Documentation';

@@ -139,10 +139,29 @@ Parses the request body as a YAML formatted string.
 Example:
 
 ```
-curl -s -H "Content-Type: application/yaml" --data-binary "client-id: admin
-client-token: pfsense" -X GET https://pfsense.example.com/api/v1/firewall/rule```
+
+```
 
 </details>
+curl-s -H "Content-Type: application/yaml" --data-binary @requestbody.yml -X GET https://localhost/api/v1/system/arp
+code: 200
+data:
+- interface: em1
+  ip: 192.168.1.1
+  linktype: ethernet
+  mac: 00:0c:29:f6:be:d9
+  status: permanent
+- interface: em0
+  ip: 172.16.209.139
+  linktype: ethernet
+  mac: 00:0c:29:f6:be:cf
+  status: permanent
+message: Success
+return: 0
+status: ok
+```
+
+_Note: request body must be contained within a properly formatted YAML file and data must be sent as binary data._
 
 <details>
     <summary>application/x-www-form-urlencoded</summary>
