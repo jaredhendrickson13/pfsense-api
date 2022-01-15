@@ -163,6 +163,8 @@ status: ok
 
 _Note: request body must be contained within a properly formatted YAML file and data must be sent as binary data._
 
+</details>
+
 <details>
     <summary>application/x-www-form-urlencoded</summary>
 
