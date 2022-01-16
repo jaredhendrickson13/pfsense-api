@@ -32,16 +32,18 @@ class APISystemPackageCreate extends APIModel {
     }
 
     public function validate_payload(){
+        $this->__validate_force();    // Must run before __validate_name
         $this->__validate_name();
-        $this->__validate_force();
+        $this->__validate_timeout();
     }
 
     # Attempts to install the package specified in $this->validated_data["name"]
     public function install_pkg() {
-        # Format and execute our pkg command
-        $pkg_force = ($this->validated_data["force"]) ? "-f" : "";
-        $pkg_cmd = "pkg ".$this->pkg_mode."-y ".$pkg_force." ".$this->validated_data["name"];
-        exec($pkg_cmd, $pkg_out, $pkg_rc);
+        # Format and execute our pkg command. Enforce a timeout to prevent gateway timeouts.
+        $pkg_force = ($this->validated_data["force"]) ? " -f" : "";
+        $pkg_y = ($this->pkg_mode === "install") ? " -y" : "";
+        $pkg_cmd = "pkg ".$this->pkg_mode.$pkg_y.$pkg_force." ".$this->validated_data["name"]." 2>&1";
+        exec("timeout ".$this->validated_data["timeout"]." ".$pkg_cmd, $pkg_out, $pkg_rc);
 
         # Check for known errors
         $api_rc = $this->__check_pkg_install($pkg_out, $pkg_rc);
@@ -90,7 +92,7 @@ class APISystemPackageCreate extends APIModel {
                 # Ensure this package exists in pfSense's repos
                 if ($this->is_pkg_in_repo($this->initial_data["name"])) {
                     # Ensure package is not already installed
-                    if (is_pkg_installed($this->initial_data["name"])) {
+                    if (!is_pkg_installed($this->initial_data["name"]) or $this->validated_data["force"]) {
                         $this->validated_data["name"] = $this->initial_data["name"];
                     } else {
                         $this->errors[] = APIResponse\get(1076);
@@ -106,9 +108,28 @@ class APISystemPackageCreate extends APIModel {
     }
 
     private function __validate_force() {
-        # Check for our option force input
+        # Check for our optional force input
         if ($this->initial_data["force"] === true) {
             $this->validated_data["force"] = true;
+        }
+    }
+
+    private function __validate_timeout() {
+        # Check for our optional timeout input
+        if (isset($this->initial_data["timeout"])) {
+            # Require timeout value to be 120 seconds or less
+            if (is_numeric($this->initial_data["timeout"]) and intval($this->initial_data["timeout"]) <= 120) {
+                # Force timeouts less than 5 to minimum of 5 seconds
+                if (intval($this->initial_data["timeout"]) < 5) {
+                    $this->initial_data["timeout"] = 5;
+                }
+
+                $this->validated_data["timeout"] = intval($this->initial_data["timeout"]);
+            } else {
+                $this->errors[] = APIResponse\get(1079);
+            }
+        } else {
+            $this->validated_data["timeout"] = 90;
         }
     }
 
@@ -118,14 +139,23 @@ class APISystemPackageCreate extends APIModel {
     # TODO: not return unique return codes for specific errors. Re-evaluate as time goes and refactor when a better way
     # TODO: is made available.
     private function __check_pkg_install($pkg_out, $pkg_rc) {
+        # Check if our package installation timed out
+        if ($pkg_rc === 124) {
+            return 1078;
+        }
+
         # Loop through each line of the pkg output and check for known error messages
         foreach ($pkg_out as $pkg_line) {
             # Check for 'pkg install' no matching package in repository error
-            if (APITools\str_starts_with($pkg_line, "pkg: No packages available to install matching")) {
+            if (APITools\str_starts_with("pkg: No packages available to install matching", $pkg_line)) {
                 return 1075;
             }
             # Check for 'pkg install' most recent version is already installed error
-            elseif (APITools\str_starts_with($pkg_line, "The most recent versions of packages are already installed")) {
+            elseif (APITools\str_starts_with("The most recent versions of packages are already installed", $pkg_line)) {
+                return 1076;
+            }
+            # Check for 'pkg add' most recent version is already installed error
+            elseif (APITools\str_starts_with("the most recent version of", $pkg_line)) {
                 return 1076;
             }
             # Check for 'pkg add' no package file found at URL error
@@ -133,7 +163,7 @@ class APISystemPackageCreate extends APIModel {
                 return 1075;
             }
             # Check for 'pkg add' URL does not contain package file error
-            elseif (APITools\str_starts_with($pkg_line, "pkg: archive_read_open_filename")) {
+            elseif (APITools\str_starts_with("pkg: archive_read_open_filename", $pkg_line)) {
                 return 1076;
             }
             # Check for 'pkg add' DNS resolution error
@@ -148,10 +178,10 @@ class APISystemPackageCreate extends APIModel {
             elseif ($pkg_rc !== 0) {
                 return 1;
             }
-            # Otherwise, our package installation appears to be successful
-            else {
-                return 0;
-            }
+
         }
+
+        # Otherwise, our package installation appears to be successful
+        return 0;
     }
 }

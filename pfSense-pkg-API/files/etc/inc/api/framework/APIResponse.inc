@@ -565,13 +565,25 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "System package with is already installed"
+            "message" => "System package with this name is already installed"
         ],
         1077 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
             "message" => "Remote URL does not contain a pfSense package"
+        ],
+        1078 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System package installation exceeded timeout"
+        ],
+        1079 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System package installation timeout cannot be greater than 120 seconds"
         ],
 
         // 2000-2999 reserved for /services API calls
