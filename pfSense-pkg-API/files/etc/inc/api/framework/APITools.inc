@@ -424,6 +424,19 @@ function str_starts_with($needle, $haystack) {
     return (substr($haystack, 0, $length) === $needle);
 }
 
+function str_ends_with($needle, $haystack) {
+    # Variables
+    $length = strlen($needle);
+
+    # If the needle is empty, match everything.
+    if( !$length ) {
+        return true;
+    }
+
+    # Check if the end of the string matches the needle
+    return substr($haystack, -$length) === $needle;
+}
+
 // Remove virtual IP and bring down virtual interface
 function bring_down_virtual_ip($vip_ent, $id, $delete=true) {
     global $config;

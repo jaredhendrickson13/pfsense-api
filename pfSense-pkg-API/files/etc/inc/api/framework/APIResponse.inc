@@ -575,7 +575,7 @@ function get($id, $data=[], $all=false) {
         ],
         1078 => [
             "status" => "bad request",
-            "code" => 400,
+            "code" => 504,
             "return" => $id,
             "message" => "System package installation exceeded timeout"
         ],

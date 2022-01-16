@@ -159,29 +159,30 @@ class APISystemPackageCreate extends APIModel {
                 return 1076;
             }
             # Check for 'pkg add' no package file found at URL error
-            elseif ($pkg_line == "pkg: ".$this->validated_data["name"].": Not Found") {
+            elseif (APITools\str_ends_with(": Not Found", $pkg_line)) {
                 return 1075;
             }
             # Check for 'pkg add' URL does not contain package file error
-            elseif (APITools\str_starts_with("pkg: archive_read_open_filename", $pkg_line)) {
-                return 1076;
+            elseif (APITools\str_ends_with(": Unrecognized archive format", $pkg_line)) {
+                return 1077;
             }
             # Check for 'pkg add' DNS resolution error
-            elseif ($pkg_line == "pkg: ".$this->validated_data["name"].": No address record") {
+            elseif (APITools\str_ends_with(": No address record", $pkg_line)) {
                 return 13;
             }
             # Check for 'pkg add' URL unreachable error
-            elseif ($pkg_line == "pkg: ".$this->validated_data["name"].": Network is unreachable") {
+            elseif (APITools\str_ends_with(": Network is unreachable", $pkg_line)) {
                 return 13;
             }
-            # When no known error messages were matched, but the pkg command still failed, return unexpected error
-            elseif ($pkg_rc !== 0) {
-                return 1;
-            }
-
         }
 
+        # When no known error messages were matched, but the pkg command still failed, return unexpected error
+        if ($pkg_rc !== 0) {
+            return 1;
+        }
         # Otherwise, our package installation appears to be successful
-        return 0;
+        else {
+            return 0;
+        }
     }
 }
