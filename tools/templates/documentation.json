@@ -6284,7 +6284,7 @@
 										{
 											"key": "name",
 											"value": "string",
-											"description": "Specify the name of pfSense package to delete. This must be the pfSense package internal name include the `pfSense-pkg-` prefix. Non-pfSense packages cannot be deleted."
+											"description": "Specify the name of pfSense package to delete. This must be the pfSense package internal name including the `pfSense-pkg-` prefix. Non-pfSense packages cannot be deleted."
 										}
 									]
 								},
@@ -6322,7 +6322,7 @@
 										{
 											"key": "name",
 											"value": "string",
-											"description": "Specify the name of pfSense package to install. This must be the pfSense package internal name include the `pfSense-pkg-` prefix or a URL to a third-party package."
+											"description": "Specify the name of pfSense package to install. This must be the pfSense package internal name including the `pfSense-pkg-` prefix or a URL to a third-party package."
 										},
 										{
 											"key": "timeout",
