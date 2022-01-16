@@ -139,7 +139,7 @@ Parses the request body as a YAML formatted string.
 Example:
 
 ```
-curl-s -H "Content-Type: application/yaml" --data-binary @requestbody.yml -X GET https://pfsense.example.com/api/v1/system/arp
+curl -s -H "Content-Type: application/yaml" --data-binary @requestbody.yml -X GET https://pfsense.example.com/api/v1/system/arp
 code: 200
 data:
 - interface: em1
@@ -908,6 +908,12 @@ There is no limit to API calls at this time but is important to note that pfSens
 
   * [Read System Email Notification Settings](#1-read-system-email-notification-settings)
   * [Update System Email Notification Settings](#2-update-system-email-notification-settings)
+
+* [SYSTEM/PACKAGE](#systempackage)
+
+  * [Delete System Package](#1-delete-system-package)
+  * [Install System Package](#2-install-system-package)
+  * [Read System Packages](#3-read-system-packages)
 
 * [SYSTEM/REBOOT](#systemreboot)
 
@@ -7379,7 +7385,7 @@ URL: https://{{$hostname}}/api/v1/system/config
 ### 2. Update System Configuration
 
 
-Updates entire pfSense configuration. This endpoint simply replaces the entire configuration with the values submitted in your request. This can be used to restore a configuration backup or interface with configuration areas that may not be available to the API. Use extreme caution when utilizing this endpoint as it offers no input validation and has potential for configuration loss.<br><br>
+Updates entire pfSense configuration. This endpoint simply replaces the entire configuration with the values submitted in your request. This can be used to interface with configuration areas that may not be available to the API. Use extreme caution when utilizing this endpoint as it offers no input validation and has potential for configuration loss.<br><br>
 
 _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-backup-restore`]
 
@@ -7757,6 +7763,109 @@ URL: https://{{$hostname}}/api/v1/system/notifications/email
 	"username": "testuser",
 	"password": "testpassword",
 	"authentication_mechanism": "LOGIN"
+}
+```
+
+
+
+## SYSTEM/PACKAGE
+
+
+
+### 1. Delete System Package
+
+
+Delete an existing pfSense package.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installed`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/system/package
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| name | string | Specify the name of pfSense package to delete. This must be the pfSense package internal name include the `pfSense-pkg-` prefix. Non-pfSense packages cannot be deleted. |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"name": "pfSense-pkg-sudo"
+}
+```
+
+
+
+### 2. Install System Package
+
+
+Install a pfSense package.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installpackage`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/system/package
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| name | string | Specify the name of pfSense package to install. This must be the pfSense package internal name include the `pfSense-pkg-` prefix or a URL to a third-party package. |
+| timeout | integer | Specify the amount of time (in seconds) to allow the package installation to take before timing out. This must be a value less than or equal to `120`. Defaults to `90`. |
+| force | boolean | Specify whether or not this package should be forced to install. Forced installs will always force the package to re-install and bypasses certain warnings. Use caution when using forced installs. |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"name": "pfSense-pkg-sudo"
+}
+```
+
+
+
+### 3. Read System Packages
+
+
+Read pfSense packages that are currently installed.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installed`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/package
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
 }
 ```
 

@@ -6218,6 +6218,156 @@
 					"_postman_isSubFolder": true
 				},
 				{
+					"name": "PACKAGE",
+					"item": [
+						{
+							"name": "Read System Packages",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/package",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"package"
+									]
+								},
+								"description": "Read pfSense packages that are currently installed.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installed`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete System Package",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"pfSense-pkg-sudo\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/package",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"package"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "string",
+											"description": "Specify the name of pfSense package to delete. This must be the pfSense package internal name include the `pfSense-pkg-` prefix. Non-pfSense packages cannot be deleted."
+										}
+									]
+								},
+								"description": "Delete an existing pfSense package.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installed`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Install System Package",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"pfSense-pkg-sudo\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/package",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"package"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "string",
+											"description": "Specify the name of pfSense package to install. This must be the pfSense package internal name include the `pfSense-pkg-` prefix or a URL to a third-party package."
+										},
+										{
+											"key": "timeout",
+											"value": "integer",
+											"description": "Specify the amount of time (in seconds) to allow the package installation to take before timing out. This must be a value less than or equal to `120`. Defaults to `90`."
+										},
+										{
+											"key": "force",
+											"value": "boolean",
+											"description": "Specify whether or not this package should be forced to install. Forced installs will always force the package to re-install and bypasses certain warnings. Use caution when using forced installs."
+										}
+									]
+								},
+								"description": "Install a pfSense package.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installpackage`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that install, delete and read pfSense packages.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "2b421eba-fcaf-47cf-9efa-f426478ad160",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "83a09631-ec1e-462b-971c-763c6bed3224",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "ARP",
 					"item": [
 						{
@@ -6377,7 +6527,7 @@
 										"config"
 									]
 								},
-								"description": "Updates entire pfSense configuration. This endpoint simply replaces the entire configuration with the values submitted in your request. This can be used to restore a configuration backup or interface with configuration areas that may not be available to the API. Use extreme caution when utilizing this endpoint as it offers no input validation and has potential for configuration loss.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-backup-restore`]"
+								"description": "Updates entire pfSense configuration. This endpoint simply replaces the entire configuration with the values submitted in your request. This can be used to interface with configuration areas that may not be available to the API. Use extreme caution when utilizing this endpoint as it offers no input validation and has potential for configuration loss.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-backup-restore`]"
 							},
 							"response": []
 						}
