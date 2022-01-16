@@ -97,6 +97,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "API endpoint requires one or more add-on packages to be installed before accepting requests",
         ],
+        13 => [
+            "status" => "bad gateway",
+            "code" => 502,
+            "return" => $id,
+            "message" => "Failed to connect to upstream package repositories",
+        ],
 
         // 1000-1999 reserved for /system API calls
         1000 => [
@@ -536,6 +542,36 @@ function get($id, $data=[], $all=false) {
             "code" => 400,
             "return" => $id,
             "message" => "System API access list must be array of IPv4 or IPv6 subnets in CIDR notation"
+        ],
+        1073 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System package name is required"
+        ],
+        1074 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Only pfSense packages are deletable. Ensure your package is prefixed with .pfSense-pkg-'."
+        ],
+        1075 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System package with this name could not be found"
+        ],
+        1076 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System package with is already installed"
+        ],
+        1077 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Remote URL does not contain a pfSense package"
         ],
 
         // 2000-2999 reserved for /services API calls
