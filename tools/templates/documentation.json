@@ -7105,11 +7105,246 @@
 										{
 											"key": "descr",
 											"value": "string",
-											"description": "Specify the description of the certificate to delete (required if `refid` is not defined) _Note: if multiple CA exist with the same name, only the first matching CA will be deleted_"
+											"description": "Specify the description of the CA to delete (required if `refid` is not defined) _Note: if multiple CA exist with the same name, only the first matching CA will be deleted_"
 										}
 									]
 								},
 								"description": "Delete an existing CA.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that create, read, update and delete system SSL/TLS Certificate Authorities.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae501696-89ce-4113-9ac2-fad15f5bee68",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "1df86559-6031-4647-8cc0-4570403630fd",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "CRL",
+					"item": [
+						{
+							"name": "Read System CRLs",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/crl",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"crl"
+									]
+								},
+								"description": "Read installed CRLs.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Create System CRL",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"method\": \"existing\",\n\t\"crt\": \"LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZxekNDQTVPZ0F3SUJBZ0lVQi9rT2RoMzdTZnRxeHRqL1MxSTRkUTQyYXRvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWxWVU1RMHdDd1lEVlFRSERBUlBjbVZ0TVNFdwpId1lEVlFRS0RCaEpiblJsY201bGRDQlhhV1JuYVhSeklGQjBlU0JNZEdReEZ6QVZCZ05WQkFNTURuUmxjM1F1CmMyVmpiV1YwTG1Odk1CNFhEVEl3TURJd05ESXdNelV3...\",\n\t\"prv\": \"LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQ1N3d2dna29BZ0VBQW9JQ0FRREQ5RkNLU1U3SmY0QngKeWlKNkNOWGhOckI0ZVhjTk9TTm9GUVJIbXlsV2dHbEN5djMydFdicmF3RFhhQzk2aVpOSTFzNG5qWTdQT3BlWgpoNmFlaTJ5NllheS9VWWtOUkZGQmp4WlZlLzRwS2pKeXBQRlFBUlpMVko2TlNXaU5raGkwbDlqeWtacTlEbkFnCk1mclZyUEo1YktDM3JJVV...\",\n\t\"descr\": \"TEST CA\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/crl",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"crl"
+									],
+									"query": [
+										{
+											"key": "method",
+											"value": "string",
+											"description": "Set the method used to add the CA. Current supported methods are `existing`, `internal`, and `intermediate`. _Note: previous releases referred to the `existing` method as `import`. You may use `existing` or `import` interchangeably._"
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Set a descriptive name for the certificate"
+										},
+										{
+											"key": "trust",
+											"value": "boolean",
+											"description": "Specify `true` if you would like the system to trust this CA (optional)"
+										},
+										{
+											"key": "randomserial",
+											"value": "boolean",
+											"description": "Specify `true` if you would like certificates signed by this CA to utilize randomized serial numbers (optional)"
+										},
+										{
+											"key": "crt",
+											"value": "string",
+											"description": "Specify the Base64 encoded PEM CA certificate to import. This field is required when `method` is set to `existing`."
+										},
+										{
+											"key": "prv",
+											"value": "string",
+											"description": "Specify the corresponding Base64 encoded CA certificate key. This field is only available when `method` is set to `existing`. (optional)"
+										},
+										{
+											"key": "serial",
+											"value": "integer",
+											"description": "Specify the serial number to be assigned to the next certificate signed by this CA. Defaults to 1. This field is only available when `method` is set to `existing`. (optional)"
+										},
+										{
+											"key": "caref",
+											"value": "string",
+											"description": "Specify the unique reference ID of the certificate signing authority for the intermediate certificate. This field is required when `method` is set to `intermediate`."
+										},
+										{
+											"key": "keytype",
+											"value": "string",
+											"description": "Specify the private key type to generate. Options are `RSA` or `ECDSA`. This field is required when `method` is set to `internal` or `intermediate`."
+										},
+										{
+											"key": "keylen",
+											"value": "integer",
+											"description": "Specify the private key length to generate. Options are `1024`, `2048`, `3072`, `4096`, `6144`, `7680`, `8192`, `15360`, `16384`. This field is required when `method` is set to `internal` or `intermediate` AND `keytype` is set to `RSA`."
+										},
+										{
+											"key": "ecname",
+											"value": "string",
+											"description": "Specify the elliptic curve name to use when generating the private key. It is recommended to view options and compatibility within the pfSense webConfigurator or manually through OpenSSL as certain curves are not compatible in some circumstances. This field is required when `method` is set to `internal` or `intermediate` AND `keytype` is set to `ECDSA`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._"
+										},
+										{
+											"key": "digest_alg",
+											"value": "string",
+											"description": "Specify the digest algorithm to use. Options are `sha1`, `sha224`, `sha256`, `sha384` and `sha512`. This field is required when `method` is set to `internal` or `intermediate`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._"
+										},
+										{
+											"key": "lifetime",
+											"value": "integer",
+											"description": "Specify the number of days you would like this CA to be valid for. This must be below OpenSSL's maximum lifetime value (around `12000` days). Defaults to `3650` days. This field is required when `method` is set to `internal` or `intermediate`. _Note: maximum value is subject to change, when in doubt, check the pfSense webConfigurator options for this field._"
+										},
+										{
+											"key": "dn_commonname",
+											"value": "string",
+											"description": "Specify the common name of this CA. In mose cases, this will be a hostname. This field is required when `method` is set to `internal` or `intermediate`."
+										},
+										{
+											"key": "dn_country",
+											"value": "string",
+											"description": "Specify the country code for this CA. This must be a known 2-digit country code. This field is only available when `method` is set to `internal` or `intermediate`. (optional)"
+										},
+										{
+											"key": "dn_state",
+											"value": "string",
+											"description": "Specify the state or province for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional)"
+										},
+										{
+											"key": "dn_city",
+											"value": "string",
+											"description": "Specify the city or locale for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional)"
+										},
+										{
+											"key": "dn_organization",
+											"value": "string",
+											"description": "Specify the managing organization for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional)"
+										},
+										{
+											"key": "dn_organizationalunit",
+											"value": "string",
+											"description": "Specify the managing organizational unit or team for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional)"
+										}
+									]
+								},
+								"description": "Add a new CRL certificate.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete System CRL",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"refid\": \"0\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/crl?refid=string&descr=string",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"crl"
+									],
+									"query": [
+										{
+											"key": "refid",
+											"value": "string",
+											"description": "Specify the refid of the CRL to delete (required if `descr` is  not defined)"
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Specify the description of the CRL to delete (required if `refid` is not defined) _Note: if multiple CRL exist with the same name, only the first matching CRL will be deleted_"
+										}
+									]
+								},
+								"description": "Delete an existing CRL.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]"
 							},
 							"response": []
 						}
