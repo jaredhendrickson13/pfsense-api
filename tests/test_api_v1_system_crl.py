@@ -35,16 +35,17 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
             },
             "resp_time": 10
         },
-        # {
-        #     "name": "Create existing CRL",
-        #     "payload": {
-        #         "method": "existing",
-        #         "descr": "EXISTING_CRL",
-        #         "lifetime": 3650,
-        #         "crl_data": crl_text
-        #     },
-        #     "resp_time": 10
-        # },
+        {
+            "name": "Create existing CRL",
+            "payload": {
+                "caref": "61c410f04b782",
+                "method": "existing",
+                "descr": "EXISTING_CRL_TEST",
+                "lifetime": 3650,
+                "crl_data": crl_text
+            },
+            "resp_time": 10
+        },
         {
             "name": "Check signing CA reference ID requirement for intermediate method",
             "status": 400,
@@ -101,9 +102,10 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
         },
     ]
     delete_tests = [
+        {"name": "Delete CRL certificate with refid", "payload": {}, "resp_time": 10}, # refid gets populated by post_post() method
         {
-            "name": "Delete CRL certificate without key",
-            "payload": {"descr": "INTERNAL_CRL_TEST"},
+            "name": "Delete CRL certificate with descr",
+            "payload": {"descr": "EXISTING_CRL_TEST"},
             "resp_time": 10
         },
         {
@@ -114,26 +116,13 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
         },
         # TODO: add test to check that CRLs in use cannot be deleted
     ]
-
-    # def post_post(self):
-    #     # Check if this is after the first POST test
-    #     if len(self.post_responses) == 1:
-    #         self.is_return_crt_base64(self.post_responses[0])
-
-
-    # def is_return_crt_base64(self, response):
-    #     """
-    #     Takes a test response and checks if the return 'crt' data field is a Base64 encoded certificate
-    #     """
-    #     # Variables
-    #     test_params = {"name": "Ensure cert is Base64 encoded"}
-    #     crt = base64.b64decode(response["data"]["crl"])
-
-    #     # Ensure the returned Base64 decoded crt value is a certificate
-    #     if "BEGIN CERTIFICATE" not in crt.decode():
-    #         self.exit_code = 1
-    #         print(self.__format_msg__("POST", test_params, "Returned certificate is not Base64 encoded"))
-    #     else:
-    #         print(self.__format_msg__("POST", test_params, "Response is valid", "ok"))
+    
+    # Override our PRE/POST methods
+    def post_post(self):
+        # We create a firewall rule in the 1th and 2th test.
+        if len(self.post_responses) == 2:
+            for test in self.post_tests:
+                # Assign the required refid created in the POST request to the DELETE payloads
+                self.delete_tests[0]["payload"]["refid"] = self.post_responses[0]["data"]["refid"]
 
 APIE2ETestSystemCRL()
