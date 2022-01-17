@@ -106,23 +106,11 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
             "payload": {"descr": "INTERNAL_CRL_TEST"},
             "resp_time": 10
         },
-        # {
-        #     "name": "Delete CA certificate with key",
-        #     "payload": {"descr": "CA_WITH_KEY"}
-        # },
-        # {
-        #     "name": "Delete internal CA RSA",
-        #     "payload": {"descr": "INTERNAL_CA_RSA"}
-        # },
-        # {
-        #     "name": "Delete internal CA ECDSA",
-        #     "payload": {"descr": "INTERNAL_CA_ECDSA"}
-        # },
         {
             "name": "Check deletion of non-existing CRL",
             "status": 400,
-            "return": 1009,
-            "payload": {"descr": "INVALID"}
+            "return": 6032,
+            "payload": {"refid": "INVALID"}
         },
         # TODO: add test to check that CRLs in use cannot be deleted
     ]

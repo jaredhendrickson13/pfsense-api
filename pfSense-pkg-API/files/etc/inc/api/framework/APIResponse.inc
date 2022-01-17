@@ -3459,6 +3459,18 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Certificate Revocation List is required"
         ],
+        6031 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System certificate revocation list in use"
+        ],
+        6032 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Could not locate system certificate revocation list"
+        ],
 
         // 7000-7999 reserved for /diagnostics API calls
         7000 => [
