@@ -7484,12 +7484,9 @@ URL: https://{{$hostname}}/api/v1/system/crl
 ```js        
 {
 	"method": "internal",
-	"descr": "TEST CA"
-,
-	"caref": "61c410f04b782"
-,
-	"lifetime": 3650
-,
+	"descr": "TEST CA",
+	"caref": "61c410f04b782",
+	"lifetime": 3650,
 	"serial": 10
 }
 ```
