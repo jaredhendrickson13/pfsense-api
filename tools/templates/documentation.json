@@ -7034,7 +7034,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"method\": \"internal\",\n\t\"descr\": \"TEST CA\"\n,\n\t\"caref\": \"61c410f04b782\"\n,\n\t\"lifetime\": 3650\n,\n\t\"serial\": 10\n}",
+									"raw": "{\n\t\"method\": \"internal\",\n\t\"descr\": \"TEST CA\",\n\t\"caref\": \"61c410f04b782\",\n\t\"lifetime\": 3650,\n\t\"serial\": 10\n}",
 									"options": {
 										"raw": {
 											"language": "json"
