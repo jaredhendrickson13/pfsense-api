@@ -73,9 +73,9 @@ class APISystemCRLDelete extends APIModel {
         # Check our conditional 'id' field.
         if (isset($this->initial_data['id'])) {
             # Check if this ID exists
-            if (array_key_exists($this->initial_data["id"], $this->config["id"])) {
+            if (array_key_exists($this->initial_data["id"], $this->config["crl"])) {
                 $this->id = $this->initial_data['id'];
-                $this->crl_ref_id = $this->config["id"][$this->id]["refid"];
+                $this->crl_ref_id = $this->config["crl"][$this->id]["refid"];
             } else {
                 $this->errors[] = APIResponse\get(6032);
             }
