@@ -25,9 +25,36 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
     get_tests = [{"name": "Read system CRLs"}]
     post_tests = [
         {
+            "name": "Create RSA internal CA",
+            "uri": "/api/v1/system/ca",
+            "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
+            "payload": {
+                "method": "internal",
+                "descr": "INTERNAL_CA_TEST",
+                "trust": True,
+                "keytype": "RSA",
+                "keylen": 2048,
+                "digest_alg": "sha256",
+                "dn_commonname": "internal-ca-e2e-test.example.com"
+            },
+        },
+        {
+            "name": "Check signing CA reference ID requirement for intermediate method",
+            "status": 400,
+            "return": 1047,
+            "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
+            "payload": {"method": "internal", "descr": "TestCRL"}
+        },
+        {
+            "name": "Check non-existing signing CA reference ID for intermediate method",
+            "status": 400,
+            "return": 1048,
+            "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
+            "payload": {"method": "internal", "descr": "TestCRL", "caref": "INVALID"}
+        },
+        {
             "name": "Create internal CRL",
             "payload": {
-                "caref": "61c410f04b782",
                 "method": "internal",
                 "descr": "INTERNAL_CRL_TEST",
                 "lifetime": 3650,
@@ -38,7 +65,6 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
         {
             "name": "Create existing CRL",
             "payload": {
-                "caref": "61c410f04b782",
                 "method": "existing",
                 "descr": "EXISTING_CRL_TEST",
                 "lifetime": 3650,
@@ -47,58 +73,46 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
             "resp_time": 10
         },
         {
-            "name": "Check signing CA reference ID requirement for intermediate method",
-            "status": 400,
-            "return": 1047,
-            "payload": {"method": "internal", "descr": "TestCRL"}
-        },
-        {
-            "name": "Check non-existing signing CA reference ID for intermediate method",
-            "status": 400,
-            "return": 1048,
-            "payload": {"method": "internal", "descr": "TestCRL", "caref": "invalid"}
-        },
-        {
             "name": "Check method requirement",
             "status": 400,
             "return": 1031,
-            "payload": {"descr": "TestCRL", "caref": "61c410f04b782"}
+            "payload": {"descr": "TestCRL"}
         },
         {
             "name": "Check unsupported method",
             "status": 400,
             "return": 1032,
-            "payload": {"method": "INVALID_METHOD", "descr": "TestCRL", "caref": "61c410f04b782"}
+            "payload": {"method": "INVALID_METHOD", "descr": "TestCRL"}
         },
         {
             "name": "Check description character validation",
             "status": 400,
             "return": 1037,
-            "payload": {"method": "internal", "descr": "<>?&>", "caref": "61c410f04b782"}
+            "payload": {"method": "internal", "descr": "<>?&>"}
         },
         {
             "name": "Check description requirement",
             "status": 400,
             "return": 1002,
-            "payload": {"method": "internal", "caref": "61c410f04b782"}
+            "payload": {"method": "internal"}
         },
         {
             "name": "Check description requirement",
             "status": 400,
-            "return": 6030,
-            "payload": {"method": "existing", "descr": "TestCRL", "caref": "61c410f04b782"}
+            "return": 1073,
+            "payload": {"method": "existing", "descr": "TestCRL"}
         },
         {
             "name": "Check lifetime maximum constraint for internal method",
             "status": 400,
             "return": 1046,
-            "payload": {"method": "internal", "descr": "TestCA", "caref": "61c410f04b782", "lifetime": 50000}
+            "payload": {"method": "internal", "descr": "TestCRL", "lifetime": 50000}
         },
         {
             "name": "Check serial numeric validation with existing method",
             "status": 400,
             "return": 1033,
-            "payload": {"method": "internal", "descr": "TestCA", "caref": "61c410f04b782", "serial": "invalid"}
+            "payload": {"method": "internal", "descr": "TestCRL", "serial": "invalid"}
         },
     ]
     delete_tests = [
@@ -109,9 +123,14 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
             "resp_time": 10
         },
         {
+            "name": "Delete CA certificate",
+            "uri": "/api/v1/system/ca",
+            "payload": {"descr": "INTERNAL_CA_TEST"}
+        },
+        {
             "name": "Check deletion of non-existing CRL",
             "status": 400,
-            "return": 6032,
+            "return": 1075,
             "payload": {"refid": "INVALID"}
         },
         # TODO: add test to check that CRLs in use cannot be deleted
@@ -119,10 +138,18 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
     
     # Override our PRE/POST methods
     def post_post(self):
-        # We create a firewall rule in the 1th and 2th test.
-        if len(self.post_responses) == 2:
+        if len(self.post_responses) == 1:
+            # Variables
+            counter = 0
+            for test in self.post_tests:
+                # Assign the required refid created in the POST request to the DELETE payloads]
+                if "payload" in test.keys() and "no_caref" not in test.keys():
+                    self.post_tests[counter]["payload"]["caref"] = self.post_responses[0]["data"]["refid"]
+                counter = counter + 1
+
+        if len(self.post_responses) == 4:
             for test in self.post_tests:
                 # Assign the required refid created in the POST request to the DELETE payloads
-                self.delete_tests[0]["payload"]["refid"] = self.post_responses[0]["data"]["refid"]
+                self.delete_tests[0]["payload"]["refid"] = self.post_responses[3]["data"]["refid"]
 
 APIE2ETestSystemCRL()
