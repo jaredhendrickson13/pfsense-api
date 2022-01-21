@@ -88,7 +88,7 @@ class APISystemCRLCreate extends APIModel {
         if (isset($this->initial_data['crl_data'])) {
             $this->validated_data['text'] = base64_encode($this->initial_data['crl_data']);
         } else {
-            $this->errors[] = APIResponse\get(6030);
+            $this->errors[] = APIResponse\get(1073);
         }
     }
 

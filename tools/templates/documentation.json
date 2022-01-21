@@ -7034,7 +7034,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n\t\"method\": \"internal\",\n\t\"descr\": \"TEST CA\",\n\t\"caref\": \"61c410f04b782\",\n\t\"lifetime\": 3650,\n\t\"serial\": 10\n}",
+									"raw": "{\n\t\"method\": \"internal\",\n\t\"descr\": \"INTERNAL_CRL\",\n\t\"caref\": \"61c410f04b782\",\n\t\"lifetime\": 3650,\n\t\"serial\": 10\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -7062,7 +7062,7 @@
 										{
 											"key": "method",
 											"value": "string",
-											"description": "Set the method used to add the certificate revocation list. Current supported methods are `existing` and `internal`."
+											"description": "Set the method used to add the certificate revocation list. Current supported methods are `existing` and `internal`. _Note: `internal` method will create new certificate revocation list for CA provided in `caref`_."
 										},
 										{
 											"key": "descr",

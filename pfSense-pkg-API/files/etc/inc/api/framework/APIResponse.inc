@@ -537,6 +537,24 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "System API access list must be array of IPv4 or IPv6 subnets in CIDR notation"
         ],
+        1073 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate Revocation List is required"
+        ],
+        1074 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System certificate revocation list in use"
+        ],
+        1075 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Could not locate system certificate revocation list"
+        ],
 
         // 2000-2999 reserved for /services API calls
         2000 => [
@@ -3452,24 +3470,6 @@ function get($id, $data=[], $all=false) {
             "code" => 400,
             "return" => $id,
             "message" => "Only 1 dynamic gateway per eligible interface is allowed"
-        ],
-        6030 => [
-            "status" => "bad request",
-            "code" => 400,
-            "return" => $id,
-            "message" => "Certificate Revocation List is required"
-        ],
-        6031 => [
-            "status" => "bad request",
-            "code" => 400,
-            "return" => $id,
-            "message" => "System certificate revocation list in use"
-        ],
-        6032 => [
-            "status" => "bad request",
-            "code" => 400,
-            "return" => $id,
-            "message" => "Could not locate system certificate revocation list"
         ],
 
         // 7000-7999 reserved for /diagnostics API calls

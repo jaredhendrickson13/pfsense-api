@@ -7465,7 +7465,7 @@ URL: https://{{$hostname}}/api/v1/system/crl
 | Key | Type | Description |
 | --- | ------|-------------|
 | caref | string | Specify the unique reference ID of the certificate signing authority for the certificate revocation list. |
-| method | string | Set the method used to add the certificate revocation list. Current supported methods are `existing` and `internal`. |
+| method | string | Set the method used to add the certificate revocation list. Current supported methods are `existing` and `internal`. _Note: `internal` method will create new certificate revocation list for CA provided in `caref`_. |
 | descr | string | Set a descriptive name for the certificate revocation list |
 | crl_data | string | Specify the Base64 encoded PEM certificate revocation list to import. This field is required when `method` is set to `existing`. _Note: Import Certificate Revocation List in X.509 CRL format. `-----BEGIN X509 CRL-----[A bunch of random-looking base64-encoded data]-----END X509 CRL-----`._ |
 | lifetime | integer | Specify the number of days you would like this certificate revocation list to be valid for. This must be below OpenSSL's maximum lifetime value (around `12000` days). Defaults to `9999` days. This field is only available when `method` is set to `internal`. _Note: maximum value is subject to change, when in doubt, check the pfSense webConfigurator options for this field._ (optional) |
@@ -7478,7 +7478,7 @@ URL: https://{{$hostname}}/api/v1/system/crl
 ```js        
 {
 	"method": "internal",
-	"descr": "TEST CA",
+	"descr": "INTERNAL_CRL",
 	"caref": "61c410f04b782",
 	"lifetime": 3650,
 	"serial": 10
