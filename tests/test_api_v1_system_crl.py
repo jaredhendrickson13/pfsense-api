@@ -99,7 +99,7 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
         {
             "name": "Check description requirement",
             "status": 400,
-            "return": 1073,
+            "return": 1080,
             "payload": {"method": "existing", "descr": "TestCRL"}
         },
         {
@@ -130,7 +130,7 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
         {
             "name": "Check deletion of non-existing CRL",
             "status": 400,
-            "return": 1075,
+            "return": 1082,
             "payload": {"refid": "INVALID"}
         },
         # TODO: add test to check that CRLs in use cannot be deleted
