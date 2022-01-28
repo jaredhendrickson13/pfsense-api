@@ -77,7 +77,7 @@ class APISystemCRLDelete extends APIModel {
                 $this->id = $this->initial_data['id'];
                 $this->crl_ref_id = $this->config["crl"][$this->id]["refid"];
             } else {
-                $this->errors[] = APIResponse\get(1075);
+                $this->errors[] = APIResponse\get(1082);
             }
         }
 
@@ -87,10 +87,10 @@ class APISystemCRLDelete extends APIModel {
             if (!crl_in_use($this->crl_ref_id)) {
                 $this->validated_data = $this->config["crl"][$this->id];
             } else {
-                $this->errors[] = APIResponse\get(1074);
+                $this->errors[] = APIResponse\get(1081);
             }
         } else {
-            $this->errors[] = APIResponse\get(1075);
+            $this->errors[] = APIResponse\get(1082);
         }
     }
 }
