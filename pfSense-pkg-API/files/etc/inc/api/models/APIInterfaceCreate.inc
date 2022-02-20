@@ -66,14 +66,18 @@ class APIInterfaceCreate extends APIModel {
     }
 
     private function __validate_spoofmac() {
-        // Check for our MAC address value
+        # Check for our MAC address value
         if (isset($this->initial_data["spoofmac"])) {
-            // Check if mac addr is valid
+            # Check if mac addr is valid
             if (is_macaddr($this->initial_data["spoofmac"])) {
                 $this->validated_data["spoofmac"] = $this->initial_data["spoofmac"];
             } else {
                 $this->errors[] = APIResponse\get(3003);
             }
+        }
+        # Otherwise assume default
+        else {
+            $this->validated_data["spoofmac"] = "";
         }
     }
 
