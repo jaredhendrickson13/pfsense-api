@@ -885,6 +885,12 @@ There is no limit to API calls at this time but is important to note that pfSens
 
   * [Update Console Settings](#1-update-console-settings)
 
+* [SYSTEM/CRL](#systemcrl)
+
+  * [Create System CRL](#1-create-system-crl)
+  * [Delete System CRL](#2-delete-system-crl)
+  * [Read System CRLs](#3-read-system-crls)
+
 * [SYSTEM/DNS](#systemdns)
 
   * [Read System DNS](#1-read-system-dns)
@@ -7181,7 +7187,7 @@ URL: https://{{$hostname}}/api/v1/system/ca
 | Key | Type | Description |
 | --- | ------|-------------|
 | refid | string | Specify the refid of the CA to delete (required if `descr` is  not defined) |
-| descr | string | Specify the description of the certificate to delete (required if `refid` is not defined) _Note: if multiple CA exist with the same name, only the first matching CA will be deleted_ |
+| descr | string | Specify the description of the CA to delete (required if `refid` is not defined) _Note: if multiple CA exist with the same name, only the first matching CA will be deleted_ |
 
 
 
@@ -7434,6 +7440,117 @@ URL: https://{{$hostname}}/api/v1/system/console
 ```js        
 {
 	"disableconsolemenu": true
+}
+```
+
+
+
+## SYSTEM/CRL
+
+
+
+### 1. Create System CRL
+
+
+Add a new CRL.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/system/crl
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| caref | string | Specify the unique reference ID of the certificate signing authority for the certificate revocation list. |
+| method | string | Set the method used to add the certificate revocation list. Current supported methods are `existing` and `internal`. _Note: `internal` method will create new certificate revocation list for CA provided in `caref`_. |
+| descr | string | Set a descriptive name for the certificate revocation list |
+| crl_data | string | Specify the Base64 encoded PEM certificate revocation list to import. This field is required when `method` is set to `existing`. _Note: Import Certificate Revocation List in X.509 CRL format. `-----BEGIN X509 CRL-----[A bunch of random-looking base64-encoded data]-----END X509 CRL-----`._ |
+| lifetime | integer | Specify the number of days you would like this certificate revocation list to be valid for. This must be below OpenSSL's maximum lifetime value (around `12000` days). Defaults to `9999` days. This field is only available when `method` is set to `internal`. _Note: maximum value is subject to change, when in doubt, check the pfSense webConfigurator options for this field._ (optional) |
+| serial | integer | Specify the serial number to be assigned to the next certificate revocation list. Defaults to 0. This field is only available when `method` is set to `internal`. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"method": "internal",
+	"descr": "INTERNAL_CRL",
+	"caref": "61c410f04b782",
+	"lifetime": 3650,
+	"serial": 10
+}
+```
+
+
+
+### 2. Delete System CRL
+
+
+Delete an existing CRL.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/system/crl
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| refid | string | Specify the refid of the certificate revocation list to delete (required if `descr` is  not defined) |
+| descr | string | Specify the description of the certificate revocation list to delete (required if `refid` is not defined) _Note: if multiple certificate revocation list exist with the same name, only the first matching certificate revocation list will be deleted_ |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"refid": "0"
+}
+```
+
+
+
+### 3. Read System CRLs
+
+
+Read installed CRLs.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/crl
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
 }
 ```
 

@@ -7105,11 +7105,181 @@
 										{
 											"key": "descr",
 											"value": "string",
-											"description": "Specify the description of the certificate to delete (required if `refid` is not defined) _Note: if multiple CA exist with the same name, only the first matching CA will be deleted_"
+											"description": "Specify the description of the CA to delete (required if `refid` is not defined) _Note: if multiple CA exist with the same name, only the first matching CA will be deleted_"
 										}
 									]
 								},
 								"description": "Delete an existing CA.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that create, read, update and delete system SSL/TLS Certificate Authorities.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae501696-89ce-4113-9ac2-fad15f5bee68",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "1df86559-6031-4647-8cc0-4570403630fd",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "CRL",
+					"item": [
+						{
+							"name": "Read System CRLs",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/crl",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"crl"
+									]
+								},
+								"description": "Read installed CRLs.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Create System CRL",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"method\": \"internal\",\n\t\"descr\": \"INTERNAL_CRL\",\n\t\"caref\": \"61c410f04b782\",\n\t\"lifetime\": 3650,\n\t\"serial\": 10\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/crl",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"crl"
+									],
+									"query": [
+										{
+											"key": "caref",
+											"value": "string",
+											"description": "Specify the unique reference ID of the certificate signing authority for the certificate revocation list."
+										},
+										{
+											"key": "method",
+											"value": "string",
+											"description": "Set the method used to add the certificate revocation list. Current supported methods are `existing` and `internal`. _Note: `internal` method will create new certificate revocation list for CA provided in `caref`_."
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Set a descriptive name for the certificate revocation list"
+										},
+										{
+											"key": "crl_data",
+											"value": "string",
+											"description": "Specify the Base64 encoded PEM certificate revocation list to import. This field is required when `method` is set to `existing`. _Note: Import Certificate Revocation List in X.509 CRL format. `-----BEGIN X509 CRL-----[A bunch of random-looking base64-encoded data]-----END X509 CRL-----`._"
+										},
+										{
+											"key": "lifetime",
+											"value": "integer",
+											"description": "Specify the number of days you would like this certificate revocation list to be valid for. This must be below OpenSSL's maximum lifetime value (around `12000` days). Defaults to `9999` days. This field is only available when `method` is set to `internal`. _Note: maximum value is subject to change, when in doubt, check the pfSense webConfigurator options for this field._ (optional)"
+										},
+										{
+											"key": "serial",
+											"value": "integer",
+											"description": "Specify the serial number to be assigned to the next certificate revocation list. Defaults to 0. This field is only available when `method` is set to `internal`. (optional)"
+										}
+									]
+								},
+								"description": "Add a new CRL.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete System CRL",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"refid\": \"0\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/crl?refid=string&descr=string",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"crl"
+									],
+									"query": [
+										{
+											"key": "refid",
+											"value": "string",
+											"description": "Specify the refid of the certificate revocation list to delete (required if `descr` is  not defined)"
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Specify the description of the certificate revocation list to delete (required if `refid` is not defined) _Note: if multiple certificate revocation list exist with the same name, only the first matching certificate revocation list will be deleted_"
+										}
+									]
+								},
+								"description": "Delete an existing CRL.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]"
 							},
 							"response": []
 						}

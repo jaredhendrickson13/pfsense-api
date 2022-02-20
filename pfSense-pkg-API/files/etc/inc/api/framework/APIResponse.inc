@@ -585,6 +585,24 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "System package installation timeout cannot be greater than 120 seconds"
         ],
+        1080 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Certificate Revocation List is required"
+        ],
+        1081 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System certificate revocation list in use"
+        ],
+        1082 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Could not locate system certificate revocation list"
+        ],
 
         // 2000-2999 reserved for /services API calls
         2000 => [

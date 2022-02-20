@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2021 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -17,19 +17,19 @@ require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
 
-class APISystemCertificateDelete extends APIModel {
-    public $cert_ref_id;
+class APISystemCRLDelete extends APIModel {
+    public $crl_ref_id;
     # Create our method constructor
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-certmanager"];
-        $this->change_note = "Deleted certificate via API";
-        $this->cert_ref_id = "";
+        $this->change_note = "Deleted Certificate Revocation List via API";
+        $this->crl_ref_id = "";
     }
 
     public function action() {
         # Remove the certificate from configuration
-        unset($this->config["cert"][$this->id]);
+        unset($this->config["crl"][$this->id]);
         $this->write_config();
 
         return APIResponse\get(0, $this->validated_data);
@@ -44,11 +44,11 @@ class APISystemCertificateDelete extends APIModel {
     private function __validate_refid() {
         # Check for our conditional 'refid' field
         if (isset($this->initial_data['refid'])) {
-            # Loop through our certificates and find a match
-            foreach ($this->config["cert"] as $i => $c) {
+            # Loop through our certificates revocation list and find a match
+            foreach ($this->config["crl"] as $i => $c) {
                 if ($c["refid"] === $this->initial_data['refid']) {
                     $this->id = $i;
-                    $this->cert_ref_id = $this->initial_data['refid'];
+                    $this->crl_ref_id = $this->initial_data['refid'];
                     break;
                 }
             }
@@ -59,10 +59,10 @@ class APISystemCertificateDelete extends APIModel {
         # Check for our conditional 'descr' field. Only validate this field if the ID was not found by ref ID previously
         if (isset($this->initial_data['descr']) and !isset($this->id)) {
             # Loop through our certificates and find a match
-            foreach ($this->config["cert"] as $i => $c) {
+            foreach ($this->config["crl"] as $i => $c) {
                 if ($c["descr"] === $this->initial_data['descr']) {
                     $this->id = $i;
-                    $this->cert_ref_id = $c["refid"];
+                    $this->crl_ref_id = $c["refid"];
                     break;
                 }
             }
@@ -73,24 +73,24 @@ class APISystemCertificateDelete extends APIModel {
         # Check our conditional 'id' field.
         if (isset($this->initial_data['id'])) {
             # Check if this ID exists
-            if (array_key_exists($this->initial_data["id"], $this->config["cert"])) {
+            if (array_key_exists($this->initial_data["id"], $this->config["crl"])) {
                 $this->id = $this->initial_data['id'];
-                $this->cert_ref_id = $this->config["cert"][$this->id]["refid"];
+                $this->crl_ref_id = $this->config["crl"][$this->id]["refid"];
             } else {
-                $this->errors[] = APIResponse\get(1009);
+                $this->errors[] = APIResponse\get(1082);
             }
         }
 
         # Ensure that the certs index ID was identified by one of the locators and is not in use.
-        if (isset($this->id) and isset($this->cert_ref_id)) {
-            # Ensure certificate is not in use
-            if (!cert_in_use($this->cert_ref_id)) {
-                $this->validated_data = $this->config["cert"][$this->id];
+        if (isset($this->id) and isset($this->crl_ref_id)) {
+            # Ensure certificates revocation list is not in use
+            if (!crl_in_use($this->crl_ref_id)) {
+                $this->validated_data = $this->config["crl"][$this->id];
             } else {
-                $this->errors[] = APIResponse\get(1005);
+                $this->errors[] = APIResponse\get(1081);
             }
         } else {
-            $this->errors[] = APIResponse\get(1009);
+            $this->errors[] = APIResponse\get(1082);
         }
     }
 }
