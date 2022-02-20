@@ -5,7 +5,7 @@
  * part of pfSense (https://www.pfsense.org)
  * Copyright (c) 2004-2013 BSD Perimeter
  * Copyright (c) 2013-2016 Electric Sheep Fencing
- * Copyright (c) 2014-2021 Rubicon Communications, LLC (Netgate)
+ * Copyright (c) 2014-2022 Rubicon Communications, LLC (Netgate)
  * All rights reserved.
  *
  * originally part of m0n0wall (http://m0n0.ch/wall)
@@ -672,7 +672,7 @@ function system_dhcpleases_configure() {
     }
 }
 
-function system_get_dhcpleases() {
+function system_get_dhcpleases($dnsavailable=null) {
     global $config, $g;
 
     $leases = array();
@@ -730,6 +730,7 @@ function system_get_dhcpleases() {
     $failover = false;
     $dedup_lease = false;
     $dedup_failover = false;
+
     foreach ($leases_content as $line) {
         /* Skip comments */
         if (preg_match('/^\s*(|#.*)$/', $line)) {
@@ -739,9 +740,14 @@ function system_get_dhcpleases() {
         if (preg_match('/}$/', $line)) {
             if ($lease) {
                 if (empty($item['hostname'])) {
-                    $hostname = gethostbyaddr($item['ip']);
-                    if (!empty($hostname)) {
-                        $item['hostname'] = $hostname;
+                    if (is_null($dnsavailable)) {
+                        $dnsavailable = check_dnsavailable();
+                    }
+                    if ($dnsavailable) {
+                        $hostname = gethostbyaddr($item['ip']);
+                        if (!empty($hostname)) {
+                            $item['hostname'] = $hostname;
+                        }
                     }
                 }
                 $leases['lease'][] = $item;
@@ -937,9 +943,10 @@ function system_staticroutes_configure($interface = "", $update_dns = false) {
         $gateways_arr = return_gateways_array(false, true);
 
         foreach ($static_routes as $rtent) {
-            /* Do not delete disabled routes on boot,
-             * see https://redmine.pfsense.org/issues/3709 */
-            if (isset($rtent['disabled']) && platform_booting()) {
+            /* Do not delete disabled routes,
+             * see https://redmine.pfsense.org/issues/3709
+             * and https://redmine.pfsense.org/issues/10706 */
+            if (isset($rtent['disabled'])) {
                 continue;
             }
 
@@ -1034,6 +1041,32 @@ function system_staticroutes_configure($interface = "", $update_dns = false) {
             }
         }
         unset($gateways_arr);
+
+        /* keep static routes cache,
+         * see https://redmine.pfsense.org/issues/11599 */
+        $id = 0;
+        foreach ($config['staticroutes']['route'] as $sroute) {
+            $targets = array();
+            if (is_subnet($sroute['network'])) {
+                $targets[] = $sroute['network'];
+            } elseif (is_alias($sroute['network'])) {
+                foreach (preg_split('/\s+/', $aliastable[$sroute['network']]) as $tgt) {
+                    if (is_ipaddrv4($tgt)) {
+                        $tgt .= "/32";
+                    }
+                    if (is_ipaddrv6($tgt)) {
+                        $tgt .= "/128";
+                    }
+                    if (!is_subnet($tgt)) {
+                        continue;
+                    }
+                    $targets[] = $tgt;
+                }
+            }
+            file_put_contents("{$g['tmp_path']}/staticroute_{$id}", serialize($targets));
+            file_put_contents("{$g['tmp_path']}/staticroute_{$id}_gw", serialize($sroute['gateway']));
+            $id++;
+        }
     }
     unset($static_routes);
 
@@ -1061,6 +1094,52 @@ function system_staticroutes_configure($interface = "", $update_dns = false) {
     unset($filterdns_list);
 
     return 0;
+}
+
+function delete_static_route($id, $delete = false) {
+    global $g, $config, $changedesc_prefix, $a_gateways;
+
+    if (!isset($config['staticroutes']['route'][$id])) {
+        return;
+    }
+
+    if (file_exists("{$g['tmp_path']}/.system_routes.apply")) {
+        $toapplylist = unserialize(file_get_contents("{$g['tmp_path']}/.system_routes.apply"));
+    } else {
+        $toapplylist = array();
+    }
+
+    if (file_exists("{$g['tmp_path']}/staticroute_{$id}") &&
+        file_exists("{$g['tmp_path']}/staticroute_{$id}_gw")) {
+        $delete_targets = unserialize(file_get_contents("{$g['tmp_path']}/staticroute_{$id}"));
+        $delgw = lookup_gateway_ip_by_name(unserialize(file_get_contents("{$g['tmp_path']}/staticroute_{$id}_gw")));
+        if (count($delete_targets)) {
+            foreach ($delete_targets as $dts) {
+                if (is_subnetv4($dts)) {
+                    $family = "-inet";
+                } else {
+                    $family = "-inet6";
+                }
+                $route = route_get($dts, '', true);
+                if (!count($route)) {
+                    continue;
+                }
+                $toapplylist[] = "/sbin/route delete " .
+                    $family . " " . $dts . " " . $delgw;
+            }
+        }
+    }
+
+    if ($delete) {
+        unlink_if_exists("{$g['tmp_path']}/staticroute_{$id}");
+        unlink_if_exists("{$g['tmp_path']}/staticroute_{$id}_gw");
+    }
+
+    if (!empty($toapplylist)) {
+        file_put_contents("{$g['tmp_path']}/.system_routes.apply", serialize($toapplylist));
+    }
+
+    unset($targets);
 }
 
 function system_routing_enable() {
@@ -1627,8 +1706,8 @@ global $ntp_poll_min_value, $ntp_poll_max_value;
 global $ntp_poll_min_default_gps, $ntp_poll_max_default_gps;
 global $ntp_poll_min_default_pps, $ntp_poll_max_default_pps;
 global $ntp_poll_min_default, $ntp_poll_max_default;
-global $ntp_auth_halgos;
-$ntp_poll_min_value = 4;
+global $ntp_auth_halgos, $ntp_server_types;
+$ntp_poll_min_value = 3;
 $ntp_poll_max_value = 17;
 $ntp_poll_min_default_gps = 4;
 $ntp_poll_max_default_gps = 4;
@@ -1638,7 +1717,13 @@ $ntp_poll_min_default = 'omit';
 $ntp_poll_max_default = 9;
 $ntp_auth_halgos = array(
     'md5' => 'MD5',
-    'sha1' => 'SHA1'
+    'sha1' => 'SHA1',
+    'sha256' => 'SHA256'
+);
+$ntp_server_types = array(
+    'server' => 'Server',
+    'pool' => 'Pool',
+    'peer' => 'Peer'
 );
 
 function system_ntp_poll_values() {
@@ -1677,9 +1762,14 @@ function system_ntp_setup_gps($serialport) {
     }
 
     init_config_arr(array('ntpd', 'gps'));
+    $serialports = get_serial_ports(true);
+
+    if (!array_key_exists($serialport, $serialports)) {
+        return false;
+    }
 
     $gps_device = '/dev/gps0';
-    $serialport = '/dev/'.$serialport;
+    $serialport = '/dev/'.basename($serialport);
 
     if (!file_exists($serialport)) {
         return false;
@@ -1736,7 +1826,7 @@ function system_ntp_setup_gps($serialport) {
 
     /* XXX: Why not file_put_contents to the device */
     @file_put_contents('/tmp/gps.init', $gps_init);
-    mwexec("cat /tmp/gps.init > {$serialport}");
+    mwexec("/bin/cat /tmp/gps.init > {$serialport}");
 
     if ($found && $config['ntpd']['gps']['autobaudinit']) {
         system_ntp_setup_rawspeed($serialport, $gpsbaud);
@@ -1764,8 +1854,14 @@ function system_ntp_setup_rawspeed($serialport, $baud) {
 function system_ntp_setup_pps($serialport) {
     global $config, $g;
 
+    $serialports = get_serial_ports(true);
+
+    if (!array_key_exists($serialport, $serialports)) {
+        return false;
+    }
+
     $pps_device = '/dev/pps0';
-    $serialport = '/dev/'.$serialport;
+    $serialport = '/dev/'.basename($serialport);
 
     if (!file_exists($serialport)) {
         return false;
@@ -1990,7 +2086,11 @@ function system_ntp_configure() {
             $ntpcfg .= 'pool ';
             $have_pools = true;
         } else {
-            $ntpcfg .= 'server ';
+            if (substr_count($config['ntpd']['ispeer'], $ts)) {
+                $ntpcfg .= 'peer ';
+            } else {
+                $ntpcfg .= 'server ';
+            }
             if ($config['ntpd']['dnsresolv'] == 'inet') {
                 $ntpcfg .= '-4 ';
             } elseif ($config['ntpd']['dnsresolv'] == 'inet6') {
@@ -1998,7 +2098,10 @@ function system_ntp_configure() {
             }
         }
 
-        $ntpcfg .= "{$ts} iburst";
+        $ntpcfg .= "{$ts}";
+        if (!substr_count($config['ntpd']['ispeer'], $ts)) {
+            $ntpcfg .= " iburst";
+        }
 
         $ntpcfg .= system_ntp_fixup_poll_value('minpoll', $config['ntpd']['ntpminpoll'], $ntp_poll_min_default);
         $ntpcfg .= system_ntp_fixup_poll_value('maxpoll', $config['ntpd']['ntpmaxpoll'], $ntp_poll_max_default);
@@ -2204,7 +2307,7 @@ function system_reboot() {
 
     system_reboot_cleanup();
 
-    mwexec("nohup /etc/rc.reboot > /dev/null 2>&1 &");
+    mwexec("/usr/bin/nohup /etc/rc.reboot > /dev/null 2>&1 &");
 }
 
 function system_reboot_sync($reroot=false) {
@@ -2578,7 +2681,7 @@ function system_identify_specific_platform() {
             return (array('name' => 'RCC', 'descr' => 'Netgate XG-2758'));
             break;
         case 'SG-5100':
-            return (array('name' => 'SG-5100', 'descr' => 'Netgate SG-5100'));
+            return (array('name' => '5100', 'descr' => 'Netgate 5100'));
             break;
         case 'Minnowboard Turbot D0 PLATFORM':
         case 'Minnowboard Turbot D0/D1 PLATFORM':
@@ -2613,9 +2716,9 @@ function system_identify_specific_platform() {
             break;
         case 'SYS-5018D-FN4T':
             if (strpos($hw_model, "D-1541") !== false) {
-                return (array('name' => 'XG-1541', 'descr' => 'Super Micro XG-1541'));
+                return (array('name' => '1541', 'descr' => 'Super Micro 1541'));
             } else {
-                return (array('name' => 'XG-1540', 'descr' => 'Super Micro XG-1540'));
+                return (array('name' => '1540', 'descr' => 'Super Micro XG-1540'));
             }
             break;
         case 'apu2':
@@ -2645,7 +2748,7 @@ function system_identify_specific_platform() {
         $planar_product);
     if (isset($planar_product[0]) &&
         $planar_product[0] == 'X10SDV-8C-TLN4F+') {
-        return array('name' => 'XG-1537', 'descr' => 'Super Micro XG-1537');
+        return array('name' => '1537', 'descr' => 'Super Micro 1537');
     }
 
     if (strpos($hw_model, "PC Engines WRAP") !== false) {
@@ -2702,6 +2805,54 @@ function system_get_arp_table($resolve_hostnames = false) {
     }
 
     return $arp_table;
+}
+
+function _getHostName($mac, $ip) {
+    global $dhcpmac, $dhcpip;
+
+    if ($dhcpmac[$mac]) {
+        return $dhcpmac[$mac];
+    } else if ($dhcpip[$ip]) {
+        return $dhcpip[$ip];
+    } else {
+        $ipproto = (is_ipaddrv4($ip)) ? '-4 ' : '-6 ';
+        exec("/usr/bin/host -W 1 " . $ipproto . escapeshellarg($ip), $output);
+        if (preg_match('/.*pointer ([A-Za-z_0-9.-]+)\..*/', $output[0], $matches)) {
+            if ($matches[1] <> $ip) {
+                return $matches[1];
+            }
+        }
+    }
+    return "";
+}
+
+function check_dnsavailable($proto='inet') {
+
+    if ($proto == 'inet') {
+        $gdns = array('8.8.8.8', '8.8.4.4');
+    } else {
+        $gdns = array('2001:4860:4860::8888', '2001:4860:4860::8844');
+    }
+    $nameservers = array_merge($gdns, get_dns_nameservers());
+    $test = 0;
+
+    foreach ($gdns as $dns) {
+        if ($dns == '127.0.0.1') {
+            continue;
+        } else {
+            $dns_result = trim(_getHostName("", $dns));
+            if (($test == '2') && ($dns_result == "")) {
+                return false;
+            } elseif ($dns_result == "") {
+                $test++;
+                continue;
+            } else {
+                return true;
+            }
+        }
+    }
+
+    return false;
 }
 
 ?>
