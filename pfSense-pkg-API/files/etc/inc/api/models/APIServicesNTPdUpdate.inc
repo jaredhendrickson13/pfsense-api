@@ -23,7 +23,6 @@ class APIServicesNTPdUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-ntpd"];
         $this->change_note = "Modified NTP settings via API";
-        $this->validated_data = $this->config["ntpd"];
     }
 
     public function action() {
@@ -43,6 +42,15 @@ class APIServicesNTPdUpdate extends APIModel {
     }
 
     public function validate_payload() {
+        # Pull the existing NTP configuration or default if it's empty
+        if (!empty($this->config["ntpd"])) {
+            $this->validated_data = $this->config["ntpd"];
+        } else {
+            $this->validated_data = [];
+            $this->config["ntpd"] = [];
+        }
+
+        # Validate each NTP field
         $this->__validate_interface();
         $this->__validate_timeservers();
         $this->__validate_orphan();
