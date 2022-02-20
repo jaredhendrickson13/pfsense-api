@@ -12,7 +12,7 @@ properly written to the master XML configuration and the correct backend configu
 
 
 # Requirements
-- pfSense 2.5.0 or later is supported (older pfSense versions may be compatible with older versions of pfSense API)
+- pfSense CE 2.5.0 or later is supported. pfSense Plus is NOT compatible with this API and will break your pfSense Plus installation. (older pfSense CDE versions may be compatible with older versions of pfSense API)
 - pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the 
 webConfigurator are required to make calls to the API endpoints
 - While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit
