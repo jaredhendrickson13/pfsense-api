@@ -19,7 +19,7 @@ endpoints enforce input validation to prevent invalid configurations from being 
 properly written to the master XML configuration and the correct backend configurations are made preventing the need for
 a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!
 # Requirements
-- pfSense 2.5.0 or later is supported (older pfSense versions may be compatible with older versions of pfSense API)
+- pfSense CE 2.5.0 or later is supported. pfSense Plus is NOT compatible with this API and will break your pfSense Plus installation. (older pfSense CE versions may be compatible with older versions of pfSense API)
 - pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the
 webConfigurator are required to make calls to the API endpoints
 - While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit
@@ -410,7 +410,7 @@ There is no limit to API calls at this time but is important to note that pfSens
 by pfSense&rsquo;s webConfigurator into API endpoints to create, read, update and delete pfSense configurations. All API
 endpoints enforce input validation to prevent invalid configurations from being made. Configurations made via API are
 properly written to the master XML configuration and the correct backend configurations are made preventing the need for
-a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!<h1>Requirements</h1><ul><li>pfSense 2.5.0 or later is supported (older pfSense versions may be compatible with older versions of pfSense API)<li>pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the
+a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!<h1>Requirements</h1><ul><li>pfSense CE 2.5.0 or later is supported. pfSense Plus is NOT compatible with this API and will break your pfSense Plus installation. (older pfSense CE versions may be compatible with older versions of pfSense API)<li>pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the
 webConfigurator are required to make calls to the API endpoints<li>While not an enforced requirement, it is <strong>strongly</strong> recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit</ul><h1>Installation</h1><p>To install pfSense API, simply run the following command from the pfSense shell:<br><pre><code>pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.5-pkg-API.txz &amp;&amp; /etc/rc.restart_webgui
 </code></pre><p>To uninstall pfSense API, run the following command:<br><pre><code>pfsense-api delete
 </code></pre><p>To update pfSense API to the latest stable version, run the following command:<pre><code>pfsense-api update
@@ -2315,7 +2315,7 @@ if(IsJsonString(html)){var obj=JSON.parse(html);var formattedJson=JSON.stringify
 function IsJsonString(str){try{JSON.parse(str);}catch(e){return false;}
 return true;}
 String.prototype.replaceAll=function(replaceThis,withThis){var re=new RegExp(RegExp.quote(replaceThis),"g");return this.replace(re,withThis);};RegExp.quote=function(str){return str.replace(/([.?*+^$[\]\\(){}-])/g,"\\$1");};function syntaxHighlight(json){json=json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,function(match){var cls='number';if(/^"/.test(match)){if(/:$/.test(match)){cls='key';}else{cls='string';}}else if(/true|false/.test(match)){cls='boolean';}else if(/null/.test(match)){cls='null';}
-return '<span class="'+cls+'">'+match+'</span>';});}</script><br><br><footer class="navbar-default navbar-fixed-bottom"><div class=container-fluid><div class="span12 text-center"><span data-toggle=tooltip title="If the application help you, please feel free to give a star to the project in github. Your star inspire me to work more on open-source projects like this!">Made with <em class=love-color>&#9829;</em> by <a href=https://github.com/thedevsaddam target=_blank class=text-muted>thedevsaddam</a> | Generated at: 2021-12-20 12:05:38 by <a href=https://github.com/thedevsaddam/docgen target=_blank class=text-muted>docgen</a></span></div></div></footer>
+return '<span class="'+cls+'">'+match+'</span>';});}</script><br><br><footer class="navbar-default navbar-fixed-bottom"><div class=container-fluid><div class="span12 text-center"><span data-toggle=tooltip title="If the application help you, please feel free to give a star to the project in github. Your star inspire me to work more on open-source projects like this!">Made with <em class=love-color>&#9829;</em> by <a href=https://github.com/thedevsaddam target=_blank class=text-muted>thedevsaddam</a> | Generated at: 2022-02-19 22:43:46 by <a href=https://github.com/thedevsaddam/docgen target=_blank class=text-muted>docgen</a></span></div></div></footer>
 <script type="text/javascript">
     $(document).ready(function() {
         document.title = 'pfSense REST API Documentation';
