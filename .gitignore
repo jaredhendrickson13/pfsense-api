@@ -1,5 +1,0 @@
-.idea
-tests/e2e_test_framework/__pycache__/
-*.DS_Store
-.phplint-cache
-
