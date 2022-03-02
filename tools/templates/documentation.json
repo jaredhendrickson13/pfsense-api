@@ -10315,27 +10315,27 @@
 												{
 													"key": "host",
 													"value": "string",
-													"description": "Hostname of new DNS A record"
+													"description": "Specify the hostname portion of the new DNS A record."
 												},
 												{
 													"key": "domain",
 													"value": "string",
-													"description": "Domain of new DNS A record"
+													"description": "Specify the domain portion of the new DNS A record."
 												},
 												{
 													"key": "ip",
-													"value": "string",
-													"description": "IPv4 or IPv6 of new DNS A record"
+													"value": "array or string",
+													"description": "Specify the IPv4 or IPv6 address this entry will resolve. This can be passed in as a string to resolve a single IP, or an array of strings to resolve multiple IPs. At least 1 value is required."
 												},
 												{
 													"key": "descr",
 													"value": "string",
-													"description": "Description of host override (optional)"
+													"description": "Specify the description of host override (optional)"
 												},
 												{
 													"key": "aliases",
 													"value": "array",
-													"description": "Hostname aliases (CNAME) for host override (optional)"
+													"description": "Specify additional domain names that should resolve the same IPs. This uses the same fields as the /api/v1/services/unbound/host_override/alias endpoint. (optional)"
 												},
 												{
 													"key": "apply",
@@ -10384,32 +10384,32 @@
 												{
 													"key": "host",
 													"value": "string",
-													"description": "Update the hostname of this host override (optional)"
+													"description": "Update the hostname portion of the new DNS A record. (optional)"
 												},
 												{
 													"key": "domain",
 													"value": "string",
-													"description": "Update the domain name of this host override (optional)"
+													"description": "Update the domain portion of the new DNS A record. (optional)"
 												},
 												{
 													"key": "ip",
-													"value": "string",
-													"description": "Update the IPv4/IPv6 address of this host override (optional)"
+													"value": "array or string",
+													"description": "Update the IPv4 or IPv6 address this entry will resolve. This can be passed in as a string to resolve a single IP, or an array of strings to resolve multiple IPs. At least 1 value is required. (optional)"
 												},
 												{
 													"key": "descr",
 													"value": "string",
-													"description": "Update the description of this host override (optional)"
+													"description": "Update the description of host override (optional)"
 												},
 												{
 													"key": "aliases",
 													"value": "array",
-													"description": "Update the aliases for this host override. This will replace any existing entries. (optional)"
+													"description": "Update additional domain names that should resolve the same IPs. This uses the same fields as the /api/v1/services/unbound/host_override/alias endpoint. (optional)"
 												},
 												{
 													"key": "apply",
 													"value": "boolean",
-													"description": "Specify whether or not you would like this host override update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only updating a single host override, you may set this true to apply it immediately. Defaults to false. (optional)"
+													"description": "Update whether or not you would like this host override to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only creating a single host override, you may set this true to apply it immediately. Defaults to false. (optional)"
 												}
 											]
 										},

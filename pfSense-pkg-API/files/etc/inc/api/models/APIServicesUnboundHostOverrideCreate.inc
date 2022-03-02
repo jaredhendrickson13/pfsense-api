@@ -44,12 +44,6 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
         $this->__validate_host();
         $this->__validate_domain();
         $this->__validate_ip();
-
-        # Before proceeding, check that a host override matching this host, domain and IP type doesn't already exist
-        if ($this->host_override_exists()) {
-            $this->errors[] = APIResponse\get(2010);
-        }
-
         $this->__validate_descr();
         $this->__validate_aliases();
     }
@@ -83,13 +77,26 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
     }
 
     private function __validate_ip() {
+        # Local variables
+        $valid_ips = [];
+
         # Check for our required 'ip' payload value
-        if (isset($this->initial_data['ip'])) {
-            if (!is_ipaddrv4($this->initial_data["ip"]) and !is_ipaddrv6($this->initial_data["ip"])) {
-                $this->errors[] = APIResponse\get(2011);
-            } else {
-                $this->validated_data["ip"] = trim($this->initial_data['ip']);
+        if (isset($this->initial_data['ip']) and !empty($this->initial_data["ip"])) {
+            # This field is expected to be an array, if a string was passed in, convert it to a single item array.
+            if (!is_array($this->initial_data["ip"])) {
+                $this->initial_data["ip"] = array($this->initial_data["ip"]);
             }
+
+            # Loop through each provided IP and ensure it is valid.
+            foreach ($this->initial_data["ip"] as $ip) {
+                if (!is_ipaddrv4($ip) and !is_ipaddrv6($ip)) {
+                    $this->errors[] = APIResponse\get(2011);
+                } else {
+                    $valid_ips[] = trim($ip);
+                }
+            }
+            # Join our valid IPs into a comma separated string as expected by pfSense
+            $this->validated_data["ip"] = implode(",", $valid_ips);
         } else {
             $this->errors[] = APIResponse\get(2006);
         }
@@ -123,24 +130,4 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
             }
         }
     }
-
-    public function host_override_exists() {
-        # Local variables
-        $host = $this->validated_data["host"];
-        $domain = $this->validated_data["domain"];
-        $ip = $this->validated_data["ip"];
-
-        # Loop through each host override and check if the FQDN already exists
-        foreach ($this->config["unbound"]["hosts"] as $ent) {
-            # Check the FQDN matches this entry
-            if ($ent["host"] === $host and $ent["domain"] === $domain) {
-                # Host overrides are allowed an IPv4 and IPv6 address, check if it already has one.
-                if ((is_ipaddrv4($ent["ip"]) and is_ipaddrv4($ip)) or (is_ipaddrv6($ent["ip"]) and is_ipaddrv6($ip))){
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
 }

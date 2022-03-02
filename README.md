@@ -6410,11 +6410,11 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 
 | Key | Type | Description |
 | --- | ------|-------------|
-| host | string | Hostname of new DNS A record |
-| domain | string | Domain of new DNS A record |
-| ip | string | IPv4 or IPv6 of new DNS A record |
-| descr | string | Description of host override (optional) |
-| aliases | array | Hostname aliases (CNAME) for host override (optional) |
+| host | string | Specify the hostname portion of the new DNS A record. |
+| domain | string | Specify the domain portion of the new DNS A record. |
+| ip | array or string | Specify the IPv4 or IPv6 address this entry will resolve. This can be passed in as a string to resolve a single IP, or an array of strings to resolve multiple IPs. At least 1 value is required. |
+| descr | string | Specify the description of host override (optional) |
+| aliases | array | Specify additional domain names that should resolve the same IPs. This uses the same fields as the /api/v1/services/unbound/host_override/alias endpoint. (optional) |
 | apply | boolean | Specify whether or not you would like this host override to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only creating a single host override, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
@@ -6515,12 +6515,12 @@ URL: https://{{$hostname}}/api/v1/services/unbound/host_override
 | Key | Type | Description |
 | --- | ------|-------------|
 | id | integer | Specify the ID of the host override to update |
-| host | string | Update the hostname of this host override (optional) |
-| domain | string | Update the domain name of this host override (optional) |
-| ip | string | Update the IPv4/IPv6 address of this host override (optional) |
-| descr | string | Update the description of this host override (optional) |
-| aliases | array | Update the aliases for this host override. This will replace any existing entries. (optional) |
-| apply | boolean | Specify whether or not you would like this host override update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only updating a single host override, you may set this true to apply it immediately. Defaults to false. (optional) |
+| host | string | Update the hostname portion of the new DNS A record. (optional) |
+| domain | string | Update the domain portion of the new DNS A record. (optional) |
+| ip | array or string | Update the IPv4 or IPv6 address this entry will resolve. This can be passed in as a string to resolve a single IP, or an array of strings to resolve multiple IPs. At least 1 value is required. (optional) |
+| descr | string | Update the description of host override (optional) |
+| aliases | array | Update additional domain names that should resolve the same IPs. This uses the same fields as the /api/v1/services/unbound/host_override/alias endpoint. (optional) |
+| apply | boolean | Update whether or not you would like this host override to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only creating a single host override, you may set this true to apply it immediately. Defaults to false. (optional) |
 
 
 
@@ -7910,7 +7910,7 @@ URL: https://{{$hostname}}/api/v1/system/package
 
 | Key | Type | Description |
 | --- | ------|-------------|
-| name | string | Specify the name of pfSense package to delete. This must be the pfSense package internal name include the `pfSense-pkg-` prefix. Non-pfSense packages cannot be deleted. |
+| name | string | Specify the name of pfSense package to delete. This must be the pfSense package internal name including the `pfSense-pkg-` prefix. Non-pfSense packages cannot be deleted. |
 
 
 
@@ -7945,7 +7945,7 @@ URL: https://{{$hostname}}/api/v1/system/package
 
 | Key | Type | Description |
 | --- | ------|-------------|
-| name | string | Specify the name of pfSense package to install. This must be the pfSense package internal name include the `pfSense-pkg-` prefix or a URL to a third-party package. |
+| name | string | Specify the name of pfSense package to install. This must be the pfSense package internal name including the `pfSense-pkg-` prefix or a URL to a third-party package. |
 | timeout | integer | Specify the amount of time (in seconds) to allow the package installation to take before timing out. This must be a value less than or equal to `120`. Defaults to `90`. |
 | force | boolean | Specify whether or not this package should be forced to install. Forced installs will always force the package to re-install and bypasses certain warnings. Use caution when using forced installs. |
 
