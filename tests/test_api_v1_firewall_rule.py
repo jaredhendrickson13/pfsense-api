@@ -127,6 +127,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "pdnpipe": "Test_DNQueue2",
                 "defaultqueue": "Test_Altq",
                 "ackqueue": "Test_Altq2",
+                "gateway": "",
                 "log": True,
                 "top": True
             },
@@ -499,6 +500,14 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "gateway": "WAN_DHCP",
                 "log": False,
                 "top": True,
+                "apply": True
+            },
+            "resp_time": 3    # Allow a few seconds for the firewall filter to reload
+        },
+        {
+            "name": "Test ability to revert the gateway field to default",
+            "payload": {
+                "gateway": "default",
                 "apply": True
             },
             "resp_time": 3    # Allow a few seconds for the firewall filter to reload
