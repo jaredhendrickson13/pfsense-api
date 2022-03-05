@@ -32,6 +32,7 @@ require_once("functions.inc");
 require_once("openvpn.inc");
 require_once("certs.inc");
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 # Checks our content type header and parses the content accordingly
 function get_request_data() {
@@ -129,16 +130,18 @@ function create_jwt_server_key($rotate=false) {
 # Creates a JWT to use for JWT authentication
 function create_jwt($data) {
     global $config;
-    $api_config = get_api_config()[1];    // Save our current API config
-    $token_exp = $api_config["jwt_exp"];    // Expire token in one hours
-    create_jwt_server_key();    // Ensure we have a JWT server key
+
+    # Pull the API configuration and extract the jwt expiration value, then ensure a server key exists.
+    $api_config = get_api_config()[1];
+    $token_exp = $api_config["jwt_exp"];
+    create_jwt_server_key();
     $payload = array(
         "iss" => $config["system"]["hostname"],
         "exp" => time() + $token_exp,
         "nbf" => time(),
         "data" => $data
     );
-    return JWT::encode($payload, $api_config["server_key"]);
+    return JWT::encode($payload, $api_config["server_key"], "ES256");
 }
 
 # Decodes a JWT using our store server key
@@ -146,7 +149,7 @@ function decode_jwt($token) {
     $token = (is_string($token)) ? $token : "";
     $key = get_api_config()[1]["server_key"];    // Save our current server key
     try {
-        $decoded = (array) JWT::decode($token, $key, array('HS256'));
+        $decoded = (array) JWT::decode($token, new Key($key, "ES256"));
     } catch (\Exception $e) {
         $decoded = false;
     }
