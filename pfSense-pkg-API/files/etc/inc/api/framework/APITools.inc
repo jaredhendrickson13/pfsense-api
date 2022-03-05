@@ -18,6 +18,7 @@ require_once("php-jwt/src/JWT.php");
 require_once("php-jwt/src/ExpiredException.php");
 require_once("php-jwt/src/SignatureInvalidException.php");
 require_once("php-jwt/src/BeforeValidException.php");
+require_once("php-jwt/src/Key.php");
 require_once("config.inc");
 require_once("util.inc");
 require_once("interfaces.inc");
@@ -131,25 +132,28 @@ function create_jwt_server_key($rotate=false) {
 function create_jwt($data) {
     global $config;
 
-    # Pull the API configuration and extract the jwt expiration value, then ensure a server key exists.
+    # Pull the API configuration and extract the jwt expiration value, then ensure a server key and payload exists.
     $api_config = get_api_config()[1];
     $token_exp = $api_config["jwt_exp"];
     create_jwt_server_key();
     $payload = array(
         "iss" => $config["system"]["hostname"],
+        "aud" => $config["system"]["hostname"],
         "exp" => time() + $token_exp,
         "nbf" => time(),
         "data" => $data
     );
-    return JWT::encode($payload, $api_config["server_key"], "ES256");
+
+    # Return the encoded JWT
+    return JWT::encode($payload, $api_config["server_key"], "HS256");
 }
 
 # Decodes a JWT using our store server key
 function decode_jwt($token) {
     $token = (is_string($token)) ? $token : "";
-    $key = get_api_config()[1]["server_key"];    // Save our current server key
+    $key = get_api_config()[1]["server_key"];
     try {
-        $decoded = (array) JWT::decode($token, new Key($key, "ES256"));
+        $decoded = (array) JWT::decode($token, new Key($key, "HS256"));
     } catch (\Exception $e) {
         $decoded = false;
     }
