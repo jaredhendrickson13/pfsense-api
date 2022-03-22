@@ -217,18 +217,28 @@ class APIFirewallRuleUpdate extends APIModel {
             if (!isset($this->initial_data["gateway"])) {
                 $this->initial_data["gateway"] = $this->validated_data["gateway"];
             }
-            $gw_protocol = APITools\is_gateway($this->initial_data["gateway"], true);
-            # Check if we were able to locate the gateway
-            if ($gw_protocol === false) {
-                $this->errors[] = APIResponse\get(4043);
+
+            # Unset this field if the default value was requested
+            if (in_array($this->initial_data["gateway"], ["", "default"])) {
+                unset($this->validated_data["gateway"]);
             }
-            # Check if the gateway IP protocol matches our rule's IP protocol
-            elseif ($gw_protocol !== $this->validated_data["ipprotocol"]) {
-                $this->errors[] = APIResponse\get(4109);
-            }
-            # Otherwise, the gateway is valid
+            # Otherwise, proceed with validation
             else {
-                $this->validated_data["gateway"] = $this->initial_data["gateway"];
+                # Check this gateway's IP protocol
+                $gw_protocol = APITools\is_gateway($this->initial_data["gateway"], true);
+
+                # Check if we were able to locate the gateway
+                if ($gw_protocol === false) {
+                    $this->errors[] = APIResponse\get(4043);
+                }
+                # Check if the gateway IP protocol matches our rule's IP protocol
+                elseif ($gw_protocol !== $this->validated_data["ipprotocol"]) {
+                    $this->errors[] = APIResponse\get(4109);
+                }
+                # Otherwise, the gateway is valid
+                else {
+                    $this->validated_data["gateway"] = $this->initial_data["gateway"];
+                }
             }
         }
     }
