@@ -2619,7 +2619,7 @@
 										{
 											"key": "gateway",
 											"value": "string",
-											"description": "Set the routing gateway traffic will take upon match (optional)"
+											"description": "Set the routing gateway traffic will take upon match. (optional)"
 										},
 										{
 											"key": "sched",
@@ -2767,7 +2767,7 @@
 										{
 											"key": "gateway",
 											"value": "string",
-											"description": "Update the routing gateway traffic will take upon match (optional)"
+											"description": "Update the routing gateway traffic will take upon match. Specify `default` or an empty string to revert this field to the default gateway. (optional)"
 										},
 										{
 											"key": "sched",

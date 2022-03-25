@@ -194,18 +194,23 @@ class APIFirewallRuleCreate extends APIModel {
     private function __validate_gateway() {
         # Check for our optional 'gateway' payload value
         if (isset($this->initial_data['gateway'])) {
-            $gw_protocol = APITools\is_gateway($this->initial_data["gateway"], true);
-            # Check if we were able to locate the gateway
-            if ($gw_protocol === false) {
-                $this->errors[] = APIResponse\get(4043);
-            }
-            # Check if the gateway IP protocol matches our rule's IP protocol
-            elseif ($gw_protocol !== $this->validated_data["ipprotocol"]) {
-                $this->errors[] = APIResponse\get(4109);
-            }
-            # Otherwise, the gateway is valid
-            else {
-                $this->validated_data["gateway"] = $this->initial_data["gateway"];
+            # Only validate this field if the default was not requested.
+            if (!in_array($this->initial_data["gateway"], ["", "default"])) {
+                # Check this gateway's IP protocol
+                $gw_protocol = APITools\is_gateway($this->initial_data["gateway"], true);
+
+                # Check if we were able to locate the gateway
+                if ($gw_protocol === false) {
+                    $this->errors[] = APIResponse\get(4043);
+                }
+                # Check if the gateway IP protocol matches our rule's IP protocol
+                elseif ($gw_protocol !== $this->validated_data["ipprotocol"]) {
+                    $this->errors[] = APIResponse\get(4109);
+                }
+                # Otherwise, the gateway is valid
+                else {
+                    $this->validated_data["gateway"] = $this->initial_data["gateway"];
+                }
             }
         }
     }

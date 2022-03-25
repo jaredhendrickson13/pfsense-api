@@ -127,6 +127,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
                 "pdnpipe": "Test_DNQueue2",
                 "defaultqueue": "Test_Altq",
                 "ackqueue": "Test_Altq2",
+                "gateway": "",
                 "log": True,
                 "top": True
             },
@@ -549,6 +550,14 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
                 "dstport": "443",
                 "descr": "Unit test",
                 "direction": "out"
+            },
+                "resp_time": 3    # Allow a few seconds for the firewall filter to reload
+        },
+        }
+            "name": "Test ability to revert the gateway field to default",
+            "payload": {
+                "gateway": "default",
+                "apply": True
             },
             "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         },

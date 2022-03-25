@@ -18,6 +18,7 @@ require_once("php-jwt/src/JWT.php");
 require_once("php-jwt/src/ExpiredException.php");
 require_once("php-jwt/src/SignatureInvalidException.php");
 require_once("php-jwt/src/BeforeValidException.php");
+require_once("php-jwt/src/Key.php");
 require_once("config.inc");
 require_once("util.inc");
 require_once("interfaces.inc");
@@ -34,6 +35,7 @@ require_once("certs.inc");
 require_once("pkg-utils.inc");
 require_once("spyc-yaml/yaml.inc");
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 # Checks our content type header and parses the content accordingly
 function get_request_data() {
@@ -132,24 +134,29 @@ function create_jwt_server_key($rotate=false) {
 # Creates a JWT to use for JWT authentication
 function create_jwt($data) {
     global $config;
-    $api_config = get_api_config()[1];    // Save our current API config
-    $token_exp = $api_config["jwt_exp"];    // Expire token in one hours
-    create_jwt_server_key();    // Ensure we have a JWT server key
+
+    # Pull the API configuration and extract the jwt expiration value, then ensure a server key and payload exists.
+    $api_config = get_api_config()[1];
+    $token_exp = $api_config["jwt_exp"];
+    create_jwt_server_key();
     $payload = array(
         "iss" => $config["system"]["hostname"],
+        "aud" => $config["system"]["hostname"],
         "exp" => time() + $token_exp,
         "nbf" => time(),
         "data" => $data
     );
-    return JWT::encode($payload, $api_config["server_key"]);
+
+    # Return the encoded JWT
+    return JWT::encode($payload, $api_config["server_key"], "HS256");
 }
 
 # Decodes a JWT using our store server key
 function decode_jwt($token) {
     $token = (is_string($token)) ? $token : "";
-    $key = get_api_config()[1]["server_key"];    // Save our current server key
+    $key = get_api_config()[1]["server_key"];
     try {
-        $decoded = (array) JWT::decode($token, $key, array('HS256'));
+        $decoded = (array) JWT::decode($token, new Key($key, "HS256"));
     } catch (\Exception $e) {
         $decoded = false;
     }
