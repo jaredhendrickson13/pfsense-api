@@ -502,7 +502,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         {
             "name": "Test unknown floating direction",
             "status": 400,
-            "return": 6030,
+            "return": 4239,
             "payload": {
                 "type": "pass",
                 "interface": "wan",
@@ -551,9 +551,9 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
                 "descr": "Unit test",
                 "direction": "out"
             },
-                "resp_time": 3    # Allow a few seconds for the firewall filter to reload
+            "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         },
-        }
+        {
             "name": "Test ability to revert the gateway field to default",
             "payload": {
                 "gateway": "default",
@@ -705,7 +705,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         {
             "name": "Test unknown floating direction",
             "status": 400,
-            "return": 6030,
+            "return": 4239,
             "payload": {
                 "type": "pass",
                 "interface": "wan",

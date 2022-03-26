@@ -291,7 +291,7 @@ class APIE2ETest:
             '--timeout',
             dest="timeout",
             type=int,
-            default=12,
+            default=35,
             help="Connection timeout limit in seconds"
         )
         parser.add_argument(

@@ -52,42 +52,6 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
             }
         },
         {
-            "name": "Test IPv4 host override unique constraint",
-            "status": 400,
-            "return": 2010,
-            "payload": {
-                "host": "pfsense-api",
-                "domain": "e2e.test",
-                "ip": "1.2.3.4",
-                "descr": "E2E Test IPv4",
-                "aliases": [
-                    {
-                        "host": "pfsense-api-alias",
-                        "domain": "e2e.test",
-                        "description": "E2E Test"
-                    }
-                ]
-            }
-        },
-        {
-            "name": "Test IPv6 host override unique constraint",
-            "status": 400,
-            "return": 2010,
-            "payload": {
-                "host": "pfsense-api",
-                "domain": "e2e.test",
-                "ip": "fd00:abcd::",
-                "descr": "E2E Test IPv6",
-                "aliases": [
-                    {
-                        "host": "pfsense-api-alias",
-                        "domain": "e2e.test",
-                        "description": "E2E Test"
-                    }
-                ]
-            }
-        },
-        {
             "name": "Test host validation",
             "status": 400,
             "return": 2046,
@@ -151,40 +115,6 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
                         "description": "Updated E2E Test"
                     }
                 ]
-            }
-        },
-        {
-            "name": "Test host and domain field unique constraint update tolerance",
-            "payload": {
-                "id": 0,
-                "host": "updated-pfsense-api",
-                "domain": "updated-e2e.test",
-                "ip": "2.4.6.8",
-                "descr": "Check host and domain field unique constraint tolerance",
-                "apply": True
-            },
-            "resp_time": 10    # Allow a few seconds for Unbound to reload
-        },
-        {
-            "name": "Test IPv4 host override unique constraint",
-            "status": 400,
-            "return": 2010,
-            "payload": {
-                "id": 0,
-                "host": "updated-pfsense-api",
-                "domain": "updated-e2e.test",
-                "ip": "0::",
-            }
-        },
-        {
-            "name": "Test IPv6 host override unique constraint",
-            "status": 400,
-            "return": 2010,
-            "payload": {
-                "id": 1,
-                "host": "updated-pfsense-api",
-                "domain": "updated-e2e.test",
-                "ip": "4.3.2.1",
             }
         },
         {
