@@ -663,12 +663,12 @@
 												{
 													"key": "username",
 													"value": "string",
-													"description": "Username to grant new group membership"
+													"description": "Username to grant new group membership."
 												},
 												{
 													"key": "group",
 													"value": "string",
-													"description": "Name of group to assign. Multiple groups may be assigned at once if passed in as array. Group name must match exactly as is displayed in webConfigurator."
+													"description": "Name of group to assign this user to. Multiple groups may be assigned at once if passed in as array. Group names must match exactly as is displayed in webConfigurator."
 												}
 											]
 										},
@@ -706,12 +706,12 @@
 												{
 													"key": "username",
 													"value": "string",
-													"description": "Username of member to remove from group"
+													"description": "Username of member to remove from group."
 												},
 												{
 													"key": "group",
 													"value": "string",
-													"description": "Name of group to delete. Multiple groups may be deleted at once if passed in as array. Group name must match exactly as is displayed in webConfigurator."
+													"description": "Name of the group to remove membership from. Multiple groups may be deleted at once if passed in as array. Group name must match exactly as is displayed in webConfigurator."
 												}
 											]
 										},
