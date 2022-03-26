@@ -8264,7 +8264,7 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-g
 
 ```bash
 Method: POST
-URL: https://{{$hostname}}/api/v1/user/group
+URL: https://{{$hostname}}/api/v1/user/group/member
 ```
 
 
@@ -8301,7 +8301,7 @@ _Requires at least one of the following privileges:_ [`page-all`, `page-system-g
 
 ```bash
 Method: DELETE
-URL: https://{{$hostname}}/api/v1/user/group
+URL: https://{{$hostname}}/api/v1/user/group/member
 ```
 
 

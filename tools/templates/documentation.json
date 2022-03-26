@@ -644,7 +644,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/user/group?username=string&group=string",
+									"raw": "https://{{$hostname}}/api/v1/user/group/member?username=string&group=string",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"
@@ -687,7 +687,7 @@
 									}
 								},
 								"url": {
-									"raw": "https://{{$hostname}}/api/v1/user/group?username=string&group=string",
+									"raw": "https://{{$hostname}}/api/v1/user/group/member?username=string&group=string",
 									"protocol": "https",
 									"host": [
 										"{{$hostname}}"

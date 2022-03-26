@@ -1,8 +1,8 @@
 import e2e_test_framework
 
 
-class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
-    uri = "/api/v1/user/group"
+class APIE2ETestUserGroupMember(e2e_test_framework.APIE2ETest):
+    uri = "/api/v1/user/group/member"
     post_tests = [
         {
             "name": "Add user to admins group",
@@ -23,4 +23,4 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
     ]
 
 
-APIE2ETestUserGroup()
+APIE2ETestUserGroupMember()
