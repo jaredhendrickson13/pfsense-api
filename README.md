@@ -8273,8 +8273,8 @@ URL: https://{{$hostname}}/api/v1/user/group/member
 
 | Key | Type | Description |
 | --- | ------|-------------|
-| username | string | Username to grant new group membership |
-| group | string | Name of group to assign. Multiple groups may be assigned at once if passed in as array. Group name must match exactly as is displayed in webConfigurator. |
+| username | string | Username to grant new group membership. |
+| group | string | Name of group to assign this user to. Multiple groups may be assigned at once if passed in as array. Group names must match exactly as is displayed in webConfigurator. |
 
 
 
@@ -8310,8 +8310,8 @@ URL: https://{{$hostname}}/api/v1/user/group/member
 
 | Key | Type | Description |
 | --- | ------|-------------|
-| username | string | Username of member to remove from group |
-| group | string | Name of group to delete. Multiple groups may be deleted at once if passed in as array. Group name must match exactly as is displayed in webConfigurator. |
+| username | string | Username of member to remove from group. |
+| group | string | Name of the group to remove membership from. Multiple groups may be deleted at once if passed in as array. Group name must match exactly as is displayed in webConfigurator. |
 
 
 
