@@ -630,93 +630,124 @@
 					"name": "GROUP",
 					"item": [
 						{
-							"name": "Create User Group",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"username\": \"new_user\",\n\t\"group\": [\"admins\"]\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
+							"name": "MEMBER",
+							"item": [
+								{
+									"name": "Assign User Group Member",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"username\": \"new_user\",\n\t\"group\": [\"admins\"]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/user/group/member?username=string&group=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"user",
+												"group",
+												"member"
+											],
+											"query": [
+												{
+													"key": "username",
+													"value": "string",
+													"description": "Username to grant new group membership"
+												},
+												{
+													"key": "group",
+													"value": "string",
+													"description": "Name of group to assign. Multiple groups may be assigned at once if passed in as array. Group name must match exactly as is displayed in webConfigurator."
+												}
+											]
+										},
+										"description": "Add a user to an existing group.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Remove User Group Member",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"username\": \"new_user\",\n\t\"group\": \"test\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/user/group/member?username=string&group=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"user",
+												"group"
+											],
+											"query": [
+												{
+													"key": "username",
+													"value": "string",
+													"description": "Username of member to remove from group"
+												},
+												{
+													"key": "group",
+													"value": "string",
+													"description": "Name of group to delete. Multiple groups may be deleted at once if passed in as array. Group name must match exactly as is displayed in webConfigurator."
+												}
+											]
+										},
+										"description": "Delete a user from an existing group.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that assign or remove group membership of a user.",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "fdf6fdf8-da76-4ff2-a22d-ae99527a107c",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
 									}
 								},
-								"url": {
-									"raw": "https://{{$hostname}}/api/v1/user/group/member?username=string&group=string",
-									"protocol": "https",
-									"host": [
-										"{{$hostname}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"user",
-										"group"
-									],
-									"query": [
-										{
-											"key": "username",
-											"value": "string",
-											"description": "Username to grant new privilege"
-										},
-										{
-											"key": "group",
-											"value": "string",
-											"description": "Name of group to assign. Multiple groups may be assigned at once if passed in as array. Group name must match exactly as is displayed in webConfigurator."
-										}
-									]
-								},
-								"description": "Add a user to an existing group.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]"
-							},
-							"response": []
-						},
-						{
-							"name": "Delete User Group",
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"username\": \"new_user\",\n\t\"group\": \"test\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
+								{
+									"listen": "test",
+									"script": {
+										"id": "85540dd7-2448-4cbc-a4de-1c7dbda99c8b",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
 									}
-								},
-								"url": {
-									"raw": "https://{{$hostname}}/api/v1/user/group/member?username=string&group=string",
-									"protocol": "https",
-									"host": [
-										"{{$hostname}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"user",
-										"group"
-									],
-									"query": [
-										{
-											"key": "username",
-											"value": "string",
-											"description": "Username to remove from group"
-										},
-										{
-											"key": "group",
-											"value": "string",
-											"description": "Name of group to delete. Multiple groups may be deleted at once if passed in as array. Group name must match exactly as is displayed in webConfigurator."
-										}
-									]
-								},
-								"description": "Delete a user from an existing group.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]"
-							},
-							"response": []
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						}
 					],
-					"description": "API endpoints that create, read, update and delete pfSense user group memberships.",
+					"description": "API endpoints that create, read, update and delete pfSense user groups.",
 					"event": [
 						{
 							"listen": "prerequest",

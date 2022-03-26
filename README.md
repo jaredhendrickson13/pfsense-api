@@ -803,9 +803,9 @@ There is no limit to API calls at this time but is important to note that pfSens
     1. [Create Interface Bridges](#2-create-interface-bridges)
     1. [Update Interface Bridges](#3-update-interface-bridges)
     1. [Delete Interface Bridges](#4-delete-interface-bridges)
-* [USER/GROUP](#usergroup)
-    1. [Create User Group](#1-create-user-group)
-    1. [Delete User Group](#2-delete-user-group)
+* [USER/GROUP/MEMBER](#usergroupmember)
+    1. [Assign User Group Member](#1-assign-user-group-member)
+    1. [Remove User Group Member](#2-remove-user-group-member)
 * [USER/PRIVILEGE](#userprivilege)
     1. [Create User Privileges](#1-create-user-privileges)
     1. [Delete User Privileges](#2-delete-user-privileges)
@@ -8248,11 +8248,11 @@ URL: https://{{$hostname}}/api/v1/interface/bridge
 
 
 
-## USER/GROUP
+## USER/GROUP/MEMBER
 
 
 
-### 1. Create User Group
+### 1. Assign User Group Member
 
 
 Add a user to an existing group.<br><br>
@@ -8273,7 +8273,7 @@ URL: https://{{$hostname}}/api/v1/user/group/member
 
 | Key | Type | Description |
 | --- | ------|-------------|
-| username | string | Username to grant new privilege |
+| username | string | Username to grant new group membership |
 | group | string | Name of group to assign. Multiple groups may be assigned at once if passed in as array. Group name must match exactly as is displayed in webConfigurator. |
 
 
@@ -8289,7 +8289,7 @@ URL: https://{{$hostname}}/api/v1/user/group/member
 
 
 
-### 2. Delete User Group
+### 2. Remove User Group Member
 
 
 Delete a user from an existing group.<br><br>
@@ -8310,7 +8310,7 @@ URL: https://{{$hostname}}/api/v1/user/group/member
 
 | Key | Type | Description |
 | --- | ------|-------------|
-| username | string | Username to remove from group |
+| username | string | Username of member to remove from group |
 | group | string | Name of group to delete. Multiple groups may be deleted at once if passed in as array. Group name must match exactly as is displayed in webConfigurator. |
 
 
