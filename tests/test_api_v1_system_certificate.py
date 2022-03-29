@@ -231,6 +231,22 @@ class APIUnitTestSystemCertificate(unit_test_framework.APIUnitTest):
          "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1", "digest_alg": "sha256", "lifetime": 365, "dn_commonname": "test.example.com", "dn_country": "US", "type": "user", "altnames": [{"email": "#@!INVALIDEMAIL!@#"}]}
         }
     ]
+    put_tests = [
+        {
+            "name": "Check updating a non-existing certificate",
+            "status": 400,
+            "return": 1009,
+            "payload": {"descr": "INVALID"}
+        },
+        {
+            "name": "Update an existing certificate",
+            "payload": {
+                "descr": "Unit Test",
+                "crt": crt,
+                "prv": prv
+            }
+        },
+    ]
     delete_tests = [
         {
             "name": "Delete certificate",
