@@ -1006,6 +1006,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Missing OpenVPN client specific override parameter 'refid'. This parameter is needed to identify the csc to modify."
         ],
+        2999 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid service name specified."
+        ],
 
 
 

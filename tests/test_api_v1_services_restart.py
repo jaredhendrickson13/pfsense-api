@@ -20,6 +20,13 @@ class APIUnitTestServicesRestart(unit_test_framework.APIUnitTest):
         {
             "name": "Restart all services",
             "resp_time": 15    # Allow up to 15 seconds for all services to restart
+        },
+        {
+            "name": "Restart single service",
+            "resp_time": 15,    # Allow up to 15 seconds for all services to restart
+            "payload": {
+                "service": "sshd"
+            }
         }
     ]
 

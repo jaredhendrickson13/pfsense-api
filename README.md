@@ -4212,7 +4212,7 @@ URL: https://{{$hostname}}/api/v1/services
 
 
 
-### 2. Restart All Services
+### 2a. Restart All Services
 
 
 Restart all available services.<br><br>
@@ -4234,6 +4234,40 @@ URL: https://{{$hostname}}/api/v1/services/restart
 ```js        
 {
     
+}
+```
+
+
+
+### 2b. Restart Single Service
+
+
+Restart a single service.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/services/restart
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| service | String | Specify the name of the service to restart |
+***Example Request:***
+
+
+
+```js        
+{
+    "service": "sshd"
 }
 ```
 
