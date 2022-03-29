@@ -1475,6 +1475,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "OpenVPN Server The field 'DNS Server' must contain a valid IP address."
         ],
+        2999 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid service name specified."
+        ],
 
         // 3000-3999 reserved for /interfaces API calls
         3000 => [
