@@ -1,9 +1,9 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestSystemConfig(unit_test_framework.APIUnitTest):
+class APIE2ETestSystemConfig(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/system/config"
     get_tests = [{"name": "Read the entire pfSense configuration"}]
 
 
-APIUnitTestSystemConfig()
+APIE2ETestSystemConfig()

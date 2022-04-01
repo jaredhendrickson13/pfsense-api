@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestInterface(unit_test_framework.APIUnitTest):
+class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/interface"
     get_tests = [
         {"name": "Read all configured interfaces"}
@@ -520,7 +520,7 @@ class APIUnitTestInterface(unit_test_framework.APIUnitTest):
             "name": "Create a staticv4/staticv6 interface",
             "payload": {
                 "if": "em2",
-                "descr": "UNIT_TEST",
+                "descr": "e2e_test",
                 "enable": True,
                 "type": "staticv4",
                 "type6": "staticv6",
@@ -559,7 +559,7 @@ class APIUnitTestInterface(unit_test_framework.APIUnitTest):
             "name": "Update staticv4/staticv6 interface to dhcp/dhcp6 and apply",
             "payload": {
                 "id": "em2",
-                "descr": "UNIT_TEST_UPDATED",
+                "descr": "e2e_test_UPDATED",
                 "enable": False,
                 "type": "dhcp",
                 "type6": "dhcp6",
@@ -614,4 +614,4 @@ class APIUnitTestInterface(unit_test_framework.APIUnitTest):
         }
     ]
 
-APIUnitTestInterface()
+APIE2ETestInterface()

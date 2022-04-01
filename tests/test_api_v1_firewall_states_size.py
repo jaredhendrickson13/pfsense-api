@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestFirewallStatesSize(unit_test_framework.APIUnitTest):
+class APIE2ETestFirewallStatesSize(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/firewall/states/size"
     get_tests = [{"name": "Read firewall states size"}]
     put_tests = [
@@ -28,4 +28,4 @@ class APIUnitTestFirewallStatesSize(unit_test_framework.APIUnitTest):
         }
     ]
 
-APIUnitTestFirewallStatesSize()
+APIE2ETestFirewallStatesSize()

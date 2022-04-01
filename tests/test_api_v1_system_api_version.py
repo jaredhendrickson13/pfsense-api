@@ -1,9 +1,9 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestSystemAPIVersion(unit_test_framework.APIUnitTest):
+class APIE2ETestSystemAPIVersion(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/system/api/version"
     get_tests = [{"name": "Read API version"}]
 
 
-APIUnitTestSystemAPIVersion()
+APIE2ETestSystemAPIVersion()

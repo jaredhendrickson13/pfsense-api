@@ -1,7 +1,7 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestSystemHalt(unit_test_framework.APIUnitTest):
+class APIE2ETestSystemHalt(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/system/halt"
     post_tests = [
         {
@@ -11,4 +11,4 @@ class APIUnitTestSystemHalt(unit_test_framework.APIUnitTest):
     ]
 
 
-APIUnitTestSystemHalt()
+APIE2ETestSystemHalt()

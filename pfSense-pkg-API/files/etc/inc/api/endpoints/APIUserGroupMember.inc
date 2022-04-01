@@ -15,16 +15,16 @@
 
 require_once("api/framework/APIEndpoint.inc");
 
-class APIUserGroup extends APIEndpoint {
+class APIUserGroupMember extends APIEndpoint {
     public function __construct() {
-        $this->url = "/api/v1/user/group";
+        $this->url = "/api/v1/user/group/member";
     }
 
     protected function post() {
-        return (new APIUserGroupCreate())->call();
+        return (new APIUserGroupMemberCreate())->call();
     }
 
     protected function delete() {
-        return (new APIUserGroupDelete())->call();
+        return (new APIUserGroupMemberDelete())->call();
     }
 }

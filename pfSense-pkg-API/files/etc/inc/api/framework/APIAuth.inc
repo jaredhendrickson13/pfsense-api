@@ -44,8 +44,12 @@ class APIAuth {
     # AUTHENTICATION #
     # Attempts to authenticate using local database authentication
     private function authenticate_local_database() {
-        $this->username = $this->request["client-id"];
-        // Authenticate against local database
+        # Attempt to pull credentials from basic auth, fallback to original request body credentials
+        # TODO: in a future release make basic authentication the only way to pass in local database credentials
+        $this->username = (!empty($_SERVER['PHP_AUTH_USER'])) ? $_SERVER['PHP_AUTH_USER'] : $this->request["client-id"];
+        $this->request["client-token"] = (!empty($_SERVER['PHP_AUTH_PW'])) ? $_SERVER['PHP_AUTH_PW'] : $this->request["client-token"];
+
+        # Authenticate against local database
         if (authenticate_user($this->username, $this->request["client-token"])) {
             // Ensure user is not disabled
             if (APITools\is_user_disabled($this->username) === false) {
@@ -64,7 +68,7 @@ class APIAuth {
         $token = $auth_header[1];
         $decoded_jwt = APITools\decode_jwt($token);
 
-        // Check that the JWT from our Authorization header is valid
+        # Check that the JWT from our Authorization header is valid
         if ($token_type === "Bearer" and $decoded_jwt !== false) {
             $this->username = $decoded_jwt["data"];
             // Ensure user is not disabled
@@ -129,13 +133,16 @@ class APIAuth {
 
         # If no require privileges were given, assume call is always authorized
         if (!empty($this->req_privs)) {
-            # If API is in readonly mode, only allow GET requests
-            if (!$this->read_mode or ($this->read_mode and $_SERVER['REQUEST_METHOD'] === "GET")) {
-                # Loop through each of our req privs and ensure the client has them, also check if access is read only
-                foreach ($this->req_privs as &$priv) {
-                    if (in_array($priv, $this->privs)) {
-                        $authorized = true;
-                        break;
+            # Check that client's IP is authorized
+            if ($this->__is_ip_authorized()) {
+                # If API is in readonly mode, only allow GET requests
+                if (!$this->read_mode or ($this->read_mode and $_SERVER['REQUEST_METHOD'] === "GET")) {
+                    # Loop through each of our req privs and ensure client has them, also check if access is read only
+                    foreach ($this->req_privs as &$priv) {
+                        if (in_array($priv, $this->privs)) {
+                            $authorized = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -146,5 +153,25 @@ class APIAuth {
         # Set our class is_authorized attribute to our authorization resp and return the resp
         $this->is_authorized = $authorized;
         return $authorized;
+    }
+
+    # Check if our client's IP is within our API access list
+    private function __is_ip_authorized() {
+        # Check if we have any API access list entries
+        if (!empty($this->api_config["access_list"])) {
+            # Check if the client's IP is within any of the allowed subnets
+            foreach (explode(" ", $this->api_config["access_list"]) as $subnet) {
+                # This IP is authorized if it's within this subnet
+                if (APITools\is_ip_in_cidr($this->ip_address, $subnet)) {
+                    return true;
+                }
+            }
+            # IP is not authorized if it's not within any configured subnet
+            return false;
+        }
+        # The API access list is not configured, authorize any IP
+        else {
+            return true;
+        }
     }
 }

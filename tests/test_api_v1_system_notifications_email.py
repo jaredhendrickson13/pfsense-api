@@ -1,7 +1,7 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestSystemNotificationsEmail(unit_test_framework.APIUnitTest):
+class APIE2ETestSystemNotificationsEmail(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/system/notifications/email"
     get_tests = [{"name": "Read the system email notification settings"}]
     put_tests = [
@@ -127,4 +127,4 @@ class APIUnitTestSystemNotificationsEmail(unit_test_framework.APIUnitTest):
     ]
 
 
-APIUnitTestSystemNotificationsEmail()
+APIE2ETestSystemNotificationsEmail()

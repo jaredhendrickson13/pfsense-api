@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "3c9386e2-aa20-4f27-8851-a5f6bc57e8eb",
 		"name": "pfSense REST API Documentation",
-		"description": "---\n\n# Introduction\npfSense API is a fast, safe, REST API package for pfSense firewalls. This works by leveraging the same PHP functions and processes used \nby pfSense's webConfigurator into API endpoints to create, read, update and delete pfSense configurations. All API \nendpoints enforce input validation to prevent invalid configurations from being made. Configurations made via API are \nproperly written to the master XML configuration and the correct backend configurations are made preventing the need for\n a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!\n\n\n# Requirements\n- pfSense CE 2.5.0 or later is supported. pfSense Plus is NOT compatible with this API and will break your pfSense Plus installation. (older pfSense CE versions may be compatible with older versions of pfSense API)\n- pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the \nwebConfigurator are required to make calls to the API endpoints\n- While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit\n\n\n# Installation\nTo install pfSense API, simply run the following command from the pfSense shell:<br>\n```\npkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.5-pkg-API.txz && /etc/rc.restart_webgui\n```\n\nTo uninstall pfSense API, run the following command:<br>\n```\npfsense-api delete\n```\n\nTo update pfSense API to the latest stable version, run the following command:\n```\npfsense-api update\n```\n\nTo revert to a previous version of pfSense API (e.g. v1.1.7), run the following command:\n```\npfsense-api revert v1.1.7\n```\n\n### Notes: \n- To install the 2.6 package, simply change the `2.5` in the install URL to `2.6`.\n- In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package\n- If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to \n'Diagnostics > Command Prompt' and enter the commands there\n- When updating pfSense, **_you must reinstall pfSense API afterwards_**. Unfortunately, pfSense removes all existing packages and only re-installs packages found within pfSense's package repositories. Since pfSense API is not an official package in pfSense's repositories, it does not get reinstalled automatically.\n- The `pfsense-api` command line tool was introduced in v1.1.0. Refer to the corresponding documentation for earlier releases.\n\n\n# UI Settings & Documentation\nAfter installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System > API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation in context to your pfSense instance.\n\n### Notes: \n- Users must hold the `page-all` or `page-system-api` privileges to access the API page within the webConfigurator\n\n\n# Authentication & Authorization\nBy default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense \nfrom the API out of the box, and user passwords may be changed from the API to immediately add additional security if \nneeded. After installation, you can navigate to System > API in the pfSense webConfigurator to configure API\nauthentication. Please note that external authentication servers like LDAP or RADIUS are not supported with any \nAPI authentication method at this time. \n\nTo authenticate your API call, follow the instructions for your configured authentication mode:\n\n<details>\n    <summary>Local Database (default)</summary>\n\nUses the same credentials as the pfSense webConfigurator. To authenticate API calls, simply add a `client-id` value containing your username and a `client-token` value containing your password to your payload. For example `{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}`\n\n</details>\n\n<details>\n    <summary>JWT</summary>\n\nRequires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a `client-id` value containing your pfSense username and a `client-token` value containing your pfSense password to your payload. For example `{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}`. Once you have your bearer token, you can authenticate your API call by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)\n</details>\n\n<details>\n    <summary>API Token</summary>\n\nUses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication; not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by specifying your client-id and client-token within an `Authorization` header, these values must be separated by a space. (e.g. `Authorization: client-id-here client-token-here`)\n\n_Note: In previous versions of pfSense API, the client-id and client-token were provided via the request payload. This functionality is still supported but is not recommended. It will be removed in a future release._\n\n</details>\n\n### Authorization\npfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.\n\n\n# Content Types\npfSense API can handle a few different content types. Please note, if a `Content-Type` header is not specified in your request, pfSense API will attempt to determine the\ncontent type which may have undesired results. It is recommended you specify your preferred `Content-Type` on each request. While several content types may be enabled,\n`application/json` is the recommended content type. Supported content types are:\n\n<details>\n    <summary>application/json</summary>\n\nParses the request body as a JSON formatted string. This is the recommended content type.\n\nExample:\n\n```\ncurl -s -H \"Content-Type: application/json\" -d '{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}' -X GET https://pfsense.example.com/api/v1/system/arp\n{\n  \"status\": \"ok\",\n  \"code\": 200,\n  \"return\": 0,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"ip\": \"192.168.1.1\",\n      \"mac\": \"00:0c:29:f6:be:d9\",\n      \"interface\": \"em1\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    },\n    {\n      \"ip\": \"172.16.209.139\",\n      \"mac\": \"00:0c:29:f6:be:cf\",\n      \"interface\": \"em0\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    }\n  ]\n}\n```\n\n</details>\n\n<details>\n    <summary>application/x-www-form-urlencoded</summary>\n\nParses the request body as URL encoded parameters. Note: boolean and integer types may not be parsed using this content type.\n\nExample:\n\n```\ncurl -s -H \"Content-Type: application/x-www-form-urlencoded\" -X GET \"https://pfsense.example.com/api/v1/system/arp?client-id=admin&client-token=pfsense\"\n{\n  \"status\": \"ok\",\n  \"code\": 200,\n  \"return\": 0,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"ip\": \"192.168.1.1\",\n      \"mac\": \"00:0c:29:f6:be:d9\",\n      \"interface\": \"em1\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    },\n    {\n      \"ip\": \"172.16.209.139\",\n      \"mac\": \"00:0c:29:f6:be:cf\",\n      \"interface\": \"em0\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    }\n  ]\n}\n```\n\n</details>\n\n# Response Codes\n`200 (OK)` : API call succeeded<br>\n`400 (Bad Request)` : An error was found within your requested parameters<br>\n`401 (Unauthorized)` : API client has not completed authentication or authorization successfully<br>\n`403 (Forbidden)` : The API endpoint has refused your call. Commonly due to your access settings found in System > API<br>\n`404 (Not found)` : Either the API endpoint or requested data was not found<br>\n`500 (Server error)` : The API endpoint encountered an unexpected error processing your API request<br>\n\n\n# Error Codes\nA full list of error codes can be found by navigating to /api/v1/system/api/error after installation. This will return\n JSON data containing each error code and their corresponding error message. No authentication is required to view the \n error code library. This also makes API integration with third-party software easy as the API error codes and messages \n are always just an HTTP call away!\n\n\n# Queries\npfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field. \n<details>\n    <summary>Targeting Objects</summary>\n    \nYou may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns this response without a query:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you want the endpoint to only return the objects that have their `type` value set to `type1` you could add `{\"type\": \"type1\"}` to your payload. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n    ]\n}\n```\n\nAdditionally, if you need to target values that are nested within an array, you can add `{\"extra__tag\": 100}` to recursively target the `tag` value within the `extra` array. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n</details>\n\n<details>\n    <summary>Query Filters</summary>\n    \nQuery filters allow you to apply logic to the objects you target. This makes it easy to target data that meets specific criteria:\n\n### Starts With\n    \nThe `startswith` filter allows you to target objects whose values start with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names started with `Other`, you could use the payload `{\"name__startswith\": \"Other\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n### Ends With\n    \nThe `endswith` filter allows you to target objects whose values end with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names ended with `er Test`, you could use the payload `{\"name__endswith\" \"er Test\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}    \n    ]\n}\n```\n\n### Contains\n    \nThe `contains` filter allows you to target objects whose values contain a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names contain `ther`, you could use the payload `{\"name__contains\": \"ther\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}    \n    ]\n}\n```\n\n### Less Than\n    \nThe `lt` filter allows you to target objects whose values are less than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is less than `100`, you could use the payload `{\"extra__tag__lt\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}  \n    ]\n}\n```\n\n### Less Than or Equal To\n    \nThe `lte` filter allows you to target objects whose values are less than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is less than or equal to `100`, you could use the payload `{\"extra__tag__lte\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}},\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n### Greater Than\n    \nThe `gt` filter allows you to target objects whose values are greater than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is greater than `100`, you could use the payload `{\"extra__tag__gt\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}  \n    ]\n}\n```\n\n### Greater Than or Equal To\n    \nThe `lte` filter allows you to target objects whose values are greater than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is greater than or equal to `100`, you could use the payload `{\"extra__tag__gte\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n    ]\n}\n```\n\n</details>\n\n### Obtaining Object IDs\nYou may notice some API endpoints require an object `id` to update or delete objects. These IDs are not stored values, rather pfSense uses the object's array index value to locate and identify objects. Unless specified otherwise, API endpoints will use the same array index value (as returned in the `data` response field) to locate objects when updating or deleting. Some important items to note about these IDs:\n\n- pfSense starts arrays with an index of 0. If you use a loop counter to determine the ID of a specific object, you must start that counter at 0.\n- These IDs are dynamic. For example, if you have 3 static route objects stored (IDs `0`, `1`, and `2`) and you _delete_ the object with ID `1`, pfSense will resort the array so the object with ID `2` will now have an ID of `1`.\n- API queries will retain the object's ID in the response. In the event that the `data` response field is no longer a sequential array due to the query, the `data` field will be represented as an associative array with the array items` key being the objects ID.\n\n### Requirements for queries:\n- API call must be successful and return `0` in the `return` field.\n- Endpoints must return an array of objects in the data field (e.g. `[{\"id\": 0, \"name\": \"Test\"}, {\"id\": 1, \"name\": \"Other Test\"}]`).\n- At least two objects must be present within the data field to support queries.\n\n### Notes:\n- For those using the Local database or API token authentication types, `client-id` and `client-token` are excluded from queries by default\n- Both recursive queries and query filters are separated by double underscores (`__`)\n\n\n# Rate limit\nThere is no limit to API calls at this time but is important to note that pfSense's XML configuration was not designed for quick simultaneous writes like a traditional database. It may be necessary to delay API calls in sequence to prevent unexpected behavior. Alternatively, you may limit the API to read-only mode to only allow endpoints with read (GET) access within the webConfigurator's System > API page.\n\n\n# Endpoints",
+		"description": "---\n\n# Introduction\npfSense API is a fast, safe, REST API package for pfSense firewalls. This works by leveraging the same PHP functions and processes used \nby pfSense's webConfigurator into API endpoints to create, read, update and delete pfSense configurations. All API \nendpoints enforce input validation to prevent invalid configurations from being made. Configurations made via API are \nproperly written to the master XML configuration and the correct backend configurations are made preventing the need for\n a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!\n\n\n# Requirements\n- pfSense CE 2.5.0 or later is supported. pfSense Plus is NOT compatible with this API and will break your pfSense Plus installation. (older pfSense CE versions may be compatible with older versions of pfSense API)\n- pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the \nwebConfigurator are required to make calls to the API endpoints\n- While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit\n\n\n# Installation\nTo install pfSense API, simply run the following command from the pfSense shell:<br>\n```\npkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.5-pkg-API.txz && /etc/rc.restart_webgui\n```\n\nTo uninstall pfSense API, run the following command:<br>\n```\npfsense-api delete\n```\n\nTo update pfSense API to the latest stable version, run the following command:\n```\npfsense-api update\n```\n\nTo revert to a previous version of pfSense API (e.g. v1.1.7), run the following command:\n```\npfsense-api revert v1.1.7\n```\n\n### Notes: \n- To install the 2.6 package, simply change the `2.5` in the install URL to `2.6`.\n- In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package\n- If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to \n'Diagnostics > Command Prompt' and enter the commands there\n- When updating pfSense, **_you must reinstall pfSense API afterwards_**. Unfortunately, pfSense removes all existing packages and only re-installs packages found within pfSense's package repositories. Since pfSense API is not an official package in pfSense's repositories, it does not get reinstalled automatically.\n- The `pfsense-api` command line tool was introduced in v1.1.0. Refer to the corresponding documentation for earlier releases.\n\n\n# UI Settings & Documentation\nAfter installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System > API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation in context to your pfSense instance.\n\n### Notes: \n- Users must hold the `page-all` or `page-system-api` privileges to access the API page within the webConfigurator\n\n\n# Authentication & Authorization\nBy default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense \nfrom the API out of the box, and user passwords may be changed from the API to immediately add additional security if \nneeded. After installation, you can navigate to System > API in the pfSense webConfigurator to configure API\nauthentication. Please note that external authentication servers like LDAP or RADIUS are not supported with any \nAPI authentication method at this time. \n\nTo authenticate your API call, follow the instructions for your configured authentication mode:\n\n<details>\n    <summary>Local Database (default)</summary>\n\nUses the same credentials as the pfSense webConfigurator. To authenticate API calls, pass in your username and password using basic authentication. For example: `curl -u admin:pfsense https://pfsense.example.com/api/v1/firewall/rule`\n\n_Note: in previous releases, local database authentication used the `client-id` and `client-token` fields in your request body to authenticate. This functionality still exists but is not recommended. It will be removed in a future release._\n</details>\n\n<details>\n    <summary>JWT</summary>\n\nRequires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a `client-id` value containing your pfSense username and a `client-token` value containing your pfSense password to your payload. For example `{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}`. Once you have your bearer token, you can authenticate your API call by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)\n</details>\n\n<details>\n    <summary>API Token</summary>\n\nUses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication; not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by specifying your client-id and client-token within an `Authorization` header, these values must be separated by a space. (e.g. `Authorization: client-id-here client-token-here`)\n\n_Note: In previous versions of pfSense API, the client-id and client-token were provided via the request payload. This functionality is still supported but is not recommended. It will be removed in a future release._\n\n</details>\n\n### Authorization\npfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.\n\n\n# Content Types\npfSense API can handle a few different content types. Please note, if a `Content-Type` header is not specified in your request, pfSense API will attempt to determine the\ncontent type which may have undesired results. It is recommended you specify your preferred `Content-Type` on each request. While several content types may be enabled,\n`application/json` is the recommended content type. Supported content types are:\n\n<details>\n    <summary>application/json</summary>\n\nParses the request body as a JSON formatted string. This is the recommended content type.\n\nExample:\n\n```\ncurl -s -H \"Content-Type: application/json\" -d '{\"client-id\": \"admin\", \"client-token\": \"pfsense\"}' -X GET https://pfsense.example.com/api/v1/system/arp\n{\n  \"status\": \"ok\",\n  \"code\": 200,\n  \"return\": 0,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"ip\": \"192.168.1.1\",\n      \"mac\": \"00:0c:29:f6:be:d9\",\n      \"interface\": \"em1\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    },\n    {\n      \"ip\": \"172.16.209.139\",\n      \"mac\": \"00:0c:29:f6:be:cf\",\n      \"interface\": \"em0\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    }\n  ]\n}\n```\n\n</details>\n\n<details>\n    <summary>application/yaml</summary>\n\nParses the request body as a YAML formatted string.\n\nExample:\n\n```\ncurl -s -H \"Content-Type: application/yaml\" --data-binary @requestbody.yml -X GET https://pfsense.example.com/api/v1/system/arp\ncode: 200\ndata:\n- interface: em1\n  ip: 192.168.1.1\n  linktype: ethernet\n  mac: 00:0c:29:f6:be:d9\n  status: permanent\n- interface: em0\n  ip: 172.16.209.139\n  linktype: ethernet\n  mac: 00:0c:29:f6:be:cf\n  status: permanent\nmessage: Success\nreturn: 0\nstatus: ok\n```\n\n_Note: request body must be contained within a properly formatted YAML file and data must be sent as binary data. Using the YAML content type may impact performance compared to JSON._\n\n</details>\n\n<details>\n    <summary>application/x-www-form-urlencoded</summary>\n\nParses the request body as URL encoded parameters. Note: boolean and integer types may not be parsed using this content type.\n\nExample:\n\n```\ncurl -s -H \"Content-Type: application/x-www-form-urlencoded\" -X GET \"https://pfsense.example.com/api/v1/system/arp?client-id=admin&client-token=pfsense\"\n{\n  \"status\": \"ok\",\n  \"code\": 200,\n  \"return\": 0,\n  \"message\": \"Success\",\n  \"data\": [\n    {\n      \"ip\": \"192.168.1.1\",\n      \"mac\": \"00:0c:29:f6:be:d9\",\n      \"interface\": \"em1\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    },\n    {\n      \"ip\": \"172.16.209.139\",\n      \"mac\": \"00:0c:29:f6:be:cf\",\n      \"interface\": \"em0\",\n      \"status\": \"permanent\",\n      \"linktype\": \"ethernet\"\n    }\n  ]\n}\n```\n\n</details>\n\n# Response Codes\n`200 (OK)` : API call succeeded<br>\n`400 (Bad Request)` : An error was found within your requested parameters<br>\n`401 (Unauthorized)` : API client has not completed authentication or authorization successfully<br>\n`403 (Forbidden)` : The API endpoint has refused your call. Commonly due to your access settings found in System > API<br>\n`404 (Not found)` : Either the API endpoint or requested data was not found<br>\n`500 (Server error)` : The API endpoint encountered an unexpected error processing your API request<br>\n\n\n# Error Codes\nA full list of error codes can be found by navigating to /api/v1/system/api/error after installation. This will return\n JSON data containing each error code and their corresponding error message. No authentication is required to view the \n error code library. This also makes API integration with third-party software easy as the API error codes and messages \n are always just an HTTP call away!\n\n\n# Queries\npfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field. \n<details>\n    <summary>Targeting Objects</summary>\n    \nYou may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns this response without a query:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you want the endpoint to only return the objects that have their `type` value set to `type1` you could add `{\"type\": \"type1\"}` to your payload. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n    ]\n}\n```\n\nAdditionally, if you need to target values that are nested within an array, you can add `{\"extra__tag\": 100}` to recursively target the `tag` value within the `extra` array. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n</details>\n\n<details>\n    <summary>Query Filters</summary>\n    \nQuery filters allow you to apply logic to the objects you target. This makes it easy to target data that meets specific criteria:\n\n### Starts With\n    \nThe `startswith` filter allows you to target objects whose values start with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names started with `Other`, you could use the payload `{\"name__startswith\": \"Other\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n### Ends With\n    \nThe `endswith` filter allows you to target objects whose values end with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names ended with `er Test`, you could use the payload `{\"name__endswith\" \"er Test\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}    \n    ]\n}\n```\n\n### Contains\n    \nThe `contains` filter allows you to target objects whose values contain a specific substring. This will work on both string and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose names contain `ther`, you could use the payload `{\"name__contains\": \"ther\"}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}    \n    ]\n}\n```\n\n### Less Than\n    \nThe `lt` filter allows you to target objects whose values are less than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is less than `100`, you could use the payload `{\"extra__tag__lt\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}  \n    ]\n}\n```\n\n### Less Than or Equal To\n    \nThe `lte` filter allows you to target objects whose values are less than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is less than or equal to `100`, you could use the payload `{\"extra__tag__lte\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}},\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}}\n    ]\n}\n```\n\n### Greater Than\n    \nThe `gt` filter allows you to target objects whose values are greater than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is greater than `100`, you could use the payload `{\"extra__tag__gt\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}  \n    ]\n}\n```\n\n### Greater Than or Equal To\n    \nThe `lte` filter allows you to target objects whose values are greater than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 0, \"name\": \"Test\", \"type\": \"type1\", \"extra\": {\"tag\": 0}}, \n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n\n    ]\n}\n```\n\nIf you wanted to target objects whose tag is greater than or equal to `100`, you could use the payload `{\"extra__tag__gte\": 100}`. This returns:\n\n```json\n{\n    \"status\":\"ok\",\n    \"code\":200,\n    \"return\":0,\n    \"message\":\"Success\",\n    \"data\": [\n        {\"id\": 1, \"name\": \"Other Test\", \"type\": \"type2\", \"extra\": {\"tag\": 100}},\n        {\"id\": 2, \"name\": \"Another Test\", \"type\": \"type1\", \"extra\": {\"tag\": 200}}\n    ]\n}\n```\n\n</details>\n\n### Obtaining Object IDs\nYou may notice some API endpoints require an object `id` to update or delete objects. These IDs are not stored values, rather pfSense uses the object's array index value to locate and identify objects. Unless specified otherwise, API endpoints will use the same array index value (as returned in the `data` response field) to locate objects when updating or deleting. Some important items to note about these IDs:\n\n- pfSense starts arrays with an index of 0. If you use a loop counter to determine the ID of a specific object, you must start that counter at 0.\n- These IDs are dynamic. For example, if you have 3 static route objects stored (IDs `0`, `1`, and `2`) and you _delete_ the object with ID `1`, pfSense will resort the array so the object with ID `2` will now have an ID of `1`.\n- API queries will retain the object's ID in the response. In the event that the `data` response field is no longer a sequential array due to the query, the `data` field will be represented as an associative array with the array items` key being the objects ID.\n\n### Requirements for queries:\n- API call must be successful and return `0` in the `return` field.\n- Endpoints must return an array of objects in the data field (e.g. `[{\"id\": 0, \"name\": \"Test\"}, {\"id\": 1, \"name\": \"Other Test\"}]`).\n- At least two objects must be present within the data field to support queries.\n\n### Notes:\n- For those using the Local database or API token authentication types, `client-id` and `client-token` are excluded from queries by default\n- Both recursive queries and query filters are separated by double underscores (`__`)\n\n\n# Rate limit\nThere is no limit to API calls at this time but is important to note that pfSense's XML configuration was not designed for quick simultaneous writes like a traditional database. It may be necessary to delay API calls in sequence to prevent unexpected behavior. Alternatively, you may limit the API to read-only mode to only allow endpoints with read (GET) access within the webConfigurator's System > API page.\n\n\n# Endpoints",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -630,93 +630,124 @@
 					"name": "GROUP",
 					"item": [
 						{
-							"name": "Create User Group",
-							"request": {
-								"method": "POST",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"username\": \"new_user\",\n\t\"group\": [\"admins\"]\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
+							"name": "MEMBER",
+							"item": [
+								{
+									"name": "Assign User Group Member",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"username\": \"new_user\",\n\t\"group\": [\"admins\"]\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/user/group/member?username=string&group=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"user",
+												"group",
+												"member"
+											],
+											"query": [
+												{
+													"key": "username",
+													"value": "string",
+													"description": "Username to grant new group membership."
+												},
+												{
+													"key": "group",
+													"value": "string",
+													"description": "Name of group to assign this user to. Multiple groups may be assigned at once if passed in as array. Group names must match exactly as is displayed in webConfigurator."
+												}
+											]
+										},
+										"description": "Add a user to an existing group.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]"
+									},
+									"response": []
+								},
+								{
+									"name": "Remove User Group Member",
+									"request": {
+										"method": "DELETE",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"username\": \"new_user\",\n\t\"group\": \"test\"\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/user/group/member?username=string&group=string",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"user",
+												"group"
+											],
+											"query": [
+												{
+													"key": "username",
+													"value": "string",
+													"description": "Username of member to remove from group."
+												},
+												{
+													"key": "group",
+													"value": "string",
+													"description": "Name of the group to remove membership from. Multiple groups may be deleted at once if passed in as array. Group name must match exactly as is displayed in webConfigurator."
+												}
+											]
+										},
+										"description": "Delete a user from an existing group.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that assign or remove group membership of a user.",
+							"event": [
+								{
+									"listen": "prerequest",
+									"script": {
+										"id": "fdf6fdf8-da76-4ff2-a22d-ae99527a107c",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
 									}
 								},
-								"url": {
-									"raw": "https://{{$hostname}}/api/v1/user/group?username=string&group=string",
-									"protocol": "https",
-									"host": [
-										"{{$hostname}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"user",
-										"group"
-									],
-									"query": [
-										{
-											"key": "username",
-											"value": "string",
-											"description": "Username to grant new privilege"
-										},
-										{
-											"key": "group",
-											"value": "string",
-											"description": "Name of group to assign. Multiple groups may be assigned at once if passed in as array. Group name must match exactly as is displayed in webConfigurator."
-										}
-									]
-								},
-								"description": "Add a user to an existing group.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]"
-							},
-							"response": []
-						},
-						{
-							"name": "Delete User Group",
-							"request": {
-								"method": "DELETE",
-								"header": [],
-								"body": {
-									"mode": "raw",
-									"raw": "{\n\t\"username\": \"new_user\",\n\t\"group\": \"test\"\n}",
-									"options": {
-										"raw": {
-											"language": "json"
-										}
+								{
+									"listen": "test",
+									"script": {
+										"id": "85540dd7-2448-4cbc-a4de-1c7dbda99c8b",
+										"type": "text/javascript",
+										"exec": [
+											""
+										]
 									}
-								},
-								"url": {
-									"raw": "https://{{$hostname}}/api/v1/user/group?username=string&group=string",
-									"protocol": "https",
-									"host": [
-										"{{$hostname}}"
-									],
-									"path": [
-										"api",
-										"v1",
-										"user",
-										"group"
-									],
-									"query": [
-										{
-											"key": "username",
-											"value": "string",
-											"description": "Username to remove from group"
-										},
-										{
-											"key": "group",
-											"value": "string",
-											"description": "Name of group to delete. Multiple groups may be deleted at once if passed in as array. Group name must match exactly as is displayed in webConfigurator."
-										}
-									]
-								},
-								"description": "Delete a user from an existing group.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]"
-							},
-							"response": []
+								}
+							],
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
 						}
 					],
-					"description": "API endpoints that create, read, update and delete pfSense user group memberships.",
+					"description": "API endpoints that create, read, update and delete pfSense user groups.",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -2435,7 +2466,8 @@
 												"api",
 												"v1",
 												"firewall",
-												"rule"
+												"rule",
+												"flush"
 											]
 										},
 										"description": "Deletes all existing firewall rules. This is useful for scripts that need to setup the firewall rules from scratch.<br><br>_Note: this endpoint will not reload the firewall filter automatically, you must make another API call to the /api/v1/firewall/apply endpoint to do so. Ensure firewall rules are created before reloading the filter to prevent lockout!_.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules-edit`]"
@@ -2444,6 +2476,68 @@
 								}
 							],
 							"description": "API endpoints that flush existing firewall rule configurations.",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
+							"name": "SORT",
+							"item": [
+								{
+									"name": "Sort Firewall Rules",
+									"request": {
+										"method": "PUT",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{\n\t\"field\": \"descr\",\n\t\"option\": \"descend\",\n\t\"dry_run\": true\n}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/firewall/rule/sort",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"firewall",
+												"rule",
+												"sort"
+											],
+											"query": [
+												{
+													"key": "field",
+													"value": "string",
+													"description": "Specify the firewall rule field to sort by. This field must be present on at least one firewall rules for any sorting to occur. In most cases, this will be set to `descr` to sort firewall rules by their descriptions."
+												},
+												{
+													"key": "option",
+													"value": "string",
+													"description": "Specify sorting option to use when sorting rules. Options are `ascend`, `descend`, `natural`, `numeric` and `string`. See https://www.php.net/manual/en/function.array-multisort.php for more information. Defaults to `ascend`. (optional)"
+												},
+												{
+													"key": "dry_run",
+													"value": "boolean",
+													"description": "Specify whether or not the API should write the requested sorting to configuration. If `true`, the API will not write the sorted configuration, only return a representation of what the sort will look like. This is helpful when you are unsure if a particular sort will cause issues. If `false`, the sorted firewall rules will be written to configuration. Defaults to `false`. (optional)"
+												},
+												{
+													"key": "apply",
+													"value": "boolean",
+													"description": "Specify whether or not the firewall filter should be reloaded after sorting. If `true`, the firewall filter will be immediately reloaded after sorting. If `false`, the sorted configuration will be written but not applied and a separate call to /api/v1/firewall/apply will be needed to apply changes. This field has no effect when `dry_run` is set to `true`. Defaults to `false`. (optional)"
+												}
+											]
+										},
+										"description": "Sorts firewall rules based on specified criteria. Use caution when sorting firewall rules when block rules are present.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints that sort firewall rule configurations.",
 							"protocolProfileBehavior": {},
 							"_postman_isSubFolder": true
 						},
@@ -2516,7 +2610,7 @@
 										{
 											"key": "interface",
 											"value": "string",
-											"description": "Set which interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported. "
+											"description": "Set which interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0)."
 										},
 										{
 											"key": "ipprotocol",
@@ -2597,6 +2691,16 @@
 											"key": "log",
 											"value": "boolean",
 											"description": "Enabling rule matched logging (optional)"
+										},	
+										{
+											"key": "floating",
+											"value": "boolean",
+											"description": "Set firewall rule is floating rule (optional)"
+										},
+										{
+											"key": "direction",
+											"value": "string",
+											"description": "Set the direction of firewall floating rule, This is only necessary when `floating` is set. Set a firewall rule direction (`in`, `out`, `any`), if not set default to (`any`) (optional)"
 										},
 										{
 											"key": "top",
@@ -2654,7 +2758,7 @@
 										{
 											"key": "interface",
 											"value": "string",
-											"description": "Update the interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Floating rules are not supported. (optional)"
+											"description": "Update the interface the rule will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). (optional)"
 										},
 										{
 											"key": "ipprotocol",
@@ -2740,6 +2844,16 @@
 											"key": "top",
 											"value": "boolean",
 											"description": "Move firewall rule to top of access control list (optional)"
+										},
+										{
+											"key": "floating",
+											"value": "boolean",
+											"description": "Set firewall rule is floating rule (optional)"
+										},
+										{
+											"key": "direction",
+											"value": "string",
+											"description": "Set the direction of firewall floating rule, This is only necessary when `floating` is set. Set a firewall rule direction (`in`, `out`, `any`), if not set default to (`any`) (optional)"
 										},
 										{
 											"key": "apply",
@@ -4237,6 +4351,67 @@
 								"description": "Read the current firewall states.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-statessummary`]"
 							},
 							"response": []
+						},
+						{
+							"name": "Delete Firewall States",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/firewall/states",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"firewall",
+										"states"
+									],
+									"query": [
+										{
+											"key": "source",
+											"value": "string",
+											"description": "Specify the source IP address or CIDR of the firewall states to kill. This field is required unless `reset` is set to `true`."
+										},
+										{
+											"key": "destination",
+											"value": "string",
+											"description": "Specify the destination IP address or CIDR of the firewall states to kill. This field has no effect when `reset` is set to `true`. (optional)"
+										},
+										{
+											"key": "reset",
+											"value": "boolean",
+											"description":  "Specify whether or not the entire state table should be reset. If `true`, all firewall states will be killed and the `source` and `destination` fields will have no effect. Defaults to `false`. (optional) _Note: setting this field to `true` when the `async` field is set to `false` or the `sleep` field is set too low will prevent the API from sending a response._(optional)"
+										},
+										{
+											"key": "async",
+											"value": "boolean",
+											"description":  "Specify whether or not firewall states should be killed asynchronously (in the background). In most cases, this is required to prevent the state that allows the API to respond from being killed prematurely. Defaults to `true`. (optional)"
+										},
+										{
+											"key": "sleep",
+											"value": "integer",
+											"description":  "Specify the amount of time (in seconds) to wait to kill the targeted firewall states. This must be an integer between 0 and 300. Only applicable when `async` is set to `true`. (optional)"
+										}
+									]
+								},
+								"description": "Delete current firewall states.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-showstates`]"
+							},
+							"response": []
 						}
 					],
 					"description": "API endpoints that create, read, update and delete firewall states.",
@@ -4668,7 +4843,7 @@
 												"header": [],
 												"body": {
 													"mode": "raw",
-													"raw": "{\n    \"limiter\": \"Test_Limiter\",\n    \"name\": \"Test_Queue\",\n    \"mask\": \"srcaddress\",\n    \"maskbits\": 31,\n    \"description\": \"Unit test\",\n    \"aqm\": \"codel\",\n    \"weight\": 1,\n    \"plr\": 0.01,\n    \"buckets\": 16,\n    \"apply\": true\n}",
+													"raw": "{\n    \"limiter\": \"Test_Limiter\",\n    \"name\": \"Test_Queue\",\n    \"mask\": \"srcaddress\",\n    \"maskbits\": 31,\n    \"description\": \"E2E test\",\n    \"aqm\": \"codel\",\n    \"weight\": 1,\n    \"plr\": 0.01,\n    \"buckets\": 16,\n    \"apply\": true\n}",
 													"options": {
 														"raw": {
 															"language": "json"
@@ -4908,7 +5083,7 @@
 										"header": [],
 										"body": {
 											"mode": "raw",
-											"raw": "{\n    \"name\": \"Test_Limiter\",\n    \"bandwidth\": [{\"bw\": 100, \"bwscale\": \"Mb\"}],\n    \"mask\": \"srcaddress\",\n    \"maskbits\": 31,\n    \"description\": \"Unit test\",\n    \"aqm\": \"codel\",\n    \"sched\": \"fq_pie\",\n    \"delay\": 1,\n    \"plr\": 0.01,\n    \"buckets\": 16,\n    \"apply\": true\n}",
+											"raw": "{\n    \"name\": \"Test_Limiter\",\n    \"bandwidth\": [{\"bw\": 100, \"bwscale\": \"Mb\"}],\n    \"mask\": \"srcaddress\",\n    \"maskbits\": 31,\n    \"description\": \"E2E test\",\n    \"aqm\": \"codel\",\n    \"sched\": \"fq_pie\",\n    \"delay\": 1,\n    \"plr\": 0.01,\n    \"buckets\": 16,\n    \"apply\": true\n}",
 											"options": {
 												"raw": {
 													"language": "json"
@@ -6074,6 +6249,156 @@
 					"_postman_isSubFolder": true
 				},
 				{
+					"name": "PACKAGE",
+					"item": [
+						{
+							"name": "Read System Packages",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/package",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"package"
+									]
+								},
+								"description": "Read pfSense packages that are currently installed.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installed`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete System Package",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"pfSense-pkg-sudo\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/package",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"package"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "string",
+											"description": "Specify the name of pfSense package to delete. This must be the pfSense package internal name including the `pfSense-pkg-` prefix. Non-pfSense packages cannot be deleted."
+										}
+									]
+								},
+								"description": "Delete an existing pfSense package.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installed`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Install System Package",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"name\": \"pfSense-pkg-sudo\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/package",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"package"
+									],
+									"query": [
+										{
+											"key": "name",
+											"value": "string",
+											"description": "Specify the name of pfSense package to install. This must be the pfSense package internal name including the `pfSense-pkg-` prefix or a URL to a third-party package."
+										},
+										{
+											"key": "timeout",
+											"value": "integer",
+											"description": "Specify the amount of time (in seconds) to allow the package installation to take before timing out. This must be a value less than or equal to `120`. Defaults to `90`."
+										},
+										{
+											"key": "force",
+											"value": "boolean",
+											"description": "Specify whether or not this package should be forced to install. Forced installs will always force the package to re-install and bypasses certain warnings. Use caution when using forced installs."
+										}
+									]
+								},
+								"description": "Install a pfSense package.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installpackage`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that install, delete and read pfSense packages.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "2b421eba-fcaf-47cf-9efa-f426478ad160",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "83a09631-ec1e-462b-971c-763c6bed3224",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
 					"name": "ARP",
 					"item": [
 						{
@@ -6233,7 +6558,7 @@
 										"config"
 									]
 								},
-								"description": "Updates entire pfSense configuration. This endpoint simply replaces the entire configuration with the values submitted in your request. This can be used to restore a configuration backup or interface with configuration areas that may not be available to the API. Use extreme caution when utilizing this endpoint as it offers no input validation and has potential for configuration loss.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-backup-restore`]"
+								"description": "Updates entire pfSense configuration. This endpoint simply replaces the entire configuration with the values submitted in your request. This can be used to interface with configuration areas that may not be available to the API. Use extreme caution when utilizing this endpoint as it offers no input validation and has potential for configuration loss.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-backup-restore`]"
 							},
 							"response": []
 						}
@@ -6811,11 +7136,181 @@
 										{
 											"key": "descr",
 											"value": "string",
-											"description": "Specify the description of the certificate to delete (required if `refid` is not defined) _Note: if multiple CA exist with the same name, only the first matching CA will be deleted_"
+											"description": "Specify the description of the CA to delete (required if `refid` is not defined) _Note: if multiple CA exist with the same name, only the first matching CA will be deleted_"
 										}
 									]
 								},
 								"description": "Delete an existing CA.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]"
+							},
+							"response": []
+						}
+					],
+					"description": "API endpoints that create, read, update and delete system SSL/TLS Certificate Authorities.",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"id": "ae501696-89ce-4113-9ac2-fad15f5bee68",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"id": "1df86559-6031-4647-8cc0-4570403630fd",
+								"type": "text/javascript",
+								"exec": [
+									""
+								]
+							}
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				},
+				{
+					"name": "CRL",
+					"item": [
+						{
+							"name": "Read System CRLs",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/crl",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"crl"
+									]
+								},
+								"description": "Read installed CRLs.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Create System CRL",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"method\": \"internal\",\n\t\"descr\": \"INTERNAL_CRL\",\n\t\"caref\": \"61c410f04b782\",\n\t\"lifetime\": 3650,\n\t\"serial\": 10\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/crl",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"crl"
+									],
+									"query": [
+										{
+											"key": "caref",
+											"value": "string",
+											"description": "Specify the unique reference ID of the certificate signing authority for the certificate revocation list."
+										},
+										{
+											"key": "method",
+											"value": "string",
+											"description": "Set the method used to add the certificate revocation list. Current supported methods are `existing` and `internal`. _Note: `internal` method will create new certificate revocation list for CA provided in `caref`_."
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Set a descriptive name for the certificate revocation list"
+										},
+										{
+											"key": "crl_data",
+											"value": "string",
+											"description": "Specify the Base64 encoded PEM certificate revocation list to import. This field is required when `method` is set to `existing`. _Note: Import Certificate Revocation List in X.509 CRL format. `-----BEGIN X509 CRL-----[A bunch of random-looking base64-encoded data]-----END X509 CRL-----`._"
+										},
+										{
+											"key": "lifetime",
+											"value": "integer",
+											"description": "Specify the number of days you would like this certificate revocation list to be valid for. This must be below OpenSSL's maximum lifetime value (around `12000` days). Defaults to `9999` days. This field is only available when `method` is set to `internal`. _Note: maximum value is subject to change, when in doubt, check the pfSense webConfigurator options for this field._ (optional)"
+										},
+										{
+											"key": "serial",
+											"value": "integer",
+											"description": "Specify the serial number to be assigned to the next certificate revocation list. Defaults to 0. This field is only available when `method` is set to `internal`. (optional)"
+										}
+									]
+								},
+								"description": "Add a new CRL.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete System CRL",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"refid\": \"0\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/system/crl?refid=string&descr=string",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"system",
+										"crl"
+									],
+									"query": [
+										{
+											"key": "refid",
+											"value": "string",
+											"description": "Specify the refid of the certificate revocation list to delete (required if `descr` is  not defined)"
+										},
+										{
+											"key": "descr",
+											"value": "string",
+											"description": "Specify the description of the certificate revocation list to delete (required if `refid` is not defined) _Note: if multiple certificate revocation list exist with the same name, only the first matching certificate revocation list will be deleted_"
+										}
+									]
+								},
+								"description": "Delete an existing CRL.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]"
 							},
 							"response": []
 						}
@@ -6959,6 +7454,11 @@
 											"key": "custom_headers",
 											"value": "array",
 											"description": "Update the custom response headers for the API to return in API responses. This must be an array of key-value pairs (e.g. `{\"custom-header\": \"custom-header-value}`. To revert custom headers to the default state, simply pass in an empty array. In most cases, custom headers are not necessary. An example use case for custom headers is setting CORS policy headers required by some frontend web applications. (optional)"
+										},
+										{
+											"key": "access_list",
+											"value": "array",
+											"description": "Update the API access list. This must be an array of IPv4 or IPv6 subnets in CIDR notation. If left blank, all subnets will be allowed. (optional)"
 										},
 										{
 											"key": "hasync",
@@ -8008,7 +8508,7 @@
 								"header": [],
 								"body": {
 									"mode": "raw",
-									"raw": "{\n    \"id\": 0,\n    \"name\": \"UPDATED_TEST_GATEWAY\",\n    \"ipprotocol\": \"inet6\",\n    \"gateway\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n    \"monitor\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n    \"descr\": \"Updated Unit Test\",\n    \"disabled\": true,\n    \"action_disable\": true,\n    \"monitor_disable\": true,\n    \"weight\": 2,\n    \"data_payload\": 5,\n    \"latencylow\": 300,\n    \"latencyhigh\": 600,\n    \"interval\": 2100,\n    \"loss_interval\": 2500,\n    \"action_interval\": 1040,\n    \"time_period\": 66000,\n    \"losslow\": 5,\n    \"losshigh\": 10\n}",
+									"raw": "{\n    \"id\": 0,\n    \"name\": \"UPDATED_TEST_GATEWAY\",\n    \"ipprotocol\": \"inet6\",\n    \"gateway\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n    \"monitor\": \"2001:0db8:85a3:0000:0000:8a2e:0370:7334\",\n    \"descr\": \"Updated E2E Test\",\n    \"disabled\": true,\n    \"action_disable\": true,\n    \"monitor_disable\": true,\n    \"weight\": 2,\n    \"data_payload\": 5,\n    \"latencylow\": 300,\n    \"latencyhigh\": 600,\n    \"interval\": 2100,\n    \"loss_interval\": 2500,\n    \"action_interval\": 1040,\n    \"time_period\": 66000,\n    \"losslow\": 5,\n    \"losshigh\": 10\n}",
 									"options": {
 										"raw": {
 											"language": "json"
@@ -9846,27 +10346,27 @@
 												{
 													"key": "host",
 													"value": "string",
-													"description": "Hostname of new DNS A record"
+													"description": "Specify the hostname portion of the new DNS A record."
 												},
 												{
 													"key": "domain",
 													"value": "string",
-													"description": "Domain of new DNS A record"
+													"description": "Specify the domain portion of the new DNS A record."
 												},
 												{
 													"key": "ip",
-													"value": "string",
-													"description": "IPv4 or IPv6 of new DNS A record"
+													"value": "array or string",
+													"description": "Specify the IPv4 or IPv6 address this entry will resolve. This can be passed in as a string to resolve a single IP, or an array of strings to resolve multiple IPs. At least 1 value is required."
 												},
 												{
 													"key": "descr",
 													"value": "string",
-													"description": "Description of host override (optional)"
+													"description": "Specify the description of host override (optional)"
 												},
 												{
 													"key": "aliases",
 													"value": "array",
-													"description": "Hostname aliases (CNAME) for host override (optional)"
+													"description": "Specify additional domain names that should resolve the same IPs. This uses the same fields as the /api/v1/services/unbound/host_override/alias endpoint. (optional)"
 												},
 												{
 													"key": "apply",
@@ -9915,32 +10415,32 @@
 												{
 													"key": "host",
 													"value": "string",
-													"description": "Update the hostname of this host override (optional)"
+													"description": "Update the hostname portion of the new DNS A record. (optional)"
 												},
 												{
 													"key": "domain",
 													"value": "string",
-													"description": "Update the domain name of this host override (optional)"
+													"description": "Update the domain portion of the new DNS A record. (optional)"
 												},
 												{
 													"key": "ip",
-													"value": "string",
-													"description": "Update the IPv4/IPv6 address of this host override (optional)"
+													"value": "array or string",
+													"description": "Update the IPv4 or IPv6 address this entry will resolve. This can be passed in as a string to resolve a single IP, or an array of strings to resolve multiple IPs. At least 1 value is required. (optional)"
 												},
 												{
 													"key": "descr",
 													"value": "string",
-													"description": "Update the description of this host override (optional)"
+													"description": "Update the description of host override (optional)"
 												},
 												{
 													"key": "aliases",
 													"value": "array",
-													"description": "Update the aliases for this host override. This will replace any existing entries. (optional)"
+													"description": "Update additional domain names that should resolve the same IPs. This uses the same fields as the /api/v1/services/unbound/host_override/alias endpoint. (optional)"
 												},
 												{
 													"key": "apply",
 													"value": "boolean",
-													"description": "Specify whether or not you would like this host override update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only updating a single host override, you may set this true to apply it immediately. Defaults to false. (optional)"
+													"description": "Update whether or not you would like this host override to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple host overrides at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/services/unbound/apply` endpoint. Otherwise, If you are only creating a single host override, you may set this true to apply it immediately. Defaults to false. (optional)"
 												}
 											]
 										},
@@ -11026,6 +11526,68 @@
 							"_postman_isSubFolder": true
 						},
 						{
+							"name": "OPTIONS",
+							"item": [
+								{
+									"name": "Create DHCPd Options",
+									"request": {
+										"method": "POST",
+										"header": [],
+										"body": {
+											"mode": "raw",
+											"raw": "{}",
+											"options": {
+												"raw": {
+													"language": "json"
+												}
+											}
+										},
+										"url": {
+											"raw": "https://{{$hostname}}/api/v1/services/dhcpd/options",
+											"protocol": "https",
+											"host": [
+												"{{$hostname}}"
+											],
+											"path": [
+												"api",
+												"v1",
+												"services",
+												"dhcpd",
+												"options"
+											],
+											"query": [
+												{
+													"key": "interface",
+													"value": "string",
+													"description": "Specify which interface to create the DHCP option for. _Note: this field is not required when creating DHCP options via the `numberoptions` field of the /api/v1/services/dhcpd endpoint._"
+												},
+												{
+													"key": "number",
+													"value": "integer",
+													"description": "Specify the DHCP option number to create. This must be a value between 1 and 254."
+												},
+												{
+													"key": "type",
+													"value": "string",
+													"description": "Specify the DHCP option value type. Options are `text`, `string`, `boolean`, `unsigned integer 8`, `unsigned integer 16`, `unsigned integer 32`, `signed integer 8`, `signed integer 16`, `signed integer 32`, and `ip-address`."
+												},
+												{
+													"key": "value",
+													"value": "string or integer or boolean (conditional)",
+													"description": "Specify the DHCP option's value. If `type` is set to `text`, this field must be string that does not contain quotations marks. If `type` is set to `string`, this field must be string enclosed in quotes or is a hexadecimal value. If `type` is set to `boolean`, this value must be `true` or `false` as a boolean OR `true`, `false`, `on` or `off` as a string. If `type` is set to `unsigned integer 8`, this field must be an integer between `1` and `255`. If `type` is set to `unsigned integer 16`, this field must be an integer between `1` and `65535`. If `type` is set to `unsigned integer 32`, this field must be an integer between `1` and `4294967295`. If `type` is set to `signed integer 8`, this field must be an integer between `-128` and `127`. If `type` is set to `signed integer 16`, this field must be an integer between `-32768` and `32767`. If `type` is set to `signed integer 32`, this field must be an integer between `-2147483648` and `2147483647`. If `type` is set to `ip-address`, this field must be a string containing a valid IPv4 address or hostname."
+												}
+											]
+										},
+										"description": "Create new DHCPd options.<br>\n\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver`]"
+									},
+									"response": []
+								}
+							],
+							"description": "API endpoints to create DHCP options",
+							"protocolProfileBehavior": {},
+							"_postman_isSubFolder": true
+						},
+						{
 							"name": "LEASE",
 							"item": [
 								{
@@ -11197,6 +11759,16 @@
 											"description": "Update the search domains to include In the DHCP lease. You may pass In an array for multiple entries or a string for single entries. Each entry must be a valid domain name. (optional)"
 										},
 										{
+											"key": "defaultleasetime",
+											"value": "string or integer",
+											"description": "Update the default DHCP lease time. This must be a value of 60 or greater and must be less than the maximum DHCP lease time. This field can be unset to the system default by passing in an empty string. (optional)"
+										},
+										{
+											"key": "maxleasetime",
+											"value": "string or integer",
+											"description": "Update the maximum DHCP lease time. This must be a value of 60 or greater and must be greater than the default DHCP lease time. This field can be unset to the system default by passing in an empty string. (optional)"
+										},
+										{
 											"key": "mac_allow",
 											"value": "string or array",
 											"description": "Update the list of allowed MAC addresses. You may pass In an array for multiple entries or a string for single entries. Each entry must be a full or partial MAC address. Alternatively, you may specify an empty array to revert to default (optional)"
@@ -11225,6 +11797,11 @@
 											"key": "denyunknown",
 											"value": "boolean",
 											"description": "Update whether or not to ignore unknown MAC addresses. If true, you must specify MAC addresses in the `mac_allow` field or add a static DHCP entry to receive DHCP requests. (optional)"
+										},
+										{
+											"key": "numberoptions",
+											"value": "array",
+											"description": "Update configured DHCP options. This must be an array of option objects. See documentation for the /api/v1/services/dhcpd/options endpoint to object fields. To unset DHCP options, pass in an empty array. (optional)"
 										}
 									]
 								},

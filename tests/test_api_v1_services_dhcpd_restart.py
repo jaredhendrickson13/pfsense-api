@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestServicesDHCPdRestart(unit_test_framework.APIUnitTest):
+class APIE2ETestServicesDHCPdRestart(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/dhcpd/restart"
     post_tests = [
         {"name": "Restart the DHPCd service", "resp_time": 10}
     ]
 
-APIUnitTestServicesDHCPdRestart()
+APIE2ETestServicesDHCPdRestart()

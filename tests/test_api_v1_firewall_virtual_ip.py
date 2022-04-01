@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestFirewallVirtualIP(unit_test_framework.APIUnitTest):
+class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/firewall/virtual_ip"
     get_tests = [{"name": "Read all virtual IPs"}]
     post_tests = [
@@ -25,7 +25,7 @@ class APIUnitTestFirewallVirtualIP(unit_test_framework.APIUnitTest):
                 "interface": "wan",
                 "subnet": "172.16.77.239/32",
                 "password": "testpass",
-                "descr": "Unit Test",
+                "descr": "E2E Test",
                 "vhid": 10
             },
             "resp_time": 10     # Allow up to ten seconds for vips
@@ -36,7 +36,7 @@ class APIUnitTestFirewallVirtualIP(unit_test_framework.APIUnitTest):
                 "mode": "proxyarp",
                 "interface": "wan",
                 "subnet": "172.16.77.240/32",
-                "descr": "Unit Test"
+                "descr": "E2E Test"
             },
             "resp_time": 10     # Allow up to ten seconds for vips
         },
@@ -46,7 +46,7 @@ class APIUnitTestFirewallVirtualIP(unit_test_framework.APIUnitTest):
                 "mode": "ipalias",
                 "interface": "wan",
                 "subnet": "172.16.77.241/32",
-                "descr": "Unit Test"
+                "descr": "E2E Test"
             },
             "resp_time": 10     # Allow up to ten seconds for vips
         },
@@ -208,7 +208,7 @@ class APIUnitTestFirewallVirtualIP(unit_test_framework.APIUnitTest):
                 "subnet": "172.16.77.229/32",
                 "password": "newtestpass",
                 "vhid": 25,
-                "descr": "Updated unit Test",
+                "descr": "Updated E2E test",
             },
             "resp_time": 10     # Allow up to ten seconds for vips
         },
@@ -219,7 +219,7 @@ class APIUnitTestFirewallVirtualIP(unit_test_framework.APIUnitTest):
                 "mode": "proxyarp",
                 "interface": "wan",
                 "subnet": "172.16.77.230/32",
-                "descr": "Updated unit Test",
+                "descr": "Updated E2E test",
             },
             "resp_time": 10     # Allow up to ten seconds for vips
         },
@@ -230,7 +230,7 @@ class APIUnitTestFirewallVirtualIP(unit_test_framework.APIUnitTest):
                 "mode": "ipalias",
                 "interface": "wan",
                 "subnet": "172.16.77.231/32",
-                "descr": "Updated unit Test",
+                "descr": "Updated E2E test",
             },
             "resp_time": 10  # Allow up to ten seconds for vips
         },
@@ -358,4 +358,4 @@ class APIUnitTestFirewallVirtualIP(unit_test_framework.APIUnitTest):
         }
     ]
 
-APIUnitTestFirewallVirtualIP()
+APIE2ETestFirewallVirtualIP()

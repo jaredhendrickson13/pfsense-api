@@ -14,10 +14,10 @@ If you plan on contributing, please follow these basic requirements
 
 Testing
 -------
-It is preferred that any API endpoints or core features of this package include unit tests at the time they are written.
+It is preferred that any API endpoints or core features of this package include E2E tests at the time they are written.
 This will help speed up pull requests, and assist in future regression testing. For example, if you write a new API
-endpoint please include a unit test that will thoroughly test the extent of that endpoint. Python3 is the preferred
-language for unit tests. Seeing as changes will primarily be to API endpoints, please consider Python3's `requests` 
+endpoint please include a E2E test that will thoroughly test the extent of that endpoint. Python3 is the preferred
+language for E2E tests. Seeing as changes will primarily be to API endpoints, please consider Python3's `requests` 
 module.
 
 Proposing Changes
@@ -91,6 +91,13 @@ not specified, the default values are assumed:
 utilizes the same permissions as the pfSense webConfigurator. Specify the privileges internal config value in array
 format. Defaults to `["page-all"]` which requires client to have the 'WebCfg - All Pages' permission. A list of pfSense
 privileges can be found here: https://github.com/pfsense/pfsense/blob/master/src/etc/inc/priv.defs.inc
+
+- `$this->packages` : Allows you to specify any add-on packages required for the model to operate. This must use the
+full pfSense package name (including `pfSense-pkg-`). All packages must be present on the system in order for the API
+model to operate. If any packages are missing, the API will return a 500 error. Defaults to `[]`.
+
+- `$this->package_includes` : Allows you to specify additional PHP files to include for add-on packages. These files
+will only attempt to be included if ALL packages specified in `$this->packages` are present. Defaults to `[]`.
 
 - `$this->requires_auth` : Specify whether authentication and authorization is required for the API model. If set to 
 `false` clients will not have to authenticate or have privilege to access. Defaults to `true`.
@@ -360,26 +367,26 @@ Often times you will need to create functions to condense redundant tasks. You c
 `$some_variable = APITools\your_custom_tool_function();`
 
 
-## Writing API Unit Tests ##
-Unit tests are written using Python3. pfSense API includes a an unit_test_framework module in the `tests` directory to make
-this process simple. Unit tests help to ensure each endpoint remains functional when changes have been made.
+## Writing API E2E Tests ##
+E2E tests are written using Python3. pfSense API includes a an e2e_test_framework module in the `tests` directory to make
+this process simple. E2E tests help to ensure each endpoint remains functional when changes have been made.
 
 #### Getting Started ####
-To get started creating a new API unit test, you first need to create a new Python3 file in `/tests`. This file must 
+To get started creating a new API E2E test, you first need to create a new Python3 file in `/tests`. This file must 
 start with `test` and end with `.py` to be included in the `run_all_tests.py` script. Once you have created this file, 
-you must create a new class that extends our APIUnitTest framework class:
+you must create a new class that extends our APIE2ETest framework class:
 
 ```python
-import unit_test_framework
+import e2e_test_framework
 
-class NewAPIUnitTest(unit_test_framework.APIUnitTest):
+class NewAPIE2ETest(e2e_test_framework.APIE2ETest):
     # ...
 ```
 
 #### Overriding Base Model Properties ####
-The APIUnitTest class requires you to override a some properties to function correctly:
+The APIE2ETest class requires you to override a some properties to function correctly:
 
-- `url` : A string specifying the URL this unit test will be testing
+- `url` : A string specifying the URL this E2E test will be testing
 - `time_delay` : An integer specifying how many seconds should be waited between requests. Defaults to `1`.
 - `get_tests` : A list of dictionary formatted test parameters for GET requests. If this endpoint does not support 
 GET requests, you do not need to override this property. If this endpoint does support GET request, but does not require
@@ -438,7 +445,7 @@ included.
 included.
 
 #### Other Base Model Properties
-The APIUnitTest class also contains a few properties that are not intended to be overridden:
+The APIE2ETest class also contains a few properties that are not intended to be overridden:
 
 - `uid` : a unique ID that can be used for payload fields that required a unique value
 
@@ -456,14 +463,14 @@ overridden:
 - `pre_delete()` : Runs before the DELETE request is made.
 - `post_delete()` : Runs after the DELETE request is made.
 
-#### Running Unit Tests ####
-Once you have written your unit test class, you must ensure you create the unit test object at the end of the file
+#### Running E2E Tests ####
+Once you have written your E2E test class, you must ensure you create the E2E test object at the end of the file
 you've created like so:
 
 ```python
-import unit_test_framework
+import e2e_test_framework
 
-class NewAPIUnitTest(unit_test_framework.APIUnitTest):
+class NewAPIE2ETest(e2e_test_framework.APIE2ETest):
     url = "/api/v1/your_endpoint"
     get_requests = [{}]
     post_requests = [
@@ -512,16 +519,16 @@ class NewAPIUnitTest(unit_test_framework.APIUnitTest):
         },
     ]     
 
-NewAPIUnitTest()
+NewAPIE2ETest()
 ```
 
-Once this is done, you can run the unit test via command line by running:<br>
-`python3 test/test_your_unit_test_framework.py --host <ENTER PFSENSE IP/HOSTNAME HERE>`
+Once this is done, you can run the E2E test via command line by running:<br>
+`python3 test/test_your_e2e_test_framework.py --host <ENTER PFSENSE IP/HOSTNAME HERE>`
 
-Or you may run all the unit tests by running:<br>
+Or you may run all the E2E tests by running:<br>
 `python3 test/run_all_tests.py`
 
-Unit tests will check API responses for the following:
+E2E tests will check API responses for the following:
 - Ability to connect to API endpoint
 - API responses properly return data in a JSON format
 - API responses include the correct HTTP status code

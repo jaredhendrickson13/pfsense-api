@@ -1,7 +1,7 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestSystemHostname(unit_test_framework.APIUnitTest):
+class APIE2ETestSystemHostname(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/system/hostname"
     get_tests = [{"name": "Read the system hostname"}]
     put_tests = [
@@ -25,4 +25,4 @@ class APIUnitTestSystemHostname(unit_test_framework.APIUnitTest):
     ]
 
 
-APIUnitTestSystemHostname()
+APIE2ETestSystemHostname()
