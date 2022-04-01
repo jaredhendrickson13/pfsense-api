@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestFirewallTrafficShaperLimiterQueue(unit_test_framework.APIUnitTest):
+class APIE2ETestFirewallTrafficShaperLimiterQueue(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/firewall/traffic_shaper/limiter/queue"
     post_tests = [
         {
@@ -25,7 +25,7 @@ class APIUnitTestFirewallTrafficShaperLimiterQueue(unit_test_framework.APIUnitTe
                 "bandwidth": [{"bw": 100, "bwscale": "Mb"}],
                 "mask": "srcaddress",
                 "maskbits": 31,
-                "description": "Unit test",
+                "description": "E2E test",
                 "aqm": "codel",
                 "sched": "fq_pie",
                 "qlimit": 7000,
@@ -43,7 +43,7 @@ class APIUnitTestFirewallTrafficShaperLimiterQueue(unit_test_framework.APIUnitTe
                 "name": "Test_Queue",
                 "mask": "srcaddress",
                 "maskbits": 31,
-                "description": "Unit test",
+                "description": "E2E test",
                 "aqm": "codel",
                 "qlimit": 7000,
                 "weight": 1,
@@ -60,7 +60,7 @@ class APIUnitTestFirewallTrafficShaperLimiterQueue(unit_test_framework.APIUnitTe
                 "name": "Test_Queue2",
                 "mask": "srcaddress",
                 "maskbits": 31,
-                "description": "Unit test",
+                "description": "E2E test",
                 "aqm": "codel",
                 "qlimit": 7000,
                 "weight": 1,
@@ -764,4 +764,4 @@ class APIUnitTestFirewallTrafficShaperLimiterQueue(unit_test_framework.APIUnitTe
     ]
 
 
-APIUnitTestFirewallTrafficShaperLimiterQueue()
+APIE2ETestFirewallTrafficShaperLimiterQueue()

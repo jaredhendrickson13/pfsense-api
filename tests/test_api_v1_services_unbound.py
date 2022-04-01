@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestServicesUnbound(unit_test_framework.APIUnitTest):
+class APIE2ETestServicesUnbound(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/unbound"
     get_tests = [{"name": "Read the Unbound configuration"}]
 
 
-APIUnitTestServicesUnbound()
+APIE2ETestServicesUnbound()

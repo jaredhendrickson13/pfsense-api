@@ -48,7 +48,7 @@ class APISystemCertificateDelete extends APIModel {
             foreach ($this->config["cert"] as $i => $c) {
                 if ($c["refid"] === $this->initial_data['refid']) {
                     $this->id = $i;
-                    $this->cert_ref_id = $this->initial_data['refid'];;
+                    $this->cert_ref_id = $this->initial_data['refid'];
                     break;
                 }
             }

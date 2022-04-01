@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestRoutingGateway(unit_test_framework.APIUnitTest):
+class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/routing/gateway"
     get_tests = [{"name": "Read all routing gateways"}]
     post_tests = [
@@ -22,11 +22,11 @@ class APIUnitTestRoutingGateway(unit_test_framework.APIUnitTest):
             "name": "Create routing gateway",
             "payload": {
                 "interface": "wan",
-                "name": "API_UNIT_TEST_GATEWAY",
+                "name": "API_e2e_test_GATEWAY",
                 "ipprotocol": "inet",
                 "gateway": "172.16.209.1",
                 "monitor": "172.16.209.250",
-                "descr": "Unit test"
+                "descr": "E2E test"
             }
         },
         {
@@ -349,11 +349,11 @@ class APIUnitTestRoutingGateway(unit_test_framework.APIUnitTest):
             "name": "Update routing gateway",
             "payload": {
                 "id": 0,
-                "name": "UPDATED_UNIT_TEST_GATEWAY",
+                "name": "UPDATED_e2e_test_GATEWAY",
                 "ipprotocol": "inet6",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
                 "monitor": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
-                "descr": "Updated Unit Test",
+                "descr": "Updated E2E Test",
                 "disabled": True,
                 "action_disable": True,
                 "monitor_disable": True,
@@ -708,4 +708,4 @@ class APIUnitTestRoutingGateway(unit_test_framework.APIUnitTest):
         }
     ]
 
-APIUnitTestRoutingGateway()
+APIE2ETestRoutingGateway()

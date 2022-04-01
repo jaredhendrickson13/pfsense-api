@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestInterfaceVLAN(unit_test_framework.APIUnitTest):
+class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/interface/vlan"
     get_tests = [{"name": "Read all interface VLANs"}]
     post_tests = [
@@ -24,7 +24,7 @@ class APIUnitTestInterfaceVLAN(unit_test_framework.APIUnitTest):
                 "if": "lo0",
                 "tag": 10,
                 "pcp": 0,
-                "descr": "Unit Test"
+                "descr": "E2E Test"
             }
         },
         {
@@ -33,7 +33,7 @@ class APIUnitTestInterfaceVLAN(unit_test_framework.APIUnitTest):
                 "if": "lo0",
                 "tag": 11,
                 "pcp": 0,
-                "descr": "Unit Test"
+                "descr": "E2E Test"
             }
         },
         {
@@ -44,7 +44,7 @@ class APIUnitTestInterfaceVLAN(unit_test_framework.APIUnitTest):
                 "if": "FAKE_INTERFACE",
                 "tag": 11,
                 "pcp": 0,
-                "descr": "Unit Test"
+                "descr": "E2E Test"
             }
         },
         {
@@ -93,7 +93,7 @@ class APIUnitTestInterfaceVLAN(unit_test_framework.APIUnitTest):
                 "if": "lo0",
                 "tag": 20,
                 "pcp": 7,
-                "descr": "Updated unit Test 0"
+                "descr": "Updated E2E test 0"
             }
         },
         {
@@ -109,7 +109,7 @@ class APIUnitTestInterfaceVLAN(unit_test_framework.APIUnitTest):
                 "if": "lo0",
                 "tag": 20,
                 "pcp": 7,
-                "descr": "Updated unit Test 0"
+                "descr": "Updated E2E test 0"
             }
         },
         {
@@ -166,4 +166,4 @@ class APIUnitTestInterfaceVLAN(unit_test_framework.APIUnitTest):
         }
     ]
 
-APIUnitTestInterfaceVLAN()
+APIE2ETestInterfaceVLAN()

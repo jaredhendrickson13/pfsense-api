@@ -1,7 +1,7 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestUserPrivilege(unit_test_framework.APIUnitTest):
+class APIE2ETestUserPrivilege(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/user/privilege"
     post_tests = [
         {
@@ -45,4 +45,4 @@ class APIUnitTestUserPrivilege(unit_test_framework.APIUnitTest):
     ]
 
 
-APIUnitTestUserPrivilege()
+APIE2ETestUserPrivilege()

@@ -43,11 +43,14 @@ class APIServicesDHCPdUpdate extends APIModel {
         $this->__validate_mac_allow();
         $this->__validate_mac_deny();
         $this->__validate_domainsearchlist();
+        $this->__validate_defaultleasetime();
+        $this->__validate_maxleasetime();
         $this->__validate_gateway();
         $this->__validate_dnsserver();
         $this->__validate_staticarp();
         $this->__validate_ignorebootp();
         $this->__validate_denyunknown();
+        $this->__validate_numberoptions();
     }
 
     private function __validate_interface() {
@@ -60,7 +63,7 @@ class APIServicesDHCPdUpdate extends APIModel {
                 # Check that interface hosts a static network with multiple addresses
                 if (isset($this->__if_conf["enable"]) and is_ipaddrv4($this->__if_conf["ipaddr"]) and $this->__if_conf["subnet"] <= 31) {
                     $this->id = $this->initial_data["interface"];
-                    $this->__init_config($this->id);
+                    $this->init_config($this->id);
                     $this->validated_data = $this->config["dhcpd"][$this->id];
                 } else {
                     $this->errors[] = APIResponse\get(2019);
@@ -87,11 +90,11 @@ class APIServicesDHCPdUpdate extends APIModel {
         if (isset($this->initial_data["range_from"])) {
             # Ensure our range_from is an IPv4 address
             if (is_ipaddrv4($this->initial_data["range_from"])) {
-                $ip = ip2long($this->initial_data["range_from"]);
-                $start_ip = ip2long(gen_subnetv4($this->__if_conf["ipaddr"], $this->__if_conf["subnet"]));
-                $end_ip = ip2long($this->initial_data["range_to"]);
+                # Format this interface's CIDR
+                $if_cidr = $this->__if_conf["ipaddr"]."/".$this->__if_conf["subnet"];
+
                 # Ensure our range_from is within our available range
-                if ($ip > $start_ip and $ip < $end_ip) {
+                if (APITools\is_ipv4_in_cidr($this->initial_data["range_from"], $if_cidr)) {
                     $this->validated_data["range"]["from"] = $this->initial_data["range_from"];
                 } else {
                     $this->errors[] = APIResponse\get(2022);
@@ -109,11 +112,11 @@ class APIServicesDHCPdUpdate extends APIModel {
         if (isset($this->initial_data["range_to"])) {
             # Ensure our range_to is an IPv4 address
             if (is_ipaddrv4($this->initial_data["range_to"])) {
-                $ip = ip2long($this->initial_data["range_to"]);
-                $start_ip = ip2long($this->validated_data["range_from"]);
-                $end_ip = ip2long(gen_subnetv4_max($this->__if_conf["ipaddr"], $this->__if_conf["subnet"]));
+                # Format this interface's CIDR
+                $if_cidr = $this->__if_conf["ipaddr"]."/".$this->__if_conf["subnet"];
+
                 # Ensure our range_to is within our available range
-                if ($ip > $start_ip and $ip < $end_ip) {
+                if (APITools\is_ipv4_in_cidr($this->initial_data["range_to"], $if_cidr)) {
                     $this->validated_data["range"]["to"] = $this->initial_data["range_to"];
                 } else {
                     $this->errors[] = APIResponse\get(2025);
@@ -219,16 +222,70 @@ class APIServicesDHCPdUpdate extends APIModel {
         }
     }
 
+    private function __validate_defaultleasetime() {
+        # Variables
+        $max_time = $this->validated_data["maxleasetime"];
+
+        # Check for our optional defaultleasetime field
+        if (isset($this->initial_data["defaultleasetime"])) {
+            # Allow clients to unset this field with an empty string
+            if ($this->initial_data["defaultleasetime"] === "") {
+                unset($this->validated_data["defaultleasetime"]);
+                return;
+            }
+
+            # Return an error if the default lease time is less than 60
+            if (intval($this->initial_data["defaultleasetime"]) < 60) {
+                $this->errors[] = APIResponse\get(2080);
+            }
+            # Return error if the default lease time is greater than the maximum lease time
+            elseif (!empty($max_time) and intval($this->initial_data["defaultleasetime"]) >= intval($max_time)) {
+                $this->errors[] = APIResponse\get(2081);
+            }
+            # When no error criteria was met above, the data is valid
+            else {
+                $this->validated_data["defaultleasetime"] = intval($this->initial_data["defaultleasetime"]);
+            }
+        }
+    }
+
+    private function __validate_maxleasetime() {
+        # Variables
+        $def_time = $this->validated_data["defaultleasetime"];
+
+        # Check for our optional maxleasetime field
+        if (isset($this->initial_data["maxleasetime"])) {
+            # Allow clients to unset this field with an empty string
+            if ($this->initial_data["maxleasetime"] === "") {
+                unset($this->validated_data["maxleasetime"]);
+                return;
+            }
+
+            # Return an error if the max lease time is less than 60
+            if (intval($this->initial_data["maxleasetime"]) < 60) {
+                $this->errors[] = APIResponse\get(2082);
+            }
+            # Return error if the default lease time is greater than the maximum lease time
+            elseif (!empty($def_time) and intval($this->initial_data["maxleasetime"]) <= intval($def_time)) {
+                $this->errors[] = APIResponse\get(2081);
+            }
+            # When no error criteria was met above, the data is valid
+            else {
+                $this->validated_data["maxleasetime"] = intval($this->initial_data["maxleasetime"]);
+            }
+        }
+    }
+
     private function __validate_gateway() {
         # Check for our optional 'gateway' payload value
         if (isset($this->initial_data["gateway"])) {
             # Ensure our gateway is an IPv4 address
             if (is_ipaddrv4($this->initial_data["gateway"])) {
-                $ip = ip2long($this->initial_data["gateway"]);
-                $start_ip = ip2long(gen_subnetv4($this->__if_conf["ipaddr"], $this->__if_conf["subnet"]));
-                $end_ip = ip2long(gen_subnetv4_max($this->__if_conf["ipaddr"], $this->__if_conf["subnet"]));
+                # Format this interface's CIDR
+                $if_cidr = $this->__if_conf["ipaddr"]."/".$this->__if_conf["subnet"];
+
                 # Ensure our gateway is within our available range
-                if ($ip > $start_ip and $ip < $end_ip) {
+                if (APITools\is_ipv4_in_cidr($this->initial_data["gateway"], $if_cidr)) {
                     $this->validated_data["gateway"] = $this->initial_data["gateway"];
                 } else {
                     $this->errors[] = APIResponse\get(2029);
@@ -298,8 +355,39 @@ class APIServicesDHCPdUpdate extends APIModel {
         }
     }
 
+    # This method invokes a nested API call to the APIServicesDHCPdOptionsCreate model
+    private function __validate_numberoptions() {
+        # Check for our optional numberoptions field
+        if (isset($this->initial_data["numberoptions"])) {
+            # Discard the nested 'item' array if present
+            if (array_key_exists("item", $this->initial_data["numberoptions"])) {
+                $this->initial_data["numberoptions"] = $this->initial_data["numberoptions"]["item"];
+            }
+
+            # Reset the saved number options
+            $this->validated_data["numberoptions"] = [];
+
+            # Loop through each requested number option and ensure it is valid
+            foreach ($this->initial_data["numberoptions"] as $numberoption) {
+                $options_model = new APIServicesDHCPdOptionsCreate();
+                $options_model->initial_data = $numberoption;
+                $options_model->__validate_number();
+                $options_model->__validate_type();
+                $options_model->__validate_value();
+
+                # Add any errors found in our nested model to the current model
+                $this->errors = $this->errors + $options_model->errors;
+
+                # Only save our data as validated if no errors occurred
+                if (!$options_model->errors) {
+                    $this->validated_data["numberoptions"]["item"][] = $options_model->validated_data;
+                }
+            }
+        }
+    }
+
     # Executes functions to reload DHCP and corresponding/dependent services
-    protected function reload_dhcpd() {
+    public function reload_dhcpd() {
         $retvaldhcp = 0;
         $retvaldns = 0;
         /* dnsmasq_configure calls dhcpd_configure */
@@ -351,7 +439,7 @@ class APIServicesDHCPdUpdate extends APIModel {
         filter_configure();
     }
 
-    private function __init_config($interface) {
+    public function init_config($interface) {
         # Initialize the DHCP configuration if it does not exist
         if (empty($this->config["dhcpd"])) {
             $this->config["dhcpd"] = [];

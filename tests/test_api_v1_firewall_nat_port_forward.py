@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestFirewallNATPortForward(unit_test_framework.APIUnitTest):
+class APIE2ETestFirewallNATPortForward(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/firewall/nat/port_forward"
     get_tests = [
         {"name": "Read all NAT port forwards"}
@@ -32,7 +32,7 @@ class APIUnitTestFirewallNATPortForward(unit_test_framework.APIUnitTest):
                 "target": "192.168.1.123",
                 "local-port": "443",
                 "natreflection": "purenat",
-                "descr": "Unit Test",
+                "descr": "E2E Test",
                 "nosync": True,
                 "top": True
             }
@@ -52,7 +52,7 @@ class APIUnitTestFirewallNATPortForward(unit_test_framework.APIUnitTest):
                 "target": "192.168.1.1",
                 "local-port": "80",
                 "natreflection": "enable",
-                "descr": "Updated Unit Test",
+                "descr": "Updated E2E Test",
                 "nosync": False,
                 "nordr": True,
                 "disabled": True,
@@ -66,4 +66,4 @@ class APIUnitTestFirewallNATPortForward(unit_test_framework.APIUnitTest):
         {"name": "Delete NAT port forward", "payload": {"id": 0}}
     ]
 
-APIUnitTestFirewallNATPortForward()
+APIE2ETestFirewallNATPortForward()

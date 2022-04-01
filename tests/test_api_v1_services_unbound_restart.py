@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestServicesUnboundRestart(unit_test_framework.APIUnitTest):
+class APIE2ETestServicesUnboundRestart(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/unbound/restart"
     post_tests = [
         {
@@ -25,4 +25,4 @@ class APIUnitTestServicesUnboundRestart(unit_test_framework.APIUnitTest):
     ]
 
 
-APIUnitTestServicesUnboundRestart()
+APIE2ETestServicesUnboundRestart()

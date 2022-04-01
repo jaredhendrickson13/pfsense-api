@@ -1,7 +1,7 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestUser(unit_test_framework.APIUnitTest):
+class APIE2ETestUser(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/user"
     get_tests = [{"name": "Read local users"}]
     post_tests = [
@@ -16,7 +16,7 @@ class APIUnitTestUser(unit_test_framework.APIUnitTest):
                 "keylen": 2048,
                 "digest_alg": "sha256",
                 "lifetime": 3650,
-                "dn_commonname": "internal-ca-unit-test.example.com"
+                "dn_commonname": "internal-ca-e2e-test.example.com"
             },
         },
         {
@@ -45,7 +45,7 @@ class APIUnitTestUser(unit_test_framework.APIUnitTest):
                 "keylen": 2048,
                 "digest_alg": "sha256",
                 "lifetime": 3650,
-                "dn_commonname": "internal-cert-unit-test.example.com",
+                "dn_commonname": "internal-cert-e2e-test.example.com",
                 "type": "server"
             }
         },
@@ -305,4 +305,4 @@ class APIUnitTestUser(unit_test_framework.APIUnitTest):
                         self.put_tests[put_counter]["payload"]["cert"] = [self.post_responses[2]["data"]["refid"]]
                     put_counter = put_counter + 1
 
-APIUnitTestUser()
+APIE2ETestUser()

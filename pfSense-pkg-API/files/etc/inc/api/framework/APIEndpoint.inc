@@ -85,13 +85,34 @@ class APIEndpoint {
         }
 
         # Add API required response headers, these will override any custom headers
-        header("Content-Type: application/json", true);
         header("Referer: no-referrer");
 
         # Format the HTTP response as JSON and set response code
         http_response_code($resp["code"]);
-        echo json_encode($resp) . PHP_EOL;
+        echo $this->content_type_encode($resp) . PHP_EOL;
         session_destroy();
         exit();
+    }
+
+    # Encodes the API response data to the requested or most relevant content type
+    public function content_type_encode($data) {
+        # Variables
+        $content_type = ($_SERVER["HTTP_ACCEPT"] !== "*/*") ? $_SERVER["HTTP_ACCEPT"] : $_SERVER["HTTP_CONTENT_TYPE"];
+
+        # Encode response as JSON if content type is application/json
+        if ($content_type === "application/json") {
+            header("Content-Type: application/json", true);
+            return json_encode($data);
+        }
+        # Encode response as YAML if content type is application/yaml
+        elseif ($content_type === "application/yaml") {
+            header("Content-Type: application/yaml", true);
+            return yaml_encode($data);
+        }
+        # Otherwise, just default to JSON
+        else {
+            header("Content-Type: application/json", true);
+            return json_encode($data);
+        }
     }
 }

@@ -31,7 +31,7 @@ class APISystemRebootCreate extends APIModel {
     }
 
     private function __clean_system_halt() {
-        # Don't actually reboot the system if we are just debugging. Required for unit testing.
+        # Don't actually reboot the system if we are just debugging. Required for E2E testing.
         if ($this->initial_data["debug"] !== true) {
             # Use ob_start()/ob_end_clean() to prevent system_reboot() from printing output to the JSON response
             ob_start();

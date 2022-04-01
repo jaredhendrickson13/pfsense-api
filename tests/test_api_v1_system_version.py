@@ -1,9 +1,9 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestSystemVersion(unit_test_framework.APIUnitTest):
+class APIE2ETestSystemVersion(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/system/version"
     get_tests = [{"name": "Read pfSense version"}]
 
 
-APIUnitTestSystemVersion()
+APIE2ETestSystemVersion()

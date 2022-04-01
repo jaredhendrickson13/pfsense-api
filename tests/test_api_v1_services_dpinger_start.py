@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestServicesDpingerStart(unit_test_framework.APIUnitTest):
+class APIE2ETestServicesDpingerStart(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/dpinger/start"
     post_tests = [{"name": "Start the dpinger service"}]
 
-APIUnitTestServicesDpingerStart()
+APIE2ETestServicesDpingerStart()

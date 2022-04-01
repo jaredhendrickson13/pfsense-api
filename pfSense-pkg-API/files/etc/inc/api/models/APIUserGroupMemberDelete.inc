@@ -16,7 +16,7 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-class APIUserGroupDelete extends APIModel {
+class APIUserGroupMemberDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
@@ -35,6 +35,11 @@ class APIUserGroupDelete extends APIModel {
     }
 
     public function validate_payload() {
+        $this->__validate_username();
+        $this->__validate_group();
+    }
+
+    function __validate_username() {
         if (isset($this->initial_data['username'])) {
             if (!array_key_exists($this->initial_data["username"], index_users())) {
                 $this->errors[] = APIResponse\get(5001);
@@ -45,6 +50,9 @@ class APIUserGroupDelete extends APIModel {
         } else {
             $this->errors[] = APIResponse\get(5000);
         }
+    }
+
+    function __validate_group() {
         if (isset($this->initial_data['group'])) {
             if (is_string($this->initial_data["group"])) {
                 $this->initial_data["group"] = array($this->initial_data["group"]);

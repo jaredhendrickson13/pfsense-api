@@ -41,7 +41,7 @@ class JWT
 
     /**
      * Allow the current timestamp to be specified.
-     * Useful for fixing a value within unit testing.
+     * Useful for fixing a value within E2E testing.
      *
      * Will default to PHP time() value if null.
      */

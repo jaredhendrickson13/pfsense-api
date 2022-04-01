@@ -140,6 +140,24 @@ if (isset($_POST["save"])) {
         unset($pkg_config["custom_headers"]);
     }
 
+    # Validate subnets within the specified access list
+    if (!empty($_POST["access_list"])) {
+        # Convert access list to array and remove line breaks
+        $access_list = explode(" ", $_POST["access_list"]);
+
+        # Check each subnet within the access list to ensure it is valid
+        foreach ($access_list as $subnet) {
+            if (!is_subnet($subnet)) {
+                $input_errors[] = "Access list entry '".$subnet."' is not a valid IPv4 or IPv6 CIDR.";
+                $has_errors = true;
+                break;
+            }
+        }
+        $pkg_config["access_list"] = $_POST["access_list"];
+    } else {
+        $pkg_config["access_list"] = "";
+    }
+
     # Validate HA Sync settings if enabled
     if (!empty($_POST["hasync"])) {
         $pkg_config["hasync"] = "";
@@ -352,6 +370,17 @@ $advanced_section->addInput(new Form_Textarea(
     'Specify custom response headers to return with API responses. This must be JSON encoded string containing key-value
      pairs (e.g. <code>{"test-header-name": "test-header-value"}</code>). This may be required by some HTTP clients and frameworks.
      For example, this can be used to set CORS policy headers required by frontend web applications.'
+);
+
+$advanced_section->addInput(new Form_Textarea(
+    'access_list',
+    'Allowed Networks',
+    $pkg_config["access_list"]
+))->setHelp(
+    'Specify IPv4 or IPv6 subnets (in CIDR notation) that are allowed to interact with the API. Subnets must
+    use the network address in the CIDR and not any other address within the subnet. Multiple subnets may be specified
+    separated by a space. If a client tries to invoke an API call that is not within an allowed subnet, a 403 error will
+    be returned. If left blank, all IPs will be allowed and the access list will essentially be bypassed.'
 );
 
 # Populate the entire form

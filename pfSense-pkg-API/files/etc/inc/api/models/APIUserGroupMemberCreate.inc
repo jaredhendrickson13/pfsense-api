@@ -16,12 +16,15 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-class APIUserGroupCreate extends APIModel {
+class APIUserGroupMemberCreate extends APIModel {
+    private $__user_groups;
+
     # Create our method constructor
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-groupmanager"];
         $this->change_note = "Added group membership for user via API";
+        $this->__user_groups = [];
     }
 
     public function action() {
@@ -31,33 +34,45 @@ class APIUserGroupCreate extends APIModel {
     }
 
     public function validate_payload() {
+        $this->__validate_username();
+        $this->__validate_group();
+    }
+
+    function __validate_username() {
+        # Validate the required 'username' field
         if (isset($this->initial_data['username'])) {
             if (!array_key_exists($this->initial_data['username'], index_users())) {
                 $this->errors[] = APIResponse\get(5001);
             } else {
                 $this->validated_data["username"] = $this->initial_data['username'];
                 $this->validated_data["user_config"] = getUserEntry($this->validated_data["username"]);
-                $user_groups = local_user_get_groups($this->validated_data["user_config"], true);
+                $this->__user_groups = local_user_get_groups($this->validated_data["user_config"], true);
             }
         } else {
             $this->errors[] = APIResponse\get(5000);
         }
+    }
+
+    function __validate_group() {
+        # Validate the required 'group' field
         if (isset($this->initial_data['group'])) {
+            # Ensure strings are converted to an array
             if (is_string($this->initial_data['group'])) {
                 $this->initial_data['group'] = array($this->initial_data['group']);
             }
+
             if (is_array($this->initial_data['group'])) {
                 $this->validated_data["user_groups"] = [];
                 foreach ($this->initial_data['group'] as $ng) {
                     if (!array_key_exists($ng, index_groups())) {
                         $this->errors[] = APIResponse\get(5008);
                     }
-                    if (!in_array($ng, $user_groups)) {
+                    if (!in_array($ng, $this->__user_groups)) {
                         $this->validated_data["user_groups"][] = $ng;
                     }
                 }
-                // Add our new groups to our existing groups
-                $this->validated_data["user_groups"] = array_merge($user_groups, $this->validated_data["user_groups"]);
+                # Add our new groups to our existing groups
+                $this->validated_data["user_groups"] = array_merge($this->__user_groups, $this->validated_data["user_groups"]);
             } else {
                 $this->errors[] = APIResponse\get(5009);
             }

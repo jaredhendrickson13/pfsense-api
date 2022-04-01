@@ -1,9 +1,9 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestSystemTable(unit_test_framework.APIUnitTest):
+class APIE2ETestSystemTable(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/system/table"
     get_tests = [{"name": "Read system tables"}]
 
 
-APIUnitTestSystemTable()
+APIE2ETestSystemTable()

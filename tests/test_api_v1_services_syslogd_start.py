@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestServicesSyslogdStart(unit_test_framework.APIUnitTest):
+class APIE2ETestServicesSyslogdStart(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/syslogd/start"
     post_tests = [{"name": "Start the syslogd service"}]
 
 
-APIUnitTestServicesSyslogdStart()
+APIE2ETestServicesSyslogdStart()

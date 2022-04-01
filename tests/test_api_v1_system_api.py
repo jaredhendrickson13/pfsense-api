@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestSystemAPI(unit_test_framework.APIUnitTest):
+class APIE2ETestSystemAPI(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/system/api"
     get_tests = [{"name": "Read API configuration"}]
     put_tests = [
@@ -26,7 +26,8 @@ class APIUnitTestSystemAPI(unit_test_framework.APIUnitTest):
                 "jwt_exp": 86400,
                 "keyhash": "sha512",
                 "keybytes": 64,
-                "allowed_interfaces": ["WAN"]
+                "allowed_interfaces": ["WAN"],
+                "access_list": ["0::/0", "0.0.0.0/0"]
             },
         },
         {
@@ -36,7 +37,8 @@ class APIUnitTestSystemAPI(unit_test_framework.APIUnitTest):
                 "jwt_exp": 3600,
                 "keyhash": "sha256",
                 "keybytes": 16,
-                "allowed_interfaces": ["any"]
+                "allowed_interfaces": ["any"],
+                "access_list": []
             },
         },
         {
@@ -79,8 +81,15 @@ class APIUnitTestSystemAPI(unit_test_framework.APIUnitTest):
                 "allowed_interfaces": ["INVALID"]
             }
         },
-
+        {
+            "name": "Test invalid access list",
+            "status": 400,
+            "return": 1072,
+            "payload": {
+                "access_list": ["INVALID"]
+            }
+        },
     ]
 
 
-APIUnitTestSystemAPI()
+APIE2ETestSystemAPI()
