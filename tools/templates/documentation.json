@@ -630,124 +630,93 @@
 					"name": "GROUP",
 					"item": [
 						{
-							"name": "MEMBER",
-							"item": [
-								{
-									"name": "Assign User Group Member",
-									"request": {
-										"method": "POST",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"username\": \"new_user\",\n\t\"group\": [\"admins\"]\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "https://{{$hostname}}/api/v1/user/group/member?username=string&group=string",
-											"protocol": "https",
-											"host": [
-												"{{$hostname}}"
-											],
-											"path": [
-												"api",
-												"v1",
-												"user",
-												"group",
-												"member"
-											],
-											"query": [
-												{
-													"key": "username",
-													"value": "string",
-													"description": "Username to grant new group membership."
-												},
-												{
-													"key": "group",
-													"value": "string",
-													"description": "Name of group to assign this user to. Multiple groups may be assigned at once if passed in as array. Group names must match exactly as is displayed in webConfigurator."
-												}
-											]
-										},
-										"description": "Add a user to an existing group.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]"
-									},
-									"response": []
-								},
-								{
-									"name": "Remove User Group Member",
-									"request": {
-										"method": "DELETE",
-										"header": [],
-										"body": {
-											"mode": "raw",
-											"raw": "{\n\t\"username\": \"new_user\",\n\t\"group\": \"test\"\n}",
-											"options": {
-												"raw": {
-													"language": "json"
-												}
-											}
-										},
-										"url": {
-											"raw": "https://{{$hostname}}/api/v1/user/group/member?username=string&group=string",
-											"protocol": "https",
-											"host": [
-												"{{$hostname}}"
-											],
-											"path": [
-												"api",
-												"v1",
-												"user",
-												"group"
-											],
-											"query": [
-												{
-													"key": "username",
-													"value": "string",
-													"description": "Username of member to remove from group."
-												},
-												{
-													"key": "group",
-													"value": "string",
-													"description": "Name of the group to remove membership from. Multiple groups may be deleted at once if passed in as array. Group name must match exactly as is displayed in webConfigurator."
-												}
-											]
-										},
-										"description": "Delete a user from an existing group.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]"
-									},
-									"response": []
-								}
-							],
-							"description": "API endpoints that assign or remove group membership of a user.",
-							"event": [
-								{
-									"listen": "prerequest",
-									"script": {
-										"id": "fdf6fdf8-da76-4ff2-a22d-ae99527a107c",
-										"type": "text/javascript",
-										"exec": [
-											""
-										]
+							"name": "Create User Group",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"username\": \"new_user\",\n\t\"group\": [\"admins\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
 									}
 								},
-								{
-									"listen": "test",
-									"script": {
-										"id": "85540dd7-2448-4cbc-a4de-1c7dbda99c8b",
-										"type": "text/javascript",
-										"exec": [
-											""
-										]
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/user/group?username=string&group=string",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"group"
+									],
+									"query": [
+										{
+											"key": "username",
+											"value": "string",
+											"description": "Username to grant new privilege"
+										},
+										{
+											"key": "group",
+											"value": "string",
+											"description": "Name of group to assign. Multiple groups may be assigned at once if passed in as array. Group name must match exactly as is displayed in webConfigurator."
+										}
+									]
+								},
+								"description": "Add a user to an existing group.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]"
+							},
+							"response": []
+						},
+						{
+							"name": "Delete User Group",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n\t\"username\": \"new_user\",\n\t\"group\": \"test\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
 									}
-								}
-							],
-							"protocolProfileBehavior": {},
-							"_postman_isSubFolder": true
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/user/group?username=string&group=string",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"user",
+										"group"
+									],
+									"query": [
+										{
+											"key": "username",
+											"value": "string",
+											"description": "Username to remove from group"
+										},
+										{
+											"key": "group",
+											"value": "string",
+											"description": "Name of group to delete. Multiple groups may be deleted at once if passed in as array. Group name must match exactly as is displayed in webConfigurator."
+										}
+									]
+								},
+								"description": "Delete a user from an existing group.<br><br>\n\n_Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]"
+							},
+							"response": []
 						}
 					],
-					"description": "API endpoints that create, read, update and delete pfSense user groups.",
+					"description": "API endpoints that create, read, update and delete pfSense user group memberships.",
 					"event": [
 						{
 							"listen": "prerequest",
@@ -2650,7 +2619,7 @@
 										{
 											"key": "gateway",
 											"value": "string",
-											"description": "Set the routing gateway traffic will take upon match. (optional)"
+											"description": "Set the routing gateway traffic will take upon match (optional)"
 										},
 										{
 											"key": "sched",
@@ -2798,7 +2767,7 @@
 										{
 											"key": "gateway",
 											"value": "string",
-											"description": "Update the routing gateway traffic will take upon match. Specify `default` or an empty string to revert this field to the default gateway. (optional)"
+											"description": "Update the routing gateway traffic will take upon match (optional)"
 										},
 										{
 											"key": "sched",
@@ -12910,6 +12879,887 @@
 				}
 			],
 			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "OPENVPN",
+			"item": [
+				{
+					"name": "SERVER",
+					"item": [
+						{
+							"name": "Read OpenVPN Server",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/openvpn/server",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"openvpn",
+										"server"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create OpenVPN Server",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"mode\": \"server_tls_user\",\r\n        \"caref\": \"61c7fbce3a351\",\r\n    \"crlref\": \"61c467cd2fd4f\",\r\n    \"certref\": \"61c4121240420\",\r\n    \"custom_options\": \"ifconfig-push xxx.xxx.xxx.xxx 255.255.255.0;\",\r\n    \"disable\": true,\r\n    \"protocol\": \"tcp\",\r\n    \"interface\": \"lan\",\r\n    \"description\": \"A server, that is specific...\",\r\n    \"tunnel_network\": \"10.0.8.5/24\",\r\n    \"tunnel_networkv6\": \"2001:db9:1:1::100/64\",\r\n    \"local_network\": \"10.0.9.5/24, 10.0.8.5/24, 10.0.10.5/24\",\r\n    \"local_networkv6\": \"2001:db9:1:1::100/64, 2002:db9:1:1::100/64, 2003:db9:1:1::100/64\",\r\n    \"remote_network\": \"10.0.9.5/24, 10.0.8.5/24, 10.0.10.5/24\",\r\n    \"remote_networkv6\": \"2001:db9:1:1::100/64, 2002:db9:1:1::100/64, 2003:db9:1:1::100/64\",\r\n    \"redirect_gateway\": true,\r\n    \"dynamic_ip\": true,\r\n    \"dns_domain\": \"example.com\",\r\n    \"dns_servers\": \"8.8.8.8, 8.8.4.4, 8.8.3.3, 8.8.2.2\",\r\n    \"ntp_servers\": \"192.168.56.101, 192.168.56.102\",\r\n    \"netbios_enable\": true,\r\n    \"netbios_node_type\": \"p\",\r\n    \"netbios_scope\": \"5\",\r\n    \"wins_servers\": \"192.168.56.103, 192.168.56.104\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/openvpn/server?server_tls_user=string&custom_options=string&disable=boolean&caref=string&block=boolean&description=string&tunnel_network=string&tunnel_networkv6=string&local_network=string&local_networkv6=string&remote_network=string&remote_networkv6=string&redirect_gateway=boolean&prevent_server_definitions=boolean&remove_server_routes=boolean&dns_domain=string&dns_servers=string&ntp_servers=string&netbios_enable=boolean&netbios_node_type=string&netbios_scope=string&wins_servers=string",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"openvpn",
+										"server"
+									],
+									"query": [
+										{
+											"key": "mode",
+											"value": "string",
+											"description": "Set the server mode option. Options are `p2p_tls`, `p2p_shared_key`, `server_tls`, `server_user` and `server_tls_user`. The default setting is `p2p_tls`. (optional)"
+										},
+										{
+											"key": "protocol",
+											"value": "string",
+											"description": "Set protocol. Options are `udp4`, `udp6`, `tcp4`, `tcp6`, `udp` and `tcp`. The default setting is `udp4`. (optional)"
+										},
+										{
+											"key": "authmode",
+											"value": "string",
+											"description": "Backend for authentication, This is only necessary if you have specified the `mode` to `server_user` or `server_tls_user`. The default setting is `Local Database` (optional)."
+										},
+										{
+											"key": "dev_mode",
+											"value": "string",
+											"description": "Set Device mode. Options are `tun` and `tap`. The default setting is `tun`. (optional)"
+										},
+										{
+											"key": "interface",
+											"value": "string",
+											"description": "The interface or Virtual IP address where OpenVPN will receive client connections. The default setting is `wan`. (optional)"
+										},
+										{
+											"key": "local_port",
+											"value": "string or integer",
+											"description": "The port used by OpenVPN to receive client connections. Omitting this will default to next available port. (optional)"
+										},
+										{
+											"key": "description",
+											"value": "string",
+											"description": "A description for administrative reference (not parsed)."
+										},
+										{
+											"key": "custom_options",
+											"value": "string",
+											"description": "Enter any additional options to add for this client specific override, separated by a semicolon.\nEXAMPLE: `push \"route 10.0.0.0 255.255.255.0\";`"
+										},
+										{
+											"key": "tls",
+											"value": "string",
+											"description": "Paste the TLS key. This is not necessary for mode `p2p_shared_key`. Options are `\"\"` for automatic TLS key generation and a raw TLS key. Omitting disable TLS configuration. _Note: Import shared key in PEM format. `-----BEGIN OpenVPN Static key V1-----[A bunch of random-looking base64-encoded data]-----END OpenVPN Static key V1-----`. (optional)"
+										},
+										{
+											"key": "tls_type",
+											"value": "string",
+											"description": "Enter TLS Key Usage Mode. This is not necessary for mode `p2p_shared_key`. Options are `auth` and `crypt`. The default setting is `auth`. (optional)"
+										},
+										{
+											"key": "tlsauth_keydir",
+											"value": "string",
+											"description": "Enter TLS keydir direction. This is not necessary for mode `p2p_shared_key`. Options are `default`, `direction-0`, `direction-1` and `both-directions` . The default setting is `default`. (optional)"
+										},
+										{
+											"key": "shared_key",
+											"value": "string",
+											"description": "Enter Shared Key. This is only mandatory for mode `p2p_shared_key`. Options are `\"\"` for automatic shared key generation and a raw shared key. _Note: Import shared key in PEM format. `-----BEGIN OpenVPN Static key V1-----[A bunch of random-looking base64-encoded data]-----END OpenVPN Static key V1-----`."
+										},
+										{
+											"key": "caref",
+											"value": "string",
+											"description": "Specify the unique reference ID of the certificate signing authority."
+										},
+										{
+											"key": "crlref",
+											"value": "string",
+											"description": "Specify the unique reference ID of the certificate revocation list. The default setting is `none`. (optional)"
+										},
+										{
+											"key": "certref",
+											"value": "string",
+											"description": "Specify the unique reference ID of the certificate."
+										},
+										{
+											"key": "ocspcheck",
+											"value": "boolean",
+											"description": "Whether to check client certificates with OCSP. (optional)"
+										},
+										{
+											"key": "ocspurl",
+											"value": "string",
+											"description": "Enter OCSP URL. This is only necessary for `ocspcheck`. The default setting is `\"\"`. (optional)"
+										},
+										{
+											"key": "dh_length",
+											"value": "string",
+											"description": "Enter DH parameter length. Options are `1024`, `2048`, `3072`, `4096`, `6144`, `7680`, `8192`, `15360`, `16384` and `ECDH Only`. The default setting is `2048`. (optional)"
+										},
+										{
+											"key": "ecdh_curve",
+											"value": "string",
+											"description": "Enter ECDH curve. Options are `none`, `prime256v1`, `secp384r1` and `secp521r1`. The default setting is `none`. (optional)"
+										},
+										{
+											"key": "cert_depth",
+											"value": "string",
+											"description": "Enter Certificate depth. Options are `none`, `one`, `two`, `three`, `four` and `five`. The default setting is `one`. (optional)"
+										},
+										{
+											"key": "strictusercn",
+											"value": "boolean",
+											"description": "Enforce Strict User-CN matching. This is only necessary for mode `server_tls_user`. Omitting will disable. (optional)"
+										},
+										{
+											"key": "ncp_enable",
+											"value": "boolean",
+											"description": "Enable Data Encryption Negotiation. Disabling this feature is deprecated. Omitting will enable. (optional)"
+										},
+										{
+											"key": "data_ciphers",
+											"value": "string",
+											"description": "Enter comma sepereted data encryption algorithms (e.g. `AES-256-GCM,AES-128-GCM,CHACHA20-POLY1305`). Data encryption algorithms will be truncated to 19.The default setting is `AES-256-GCM,AES-128-GCM,CHACHA20-POLY1305`. (optional)"
+										},
+										{
+											"key": "data_ciphers_fallback",
+											"value": "string",
+											"description": "Enter fallback data encryption algorithm. The default setting is `AES-256-CBC`. (optional)"
+										},
+										{
+											"key": "digest",
+											"value": "string",
+											"description": "Enter auth digest algorithm. Options are `SHA256`, `BLAKE2b512`, `BLAKE2b256`, `MD4`, `MD5`, `MD5-SHA1`, `MDC2`, `RIPEMD160`, `SHA1`, `SHA224`, `SHA256`, `SHA3-224`, `SHA3-256`, `SHA3-384`, `SHA3-512`, `SHA384`, `SHA512`, `SHA512-224`, `SHA512-256`, `SHAKE128`, `SHAKE256`, `SM3`, `whirlpool` and `none`. The default setting is `SHA256`. (optional)"
+										},
+										{
+											"key": "engine",
+											"value": "string",
+											"description": "Enter Hardware crypto. Options are `none` and any enabled hardware crypto. The default setting is `none`. (optional)"
+										},
+										{
+											"key": "tunnel_network",
+											"value": "string",
+											"description": "The virtual IPv4 network used for private communications between this client and the server expressed using CIDR (e.g. `10.0.8.5/24`).\nWith subnet topology, enter the client IP address and the subnet mask must match the IPv4 Tunnel Network on the server.\nWith net30 topology, the first network address of the /30 is assumed to be the server address and the second network address will be assigned to the client. NOTE: Using a tunnel network and server bridge settings together is not allowed."
+										},
+										{
+											"key": "tunnel_networkv6",
+											"value": "string",
+											"description": "The virtual IPv6 network used for private communications between this client and the server expressed using prefix (e.g. `2001:db9:1:1::100/64`).\nEnter the client IPv6 address and prefix. The prefix must match the IPv6 Tunnel Network prefix on the server. NOTE: Using a tunnel network and server bridge settings together is not allowed."
+										},
+										{
+											"key": "serverbridge_dhcp",
+											"value": "boolean",
+											"description": "Allow clients on the bridge to obtain DHCP. This is only available for mode `server_tls` , `server_user` or `server_tls_user` and dev_mode `tap`. NOTE: Using a tunnel network and server bridge settings together is not allowed. (optional)"
+										},
+										{
+											"key": "serverbridge_interface",
+											"value": "string",
+											"description": "The interface to which this TAP instance will be bridged. This is not done automatically. This interface must be assigned and the bridge created separately. This setting controls which existing IP address and subnet mask are used by OpenVPN for the bridge. Setting this to `none` will cause the Server Bridge DHCP settings below to be ignored. This is only available for mode `server_tls` , `server_user` or `server_tls_user` and dev_mode `tap`. NOTE: currently support `wan`, `lan` and `none`. (optional)"
+										},
+										{
+											"key": "serverbridge_routegateway",
+											"value": "boolean",
+											"description": "When omitting the IPv4 Tunnel Network for a bridge, connecting clients cannot automatically determine a server-side gateway for IPv4 Local Network(s) or Redirect IPv4 Gateway traffic. When enabled, this option sends the IPv4 address of the selected Bridge Interface to clients which they can then use as a gateway for routing traffic outside of the bridged subnet. OpenVPN does not currently support this mechanism for IPv6. This is only available for mode `server_tls` , `server_user` or `server_tls_user` and dev_mode `tap`. (optional)"
+										},
+										{
+											"key": "serverbridge_dhcp_start",
+											"value": "string",
+											"description": "When using TAP mode as a multi-point server, a DHCP range may optionally be supplied to use on the interface to which this TAP instance is bridged. If these settings are left blank, DHCP will be passed through to the LAN, and the interface setting above will be ignored. This is only available for mode `server_tls` , `server_user` or `server_tls_user` and dev_mode `tap`. (optional)"
+										},
+										{
+											"key": "serverbridge_dhcp_end",
+											"value": "string",
+											"description": "When using TAP mode as a multi-point server, a DHCP range may optionally be supplied to use on the interface to which this TAP instance is bridged. If these settings are left blank, DHCP will be passed through to the LAN, and the interface setting above will be ignored. This is only available for mode `server_tls` , `server_user` or `server_tls_user` and dev_mode `tap`. (optional)"
+										},
+										{
+											"key": "local_network",
+											"value": "string",
+											"description": "These are the IPv4 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more CIDR networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
+										},
+										{
+											"key": "local_networkv6",
+											"value": "string",
+											"description": "These are the IPv6 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more IP/PREFIX networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
+										},
+										{
+											"key": "remote_network",
+											"value": "string",
+											"description": "These are the IPv4 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more CIDR ranges. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv4 Remote Networks list on the corresponding OpenVPN server settings. This is only available for mode `p2p_tls ` or `p2p_shared_key`. (optional)"
+										},
+										{
+											"key": "remote_networkv6",
+											"value": "string",
+											"description": "These are the IPv6 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more IP/PREFIX networks. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv6 Remote Networks list on the corresponding OpenVPN server settings. This is only available for mode `p2p_tls ` or `p2p_shared_key`. (optional)"
+										},
+										{
+											"key": "redirect_gateway",
+											"value": "boolean",
+											"description": "Force all client generated traffic through the tunnel. (optional)"
+										},
+										{
+											"key": "redirect_gateway6",
+											"value": "boolean",
+											"description": "Force all client generated traffic through the tunnel. (optional)"
+										},
+										{
+											"key": "concurrent_connections",
+											"value": "string or integer",
+											"description": "Specify the maximum number of clients allowed to concurrently connect to this server. (optional)"
+										},
+										{
+											"key": "allow_compression",
+											"value": "string",
+											"description": "Allow compression to be used with this VPN instance. Options are `asym`, `no` and `yes`. The default setting is `no` (optional)"
+										},
+										{
+											"key": "compression",
+											"value": "string",
+											"description": "Compression to be used with this VPN instance. This is only necessary for `allow_compression` set to `yes` or `asym`. Options are `none`, `stub`, `stub-v2`, `lz4`, `lz4-v2`, `lzo`, `noadapt`, `adaptive`, `yes` and `no`. Compression can potentially dangerous and insecure. Deprecated. Compress tunnel packets using the LZO algorithm. The default setting is `none` (optional)"
+										},
+										{
+											"key": "compression_push",
+											"value": "boolean",
+											"description": "Push the selected Compression setting to connecting clients. This is only necessary for `allow_compression` set to `yes` or `asym`. (optional)"
+										},
+										{
+											"key": "passtos",
+											"value": "boolean",
+											"description": "Allow communication between clients connected to this server. (optional)"
+										},
+										{
+											"key": "client2client",
+											"value": "boolean",
+											"description": "Whether to disable this override without removing it. (optional)"
+										},
+										{
+											"key": "duplicate_cn",
+											"value": "boolean",
+											"description": "Allow multiple concurrent connections from the same user. This is only necessary for mode `p2p_shared_key`. (optional)"
+										},
+										{
+											"key": "dynamic_ip",
+											"value": "boolean",
+											"description": "Allow connected clients to retain their connections if their IP address changes. (optional)"
+										},
+										{
+											"key": "topology",
+											"value": "string",
+											"description": "Specifies the method used to supply a virtual adapter IP address to clients when using TUN mode on IPv4. Options are `subnet` and `net30`. The default setting is `subnet`. (optional)"
+										},
+										{
+											"key": "dns_domain",
+											"value": "string",
+											"description": "Domain name for DNS to provide to the client. (optional)"
+										},
+										{
+											"key": "dns_servers",
+											"value": "string",
+											"description": "A comma-separated list of no more than 4 DNS server IP addresses (i.e. 8.8.8.8). Any more than the first four are ignored. This list is provided to the clent."
+										},
+										{
+											"key": "push_blockoutsidedns",
+											"value": "boolean",
+											"description": "Make Windows 10 Clients Block access to DNS servers except across OpenVPN while connected, forcing clients to use only VPN DNS servers. (optional)"
+										},
+										{
+											"key": "push_register_dns",
+											"value": "boolean",
+											"description": "Run \"net stop dnscache\", \"net start dnscache\", \"ipconfig /flushdns\" and \"ipconfig /registerdns\" on connection initiation. This only availabe for mode `server_tls`, `server_user` and `server_tls_user`. (optional)"
+										},
+										{
+											"key": "inactive_seconds",
+											"value": "string or integer",
+											"description": "Causes OpenVPN to exit after n seconds of inactivity on the TUN/TAP device. `0` disables this feature. The default setting is `300`. (optional)"
+										},
+										{
+											"key": "ping_method",
+											"value": "string",
+											"description": "Enter ping method. Options `keepalive` and `ping`. The default setting is `keepalive`. (optional)"
+										},
+										{
+											"key": "keepalive_interval",
+											"value": "string or integer",
+											"description": "Enter keepalive interval. The default setting is `10`. This only available for `keepalive` method. (optional)"
+										},
+										{
+											"key": "keepalive_timeout",
+											"value": "string or integer",
+											"description": "Enter keepalive timeout. The default setting is `60`. This only available for `keepalive` method. (optional)"
+										},
+										{
+											"key": "ping_seconds",
+											"value": "string or integer",
+											"description": "Enter ping seconds. This is only necessary for `ping` method. The default setting is `10`. (optional)"
+										},
+										{
+											"key": "ping_action_seconds",
+											"value": "string or integer",
+											"description": "Enter ping action seconds. This is only necessary for `ping` method. The default setting is `60`. (optional)"
+										},
+										{
+											"key": "ping_push",
+											"value": "boolean",
+											"description": "Push ping to VPN client. This is only necessary for `ping` method. (optional)"
+										},
+										{
+											"key": "ping_action_push",
+											"value": "boolean",
+											"description": "Push ping-restart/ping-exit to VPN client. This is only necessary for `ping` method. (optional)"
+										},
+										{
+											"key": "ping_action",
+											"value": "string",
+											"description": "Exit or restart OpenVPN after timeout from remote. Options `ping_exit` and `ping_restart`. This is only necessary for `ping` method. The default setting is `ping_restart`. (optional)"
+										},
+										{
+											"key": "username_as_common_name",
+											"value": "boolean",
+											"description": "Use the authenticated client username instead of the certificate common name (CN). This is only necessary for mode `server_user` or `server_tls_user`. The default setting is `false`. (optional)"
+										},
+										{
+											"key": "udp_fast_io",
+											"value": "boolean",
+											"description": "Use fast I/O operations with UDP writes to tun/tap. Experimental. The default setting is `false`. (optional)"
+										},
+										{
+											"key": "exit_notify",
+											"value": "string",
+											"description": "Send an explicit exit notification to connected clients/peers when restarting or shutting down, so they may immediately disconnect rather than waiting for a timeout. In SSL/TLS Server modes, clients may be directed to reconnect or use the next server. In Peer-to-Peer Shared Key or with a /30 Tunnel Network, this value controls how many times this instance will attempt to send the exit notification. Options `once`, `twice`, `none` and `\"\"`. The default setting is `once`. (optional)"
+										},
+										{
+											"key": "sndrcvbuf",
+											"value": "string",
+											"description": "Configure a Send and Receive Buffer size for OpenVPN. Options `64KiB`, `128KiB`, `256KiB`, `512KiB`, `1MiB`, `2MiB` and `default`. The default setting is `default`. (optional)"
+										},
+										{
+											"key": "ntp_servers",
+											"value": "string",
+											"description": "A comma-separated list of no more than 2 NTP server IP addresses. Any more than the first two are ignored. (optional)"
+										},
+										{
+											"key": "netbios_enable",
+											"value": "boolean",
+											"description": "Enable NetBIOS over TCP/IP. If this option is not set, all NetBIOS-over-TCP/IP options (including WINS) will be disabled. (optional)"
+										},
+										{
+											"key": "netbios_node_type",
+											"value": "string",
+											"description": "Possible options: b (broadcasts), p (point-to-point name queries to a WINS server), m (broadcast then query name server), and h (query name server, then broadcast). This parameter takes a single letter either b, p, m, or h. Any other string will result in this option being set to none. (optional)"
+										},
+										{
+											"key": "netbios_scope",
+											"value": "string",
+											"description": "A NetBIOS Scope ID provides an extended naming service for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS traffic on a single network to only those nodes with the same NetBIOS scope ID. (optional)"
+										},
+										{
+											"key": "create_gw",
+											"value": "string",
+											"description": "If you assign a virtual interface to this OpenVPN server, this setting controls which gateway types will be created. Options are `v4only`, `v6only` and `both`. The default setting is `both`. (optional)"
+										},
+										{
+											"key": "verbosity_level",
+											"value": "string",
+											"description": "Each level shows all info from the previous levels. Level `3` is recommended for a good summary of what's happening without being swamped by output. Maximum level `11`. The default setting is `default`, equivalent to level `1`. (optional)"
+										},
+										{
+											"key": "wins_servers",
+											"value": "string",
+											"description": "A comma-separated list of no more than 2 WINS server IP addresses. Any more than the first two are ignored. (optional)"
+										},
+										{
+											"key": "disable",
+											"value": "boolean",
+											"description": "Whether to disable this server. (optional)"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update OpenVPN Server",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"vpnid\": 1,\r\n    \"mode\": \"server_tls_user\",\r\n        \"caref\": \"61c7fbce3a351\",\r\n    \"crlref\": \"61c467cd2fd4f\",\r\n    \"certref\": \"61c4121240420\",\r\n    \"custom_options\": \"ifconfig-push xxx.xxx.xxx.xxx 255.255.255.0;\",\r\n    \"disable\": true,\r\n    \"protocol\": \"tcp\",\r\n    \"interface\": \"lan\",\r\n    \"description\": \"A server, that is specific...\",\r\n    \"tunnel_network\": \"10.0.8.5/24\",\r\n    \"tunnel_networkv6\": \"2001:db9:1:1::100/64\",\r\n    \"local_network\": \"10.0.9.5/24, 10.0.8.5/24, 10.0.10.5/24\",\r\n    \"local_networkv6\": \"2001:db9:1:1::100/64, 2002:db9:1:1::100/64, 2003:db9:1:1::100/64\",\r\n    \"remote_network\": \"10.0.9.5/24, 10.0.8.5/24, 10.0.10.5/24\",\r\n    \"remote_networkv6\": \"2001:db9:1:1::100/64, 2002:db9:1:1::100/64, 2003:db9:1:1::100/64\",\r\n    \"redirect_gateway\": true,\r\n    \"dynamic_ip\": true,\r\n    \"dns_domain\": \"example.com\",\r\n    \"dns_servers\": \"8.8.8.8, 8.8.4.4, 8.8.3.3, 8.8.2.2\",\r\n    \"ntp_servers\": \"192.168.56.101, 192.168.56.102\",\r\n    \"netbios_enable\": true,\r\n    \"netbios_node_type\": \"p\",\r\n    \"netbios_scope\": \"5\",\r\n    \"wins_servers\": \"192.168.56.103, 192.168.56.104\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/openvpn/server?vpnid=number&server_tls_user=string&custom_options=string&disable=boolean&caref=string&description=string&tunnel_network=string&tunnel_networkv6=string&local_network=string&local_networkv6=string&remote_network=string&remote_networkv6=string&redirect_gateway=boolean&prevent_server_definitions=boolean&remove_server_routes=boolean&dns_domain=string&dns_servers=string&ntp_servers=string&netbios_enable=boolean&netbios_node_type=string&netbios_scope=string&wins_servers=string",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"openvpn",
+										"server"
+									],
+									"query": [
+										{
+											"key": "vpnid",
+											"value": "string or integer",
+											"description": "VPN id. This id indicates the id of the server you want to update. This id is static and not an index of an entry in the config array. Best to first get all servers and get the id of the one you want to delete before calling this endpoint."
+										},
+										{
+											"key": "mode",
+											"value": "string",
+											"description": "Set the server mode option. Options are `p2p_tls`, `p2p_shared_key`, `server_tls`, `server_user` and `server_tls_user`. The default setting is `p2p_tls`. (optional)"
+										},
+										{
+											"key": "protocol",
+											"value": "string",
+											"description": "Set protocol. Options are `udp4`, `udp6`, `tcp4`, `tcp6`, `udp` and `tcp`. The default setting is `udp4`. (optional)"
+										},
+										{
+											"key": "authmode",
+											"value": "string",
+											"description": "Backend for authentication, This is only necessary if you have specified the `mode` to `server_user` or `server_tls_user`. The default setting is `Local Database` (optional)."
+										},
+										{
+											"key": "dev_mode",
+											"value": "string",
+											"description": "Set Device mode. Options are `tun` and `tap`. The default setting is `tun`. (optional)"
+										},
+										{
+											"key": "interface",
+											"value": "string",
+											"description": "The interface or Virtual IP address where OpenVPN will receive client connections. The default setting is `wan`. (optional)"
+										},
+										{
+											"key": "local_port",
+											"value": "string or integer",
+											"description": "The port used by OpenVPN to receive client connections. Omitting this will default to next available port. (optional)"
+										},
+										{
+											"key": "description",
+											"value": "string",
+											"description": "A description for administrative reference (not parsed)."
+										},
+										{
+											"key": "custom_options",
+											"value": "string",
+											"description": "Enter any additional options to add for this client specific override, separated by a semicolon.\nEXAMPLE: `push \"route 10.0.0.0 255.255.255.0\";`"
+										},
+										{
+											"key": "tls",
+											"value": "string",
+											"description": "Paste the TLS key. This is not necessary for mode `p2p_shared_key`. Options are `\"\"` for automatic TLS key generation and a raw TLS key. Omitting disable TLS configuration. _Note: Import shared key in PEM format. `-----BEGIN OpenVPN Static key V1-----[A bunch of random-looking base64-encoded data]-----END OpenVPN Static key V1-----`. (optional)"
+										},
+										{
+											"key": "tls_type",
+											"value": "string",
+											"description": "Enter TLS Key Usage Mode. This is not necessary for mode `p2p_shared_key`. Options are `auth` and `crypt`. The default setting is `auth`. (optional)"
+										},
+										{
+											"key": "tlsauth_keydir",
+											"value": "string",
+											"description": "Enter TLS keydir direction. This is not necessary for mode `p2p_shared_key`. Options are `default`, `direction-0`, `direction-1` and `both-directions` . The default setting is `default`. (optional)"
+										},
+										{
+											"key": "shared_key",
+											"value": "string",
+											"description": "Enter Shared Key. This is only mandatory for mode `p2p_shared_key`. Options are `\"\"` for automatic shared key generation and a raw shared key. _Note: Import shared key in PEM format. `-----BEGIN OpenVPN Static key V1-----[A bunch of random-looking base64-encoded data]-----END OpenVPN Static key V1-----`."
+										},
+										{
+											"key": "caref",
+											"value": "string",
+											"description": "Specify the unique reference ID of the certificate signing authority."
+										},
+										{
+											"key": "crlref",
+											"value": "string",
+											"description": "Specify the unique reference ID of the certificate revocation list. The default setting is `none`. (optional)"
+										},
+										{
+											"key": "certref",
+											"value": "string",
+											"description": "Specify the unique reference ID of the certificate."
+										},
+										{
+											"key": "ocspcheck",
+											"value": "boolean",
+											"description": "Whether to check client certificates with OCSP. (optional)"
+										},
+										{
+											"key": "ocspurl",
+											"value": "string",
+											"description": "Enter OCSP URL. This is only necessary for `ocspcheck`. The default setting is `\"\"`. (optional)"
+										},
+										{
+											"key": "dh_length",
+											"value": "string",
+											"description": "Enter DH parameter length. Options are `1024`, `2048`, `3072`, `4096`, `6144`, `7680`, `8192`, `15360`, `16384` and `ECDH Only`. The default setting is `2048`. (optional)"
+										},
+										{
+											"key": "ecdh_curve",
+											"value": "string",
+											"description": "Enter ECDH curve. Options are `none`, `prime256v1`, `secp384r1` and `secp521r1`. The default setting is `none`. (optional)"
+										},
+										{
+											"key": "cert_depth",
+											"value": "string",
+											"description": "Enter Certificate depth. Options are `none`, `one`, `two`, `three`, `four` and `five`. The default setting is `one`. (optional)"
+										},
+										{
+											"key": "strictusercn",
+											"value": "boolean",
+											"description": "Enforce Strict User-CN matching. This is only necessary for mode `server_tls_user`. Omitting will disable. (optional)"
+										},
+										{
+											"key": "ncp_enable",
+											"value": "boolean",
+											"description": "Enable Data Encryption Negotiation. Disabling this feature is deprecated. Omitting will enable. (optional)"
+										},
+										{
+											"key": "data_ciphers",
+											"value": "string",
+											"description": "Enter comma sepereted data encryption algorithms (e.g. `AES-256-GCM,AES-128-GCM,CHACHA20-POLY1305`). Data encryption algorithms will be truncated to 19.The default setting is `AES-256-GCM,AES-128-GCM,CHACHA20-POLY1305`. (optional)"
+										},
+										{
+											"key": "data_ciphers_fallback",
+											"value": "string",
+											"description": "Enter fallback data encryption algorithm. The default setting is `AES-256-CBC`. (optional)"
+										},
+										{
+											"key": "digest",
+											"value": "string",
+											"description": "Enter auth digest algorithm. Options are `SHA256`, `BLAKE2b512`, `BLAKE2b256`, `MD4`, `MD5`, `MD5-SHA1`, `MDC2`, `RIPEMD160`, `SHA1`, `SHA224`, `SHA256`, `SHA3-224`, `SHA3-256`, `SHA3-384`, `SHA3-512`, `SHA384`, `SHA512`, `SHA512-224`, `SHA512-256`, `SHAKE128`, `SHAKE256`, `SM3`, `whirlpool` and `none`. The default setting is `SHA256`. (optional)"
+										},
+										{
+											"key": "engine",
+											"value": "string",
+											"description": "Enter Hardware crypto. Options are `none` and any enabled hardware crypto. The default setting is `none`. (optional)"
+										},
+										{
+											"key": "tunnel_network",
+											"value": "string",
+											"description": "The virtual IPv4 network used for private communications between this client and the server expressed using CIDR (e.g. `10.0.8.5/24`).\nWith subnet topology, enter the client IP address and the subnet mask must match the IPv4 Tunnel Network on the server.\nWith net30 topology, the first network address of the /30 is assumed to be the server address and the second network address will be assigned to the client. NOTE: Using a tunnel network and server bridge settings together is not allowed."
+										},
+										{
+											"key": "tunnel_networkv6",
+											"value": "string",
+											"description": "The virtual IPv6 network used for private communications between this client and the server expressed using prefix (e.g. `2001:db9:1:1::100/64`).\nEnter the client IPv6 address and prefix. The prefix must match the IPv6 Tunnel Network prefix on the server. NOTE: Using a tunnel network and server bridge settings together is not allowed."
+										},
+										{
+											"key": "serverbridge_dhcp",
+											"value": "boolean",
+											"description": "Allow clients on the bridge to obtain DHCP. This is only available for mode `server_tls` , `server_user` or `server_tls_user` and dev_mode `tap`. NOTE: Using a tunnel network and server bridge settings together is not allowed. (optional)"
+										},
+										{
+											"key": "serverbridge_interface",
+											"value": "string",
+											"description": "The interface to which this TAP instance will be bridged. This is not done automatically. This interface must be assigned and the bridge created separately. This setting controls which existing IP address and subnet mask are used by OpenVPN for the bridge. Setting this to `none` will cause the Server Bridge DHCP settings below to be ignored. This is only available for mode `server_tls` , `server_user` or `server_tls_user` and dev_mode `tap`. NOTE: currently support `wan`, `lan` and `none`. (optional)"
+										},
+										{
+											"key": "serverbridge_routegateway",
+											"value": "boolean",
+											"description": "When omitting the IPv4 Tunnel Network for a bridge, connecting clients cannot automatically determine a server-side gateway for IPv4 Local Network(s) or Redirect IPv4 Gateway traffic. When enabled, this option sends the IPv4 address of the selected Bridge Interface to clients which they can then use as a gateway for routing traffic outside of the bridged subnet. OpenVPN does not currently support this mechanism for IPv6. This is only available for mode `server_tls` , `server_user` or `server_tls_user` and dev_mode `tap`. (optional)"
+										},
+										{
+											"key": "serverbridge_dhcp_start",
+											"value": "string",
+											"description": "When using TAP mode as a multi-point server, a DHCP range may optionally be supplied to use on the interface to which this TAP instance is bridged. If these settings are left blank, DHCP will be passed through to the LAN, and the interface setting above will be ignored. This is only available for mode `server_tls` , `server_user` or `server_tls_user` and dev_mode `tap`. (optional)"
+										},
+										{
+											"key": "serverbridge_dhcp_end",
+											"value": "string",
+											"description": "When using TAP mode as a multi-point server, a DHCP range may optionally be supplied to use on the interface to which this TAP instance is bridged. If these settings are left blank, DHCP will be passed through to the LAN, and the interface setting above will be ignored. This is only available for mode `server_tls` , `server_user` or `server_tls_user` and dev_mode `tap`. (optional)"
+										},
+										{
+											"key": "local_network",
+											"value": "string",
+											"description": "These are the IPv4 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more CIDR networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
+										},
+										{
+											"key": "local_networkv6",
+											"value": "string",
+											"description": "These are the IPv6 server-side networks that will be accessible from this particular client. Expressed as a comma-separated list of one or more IP/PREFIX networks.\nNOTE: Networks do not need to be specified here if they have already been defined on the main server configuration."
+										},
+										{
+											"key": "remote_network",
+											"value": "string",
+											"description": "These are the IPv4 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more CIDR ranges. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv4 Remote Networks list on the corresponding OpenVPN server settings. This is only available for mode `p2p_tls ` or `p2p_shared_key`. (optional)"
+										},
+										{
+											"key": "remote_networkv6",
+											"value": "string",
+											"description": "These are the IPv6 client-side networks that will be routed to this client specifically using iroute, so that a site-to-site VPN can be established. Expressed as a comma-separated list of one or more IP/PREFIX networks. May be left blank if there are no client-side networks to be routed.\nNOTE: Remember to add these subnets to the IPv6 Remote Networks list on the corresponding OpenVPN server settings. This is only available for mode `p2p_tls ` or `p2p_shared_key`. (optional)"
+										},
+										{
+											"key": "redirect_gateway",
+											"value": "boolean",
+											"description": "Force all client generated traffic through the tunnel. (optional)"
+										},
+										{
+											"key": "redirect_gateway6",
+											"value": "boolean",
+											"description": "Force all client generated traffic through the tunnel. (optional)"
+										},
+										{
+											"key": "concurrent_connections",
+											"value": "string or integer",
+											"description": "Specify the maximum number of clients allowed to concurrently connect to this server. (optional)"
+										},
+										{
+											"key": "allow_compression",
+											"value": "string",
+											"description": "Allow compression to be used with this VPN instance. Options are `asym`, `no` and `yes`. The default setting is `no` (optional)"
+										},
+										{
+											"key": "compression",
+											"value": "string",
+											"description": "Compression to be used with this VPN instance. This is only necessary for `allow_compression` set to `yes` or `asym`. Options are `none`, `stub`, `stub-v2`, `lz4`, `lz4-v2`, `lzo`, `noadapt`, `adaptive`, `yes` and `no`. Compression can potentially dangerous and insecure. Deprecated. Compress tunnel packets using the LZO algorithm. The default setting is `none` (optional)"
+										},
+										{
+											"key": "compression_push",
+											"value": "boolean",
+											"description": "Push the selected Compression setting to connecting clients. This is only necessary for `allow_compression` set to `yes` or `asym`. (optional)"
+										},
+										{
+											"key": "passtos",
+											"value": "boolean",
+											"description": "Allow communication between clients connected to this server. (optional)"
+										},
+										{
+											"key": "client2client",
+											"value": "boolean",
+											"description": "Whether to disable this override without removing it. (optional)"
+										},
+										{
+											"key": "duplicate_cn",
+											"value": "boolean",
+											"description": "Allow multiple concurrent connections from the same user. This is only necessary for mode `p2p_shared_key`. (optional)"
+										},
+										{
+											"key": "dynamic_ip",
+											"value": "boolean",
+											"description": "Allow connected clients to retain their connections if their IP address changes. (optional)"
+										},
+										{
+											"key": "topology",
+											"value": "string",
+											"description": "Specifies the method used to supply a virtual adapter IP address to clients when using TUN mode on IPv4. Options are `subnet` and `net30`. The default setting is `subnet`. (optional)"
+										},
+										{
+											"key": "dns_domain",
+											"value": "string",
+											"description": "Domain name for DNS to provide to the client. (optional)"
+										},
+										{
+											"key": "dns_servers",
+											"value": "string",
+											"description": "A comma-separated list of no more than 4 DNS server IP addresses (i.e. 8.8.8.8). Any more than the first four are ignored. This list is provided to the clent."
+										},
+										{
+											"key": "push_blockoutsidedns",
+											"value": "boolean",
+											"description": "Make Windows 10 Clients Block access to DNS servers except across OpenVPN while connected, forcing clients to use only VPN DNS servers. (optional)"
+										},
+										{
+											"key": "push_register_dns",
+											"value": "boolean",
+											"description": "Run \"net stop dnscache\", \"net start dnscache\", \"ipconfig /flushdns\" and \"ipconfig /registerdns\" on connection initiation. This only availabe for mode `server_tls`, `server_user` and `server_tls_user`. (optional)"
+										},
+										{
+											"key": "inactive_seconds",
+											"value": "string or integer",
+											"description": "Causes OpenVPN to exit after n seconds of inactivity on the TUN/TAP device. `0` disables this feature. The default setting is `300`. (optional)"
+										},
+										{
+											"key": "ping_method",
+											"value": "string",
+											"description": "Enter ping method. Options `keepalive` and `ping`. The default setting is `keepalive`. (optional)"
+										},
+										{
+											"key": "keepalive_interval",
+											"value": "string or integer",
+											"description": "Enter keepalive interval. The default setting is `10`. This only available for `keepalive` method. (optional)"
+										},
+										{
+											"key": "keepalive_timeout",
+											"value": "string or integer",
+											"description": "Enter keepalive timeout. The default setting is `60`. This only available for `keepalive` method. (optional)"
+										},
+										{
+											"key": "ping_seconds",
+											"value": "string or integer",
+											"description": "Enter ping seconds. This is only necessary for `ping` method. The default setting is `10`. (optional)"
+										},
+										{
+											"key": "ping_action_seconds",
+											"value": "string or integer",
+											"description": "Enter ping action seconds. This is only necessary for `ping` method. The default setting is `60`. (optional)"
+										},
+										{
+											"key": "ping_push",
+											"value": "boolean",
+											"description": "Push ping to VPN client. This is only necessary for `ping` method. (optional)"
+										},
+										{
+											"key": "ping_action_push",
+											"value": "boolean",
+											"description": "Push ping-restart/ping-exit to VPN client. This is only necessary for `ping` method. (optional)"
+										},
+										{
+											"key": "ping_action",
+											"value": "string",
+											"description": "Exit or restart OpenVPN after timeout from remote. Options `ping_exit` and `ping_restart`. This is only necessary for `ping` method. The default setting is `ping_restart`. (optional)"
+										},
+										{
+											"key": "username_as_common_name",
+											"value": "boolean",
+											"description": "Use the authenticated client username instead of the certificate common name (CN). This is only necessary for mode `server_user` or `server_tls_user`. The default setting is `false`. (optional)"
+										},
+										{
+											"key": "udp_fast_io",
+											"value": "boolean",
+											"description": "Use fast I/O operations with UDP writes to tun/tap. Experimental. The default setting is `false`. (optional)"
+										},
+										{
+											"key": "exit_notify",
+											"value": "string",
+											"description": "Send an explicit exit notification to connected clients/peers when restarting or shutting down, so they may immediately disconnect rather than waiting for a timeout. In SSL/TLS Server modes, clients may be directed to reconnect or use the next server. In Peer-to-Peer Shared Key or with a /30 Tunnel Network, this value controls how many times this instance will attempt to send the exit notification. Options `once`, `twice`, `none` and `\"\"`. The default setting is `once`. (optional)"
+										},
+										{
+											"key": "sndrcvbuf",
+											"value": "string",
+											"description": "Configure a Send and Receive Buffer size for OpenVPN. Options `64KiB`, `128KiB`, `256KiB`, `512KiB`, `1MiB`, `2MiB` and `default`. The default setting is `default`. (optional)"
+										},
+										{
+											"key": "ntp_servers",
+											"value": "string",
+											"description": "A comma-separated list of no more than 2 NTP server IP addresses. Any more than the first two are ignored. (optional)"
+										},
+										{
+											"key": "netbios_enable",
+											"value": "boolean",
+											"description": "Enable NetBIOS over TCP/IP. If this option is not set, all NetBIOS-over-TCP/IP options (including WINS) will be disabled. (optional)"
+										},
+										{
+											"key": "netbios_node_type",
+											"value": "string",
+											"description": "Possible options: b (broadcasts), p (point-to-point name queries to a WINS server), m (broadcast then query name server), and h (query name server, then broadcast). This parameter takes a single letter either b, p, m, or h. Any other string will result in this option being set to none. (optional)"
+										},
+										{
+											"key": "netbios_scope",
+											"value": "string",
+											"description": "A NetBIOS Scope ID provides an extended naming service for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS traffic on a single network to only those nodes with the same NetBIOS scope ID. (optional)"
+										},
+										{
+											"key": "create_gw",
+											"value": "string",
+											"description": "If you assign a virtual interface to this OpenVPN server, this setting controls which gateway types will be created. Options are `v4only`, `v6only` and `both`. The default setting is `both`. (optional)"
+										},
+										{
+											"key": "verbosity_level",
+											"value": "string",
+											"description": "Each level shows all info from the previous levels. Level `3` is recommended for a good summary of what's happening without being swamped by output. Maximum level `11`. The default setting is `default`, equivalent to level `1`. (optional)"
+										},
+										{
+											"key": "wins_servers",
+											"value": "string",
+											"description": "A comma-separated list of no more than 2 WINS server IP addresses. Any more than the first two are ignored. (optional)"
+										},
+										{
+											"key": "disable",
+											"value": "boolean",
+											"description": "Whether to disable this server. (optional)"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete OpenVPN Server",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"vpnid\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "https://{{$hostname}}/api/v1/services/openvpn/server?vpnid=int",
+									"protocol": "https",
+									"host": [
+										"{{$hostname}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"openvpn",
+										"server"
+									],
+									"query": [
+										{
+											"key": "vpnid",
+											"value": "string or integer",
+											"description": "VPN id. This id indicates the id of the server you want to delete. This id is static and not an index of an entry in the config array. Best to first get all servers and get the id of the one you want to delete before calling this endpoint."
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"_postman_isSubFolder": true
+				}
+			],
+			"_postman_isSubFolder": true
 		},
 		{
 			"name": "ACCESS_TOKEN",
