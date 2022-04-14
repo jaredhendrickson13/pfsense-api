@@ -28,6 +28,10 @@ class APISystemCertificate extends APIEndpoint {
         return (new APISystemCertificateCreate())->call();
     }
 
+    protected function put() {
+        return (new APISystemCertificateUpdate())->call();
+    }
+
     protected function delete() {
         return (new APISystemCertificateDelete())->call();
     }

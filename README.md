@@ -698,7 +698,8 @@ There is no limit to API calls at this time but is important to note that pfSens
 * [SYSTEM/CERTIFICATE](#systemcertificate)
     1. [Read System Certificates](#1-read-system-certificates)
     1. [Create System Certificates](#2-create-system-certificates)
-    1. [Delete System Certificates](#3-delete-system-certificates)
+    1. [Update System Certificates](#3-update-system-certificates)
+    1. [Delete System Certificates](#4-delete-system-certificates)
 * [SYSTEM/HOSTNAME](#systemhostname)
     1. [Read System Hostname](#1-read-system-hostname)
     1. [Update System Hostname](#2-update-system-hostname)
@@ -5230,7 +5231,48 @@ URL: https://{{$hostname}}/api/v1/system/certificate
 
 
 
-### 3. Delete System Certificates
+### 3. Update System Certificates
+
+
+Update an installed SSL certificate.  
+Dependent services are NOT restarted.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/system/certificate
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| refid | string | Specify the refid of the certificate to change (required if `descr` is not defined) |
+| descr | string | Specify the description of the certificate to delete (required if `refid` is not defined) _Note: if multiple certificates exist with the same name, only the first matching certificate will be updated_ _Note: `descr` can be changed when `refid` is specified_|
+| crt | string | Specify the Base64 encoded PEM certificate to import. This field is required when `method` is set to `existing`. _Note: previous releases referred to the `crt` field as `cert`. Both `crt` and `cert` can be used interchangeably._ |
+| prv | string | Specify the corresponding Base64 encoded certificate key. This field is required when `method` is set to `existing`. _Note: previous releases referred to the `prv` field as `key`. Both `prv` and `key` can be used interchangeably._ |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "descr": "my already existing certificate",
+    "crt": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUNZRENDQWNtZ0F3SUJBZ0lVSUt0U1pUYVRZSWhncytNNllsUUxrZFZ0Tm1nd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1FqRUxNQWtHQTFVRUJoTUNXRmd4RlRBVEJnTlZCQWNNREVSbFptRjFiSFFnUTJsMGVURWNNQm9HQTFVRQpDZ3dUUkdWbVlYVnNkQ0JEYjIxd1lXNTVJRXgwWkRBZUZ3MHlNakF6TWpreE5ESTVNRGRhRncweU16QXpNamt4Ck5ESTVNRGRhTUVJeEN6QUpCZ05WQkFZVEFsaFlNUlV3RXdZRFZRUUhEQXhFWldaaGRXeDBJRU5wZEhreEhEQWEKQmdOVkJBb01FMFJsWm1GMWJIUWdRMjl0Y0dGdWVTQk1kR1F3Z1o4d0RRWUpLb1pJaHZjTkFRRUJCUUFEZ1kwQQpNSUdKQW9HQkFLTjlnaGlHT29rakp1aGs3VlZHYnVWdWg4MUxwVUFYNjEzRzRUZWlFMXJOUVl4U0NWSmdCaXpQCkxZK2hidmRjWUxGdGk4Rm1EM1hpM2J1aUxmdmY3UW5VOWljbmxwVTU4bU00VEEvR1orMisyZXpJTUhCdVowek8KZVRQSXhpOEMzYmZtb1VzME9JdEc0SGNlcWlpK09taXIrY3VlNk5xcVNJQUJuRzFoWHpENUFnTUJBQUdqVXpCUgpNQjBHQTFVZERnUVdCQlJMWFRWa01sQUtKbktaNTJRNmVIWmVRb3pNbHpBZkJnTlZIU01FR0RBV2dCUkxYVFZrCk1sQUtKbktaNTJRNmVIWmVRb3pNbHpBUEJnTlZIUk1CQWY4RUJUQURBUUgvTUEwR0NTcUdTSWIzRFFFQkN3VUEKQTRHQkFKRjd6MHBtQlhkQ0xJOWo5c2dFWCs3MWwyRGtYVEttZ2thS05ZN011RFBVQ1RNdUpjZ2MzbDdyd25BbwpRV3FpQ3o4VVZYdENER2xKVzZGYXJUWU5VSTlyaHAxR3hsbDQ3ckt5eXVCVUlLQmkwSFpPa3Y4dnBGM0lqcldECmlqRE5DbFZHQWlDSUU4STFIZDExT3cyY2pNODVCcFpDVFZycXJVaUJFSEswWWtpSwotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==",
+    "prv": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUNkZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQW1Bd2dnSmNBZ0VBQW9HQkFLTjlnaGlHT29rakp1aGsKN1ZWR2J1VnVoODFMcFVBWDYxM0c0VGVpRTFyTlFZeFNDVkpnQml6UExZK2hidmRjWUxGdGk4Rm1EM1hpM2J1aQpMZnZmN1FuVTlpY25scFU1OG1NNFRBL0daKzIrMmV6SU1IQnVaMHpPZVRQSXhpOEMzYmZtb1VzME9JdEc0SGNlCnFpaStPbWlyK2N1ZTZOcXFTSUFCbkcxaFh6RDVBZ01CQUFFQ2dZQnI1U0dkYzhCZnp0NFhrcnY2Z2pBZnBERmwKY0IzUHpibGNPeXRaSHRKdEkzYTExMUlsbGcrZE5PRlpuKzF1dS8xb091WjNyUlpZODI3b0xLRHlVQmJMVHpEcwpHVzcwU09JZElwTXQxRmtWNmJZbDBpTXllaU1TUFdOeVl3YjA4Yko3ejZobzgxZnR1NGU4Y2FVS2lDdnZOK1lvCmtmVjk3RHEvNUV1NjVkSGZyUUpCQU5GbSt6dzVWNU83QmVhNXdiNXFSc0daODdBUDMxTU1TNWR3d21nM0VzVmoKekc0UnNMMXNTTjZ3SnM3LytaRERhcDVXS2M0T1FEZDA2YjVQTW5tM3dFTUNRUURIM3c3SXhneVRpaWNSUnpQegpBam5oZU5JL0h2NmloR0craFBMMnIxaFRTUFlWTDhRb2xHLzhhM3JGZW5iNm5rMjlyWks0eXdaK2x1R3hqbFRUCm02UVRBa0VBbmxMOW04QkRUZ2cyNHdjSnpMMnY5OHM5NjUxa25mY0s1RnEyTW5PSmRzTUpHeU8yL05GMW15R1cKaGlZVi9IVTBGTGxTN0Yvci84SWV4T3crWHJjbTN3SkFWZDJiSVdBTUtScFIvRmRGbHlHZXNpSFEyVE04bTU4Wgp5dHFjOHFPVDQzdlYxSFpINUZNWTVTMWJlaGxKb2hOK1BIMmtLZVYyN2MxdU9uUjJOczZIcHdKQU8zdyt4ZnJoCk1ETlJ0TlZPQmZDc0p6aVV1ejRTZXY1K1pMVEphRWpmNkJUSUhVVHl2MGJzRUt3SGNtV3FQc0lFcFFvUkZnSlQKbElmelJSQXdBRWpDNVE9PQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0tCg=="
+}
+```
+
+
+
+### 4. Delete System Certificates
 
 
 Delete an existing certificate.<br><br>
