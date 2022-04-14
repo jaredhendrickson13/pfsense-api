@@ -1193,8 +1193,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "DHCPd option with type ip-address must be valid IPv4 address or hostname"
         ],
-
-
+        2999 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid service name specified."
+        ],
 
         // 3000-3999 reserved for /interfaces API calls
         3000 => [
