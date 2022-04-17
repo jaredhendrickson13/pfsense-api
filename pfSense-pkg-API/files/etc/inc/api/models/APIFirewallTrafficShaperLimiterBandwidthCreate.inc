@@ -122,8 +122,8 @@ class APIFirewallTrafficShaperLimiterBandwidthCreate extends APIModel {
     public function is_firewall_schedule($name) {
         # Loop through each configured firewall schedule and check if one exists with a provided name
         foreach ($this->config["schedules"]["schedule"] as $schedule) {
-            # Check if the provided name matches this schedule's name
-            if ($name === $schedule["name"]) {
+            # Check if the provided name matches this schedule's name or if the name is 'none'
+            if ($name === $schedule["name"] or $name == "none") {
                 return true;
             }
         }
