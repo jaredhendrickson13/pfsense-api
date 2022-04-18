@@ -21,7 +21,7 @@ class APISystemCRLRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-certmanager"];
+        $this->privileges = ["page-all", "page-system-crlmanager"];
     }
 
     public function action() {

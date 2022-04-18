@@ -169,7 +169,7 @@ class APISystemCertificateCreate extends APIModel {
                 $this->validated_data["prv"] = $key;
             }
         } else {
-
+            $this->errors[] = APIResponse\get(1004);
         }
     }
 
@@ -191,7 +191,6 @@ class APISystemCertificateCreate extends APIModel {
         # Local variables
         $key_types = ["RSA", "ECDSA"];
 
-
         # Validate the required 'keytype' field
         if (isset($this->initial_data['keytype'])) {
             # Ensure keytype is known
@@ -208,7 +207,6 @@ class APISystemCertificateCreate extends APIModel {
     private function __validate_keylen() {
         # Local variables
         $key_lengths = [1024, 2048, 3072, 4096, 6144, 7680, 8192, 15360, 16384];
-
 
         # Validate the conditional 'keylen' field when the keytype is set to RSA
         if ($this->cert_attr["keytype"] === "RSA") {

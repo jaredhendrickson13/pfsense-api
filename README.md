@@ -949,12 +949,287 @@ There is no limit to API calls at this time but is important to note that pfSens
   * [Read System Version](#1-read-system-version)
 
 * [USER](#user)
+<<<<<<< HEAD
 
   * [Create Users](#1-create-users)
   * [Delete Users](#2-delete-users)
   * [Read Users](#3-read-users)
   * [Update Users](#4-update-users)
 
+=======
+    1. [Read Users](#1-read-users)
+    1. [Create Users](#2-create-users)
+    1. [Update Users](#3-update-users)
+    1. [Delete Users](#4-delete-users)
+* [INTERFACE](#interface)
+    1. [Read Interfaces](#1-read-interfaces)
+    1. [Create Interfaces](#2-create-interfaces)
+    1. [Update Interfaces](#3-update-interfaces)
+    1. [Delete Interfaces](#4-delete-interfaces)
+* [SERVICES](#services)
+    1. [Read Services](#1-read-services)
+    1. [Start All Services](#2-start-all-services)
+    1. [Stop All Services](#3-stop-all-services)
+    1. [Restart All Services](#4-restart-all-services)
+* [ACCESS_TOKEN](#access_token)
+    1. [Request Access Token](#1-request-access-token)
+* [DIAGNOSTICS](#diagnostics)
+    1. [Execute Shell Command](#1-execute-shell-command)
+* [SERVICES/DDNS](#servicesddns)
+    1. [Read Dynamic DNS](#1-read-dynamic-dns)
+* [SERVICES/SYSLOGD](#servicessyslogd)
+    1. [Start SYSLOGd Service](#1-start-syslogd-service)
+    1. [Restart SYSLOGd Service](#2-restart-syslogd-service)
+    1. [Stop SYSLOGd Service](#3-stop-syslogd-service)
+* [SERVICES/SSHD](#servicessshd)
+    1. [Start SSHd Service](#1-start-sshd-service)
+    1. [Update SSHd Configuration](#2-update-sshd-configuration)
+    1. [Restart SSHd Service](#3-restart-sshd-service)
+    1. [Stop SSHd Service](#4-stop-sshd-service)
+    1. [Read SSHd Configuration](#5-read-sshd-configuration)
+* [SERVICES/NTPD/TIME_SERVER](#servicesntpdtime_server)
+    1. [Create NTPd Time Server](#1-create-ntpd-time-server)
+    1. [Delete NTPd Time Server](#2-delete-ntpd-time-server)
+* [SERVICES/NTPD](#servicesntpd)
+    1. [Start NTPd Service](#1-start-ntpd-service)
+    1. [Read NTPd Service](#2-read-ntpd-service)
+    1. [Update NTPd Service](#3-update-ntpd-service)
+    1. [Restart NTPd Service](#4-restart-ntpd-service)
+    1. [Stop NTPd Service](#5-stop-ntpd-service)
+* [SERVICES/DPINGER](#servicesdpinger)
+    1. [Start DPINGER Service](#1-start-dpinger-service)
+    1. [Restart DPINGER Service](#2-restart-dpinger-service)
+    1. [Stop DPINGER Service](#3-stop-dpinger-service)
+* [SERVICES/DHCPD/STATIC_MAPPING](#servicesdhcpdstatic_mapping)
+    1. [Read DHCPd Static Mappings](#1-read-dhcpd-static-mappings)
+    1. [Create DHCPd Static Mappings](#2-create-dhcpd-static-mappings)
+    1. [Update DHCPd Static Mappings](#3-update-dhcpd-static-mappings)
+    1. [Delete DHCPd Static Mappings](#4-delete-dhcpd-static-mappings)
+* [SERVICES/DHCPD/OPTIONS](#servicesdhcpdoptions)
+    1. [Create DHCPd Options](#1-create-dhcpd-options)
+* [SERVICES/DHCPD/LEASE](#servicesdhcpdlease)
+    1. [Read DHCPd Leases](#1-read-dhcpd-leases)
+* [SERVICES/DHCPD](#servicesdhcpd)
+    1. [Start DHCPd Service](#1-start-dhcpd-service)
+    1. [Read DHCPd Service Configuration](#2-read-dhcpd-service-configuration)
+    1. [Update DHCPd Service Configuration](#3-update-dhcpd-service-configuration)
+    1. [Restart DHCPd Service](#4-restart-dhcpd-service)
+    1. [Stop DHCPd Service](#5-stop-dhcpd-service)
+* [SERVICES/DNSMASQ/HOST_OVERRIDE/ALIAS](#servicesdnsmasqhost_overridealias)
+    1. [Create dnsmasq Host Override Alias](#1-create-dnsmasq-host-override-alias)
+* [SERVICES/DNSMASQ/HOST_OVERRIDE](#servicesdnsmasqhost_override)
+    1. [Create dnsmasq Host Override](#1-create-dnsmasq-host-override)
+    1. [Update dnsmasq Host Override](#2-update-dnsmasq-host-override)
+    1. [Delete dnsmasq Host Override](#3-delete-dnsmasq-host-override)
+    1. [Read dnsmasq Host Override](#4-read-dnsmasq-host-override)
+* [SERVICES/DNSMASQ](#servicesdnsmasq)
+    1. [Read dnsmasq Configuration](#1-read-dnsmasq-configuration)
+    1. [Start dnsmasq Service](#2-start-dnsmasq-service)
+    1. [Restart dnsmasq Service](#3-restart-dnsmasq-service)
+    1. [Stop dnsmasq Service](#4-stop-dnsmasq-service)
+    1. [Apply Pending dnsmasq Changes](#5-apply-pending-dnsmasq-changes)
+* [SERVICES/UNBOUND/ACCESS_LIST/ROW](#servicesunboundaccess_listrow)
+    1. [Create Unbound Access List Row](#1-create-unbound-access-list-row)
+* [SERVICES/UNBOUND/ACCESS_LIST](#servicesunboundaccess_list)
+    1. [Read Unbound Access Lists](#1-read-unbound-access-lists)
+    1. [Create Unbound Access List](#2-create-unbound-access-list)
+    1. [Update Unbound Access List](#3-update-unbound-access-list)
+    1. [Delete Unbound Access List](#4-delete-unbound-access-list)
+* [SERVICES/UNBOUND/HOST_OVERRIDE/ALIAS](#servicesunboundhost_overridealias)
+    1. [Create Unbound Host Override Alias](#1-create-unbound-host-override-alias)
+* [SERVICES/UNBOUND/HOST_OVERRIDE](#servicesunboundhost_override)
+    1. [Create Unbound Host Override](#1-create-unbound-host-override)
+    1. [Update Unbound Host Override](#2-update-unbound-host-override)
+    1. [Delete Unbound Host Override](#3-delete-unbound-host-override)
+    1. [Read Unbound Host Override](#4-read-unbound-host-override)
+* [SERVICES/UNBOUND](#servicesunbound)
+    1. [Read Unbound Configuration](#1-read-unbound-configuration)
+    1. [Start Unbound Service](#2-start-unbound-service)
+    1. [Restart Unbound Service](#3-restart-unbound-service)
+    1. [Stop Unbound Service](#4-stop-unbound-service)
+    1. [Apply Pending Unbound Changes](#5-apply-pending-unbound-changes)
+* [SERVICES/OPENVPN/CSC](#servicesopenvpncsc)
+    1. [Read OpenVPN Client Specific Overrides](#1-read-openvpn-client-specific-overrides)
+    1. [Create OpenVPN Client Specific Overrides](#2-create-openvpn-client-specific-overrides)
+    1. [Update OpenVPN Client Specific Overrides](#3-update-openvpn-client-specific-overrides)
+    1. [Delete OpenVPN Client Specific Override](#4-delete-openvpn-client-specific-override)
+* [STATUS/SYSTEM](#statussystem)
+    1. [Read System Status](#1-read-system-status)
+* [STATUS/INTERFACE](#statusinterface)
+    1. [Read Interface Status](#1-read-interface-status)
+* [STATUS/GATEWAY](#statusgateway)
+    1. [Read Gateway Status](#1-read-gateway-status)
+* [STATUS/LOG](#statuslog)
+    1. [Read System Status Log](#1-read-system-status-log)
+    1. [Read Firewall Status Log](#2-read-firewall-status-log)
+    1. [Read DHCP Status Log](#3-read-dhcp-status-log)
+    1. [Read Configuration History Status Log](#4-read-configuration-history-status-log)
+* [STATUS/OPENVPN](#statusopenvpn)
+    1. [Read OpenVPN Status](#1-read-openvpn-status)
+* [STATUS/CARP](#statuscarp)
+    1. [Read CARP Status](#1-read-carp-status)
+    1. [Update CARP Status](#2-update-carp-status)
+* [ROUTING/APPLY](#routingapply)
+    1. [Apply Routing](#1-apply-routing)
+* [ROUTING/STATIC_ROUTE](#routingstatic_route)
+    1. [Read Static Routes](#1-read-static-routes)
+    1. [Delete Static Routes](#2-delete-static-routes)
+    1. [Create Static Routes](#3-create-static-routes)
+    1. [Update Static Routes](#4-update-static-routes)
+* [ROUTING/GATEWAY/DETAIL](#routinggatewaydetail)
+    1. [Read Routing Gateway Details](#1-read-routing-gateway-details)
+* [ROUTING/GATEWAY](#routinggateway)
+    1. [Read Routing Gateways](#1-read-routing-gateways)
+    1. [Delete Routing Gateways](#2-delete-routing-gateways)
+    1. [Create Routing Gateways](#3-create-routing-gateways)
+    1. [Update Routing Gateways](#4-update-routing-gateways)
+* [SYSTEM/HALT](#systemhalt)
+    1. [Halt System](#1-halt-system)
+* [SYSTEM/REBOOT](#systemreboot)
+    1. [Create System Reboot](#1-create-system-reboot)
+* [SYSTEM/CONSOLE](#systemconsole)
+    1. [Update Console Settings](#1-update-console-settings)
+* [SYSTEM/TABLE](#systemtable)
+    1. [Read System Tables](#1-read-system-tables)
+* [SYSTEM/TUNABLE](#systemtunable)
+    1. [Read System Tunables](#1-read-system-tunables)
+    1. [Create System Tunables](#2-create-system-tunables)
+    1. [Update System Tunables](#3-update-system-tunables)
+    1. [Delete System Tunables](#4-delete-system-tunables)
+* [SYSTEM/DNS/SERVER](#systemdnsserver)
+    1. [Delete System DNS Server](#1-delete-system-dns-server)
+    1. [Create System DNS Server](#2-create-system-dns-server)
+* [SYSTEM/DNS](#systemdns)
+    1. [Read System DNS](#1-read-system-dns)
+    1. [Update System DNS](#2-update-system-dns)
+* [SYSTEM/API](#systemapi)
+    1. [Read System API Configuration](#1-read-system-api-configuration)
+    1. [Update System API Configuration](#2-update-system-api-configuration)
+    1. [Read System API Error Library](#3-read-system-api-error-library)
+    1. [Read System API Version](#4-read-system-api-version)
+* [SYSTEM/CRL](#systemcrl)
+    1. [Read System CRLs](#1-read-system-crls)
+    1. [Create System CRL](#2-create-system-crl)
+    1. [Delete System CRL](#3-delete-system-crl)
+* [SYSTEM/CA](#systemca)
+    1. [Read System CAs](#1-read-system-cas)
+    1. [Create System CA](#2-create-system-ca)
+    1. [Delete System CA](#3-delete-system-ca)
+* [SYSTEM/CERTIFICATE](#systemcertificate)
+    1. [Read System Certificates](#1-read-system-certificates)
+    1. [Create System Certificates](#2-create-system-certificates)
+    1. [Delete System Certificates](#3-delete-system-certificates)
+* [SYSTEM/HOSTNAME](#systemhostname)
+    1. [Read System Hostname](#1-read-system-hostname)
+    1. [Update System Hostname](#2-update-system-hostname)
+* [SYSTEM/CONFIG](#systemconfig)
+    1. [Read System Configuration](#1-read-system-configuration)
+    1. [Update System Configuration](#2-update-system-configuration)
+* [SYSTEM/ARP](#systemarp)
+    1. [Read System ARP Table](#1-read-system-arp-table)
+    1. [Delete System ARP Table](#2-delete-system-arp-table)
+* [SYSTEM/PACKAGE](#systempackage)
+    1. [Read System Packages](#1-read-system-packages)
+    1. [Delete System Package](#2-delete-system-package)
+    1. [Install System Package](#3-install-system-package)
+* [SYSTEM/VERSION](#systemversion)
+    1. [Read System Version](#1-read-system-version)
+* [SYSTEM/NOTIFICATIONS/EMAIL](#systemnotificationsemail)
+    1. [Read System Email Notification Settings](#1-read-system-email-notification-settings)
+    1. [Update System Email Notification Settings](#2-update-system-email-notification-settings)
+* [FIREWALL/SCHEDULE/TIME_RANGE](#firewallscheduletime_range)
+    1. [Create Schedule Time Range](#1-create-schedule-time-range)
+    1. [Delete Schedule Time Range](#2-delete-schedule-time-range)
+* [FIREWALL/SCHEDULE](#firewallschedule)
+    1. [Create Schedule](#1-create-schedule)
+    1. [Update Schedule](#2-update-schedule)
+    1. [Delete Schedule](#3-delete-schedule)
+    1. [Read schedules](#4-read-schedules)
+* [FIREWALL/TRAFFIC_SHAPER/QUEUE](#firewalltraffic_shaperqueue)
+    1. [Create Traffic Shaper Queue](#1-create-traffic-shaper-queue)
+    1. [Delete Traffic Shaper Queue](#2-delete-traffic-shaper-queue)
+* [FIREWALL/TRAFFIC_SHAPER/LIMITER/BANDWIDTH](#firewalltraffic_shaperlimiterbandwidth)
+    1. [Create Limiter Bandwidth](#1-create-limiter-bandwidth)
+    1. [Delete Limiter Bandwidth](#2-delete-limiter-bandwidth)
+* [FIREWALL/TRAFFIC_SHAPER/LIMITER/QUEUE](#firewalltraffic_shaperlimiterqueue)
+    1. [Create Limiter Queue](#1-create-limiter-queue)
+    1. [Delete Limiter Queue](#2-delete-limiter-queue)
+* [FIREWALL/TRAFFIC_SHAPER/LIMITER](#firewalltraffic_shaperlimiter)
+    1. [Create Limiter](#1-create-limiter)
+    1. [Read Limiters](#2-read-limiters)
+    1. [Delete limiter](#3-delete-limiter)
+* [FIREWALL/TRAFFIC_SHAPER](#firewalltraffic_shaper)
+    1. [Create Traffic Shaper](#1-create-traffic-shaper)
+    1. [Update Traffic Shaper](#2-update-traffic-shaper)
+    1. [Read Traffic Shapers](#3-read-traffic-shapers)
+    1. [Delete Traffic Shaper](#4-delete-traffic-shaper)
+* [FIREWALL/APPLY](#firewallapply)
+    1. [Apply Firewall](#1-apply-firewall)
+* [FIREWALL/STATES/SIZE](#firewallstatessize)
+    1. [Read Firewall State Size](#1-read-firewall-state-size)
+    1. [Update Firewall State Size](#2-update-firewall-state-size)
+* [FIREWALL/STATES](#firewallstates)
+    1. [Read Firewall States](#1-read-firewall-states)
+    1. [Delete Firewall States](#2-delete-firewall-states)
+* [FIREWALL/NAT/PORTFOWARD](#firewallnatportfoward)
+    1. [Read NAT Port Forwards](#1-read-nat-port-forwards)
+    1. [Create NAT Port Forwards](#2-create-nat-port-forwards)
+    1. [Update NAT Port Forwards](#3-update-nat-port-forwards)
+    1. [Delete NAT Port Forwards](#4-delete-nat-port-forwards)
+* [FIREWALL/NAT/ONE_TO_ONE](#firewallnatone_to_one)
+    1. [Read NAT 1-to-1 Mappings](#1-read-nat-1-to-1-mappings)
+    1. [Create NAT 1-to-1 Mappings](#2-create-nat-1-to-1-mappings)
+    1. [Update NAT 1-to-1 Mappings](#3-update-nat-1-to-1-mappings)
+    1. [Delete NAT 1-to-1 Mappings](#4-delete-nat-1-to-1-mappings)
+* [FIREWALL/NAT/OUTBOUND/MAPPING](#firewallnatoutboundmapping)
+    1. [Read Outbound NAT Mappings](#1-read-outbound-nat-mappings)
+    1. [Create Outbound NAT Mappings](#2-create-outbound-nat-mappings)
+    1. [Update Outbound NAT Mappings](#3-update-outbound-nat-mappings)
+    1. [Delete Outbound NAT Mappings](#4-delete-outbound-nat-mappings)
+* [FIREWALL/NAT/OUTBOUND](#firewallnatoutbound)
+    1. [Read Outbound NAT Settings](#1-read-outbound-nat-settings)
+    1. [Update Outbound NAT Settings](#2-update-outbound-nat-settings)
+* [FIREWALL/VIRTUAL_IP](#firewallvirtual_ip)
+    1. [Read Virtual IPs](#1-read-virtual-ips)
+    1. [Create Virtual IPs](#2-create-virtual-ips)
+    1. [Update Virtual IPs](#3-update-virtual-ips)
+    1. [Delete Virtual IPs](#4-delete-virtual-ips)
+* [FIREWALL/RULE/FLUSH](#firewallruleflush)
+    1. [Delete All Firewall Rules](#1-delete-all-firewall-rules)
+* [FIREWALL/RULE/SORT](#firewallrulesort)
+    1. [Sort Firewall Rules](#1-sort-firewall-rules)
+* [FIREWALL/RULE](#firewallrule)
+    1. [Read Firewall Rules](#1-read-firewall-rules)
+    1. [Create Firewall Rules](#2-create-firewall-rules)
+    1. [Update Firewall Rules](#3-update-firewall-rules)
+    1. [Delete Firewall Rules](#4-delete-firewall-rules)
+* [FIREWALL/ALIAS/ENTRY](#firewallaliasentry)
+    1. [Create Firewall Alias Entries](#1-create-firewall-alias-entries)
+    1. [Delete Firewall Alias Entries](#2-delete-firewall-alias-entries)
+* [FIREWALL/ALIAS](#firewallalias)
+    1. [Read Firewall Aliases](#1-read-firewall-aliases)
+    1. [Create Firewall Aliases](#2-create-firewall-aliases)
+    1. [Update Firewall Aliases](#3-update-firewall-aliases)
+    1. [Delete Firewall Aliases](#4-delete-firewall-aliases)
+* [INTERFACE/APPLY](#interfaceapply)
+    1. [Apply Interfaces](#1-apply-interfaces)
+* [INTERFACE/VLAN](#interfacevlan)
+    1. [Read Interface VLANs](#1-read-interface-vlans)
+    1. [Create Interface VLANs](#2-create-interface-vlans)
+    1. [Update Interface VLANs](#3-update-interface-vlans)
+    1. [Delete Interface VLANs](#4-delete-interface-vlans)
+* [INTERFACE/BRIDGE](#interfacebridge)
+    1. [Read Interface Bridges](#1-read-interface-bridges)
+    1. [Create Interface Bridges](#2-create-interface-bridges)
+    1. [Update Interface Bridges](#3-update-interface-bridges)
+    1. [Delete Interface Bridges](#4-delete-interface-bridges)
+* [USER/GROUP/MEMBER](#usergroupmember)
+    1. [Assign User Group Member](#1-assign-user-group-member)
+    1. [Remove User Group Member](#2-remove-user-group-member)
+* [USER/PRIVILEGE](#userprivilege)
+    1. [Create User Privileges](#1-create-user-privileges)
+    1. [Delete User Privileges](#2-delete-user-privileges)
+>>>>>>> d2a1ba0 (More OpenAPI conversions)
 * [USER/AUTH_SERVER](#userauth_server)
 
   * [Create LDAP Auth Servers](#1-create-ldap-auth-servers)
@@ -980,6 +1255,520 @@ There is no limit to API calls at this time but is important to note that pfSens
 --------
 
 
+<<<<<<< HEAD
+=======
+
+## USER
+
+API endpoints that create, read, update and delete pfSense users and authentication management.
+
+
+
+### 1. Read Users
+
+
+Reads users from the local user database.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-usermanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/user
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Create Users
+
+
+Add a new pfSense user to the local database.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-usermanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/user
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| username | string | Username to assign new user |
+| password | string | Password to assign new user |
+| disabled | boolean | Disable user account upon creation. `true` to disable, `false` to keep enabled. Defaults to `false` (optional) |
+| descr | string | Descriptive name to assign new user (optional) |
+| expires | string | Expiration date for user account in  MM/DD/YYYY format (optional) |
+| priv | array | Assign privileges to this user. This must be an array of corresponding pfSense privileges (e.g. `page-firewall-rule`). (optional) |
+| cert | array | Assign user certificates to this user. This must be an array of corresponding user certificate's `refid` values. (optional) |
+| authorizedkeys | string | Base64 encoded authorized SSH keys to assign new user (optional) |
+| ipsecpsk | string | IPsec pre-shared key to assign new user (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"disabled": true,
+	"username": "new_user",
+	"password": "changeme",
+	"descr": "NEW USER",
+	"authorizedkeys": "test auth key",
+	"ipsecpsk": "test psk",
+	"expires": "11/22/2020"
+}
+```
+
+
+
+### 3. Update Users
+
+
+Update an existing user.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-usermanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/user
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| username | string | Username to modify |
+| password | string | Change user password (optional) |
+| descr | string | Descriptive name to assign the user (optional) |
+| disabled | boolean | Disable user account  (optional) |
+| expires | string | Expiration date for user account in  MM/DD/YYYY format (optional) |
+| priv | array | Update privileges assigned to this user. This must be an array of corresponding pfSense privileges (e.g. `page-firewall-rule`). To remove all privileges from a user use an empty array. (optional) |
+| cert | array | Update user certificates assigned to this user. This must be an array of corresponding user certificate's `refid` values. To remove all user certificate assignments, use empty array. (optional) |
+| authorizedkeys | string | Base64 encoded authorized keys to add to user (optional) |
+| ipsecpsk | string | IPsec pre-shared key to assign to user (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"disabled": true,
+	"username": "new_user",
+	"password": "changeme",
+	"descr": "NEW USER",
+	"authorizedkeys": "test auth key",
+	"ipsecpsk": "test psk",
+	"expires": "11/22/2020"
+}
+```
+
+
+
+### 4. Delete Users
+
+
+Delete an existing pfSense user from the local database.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-usermanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/user
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| username | string | Username to to delete |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"username": "new_user"
+}
+```
+
+
+
+## INTERFACE
+
+API endpoints that create, read, update and delete network interfaces.
+
+
+
+### 1. Read Interfaces
+
+
+Read interface assignments and configuration.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/interface
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+}
+```
+
+
+
+### 2. Create Interfaces
+
+
+Add a new interface.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/interface
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| if | string | Specify the physical interface to configure |
+| descr | string | Set a descriptive name for the new interface |
+| enable | boolean | Enable the interface upon creation. Do not specify this value to leave disabled. |
+| spoofmac | string | Set a custom MAC address to the interface (optional) |
+| mtu | string or integer | Set a custom MTU for this interface (optional) |
+| mss | string or integer | Set a custom MSS for the this interface (optional) |
+| media | string | Set a custom speed/duplex setting for this interface (optional) |
+| type | string | Set the interface IPv4  configuration type (optional) |
+| type6 | string | Set the interface IPv6  configuration type (optional) |
+| ipaddr | string | Set the interface's static IPv4 address (required if `type` is set to `staticv4`) |
+| subnet | string or integer | Set the interface's static IPv4 address's subnet bitmask (required if `type` is set to `staticv4`) |
+| gateway | string | Set the interface network's upstream gateway. This is only necessary on WAN/UPLINK interfaces (optional) |
+| ipaddrv6 | string | Set the interface's static IPv6 address (required if `type6` is set to `staticv6`) |
+| subnetv6 | string or integer | Set the interface's static IPv6 address's subnet bitmask (required if `type6` is set to `staticv6`) |
+| gatewayv6 | string | Set the interface network's upstream IPv6 gateway. This is only necessary on WAN/UPLINK interfaces (optional) |
+| ipv6usev4iface | boolean | Allow IPv6 to use IPv4 uplink connection (optional) |
+| dhcphostname | string | Set the IPv4 DHCP hostname. Only available when `type` is set to `dhcp` (optional) |
+| dhcprejectfrom | string or array | Set the IPv4 DHCP rejected servers. You may pass values in as array or as comma separated string. Only available when `type` is set to `dhcp` (optional) |
+| alias-address | string | Set the IPv4 DHCP address alias. The value in this field is used as a fixed alias IPv4 address by the DHCP client (optional) |
+| alias-subnet | string or integer | Set the IPv4 DHCP address aliases subnet (optional) |
+| adv_dhcp_pt_timeout | string or integer | Set the IPv4 DHCP protocol timeout interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_retry | string or integer | Set the IPv4 DHCP protocol retry interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_select_timeout | string or integer | Set the IPv4 DHCP protocol select timeout interval. Must be numeric value greater than 0 (optional) |
+| adv_dhcp_pt_reboot | string or integer | Set the IPv4 DHCP protocol reboot interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_backoff_cutoff | string or integer | Set the IPv4 DHCP protocol backoff cutoff interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_initial_interval | string or integer | Set the IPv4 DHCP protocol initial interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_config_advanced | boolean | Enable the IPv4 DHCP advanced configuration options. This enables the DHCP options listed below (optional) |
+| adv_dhcp_send_options | string | Set a custom IPv4 `send` option (optional) |
+| adv_dhcp_request_options | string | Set a custom IPv4 `request` option (optional) |
+| adv_dhcp_request_options | string | Set a custom IPv4 `required` option (optional) |
+| adv_dhcp_option_modifiers | string | Set a custom IPv4 optional modifier (optional) |
+| adv_dhcp_config_file_override | boolean | Enable local DHCP configuration file override (optional) |
+| adv_dhcp_config_file_override_file | string | Set the custom DHCP configuration file's absolute path. This file must exist beforehand (optional) |
+| dhcpvlanenable | boolean | Enable DHCP VLAN prioritization (optional) |
+| dhcpcvpt | string or integer | Set the DHCP VLAN priority. Must be a numeric value between 1 and 7 (optional) |
+| gateway-6rd | string | Set the 6RD interface IPv4 gateway address. Only required when `type6` is set to `6rd` |
+| prefix-6rd | string | Set the 6RD IPv6 prefix assigned by the ISP. Only required when `type6` is set to `6rd` |
+| prefix-6rd-v4plen | integer or string | Set the 6RD IPv4 prefix length. This is typically assigned by the ISP. Only available when `type6` is set to `6rd` |
+| track6-interface | string | Set the Track6 dynamic IPv6 interface. This must be a dynamically configured IPv6 interface. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Only required with `type6` is set to `track6` |
+| track6-prefix-id-hex | string or integer | Set the IPv6 prefix ID. The value in this field is the (Delegated) IPv6 prefix ID. This determines the configurable network ID based on the dynamic IPv6 connection. The default value is 0. Only available when `type6` is set to `track6` |
+| apply | boolean | Specify whether or not you would like this interface to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple interfaces at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/interface/apply` endpoint. Otherwise, If you are only creating a single interface, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"if": "em1.3",
+	"descr": "asdf",
+	"enable": "",
+	"type": "staticv4",
+	"ipaddr": "10.250.0.1",
+	"subnet": "24",
+	"blockbogons": true
+}
+```
+
+
+
+### 3. Update Interfaces
+
+
+Update an existing interface.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/interface
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | string | Specify the Interface to update. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0) |
+| if | string | Update the physical interface configured (optional) |
+| descr | string | Update the descriptive name of the interface (optional) |
+| enable | boolean | Enable or disable the Interface (optional) |
+| spoofmac | string | Update the MAC address of the interface (optional) |
+| mtu | string or integer | Update the MTU for this interface (optional) |
+| mss | string or integer | Update the MSS for the this interface (optional) |
+| media | string | Update the speed/duplex setting for this interface (optional) |
+| type | string | Update the interface IPv4  configuration type (optional) |
+| type6 | string | Update the interface IPv6  configuration type (optional) |
+| ipaddr | string | Update the interface's static IPv4 address (required if `type` is set to `staticv4`) |
+| subnet | string or integer | Update the interface's static IPv4 address's subnet bitmask (required if `type` is set to `staticv4`) |
+| gateway | string | Update the interface network's upstream gateway. This is only necessary on WAN/UPLINK interfaces (optional) |
+| ipaddrv6 | string | Update the interface's static IPv6 address (required if `type6` is set to `staticv6`) |
+| subnetv6 | string or integer | Update the interface's static IPv6 address's subnet bitmask (required if `type6` is set to `staticv6`) |
+| gatewayv6 | string | Update the interface network's upstream IPv6 gateway. This is only necessary on WAN/UPLINK interfaces (optional) |
+| ipv6usev4iface | boolean | Enable or disable IPv6 over IPv4 uplink connection (optional) |
+| dhcphostname | string | Update the IPv4 DHCP hostname. Only available when `type` is set to `dhcp` (optional) |
+| dhcprejectfrom | string or array | Update the IPv4 DHCP rejected servers. You may pass values in as array or as comma separated string. Only available when `type` is set to `dhcp` (optional) |
+| alias-address | string | Update the IPv4 DHCP address alias. The value in this field is used as a fixed alias IPv4 address by the DHCP client (optional) |
+| alias-subnet | string or integer | Update the IPv4 DHCP address aliases subnet (optional) |
+| adv_dhcp_pt_timeout | string or integer | Update the IPv4 DHCP protocol timeout interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_retry | string or integer | Update the IPv4 DHCP protocol retry interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_select_timeout | string or integer | Update the IPv4 DHCP protocol select timeout interval. Must be numeric value greater than 0 (optional) |
+| adv_dhcp_pt_reboot | string or integer | Update the IPv4 DHCP protocol reboot interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_backoff_cutoff | string or integer | Update the IPv4 DHCP protocol backoff cutoff interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_pt_initial_interval | string or integer | Update the IPv4 DHCP protocol initial interval. Must be numeric value greater than 1 (optional) |
+| adv_dhcp_config_advanced | boolean | Enable or disable the IPv4 DHCP advanced configuration options. This enables the DHCP options listed below (optional) |
+| adv_dhcp_send_options | string | Update the IPv4 `send` option (optional) |
+| adv_dhcp_request_options | string | Update the IPv4 `request` option (optional) |
+| adv_dhcp_request_options | string | Update the IPv4 `required` option (optional) |
+| adv_dhcp_option_modifiers | string | Update the IPv4 option modifier (optional) |
+| adv_dhcp_config_file_override | boolean | Enable or disable local DHCP configuration file override (optional) |
+| adv_dhcp_config_file_override_file | string | Update the custom DHCP configuration file's absolute path. This file must exist beforehand (optional) |
+| dhcpvlanenable | boolean | Enable or disable DHCP VLAN prioritization (optional) |
+| dhcpcvpt | string or integer | Update the DHCP VLAN priority. Must be a numeric value between 1 and 7 (optional) |
+| gateway-6rd | string | Update the 6RD interface IPv4 gateway address. Only required when `type6` is set to `6rd` |
+| prefix-6rd | string | Update the 6RD IPv6 prefix assigned by the ISP. Only required when `type6` is set to `6rd` |
+| prefix-6rd-v4plen | integer or string | Update the 6RD IPv4 prefix length. This is typically assigned by the ISP. Only available when `type6` is set to `6rd` |
+| track6-interface | string | Update the Track6 dynamic IPv6 interface. This must be a dynamically configured IPv6 interface. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). Only required with `type6` is set to `track6` |
+| track6-prefix-id-hex | string or integer | Update the IPv6 prefix ID. The value in this field is the (Delegated) IPv6 prefix ID. This determines the configurable network ID based on the dynamic IPv6 connection. The default value is 0. Only available when `type6` is set to `track6` |
+| apply | boolean | Specify whether or not you would like this interface update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple interfaces at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/interface/apply` endpoint. Otherwise, If you are only updating a single interface, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"if": "em1.3",
+	"descr": "asdf",
+	"enable": "",
+	"type": "staticv4",
+	"ipaddr": "10.250.0.1",
+	"subnet": "24",
+	"blockbogons": true
+}
+```
+
+
+
+### 4. Delete Interfaces
+
+
+Delete an existing interface. __Note: interface deletions will be applied immediately, there is no need to apply interface changes afterwards__<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/interface
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| if | string | Specify the interface to delete. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"if": "em1.3"
+}
+```
+
+
+
+## SERVICES
+
+API endpoints that create, read, update, and delete system services.
+
+
+
+### 1. Read Services
+
+
+Read available services.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/services
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Start All Services
+
+
+Start all available services.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/services/start
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 3. Stop All Services
+
+
+Stop all available services.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/services/stop
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 4. Restart All Services
+
+
+Restart all available services.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/services/restart
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+>>>>>>> d2a1ba0 (More OpenAPI conversions)
 ## ACCESS_TOKEN
 API endpoints used to receive access tokens used to authenticate API requests. Only applicable when the API authentication mode is set to JWT.
 
@@ -2370,6 +3159,7 @@ URL: https://{{$hostname}}/api/v1/firewall/schedule
 
 ```js        
 {
+<<<<<<< HEAD
     "name": "Test_Schedule",
     "descr": "Updated test firewall schedule",
     "timerange": [
@@ -2385,6 +3175,2109 @@ URL: https://{{$hostname}}/api/v1/firewall/schedule
             "rangedescr": "Every Sat, Sun from 10:15 to 12:00"
         }
     ]
+=======
+    "refid": 0,
+    "server_list": "1, 2",
+    "custom_options": "ifconfig-push 10.10.10.1 255.255.255.0;",
+    "disable": false,
+    "common_name": "commonname2",
+    "block": false,
+    "description": "An override, that is VERY specific...",
+    "tunnel_network": "10.0.8.6/24",
+    "tunnel_networkv6": "2001:dc9:1:1::100/64",
+    "local_network": "10.0.9.6/24, 10.0.8.5/24, 10.0.10.6/24",
+    "local_networkv6": "2001:dc9:1:1::100/64, 2002:dc9:1:1::100/64, 2003:dc9:1:1::100/64",
+    "remote_network": "10.0.9.6/24, 10.0.8.5/24, 10.0.10.6/24",
+    "remote_networkv6": "2001:dc9:1:1::100/64, 2002:dc9:1:1::100/64, 2003:dc9:1:1::100/64",
+    "redirect_gateway": false,
+    "prevent_server_definitions": false,
+    "remove_server_routes": false,
+    "dns_domain": "github.com",
+    "dns_servers": "8.8.8.7, 8.8.4.7, 8.8.3.7, 8.8.2.7",
+    "ntp_servers": "192.168.56.106, 192.168.56.107",
+    "netbios_enable": false,
+    "netbios_node_type": "m",
+    "netbios_scope": "42",
+    "wins_servers": "192.168.56.108, 192.168.56.194"
+}
+```
+
+
+
+### 4. Delete OpenVPN Client Specific Override
+
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/services/openvpn/csc
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| refid | int | Reference id. This id indicates the id of the client specific override you want to delete. This id is not static as it is essentially the index of an entry in the config array. Best to first get all client specific overrides and get the id of the one you want to delete before calling this endpoint. |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "refid": 0
+}
+```
+
+
+
+## STATUS/SYSTEM
+
+
+
+### 1. Read System Status
+
+
+Read system status and metrics. All usage values are represented as a decimal percentage. Temperature readings require thermal sensor and/or driver configuration.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-dashboard-widgets`, `page-dashboard-all`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/status/system
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## STATUS/INTERFACE
+
+
+
+### 1. Read Interface Status
+
+
+Read interface status and metrics.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-interfaces`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/status/interface
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## STATUS/GATEWAY
+
+
+
+### 1. Read Gateway Status
+
+
+Read gateway status and metrics.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-gateway`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/status/gateway
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## STATUS/LOG
+
+
+
+### 1. Read System Status Log
+
+
+Read the system.log file.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-logs-system`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/status/log/system
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+
+}
+```
+
+
+
+### 2. Read Firewall Status Log
+
+
+Read the filter.log file.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-logs-firewall`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/status/log/firewall
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+
+}
+```
+
+
+
+### 3. Read DHCP Status Log
+
+
+Read the dhcpd.log file.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-logs-dhcp`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/status/log/dhcp
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+
+}
+```
+
+
+
+### 4. Read Configuration History Status Log
+
+
+Read the configuration history log.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-configurationhistory`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/status/log/config_history
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+
+}
+```
+
+
+
+## STATUS/OPENVPN
+
+
+
+### 1. Read OpenVPN Status
+
+
+Read the OpenVPN status.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-openvpn`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/status/openvpn
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## STATUS/CARP
+
+
+
+### 1. Read CARP Status
+
+
+Read the CARP (failover) status.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-carp`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/status/carp
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Update CARP Status
+
+
+Read the CARP (failover) status.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-status-carp`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/status/carp
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| enable | boolean | Enable or disable CARP. Requires bool (optional) |
+| maintenance_mode | boolean | Enable or disable CARP maintenance mode. Requires bool (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"enable": true,
+	"maintenance_mode": true
+}
+```
+
+
+
+## ROUTING/APPLY
+
+
+
+### 1. Apply Routing
+
+
+Apply pending routing changes. This endpoint returns no data.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`, `page-system-gateways-editgateway`, `page-system-staticroutes`, `page-system-staticroutes-editroute`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/routing/apply
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+}
+```
+
+
+
+## ROUTING/STATIC_ROUTE
+
+
+
+### 1. Read Static Routes
+
+
+Read existing static routes.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/routing/static_route
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+
+}
+```
+
+
+
+### 2. Delete Static Routes
+
+
+Delete existing static routes. __Note: route deletions will be applied immediately, there is no need to apply routing changes afterwards__<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/routing/static_route
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | Integer | Specify the ID of the static route to delete |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "id": 0
+}
+```
+
+
+
+### 3. Create Static Routes
+
+
+Create a new static route.<br>
+_Note: Unlike the webConfigurator, this endpoint will allow you to override existing routes. There are practical use cases for this functionality and it is important to use caution when adding routes_<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/routing/static_route
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| network | string | Specify an IPv4 CIDR, IPv6 CIDR or network alias this route will apply to |
+| gateway | string | Specify the name of the gateway traffic matching this route will use |
+| descr | string | Leave a description of this route (optional) |
+| disabled | boolean | Disable this route upon creation (optional) |
+| apply | boolean | Specify whether or not you would like this route to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple routes at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only creating a single route, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "network": "10.1.1.1/24",
+    "gateway": "WAN_DHCP"
+
+}
+```
+
+
+
+### 4. Update Static Routes
+
+
+Update an existing static route.<br>
+_Note: Unlike the webConfigurator, this endpoint will allow you to override existing routes. There are practical use cases for this functionality and it is important to use caution when adding routes_<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/routing/static_route
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | Integer | Specify the ID of the static route to update |
+| network | string | Update the IPv4 CIDR, IPv6 CIDR or network alias this route will apply to (optional) |
+| gateway | string | Update the name of the gateway traffic matching this route will use (optional) |
+| descr | string | Update description of this route (optional) |
+| disabled | boolean | Disable this route (optional) |
+| apply | boolean | Specify whether or not you would like this route update to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple routes at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only updating a single route, you may set this true to apply it immediately. Please note, this will default to true for routing updates, if this is set to false when updating routes, the existing route will be removed from the routing table until the changes are applied! Defaults to true. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "id": 0,
+    "network": "10.1.2.0/24",
+    "gateway": "WAN_DHCP",
+    "descr": "New Description"
+
+}
+```
+
+
+
+## ROUTING/GATEWAY/DETAIL
+
+
+
+### 1. Read Routing Gateway Details
+
+
+Read verbose routing gateway details about both dynamic/system gateways and static gateways.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/routing/gateway/detail
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+
+}
+```
+
+
+
+## ROUTING/GATEWAY
+
+
+
+### 1. Read Routing Gateways
+
+
+Read routing gateways.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]
+
+_Note: This endpoint originally returned verbose routing gateway details. This functionality has moved to /api/v1/routing/gateway/detail._
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/routing/gateway
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+
+}
+```
+
+
+
+### 2. Delete Routing Gateways
+
+
+Delete existing routing gateways. __Note: gateway deletions will be applied immediately, there is no need to apply routing changes afterwards__<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/routing/gateway
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the gateway to delete. _Note: If you are obtaining the ID via GET request, the ID will be included in the response within the `attribute` field of the object._ |
+
+
+
+***Example Request:***
+
+```js        
+{
+
+}
+```
+
+
+
+### 3. Create Routing Gateways
+
+
+Create new routing gateways.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/routing/gateway
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| interface | string | Set which interface the gateway will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0).  |
+| ipprotocol | string | Set what IP protocol this gateway will serve. Options are `inet` for IPv4, or `inet6` for IPv6. |
+| name | string | Set a descriptive name for this gateway. This name must be unique, and can only contains alphanumeric characters and underscores. |
+| gateway | string | Set the IP address of the gateway. This value must be a valid IPv4 address If you have set your `ipprotocol` value to `inet`, or it must be a valid IPv6 address if you have set your `ipprotocol` value to `inet6`. Unlike the pfSense webConfigurator, this address Is not restricted to an address within the interfaces subnet by default. |
+| monitor | string | Set the IP address used to monitor this gateway. This is usually only necessary if the `gateway` IP does not accept ICMP probes. Defaults to the `gateway` address. (optional) |
+| disabled | boolean | Disable this gateway upon creation. Defaults to false. (optional) |
+| monitor_disable | boolean | Disable gateway monitoring for this gateway. Defaults to false. (optional) |
+| action_disable | boolean | Disable any action taken on gateway events for this gateway. This will consider the gateway always up. Defaults to false. (optional) |
+| force_down | boolean | Force this gateway to always be considered down. Defaults to false. (optional) |
+| descr | string | Set a description for this gateway (optional) |
+| weight | integer | Set this gateways weight when utilizing gateway load balancing within a gateway group. This value must be between 1 and 30. Defaults to 1. (optional) |
+| data_payload | integer | Set a data payload to send on ICMP packets sent to the gateway monitor IP. This value must be a positive integer. Defaults to 1. (optional) |
+| latencylow | integer | Set the low threshold in milliseconds for latency. Any packet that exceeds this threshold will be trigger a minor latency gateway event. This value must be a positive integer that is less than the `latencyhigh` value. Defaults to 200. (optional) |
+| latencyhigh | integer | Set the high threshold in milliseconds for latency. Any packet that exceeds this threshold will be trigger a major latency gateway event. This value must be a positive integer that is greater than the `latencylow` value. Defaults to 500. (optional) |
+| losslow | integer | Set the low threshold for packet loss In %. If total packet loss exceeds this percentage, a minor packet loss gateway event will be triggered. This value must be greater or equal to 1 and be less than the `losshigh` value. Defaults to 10. (optional) |
+| losshigh | integer | Set the high threshold for packet loss In %. If total packet loss exceeds this percentage, a major packet loss gateway event will be triggered. This value must be greater than the `losslow` value and be less or equal to 100. Defaults to 20. (optional) |
+| interval | integer | Set how often gateway monitor ICMP probes will be sent in milliseconds. This value must be greater than or equal to 1 and less than or equal to 3600000. Defaults to 500. (optional) |
+| loss_interval | integer | Set how long the gateway monitor will wait (in milliseconds) for response packets before considering the packet lost. This value must be greater than or equal to the `latencyhigh` value. Defaults to 2000. (optional) |
+| time_period | integer | Set the time period In milliseconds for gateway monitor metrics to be averaged. This value must be greater than twice the probe interval plus the loss interval. Defaults to 60000. (optional) |
+| alert_interval | integer | Set the time interval in milliseconds which alert conditions will be checked. This value must be greater than or equal to the `interval` value. Defaults to 1000. (optional) |
+| apply | boolean | Specify whether or not you would like this gateway to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are creating multiple gateways at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only creating a single gateway, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "interface": "wan",
+    "name": "TEST_GATEWAY",
+    "ipprotocol": "inet",
+    "gateway": "172.16.209.1",
+    "monitor": "172.16.209.250",
+    "descr": "Test gateway"
+}
+```
+
+
+
+### 4. Update Routing Gateways
+
+
+Update existing routing gateways.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/routing/gateway
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | integer | Specify the ID of the gateway to update. _Note: If you are obtaining the ID via GET request, the ID will be included in the response within the `attribute` field of the object._ |
+| interface | string | Update the interface the gateway will apply to. You may specify either the interface's descriptive name, the pfSense ID (wan, lan, optx), or the physical interface id (e.g. igb0). (optional) |
+| ipprotocol | string | Update the IP protocol this gateway will serve. Options are `inet` for IPv4, or `inet6` for IPv6. If you are changing the protocol, you will also be required to update the `gateway` and/or `monitor` values to match the specified protocol. (optional) |
+| name | string | Update the descriptive name for this gateway. This name must be unique, and can only contain alphanumeric characters and underscores. (optional) |
+| gateway | string | Update the IP address of the gateway. This value must be a valid IPv4 address If you have set your `ipprotocol` value to `inet`, or it must be a valid IPv6 address if you have set your `ipprotocol` value to `inet6`. Unlike the pfSense webConfigurator, this address Is not restricted to an address within the interfaces subnet by default. (optional) |
+| monitor | string | Set the IP address used to monitor this gateway. This is usually only necessary if the `gateway` IP does not accept ICMP probes. Defaults to the `gateway` address. (optional) |
+| disabled | boolean | Enable or disable this gateway upon update. True to disable, false to enable. (optional) |
+| monitor_disable | boolean | Enable or disable gateway monitoring for this gateway. True to disable, false to enable. (optional) |
+| action_disable | boolean | Enable or disable any action taken on gateway events for this gateway. If disabled, this will consider the gateway always up. True for disabled, false for enable. (optional) |
+| force_down | boolean | Enable or disable forcing this gateway to always be considered down. True for enable, false for disable. (optional) |
+| descr | string | Update the description for this gateway (optional) |
+| weight | integer | Update this gateways weight when utilizing gateway load balancing within a gateway group. This value must be between 1 and 30. (optional) |
+| data_payload | integer | Update the data payload to send on ICMP packets sent to the gateway monitor IP. This value must be a positive integer. (optional) |
+| latencylow | integer | Update the low threshold in milliseconds for latency. Any packet that exceeds this threshold will be trigger a minor latency gateway event. This value must be a positive integer that is less than the `latencyhigh` value.  (optional) |
+| latencyhigh | integer | Update the high threshold in milliseconds for latency. Any packet that exceeds this threshold will be trigger a major latency gateway event. This value must be a positive integer that is greater than the `latencylow` value. (optional) |
+| losslow | integer | Update the low threshold for packet loss In %. If total packet loss exceeds this percentage, a minor packet loss gateway event will be triggered. This value must be greater or equal to 1 and be less than the `losshigh` value. (optional) |
+| losshigh | integer | Update the high threshold for packet loss In %. If total packet loss exceeds this percentage, a major packet loss gateway event will be triggered. This value must be greater than the `losslow` value and be less or equal to 100. (optional) |
+| interval | integer | Update how often gateway monitor ICMP probes will be sent in milliseconds. This value must be greater than or equal to 1 and less than or equal to 3600000. (optional) |
+| loss_interval | integer | Update how long the gateway monitor will wait (in milliseconds) for response packets before considering the packet lost. This value must be greater than or equal to the `latencyhigh` value. (optional) |
+| time_period | integer | Update the time period In milliseconds for gateway monitor metrics to be averaged. This value must be greater than twice the probe interval plus the loss interval. (optional) |
+| alert_interval | integer | Update the time interval in milliseconds which alert conditions will be checked. This value must be greater than or equal to the `interval` value. (optional) |
+| apply | boolean | Specify whether or not you would like these gateway updates to be applied immediately, or simply written to the configuration to be applied later. Typically, if you are updating multiple gateways at once it Is best to set this to false and apply the changes afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If you are only updating a single gateway, you may set this true to apply it immediately. Defaults to false. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "id": 0,
+    "name": "UPDATED_TEST_GATEWAY",
+    "ipprotocol": "inet6",
+    "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+    "monitor": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+    "descr": "Updated E2E Test",
+    "disabled": true,
+    "action_disable": true,
+    "monitor_disable": true,
+    "weight": 2,
+    "data_payload": 5,
+    "latencylow": 300,
+    "latencyhigh": 600,
+    "interval": 2100,
+    "loss_interval": 2500,
+    "action_interval": 1040,
+    "time_period": 66000,
+    "losslow": 5,
+    "losshigh": 10
+}
+```
+
+
+
+## SYSTEM/HALT
+
+
+
+### 1. Halt System
+
+
+Halts the pfSense system.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-haltsystem`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/system/halt
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## SYSTEM/REBOOT
+
+
+
+### 1. Create System Reboot
+
+
+Reboots the pfSense system.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-rebootsystem`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/system/reboot
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## SYSTEM/CONSOLE
+
+
+
+### 1. Update Console Settings
+
+
+Updates the console settings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-admin`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/system/console
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| disableconsolemenu | boolean | Enable or disable console password protection. `true` to enable, `false` to disable. |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"disableconsolemenu": true
+}
+```
+
+
+
+## SYSTEM/TABLE
+
+
+
+### 1. Read System Tables
+
+
+Read existing table entries.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-tables`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/table
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+
+}
+```
+
+
+
+## SYSTEM/TUNABLE
+
+
+
+### 1. Read System Tunables
+
+
+Read current sysctl tunable configuration.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-sysctl`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/tunable
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+
+}
+```
+
+
+
+### 2. Create System Tunables
+
+
+Create a new sysctl tunable.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-sysctl`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/system/tunable
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| tunable | string | Specify the name of this tunable. This should be a value recognized by sysctl |
+| value | string or Integer | Specify the value to set this tunable |
+| descr | string | Specify a description for this tunable (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "tunable": "test3",
+    "value": 1,
+    "descr": "A test tunable added via pfSense API"
+}
+```
+
+
+
+### 3. Update System Tunables
+
+
+Update an existing sysctl tunable.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-sysctl`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/system/tunable
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | string | Specify the name of the tunable to update |
+| tunable | string | Update the name of this tunable. This should be a value recognized by sysctl. (optional) |
+| value | string or Integer | Update the value to set this tunable (optional) |
+| descr | string | Update a description for this tunable (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "id": "testnew",
+    "tunable": "test",
+    "value": "2",
+    "descr": "A new test tunable added via pfSense API"
+}
+```
+
+
+
+### 4. Delete System Tunables
+
+
+Delete an existing sysctl tunable.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-sysctl`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/system/tunable
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| id | string | Specify the name of the tunable to delete |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "id": "test"
+}
+```
+
+
+
+## SYSTEM/DNS/SERVER
+
+
+
+### 1. Delete System DNS Server
+
+
+Delete existing system DNS servers.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/system/dns/server
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| dnsserver | array or string | Specify the IP(s) of the DNS servers to delete. Single values may be specified as string, multiple values may be specified as array |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"dnsserver": ["8.8.4.4", "1.1.1.1"]
+}
+```
+
+
+
+### 2. Create System DNS Server
+
+
+Add a new DNS server to our system DNS servers.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/system/dns/server
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| dnsserver | array or string | Specify the IP(s) of the DNS servers to add. Single values may be specified as string, multiple values may be specified as array |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"dnsserver": "1.1.1.1"
+}
+```
+
+
+
+## SYSTEM/DNS
+
+
+
+### 1. Read System DNS
+
+
+Read current system DNS configuration.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/dns
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Update System DNS
+
+
+Modify the existing system DNS configuration.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/system/dns
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| dnsserver | array or string | Specify which DNS servers to assign the system. Single values may be passed in as string, multiple values may be passed in as array of strings. Any existing configuration will be overwritten (optional) |
+| dnsallowoverride | boolean | Enable or disable DNS override on WAN interfaces configured using DHCP (optional) |
+| dnslocalhost | boolean | Enable or disable local system DNS queries (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"dnsserver": ["8.8.4.4", "1.1.1.1", "8.8.8.8"],
+	"dnslocalhost": true,
+	"dnsallowoverride": false
+}
+```
+
+
+
+## SYSTEM/API
+
+
+
+### 1. Read System API Configuration
+
+
+Read current API configuration.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/api
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Update System API Configuration
+
+
+Update the API configuration.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/system/api
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| enable | boolean | Disable the API. If set to `false`, the API will be disable and no further API requests can be made. In most cases this Is not necessary. (optional) |
+| persist | boolean | Enable/disable persistent API configuration. If set to `true`, pfSense API will store a copy of the API configuration In the case a system update or package update Is needed and/or the API configuration must be restored. If set to `false`, all API configuration will be lost whenever the system updates, the package Is updated, or the package Is deleted. It Is recommended to keep this feature enabled. (optional) |
+| readonly | boolean | Enable read only mode. If set to `true`, the API will only answer read (GET) requests. This also means you will not be able to disable read only mode from the API.  |
+| allow_options | boolean | Enable/disable the OPTIONS request method from API responses. If set to `true`, the API will answer OPTIONS requests. If set to `false`, the API will return a 405 Method Not Allowed response. (optional) |
+| available_interfaces | array | Update the Interfaces that are allowed to answer API requests. Each Item In the array must be a valid physical Interface ID (e.g. `"em0"`), pfSense Interface ID, (e.g. `"opt1"`),  or descriptive Interface name (e.g. `"WAN"`). Additionally you may add `"localhost"` to allow local API requests, or add `"any"` to allow any Interface to answer API requests. It Is best practice to only allow Inside Interfaces to answer API requests, or use firewall rules to filter requests made to outside Interfaces. (optional) |
+| authmode | string | Update the API authentication mode. Choices are `"local"` for local database authentication, `"jwt"` for JWT bearer token authentication, and `"token"` for standalone API token authentication. (optional) |
+| jwt_exp | integer | Update the JWT expiration interval (in seconds). Value must be an Integer greater or equal to `300` and less than or equal to `86400`. This Is only applicable when the `authmode` setting Is set to `jwt`. (optional) |
+| keyhash | string | Update the hashing algorithm to use when generating API tokens. Choices are `"sha256"`, `"sha384"`, `"sha512"`, and `"md5"`. This Is only applicable when the `authmode` setting Is set to `token`. (optional) |
+| keybytes | integer | Update the key byte strength to use when generating API tokens. Choices are `16`, `32` and `64`. This Is only applicable when the `authmode` setting Is set to `token`. (optional) |
+| custom_headers | array | Update the custom response headers for the API to return in API responses. This must be an array of key-value pairs (e.g. `{"custom-header": "custom-header-value}`. To revert custom headers to the default state, simply pass in an empty array. In most cases, custom headers are not necessary. An example use case for custom headers is setting CORS policy headers required by some frontend web applications. (optional) |
+| access_list | array | Update the API access list. This must be an array of IPv4 or IPv6 subnets in CIDR notation. If left blank, all subnets will be allowed. (optional) |
+| hasync | boolean | Enable or disable HA sync for API configurations. (optional) |
+| hasync_hosts | array | Update the hosts to sync API configurations to. This must be an array of IP addresses or FQDN strings. At least one host must be specified when HA sync is enabled. (optional) |
+| hasync_username | string | Update the username to authenticate as for HA synchronization. This user must be present on ALL hosts specified in the `hasync_hosts` field and must hold the `page-system-api` privilege. A value must be set when HA sync is enabled. (optional) |
+| hasync_password | string | Update the password of the username to authenticate as for HA synchronization. A value must be set when HA sync is enabled. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+    "persist": false, 
+    "jwt_exp": 86400, 
+    "authmode": "token",
+    "hashalgo": "sha512", 
+    "keybytes": 64, 
+    "allowed_interfaces": ["WAN"],
+    "custom_headers": {"custom-header-1": "Value1", "custom-header-2": "Value2"},
+    "allow_options": true
+}
+```
+
+
+
+### 3. Read System API Error Library
+
+
+Read our error code library. This function does NOT require authentication and is intended to be used by third-party scripts/software to translate error codes to their full error message.
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/api/error
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 4. Read System API Version
+
+
+Read the current API version and locate available version updates.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/api/version
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## SYSTEM/CRL
+
+
+
+### 1. Read System CRLs
+
+
+Read installed CRLs.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/crl
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Create System CRL
+
+
+Add a new CRL.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/system/crl
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| caref | string | Specify the unique reference ID of the certificate signing authority for the certificate revocation list. |
+| method | string | Set the method used to add the certificate revocation list. Current supported methods are `existing` and `internal`. _Note: `internal` method will create new certificate revocation list for CA provided in `caref`_. |
+| descr | string | Set a descriptive name for the certificate revocation list |
+| crl_data | string | Specify the Base64 encoded PEM certificate revocation list to import. This field is required when `method` is set to `existing`. _Note: Import Certificate Revocation List in X.509 CRL format. `-----BEGIN X509 CRL-----[A bunch of random-looking base64-encoded data]-----END X509 CRL-----`._ |
+| lifetime | integer | Specify the number of days you would like this certificate revocation list to be valid for. This must be below OpenSSL's maximum lifetime value (around `12000` days). Defaults to `9999` days. This field is only available when `method` is set to `internal`. _Note: maximum value is subject to change, when in doubt, check the pfSense webConfigurator options for this field._ (optional) |
+| serial | integer | Specify the serial number to be assigned to the next certificate revocation list. Defaults to 0. This field is only available when `method` is set to `internal`. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"method": "internal",
+	"descr": "INTERNAL_CRL",
+	"caref": "61c410f04b782",
+	"lifetime": 3650,
+	"serial": 10
+}
+```
+
+
+
+### 3. Delete System CRL
+
+
+Delete an existing CRL.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/system/crl
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| refid | string | Specify the refid of the certificate revocation list to delete (required if `descr` is  not defined) |
+| descr | string | Specify the description of the certificate revocation list to delete (required if `refid` is not defined) _Note: if multiple certificate revocation list exist with the same name, only the first matching certificate revocation list will be deleted_ |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"refid": "0"
+}
+```
+
+
+
+## SYSTEM/CA
+
+
+
+### 1. Read System CAs
+
+
+Read installed CAs.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/ca
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Create System CA
+
+
+Add a new CA certificate.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/system/ca
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| method | string | Set the method used to add the CA. Current supported methods are `existing`, `internal`, and `intermediate`. _Note: previous releases referred to the `existing` method as `import`. You may use `existing` or `import` interchangeably._ |
+| descr | string | Set a descriptive name for the certificate |
+| trust | boolean | Specify `true` if you would like the system to trust this CA (optional) |
+| randomserial | boolean | Specify `true` if you would like certificates signed by this CA to utilize randomized serial numbers (optional) |
+| crt | string | Specify the Base64 encoded PEM CA certificate to import. This field is required when `method` is set to `existing`. |
+| prv | string | Specify the corresponding Base64 encoded CA certificate key. This field is only available when `method` is set to `existing`. (optional) |
+| serial | integer | Specify the serial number to be assigned to the next certificate signed by this CA. Defaults to 1. This field is only available when `method` is set to `existing`. (optional) |
+| caref | string | Specify the unique reference ID of the certificate signing authority for the intermediate certificate. This field is required when `method` is set to `intermediate`. |
+| keytype | string | Specify the private key type to generate. Options are `RSA` or `ECDSA`. This field is required when `method` is set to `internal` or `intermediate`. |
+| keylen | integer | Specify the private key length to generate. Options are `1024`, `2048`, `3072`, `4096`, `6144`, `7680`, `8192`, `15360`, `16384`. This field is required when `method` is set to `internal` or `intermediate` AND `keytype` is set to `RSA`. |
+| ecname | string | Specify the elliptic curve name to use when generating the private key. It is recommended to view options and compatibility within the pfSense webConfigurator or manually through OpenSSL as certain curves are not compatible in some circumstances. This field is required when `method` is set to `internal` or `intermediate` AND `keytype` is set to `ECDSA`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._ |
+| digest_alg | string | Specify the digest algorithm to use. Options are `sha1`, `sha224`, `sha256`, `sha384` and `sha512`. This field is required when `method` is set to `internal` or `intermediate`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._ |
+| lifetime | integer | Specify the number of days you would like this CA to be valid for. This must be below OpenSSL's maximum lifetime value (around `12000` days). Defaults to `3650` days. This field is required when `method` is set to `internal` or `intermediate`. _Note: maximum value is subject to change, when in doubt, check the pfSense webConfigurator options for this field._ |
+| dn_commonname | string | Specify the common name of this CA. In mose cases, this will be a hostname. This field is required when `method` is set to `internal` or `intermediate`. |
+| dn_country | string | Specify the country code for this CA. This must be a known 2-digit country code. This field is only available when `method` is set to `internal` or `intermediate`. (optional) |
+| dn_state | string | Specify the state or province for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional) |
+| dn_city | string | Specify the city or locale for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional) |
+| dn_organization | string | Specify the managing organization for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional) |
+| dn_organizationalunit | string | Specify the managing organizational unit or team for this CA. This field is only available when `method` is set to `internal` or `intermediate`. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"method": "existing",
+	"crt": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZxekNDQTVPZ0F3SUJBZ0lVQi9rT2RoMzdTZnRxeHRqL1MxSTRkUTQyYXRvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWxWVU1RMHdDd1lEVlFRSERBUlBjbVZ0TVNFdwpId1lEVlFRS0RCaEpiblJsY201bGRDQlhhV1JuYVhSeklGQjBlU0JNZEdReEZ6QVZCZ05WQkFNTURuUmxjM1F1CmMyVmpiV1YwTG1Odk1CNFhEVEl3TURJd05ESXdNelV3...",
+	"prv": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQ1N3d2dna29BZ0VBQW9JQ0FRREQ5RkNLU1U3SmY0QngKeWlKNkNOWGhOckI0ZVhjTk9TTm9GUVJIbXlsV2dHbEN5djMydFdicmF3RFhhQzk2aVpOSTFzNG5qWTdQT3BlWgpoNmFlaTJ5NllheS9VWWtOUkZGQmp4WlZlLzRwS2pKeXBQRlFBUlpMVko2TlNXaU5raGkwbDlqeWtacTlEbkFnCk1mclZyUEo1YktDM3JJVV...",
+	"descr": "TEST CA"
+}
+```
+
+
+
+### 3. Delete System CA
+
+
+Delete an existing CA.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/system/ca
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| refid | string | Specify the refid of the CA to delete (required if `descr` is  not defined) |
+| descr | string | Specify the description of the CA to delete (required if `refid` is not defined) _Note: if multiple CA exist with the same name, only the first matching CA will be deleted_ |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"refid": "0"
+}
+```
+
+
+
+## SYSTEM/CERTIFICATE
+
+
+
+### 1. Read System Certificates
+
+
+Read installed SSL certificates.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/certificate
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Create System Certificates
+
+
+Add a new SSL certificate.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/system/certificate
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| method | string | Set the method used to add the certificate. Current supported methods are `existing` to import an existing PEM certificate and `internal` to generate a certificate using a CA object. _Note: previous releases referred to the `existing` method as `import`. You may use `existing` or `import` interchangeably._ |
+| descr | string | Set a descriptive name for the certificate |
+| crt | string | Specify the Base64 encoded PEM certificate to import. This field is required when `method` is set to `existing`. _Note: previous releases referred to the `crt` field as `cert`. Both `crt` and `cert` can be used interchangeably._ |
+| prv | string | Specify the corresponding Base64 encoded certificate key. This field is required when `method` is set to `existing`. _Note: previous releases referred to the `prv` field as `key`. Both `prv` and `key` can be used interchangeably._ |
+| caref | string | Specify the unique reference ID of the certificate signing authority for the certificate. This field is required when `method` is set to `internal`. |
+| keytype | string | Specify the private key type to generate. Options are `RSA` or `ECDSA`. This field is required when `method` is set to `internal`. |
+| keylen | integer | Specify the private key length to generate. Options are `1024`, `2048`, `3072`, `4096`, `6144`, `7680`, `8192`, `15360`, `16384`. This field is required when `method` is set to `internal` AND `keytype` is set to `RSA`. |
+| ecname | string | Specify the elliptic curve name to use when generating the private key. It is recommended to view options and compatibility within the pfSense webConfigurator or manually through OpenSSL as certain curves are not compatible in some circumstances. This field is required when `method` is set to `internal` AND `keytype` is set to `ECDSA`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._ |
+| digest_alg | string | Specify the digest algorithm to use. Options are `sha1`, `sha224`, `sha256`, `sha384` and `sha512`. This field is required when `method` is set to `internal`. _Note: options are subject to change, when in doubt, check the pfSense webConfigurator options for this field._ |
+| lifetime | integer | Specify the number of days you would like this certificate to be valid for. This must be below OpenSSL's maximum lifetime value (around `12000` days). Defaults to `3650` days. This field is required when `method` is set to `internal`. _Note: maximum value is subject to change, when in doubt, check the pfSense webConfigurator options for this field._ |
+| dn_commonname | string | Specify the common name of this certificate. In mose cases, this will be a hostname. This field is required when `method` is set to `internal`. |
+| dn_country | string | Specify the country code for this certificate. This must be a known 2-digit country code. This field is only available when `method` is set to `internal`. (optional) |
+| dn_state | string | Specify the state or province for this certificate. This field is only available when `method` is set to `internal`. (optional) |
+| dn_city | string | Specify the city or locale for this certificate. This field is only available when `method` is set to `internal`. (optional) |
+| dn_organization | string | Specify the managing organization for this certificate. This field is only available when `method` is set to `internal`. (optional) |
+| dn_organizationalunit | string | Specify the managing organizational unit or team for this certificate. This field is only available when `method` is set to `internal`. (optional) |
+| type | string | Specify the certificate type. Options are `server` and `user`. This field is only available when `method` is set to `internal`. |
+| altnames | array | Specify subject alternative names to list in this certificate. This must be an array of objects with each object containing a alt name type as the key and the alt name value as the value. Supported alt name types are `dns` for FQDNs, `ip` for IP addresses, `uri` for URLs, and `email` for email addresses. This field is only available when `method` is set to `internal`. An example of a valid `altnames` array is:
+
+ `[{"dns": "example.com"}, {"ip": "127.0.0.1"}, {"uri": "http://example.com/test"}, {"email": "example@example.com"}]`
+
+ (optional) |
+| active | boolean | Set this certificate as the active certificate used by the webConfigurator. Only available when `type` is set to `server` or `method` is set to `existing`. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"method": "import",
+	"cert": "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZxekNDQTVPZ0F3SUJBZ0lVQi9rT2RoMzdTZnRxeHRqL1MxSTRkUTQyYXRvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWxWVU1RMHdDd1lEVlFRSERBUlBjbVZ0TVNFdwpId1lEVlFRS0RCaEpiblJsY201bGRDQlhhV1JuYVhSeklGQjBlU0JNZEdReEZ6QVZCZ05WQkFNTURuUmxjM1F1CmMyVmpiV1YwTG1Odk1CNFhEVEl3TURJd05ESXdNelV3...",
+	"key": "LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQ1N3d2dna29BZ0VBQW9JQ0FRREQ5RkNLU1U3SmY0QngKeWlKNkNOWGhOckI0ZVhjTk9TTm9GUVJIbXlsV2dHbEN5djMydFdicmF3RFhhQzk2aVpOSTFzNG5qWTdQT3BlWgpoNmFlaTJ5NllheS9VWWtOUkZGQmp4WlZlLzRwS2pKeXBQRlFBUlpMVko2TlNXaU5raGkwbDlqeWtacTlEbkFnCk1mclZyUEo1YktDM3JJVV...",
+	"descr": "webGui Cert",
+	"active": true
+}
+```
+
+
+
+### 3. Delete System Certificates
+
+
+Delete an existing certificate.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/system/certificate
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| refid | string | Specify the refid of the certificate to delete (required if `id` and `descr` are not defined) |
+| id | string | Specify the configuration ID number of the certificate to delete (required if `refid` and `descr` are not defined) |
+| descr | string | Specify the description of the certificate to delete (required if `id` and `refid` are not defined) _Note: if multiple certificates exist with the same name, only the first matching certificate will be deleted_ |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"refid": "0"
+}
+```
+
+
+
+## SYSTEM/HOSTNAME
+
+
+
+### 1. Read System Hostname
+
+
+Read the system hostname.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/hostname
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Update System Hostname
+
+
+Modify the system hostname.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/system/hostname
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| hostname | string | Set the hostname portion of the system hostname. Do not specify to retain existing value (optional) |
+| domain | string | Set the domain portion of the system hostname. Do not specify to retain existing value (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"hostname": "hostname",
+	"domain": "domain.com"
+}
+```
+
+
+
+## SYSTEM/CONFIG
+
+
+
+### 1. Read System Configuration
+
+
+Reads entire pfSense configuration.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-backup-restore`, `page-diagnostics-command`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/config
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Update System Configuration
+
+
+Updates entire pfSense configuration. This endpoint simply replaces the entire configuration with the values submitted in your request. This can be used to interface with configuration areas that may not be available to the API. Use extreme caution when utilizing this endpoint as it offers no input validation and has potential for configuration loss.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-backup-restore`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+Type: 
+URL: https://{{$hostname}}/api/v1/system/config
+```
+
+
+
+## SYSTEM/ARP
+
+
+
+### 1. Read System ARP Table
+
+
+Read the current ARP table.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-arptable`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/arp
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Delete System ARP Table
+
+
+Delete an IP from the ARP table.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-arptable`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/system/arp
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| ip | string | IPv4 address to delete from ARP table |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"ip": "192.168.1.5"
+}
+```
+
+
+
+## SYSTEM/PACKAGE
+
+
+
+### 1. Read System Packages
+
+
+Read pfSense packages that are currently installed.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installed`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/package
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Delete System Package
+
+
+Delete an existing pfSense package.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installed`]
+
+
+***Endpoint:***
+
+```bash
+Method: DELETE
+URL: https://{{$hostname}}/api/v1/system/package
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| name | string | Specify the name of pfSense package to delete. This must be the pfSense package internal name including the `pfSense-pkg-` prefix. Non-pfSense packages cannot be deleted. |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"name": "pfSense-pkg-sudo"
+}
+```
+
+
+
+### 3. Install System Package
+
+
+Install a pfSense package.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installpackage`]
+
+
+***Endpoint:***
+
+```bash
+Method: POST
+URL: https://{{$hostname}}/api/v1/system/package
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| name | string | Specify the name of pfSense package to install. This must be the pfSense package internal name including the `pfSense-pkg-` prefix or a URL to a third-party package. |
+| timeout | integer | Specify the amount of time (in seconds) to allow the package installation to take before timing out. This must be a value less than or equal to `120`. Defaults to `90`. |
+| force | boolean | Specify whether or not this package should be forced to install. Forced installs will always force the package to re-install and bypasses certain warnings. Use caution when using forced installs. |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"name": "pfSense-pkg-sudo"
+}
+```
+
+
+
+## SYSTEM/VERSION
+
+
+
+### 1. Read System Version
+
+
+Read pfSense version data. This includes base version, patch version, buildtime, and last commit.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-dashboard-widgets`, `page-diagnostics-command`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/version
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+## SYSTEM/NOTIFICATIONS/EMAIL
+
+
+
+### 1. Read System Email Notification Settings
+
+
+Read the current system email notification settings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-notifications`]
+
+
+***Endpoint:***
+
+```bash
+Method: GET
+URL: https://{{$hostname}}/api/v1/system/notifications/email
+```
+
+
+
+***Example Request:***
+
+```js        
+{
+    
+}
+```
+
+
+
+### 2. Update System Email Notification Settings
+
+
+Update the system email notification settings.<br><br>
+
+_Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-notifications`]
+
+
+***Endpoint:***
+
+```bash
+Method: PUT
+URL: https://{{$hostname}}/api/v1/system/notifications/email
+```
+
+
+
+***Fields:***
+
+| Key | Type | Description |
+| --- | ------|-------------|
+| disabled | boolean | Specify whether email notifications should be disabled. Set `true` to disable, or `false` to enable. Defaults to `false`. (optional) |
+| ipaddress | string | Specify the IP address or hostname of the remote SMTP server. |
+| port | integer | Specify the port of the remote SMTP server. |
+| timeout | integer | Specify the timeout (in seconds) for connections to the remote SMTP server. This value must be greater than 0. Defaults to `20`. (optional) |
+| ssl | boolean | Enable or disable SMTP over SSL/TLS. Set `true` to enable, `false` to disable. Defaults to `false`. (optional) |
+| sslvalidate | boolean | Enable or disable certificate verification requirements for SSL/TLS connections. Set `true` to enable, `false` to disable. Defaults to `false`. (optional) |
+| fromaddress | string | Set the email address email notifications will be sent from. This must be a valid email address. |
+| notifyemailaddress | string | Set the email address email notifications will be sent to. This must be a valid email address. |
+| authentication_mechanism | string | Specify the authentication type to use for connections to the remote SMTP server. Options are `PLAIN` for no authentication, or `LOGIN` for authenticated connections. |
+| username | string | Set the username to use during authentication. This field is only available when `authentication_mechanism` is set to `LOGIN`. (optional) |
+| password | string | Set the password to use during authentication. This field is only available when `authentication_mechanism` is set to `LOGIN`. (optional) |
+
+
+
+***Example Request:***
+
+```js        
+{
+	"disabled": true,
+	"ipaddress": "smtp.example.com",
+	"port": 25,
+	"timeout": 10,
+	"ssl": true,
+	"sslvalidate": true,
+	"fromaddress": "noreply@example.com",
+	"notifyemailaddress": "recipient@example.com",
+	"username": "testuser",
+	"password": "testpassword",
+	"authentication_mechanism": "LOGIN"
+>>>>>>> d2a1ba0 (More OpenAPI conversions)
 }
 ```
 

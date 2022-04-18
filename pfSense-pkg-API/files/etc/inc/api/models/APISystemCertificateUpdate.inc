@@ -22,24 +22,16 @@ class APISystemCertificateUpdate extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-certmanager"];
-        $this->change_note = "Modified system certificate address via API";
+        $this->change_note = "Modified system certificate via API";
     }
 
     public function action() {
         $this->config["cert"][$this->id] = $this->validated_data;
         $this->write_config();
-        mark_subsystem_dirty("cert");
-
-        # Only reload the firewall filter if a false value was not passed in
-        # TODO: This condition applies the changes by default to stay backwards compatible with v1.3.0
-        # TODO: this should be refactored in a future release to not apply by default
-        #if ($this->initial_data["apply"] !== false) {
-        #    APIFirewallApplyCreate::apply();
-        #}
         return APIResponse\get(0, $this->config["cert"][$this->id]);
     }
 
-    private function __validate_id() {
+    private function __validate_refid() {
         # Validate optional 'refid' field containing the refid of an existing certificate. If refid is not passed, find the cert through 'descr' field
         if (isset($this->initial_data["refid"])) {
             # Loop through each cert and check for a match
@@ -58,37 +50,6 @@ class APISystemCertificateUpdate extends APIModel {
         } 
     }
 
-    private function __validate_descr() {
-        # Validate the required 'descr' field
-        if (isset($this->initial_data['descr'])) {
-            # Ensure description does not contain invalid characters
-            if (preg_match("/[\?\>\<\&\/\\\"\']/", $this->initial_data['descr'])) {
-                $this->errors[] = APIResponse\get(1037);
-            } else {
-                # Match certificate by 'descr' field only when refid is not set
-                if (isset($this->initial_data["refid"])) {
-                    $this->validated_data["descr"] = $this->initial_data['descr'];
-                } else {
-                    # Loop through each cert and check for a match
-                    foreach ($this->config["cert"] as $id=>$cert) {
-                        # Check if the field 'descr' matches the certificate's description
-                        if ($this->initial_data["descr"] === $cert["descr"]) {
-                            $this->id = $id;
-                            $this->validated_data["descr"] = $this->initial_data['descr'];
-                            break;
-                        }
-                    }
-                    # If we did not find an ID in the loop, return a not found error
-                    if (is_null($this->id)) {
-                        $this->errors[] = APIResponse\get(1009);
-                    }
-                }
-            }
-        } else {
-            $this->errors[] = APIResponse\get(1002);
-        }
-    }
-
     private function __validate_crt() {
         # Check for our required 'crt' field
         if (isset($this->initial_data["crt"]) or isset($this->initial_data["cert"])) {
@@ -105,8 +66,7 @@ class APISystemCertificateUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(1003);
             }
             else {
-                # Certificate must be stored base64-encoded
-                $this->validated_data["crt"] = base64_encode($crt);
+                $this->validated_data["crt"] = $crt;
             }
         } else {
             $this->errors[] = APIResponse\get(1003);
@@ -114,7 +74,7 @@ class APISystemCertificateUpdate extends APIModel {
     }
 
     private function __validate_prv() {
-        # Check for our optional 'prv' field
+        # Check for our required 'prv' field
         if (isset($this->initial_data["prv"]) or isset($this->initial_data["key"])) {
             # Convert 'key' to 'prv' to remain backwards compatible
             if (isset($this->initial_data["key"])) {
@@ -134,19 +94,30 @@ class APISystemCertificateUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(1049);
             }
             else {
-                # key must be stored base64-encoded
-                $this->validated_data["prv"] = base64_encode($key);
+                $this->validated_data["prv"] = $key;
             }
         } else {
+            $this->errors[] = APIResponse\get(1004);
+        }
+    }
 
+    private function __validate_descr() {
+        # Validate the optional 'descr' field
+        if (isset($this->initial_data['descr'])) {
+            # Ensure description does not contain invalid characters
+            if (preg_match("/[\?\>\<\&\/\\\"\']/", $this->initial_data['descr'])) {
+                $this->errors[] = APIResponse\get(1037);
+            } else {
+                $this->validated_data["descr"] = $this->initial_data['descr'];
+            }
         }
     }
 
     public function validate_payload() {
-        $this->__validate_id();
-        $this->__validate_descr();
+        $this->__validate_refid();
         $this->__validate_crt();
         $this->__validate_prv();
+        $this->__validate_descr();
     }
 
 }
