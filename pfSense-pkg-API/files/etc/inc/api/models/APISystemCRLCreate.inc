@@ -23,7 +23,7 @@ class APISystemCRLCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-certmanager"];
+        $this->privileges = ["page-all", "page-system-crlmanager"];
         $this->change_note = "Added certificate revocation list via API";
         $this->cert_method = null;
     }

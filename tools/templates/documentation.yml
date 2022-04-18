@@ -842,161 +842,82 @@ info:
 
 tags:
   - name: USER
-    description: Manage users.
   - name: USER > AUTH_SERVER
-    description: Manage authentication servers.
   - name: USER > PRIVILEGE
-    description: Manage user privileges.
   - name: USER > GROUP > MEMBER
-    description: Manage group memberships.
   - name: INTERFACE
-    description: Manage interfaces.
   - name: INTERFACE > BRIDGE
-    description: Manage interface bridges.
   - name: INTERFACE > VLAN
-    description: Manage VLANs.
   - name: INTERFACE > APPLY
-    description: Apply pending interface changes.
   - name: FIREWALL > ALIAS
-    description: Manage firewall aliases.
   - name: FIREWALL > ALIAS > ENTRY
-    description: Manage firewall alias address entries.
   - name: FIREWALL > RULE
-    description: Manage firewall rules.
   - name: FIREWALL > RULE > FLUSH
-    description: Remove all existing firewall rules.
   - name: FIREWALL > RULE > SORT
-    description: Sort firewall rules' ordering.
   - name: FIREWALL > VIRTUAL_IP
-    description: Manage virtual IPs.
   - name: FIREWALL > NAT > PORTFOWARD
-    description: Manage port forwards.
   - name: FIREWALL > NAT > ONE_TO_ONE
-    description: Manage 1:1 NAT mappings.
   - name: FIREWALL > NAT > OUTBOUND
-    description: Manage outbound NAT settings.
   - name: FIREWALL > NAT > OUTBOUND > MAPPING
-    description: Manage outbound NAT mappings.
   - name: FIREWALL > STATES
-    description: Manage existing firewall states.
   - name: FIREWALL > STATES > SIZE
-    description: Manage firewall state table size.
   - name: FIREWALL > APPLY
-    description: Apply pending firewall changes.
   - name: FIREWALL > TRAFFIC_SHAPER
-    description: Manage traffic shapers.
   - name: FIREWALL > TRAFFIC_SHAPER > QUEUE
-    description: Manage traffic shaper queues.
   - name: FIREWALL > TRAFFIC_SHAPER > LIMITER
-    description: Manage traffic shaper limiters.
   - name: FIREWALL > TRAFFIC_SHAPER > LIMITER > BANDWIDTH
-    description: Manage traffic shaper limiter bandwidth settings.
   - name: FIREWALL > TRAFFIC_SHAPER > LIMITER > QUEUE
-    description: Manage traffic shaper limiter queue settings.
   - name: FIREWALL > SCHEDULE
-    description: Manage firewall schedules.
   - name: FIREWALL > SCHEDULE > TIME_RANGE
-    description: Manage firewall schedule time ranges.
   - name: SYSTEM > NOTIFICATIONS > EMAIL
-    description: Manage email notification settings.
   - name: SYSTEM > VERSION
-    description: Read the current pfSense version.
   - name: SYSTEM > PACKAGE
-    description: Manage packages.
   - name: SYSTEM > ARP
-    description: Manage the ARP table.
   - name: SYSTEM > CONFIG
-    description: Manage the entire pfSense configuration.
   - name: SYSTEM > HOSTNAME
-    description: Manage the system hostname.
   - name: SYSTEM > CERTIFICATE
-    description: Manage SSL/TLS certificates.
   - name: SYSTEM > CA
-    description: Manage certificate authorities.
   - name: SYSTEM > CRL
-    description: Manage certificate revocation lists.
   - name: SYSTEM > API
-    description: Manage API settings.
   - name: SYSTEM > DNS
-    description: Manage system DNS servers and settings.
   - name: SYSTEM > DNS > SERVER
-    description: Add or remove system DNS servers.
   - name: SYSTEM > TUNABLE
-    description: Manage system tunables.
   - name: SYSTEM > TABLE
-    description: Manage tables.
   - name: SYSTEM > CONSOLE
-    description: Manage console settings.
   - name: SYSTEM > REBOOT
-    description: Initiate system reboots.
   - name: SYSTEM > HALT
-    description: Initiate system shutdowns.
   - name: ROUTING > GATEWAY
-    description: Manage routing gateways.
   - name: ROUTING > GATEWAY > DETAIL
-    description: Fetch detailed gateway information.
   - name: ROUTING > STATIC_ROUTE
-    description: Manage static routes.
   - name: ROUTING > APPLY
-    description: Apply pending routing changes.
   - name: STATUS > CARP
-    description: Manage CARP failovers.
   - name: STATUS > OPENVPN
-    description: Fetch OpenVPN status information.
   - name: STATUS > LOG
-    description: Fetch logs.
   - name: STATUS > GATEWAY
-    description: Fetch gateway statuses.
   - name: STATUS > INTERFACE
-    description: Fetch interface statuses and metrics.
   - name: STATUS > SYSTEM
-    description: Fetch system statuses.
   - name: SERVICES
-    description: Manage services.
   - name: SERVICES > OPENVPN > CSC
-    description: Manage OpenVPN client specific overrides.
   - name: SERVICES > UNBOUND
-    description: Manage DNS Resolver (Unbound) service.
   - name: SERVICES > UNBOUND > ACCESS_LIST
-    description: Manage DNS Resolver (Unbound) access lists.
   - name: SERVICES > UNBOUND > ACCESS_LIST > ROW
-    description: Manage DNS Resolver (Unbound) access list network entries.
   - name: SERVICES > UNBOUND > HOST_OVERRIDE
-    description: Manage DNS Resolver (Unbound) host overrides.
   - name: SERVICES > UNBOUND > HOST_OVERRIDE > ALIAS
-    description: Manage DNS Resolver (Unbound) host override aliases.
   - name: SERVICES > DNSMASQ
-    description: Manage DNS Forwarder (dnsmasq) service.
   - name: SERVICES > DNSMASQ > HOST_OVERRIDE
-    description: Manage DNS Forwarder (dnsmasq) host overrides.
   - name: SERVICES > DNSMASQ > HOST_OVERRIDE > ALIAS
-    description: Manage DNS Forwarder (dnsmasq) host override aliases.
   - name: SERVICES > DHCPD
-    description: Manage DHCP Server (dhcpd) configuration.
   - name: SERVICES > DHCPD > STATIC_MAPPING
-    description: Manage DHCP Server (dhcpd) static mappings.
   - name: SERVICES > DHCPD > OPTIONS
-    description: Manage DHCP Server (dhcpd) options.
   - name: SERVICES > DHCPD > LEASE
-    description: Manage DHCP Server leases.
   - name: SERVICES > DPINGER
-    description: Manage Gateway Monitor (dpinger) service.
   - name: SERVICES > NTPD
-    description: Manage NTP (ntpd) service.
   - name: SERVICES > NTPD > TIME_SERVER
-    description: Manage NTP (ntpd) time server entries.
   - name: SERVICES > SSHD
-    description: Manage SSH (sshd) service.
   - name: SERVICES > SYSLOGD
-    description: Manage System Logging (syslogd) service.
   - name: SERVICES > DDNS
-    description: Manage Dynamic DNS configuration.
   - name: ACCESS_TOKEN
-    description: >-
-      Obtain temporary access tokens to authenticate API
-      requests. Only applicable when the API authentication mode is set to JWT.
   - name: DIAGNOSTICS > COMMAND_PROMPT
-    description: Execute shell commands.
 paths:
   /api/v1/user/auth_server:
     get:
@@ -1570,6 +1491,7 @@ paths:
           required: true
           schema:
             type: string
+            format: password
         - name: disabled
           in: query
           description: Disable user account upon creation.
@@ -1662,6 +1584,7 @@ paths:
           description: New password to assign user.
           schema:
             type: string
+            format: password
         - name: disabled
           in: query
           description: Disable user account.
@@ -6288,10 +6211,9 @@ paths:
     post:
       tags:
         - FIREWALL > TRAFFIC_SHAPER
-      summary: Create Traffic Shaper
+      summary: Create traffic shaper
       description: >-
-        Add a traffic shaper policy to an interface.<br><br>
-
+        Add a new traffic shaper policy to an interface.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-firewall-trafficshaper`]
@@ -6312,74 +6234,71 @@ paths:
       parameters:
         - name: interface
           in: query
+          required: true
           schema:
             type: string
           description: >-
-            Specify the interface to create the traffic shaper policy for. You
+            Interface the traffic shaper policy will apply to. You
             may specify either the interface's descriptive name, the pfSense ID
-            (wan, lan, optx), or the physical interface id (e.g. igb0).
-          example: string
+            (wan, lan, optx), or the real interface ID (e.g. igb0).
         - name: scheduler
           in: query
+          description: Scheduler type for this traffic shaper.
+          required: true
           schema:
             type: string
-          description: >-
-            Specify the scheduler type for this traffic shaper. Choices are
-            `HFSC`, `CBQ`, `FAIRQ`, `CODELQ`, and `PRIQ`.
-          example: string
+            enum: ["HFSC", "CBQ", "FAIRQ", "CODELQ", "PRIQ"]
         - name: bandwidthtype
           in: query
+          required: true
           schema:
             type: string
+            enum: ["%", "b", "Kb", "Mb", "Gb"]
           description: >-
-            Specify the bandwidth type to use when setting the bandwidth.
+            Bandwidth type to use when setting the bandwidth.
             Choices are `%` for percentage based bandwidth, `b` for bits, `Kb`
             for kilobits, `Mb` for megabits, and `Gb` for gigabits.
-          example: string
         - name: bandwidth
           in: query
+          required: true
           schema:
-            type: string
+            type: integer
+            minimum: 1
           description: >-
-            Specify the bandwidth of this traffic shaper. This must be a numeric
+            Bandwidth limit of this traffic shaper. This must be a numeric
             value of `1` or greater. If you have set the `bandwidthtype` to `%`,
             this value must be `100` or less.
-          example: integer
         - name: enabled
           in: query
+          description: Enable this traffic shaper policy.
           schema:
-            type: string
-          description: >-
-            Enable or disable this traffic shaper upon creation. Specify `true`
-            to enable or `false` to disable. Defaults to `true`. (optional)
-          example: boolean
+            type: boolean
+            default: true
         - name: qlimit
           in: query
           schema:
-            type: string
+            type: integer
+            minimum: 1
           description: >-
-            Specify the queue limit value for this traffic shaper. If set, this
-            must be a value of `1` or greater. Defaults to no limit. (optional)
-          example: integer
+            Queue limit value for this traffic shaper policy. Do not specify this field
+            to assume no limits.
         - name: tbrconfig
           in: query
+          description: TBR size for this traffic shaper.
           schema:
-            type: string
-          description: >-
-            Specify the TBR size  for this traffic shaper. If set, this must be
-            a value of `1` or greater. (optional)
-          example: integer
+            type: integer
+            minimum: 1
         - name: apply
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
-            Specify whether this traffic shaper should be applied immediately
-            after creation. If `true`, the filter will be reloaded after
-            creation. Otherwise, if `false`, the filter will not be reloaded and
-            the change will not be applied until the next filter reload.
-            Defaults to `false`. (optional)
-          example: integer
+            Specify whether or not you would like this change to be applied
+            immediately, or simply written to the configuration to be applied
+            later. If you are modifying multiple firewall items at once it is
+            best to set this to false and apply the changes afterwards using the
+            `/api/v1/firewall/apply` endpoint.
       responses:
         '200':
           description: Successful response
@@ -6388,10 +6307,9 @@ paths:
     put:
       tags:
         - FIREWALL > TRAFFIC_SHAPER
-      summary: Update Traffic Shaper
+      summary: Update traffic shaper
       description: >-
         Update an existing traffic shaper policy for an interface.<br><br>
-
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-firewall-trafficshaper`]
@@ -6412,77 +6330,70 @@ paths:
       parameters:
         - name: interface
           in: query
+          required: true
           schema:
             type: string
           description: >-
-            Specify the interface of the traffic shaper policy to update. You
+            Interface of the traffic shaper policy to update. You
             may specify either the interface's descriptive name, the pfSense ID
-            (wan, lan, optx), or the physical interface id (e.g. igb0).
-          example: string
+            (wan, lan, optx), or the real interface ID (e.g. igb0).
         - name: scheduler
           in: query
+          description: Scheduler type for this traffic shaper.
           schema:
             type: string
-          description: >-
-            Update the scheduler type for this traffic shaper. Choices are
-            `HFSC`, `CBQ`, `FAIRQ`, `CODELQ`, and `PRIQ`. (optional)
-          example: string
+            enum: ["HFSC", "CBQ", "FAIRQ", "CODELQ", "PRIQ"]
         - name: bandwidthtype
           in: query
           schema:
             type: string
+            enum: ["%", "b", "Kb", "Mb", "Gb"]
           description: >-
-            Update the bandwidth type to use when setting the bandwidth. Choices
-            are `%` for percentage based bandwidth, `b` for bits, `Kb` for
-            kilobits, `Mb` for megabits, and `Gb` for gigabits. If the bandwidth
-            type is changed, a new `bandwidth` value will also be required.
-            (optional)
-          example: string
+            Bandwidth type to use when setting the bandwidth.
+            Choices are `%` for percentage based bandwidth, `b` for bits, `Kb`
+            for kilobits, `Mb` for megabits, and `Gb` for gigabits. If this value
+            is updated, a new `bandwidth` value will also be required.
         - name: bandwidth
           in: query
           schema:
-            type: string
+            type: integer
+            minimum: 1
           description: >-
-            Update the bandwidth of this traffic shaper. This must be a numeric
+            Bandwidth limit of this traffic shaper. This must be a numeric
             value of `1` or greater. If you have set the `bandwidthtype` to `%`,
-            this value must be `100` or less. If the `bandwidthtype` value has
-            been changed, this field will be required. (optional)
-          example: integer
+            this value must be `100` or less. This parameter is required when a
+            new `bandwidthtype` value is specified.
         - name: enabled
           in: query
+          description: Enable this traffic shaper policy.
           schema:
-            type: string
-          description: >-
-            Enable or disable this traffic shaper. Specify `true` to enable or
-            `false` to disable.  (optional)
-          example: boolean
+            type: boolean
+            default: true
         - name: qlimit
           in: query
           schema:
-            type: string
+            type: integer
+            minimum: 1
           description: >-
-            Update the queue limit value for this traffic shaper. If set, this
-            must be a value of `1` or greater. (optional)
-          example: integer
+            Queue limit value for this traffic shaper policy. Do not specify this field
+            to assume no limits.
         - name: tbrconfig
           in: query
+          description: TBR size for this traffic shaper.
           schema:
-            type: string
-          description: >-
-            Update the TBR size  for this traffic shaper. If set, this must be a
-            value of `1` or greater. (optional)
-          example: integer
+            type: integer
+            minimum: 1
         - name: apply
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
-            Specify whether this traffic shaper should be applied immediately
-            after updating. If `true`, the filter will be reloaded after
-            creation. Otherwise, if `false`, the filter will not be reloaded and
-            the change will not be applied until the next filter reload.
-            Defaults to `false`. (optional)
-          example: integer
+            Specify whether or not you would like this change to be applied
+            immediately, or simply written to the configuration to be applied
+            later. If you are modifying multiple firewall items at once it is
+            best to set this to false and apply the changes afterwards using the
+            `/api/v1/firewall/apply` endpoint.
       responses:
         '200':
           description: Successful response
@@ -6491,10 +6402,9 @@ paths:
     get:
       tags:
         - FIREWALL > TRAFFIC_SHAPER
-      summary: Read Traffic Shapers
+      summary: Read traffic shapers
       description: >-
-        Read all configured traffic shapers.<br><br>
-
+        Read all configured traffic shaper policies.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-firewall-trafficshaper`]
@@ -6506,34 +6416,33 @@ paths:
     delete:
       tags:
         - FIREWALL > TRAFFIC_SHAPER
-      summary: Delete Traffic Shaper
+      summary: Delete traffic shaper
       description: >-
         Delete the traffic shaper policy for a specific interface.<br><br>
-
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-firewall-trafficshaper`]
       parameters:
         - name: interface
           in: query
+          required: true
           schema:
             type: string
           description: >-
-            Specify the interface of the traffic shaper policy to delete. You
+            Interface of the traffic shaper policy to delete. You
             may specify either the interface's descriptive name, the pfSense ID
-            (wan, lan, optx), or the physical interface id (e.g. igb0).
-          example: string
+            (wan, lan, optx), or the real interface ID (e.g. igb0).
         - name: apply
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
-            Specify whether this traffic shaper deletion should be applied
-            immediately after deleting. If `true`, the filter will be reloaded
-            after deleting. Otherwise, if `false`, the filter will not be
-            reloaded and the change will not be applied until the next filter
-            reload. Defaults to `false`. (optional)
-          example: boolean
+            Specify whether or not you would like this change to be applied
+            immediately, or simply written to the configuration to be applied
+            later. If you are modifying multiple firewall items at once it is
+            best to set this to false and apply the changes afterwards using the
+            `/api/v1/firewall/apply` endpoint.
       responses:
         '200':
           description: Successful response
@@ -6543,10 +6452,9 @@ paths:
     post:
       tags:
         - FIREWALL > SCHEDULE > TIME_RANGE
-      summary: Create Schedule Time Range
+      summary: Create schedule time range
       description: >-
-        Add a time range to an existing firewall schedule.<br><br>
-
+        Add a new time range to an existing firewall schedule.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-firewall-schedules-edit`]
@@ -6556,7 +6464,7 @@ paths:
             schema:
               type: object
               example:
-                name: Test_Schedule
+                name: Example_Schedule
                 month: 1,3,5
                 day: 20,24,5
                 hour: 9:00-17:00
@@ -6564,66 +6472,59 @@ paths:
       parameters:
         - name: name
           in: query
+          description: Name of the existing schedule to add this time range to.
+          required: true
           schema:
             type: string
-          description: >-
-            Specify the name of the schedule to add this time range to. This
-            must be an existing firewall schedule name.
-          example: string
         - name: position
           in: query
           schema:
             type: string
           description: >-
-            Specify a comma-separated list of week days the schedule will be
-            enable for. Options are `1` for Monday, `2` for Tuesday, `3` for
+            Comma-separated list of week days the schedule will be
+            enabled on. Options are `1` for Monday, `2` for Tuesday, `3` for
             Wednesday, `4` for Thursday, `5` for Friday, `6` for Saturday, and
-            `7` for Sunday. For example, all weekdays would be formatted as such
-            `"1,2,3,4,5"`. (optional)
-          example: string
+            `7` for Sunday.
         - name: month
           in: query
           schema:
             type: string
           description: >-
-            Specify a comma-separated list of months the schedule will be
-            enabled for. This will directly correspond with each value in the
+            Comma-separated list of months the schedule will be
+            enabled on. This will directly correspond with each value in the
             `day` field. For example, to enable this schedule on March 1st, and
             August 26th, the `month` field should be formatted as `"3,8"` and
-            the `day` field should be formatted as `"1,26"`. This field will be
-            required if the `position` field was not specified. This field
-            cannot be set if the `position` field was set.
-          example: string
+            the `day` field should be formatted as `"1,26"`. This parameter is
+            required if a `position` value was not specified. This parameter
+            has no effect if the `position` field was specified.
         - name: day
           in: query
           schema:
             type: string
           description: >-
-            Specify a comma-separated list of days the schedule will be enabled
+            Comma-separated list of days the schedule will be enabled
             for. This will directly correspond with each value in the `month`
             field. For example, to enable this schedule on March 1st, and August
             26th, the `month` field should be formatted as `"3,8"` and the `day`
-            field should be formatted as `"1,26"`. This field will be required
-            if the `position` field was not specified. This field cannot be set
-            if the `position` field was set.
-          example: string
+            field should be formatted as `"1,26"`. This parameter is
+            required if a `position` value was not specified. This parameter
+            has no effect if the `position` field was specified.
         - name: hour
           in: query
+          required: true
           schema:
             type: string
           description: >-
-            Specify the hour range this schedule will be enabled for. This must
-            be two 24-hour time  strings formatted as either HH:MM or H:MM
+            Hour range this schedule will be enabled at. This must
+            be two 24-hour time strings formatted as either HH:MM or H:MM
             separated by `-` (e.g. `9:00-17:00`). The first time range must be
             less than the second time range. The minutes portion of the time
             range must be either `00`, `15`, `30`, `45`, or `59`.
-          example: string
         - name: rangedescr
           in: query
+          description: Description for this time range.
           schema:
             type: string
-          description: Specify a description for this time range. (optional)
-          example: string
       responses:
         '200':
           description: Successful response
@@ -6632,31 +6533,29 @@ paths:
     delete:
       tags:
         - FIREWALL > SCHEDULE > TIME_RANGE
-      summary: Delete Schedule Time Range
+      summary: Delete schedule time range
       description: >-
-        Delete a time range from an existing firewall schedule.<br><br>
-
+        Remove a time range from an existing firewall schedule.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-firewall-schedules-edit`]
       parameters:
         - name: name
           in: query
+          required: true
+          description: Name of the existing schedule to delete this time range from.
           schema:
             type: string
-          description: >-
-            Specify the name of the schedule to delete this time range from.
-            This must be an existing firewall schedule name.
-          example: string
         - name: id
           in: query
+          required: true
           schema:
-            type: string
+            type: integer
           description: >-
             Specify the ID of the time range to delete. This will be the
             configuration array index of the `timerange` object within the
-            `schedule` object.
-          example: integer
+            `schedule` object. Refer to the 'Obtaining Object IDs' section 
+            in the documentation intro for help obtaining this ID.
       responses:
         '200':
           description: Successful response
@@ -6666,10 +6565,9 @@ paths:
     post:
       tags:
         - FIREWALL > SCHEDULE
-      summary: Create Schedule
+      summary: Create schedule
       description: >-
-        Add a firewall schedule.<br><br>
-
+        Create a firewall schedule.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-firewall-schedules-edit`]
@@ -6679,8 +6577,8 @@ paths:
             schema:
               type: object
               example:
-                name: Test_Schedule
-                descr: Test firewall schedule
+                name: Example_Schedule
+                descr: Example firewall schedule
                 timerange:
                   - month: 1,3,5
                     day: 10,20,25
@@ -6692,30 +6590,47 @@ paths:
       parameters:
         - name: name
           in: query
+          required: true
           schema:
             type: string
+            minLength: 1
+            maxLength: 32
           description: >-
-            Specify a name for this firewall schedule. This value must be
+            Name of the firewall schedule. This value must be
             between 1 and 32 characters, and can only contain alphanumerics,
             underscores and hyphens. This value must be unique from all other
             firewall schedules.
-          example: string
-        - name: descr
-          in: query
-          schema:
-            type: string
-          description: Specify a description for this firewall schedule (optional)
-          example: string
         - name: timerange
           in: query
+          required: true
+          example:
+            - month: 1,3,5
+              day: 10,20,25
+              hour: 0:15-20:00
+              rangedescr: On Jan 1, March 20, and May 25 from 0:15 to 20:00
           schema:
-            type: string
+            type: array
+            items:
+              type: object
+              properties:
+                position:
+                  type: string
+                month:
+                  type: string
+                day:
+                  type: string
+                rangedescr:
+                  type: string
           description: >-
-            Specify an array of time range objects for this schedule. Each
-            object must contain the required fields as specified by the
+            Array of time range objects for this schedule. Each
+            object must contain fields as specified in the
             /api/v1/firewall/schedule/time_range endpoint. At least 1 time range
             object must be specified.
-          example: array
+        - name: descr
+          in: query
+          description: Description for this firewall schedule.
+          schema:
+            type: string
       responses:
         '200':
           description: Successful response
@@ -6724,7 +6639,7 @@ paths:
     put:
       tags:
         - FIREWALL > SCHEDULE
-      summary: Update Schedule
+      summary: Update schedule
       description: >-
         Update an existing firewall schedule.<br><br>
 
@@ -6750,31 +6665,40 @@ paths:
       parameters:
         - name: name
           in: query
+          description: Name of the existing firewall schedule to update.
+          required: true
           schema:
             type: string
-          description: >-
-            Specify the name of the firewall schedule to update. This field Is
-            used to locate the object and cannot be used to change the name of
-            the schedule.
-          example: string
-        - name: descr
-          in: query
-          schema:
-            type: string
-          description: Update the description for this firewall schedule (optional)
-          example: string
         - name: timerange
           in: query
+          example:
+            - month: 1,3,5
+              day: 10,20,25
+              hour: 0:15-20:00
+              rangedescr: On Jan 1, March 20, and May 25 from 0:15 to 20:00
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                position:
+                  type: string
+                month:
+                  type: string
+                day:
+                  type: string
+                rangedescr:
+                  type: string
+          description: >-
+            Array of time range objects for this schedule. Each
+            object must contain fields as specified in the
+            /api/v1/firewall/schedule/time_range endpoint. At least 1 time range
+            object must be specified. Any existing values will be overwritten.
+        - name: descr
+          in: query
+          description: Description for this firewall schedule.
           schema:
             type: string
-          description: >-
-            Update the array of time range objects for this schedule. Each
-            object must contain the required fields as specified by the
-            /api/v1/firewall/schedule/time_range endpoint. If this field is
-            passed in, at least 1 time range object must be specified.
-            Specifying this field will overwrite any existing time ranges for
-            this schedule. (optional)
-          example: array
       responses:
         '200':
           description: Successful response
@@ -6783,20 +6707,19 @@ paths:
     delete:
       tags:
         - FIREWALL > SCHEDULE
-      summary: Delete Schedule
+      summary: Delete schedule
       description: >-
         Delete an existing firewall schedule.<br><br>
-
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-firewall-schedules-edit`]
       parameters:
         - name: name
           in: query
+          description: Name of the existing firewall schedule to delete.
+          required: true
           schema:
             type: string
-          description: Specify the name of the firewall schedule to delete.
-          example: string
       responses:
         '200':
           description: Successful response
@@ -6809,7 +6732,6 @@ paths:
       description: >-
         Read all existing firewall schedules.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-firewall-schedules`]
       responses:
@@ -6821,10 +6743,9 @@ paths:
     get:
       tags:
         - SYSTEM > NOTIFICATIONS > EMAIL
-      summary: Read System Email Notification Settings
+      summary: Read email notification settings
       description: >-
-        Read the current system email notification settings.<br><br>
-
+        Read the current email notification settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-advanced-notifications`]
@@ -6836,10 +6757,9 @@ paths:
     put:
       tags:
         - SYSTEM > NOTIFICATIONS > EMAIL
-      summary: Update System Email Notification Settings
+      summary: Update email notification settings
       description: >-
-        Update the system email notification settings.<br><br>
-
+        Update the email notification settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-advanced-notifications`]
@@ -6857,99 +6777,82 @@ paths:
                 sslvalidate: true
                 fromaddress: noreply@example.com
                 notifyemailaddress: recipient@example.com
-                username: testuser
-                password: testpassword
+                username: exampleuser
+                password: examplepassword
                 authentication_mechanism: LOGIN
       parameters:
         - name: disabled
           in: query
+          description: Enable or disable email notifications.
           schema:
-            type: string
-          description: >-
-            Specify whether email notifications should be disabled. Set `true`
-            to disable, or `false` to enable. Defaults to `false`. (optional)
-          example: boolean
+            type: boolean
         - name: ipaddress
           in: query
+          description: IP address or hostname of the remote SMTP server.
+          required: true
           schema:
             type: string
-          description: Specify the IP address or hostname of the remote SMTP server.
-          example: string
         - name: port
           in: query
+          description: Port of the remote SMTP server.
+          required: true
           schema:
-            type: string
-          description: Specify the port of the remote SMTP server.
-          example: integer
+            type: integer
+            minimum: 1
+            maximum: 65535
         - name: timeout
           in: query
+          description: Timeout (in seconds) for connections to the remote SMTP server.
           schema:
-            type: string
-          description: >-
-            Specify the timeout (in seconds) for connections to the remote SMTP
-            server. This value must be greater than 0. Defaults to `20`.
-            (optional)
-          example: integer
+            type: integer
+            default: 20
+            minimum: 1
         - name: ssl
           in: query
+          description: Enable or disable SMTP over SSL/TLS.
           schema:
-            type: string
-          description: >-
-            Enable or disable SMTP over SSL/TLS. Set `true` to enable, `false`
-            to disable. Defaults to `false`. (optional)
-          example: boolean
+            type: boolean
         - name: sslvalidate
           in: query
+          description: Enable or disable certificate verification for SSL/TLS connections.
           schema:
-            type: string
-          description: >-
-            Enable or disable certificate verification requirements for SSL/TLS
-            connections. Set `true` to enable, `false` to disable. Defaults to
-            `false`. (optional)
-          example: boolean
+            type: boolean
         - name: fromaddress
           in: query
+          description: Email address email notifications will be sent from.
+          required: true
           schema:
             type: string
-          description: >-
-            Set the email address email notifications will be sent from. This
-            must be a valid email address.
-          example: string
+            format: email
         - name: notifyemailaddress
           in: query
+          description: Email address email notifications will be sent to.
+          required: true
           schema:
             type: string
-          description: >-
-            Set the email address email notifications will be sent to. This must
-            be a valid email address.
-          example: string
+            format: email
         - name: authentication_mechanism
           in: query
+          description: Authentication type to use for connections to the remote SMTP server.
+          required: true
           schema:
             type: string
-          description: >-
-            Specify the authentication type to use for connections to the remote
-            SMTP server. Options are `PLAIN` for no authentication, or `LOGIN`
-            for authenticated connections.
-          example: string
+            enum: ["PLAIN", "LOGIN"]
         - name: username
           in: query
           schema:
             type: string
           description: >-
-            Set the username to use during authentication. This field is only
+            Username to use during authentication. This parameter is only
             available when `authentication_mechanism` is set to `LOGIN`.
-            (optional)
-          example: string
         - name: password
           in: query
           schema:
             type: string
+            format: password
           description: >-
-            Set the password to use during authentication. This field is only
+            Password to use during authentication. This parameter is only
             available when `authentication_mechanism` is set to `LOGIN`.
-            (optional)
-          example: string
       responses:
         '200':
           description: Successful response
@@ -6959,11 +6862,10 @@ paths:
     get:
       tags:
         - SYSTEM > VERSION
-      summary: Read System Version
+      summary: Read system version
       description: >-
-        Read pfSense version data. This includes base version, patch version,
+        Read the pfSense version data. This includes base version, patch version,
         buildtime, and last commit.<br><br>
-
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-dashboard-widgets`, `page-diagnostics-command`]
@@ -6976,10 +6878,9 @@ paths:
     get:
       tags:
         - SYSTEM > PACKAGE
-      summary: Read System Packages
+      summary: Read system packages
       description: >-
-        Read pfSense packages that are currently installed.<br><br>
-
+        Read all pfSense packages that are currently installed.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-packagemanager-installed`]
@@ -6991,23 +6892,21 @@ paths:
     delete:
       tags:
         - SYSTEM > PACKAGE
-      summary: Delete System Package
+      summary: Remove system package
       description: >-
-        Delete an existing pfSense package.<br><br>
-
+        Remove an existing pfSense package.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-packagemanager-installed`]
       parameters:
         - name: name
           in: query
+          required: true
           schema:
             type: string
           description: >-
-            Specify the name of pfSense package to delete. This must be the
-            pfSense package internal name including the `pfSense-pkg-` prefix.
-            Non-pfSense packages cannot be deleted.
-          example: string
+            Name of pfSense package to delete. This must be the pfSense package internal name including the 
+            `pfSense-pkg-` prefix. Non-pfSense packages cannot be removed.
       responses:
         '200':
           description: Successful response
@@ -7016,10 +6915,9 @@ paths:
     post:
       tags:
         - SYSTEM > PACKAGE
-      summary: Install System Package
+      summary: Install system package
       description: >-
         Install a pfSense package.<br><br>
-
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-packagemanager-installpackage`]
@@ -7033,31 +6931,28 @@ paths:
       parameters:
         - name: name
           in: query
+          required: true
           schema:
             type: string
           description: >-
-            Specify the name of pfSense package to install. This must be the
-            pfSense package internal name including the `pfSense-pkg-` prefix or
-            a URL to a third-party package.
-          example: string
+            Name of pfSense package to install. This must be the pfSense package internal name including the 
+            `pfSense-pkg-` prefix or a URL to an external package.
         - name: timeout
           in: query
+          description: Amount of time (in seconds) to allow the package installation to take before timing out.
           schema:
-            type: string
-          description: >-
-            Specify the amount of time (in seconds) to allow the package
-            installation to take before timing out. This must be a value less
-            than or equal to `120`. Defaults to `90`.
-          example: integer
+            type: integer
+            default: 90
+            minimum: 5
+            maximum: 120
         - name: force
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
-            Specify whether or not this package should be forced to install.
-            Forced installs will always force the package to re-install and
-            bypasses certain warnings. Use caution when using forced installs.
-          example: boolean
+            Force the installation of the package. Forced installs will always force the package to re-install and
+            bypasses certain warnings. Use extreme caution when using forced installs.
       responses:
         '200':
           description: Successful response
@@ -7067,10 +6962,9 @@ paths:
     get:
       tags:
         - SYSTEM > ARP
-      summary: Read System ARP Table
+      summary: Read ARP table
       description: >-
         Read the current ARP table.<br><br>
-
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-diagnostics-arptable`]
@@ -7082,20 +6976,19 @@ paths:
     delete:
       tags:
         - SYSTEM > ARP
-      summary: Delete System ARP Table
+      summary: Delete ARP table entry
       description: >-
         Delete an IP from the ARP table.<br><br>
-
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-diagnostics-arptable`]
       parameters:
         - name: ip
           in: query
+          required: true
+          description: IPv4 address to delete from the ARP table.
           schema:
             type: string
-          description: IPv4 address to delete from ARP table
-          example: string
       responses:
         '200':
           description: Successful response
@@ -7105,10 +6998,9 @@ paths:
     get:
       tags:
         - SYSTEM > CONFIG
-      summary: Read System Configuration
+      summary: Read pfSense configuration
       description: >-
-        Reads entire pfSense configuration.<br><br>
-
+        Read the entire pfSense configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-diagnostics-backup-restore`, `page-diagnostics-command`]
@@ -7120,15 +7012,14 @@ paths:
     put:
       tags:
         - SYSTEM > CONFIG
-      summary: Update System Configuration
+      summary: Update pfSense configuration
       description: >-
-        Updates entire pfSense configuration. This endpoint simply replaces the
+        Updates the entire pfSense configuration. This endpoint simply replaces the
         entire configuration with the values submitted in your request. This can
         be used to interface with configuration areas that may not be available
         to the API. Use extreme caution when utilizing this endpoint as it
-        offers no input validation and has potential for configuration
-        loss.<br><br>
-
+        offers no input validation and has high potential for configuration
+        loss. This endpoint is purely experimental.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-diagnostics-backup-restore`]
@@ -7143,10 +7034,9 @@ paths:
     get:
       tags:
         - SYSTEM > HOSTNAME
-      summary: Read System Hostname
+      summary: Read system hostname
       description: >-
-        Read the system hostname.<br><br>
-
+        Read the system's hostname.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system`]
@@ -7158,10 +7048,9 @@ paths:
     put:
       tags:
         - SYSTEM > HOSTNAME
-      summary: Update System Hostname
+      summary: Update system hostname
       description: >-
         Modify the system hostname.<br><br>
-
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system`]
@@ -7176,20 +7065,14 @@ paths:
       parameters:
         - name: hostname
           in: query
+          description: Hostname portion of the system hostname. Do not specify to retain existing value.
           schema:
             type: string
-          description: >-
-            Set the hostname portion of the system hostname. Do not specify to
-            retain existing value (optional)
-          example: string
         - name: domain
           in: query
           schema:
             type: string
-          description: >-
-            Set the domain portion of the system hostname. Do not specify to
-            retain existing value (optional)
-          example: string
+          description: Domain portion of the system hostname. Do not specify to retain existing value.
       responses:
         '200':
           description: Successful response
@@ -7199,10 +7082,9 @@ paths:
     get:
       tags:
         - SYSTEM > CERTIFICATE
-      summary: Read System Certificates
+      summary: Read certificates
       description: >-
-        Read installed SSL certificates.<br><br>
-
+        Read installed SSL/TLS certificates.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-certmanager`]
@@ -7214,10 +7096,9 @@ paths:
     post:
       tags:
         - SYSTEM > CERTIFICATE
-      summary: Create System Certificates
+      summary: Create or import certificate
       description: >-
-        Add a new SSL certificate.<br><br>
-
+        Generate or import a new SSL/TLS certificate.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-certmanager`]
@@ -7232,194 +7113,231 @@ paths:
                   LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZxekNDQTVPZ0F3SUJBZ0lVQi9rT2RoMzdTZnRxeHRqL1MxSTRkUTQyYXRvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWxWVU1RMHdDd1lEVlFRSERBUlBjbVZ0TVNFdwpId1lEVlFRS0RCaEpiblJsY201bGRDQlhhV1JuYVhSeklGQjBlU0JNZEdReEZ6QVZCZ05WQkFNTURuUmxjM1F1CmMyVmpiV1YwTG1Odk1CNFhEVEl3TURJd05ESXdNelV3...
                 key: >-
                   LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQ1N3d2dna29BZ0VBQW9JQ0FRREQ5RkNLU1U3SmY0QngKeWlKNkNOWGhOckI0ZVhjTk9TTm9GUVJIbXlsV2dHbEN5djMydFdicmF3RFhhQzk2aVpOSTFzNG5qWTdQT3BlWgpoNmFlaTJ5NllheS9VWWtOUkZGQmp4WlZlLzRwS2pKeXBQRlFBUlpMVko2TlNXaU5raGkwbDlqeWtacTlEbkFnCk1mclZyUEo1YktDM3JJVV...
-                descr: webGui Cert
+                descr: Example Cert
                 active: true
       parameters:
         - name: method
           in: query
+          required: true
           schema:
             type: string
+            enum: ["import", "existing", "internal"]
           description: >-
-            Set the method used to add the certificate. Current supported
-            methods are `existing` to import an existing PEM certificate and
-            `internal` to generate a certificate using a CA object. _Note:
-            previous releases referred to the `existing` method as `import`. You
-            may use `existing` or `import` interchangeably._
-          example: string
+            Method used to add the certificate. _Note: previous releases referred to the `existing` method as `import`. 
+            You may use `existing` or `import` interchangeably._
         - name: descr
           in: query
+          description: Descriptive name for the certificate.
+          required: true
           schema:
             type: string
-          description: Set a descriptive name for the certificate
-          example: string
         - name: crt
           in: query
           schema:
             type: string
           description: >-
-            Specify the Base64 encoded PEM certificate to import. This field is
+            Base64 encoded PEM certificate to import. This parameter is
             required when `method` is set to `existing`. _Note: previous
-            releases referred to the `crt` field as `cert`. Both `crt` and
+            releases referred to the `crt` parameter as `cert`. Both `crt` and
             `cert` can be used interchangeably._
-          example: string
         - name: prv
           in: query
           schema:
             type: string
           description: >-
-            Specify the corresponding Base64 encoded certificate key. This field
+            Corresponding Base64 encoded certificate key. This parameter
             is required when `method` is set to `existing`. _Note: previous
-            releases referred to the `prv` field as `key`. Both `prv` and `key`
+            releases referred to the `prv` parameter as `key`. Both `prv` and `key`
             can be used interchangeably._
-          example: string
         - name: caref
           in: query
           schema:
             type: string
           description: >-
-            Specify the unique reference ID of the certificate signing authority
-            for the certificate. This field is required when `method` is set to
+            Unique reference ID of the existing certificate signing authority to use
+            for the certificate. This parameter is required when `method` is set to
             `internal`.
-          example: string
         - name: keytype
           in: query
           schema:
             type: string
+            enum: ["RSA", "ECDSA"]
           description: >-
-            Specify the private key type to generate. Options are `RSA` or
-            `ECDSA`. This field is required when `method` is set to `internal`.
-          example: string
+            Private key type to generate. Options are `RSA` or
+            `ECDSA`. This parameter is required when `method` is set to `internal`.
         - name: keylen
           in: query
           schema:
-            type: string
+            type: integer
+            enum: [1024, 2048, 3072, 4096, 6144, 7680, 8192, 15360, 16384]
           description: >-
-            Specify the private key length to generate. Options are `1024`,
-            `2048`, `3072`, `4096`, `6144`, `7680`, `8192`, `15360`, `16384`.
-            This field is required when `method` is set to `internal` AND
+            Specify the private key length to generate. This parameter is required when `method` is set to `internal` AND
             `keytype` is set to `RSA`.
-          example: integer
         - name: ecname
           in: query
           schema:
             type: string
           description: >-
-            Specify the elliptic curve name to use when generating the private
+            Elliptic curve name to use when generating the private
             key. It is recommended to view options and compatibility within the
             pfSense webConfigurator or manually through OpenSSL as certain
-            curves are not compatible in some circumstances. This field is
+            curves are not compatible in some circumstances. This parameter is
             required when `method` is set to `internal` AND `keytype` is set to
             `ECDSA`. _Note: options are subject to change, when in doubt, check
-            the pfSense webConfigurator options for this field._
-          example: string
+            the pfSense webConfigurator options for this parameter._
         - name: digest_alg
           in: query
           schema:
             type: string
+            enum: ["sha1", "sha224", "sha256", "sha384", "sha512"]
           description: >-
-            Specify the digest algorithm to use. Options are `sha1`, `sha224`,
-            `sha256`, `sha384` and `sha512`. This field is required when
+            Digest algorithm to use. This parameter is required when
             `method` is set to `internal`. _Note: options are subject to change,
             when in doubt, check the pfSense webConfigurator options for this
             field._
-          example: string
         - name: lifetime
           in: query
           schema:
-            type: string
+            type: integer
+            default: 3650
           description: >-
-            Specify the number of days you would like this certificate to be
+            Number of days you would like this certificate to be
             valid for. This must be below OpenSSL's maximum lifetime value
-            (around `12000` days). Defaults to `3650` days. This field is
-            required when `method` is set to `internal`. _Note: maximum value is
-            subject to change, when in doubt, check the pfSense webConfigurator
-            options for this field._
-          example: integer
+            (around `12000` days). This parameter is required when `method` is set 
+            to `internal`. _Note: maximum value is subject to change, when in doubt, 
+            check the pfSense webConfigurator options for this parameter._
         - name: dn_commonname
           in: query
           schema:
             type: string
           description: >-
-            Specify the common name of this certificate. In mose cases, this
-            will be a hostname. This field is required when `method` is set to
+            Common name of this certificate. In mose cases, this
+            will be a hostname. This parameter is required when `method` is set to
             `internal`.
-          example: string
         - name: dn_country
           in: query
           schema:
             type: string
           description: >-
-            Specify the country code for this certificate. This must be a known
-            2-digit country code. This field is only available when `method` is
-            set to `internal`. (optional)
-          example: string
+            Country code for this certificate. This must be a known
+            2-digit country code. This parameter is only available when `method` is
+            set to `internal`.
         - name: dn_state
           in: query
           schema:
             type: string
           description: >-
-            Specify the state or province for this certificate. This field is
-            only available when `method` is set to `internal`. (optional)
-          example: string
+            State or province for this certificate. This parameter is
+            only available when `method` is set to `internal`.
         - name: dn_city
           in: query
           schema:
             type: string
           description: >-
-            Specify the city or locale for this certificate. This field is only
-            available when `method` is set to `internal`. (optional)
-          example: string
+            City or locale for this certificate. This parameter is only
+            available when `method` is set to `internal`.
         - name: dn_organization
           in: query
           schema:
             type: string
           description: >-
-            Specify the managing organization for this certificate. This field
-            is only available when `method` is set to `internal`. (optional)
-          example: string
+            The managing organization for this certificate. This parameter
+            is only available when `method` is set to `internal`.
         - name: dn_organizationalunit
           in: query
           schema:
             type: string
           description: >-
-            Specify the managing organizational unit or team for this
-            certificate. This field is only available when `method` is set to
-            `internal`. (optional)
-          example: string
+            The managing organizational unit or team for this certificate. This parameter is only available when 
+            `method` is set to `internal`.
         - name: type
           in: query
+          description: Type of certificate to generate. This parameter is required when `method` is set to `internal`.
           schema:
             type: string
-          description: >-
-            Specify the certificate type. Options are `server` and `user`. This
-            field is only available when `method` is set to `internal`.
-          example: string
+            enum: ["server", "user"]
         - name: altnames
           in: query
+          example:
+            - {"dns": "example.com"}
+            - {"ip": "127.0.0.1"}
+            - {"uri": "http://example.com/test"}
+            - {"email": "example@example.com"}
           schema:
-            type: string
+            type: array
+            items:
+              type: object
           description: >-
-            Specify subject alternative names to list in this certificate. This
+            Subject alternative names to list in this certificate. This
             must be an array of objects with each object containing a alt name
             type as the key and the alt name value as the value. Supported alt
             name types are `dns` for FQDNs, `ip` for IP addresses, `uri` for
-            URLs, and `email` for email addresses. This field is only available
-            when `method` is set to `internal`. An example of a valid `altnames`
-            array is:
-
-             `[{"dns": "example.com"}, {"ip": "127.0.0.1"}, {"uri": "http://example.com/test"}, {"email": "example@example.com"}]`
-
-             (optional)
-          example: array
+            URLs, and `email` for email addresses. This parameter is only available
+            when `method` is set to `internal`.
         - name: active
           in: query
           schema:
+            type: boolean
+            default: false
+          description: >-
+            Set this certificate as the active certificate used by the webConfigurator. This parameter is only available
+            when `type` is set to `server` or `method` is set to `existing`.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    put:
+      tags:
+        - SYSTEM > CERTIFICATE
+      summary: Update certificate
+      description: >-
+        Update an imported SSL/TLS certificate.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`,
+        `page-system-certmanager`]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                cert: >-
+                  LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZxekNDQTVPZ0F3SUJBZ0lVQi9rT2RoMzdTZnRxeHRqL1MxSTRkUTQyYXRvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWxWVU1RMHdDd1lEVlFRSERBUlBjbVZ0TVNFdwpId1lEVlFRS0RCaEpiblJsY201bGRDQlhhV1JuYVhSeklGQjBlU0JNZEdReEZ6QVZCZ05WQkFNTURuUmxjM1F1CmMyVmpiV1YwTG1Odk1CNFhEVEl3TURJd05ESXdNelV3...
+                key: >-
+                  LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQ1N3d2dna29BZ0VBQW9JQ0FRREQ5RkNLU1U3SmY0QngKeWlKNkNOWGhOckI0ZVhjTk9TTm9GUVJIbXlsV2dHbEN5djMydFdicmF3RFhhQzk2aVpOSTFzNG5qWTdQT3BlWgpoNmFlaTJ5NllheS9VWWtOUkZGQmp4WlZlLzRwS2pKeXBQRlFBUlpMVko2TlNXaU5raGkwbDlqeWtacTlEbkFnCk1mclZyUEo1YktDM3JJVV...
+                descr: Updated Example Cert
+                active: true
+      parameters:
+        - name: crt
+          in: query
+          required: true
+          schema:
             type: string
           description: >-
-            Set this certificate as the active certificate used by the
-            webConfigurator. Only available when `type` is set to `server` or
-            `method` is set to `existing`. (optional)
-          example: boolean
+            Base64 encoded PEM certificate to import. _Note: previous
+            releases referred to the `crt` parameter as `cert`. Both `crt` and
+            `cert` can be used interchangeably._
+        - name: prv
+          in: query
+          required: true
+          schema:
+            type: string
+          description: >-
+            Corresponding Base64 encoded certificate key. _Note: previous
+            releases referred to the `prv` parameter as `key`. Both `prv` and `key`
+            can be used interchangeably._
+        - name: descr
+          in: query
+          description: Descriptive name for the certificate.
+          schema:
+            type: string
+        - name: active
+          in: query
+          description: Set this certificate as the active certificate used by the webConfigurator.
+          schema:
+            type: boolean
+            default: false
       responses:
         '200':
           description: Successful response
@@ -7428,40 +7346,19 @@ paths:
     delete:
       tags:
         - SYSTEM > CERTIFICATE
-      summary: Delete System Certificates
+      summary: Delete certificate
       description: >-
-        Delete an existing certificate.<br><br>
-
+        Delete an existing SSL/TLS certificate.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-certmanager`]
       parameters:
         - name: refid
           in: query
+          description: The `refid` of the certificate to delete.
+          required: true
           schema:
             type: string
-          description: >-
-            Specify the refid of the certificate to delete (required if `id` and
-            `descr` are not defined)
-          example: string
-        - name: id
-          in: query
-          schema:
-            type: string
-          description: >-
-            Specify the configuration ID number of the certificate to delete
-            (required if `refid` and `descr` are not defined)
-          example: string
-        - name: descr
-          in: query
-          schema:
-            type: string
-          description: >-
-            Specify the description of the certificate to delete (required if
-            `id` and `refid` are not defined) _Note: if multiple certificates
-            exist with the same name, only the first matching certificate will
-            be deleted_
-          example: string
       responses:
         '200':
           description: Successful response
@@ -7471,10 +7368,9 @@ paths:
     get:
       tags:
         - SYSTEM > CA
-      summary: Read System CAs
+      summary: Read CA certificates
       description: >-
-        Read installed CAs.<br><br>
-
+        Read installed CA certificates.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-camanager`]
@@ -7486,10 +7382,9 @@ paths:
     post:
       tags:
         - SYSTEM > CA
-      summary: Create System CA
+      summary: Create or import CA certificate
       description: >-
-        Add a new CA certificate.<br><br>
-
+        Generate or import a new CA certificate.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-camanager`]
@@ -7504,184 +7399,163 @@ paths:
                   LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUZxekNDQTVPZ0F3SUJBZ0lVQi9rT2RoMzdTZnRxeHRqL1MxSTRkUTQyYXRvd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNWVk14Q3pBSkJnTlZCQWdNQWxWVU1RMHdDd1lEVlFRSERBUlBjbVZ0TVNFdwpId1lEVlFRS0RCaEpiblJsY201bGRDQlhhV1JuYVhSeklGQjBlU0JNZEdReEZ6QVZCZ05WQkFNTURuUmxjM1F1CmMyVmpiV1YwTG1Odk1CNFhEVEl3TURJd05ESXdNelV3...
                 prv: >-
                   LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUpRZ0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQ1N3d2dna29BZ0VBQW9JQ0FRREQ5RkNLU1U3SmY0QngKeWlKNkNOWGhOckI0ZVhjTk9TTm9GUVJIbXlsV2dHbEN5djMydFdicmF3RFhhQzk2aVpOSTFzNG5qWTdQT3BlWgpoNmFlaTJ5NllheS9VWWtOUkZGQmp4WlZlLzRwS2pKeXBQRlFBUlpMVko2TlNXaU5raGkwbDlqeWtacTlEbkFnCk1mclZyUEo1YktDM3JJVV...
-                descr: TEST CA
+                descr: Example CA
       parameters:
         - name: method
           in: query
+          required: true
           schema:
             type: string
+            enum: ["import", "existing", "internal", "intermediate"]
           description: >-
-            Set the method used to add the CA. Current supported methods are
-            `existing`, `internal`, and `intermediate`. _Note: previous releases
+            Method used to add the CA. _Note: previous releases
             referred to the `existing` method as `import`. You may use
             `existing` or `import` interchangeably._
-          example: string
         - name: descr
           in: query
+          description: Descriptive name for the CA.
+          required: true
           schema:
             type: string
-          description: Set a descriptive name for the certificate
-          example: string
         - name: trust
           in: query
+          description: Trust this CA across the entire system.
           schema:
-            type: string
-          description: >-
-            Specify `true` if you would like the system to trust this CA
-            (optional)
-          example: boolean
+            type: boolean
+            default: false
         - name: randomserial
           in: query
+          description: Use randomized serial numbers for certificates signed by this CA.
           schema:
-            type: string
-          description: >-
-            Specify `true` if you would like certificates signed by this CA to
-            utilize randomized serial numbers (optional)
-          example: boolean
+            type: boolean
+            default: false
         - name: crt
           in: query
           schema:
             type: string
-          description: >-
-            Specify the Base64 encoded PEM CA certificate to import. This field
+          description: Base64 encoded PEM CA certificate to import. This parameter
             is required when `method` is set to `existing`.
-          example: string
         - name: prv
           in: query
           schema:
             type: string
           description: >-
-            Specify the corresponding Base64 encoded CA certificate key. This
-            field is only available when `method` is set to `existing`.
-            (optional)
-          example: string
+            Corresponding Base64 encoded CA certificate key. This
+            parameter is only available when `method` is set to `existing`.
         - name: serial
           in: query
           schema:
-            type: string
+            type: integer
+            default: 1
+            minimum: 1
           description: >-
-            Specify the serial number to be assigned to the next certificate
-            signed by this CA. Defaults to 1. This field is only available when
-            `method` is set to `existing`. (optional)
-          example: integer
+            Set the serial number to be assigned to the next certificate
+            signed by this CA. This field is only available when
+            `method` is set to `existing`.
         - name: caref
           in: query
           schema:
             type: string
           description: >-
-            Specify the unique reference ID of the certificate signing authority
-            for the intermediate certificate. This field is required when
+            Specify the unique reference ID of the root certificate signing authority
+            for the intermediate CA certificate. This parameter is required when
             `method` is set to `intermediate`.
-          example: string
         - name: keytype
           in: query
           schema:
             type: string
+            enum: ["RSA", "ECDSA"]
           description: >-
-            Specify the private key type to generate. Options are `RSA` or
-            `ECDSA`. This field is required when `method` is set to `internal`
+            Specify the private key type to generate. This parameter is required when `method` is set to `internal`
             or `intermediate`.
-          example: string
         - name: keylen
           in: query
           schema:
-            type: string
+            type: integer
+            enum: [1024, 2048, 3072, 4096, 6144, 7680, 8192, 15360, 16384]
           description: >-
-            Specify the private key length to generate. Options are `1024`,
-            `2048`, `3072`, `4096`, `6144`, `7680`, `8192`, `15360`, `16384`.
-            This field is required when `method` is set to `internal` or
+            Private key length to generate. This parameter is required when `method` is set to `internal` or
             `intermediate` AND `keytype` is set to `RSA`.
-          example: integer
         - name: ecname
           in: query
           schema:
             type: string
           description: >-
-            Specify the elliptic curve name to use when generating the private
+            Elliptic curve name to use when generating the private
             key. It is recommended to view options and compatibility within the
             pfSense webConfigurator or manually through OpenSSL as certain
-            curves are not compatible in some circumstances. This field is
+            curves are not compatible in some circumstances. This parameter is
             required when `method` is set to `internal` or `intermediate` AND
             `keytype` is set to `ECDSA`. _Note: options are subject to change,
             when in doubt, check the pfSense webConfigurator options for this
             field._
-          example: string
         - name: digest_alg
           in: query
           schema:
             type: string
+            enum: ["sha1", "sha224", "sha256", "sha384", "sha512"]
           description: >-
-            Specify the digest algorithm to use. Options are `sha1`, `sha224`,
-            `sha256`, `sha384` and `sha512`. This field is required when
+            Digest algorithm to use. This parameter is required when
             `method` is set to `internal` or `intermediate`. _Note: options are
             subject to change, when in doubt, check the pfSense webConfigurator
             options for this field._
-          example: string
         - name: lifetime
           in: query
           schema:
-            type: string
+            type: integer
+            default: 3650
           description: >-
-            Specify the number of days you would like this CA to be valid for.
+            Number of days you would like this CA to be valid for.
             This must be below OpenSSL's maximum lifetime value (around `12000`
-            days). Defaults to `3650` days. This field is required when `method`
+            days). This parameter is required when `method`
             is set to `internal` or `intermediate`. _Note: maximum value is
             subject to change, when in doubt, check the pfSense webConfigurator
             options for this field._
-          example: integer
         - name: dn_commonname
           in: query
           schema:
             type: string
           description: >-
-            Specify the common name of this CA. In mose cases, this will be a
-            hostname. This field is required when `method` is set to `internal`
+            Common name of this CA. In mose cases, this will be a
+            hostname. This parameter is required when `method` is set to `internal`
             or `intermediate`.
-          example: string
         - name: dn_country
           in: query
           schema:
             type: string
           description: >-
-            Specify the country code for this CA. This must be a known 2-digit
-            country code. This field is only available when `method` is set to
-            `internal` or `intermediate`. (optional)
-          example: string
+            Country code for this CA. This must be a known 2-digit
+            country code. This parameter is only available when `method` is set to
+            `internal` or `intermediate`.
         - name: dn_state
           in: query
           schema:
             type: string
           description: >-
-            Specify the state or province for this CA. This field is only
+            State or province for this CA. This parameter is only
             available when `method` is set to `internal` or `intermediate`.
-            (optional)
-          example: string
         - name: dn_city
           in: query
           schema:
             type: string
           description: >-
-            Specify the city or locale for this CA. This field is only available
-            when `method` is set to `internal` or `intermediate`. (optional)
-          example: string
+            City or locale for this CA. This parameter is only available
+            when `method` is set to `internal` or `intermediate`.
         - name: dn_organization
           in: query
           schema:
             type: string
           description: >-
-            Specify the managing organization for this CA. This field is only
+            The managing organization for this CA. This parameter is only
             available when `method` is set to `internal` or `intermediate`.
-            (optional)
-          example: string
         - name: dn_organizationalunit
           in: query
           schema:
             type: string
           description: >-
-            Specify the managing organizational unit or team for this CA. This
-            field is only available when `method` is set to `internal` or
-            `intermediate`. (optional)
-          example: string
+            The managing organizational unit or team for this CA. This
+            parameter is only available when `method` is set to `internal` or
+            `intermediate`.
       responses:
         '200':
           description: Successful response
@@ -7690,31 +7564,20 @@ paths:
     delete:
       tags:
         - SYSTEM > CA
-      summary: Delete System CA
+      summary: Delete CA certificate
       description: >-
-        Delete an existing CA.<br><br>
-
+        Delete an existing CA certificate.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-camanager`]
       parameters:
         - name: refid
           in: query
+          required: true
           schema:
             type: string
           description: >-
-            Specify the refid of the CA to delete (required if `descr` is  not
-            defined)
-          example: string
-        - name: descr
-          in: query
-          schema:
-            type: string
-          description: >-
-            Specify the description of the CA to delete (required if `refid` is
-            not defined) _Note: if multiple CA exist with the same name, only
-            the first matching CA will be deleted_
-          example: string
+            The `refid` of the existing CA to delete.
       responses:
         '200':
           description: Successful response
@@ -7724,13 +7587,12 @@ paths:
     get:
       tags:
         - SYSTEM > CRL
-      summary: Read System CRLs
+      summary: Read CRLs
       description: >-
         Read installed CRLs.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
-        `page-system-camanager`]
+        `page-system-crlmanager`]
       responses:
         '200':
           description: Successful response
@@ -7739,13 +7601,12 @@ paths:
     post:
       tags:
         - SYSTEM > CRL
-      summary: Create System CRL
+      summary: Create CRL
       description: >-
         Add a new CRL.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
-        `page-system-camanager`]
+        `page-system-crlmanager`]
       requestBody:
         content:
           application/json:
@@ -7753,68 +7614,66 @@ paths:
               type: object
               example:
                 method: internal
-                descr: INTERNAL_CRL
+                descr: EXAMPLE_CRL
                 caref: 61c410f04b782
                 lifetime: 3650
                 serial: 10
       parameters:
         - name: caref
           in: query
+          required: true
           schema:
             type: string
           description: >-
             Specify the unique reference ID of the certificate signing authority
             for the certificate revocation list.
-          example: string
         - name: method
           in: query
+          required: true
           schema:
             type: string
+            enum: ["existing", "internal"]
           description: >-
-            Set the method used to add the certificate revocation list. Current
-            supported methods are `existing` and `internal`. _Note: `internal`
+            Method used to add the certificate revocation list. _Note: `internal`
             method will create new certificate revocation list for CA provided
             in `caref`_.
-          example: string
         - name: descr
           in: query
+          description: Descriptive name for the certificate revocation list.
+          required: true
           schema:
             type: string
-          description: Set a descriptive name for the certificate revocation list
-          example: string
         - name: crl_data
           in: query
           schema:
             type: string
           description: >-
-            Specify the Base64 encoded PEM certificate revocation list to
-            import. This field is required when `method` is set to `existing`.
+            Base64 encoded PEM certificate revocation list to
+            import. This parameter is required when `method` is set to `existing`.
             _Note: Import Certificate Revocation List in X.509 CRL format.
             `-----BEGIN X509 CRL-----[A bunch of random-looking base64-encoded
             data]-----END X509 CRL-----`._
-          example: string
         - name: lifetime
           in: query
           schema:
-            type: string
+            type: integer
+            default: 9999
           description: >-
-            Specify the number of days you would like this certificate
+            Number of days you would like this certificate
             revocation list to be valid for. This must be below OpenSSL's
-            maximum lifetime value (around `12000` days). Defaults to `9999`
-            days. This field is only available when `method` is set to
-            `internal`. _Note: maximum value is subject to change, when in
-            doubt, check the pfSense webConfigurator options for this field._
-            (optional)
-          example: integer
+            maximum lifetime value (around `12000` days). This parameter is 
+            only available when `method` is set to `internal`. _Note: maximum 
+            value is subject to change, when in doubt, check the pfSense webConfigurator 
+            options for this field._
         - name: serial
           in: query
           schema:
-            type: string
+            type: integer
+            default: 0
           description: >-
-            Specify the serial number to be assigned to the next certificate
-            revocation list. Defaults to 0. This field is only available when
-            `method` is set to `internal`. (optional)
-          example: integer
+            Serial number to be assigned to the next certificate
+            revocation list. This parameter is only available when
+            `method` is set to `internal`.
       responses:
         '200':
           description: Successful response
@@ -7823,32 +7682,20 @@ paths:
     delete:
       tags:
         - SYSTEM > CRL
-      summary: Delete System CRL
+      summary: Delete CRL
       description: >-
         Delete an existing CRL.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
-        `page-system-camanager`]
+        `page-system-crlmanager`]
       parameters:
         - name: refid
           in: query
+          required: true
           schema:
             type: string
           description: >-
-            Specify the refid of the certificate revocation list to delete
-            (required if `descr` is  not defined)
-          example: string
-        - name: descr
-          in: query
-          schema:
-            type: string
-          description: >-
-            Specify the description of the certificate revocation list to delete
-            (required if `refid` is not defined) _Note: if multiple certificate
-            revocation list exist with the same name, only the first matching
-            certificate revocation list will be deleted_
-          example: string
+            The `refid` of the existing certificate revocation list to delete.
       responses:
         '200':
           description: Successful response
@@ -7858,10 +7705,9 @@ paths:
     get:
       tags:
         - SYSTEM > API
-      summary: Read System API Configuration
+      summary: Read API configuration
       description: >-
-        Read current API configuration.<br><br>
-
+        Read the current API configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-api`]
@@ -7873,10 +7719,9 @@ paths:
     put:
       tags:
         - SYSTEM > API
-      summary: Update System API Configuration
+      summary: Update API configuration
       description: >-
         Update the API configuration.<br><br>
-
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-api`]
@@ -7901,152 +7746,143 @@ paths:
         - name: enable
           in: query
           schema:
-            type: string
+            type: boolean
           description: >-
-            Disable the API. If set to `false`, the API will be disable and no
-            further API requests can be made. In most cases this Is not
-            necessary. (optional)
-          example: boolean
+            Enable or disable the API. If set to `false`, the API will be disabled and you will no longer be able to 
+            API requests until the API enabled via the webConfigurator.
         - name: persist
           in: query
           schema:
-            type: string
+            type: boolean
           description: >-
-            Enable/disable persistent API configuration. If set to `true`,
-            pfSense API will store a copy of the API configuration In the case a
-            system update or package update Is needed and/or the API
+            Enable or disable persistent API configuration. If set to `true`,
+            the API will store a copy of the API configuration in the case a
+            system update or package update is needed and/or the API
             configuration must be restored. If set to `false`, all API
             configuration will be lost whenever the system updates, the package
-            Is updated, or the package Is deleted. It Is recommended to keep
-            this feature enabled. (optional)
-          example: boolean
+            is updated, or the package is deleted. It is recommended to keep
+            this feature enabled.
         - name: readonly
           in: query
           schema:
-            type: string
+            type: boolean
           description: >-
-            Enable read only mode. If set to `true`, the API will only answer
-            read (GET) requests. This also means you will not be able to disable
-            read only mode from the API.
-          example: boolean
+            Enable or disable read-only API mode. If `true`, the API will only respond to read requests and
+            modifications to configuration will not be allowed.
         - name: allow_options
           in: query
           schema:
-            type: string
+            type: boolean
           description: >-
-            Enable/disable the OPTIONS request method from API responses. If set
+            Enable or disable the OPTIONS request method from API responses. If set
             to `true`, the API will answer OPTIONS requests. If set to `false`,
-            the API will return a 405 Method Not Allowed response. (optional)
-          example: boolean
+            the API will return a 405 Method Not Allowed response.
         - name: available_interfaces
           in: query
+          example: ["lan", "localhost"]
           schema:
-            type: string
+            type: array
+            items:
+              type: string
           description: >-
-            Update the Interfaces that are allowed to answer API requests. Each
-            Item In the array must be a valid physical Interface ID (e.g.
-            `"em0"`), pfSense Interface ID, (e.g. `"opt1"`),  or descriptive
-            Interface name (e.g. `"WAN"`). Additionally you may add
-            `"localhost"` to allow local API requests, or add `"any"` to allow
-            any Interface to answer API requests. It Is best practice to only
-            allow Inside Interfaces to answer API requests, or use firewall
-            rules to filter requests made to outside Interfaces. (optional)
-          example: array
+            Interfaces that are allowed to answer API requests. Each
+            item in the array must be a valid real interface ID (e.g.
+            `em0`), pfSense interface ID, (e.g. `opt1`), or descriptive
+            interface name (e.g. `"WAN"`). Additionally you may add
+            `localhost` to allow local API requests, or add `any` to allow
+            any interface to answer API requests. It is best practice to only
+            allow inside interfaces to answer API requests, or use firewall
+            rules to filter requests made to outside interfaces.
         - name: authmode
           in: query
           schema:
             type: string
+            enum: ["local", "jwt", "token"]
           description: >-
-            Update the API authentication mode. Choices are `"local"` for local
-            database authentication, `"jwt"` for JWT bearer token
-            authentication, and `"token"` for standalone API token
-            authentication. (optional)
-          example: string
+            Update the API authentication mode.
         - name: jwt_exp
           in: query
           schema:
-            type: string
+            type: integer
+            minimum: 300
+            maximum: 86400
           description: >-
-            Update the JWT expiration interval (in seconds). Value must be an
-            Integer greater or equal to `300` and less than or equal to `86400`.
-            This Is only applicable when the `authmode` setting Is set to `jwt`.
-            (optional)
-          example: integer
+            JWT expiration interval (in seconds). This parameter is only available when `authmode` is set 
+            to `jwt`.
         - name: keyhash
           in: query
           schema:
             type: string
+            enum: ["sha256", "sha384", "sha512", "md5"]
           description: >-
-            Update the hashing algorithm to use when generating API tokens.
-            Choices are `"sha256"`, `"sha384"`, `"sha512"`, and `"md5"`. This Is
-            only applicable when the `authmode` setting Is set to `token`.
-            (optional)
-          example: string
+            Hashing algorithm to use when generating API tokens. This parameter is only available when `authmode` is 
+            set to `token`.
         - name: keybytes
           in: query
           schema:
-            type: string
+            type: integer
+            enum: [16, 32, 64]
           description: >-
-            Update the key byte strength to use when generating API tokens.
-            Choices are `16`, `32` and `64`. This Is only applicable when the
-            `authmode` setting Is set to `token`. (optional)
-          example: integer
+            Key byte strength to use when generating API tokens. This parameter is only available when `authmode` is 
+            set to `token`.
         - name: custom_headers
           in: query
+          example:
+            - {"Custom-Header-1": "custom header 1 value"}
+            - {"Custom-Header-2": "custom header 2 value"}
           schema:
-            type: string
+            type: array
+            items:
+              type: object
           description: >-
-            Update the custom response headers for the API to return in API
-            responses. This must be an array of key-value pairs (e.g.
-            `{"custom-header": "custom-header-value}`. To revert custom headers
-            to the default state, simply pass in an empty array. In most cases,
-            custom headers are not necessary. An example use case for custom
-            headers is setting CORS policy headers required by some frontend web
-            applications. (optional)
-          example: array
+            Custom response headers for the API to return in API
+            responses. To revert custom headers to the default state, simply pass in an empty array. In most cases,
+            custom headers are not necessary. An example use case for custom headers is setting CORS policy headers 
+            required by some frontend web applications.
         - name: access_list
           in: query
+          example: ["127.0.0.1/32", "192.168.1.0/24"]
           schema:
-            type: string
+            type: array
+            items: 
+              type: string
           description: >-
-            Update the API access list. This must be an array of IPv4 or IPv6
+            Set the API access list. This must be an array of IPv4 or IPv6
             subnets in CIDR notation. If left blank, all subnets will be
-            allowed. (optional)
-          example: array
+            allowed.
         - name: hasync
           in: query
+          description: Enable or disable HA sync for API configurations.
           schema:
-            type: string
-          description: Enable or disable HA sync for API configurations. (optional)
-          example: boolean
+            type: boolean
         - name: hasync_hosts
           in: query
+          example: ["pfsense-node-1.example.com", "pfsense-node-2.example.com"]
           schema:
-            type: string
+            type: array
+            items:
+              type: string
           description: >-
-            Update the hosts to sync API configurations to. This must be an
+            Hosts to sync API configurations to. This must be an
             array of IP addresses or FQDN strings. At least one host must be
-            specified when HA sync is enabled. (optional)
-          example: array
+            specified when `hasync` is set to `true`.
         - name: hasync_username
           in: query
           schema:
             type: string
           description: >-
-            Update the username to authenticate as for HA synchronization. This
+            Username to authenticate as for HA synchronization. This
             user must be present on ALL hosts specified in the `hasync_hosts`
-            field and must hold the `page-system-api` privilege. A value must be
-            set when HA sync is enabled. (optional)
-          example: string
+            value and must hold the `page-system-api` privilege. This parameter
+            is required when `hasync` is set to `true`.
         - name: hasync_password
           in: query
           schema:
             type: string
+            format: password
           description: >-
-            Update the password of the username to authenticate as for HA
-            synchronization. A value must be set when HA sync is enabled.
-            (optional)
-          example: string
+            Password of the username to authenticate as for HA synchronization. This parameter is required when 
+            `hasync` is set to `true`.
       responses:
         '200':
           description: Successful response
@@ -8056,9 +7892,9 @@ paths:
     get:
       tags:
         - SYSTEM > API
-      summary: Read System API Error Library
+      summary: Read API error library
       description: >-
-        Read our error code library. This function does NOT require
+        Read the error code library. This function does not require
         authentication and is intended to be used by third-party
         scripts/software to translate error codes to their full error message.
       responses:
@@ -8070,11 +7906,10 @@ paths:
     get:
       tags:
         - SYSTEM > API
-      summary: Read System API Version
+      summary: Read API version
       description: >-
         Read the current API version and locate available version
         updates.<br><br>
-
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-api`]
@@ -8087,22 +7922,21 @@ paths:
     delete:
       tags:
         - SYSTEM > DNS > SERVER
-      summary: Delete System DNS Server
+      summary: Remove system DNS servers
       description: >-
-        Delete existing system DNS servers.<br><br>
-
+        Remove existing system DNS servers.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system`]
       parameters:
         - name: dnsserver
           in: query
+          description: IP(s) of the system DNS servers to remove.
+          example: ["192.168.1.1", "172.16.12.5"]
           schema:
-            type: string
-          description: >-
-            Specify the IP(s) of the DNS servers to delete. Single values may be
-            specified as string, multiple values may be specified as array
-          example: array or string
+            type: array
+            items:
+              type: string
       responses:
         '200':
           description: Successful response
@@ -8111,10 +7945,9 @@ paths:
     post:
       tags:
         - SYSTEM > DNS > SERVER
-      summary: Create System DNS Server
+      summary: Add system DNS servers
       description: >-
-        Add a new DNS server to our system DNS servers.<br><br>
-
+        Add new DNS servers to the system DNS servers.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system`]
@@ -8124,16 +7957,16 @@ paths:
             schema:
               type: object
               example:
-                dnsserver: 1.1.1.1
+                dnsserver: [192.168.1.5]
       parameters:
         - name: dnsserver
           in: query
+          description: IP(s) of the DNS servers to add.
+          example: ["192.168.1.1", "172.16.12.5"]
           schema:
-            type: string
-          description: >-
-            Specify the IP(s) of the DNS servers to add. Single values may be
-            specified as string, multiple values may be specified as array
-          example: array or string
+            type: array
+            items:
+              type: string
       responses:
         '200':
           description: Successful response
@@ -8143,10 +7976,9 @@ paths:
     get:
       tags:
         - SYSTEM > DNS
-      summary: Read System DNS
+      summary: Read system DNS settings
       description: >-
-        Read current system DNS configuration.<br><br>
-
+        Read current system DNS settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system`]
@@ -8158,10 +7990,9 @@ paths:
     put:
       tags:
         - SYSTEM > DNS
-      summary: Update System DNS
+      summary: Update system DNS settings
       description: >-
-        Modify the existing system DNS configuration.<br><br>
-
+        Modify the existing system DNS settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system`]
@@ -8180,27 +8011,22 @@ paths:
       parameters:
         - name: dnsserver
           in: query
+          description: DNS servers to assign the system. Existing values will be overwritten.
+          example: [192.168.1.5, 172.16.12.5]
           schema:
-            type: string
-          description: >-
-            Specify which DNS servers to assign the system. Single values may be
-            passed in as string, multiple values may be passed in as array of
-            strings. Any existing configuration will be overwritten (optional)
-          example: array or string
+            type: array
+            items:
+              type: string
         - name: dnsallowoverride
           in: query
           schema:
-            type: string
-          description: >-
-            Enable or disable DNS override on WAN interfaces configured using
-            DHCP (optional)
-          example: boolean
+            type: boolean
+          description: Allow or deny DNS server list to be overridden by DHCP/PPP on WAN or remote OpenVPN server.
         - name: dnslocalhost
           in: query
           schema:
-            type: string
-          description: Enable or disable local system DNS queries (optional)
-          example: boolean
+            type: boolean
+          description: Enable or disable system DNS resolution via local DNS services.
       responses:
         '200':
           description: Successful response
@@ -8210,10 +8036,9 @@ paths:
     get:
       tags:
         - SYSTEM > TUNABLE
-      summary: Read System Tunables
+      summary: Read system tunables
       description: >-
-        Read current sysctl tunable configuration.<br><br>
-
+        Read current system tunable configurations.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-advanced-sysctl`]
@@ -8225,10 +8050,9 @@ paths:
     post:
       tags:
         - SYSTEM > TUNABLE
-      summary: Create System Tunables
+      summary: Create system tunable
       description: >-
-        Create a new sysctl tunable.<br><br>
-
+        Create a new system tunable.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-advanced-sysctl`]
@@ -8238,30 +8062,27 @@ paths:
             schema:
               type: object
               example:
-                tunable: test3
+                tunable: example
                 value: 1
-                descr: A test tunable added via pfSense API
+                descr: An example tunable added via API
       parameters:
         - name: tunable
           in: query
+          description: Name of this tunable. This should be a value recognized by sysctl.
+          required: true
           schema:
             type: string
-          description: >-
-            Specify the name of this tunable. This should be a value recognized
-            by sysctl
-          example: string
         - name: value
           in: query
+          description: Value to assign this tunable.
+          required: true
           schema:
             type: string
-          description: Specify the value to set this tunable
-          example: string or Integer
         - name: descr
           in: query
+          description: Description for this tunable.
           schema:
             type: string
-          description: Specify a description for this tunable (optional)
-          example: string
       responses:
         '200':
           description: Successful response
@@ -8270,10 +8091,9 @@ paths:
     put:
       tags:
         - SYSTEM > TUNABLE
-      summary: Update System Tunables
+      summary: Update system tunable
       description: >-
-        Update an existing sysctl tunable.<br><br>
-
+        Update an existing system tunable.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-advanced-sysctl`]
@@ -8283,37 +8103,32 @@ paths:
             schema:
               type: object
               example:
-                id: testnew
-                tunable: test
-                value: '2'
-                descr: A new test tunable added via pfSense API
+                id: example
+                tunable: updated.example
+                value: 0
+                descr: An updated example tunable added via API
       parameters:
         - name: id
           in: query
+          description: Name of the existing tunable to update.
+          required: true
           schema:
             type: string
-          description: Specify the name of the tunable to update
-          example: string
         - name: tunable
           in: query
+          description: New name to assign this tunable. This should be a value recognized by sysctl.
           schema:
             type: string
-          description: >-
-            Update the name of this tunable. This should be a value recognized
-            by sysctl. (optional)
-          example: string
         - name: value
           in: query
+          description: Value to assign this tunable.
           schema:
             type: string
-          description: Update the value to set this tunable (optional)
-          example: string or Integer
         - name: descr
           in: query
+          description: Description for this tunable.
           schema:
             type: string
-          description: Update a description for this tunable (optional)
-          example: string
       responses:
         '200':
           description: Successful response
@@ -8322,20 +8137,19 @@ paths:
     delete:
       tags:
         - SYSTEM > TUNABLE
-      summary: Delete System Tunables
+      summary: Delete system tunable
       description: >-
-        Delete an existing sysctl tunable.<br><br>
-
+        Delete an existing system tunable.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-advanced-sysctl`]
       parameters:
         - name: id
           in: query
+          description: Name of the existing tunable to delete.
+          required: true
           schema:
             type: string
-          description: Specify the name of the tunable to delete
-          example: string
       responses:
         '200':
           description: Successful response
@@ -8345,10 +8159,9 @@ paths:
     get:
       tags:
         - SYSTEM > TABLE
-      summary: Read System Tables
+      summary: Read tables
       description: >-
         Read existing table entries.<br><br>
-
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-diagnostics-tables`]
@@ -8361,10 +8174,9 @@ paths:
     put:
       tags:
         - SYSTEM > CONSOLE
-      summary: Update Console Settings
+      summary: Update console settings
       description: >-
-        Updates the console settings.<br><br>
-
+        Update console settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-advanced-admin`]
@@ -8378,12 +8190,9 @@ paths:
       parameters:
         - name: disableconsolemenu
           in: query
+          description: Enable or disable console password protection.
           schema:
-            type: string
-          description: >-
-            Enable or disable console password protection. `true` to enable,
-            `false` to disable.
-          example: boolean
+            type: boolean
       responses:
         '200':
           description: Successful response
@@ -8393,19 +8202,12 @@ paths:
     post:
       tags:
         - SYSTEM > REBOOT
-      summary: Create System Reboot
+      summary: Initiate system reboot
       description: >-
-        Reboots the pfSense system.<br><br>
-
+        Reboot the pfSense system.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-diagnostics-rebootsystem`]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example: {}
       responses:
         '200':
           description: Successful response
@@ -8415,19 +8217,12 @@ paths:
     post:
       tags:
         - SYSTEM > HALT
-      summary: Halt System
+      summary: Initiate system shutdown
       description: >-
-        Halts the pfSense system.<br><br>
-
+        Shutdown the pfSense system.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-diagnostics-haltsystem`]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example: {}
       responses:
         '200':
           description: Successful response
@@ -8437,11 +8232,10 @@ paths:
     get:
       tags:
         - ROUTING > GATEWAY > DETAIL
-      summary: Read Routing Gateway Details
+      summary: Read gateway details
       description: >-
         Read verbose routing gateway details about both dynamic/system gateways
         and static gateways.<br><br>
-
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-gateways`]
@@ -8454,14 +8248,12 @@ paths:
     get:
       tags:
         - ROUTING > GATEWAY
-      summary: Read Routing Gateways
+      summary: Read gateways
       description: >-
-        Read routing gateways.<br><br>
-
+        Read existing gateways.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-gateways`]
-
 
         _Note: This endpoint originally returned verbose routing gateway
         details. This functionality has moved to
@@ -8474,25 +8266,21 @@ paths:
     delete:
       tags:
         - ROUTING > GATEWAY
-      summary: Delete Routing Gateways
+      summary: Delete gateway
       description: >-
-        Delete existing routing gateways. __Note: gateway deletions will be
-        applied immediately, there is no need to apply routing changes
-        afterwards__<br><br>
-
+        Delete an existing routing gateway.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-gateways-editgateway`]
       parameters:
         - name: id
           in: query
+          required: true
           schema:
-            type: string
-          description: >-
-            Specify the ID of the gateway to delete. _Note: If you are obtaining
-            the ID via GET request, the ID will be included in the response
-            within the `attribute` field of the object._
-          example: integer
+            type: integer
+          description: >- 
+            ID of the gateway to delete. Refer to the 'Obtaining Object IDs' section in the documentation
+            intro for help obtaining this ID.
       responses:
         '200':
           description: Successful response
@@ -8501,10 +8289,9 @@ paths:
     post:
       tags:
         - ROUTING > GATEWAY
-      summary: Create Routing Gateways
+      summary: Create gateway
       description: >-
-        Create new routing gateways.<br><br>
-
+        Create a new gateway.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-gateways-editgateway`]
@@ -8515,7 +8302,7 @@ paths:
               type: object
               example:
                 interface: wan
-                name: TEST_GATEWAY
+                name: EXAMPLE_GATEWAY
                 ipprotocol: inet
                 gateway: 172.16.209.1
                 monitor: 172.16.209.250
@@ -8523,193 +8310,176 @@ paths:
       parameters:
         - name: interface
           in: query
+          required: true
           schema:
             type: string
           description: >-
-            Set which interface the gateway will apply to. You may specify
+            Interface the gateway will apply to. You may specify
             either the interface's descriptive name, the pfSense ID (wan, lan,
-            optx), or the physical interface id (e.g. igb0).
-          example: string
+            optx), or the real interface ID (e.g. igb0).
         - name: ipprotocol
           in: query
+          description: IP protocol this gateway will apply to.
+          required: true
           schema:
             type: string
-          description: >-
-            Set what IP protocol this gateway will serve. Options are `inet` for
-            IPv4, or `inet6` for IPv6.
-          example: string
+            enum: ["inet", "inet6"]
         - name: name
           in: query
+          required: true
           schema:
             type: string
-          description: >-
-            Set a descriptive name for this gateway. This name must be unique,
-            and can only contains alphanumeric characters and underscores.
-          example: string
+          description: >- 
+            Descriptive name for this gateway. This name must be unique,
+            and can only contain alphanumeric characters and underscores.
         - name: gateway
           in: query
+          required: true
           schema:
             type: string
           description: >-
-            Set the IP address of the gateway. This value must be a valid IPv4
-            address If you have set your `ipprotocol` value to `inet`, or it
-            must be a valid IPv6 address if you have set your `ipprotocol` value
-            to `inet6`. Unlike the pfSense webConfigurator, this address Is not
-            restricted to an address within the interfaces subnet by default.
-          example: string
+            IP address of the gateway. This value must be a valid IPv4
+            address if  `ipprotocol` is set to `inet`, or a valid IPv6 
+            address if `ipprotocol` is set to `inet6`.
         - name: monitor
           in: query
           schema:
             type: string
           description: >-
-            Set the IP address used to monitor this gateway. This is usually
-            only necessary if the `gateway` IP does not accept ICMP probes.
-            Defaults to the `gateway` address. (optional)
-          example: string
+            IP address used to monitor this gateway. This is only necessary if the `gateway` IP does not accept ICMP probes.
+            Defaults to the `gateway` value.
         - name: disabled
           in: query
+          description: Disable this gateway.
           schema:
-            type: string
-          description: Disable this gateway upon creation. Defaults to false. (optional)
-          example: boolean
+            type: boolean
+            default: false
         - name: monitor_disable
           in: query
+          description: Disable gateway monitoring for this gateway.
           schema:
-            type: string
-          description: >-
-            Disable gateway monitoring for this gateway. Defaults to false.
-            (optional)
-          example: boolean
+            type: boolean
+            default: false
         - name: action_disable
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
             Disable any action taken on gateway events for this gateway. This
-            will consider the gateway always up. Defaults to false. (optional)
-          example: boolean
+            will consider the gateway as always up.
         - name: force_down
           in: query
+          description: Force this gateway to always be considered down.
           schema:
-            type: string
-          description: >-
-            Force this gateway to always be considered down. Defaults to false.
-            (optional)
-          example: boolean
+            type: boolean
+            default: false
         - name: descr
           in: query
+          description: Description for this gateway.
           schema:
             type: string
-          description: Set a description for this gateway (optional)
-          example: string
         - name: weight
           in: query
+          description: Gateway's weight when utilizing gateway load balancing within a gateway group.
           schema:
-            type: string
-          description: >-
-            Set this gateways weight when utilizing gateway load balancing
-            within a gateway group. This value must be between 1 and 30.
-            Defaults to 1. (optional)
-          example: integer
+            type: integer
+            default: 1
+            minimum: 1
+            maximum: 30
         - name: data_payload
           in: query
+          description: Data payload to send in ICMP packets sent to the gateway monitor IP.
           schema:
-            type: string
-          description: >-
-            Set a data payload to send on ICMP packets sent to the gateway
-            monitor IP. This value must be a positive integer. Defaults to 1.
-            (optional)
-          example: integer
+            type: integer
+            default: 1
+            minimum: 1
         - name: latencylow
           in: query
           schema:
-            type: string
+            type: integer
+            default: 200
+            minimum: 1
           description: >-
-            Set the low threshold in milliseconds for latency. Any packet that
-            exceeds this threshold will be trigger a minor latency gateway
-            event. This value must be a positive integer that is less than the
-            `latencyhigh` value. Defaults to 200. (optional)
-          example: integer
+            Low threshold (in milliseconds) for latency. Any packet that
+            exceeds this threshold will trigger a minor latency gateway
+            event.
         - name: latencyhigh
           in: query
           schema:
-            type: string
+            type: integer
+            default: 500
           description: >-
-            Set the high threshold in milliseconds for latency. Any packet that
-            exceeds this threshold will be trigger a major latency gateway
-            event. This value must be a positive integer that is greater than
-            the `latencylow` value. Defaults to 500. (optional)
-          example: integer
+            High threshold (in milliseconds) for latency. Any packet that
+            exceeds this threshold will trigger a major latency gateway
+            event. This value must be greater than the `latencylow` value.
         - name: losslow
           in: query
           schema:
-            type: string
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
           description: >-
-            Set the low threshold for packet loss In %. If total packet loss
+            Low threshold (in %) for packet loss. If total packet loss
             exceeds this percentage, a minor packet loss gateway event will be
-            triggered. This value must be greater or equal to 1 and be less than
-            the `losshigh` value. Defaults to 10. (optional)
-          example: integer
+            triggered.
         - name: losshigh
           in: query
           schema:
-            type: string
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
           description: >-
-            Set the high threshold for packet loss In %. If total packet loss
+            High threshold (in %) for packet loss. If total packet loss
             exceeds this percentage, a major packet loss gateway event will be
-            triggered. This value must be greater than the `losslow` value and
-            be less or equal to 100. Defaults to 20. (optional)
-          example: integer
+            triggered. This value must be greater than the `losslow` value.
         - name: interval
           in: query
+          description: How often (in milliseconds) gateway monitor ICMP probes will be sent.
           schema:
-            type: string
-          description: >-
-            Set how often gateway monitor ICMP probes will be sent in
-            milliseconds. This value must be greater than or equal to 1 and less
-            than or equal to 3600000. Defaults to 500. (optional)
-          example: integer
+            type: integer
+            default: 500
+            minimum: 1
+            maximum: 3600000
         - name: loss_interval
           in: query
           schema:
-            type: string
+            type: integer
+            default: 2000
           description: >-
-            Set how long the gateway monitor will wait (in milliseconds) for
+            How long (in milliseconds) the gateway monitor will wait for
             response packets before considering the packet lost. This value must
-            be greater than or equal to the `latencyhigh` value. Defaults to
-            2000. (optional)
-          example: integer
+            be greater than or equal to the `latencyhigh` value.
         - name: time_period
           in: query
           schema:
-            type: string
+            type: integer
+            default: 60000
           description: >-
-            Set the time period In milliseconds for gateway monitor metrics to
-            be averaged. This value must be greater than twice the probe
-            interval plus the loss interval. Defaults to 60000. (optional)
-          example: integer
+            Time period (in milliseconds) for gateway monitor metrics to be averaged. This value must be greater than 
+            twice the `interval` value plus the `loss_interval` value.
         - name: alert_interval
           in: query
           schema:
-            type: string
+            type: integer
+            default: 1000
           description: >-
-            Set the time interval in milliseconds which alert conditions will be
+            Time interval (in milliseconds) which alert conditions will be
             checked. This value must be greater than or equal to the `interval`
-            value. Defaults to 1000. (optional)
-          example: integer
+            value.
         - name: apply
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
             Specify whether or not you would like this gateway to be applied
             immediately, or simply written to the configuration to be applied
             later. Typically, if you are creating multiple gateways at once it
-            Is best to set this to false and apply the changes afterwards using
-            the `/api/v1/routing/apply` endpoint. Otherwise, If you are only
-            creating a single gateway, you may set this true to apply it
-            immediately. Defaults to false. (optional)
-          example: boolean
+            is best to set this to false and apply the changes afterwards using
+            the `/api/v1/routing/apply` endpoint.
       responses:
         '200':
           description: Successful response
@@ -8718,10 +8488,9 @@ paths:
     put:
       tags:
         - ROUTING > GATEWAY
-      summary: Update Routing Gateways
+      summary: Update gateway
       description: >-
-        Update existing routing gateways.<br><br>
-
+        Update an existing gateway.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-gateways-editgateway`]
@@ -8732,7 +8501,7 @@ paths:
               type: object
               example:
                 id: 0
-                name: UPDATED_TEST_GATEWAY
+                name: UPDATED_EXAMPLE_GATEWAY
                 ipprotocol: inet6
                 gateway: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
                 monitor: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
@@ -8753,207 +8522,180 @@ paths:
       parameters:
         - name: id
           in: query
+          required: true
           schema:
-            type: string
+            type: integer
           description: >-
-            Specify the ID of the gateway to update. _Note: If you are obtaining
-            the ID via GET request, the ID will be included in the response
-            within the `attribute` field of the object._
-          example: integer
+            ID of the gateway to update. Refer to the 'Obtaining Object IDs' section in the documentation
+            intro for help obtaining this ID.
         - name: interface
           in: query
           schema:
             type: string
           description: >-
-            Update the interface the gateway will apply to. You may specify
+            Interface the gateway will apply to. You may specify
             either the interface's descriptive name, the pfSense ID (wan, lan,
-            optx), or the physical interface id (e.g. igb0). (optional)
-          example: string
+            optx), or the real interface ID (e.g. igb0).
         - name: ipprotocol
           in: query
+          description: IP protocol this gateway will apply to.
           schema:
             type: string
-          description: >-
-            Update the IP protocol this gateway will serve. Options are `inet`
-            for IPv4, or `inet6` for IPv6. If you are changing the protocol, you
-            will also be required to update the `gateway` and/or `monitor`
-            values to match the specified protocol. (optional)
-          example: string
+            enum: ["inet", "inet6"]
         - name: name
           in: query
           schema:
             type: string
-          description: >-
-            Update the descriptive name for this gateway. This name must be
-            unique, and can only contain alphanumeric characters and
-            underscores. (optional)
-          example: string
+          description: >- 
+            Descriptive name for this gateway. This name must be unique,
+            and can only contain alphanumeric characters and underscores.
         - name: gateway
           in: query
           schema:
             type: string
           description: >-
-            Update the IP address of the gateway. This value must be a valid
-            IPv4 address If you have set your `ipprotocol` value to `inet`, or
-            it must be a valid IPv6 address if you have set your `ipprotocol`
-            value to `inet6`. Unlike the pfSense webConfigurator, this address
-            Is not restricted to an address within the interfaces subnet by
-            default. (optional)
-          example: string
+            IP address of the gateway. This value must be a valid IPv4
+            address if  `ipprotocol` is set to `inet`, or a valid IPv6 
+            address if `ipprotocol` is set to `inet6`.
         - name: monitor
           in: query
           schema:
             type: string
           description: >-
-            Set the IP address used to monitor this gateway. This is usually
-            only necessary if the `gateway` IP does not accept ICMP probes.
-            Defaults to the `gateway` address. (optional)
-          example: string
+            IP address used to monitor this gateway. This is only necessary if the `gateway` IP does not accept ICMP probes.
+            Defaults to the `gateway` value.
         - name: disabled
           in: query
+          description: Disable this gateway.
           schema:
-            type: string
-          description: >-
-            Enable or disable this gateway upon update. True to disable, false
-            to enable. (optional)
-          example: boolean
+            type: boolean
+            default: false
         - name: monitor_disable
           in: query
+          description: Disable gateway monitoring for this gateway.
           schema:
-            type: string
-          description: >-
-            Enable or disable gateway monitoring for this gateway. True to
-            disable, false to enable. (optional)
-          example: boolean
+            type: boolean
+            default: false
         - name: action_disable
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
-            Enable or disable any action taken on gateway events for this
-            gateway. If disabled, this will consider the gateway always up. True
-            for disabled, false for enable. (optional)
-          example: boolean
+            Disable any action taken on gateway events for this gateway. This
+            will consider the gateway as always up.
         - name: force_down
           in: query
+          description: Force this gateway to always be considered down.
           schema:
-            type: string
-          description: >-
-            Enable or disable forcing this gateway to always be considered down.
-            True for enable, false for disable. (optional)
-          example: boolean
+            type: boolean
+            default: false
         - name: descr
           in: query
+          description: Description for this gateway.
           schema:
             type: string
-          description: Update the description for this gateway (optional)
-          example: string
         - name: weight
           in: query
+          description: Gateway's weight when utilizing gateway load balancing within a gateway group.
           schema:
-            type: string
-          description: >-
-            Update this gateways weight when utilizing gateway load balancing
-            within a gateway group. This value must be between 1 and 30.
-            (optional)
-          example: integer
+            type: integer
+            default: 1
+            minimum: 1
+            maximum: 30
         - name: data_payload
           in: query
+          description: Data payload to send in ICMP packets sent to the gateway monitor IP.
           schema:
-            type: string
-          description: >-
-            Update the data payload to send on ICMP packets sent to the gateway
-            monitor IP. This value must be a positive integer. (optional)
-          example: integer
+            type: integer
+            default: 1
+            minimum: 1
         - name: latencylow
           in: query
           schema:
-            type: string
+            type: integer
+            default: 200
+            minimum: 1
           description: >-
-            Update the low threshold in milliseconds for latency. Any packet
-            that exceeds this threshold will be trigger a minor latency gateway
-            event. This value must be a positive integer that is less than the
-            `latencyhigh` value.  (optional)
-          example: integer
+            Low threshold (in milliseconds) for latency. Any packet that
+            exceeds this threshold will trigger a minor latency gateway
+            event.
         - name: latencyhigh
           in: query
           schema:
-            type: string
+            type: integer
+            default: 500
           description: >-
-            Update the high threshold in milliseconds for latency. Any packet
-            that exceeds this threshold will be trigger a major latency gateway
-            event. This value must be a positive integer that is greater than
-            the `latencylow` value. (optional)
-          example: integer
+            High threshold (in milliseconds) for latency. Any packet that
+            exceeds this threshold will trigger a major latency gateway
+            event. This value must be greater than the `latencylow` value.
         - name: losslow
           in: query
           schema:
-            type: string
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
           description: >-
-            Update the low threshold for packet loss In %. If total packet loss
+            Low threshold (in %) for packet loss. If total packet loss
             exceeds this percentage, a minor packet loss gateway event will be
-            triggered. This value must be greater or equal to 1 and be less than
-            the `losshigh` value. (optional)
-          example: integer
+            triggered.
         - name: losshigh
           in: query
           schema:
-            type: string
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 100
           description: >-
-            Update the high threshold for packet loss In %. If total packet loss
+            High threshold (in %) for packet loss. If total packet loss
             exceeds this percentage, a major packet loss gateway event will be
-            triggered. This value must be greater than the `losslow` value and
-            be less or equal to 100. (optional)
-          example: integer
+            triggered. This value must be greater than the `losslow` value.
         - name: interval
           in: query
+          description: How often (in milliseconds) gateway monitor ICMP probes will be sent.
           schema:
-            type: string
-          description: >-
-            Update how often gateway monitor ICMP probes will be sent in
-            milliseconds. This value must be greater than or equal to 1 and less
-            than or equal to 3600000. (optional)
-          example: integer
+            type: integer
+            default: 500
+            minimum: 1
+            maximum: 3600000
         - name: loss_interval
           in: query
           schema:
-            type: string
+            type: integer
+            default: 2000
           description: >-
-            Update how long the gateway monitor will wait (in milliseconds) for
+            How long (in milliseconds) the gateway monitor will wait for
             response packets before considering the packet lost. This value must
-            be greater than or equal to the `latencyhigh` value. (optional)
-          example: integer
+            be greater than or equal to the `latencyhigh` value.
         - name: time_period
           in: query
           schema:
-            type: string
+            type: integer
+            default: 60000
           description: >-
-            Update the time period In milliseconds for gateway monitor metrics
-            to be averaged. This value must be greater than twice the probe
-            interval plus the loss interval. (optional)
-          example: integer
+            Time period (in milliseconds) for gateway monitor metrics to be averaged. This value must be greater than 
+            twice the `interval` value plus the `loss_interval` value.
         - name: alert_interval
           in: query
           schema:
-            type: string
+            type: integer
+            default: 1000
           description: >-
-            Update the time interval in milliseconds which alert conditions will
-            be checked. This value must be greater than or equal to the
-            `interval` value. (optional)
-          example: integer
+            Time interval (in milliseconds) which alert conditions will be
+            checked. This value must be greater than or equal to the `interval`
+            value.
         - name: apply
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
-            Specify whether or not you would like these gateway updates to be
-            applied immediately, or simply written to the configuration to be
-            applied later. Typically, if you are updating multiple gateways at
-            once it Is best to set this to false and apply the changes
-            afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If
-            you are only updating a single gateway, you may set this true to
-            apply it immediately. Defaults to false. (optional)
-          example: boolean
+            Specify whether or not you would like this gateway to be applied
+            immediately, or simply written to the configuration to be applied
+            later. Typically, if you are creating multiple gateways at once it
+            is best to set this to false and apply the changes afterwards using
+            the `/api/v1/routing/apply` endpoint.
       responses:
         '200':
           description: Successful response
@@ -8963,10 +8705,9 @@ paths:
     get:
       tags:
         - ROUTING > STATIC_ROUTE
-      summary: Read Static Routes
+      summary: Read static routes
       description: >-
         Read existing static routes.<br><br>
-
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-staticroutes`]
@@ -8978,22 +8719,23 @@ paths:
     delete:
       tags:
         - ROUTING > STATIC_ROUTE
-      summary: Delete Static Routes
+      summary: Delete static route
       description: >-
         Delete existing static routes. __Note: route deletions will be applied
         immediately, there is no need to apply routing changes
         afterwards__<br><br>
-
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-staticroutes-editroute`]
       parameters:
         - name: id
           in: query
+          required: true
           schema:
-            type: string
-          description: Specify the ID of the static route to delete
-          example: Integer
+            type: integer
+          description: >-
+            ID of the static route to delete. Refer to the 'Obtaining Object IDs' section in the documentation
+            intro for help obtaining this ID.
       responses:
         '200':
           description: Successful response
@@ -9002,15 +8744,9 @@ paths:
     post:
       tags:
         - ROUTING > STATIC_ROUTE
-      summary: Create Static Routes
+      summary: Create static route
       description: >-
-        Create a new static route.<br>
-
-        _Note: Unlike the webConfigurator, this endpoint will allow you to
-        override existing routes. There are practical use cases for this
-        functionality and it is important to use caution when adding
-        routes_<br><br>
-
+        Create a new static route.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-staticroutes-editroute`]
@@ -9025,43 +8761,39 @@ paths:
       parameters:
         - name: network
           in: query
+          description: IPv4 CIDR, IPv6 CIDR or network alias this route will apply to.
+          required: true
           schema:
             type: string
-          description: >-
-            Specify an IPv4 CIDR, IPv6 CIDR or network alias this route will
-            apply to
-          example: string
         - name: gateway
           in: query
+          description: Name of the gateway traffic matching this route will use.
+          required: true
           schema:
             type: string
-          description: Specify the name of the gateway traffic matching this route will use
-          example: string
         - name: descr
           in: query
+          description: Description for this route.
           schema:
             type: string
-          description: Leave a description of this route (optional)
-          example: string
+            default: ""
         - name: disabled
           in: query
+          description: Disable this route.
           schema:
-            type: string
-          description: Disable this route upon creation (optional)
-          example: boolean
+            type: boolean
+            default: false
         - name: apply
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
             Specify whether or not you would like this route to be applied
             immediately, or simply written to the configuration to be applied
             later. Typically, if you are creating multiple routes at once it Is
             best to set this to false and apply the changes afterwards using the
-            `/api/v1/routing/apply` endpoint. Otherwise, If you are only
-            creating a single route, you may set this true to apply it
-            immediately. Defaults to false. (optional)
-          example: boolean
+            `/api/v1/routing/apply` endpoint.
       responses:
         '200':
           description: Successful response
@@ -9070,15 +8802,9 @@ paths:
     put:
       tags:
         - ROUTING > STATIC_ROUTE
-      summary: Update Static Routes
+      summary: Update static route
       description: >-
-        Update an existing static route.<br>
-
-        _Note: Unlike the webConfigurator, this endpoint will allow you to
-        override existing routes. There are practical use cases for this
-        functionality and it is important to use caution when adding
-        routes_<br><br>
-
+        Update an existing static route.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-staticroutes-editroute`]
@@ -9095,54 +8821,45 @@ paths:
       parameters:
         - name: id
           in: query
+          required: true
           schema:
-            type: string
-          description: Specify the ID of the static route to update
-          example: Integer
+            type: integer
+          description: >-
+            ID of the static route to update. Refer to the 'Obtaining Object IDs' section in the documentation
+            intro for help obtaining this ID.
         - name: network
           in: query
+          description: IPv4 CIDR, IPv6 CIDR or network alias this route will apply to.
           schema:
             type: string
-          description: >-
-            Update the IPv4 CIDR, IPv6 CIDR or network alias this route will
-            apply to (optional)
-          example: string
         - name: gateway
           in: query
+          description: Name of the gateway traffic matching this route will use.
           schema:
             type: string
-          description: >-
-            Update the name of the gateway traffic matching this route will use
-            (optional)
-          example: string
         - name: descr
           in: query
+          description: Description for this route.
           schema:
             type: string
-          description: Update description of this route (optional)
-          example: string
+            default: ""
         - name: disabled
           in: query
+          description: Disable this route.
           schema:
-            type: string
-          description: Disable this route (optional)
-          example: boolean
+            type: boolean
+            default: false
         - name: apply
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
-            Specify whether or not you would like this route update to be
-            applied immediately, or simply written to the configuration to be
-            applied later. Typically, if you are updating multiple routes at
-            once it Is best to set this to false and apply the changes
-            afterwards using the `/api/v1/routing/apply` endpoint. Otherwise, If
-            you are only updating a single route, you may set this true to apply
-            it immediately. Please note, this will default to true for routing
-            updates, if this is set to false when updating routes, the existing
-            route will be removed from the routing table until the changes are
-            applied! Defaults to true. (optional)
-          example: boolean
+            Specify whether or not you would like this route to be applied
+            immediately, or simply written to the configuration to be applied
+            later. Typically, if you are creating multiple routes at once it Is
+            best to set this to false and apply the changes afterwards using the
+            `/api/v1/routing/apply` endpoint.
       responses:
         '200':
           description: Successful response
@@ -9152,20 +8869,13 @@ paths:
     post:
       tags:
         - ROUTING > APPLY
-      summary: Apply Routing
+      summary: Apply routing changes
       description: >-
-        Apply pending routing changes. This endpoint returns no data.<br><br>
-
+        Apply pending routing changes.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-system-gateways`, `page-system-gateways-editgateway`,
         `page-system-staticroutes`, `page-system-staticroutes-editroute`]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example: {}
       responses:
         '200':
           description: Successful response
@@ -9175,15 +8885,12 @@ paths:
     get:
       tags:
         - STATUS > CARP
-      summary: Read CARP Status
+      summary: Read CARP status
       description: >-
         Read the CARP (failover) status.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-status-carp`]
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: Successful response
@@ -9192,10 +8899,9 @@ paths:
     put:
       tags:
         - STATUS > CARP
-      summary: Update CARP Status
+      summary: Update CARP status
       description: >-
-        Read the CARP (failover) status.<br><br>
-
+        Update the CARP (failover) status.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-status-carp`]
@@ -9211,15 +8917,13 @@ paths:
         - name: enable
           in: query
           schema:
-            type: string
-          description: Enable or disable CARP. Requires bool (optional)
-          example: boolean
+            type: boolean
+          description: Enable or disable CARP.
         - name: maintenance_mode
           in: query
           schema:
-            type: string
-          description: Enable or disable CARP maintenance mode. Requires bool (optional)
-          example: boolean
+            type: boolean
+          description: Enable or disable CARP maintenance mode.
       responses:
         '200':
           description: Successful response
@@ -9229,15 +8933,12 @@ paths:
     get:
       tags:
         - STATUS > OPENVPN
-      summary: Read OpenVPN Status
+      summary: Read OpenVPN status
       description: >-
         Read the OpenVPN status.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-status-openvpn`]
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: Successful response
@@ -9247,15 +8948,12 @@ paths:
     get:
       tags:
         - STATUS > LOG
-      summary: Read System Status Log
+      summary: Read system log
       description: >-
         Read the system.log file.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-diagnostics-logs-system`]
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: Successful response
@@ -9265,15 +8963,12 @@ paths:
     get:
       tags:
         - STATUS > LOG
-      summary: Read Firewall Status Log
+      summary: Read firewall log
       description: >-
         Read the filter.log file.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-diagnostics-logs-firewall`]
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: Successful response
@@ -9283,15 +8978,12 @@ paths:
     get:
       tags:
         - STATUS > LOG
-      summary: Read DHCP Status Log
+      summary: Read DHCP log
       description: >-
         Read the dhcpd.log file.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-diagnostics-logs-dhcp`]
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: Successful response
@@ -9301,15 +8993,12 @@ paths:
     get:
       tags:
         - STATUS > LOG
-      summary: Read Configuration History Status Log
+      summary: Read configuration history log
       description: >-
         Read the configuration history log.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-diagnostics-configurationhistory`]
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: Successful response
@@ -9319,15 +9008,12 @@ paths:
     get:
       tags:
         - STATUS > GATEWAY
-      summary: Read Gateway Status
+      summary: Read gateway status
       description: >-
         Read gateway status and metrics.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-status-gateway`]
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: Successful response
@@ -9337,15 +9023,12 @@ paths:
     get:
       tags:
         - STATUS > INTERFACE
-      summary: Read Interface Status
+      summary: Read interface status
       description: >-
         Read interface status and metrics.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-status-interfaces`]
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: Successful response
@@ -9355,17 +9038,14 @@ paths:
     get:
       tags:
         - STATUS > SYSTEM
-      summary: Read System Status
+      summary: Read system status
       description: >-
         Read system status and metrics. All usage values are represented as a
         decimal percentage. Temperature readings require thermal sensor and/or
         driver configuration.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-dashboard-widgets`, `page-dashboard-all`]
-      security:
-        - bearerAuth: []
       responses:
         '200':
           description: Successful response
@@ -9375,7 +9055,7 @@ paths:
     get:
       tags:
         - SERVICES > OPENVPN > CSC
-      summary: Read OpenVPN Client Specific Overrides
+      summary: Read OpenVPN client specific overrides
       responses:
         '200':
           description: Successful response
@@ -9384,7 +9064,7 @@ paths:
     post:
       tags:
         - SERVICES > OPENVPN > CSC
-      summary: Create OpenVPN Client Specific Overrides
+      summary: Create OpenVPN client specific override
       requestBody:
         content:
           application/json:
@@ -9423,56 +9103,54 @@ paths:
           schema:
             type: string
           description: >-
-            A comma separated string containing the ids of the OpenVPN servers
+            Comma separated string containing the ids of the OpenVPN servers
             that use this override. Omitting this activates the override for all
             servers.
-          example: string
         - name: custom_options
           in: query
+          example: 'push "route 10.0.0.0 255.255.255.0"'
           schema:
             type: string
           description: >-
-            Enter any additional options to add for this client specific
+            Additional options to add for this client specific
             override, separated by a semicolon.
-
-            EXAMPLE: push "route 10.0.0.0 255.255.255.0";
-          example: string
         - name: disable
           in: query
           schema:
-            type: string
-          description: Whether to disable this override without removing it.
-          example: boolean
+            type: boolean
+            default: false
+          description: Disable this override without removing it.
         - name: common_name
           in: query
+          required: true
           schema:
             type: string
           description: >-
-            Enter the X.509 common name for the client certificate, or the
+            X.509 common name for the client certificate, or the
             username for VPNs utilizing password authentication. This match is
             case sensitive.
-          example: string
         - name: block
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
             Prevents the client from connecting to this server. Do not use this
             option to permanently disable a client due to a compromised key or
             password. Use a CRL (certificate revocation list) instead.
-          example: boolean
         - name: description
           in: query
           schema:
             type: string
-          description: A description for administrative reference (not parsed).
-          example: string
+            default: ""
+          description: Description for administrative reference.
         - name: tunnel_network
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            The virtual IPv4 network used for private communications between
+            Virtual IPv4 network used for private communications between
             this client and the server expressed using CIDR (e.g. 10.0.8.5/24).
 
             With subnet topology, enter the client IP address and the subnet
@@ -9481,49 +9159,49 @@ paths:
             With net30 topology, the first network address of the /30 is assumed
             to be the server address and the second network address will be
             assigned to the client.
-          example: string
         - name: tunnel_networkv6
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            The virtual IPv6 network used for private communications between
+            Virtual IPv6 network used for private communications between
             this client and the server expressed using prefix (e.g.
             2001:db9:1:1::100/64).
 
             Enter the client IPv6 address and prefix. The prefix must match the
             IPv6 Tunnel Network prefix on the server.
-          example: string
         - name: local_network
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            These are the IPv4 server-side networks that will be accessible from
+            IPv4 server-side networks that will be accessible from
             this particular client. Expressed as a comma-separated list of one
             or more CIDR networks.
 
             NOTE: Networks do not need to be specified here if they have already
             been defined on the main server configuration.
-          example: string
         - name: local_networkv6
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            These are the IPv6 server-side networks that will be accessible from
+            IPv6 server-side networks that will be accessible from
             this particular client. Expressed as a comma-separated list of one
             or more IP/PREFIX networks.
 
             NOTE: Networks do not need to be specified here if they have already
             been defined on the main server configuration.
-          example: string
         - name: remote_network
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            These are the IPv4 client-side networks that will be routed to this
+            IPv4 client-side networks that will be routed to this
             client specifically using iroute, so that a site-to-site VPN can be
             established. Expressed as a comma-separated list of one or more CIDR
             ranges. May be left blank if there are no client-side networks to be
@@ -9531,13 +9209,13 @@ paths:
 
             NOTE: Remember to add these subnets to the IPv4 Remote Networks list
             on the corresponding OpenVPN server settings.
-          example: string
         - name: remote_networkv6
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            These are the IPv6 client-side networks that will be routed to this
+            IPv6 client-side networks that will be routed to this
             client specifically using iroute, so that a site-to-site VPN can be
             established. Expressed as a comma-separated list of one or more
             IP/PREFIX networks. May be left blank if there are no client-side
@@ -9545,88 +9223,87 @@ paths:
 
             NOTE: Remember to add these subnets to the IPv6 Remote Networks list
             on the corresponding OpenVPN server settings.
-          example: string
         - name: redirect_gateway
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: Force all client generated traffic through the tunnel.
-          example: boolean
         - name: prevent_server_definitions
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
             Prevent this client from receiving any server-defined client
             settings.
-          example: boolean
         - name: remove_server_routes
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
             Prevent this client from receiving any server-defined routes without
             removing any other options.
-          example: boolean
         - name: dns_domain
           in: query
           schema:
             type: string
+            default: ""
           description: Domain name for DNS to provide to the client.
-          example: string
         - name: dns_servers
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            A comma-separated list of no more than 4 DNS server IP addresses
+            Comma-separated list of no more than 4 DNS server IP addresses
             (i.e. 8.8.8.8). Any more than the first four are ignored. This list
             is provided to the clent.
-          example: string
         - name: ntp_servers
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            A comma-separated list of no more than 2 NTP server IP addresses.
+            Comma-separated list of no more than 2 NTP server IP addresses.
             Any more than the first two are ignored.
-          example: string
         - name: netbios_enable
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
             Enable NetBIOS over TCP/IP. If this option is not set, all
             NetBIOS-over-TCP/IP options (including WINS) will be disabled.
-          example: boolean
         - name: netbios_node_type
           in: query
           schema:
             type: string
+            enum: [b, p, m, h]
           description: >-
             Possible options: b (broadcasts), p (point-to-point name queries to
             a WINS server), m (broadcast then query name server), and h (query
             name server, then broadcast). This parameter takes a single letter
             either b, p, m, or h. Any other string will result in this option
             being set to none.
-          example: string
         - name: netbios_scope
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            A NetBIOS Scope ID provides an extended naming service for NetBIOS
+            NetBIOS Scope ID provides an extended naming service for NetBIOS
             over TCP/IP. The NetBIOS scope ID isolates NetBIOS traffic on a
             single network to only those nodes with the same NetBIOS scope ID.
-          example: string
         - name: wins_servers
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            A comma-separated list of no more than 2 WINS server IP addresses.
+            Comma-separated list of no more than 2 WINS server IP addresses.
             Any more than the first two are ignored.
-          example: string
       responses:
         '200':
           description: Successful response
@@ -9635,7 +9312,7 @@ paths:
     put:
       tags:
         - SERVICES > OPENVPN > CSC
-      summary: Update OpenVPN Client Specific Overrides
+      summary: Update OpenVPN client specific override
       requestBody:
         content:
           application/json:
@@ -9670,72 +9347,66 @@ paths:
                 netbios_scope: '42'
                 wins_servers: 192.168.56.108, 192.168.56.194
       parameters:
-        - name: refid
+        - name: id
+          required: true
           in: query
           schema:
             type: string
           description: >-
-            Reference id. This id indicates the id of the client specific
-            override you want to modify. This id is not static as it is
-            essentially the index of an entry in the config array. Best to first
-            get all client specific overrides and get the id of the one you want
-            to modify before calling this endpoint.
-          example: int
+            ID of the client specific override to update. Refer to the 'Obtaining Object IDs' section in the documentation
+            intro for help obtaining this ID.
         - name: server_list
           in: query
           schema:
             type: string
           description: >-
-            A comma separated string containing the ids of the OpenVPN servers
+            Comma separated string containing the ids of the OpenVPN servers
             that use this override. Omitting this activates the override for all
             servers.
-          example: string
         - name: custom_options
           in: query
+          example: 'push "route 10.0.0.0 255.255.255.0"'
           schema:
             type: string
           description: >-
-            Enter any additional options to add for this client specific
+            Additional options to add for this client specific
             override, separated by a semicolon.
-
-            EXAMPLE: push "route 10.0.0.0 255.255.255.0";
-          example: string
         - name: disable
           in: query
           schema:
-            type: string
-          description: Whether to disable this override without removing it.
-          example: boolean
+            type: boolean
+            default: false
+          description: Disable this override without removing it.
         - name: common_name
           in: query
           schema:
             type: string
           description: >-
-            Enter the X.509 common name for the client certificate, or the
+            X.509 common name for the client certificate, or the
             username for VPNs utilizing password authentication. This match is
             case sensitive.
-          example: string
         - name: block
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
             Prevents the client from connecting to this server. Do not use this
             option to permanently disable a client due to a compromised key or
             password. Use a CRL (certificate revocation list) instead.
-          example: boolean
         - name: description
           in: query
           schema:
             type: string
-          description: A description for administrative reference (not parsed).
-          example: string
+            default: ""
+          description: Description for administrative reference.
         - name: tunnel_network
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            The virtual IPv4 network used for private communications between
+            Virtual IPv4 network used for private communications between
             this client and the server expressed using CIDR (e.g. 10.0.8.5/24).
 
             With subnet topology, enter the client IP address and the subnet
@@ -9744,49 +9415,49 @@ paths:
             With net30 topology, the first network address of the /30 is assumed
             to be the server address and the second network address will be
             assigned to the client.
-          example: string
         - name: tunnel_networkv6
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            The virtual IPv6 network used for private communications between
+            Virtual IPv6 network used for private communications between
             this client and the server expressed using prefix (e.g.
             2001:db9:1:1::100/64).
 
             Enter the client IPv6 address and prefix. The prefix must match the
             IPv6 Tunnel Network prefix on the server.
-          example: string
         - name: local_network
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            These are the IPv4 server-side networks that will be accessible from
+            IPv4 server-side networks that will be accessible from
             this particular client. Expressed as a comma-separated list of one
             or more CIDR networks.
 
             NOTE: Networks do not need to be specified here if they have already
             been defined on the main server configuration.
-          example: string
         - name: local_networkv6
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            These are the IPv6 server-side networks that will be accessible from
+            IPv6 server-side networks that will be accessible from
             this particular client. Expressed as a comma-separated list of one
             or more IP/PREFIX networks.
 
             NOTE: Networks do not need to be specified here if they have already
             been defined on the main server configuration.
-          example: string
         - name: remote_network
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            These are the IPv4 client-side networks that will be routed to this
+            IPv4 client-side networks that will be routed to this
             client specifically using iroute, so that a site-to-site VPN can be
             established. Expressed as a comma-separated list of one or more CIDR
             ranges. May be left blank if there are no client-side networks to be
@@ -9794,13 +9465,13 @@ paths:
 
             NOTE: Remember to add these subnets to the IPv4 Remote Networks list
             on the corresponding OpenVPN server settings.
-          example: string
         - name: remote_networkv6
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            These are the IPv6 client-side networks that will be routed to this
+            IPv6 client-side networks that will be routed to this
             client specifically using iroute, so that a site-to-site VPN can be
             established. Expressed as a comma-separated list of one or more
             IP/PREFIX networks. May be left blank if there are no client-side
@@ -9808,88 +9479,87 @@ paths:
 
             NOTE: Remember to add these subnets to the IPv6 Remote Networks list
             on the corresponding OpenVPN server settings.
-          example: string
         - name: redirect_gateway
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: Force all client generated traffic through the tunnel.
-          example: boolean
         - name: prevent_server_definitions
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
             Prevent this client from receiving any server-defined client
             settings.
-          example: boolean
         - name: remove_server_routes
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
             Prevent this client from receiving any server-defined routes without
             removing any other options.
-          example: boolean
         - name: dns_domain
           in: query
           schema:
             type: string
+            default: ""
           description: Domain name for DNS to provide to the client.
-          example: string
         - name: dns_servers
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            A comma-separated list of no more than 4 DNS server IP addresses
+            Comma-separated list of no more than 4 DNS server IP addresses
             (i.e. 8.8.8.8). Any more than the first four are ignored. This list
             is provided to the clent.
-          example: string
         - name: ntp_servers
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            A comma-separated list of no more than 2 NTP server IP addresses.
+            Comma-separated list of no more than 2 NTP server IP addresses.
             Any more than the first two are ignored.
-          example: string
         - name: netbios_enable
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
             Enable NetBIOS over TCP/IP. If this option is not set, all
             NetBIOS-over-TCP/IP options (including WINS) will be disabled.
-          example: boolean
         - name: netbios_node_type
           in: query
           schema:
             type: string
+            enum: [b, p, m, h]
           description: >-
             Possible options: b (broadcasts), p (point-to-point name queries to
             a WINS server), m (broadcast then query name server), and h (query
             name server, then broadcast). This parameter takes a single letter
             either b, p, m, or h. Any other string will result in this option
             being set to none.
-          example: string
         - name: netbios_scope
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            A NetBIOS Scope ID provides an extended naming service for NetBIOS
+            NetBIOS Scope ID provides an extended naming service for NetBIOS
             over TCP/IP. The NetBIOS scope ID isolates NetBIOS traffic on a
             single network to only those nodes with the same NetBIOS scope ID.
-          example: string
         - name: wins_servers
           in: query
           schema:
             type: string
+            default: ""
           description: >-
-            A comma-separated list of no more than 2 WINS server IP addresses.
+            Comma-separated list of no more than 2 WINS server IP addresses.
             Any more than the first two are ignored.
-          example: string
       responses:
         '200':
           description: Successful response
@@ -9898,19 +9568,16 @@ paths:
     delete:
       tags:
         - SERVICES > OPENVPN > CSC
-      summary: Delete OpenVPN Client Specific Override
+      summary: Delete OpenVPN client specific override
       parameters:
-        - name: refid
+        - name: id
           in: query
+          required: true
           schema:
             type: string
           description: >-
-            Reference id. This id indicates the id of the client specific
-            override you want to delete. This id is not static as it is
-            essentially the index of an entry in the config array. Best to first
-            get all client specific overrides and get the id of the one you want
-            to delete before calling this endpoint.
-          example: int
+            ID of the client specific override to update. Refer to the 'Obtaining Object IDs' section in the documentation
+            intro for help obtaining this ID.
       responses:
         '200':
           description: Successful response

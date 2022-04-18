@@ -32,11 +32,16 @@ class APIServicesOpenVPNClientSpecificOverridesDelete extends APIModel {
         return APIResponse\get(0, $this->validated_data);
     }
 
-    private function __validate_refid() {
-        if (isset($this->initial_data['refid'])) {
-            if (array_key_exists((int) $this->initial_data['refid'], $this->config['openvpn']['openvpn-csc'])) {
-                $this->id = (int) $this->initial_data['refid'];
-                $this->validated_data['refid'] = $this->initial_data['refid'];
+    private function __validate_id() {
+        # Originally referred to this field as 'refid'. Still allow that value for backwards compatibility.
+        if (isset($this->initial_data["refid"])) {
+            $this->initial_data["id"] = $this->initial_data["refid"];
+        }
+
+        if (isset($this->initial_data['id'])) {
+            if (array_key_exists((int) $this->initial_data['id'], $this->config['openvpn']['openvpn-csc'])) {
+                $this->id = (int) $this->initial_data['id'];
+                $this->validated_data['id'] = $this->initial_data['id'];
             } else {
                 $this->errors[] = APIResponse\get(2078);
             }
@@ -46,6 +51,6 @@ class APIServicesOpenVPNClientSpecificOverridesDelete extends APIModel {
     }
 
     public function validate_payload() {
-        $this->__validate_refid();
+        $this->__validate_id();
     }
 }
