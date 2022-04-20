@@ -9587,11 +9587,10 @@ paths:
     post:
       tags:
         - SERVICES > UNBOUND > ACCESS_LIST > ROW
-      summary: Create Unbound Access List Row
+      summary: Add DNS Resolver (Unbound) access list row
       description: >-
-        Add a new row (network entry) to an existing Unbound access
+        Add a new row (network entry) to an existing DNS Resolver (Unbound) access
         list.<br><br>
-
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-services-dnsresolver-acls`]
@@ -9608,43 +9607,43 @@ paths:
       parameters:
         - name: id
           in: query
+          required: true
           schema:
-            type: string
-          description: Specify the ID of the access list to apply this row to.
-          example: integer
+            type: integer
+          description: >-
+            ID of the access list to apply this row to. Refer to the 'Obtaining Object IDs' section in the documentation
+            intro for help obtaining this ID.
         - name: acl_network
           in: query
+          description: IPv4 or IPv6 address of the network to add to the access list.
+          required: true
           schema:
             type: string
-          description: Specify the IPv4 or IPv6 address of the network to add to the row.
-          example: string
         - name: mask
           in: query
+          required: true
           schema:
-            type: string
+            type: integer
           description: >-
-            Specify the subnet mask of the ACL network. This must be a value
-            between 0 and 32 for IPv4 addresses or 0 and 128 or IPv6 addresses.
-          example: integer
+            Subnet mask of the `acl_network`. This must be a value
+            between `0` and `32` for IPv4 addresses or `0` and `128` or IPv6 addresses.
         - name: description
           in: query
+          description: Description of the access list row (optional)
           schema:
             type: string
-          description: Description of the access list row (optional)
-          example: string
+            default: ""
         - name: apply
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
             Specify whether or not you would like this access list row to be
             applied immediately, or simply written to the configuration to be
             applied later. Typically, if you are creating multiple access list
             rows at once it Is best to set this to false and apply the changes
             afterwards using the /api/v1/services/unbound/apply endpoint.
-            Otherwise, If you are only adding a single access list row, you may
-            set this true to apply it immediately. Defaults to false. (optional)
-          example: boolean
       responses:
         '200':
           description: Successful response
@@ -9654,10 +9653,9 @@ paths:
     get:
       tags:
         - SERVICES > UNBOUND > ACCESS_LIST
-      summary: Read Unbound Access Lists
+      summary: Read DNS Resolver (Unbound) access lists
       description: >-
-        Read configured Unbound access lists.<br><br>
-
+        Read configured DNS Resolver (Unbound) access lists.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-services-dnsresolver-acls`]
@@ -9669,10 +9667,9 @@ paths:
     post:
       tags:
         - SERVICES > UNBOUND > ACCESS_LIST
-      summary: Create Unbound Access List
+      summary: Create DNS Resolver (Unbound) access list
       description: >-
-        Add a new Unbound access list.<br><br>
-
+        Create a new DNS Resolver (Unbound) access list.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-services-dnsresolver-acls`]
@@ -9692,45 +9689,49 @@ paths:
       parameters:
         - name: aclname
           in: query
+          description: Name for this access list.
           schema:
             type: string
-          description: Specify a name for this access list (optional).
-          example: string
+            default: ""
         - name: aclaction
           in: query
+          description: Action this access list will enforce.
+          required: true
           schema:
             type: string
-          description: >-
-            Set the access list action. Options are `allow`, `deny`, `reject`,
-            `allow spoof`, `deny nonlocal`, `reject nonlocal`.
-          example: string
+            enum: ["allow", "deny", "refuse", "allow snoop", "deny nonlocal", "refuse nonlocal"]
         - name: description
           in: query
+          description: Detailed description for this access list.
           schema:
             type: string
-          description: Specify a detailed description for this access list (optional).
-          example: string
+            default: ""
         - name: row
           in: query
+          required: true
+          example:
+            - {"acl_network": "192.168.1.0", "mask": 32, "description": "Example IPv4 access list row"}
+            - {"acl_network": "0::", "mask": 128, "description": "Example IPv6 access list row"}
           schema:
-            type: string
+            type: array
+            items:
+              type: object
           description: >-
             Set networks to match for this access list. This must be an array of
             access list row objects and must contain at least one object. For
             more information on access list object fields, see documentation for
             /api/v1/services/unbound/access_list/row.
-          example: array
         - name: apply
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
-            Specify whether or not the Unbound configuration should be reloaded
-            immediately after creating. `true` to apply immediately, `false` to
-            keep the changes pending. If `false`, the Unbound configuration must
+            Specify whether or not the DNS Resolver (Unbound) configuration should be reloaded
+            immediately after. `true` to apply immediately, `false` to
+            keep the changes pending. If `false`, the DNS Resolver (Unbound) configuration must
             be reloaded manually by calling the /api/v1/services/unbound/apply
-            endpoint. Defaults to `false` (optional).
-          example: boolean
+            endpoint.
       responses:
         '200':
           description: Successful response
@@ -9739,13 +9740,9 @@ paths:
     put:
       tags:
         - SERVICES > UNBOUND > ACCESS_LIST
-      summary: Update Unbound Access List
+      summary: Update DNS Resolver (Unbound) access list
       description: >-
-        Modify an existing Unbound access list
-
-
-        <br><br>
-
+        Modify an existing DNS Resolver (Unbound) access list.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-services-dnsresolver-acls`]
@@ -9756,61 +9753,65 @@ paths:
               type: object
               example:
                 id: 0
-                aclname: Updated_Allow_All
+                aclname: Deny_all
                 aclaction: deny
-                description: Updated test ACL
+                description: Updated example ACL
                 row:
                   - acl_network: '0::'
                     mask: 0
-                    description: Updated test ACL entry
+                    description: Updated example ACL entry
       parameters:
         - name: id
           in: query
+          required: true
           schema:
-            type: string
-          description: Specify the access list ID to update.
-          example: string
+            type: integer
+          description: >-
+            ID of the access list to update. Refer to the 'Obtaining Object IDs' section in the documentation
+            intro for help obtaining this ID.
         - name: aclname
           in: query
+          description: Name for this access list.
           schema:
             type: string
-          description: Specify a name for this access list (optional).
-          example: string
+            default: ""
         - name: aclaction
           in: query
+          description: Action this access list will enforce.
           schema:
             type: string
-          description: >-
-            Set the access list action. Options are `allow`, `deny`, `reject`,
-            `allow spoof`, `deny nonlocal`, `reject nonlocal`. (optional)
-          example: string
+            enum: ["allow", "deny", "refuse", "allow snoop", "deny nonlocal", "refuse nonlocal"]
         - name: description
           in: query
+          description: Detailed description for this access list.
           schema:
             type: string
-          description: Specify a detailed description for this access list (optional).
-          example: string
+            default: ""
         - name: row
           in: query
+          example:
+            - {"acl_network": "192.168.1.0", "mask": 32, "description": "Example IPv4 access list row"}
+            - {"acl_network": "0::", "mask": 128, "description": "Example IPv6 access list row"}
           schema:
-            type: string
+            type: array
+            items:
+              type: object
           description: >-
             Set networks to match for this access list. This must be an array of
             access list row objects and must contain at least one object. For
             more information on access list object fields, see documentation for
-            /api/v1/services/unbound/access_list/row (optional).
-          example: array
+            /api/v1/services/unbound/access_list/row. Existing values will be overwritten.
         - name: apply
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
-            Specify whether or not the Unbound configuration should be reloaded
-            immediately after updating. `true` to apply immediately, `false` to
-            keep the changes pending. If `false`, the Unbound configuration must
+            Specify whether or not the DNS Resolver (Unbound) configuration should be reloaded
+            immediately after. `true` to apply immediately, `false` to
+            keep the changes pending. If `false`, the DNS Resolver (Unbound) configuration must
             be reloaded manually by calling the /api/v1/services/unbound/apply
-            endpoint. Defaults to `false` (optional).
-          example: boolean
+            endpoint.
       responses:
         '200':
           description: Successful response
@@ -9819,31 +9820,32 @@ paths:
     delete:
       tags:
         - SERVICES > UNBOUND > ACCESS_LIST
-      summary: Delete Unbound Access List
+      summary: Delete DNS Resolver (Unbound) access list
       description: >-
-        Delete Unbound access list.<br><br>
-
+        Delete DNS Resolver (Unbound) access list.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-services-dnsresolver-acls`]
       parameters:
         - name: id
           in: query
+          required: true
           schema:
-            type: string
-          description: Specify the access list ID to delete.
-          example: string
+            type: integer
+          description: >-
+            ID of the access list to delete. Refer to the 'Obtaining Object IDs' section in the documentation
+            intro for help obtaining this ID.
         - name: apply
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
-            Specify whether or not the Unbound configuration should be reloaded
-            immediately after deleting. `true` to apply immediately, `false` to
-            keep the changes pending. If `false`, the Unbound configuration must
+            Specify whether or not the DNS Resolver (Unbound) configuration should be reloaded
+            immediately after. `true` to apply immediately, `false` to
+            keep the changes pending. If `false`, the DNS Resolver (Unbound) configuration must
             be reloaded manually by calling the /api/v1/services/unbound/apply
-            endpoint. Defaults to `false` (optional).
-          example: boolean
+            endpoint.
       responses:
         '200':
           description: Successful response
@@ -9853,10 +9855,9 @@ paths:
     post:
       tags:
         - SERVICES > UNBOUND > HOST_OVERRIDE > ALIAS
-      summary: Create Unbound Host Override Alias
+      summary: Create DNS Resolver (Unbound) host override alias
       description: >-
-        Add a new host override alias to DNS Resolver (Unbound).<br><br>
-
+        Add a new host override alias to the DNS Resolver (Unbound).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-services-dnsresolver-edithost`]
@@ -9869,47 +9870,46 @@ paths:
                 id: 0
                 host: alias
                 domain: example.com
-                descr: This is a test host override alias added via pfSense API!
+                descr: Example alias
                 apply: true
       parameters:
         - name: id
           in: query
+          required: true
           schema:
-            type: string
-          description: Specify the ID of the host override to apply this alias to.
-          example: integer
+            type: integer
+          description: >-
+            ID of the host override to apply this alias to. Refer to the 'Obtaining Object IDs' section in
+            the documentation intro for help obtaining this ID.
         - name: host
           in: query
+          description: Hostname of the alias.
+          required: true
           schema:
             type: string
-          description: Specify the hostname of the alias
-          example: string
         - name: domain
           in: query
+          description: Domain of the alias.
+          required: true
           schema:
             type: string
-          description: Specify the domain name of the alias
-          example: string
         - name: description
           in: query
+          description: Description of the alias.
           schema:
             type: string
-          description: Description of alias (optional)
-          example: string
         - name: apply
           in: query
           schema:
-            type: string
+            type: boolean
+            default: false
           description: >-
             Specify whether or not you would like this host override alias to be
             applied immediately, or simply written to the configuration to be
             applied later. Typically, if you are creating multiple host override
             aliases at once it Is best to set this to false and apply the
             changes afterwards using the `/api/v1/services/unbound/apply`
-            endpoint. Otherwise, If you are only updating a single host override
-            alias, you may set this true to apply it immediately. Defaults to
-            false. (optional)
-          example: boolean
+            endpoint.
       responses:
         '200':
           description: Successful response
@@ -9919,10 +9919,9 @@ paths:
     post:
       tags:
         - SERVICES > UNBOUND > HOST_OVERRIDE
-      summary: Create Unbound Host Override
+      summary: Create DNS Resolver (Unbound) host override
       description: >-
-        Add a new host override to DNS Resolver (Unbound).<br><br>
-
+        Add a new host override to the DNS Resolver (Unbound).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-services-dnsresolver-edithost`]
@@ -9932,67 +9931,70 @@ paths:
             schema:
               type: object
               example:
-                host: test
+                host: override
                 domain: example.com
                 ip: 127.0.0.1
-                descr: This is a test host override added via pfSense API!
+                descr: Example host override
                 aliases:
-                  - host: test2
+                  - host: alias
                     domain: example.com
                     descr: >-
-                      This is a test host override alias that will also resolve
-                      to this IP!
+                      Example alias
       parameters:
         - name: host
           in: query
+          description: Hostname portion of the host override.
+          required: true
           schema:
             type: string
-          description: Specify the hostname portion of the new DNS A record.
           example: string
         - name: domain
           in: query
+          description: Domain portion of the host override.
+          required: true
           schema:
             type: string
-          description: Specify the domain portion of the new DNS A record.
-          example: string
         - name: ip
           in: query
+          required: true
+          example: [127.0.0.1]
           schema:
-            type: string
+            type: array
           description: >-
-            Specify the IPv4 or IPv6 address this entry will resolve. This can
+            IPv4 or IPv6 address this entry will resolve. This can
             be passed in as a string to resolve a single IP, or an array of
             strings to resolve multiple IPs. At least 1 value is required.
-          example: array or string
         - name: descr
           in: query
+          description: Description of the host override.
           schema:
             type: string
-          description: Specify the description of host override (optional)
-          example: string
         - name: aliases
           in: query
+          example:
+            - {"host": "example", "domain": "example.com", "descr": "Example alias 1"}
+            - {"host": "example2", "domain": "example.com", "descr": "Example alias 2"}
           schema:
-            type: string
+            type: array
+            default: []
+            items:
+              type: object
           description: >-
-            Specify additional domain names that should resolve the same IPs.
-            This uses the same fields as the
-            /api/v1/services/unbound/host_override/alias endpoint. (optional)
-          example: array
+            Host override aliases to associate with this host override.
+            For more information on alias object fields, see documentation for
+            /api/v1/services/unbound/host_override/alias.
         - name: apply
           in: query
           schema:
-            type: string
+            type: boolean
+            default: true
           description: >-
             Specify whether or not you would like this host override to be
             applied immediately, or simply written to the configuration to be
-            applied later. Typically, if you are creating multiple host
+            applied later. Typically, if you are modifying multiple host
             overrides at once it Is best to set this to false and apply the
             changes afterwards using the `/api/v1/services/unbound/apply`
-            endpoint. Otherwise, If you are only creating a single host
-            override, you may set this true to apply it immediately. Defaults to
-            false. (optional)
-          example: boolean
+            endpoint.
       responses:
         '200':
           description: Successful response
@@ -10001,10 +10003,9 @@ paths:
     put:
       tags:
         - SERVICES > UNBOUND > HOST_OVERRIDE
-      summary: Update Unbound Host Override
+      summary: Update DNS Resolver (Unbound) host override
       description: >-
-        Modify host overrides from DNS Resolver (Unbound).<br><br>
-
+        Modify host overrides from the DNS Resolver (Unbound).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-services-dnsresolver-edithost`]
@@ -10014,78 +10015,78 @@ paths:
             schema:
               type: object
               example:
-                host: updated_test
+                id: 0
+                host: updated-host-override
                 domain: example.com
                 ip: 127.0.0.2
-                descr: This is a test host override update via pfSense API!
+                descr: Updated example host override
                 aliases:
-                  - host: test2
+                  - host: updated-alias-1
                     domain: example.com
-                    descr: >-
-                      This is an updated host override alias that will also
-                      resolve to this IP!
-                  - host: updated_to_add
+                    descr: Update example alias 1
+                  - host: updated-alias-2
                     domain: example.com
-                    descr: >-
-                      This is a test host override alias that was also added
-                      during the update!
+                    descr: Update example alias 2
       parameters:
         - name: id
           in: query
+          required: true
           schema:
-            type: string
-          description: Specify the ID of the host override to update
-          example: integer
+            type: integer
+          description: ID of the host override to update. Refer to the 'Obtaining Object IDs' section in the documentation
+            intro for help obtaining this ID.
         - name: host
           in: query
+          description: Hostname portion of the host override.
           schema:
             type: string
-          description: Update the hostname portion of the new DNS A record. (optional)
           example: string
         - name: domain
           in: query
+          description: Domain portion of the host override.
           schema:
             type: string
-          description: Update the domain portion of the new DNS A record. (optional)
-          example: string
         - name: ip
           in: query
+          example: [127.0.0.1]
           schema:
-            type: string
+            type: array
           description: >-
-            Update the IPv4 or IPv6 address this entry will resolve. This can be
-            passed in as a string to resolve a single IP, or an array of strings
-            to resolve multiple IPs. At least 1 value is required. (optional)
-          example: array or string
+            IPv4 or IPv6 address this entry will resolve. This can
+            be passed in as a string to resolve a single IP, or an array of
+            strings to resolve multiple IPs. At least 1 value is required.
+            Any existing values will be overwritten.
         - name: descr
           in: query
+          description: Description of the host override.
           schema:
             type: string
-          description: Update the description of host override (optional)
-          example: string
         - name: aliases
           in: query
+          example:
+            - {"host": "example", "domain": "example.com", "descr": "Example alias 1"}
+            - {"host": "example2", "domain": "example.com", "descr": "Example alias 2"}
           schema:
-            type: string
+            type: array
+            default: []
+            items:
+              type: object
           description: >-
-            Update additional domain names that should resolve the same IPs.
-            This uses the same fields as the
-            /api/v1/services/unbound/host_override/alias endpoint. (optional)
-          example: array
+            Host override aliases to associate with this host override.
+            For more information on alias object fields, see documentation for
+            /api/v1/services/unbound/host_override/alias.
         - name: apply
           in: query
           schema:
-            type: string
+            type: boolean
+            default: true
           description: >-
-            Update whether or not you would like this host override to be
+            Specify whether or not you would like this host override to be
             applied immediately, or simply written to the configuration to be
-            applied later. Typically, if you are creating multiple host
+            applied later. Typically, if you are modifying multiple host
             overrides at once it Is best to set this to false and apply the
             changes afterwards using the `/api/v1/services/unbound/apply`
-            endpoint. Otherwise, If you are only creating a single host
-            override, you may set this true to apply it immediately. Defaults to
-            false. (optional)
-          example: boolean
+            endpoint.
       responses:
         '200':
           description: Successful response
@@ -10094,9 +10095,9 @@ paths:
     delete:
       tags:
         - SERVICES > UNBOUND > HOST_OVERRIDE
-      summary: Delete Unbound Host Override
+      summary: Delete DNS Resolver (Unbound) host override
       description: >-
-        Delete host overrides from DNS Resolver (Unbound).<br><br>
+        Delete host overrides from the DNS Resolver (Unbound).<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`,
@@ -10104,24 +10105,22 @@ paths:
       parameters:
         - name: id
           in: query
+          required: true
           schema:
-            type: string
-          description: Specify the ID of the host override to delete
-          example: integer
+            type: integer
+          description: ID of the host override to delete. Refer to the 'Obtaining Object IDs' section in the documentation
+            intro for help obtaining this ID.
         - name: apply
           in: query
           schema:
             type: string
           description: >-
-            Specify whether or not you would like this host override deletion to
-            be applied immediately, or simply written to the configuration to be
-            applied later. Typically, if you are deleting multiple host
+            Specify whether or not you would like this deletion to be
+            applied immediately, or simply written to the configuration to be
+            applied later. Typically, if you are modifying multiple host
             overrides at once it Is best to set this to false and apply the
             changes afterwards using the `/api/v1/services/unbound/apply`
-            endpoint. Otherwise, If you are only deleting a single host
-            override, you may set this to true to apply it immediately. Defaults
-            to false. (optional)
-          example: boolean
+            endpoint.
       responses:
         '200':
           description: Successful response
@@ -10130,10 +10129,9 @@ paths:
     get:
       tags:
         - SERVICES > UNBOUND > HOST_OVERRIDE
-      summary: Read Unbound Host Override
+      summary: Read DNS Resolver (Unbound) host overrides
       description: >-
-        Read host overrides from DNS Resolver (Unbound).<br><br>
-
+        Read host overrides from the DNS Resolver (Unbound).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-services-dnsresolver`]
@@ -10146,10 +10144,9 @@ paths:
     get:
       tags:
         - SERVICES > UNBOUND
-      summary: Read Unbound Configuration
+      summary: Read DNS Resolver (Unbound) configuration
       description: >-
-        Read DNS Resolver (Unbound) configuration.<br><br>
-
+        Read the entire DNS Resolver (Unbound) configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-services-dnsresolver`]
@@ -10162,19 +10159,12 @@ paths:
     post:
       tags:
         - SERVICES > UNBOUND
-      summary: Start Unbound Service
+      summary: Start DNS Resolver (Unbound) service
       description: >-
         Start the DNS Resolver (Unbound) service.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-status-services`]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example: {}
       responses:
         '200':
           description: Successful response
@@ -10184,19 +10174,12 @@ paths:
     post:
       tags:
         - SERVICES > UNBOUND
-      summary: Restart Unbound Service
+      summary: Restart DNS Resolver (Unbound) service
       description: >-
         Restart the DNS Resolver (Unbound) service.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-status-services`]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example: {}
       responses:
         '200':
           description: Successful response
@@ -10206,19 +10189,12 @@ paths:
     post:
       tags:
         - SERVICES > UNBOUND
-      summary: Stop Unbound Service
+      summary: Stop DNS Resolver (Unbound) service
       description: >-
         Stop the DNS Resolver (Unbound) service.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-status-services`]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example: {}
       responses:
         '200':
           description: Successful response
@@ -10228,19 +10204,12 @@ paths:
     post:
       tags:
         - SERVICES > UNBOUND
-      summary: Apply Pending Unbound Changes
+      summary: Apply pending DNS Resolver (Unbound) changes
       description: >-
         Apply pending DNS Resolver (Unbound) changes.<br><br>
 
-
         _Requires at least one of the following privileges:_ [`page-all`,
         `page-services-dnsresolver`]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              example: {}
       responses:
         '200':
           description: Successful response
