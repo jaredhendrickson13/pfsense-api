@@ -848,14 +848,14 @@ paths:
           schema:
             type: string
         - description: 'Specify whether or not you would like this alias to be applied
-          immediately, or simply written to the configuration to be applied later.
-          If you are creating modifying multiple aliases at once it is best to set
-          this to false and apply the changes afterwards using the `/api/v1/firewall/apply`
-          endpoint.
+            immediately, or simply written to the configuration to be applied later.
+            If you are creating modifying multiple aliases at once it is best to set
+            this to false and apply the changes afterwards using the `/api/v1/firewall/apply`
+            endpoint.
 
-          _Note: currently this defaults to always reload the firewall filter after
-          in order to remain backwards compatible with previous releases, this will
-          be changed to not reload the filter by default in a future release._'
+            _Note: currently this defaults to always reload the firewall filter after
+            in order to remain backwards compatible with previous releases, this will
+            be changed to not reload the filter by default in a future release._'
           in: query
           name: apply
           schema:
@@ -2706,10 +2706,10 @@ paths:
           schema:
             type: string
         - description: 'Reset the entire firewall states table instead of specific states.
-          If `true`, all firewall states will be killed and the `source` and `destination`
-          fields will have no effect. Defaults to `false`. _Note: setting this field
-          to `true` when the `async` field is set to `false` OR the `sleep` field
-          is set too low may prevent the API from sending a response._'
+            If `true`, all firewall states will be killed and the `source` and `destination`
+            fields will have no effect. Defaults to `false`. _Note: setting this field
+            to `true` when the `async` field is set to `false` OR the `sleep` field
+            is set too low may prevent the API from sending a response._'
           in: query
           name: reset
           schema:
@@ -4650,8 +4650,8 @@ paths:
         _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge-edit`]'
       parameters:
         - description: 'Bridge ID of bridge to delete. Bridges cannot be deleted while
-          in use. _Note: This uses the `bridgeif` value (e.g. bridge0, bridge2, etc.)
-          NOT the configuration array index like other objects._'
+            in use. _Note: This uses the `bridgeif` value (e.g. bridge0, bridge2, etc.)
+            NOT the configuration array index like other objects._'
           in: query
           name: id
           required: true
