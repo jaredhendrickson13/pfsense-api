@@ -46,7 +46,7 @@ function get_request_data() {
     $content_types = [
         "application/json" => json_decode(file_get_contents('php://input'), true),
         "application/yaml" => yaml_decode(file_get_contents('php://input')),
-        "application/x-www-form-urlencoded" => (empty($_GET)) ? json_decode(file_get_contents('php://input'), true) : $_GET
+        "application/x-www-form-urlencoded" => (empty($_GET)) ? json_decode(file_get_contents('php://input'), true) : form_decode($_GET)
     ];
 
     # Check if content type is supported, if so return corresponding parsed request data
@@ -57,6 +57,26 @@ function get_request_data() {
     else {
         return false;
     }
+}
+
+# Decode query string into their appropriate data types
+function form_decode($array) {
+    # Loop through each query string item and check for expected data types
+    foreach ($array as $key=>$value) {
+        # Check for boolean type query strings
+        if ($value === "true") {
+            $array[$key] = true;
+        } else {
+            $array[$key] = false;
+        }
+
+        # Check for integer type query strings
+        if (is_numeric($value)) {
+            $array[$key] = intval($value);
+        }
+    }
+
+    return $array;
 }
 
 # Check our local pfSense version
