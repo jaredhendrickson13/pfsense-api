@@ -1,224 +1,92 @@
-
-# pfSense REST API Documentation
-
 ---
-
 # Introduction
-pfSense API is a fast, safe, REST API package for pfSense firewalls. This works by leveraging the same PHP functions and processes used 
-by pfSense's webConfigurator into API endpoints to create, read, update and delete pfSense configurations. All API 
-endpoints enforce input validation to prevent invalid configurations from being made. Configurations made via API are 
-properly written to the master XML configuration and the correct backend configurations are made preventing the need for
- a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!
-
+pfSense API is a fast, safe, REST API package for pfSense firewalls. This works by leveraging the same PHP functions and processes used by pfSense's  webConfigurator into API endpoints to create, read, update and delete pfSense configurations. All API endpoints enforce input validation  to prevent invalid configurations from being made. Configurations made via API  are properly written to the master XML configuration and the correct backend configurations  are made preventing the need for a reboot. All this results in the fastest, safest, and  easiest way to automate pfSense!
 
 # Requirements
 - pfSense CE 2.5.0 or later is supported. pfSense Plus is NOT compatible with this API and will break your pfSense Plus installation. (older pfSense CE versions may be compatible with older versions of pfSense API)
-- pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the 
-webConfigurator are required to make calls to the API endpoints
-- While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit
-
+- pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the webConfigurator are required to make  calls to the API endpoints.
+- While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of HTTP. This ensures that login credentials and/or API tokens remain secure in-transit.
 
 # Installation
-To install pfSense API, simply run the following command from the pfSense shell:<br>
-```
-pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.5-pkg-API.txz && /etc/rc.restart_webgui
-```
+To install pfSense API, simply run the following command from the pfSense shell:<br><br>
+``` pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.5-pkg-API.txz && /etc/rc.restart_webgui ```<br><br>
+To uninstall pfSense API, run the following command:<br><br>
+``` pfsense-api delete ```<br><br>
+To update pfSense API to the latest stable version, run the following command:<br><br>
+``` pfsense-api update ```<br><br>
+To revert to a previous version of pfSense API (e.g. v1.1.7), run the following command:<br><br>
+``` pfsense-api revert v1.1.7 ```<br><br>
 
-To uninstall pfSense API, run the following command:<br>
-```
-pfsense-api delete
-```
-
-To update pfSense API to the latest stable version, run the following command:
-```
-pfsense-api update
-```
-
-To revert to a previous version of pfSense API (e.g. v1.1.7), run the following command:
-```
-pfsense-api revert v1.1.7
-```
-
-### Notes: 
+### Notes:
 - To install the 2.6 package, simply change the `2.5` in the install URL to `2.6`.
-- In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package
-- If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to 
-'Diagnostics > Command Prompt' and enter the commands there
+- In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after installing the package.
+- If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to 'Diagnostics > Command Prompt' and enter the commands there.
 - When updating pfSense, **_you must reinstall pfSense API afterwards_**. Unfortunately, pfSense removes all existing packages and only re-installs packages found within pfSense's package repositories. Since pfSense API is not an official package in pfSense's repositories, it does not get reinstalled automatically.
 - The `pfsense-api` command line tool was introduced in v1.1.0. Refer to the corresponding documentation for earlier releases.
-
 
 # UI Settings & Documentation
 After installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These will be found under System > API. The settings tab will allow you change various API settings such as enabled API interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded documentation tool that makes it easy to view the full API documentation in context to your pfSense instance.
 
-### Notes: 
-- Users must hold the `page-all` or `page-system-api` privileges to access the API page within the webConfigurator
-
+### Notes:
+- Users must hold the `page-all` or `page-system-api` privileges to access the API page within the webConfigurator.
 
 # Authentication & Authorization
-By default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense 
-from the API out of the box, and user passwords may be changed from the API to immediately add additional security if 
-needed. After installation, you can navigate to System > API in the pfSense webConfigurator to configure API
-authentication. Please note that external authentication servers like LDAP or RADIUS are not supported with any 
-API authentication method at this time. 
-
+By default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense from the API out of the box, and user passwords may be changed from  the API to immediately add additional security if needed. After installation, you can navigate to System > API in  the pfSense webConfigurator to configure API authentication. Please note that external authentication servers like  LDAP or RADIUS are not supported with any API authentication method at this time.
 To authenticate your API call, follow the instructions for your configured authentication mode:
 
 <details>
     <summary>Local Database (default)</summary>
 
-Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, pass in your username and password using basic authentication. For example: `curl -u admin:pfsense https://pfsense.example.com/api/v1/firewall/rule`
-
+Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, pass in your username and password using basic authentication. For example:<br><br>
+`curl -u admin:pfsense https://pfsense.example.com/api/v1/firewall/rule`<br><br>
 _Note: in previous releases, local database authentication used the `client-id` and `client-token` fields in your request body to authenticate. This functionality still exists but is not recommended. It will be removed in a future release._
 </details>
 
 <details>
     <summary>JWT</summary>
 
-Requires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token/ and include a `client-id` value containing your pfSense username and a `client-token` value containing your pfSense password to your payload. For example `{"client-id": "admin", "client-token": "pfsense"}`. Once you have your bearer token, you can authenticate your API call by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)
+Requires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token and include a `client-id` value containing your pfSense username and a `client-token` value containing your pfSense password to your payload. For example:<br><br>
+`{"client-id": "admin", "client-token" "pfsense"}`<br><br>
+Once you have your bearer token, you can authenticate your API call by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)
 </details>
 
 <details>
     <summary>API Token</summary>
 
-Uses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication; not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by specifying your client-id and client-token within an `Authorization` header, these values must be separated by a space. (e.g. `Authorization: client-id-here client-token-here`)
-
+Uses standalone tokens generated via the UI. These are better suited to distribute to systems as they are revocable and will only allow API authentication; not UI or SSH authentication (like the local database credentials). To generate or revoke credentials, navigate to System > API within the UI and ensure the Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate new tokens, and revoke existing tokens. Once you have your API token, you may authenticate your API call by specifying your client-id and client-token within an `Authorization` header, these values must be separated by a space. (e.g. `Authorization: client-id-here client-token-here`)<br><br>
 _Note: In previous versions of pfSense API, the client-id and client-token were provided via the request payload. This functionality is still supported but is not recommended. It will be removed in a future release._
-
 </details>
 
 ### Authorization
 pfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are stated within the API documentation.
 
-
 # Content Types
-pfSense API can handle a few different content types. Please note, if a `Content-Type` header is not specified in your request, pfSense API will attempt to determine the
-content type which may have undesired results. It is recommended you specify your preferred `Content-Type` on each request. While several content types may be enabled,
-`application/json` is the recommended content type. Supported content types are:
+pfSense API can handle a few different content types. Please note, if a `Content-Type` header is not specified in your request, pfSense API will attempt to determine the content type which may have undesired results. It is recommended you specify your  preferred `Content-Type` on each request.<br><br>
+While several content types may be enabled, `application/json` is the recommended content type. Supported content types are:
 
 <details>
     <summary>application/json</summary>
 
-Parses the request body as a JSON formatted string. This is the recommended content type.
-
-Example:
-
-```
-curl -s -H "Content-Type: application/json" -d '{"client-id": "admin", "client-token": "pfsense"}' -X GET https://pfsense.example.com/api/v1/system/arp
-{
-  "status": "ok",
-  "code": 200,
-  "return": 0,
-  "message": "Success",
-  "data": [
-    {
-      "ip": "192.168.1.1",
-      "mac": "00:0c:29:f6:be:d9",
-      "interface": "em1",
-      "status": "permanent",
-      "linktype": "ethernet"
-    },
-    {
-      "ip": "172.16.209.139",
-      "mac": "00:0c:29:f6:be:cf",
-      "interface": "em0",
-      "status": "permanent",
-      "linktype": "ethernet"
-    }
-  ]
-}
-```
-
-</details>
-
-<details>
-    <summary>application/yaml</summary>
-
-Parses the request body as a YAML formatted string.
-
-Example:
-
-```
-curl -s -H "Content-Type: application/yaml" --data-binary @requestbody.yml -X GET https://pfsense.example.com/api/v1/system/arp
-code: 200
-data:
-- interface: em1
-  ip: 192.168.1.1
-  linktype: ethernet
-  mac: 00:0c:29:f6:be:d9
-  status: permanent
-- interface: em0
-  ip: 172.16.209.139
-  linktype: ethernet
-  mac: 00:0c:29:f6:be:cf
-  status: permanent
-message: Success
-return: 0
-status: ok
-```
-
-_Note: request body must be contained within a properly formatted YAML file and data must be sent as binary data. Using the YAML content type may impact performance compared to JSON._
-
+Parses the request body as a JSON formatted string. This is the recommended content type.<br><br>
+Example:<br><br>
+``` curl -s -H "Content-Type: application/json" -d '{"client-id": "admin", "client-token": "pfsense"}' -X POST https://pfsense.example.com/api/v1/services/syslogd/restart  ```
 </details>
 
 <details>
     <summary>application/x-www-form-urlencoded</summary>
 
-Parses the request body as URL encoded parameters. Note: boolean and integer types may not be parsed using this content type.
-
-Example:
-
-```
-curl -s -H "Content-Type: application/x-www-form-urlencoded" -X GET "https://pfsense.example.com/api/v1/system/arp?client-id=admin&client-token=pfsense"
-{
-  "status": "ok",
-  "code": 200,
-  "return": 0,
-  "message": "Success",
-  "data": [
-    {
-      "ip": "192.168.1.1",
-      "mac": "00:0c:29:f6:be:d9",
-      "interface": "em1",
-      "status": "permanent",
-      "linktype": "ethernet"
-    },
-    {
-      "ip": "172.16.209.139",
-      "mac": "00:0c:29:f6:be:cf",
-      "interface": "em0",
-      "status": "permanent",
-      "linktype": "ethernet"
-    }
-  ]
-}
-```
-
+Parses the request body as URL encoded parameters.<br><br>
+_Note: this content type is only sufficient for GET and DELETE requests._
+Example:<br><br>
+``` curl -s -H "Content-Type: application/x-www-form-urlencoded" -X GET "https://pfsense.example.com/api/v1/system/arp?client-id=admin&client-token=pfsense" ```
 </details>
 
-# Response Codes
-`200 (OK)` : API call succeeded<br>
-`400 (Bad Request)` : An error was found within your requested parameters<br>
-`401 (Unauthorized)` : API client has not completed authentication or authorization successfully<br>
-`403 (Forbidden)` : The API endpoint has refused your call. Commonly due to your access settings found in System > API<br>
-`404 (Not found)` : Either the API endpoint or requested data was not found<br>
-`500 (Server error)` : The API endpoint encountered an unexpected error processing your API request<br>
-
-
-# Error Codes
-A full list of error codes can be found by navigating to /api/v1/system/api/error after installation. This will return
- JSON data containing each error code and their corresponding error message. No authentication is required to view the 
- error code library. This also makes API integration with third-party software easy as the API error codes and messages 
- are always just an HTTP call away!
-
-
 # Queries
-pfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field. 
+pfSense API contains an advanced query engine to make it easy to query specific data from API calls. For endpoints supporting `GET` requests, you may query the return data to only return data you are looking for. To query data, you may add the data you are looking for to your payload. You may specify as many query parameters as you need. In order to match the query, each parameter must match exactly, or utilize a query filter to set criteria. If no matches were found, the endpoint will return an empty array in the data field.
 <details>
     <summary>Targeting Objects</summary>
-    
-You may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns this response without a query:
 
+You may find yourself only needing to read objects with specific values set. For example, say an API endpoint normally returns this response without a query:<br><br>
 ```json
 {
     "status":"ok",
@@ -226,15 +94,14 @@ You may find yourself only needing to read objects with specific values set. For
     "return":0,
     "message":"Success",
     "data": [
-        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
         {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
         {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
-
     ]
 }
 ```
 
-If you want the endpoint to only return the objects that have their `type` value set to `type1` you could add `{"type": "type1"}` to your payload. This returns:
+If you want the endpoint to only return the objects that have their `type` value set to `type1` you could add `{"type": "type1"}` to your payload. This returns:<br><br>
 
 ```json
 {
@@ -243,13 +110,13 @@ If you want the endpoint to only return the objects that have their `type` value
     "return":0,
     "message":"Success",
     "data": [
-        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
         {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
     ]
 }
 ```
 
-Additionally, if you need to target values that are nested within an array, you can add `{"extra__tag": 100}` to recursively target the `tag` value within the `extra` array. This returns:
+Additionally, if you need to target values that are nested within an array, you can add `{"extra__tag": 100}` to recursively target the `tag` value within the `extra` array. Note the double underscore separating the parent and child keys. This returns:<br><br>
 
 ```json
 {
@@ -267,12 +134,11 @@ Additionally, if you need to target values that are nested within an array, you 
 
 <details>
     <summary>Query Filters</summary>
-    
-Query filters allow you to apply logic to the objects you target. This makes it easy to target data that meets specific criteria:
+
+Query filters allow you to apply logic to the objects you target. This makes it easy to target data that meets specific criteria:<br><br>
 
 ### Starts With
-    
-The `startswith` filter allows you to target objects whose values start with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:
+The `startswith` filter allows you to target objects whose values start with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:<br><br>
 
 ```json
 {
@@ -281,15 +147,14 @@ The `startswith` filter allows you to target objects whose values start with a s
     "return":0,
     "message":"Success",
     "data": [
-        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
         {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
         {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
-
     ]
 }
 ```
 
-If you wanted to target objects whose names started with `Other`, you could use the payload `{"name__startswith": "Other"}`. This returns:
+If you wanted to target objects whose names started with `Other`, you could use the payload `{"name__startswith": "Other"}`. This returns:<br><br>
 
 ```json
 {
@@ -304,8 +169,7 @@ If you wanted to target objects whose names started with `Other`, you could use 
 ```
 
 ### Ends With
-    
-The `endswith` filter allows you to target objects whose values end with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:
+The `endswith` filter allows you to target objects whose values end with a specific substring. This will work on both string and integer data types. Below is an example response without any queries:<br><br>
 
 ```json
 {
@@ -314,7 +178,7 @@ The `endswith` filter allows you to target objects whose values end with a speci
     "return":0,
     "message":"Success",
     "data": [
-        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
         {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
         {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
 
@@ -322,7 +186,7 @@ The `endswith` filter allows you to target objects whose values end with a speci
 }
 ```
 
-If you wanted to target objects whose names ended with `er Test`, you could use the payload `{"name__endswith" "er Test"}`. This returns:
+If you wanted to target objects whose names ended with `er Test`, you could use the payload `{"name__endswith" "er Test"}`. This returns:<br><br>
 
 ```json
 {
@@ -332,14 +196,13 @@ If you wanted to target objects whose names ended with `er Test`, you could use 
     "message":"Success",
     "data": [
         {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
-        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}    
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
     ]
 }
 ```
 
 ### Contains
-    
-The `contains` filter allows you to target objects whose values contain a specific substring. This will work on both string and integer data types. Below is an example response without any queries:
+The `contains` filter allows you to target objects whose values contain a specific substring. This will work on both string and integer data types. Below is an example response without any queries:<br><br>
 
 ```json
 {
@@ -348,15 +211,14 @@ The `contains` filter allows you to target objects whose values contain a specif
     "return":0,
     "message":"Success",
     "data": [
-        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
         {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
         {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
-
     ]
 }
 ```
 
-If you wanted to target objects whose names contain `ther`, you could use the payload `{"name__contains": "ther"}`. This returns:
+If you wanted to target objects whose names contain `ther`, you could use the payload `{"name__contains": "ther"}`. This returns:<br><br>
 
 ```json
 {
@@ -366,14 +228,13 @@ If you wanted to target objects whose names contain `ther`, you could use the pa
     "message":"Success",
     "data": [
         {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
-        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}    
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
     ]
 }
 ```
 
 ### Less Than
-    
-The `lt` filter allows you to target objects whose values are less than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:
+The `lt` filter allows you to target objects whose values are less than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:<br><br>
 
 ```json
 {
@@ -382,15 +243,14 @@ The `lt` filter allows you to target objects whose values are less than a specif
     "return":0,
     "message":"Success",
     "data": [
-        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
         {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
         {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
-
     ]
-}
+} 
 ```
 
-If you wanted to target objects whose tag is less than `100`, you could use the payload `{"extra__tag__lt": 100}`. This returns:
+If you wanted to target objects whose tag is less than `100`, you could use the payload `{"extra__tag__lt": 100}`. This returns:<br><br>
 
 ```json
 {
@@ -399,14 +259,13 @@ If you wanted to target objects whose tag is less than `100`, you could use the 
     "return":0,
     "message":"Success",
     "data": [
-        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}  
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}
     ]
 }
 ```
 
 ### Less Than or Equal To
-    
-The `lte` filter allows you to target objects whose values are less than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:
+The `lte` filter allows you to target objects whose values are less than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:<br><br>
 
 ```json
 {
@@ -415,15 +274,14 @@ The `lte` filter allows you to target objects whose values are less than or equa
     "return":0,
     "message":"Success",
     "data": [
-        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
         {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
         {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
-
     ]
 }
 ```
 
-If you wanted to target objects whose tag is less than or equal to `100`, you could use the payload `{"extra__tag__lte": 100}`. This returns:
+If you wanted to target objects whose tag is less than or equal to `100`, you could use the payload `{"extra__tag__lte": 100}`. This returns:<br><br>
 
 ```json
 {
@@ -438,9 +296,7 @@ If you wanted to target objects whose tag is less than or equal to `100`, you co
 }
 ```
 
-### Greater Than
-    
-The `gt` filter allows you to target objects whose values are greater than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:
+### Greater Than The `gt` filter allows you to target objects whose values are greater than a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:<br><br>
 
 ```json
 {
@@ -449,15 +305,14 @@ The `gt` filter allows you to target objects whose values are greater than a spe
     "return":0,
     "message":"Success",
     "data": [
-        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
         {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
         {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
-
     ]
 }
 ```
 
-If you wanted to target objects whose tag is greater than `100`, you could use the payload `{"extra__tag__gt": 100}`. This returns:
+If you wanted to target objects whose tag is greater than `100`, you could use the payload `{"extra__tag__gt": 100}`. This returns:<br><br>
 
 ```json
 {
@@ -466,14 +321,13 @@ If you wanted to target objects whose tag is greater than `100`, you could use t
     "return":0,
     "message":"Success",
     "data": [
-        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}  
+        {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
     ]
 }
 ```
 
 ### Greater Than or Equal To
-    
-The `lte` filter allows you to target objects whose values are greater than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:
+The `lte` filter allows you to target objects whose values are greater than or equal to a specific number. This will work on both numeric strings and integer data types. Below is an example response without any queries:<br><br>
 
 ```json
 {
@@ -482,15 +336,14 @@ The `lte` filter allows you to target objects whose values are greater than or e
     "return":0,
     "message":"Success",
     "data": [
-        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}}, 
+        {"id": 0, "name": "Test", "type": "type1", "extra": {"tag": 0}},
         {"id": 1, "name": "Other Test", "type": "type2", "extra": {"tag": 100}},
         {"id": 2, "name": "Another Test", "type": "type1", "extra": {"tag": 200}}
-
     ]
 }
 ```
 
-If you wanted to target objects whose tag is greater than or equal to `100`, you could use the payload `{"extra__tag__gte": 100}`. This returns:
+If you wanted to target objects whose tag is greater than or equal to `100`, you could use the payload `{"extra__tag__gte": 100}`. This returns:<br><br>
 
 ```json
 {
@@ -507,18 +360,22 @@ If you wanted to target objects whose tag is greater than or equal to `100`, you
 
 </details>
 
-### Obtaining Object IDs
-You may notice some API endpoints require an object `id` to update or delete objects. These IDs are not stored values, rather pfSense uses the object's array index value to locate and identify objects. Unless specified otherwise, API endpoints will use the same array index value (as returned in the `data` response field) to locate objects when updating or deleting. Some important items to note about these IDs:
+<details>
+  <summary>Obtaining Object IDs</summary>
 
+You may notice some API endpoints require an object `id` to update or delete objects. These IDs are not stored values, rather pfSense uses the object's array index value to locate and identify objects. Unless specified otherwise, API endpoints will use the same array index value (as returned in the `data` response field) to locate objects when updating or deleting. Some important items to note about these IDs:<br><br>
 - pfSense starts arrays with an index of 0. If you use a loop counter to determine the ID of a specific object, you must start that counter at 0.
 - These IDs are dynamic. For example, if you have 3 static route objects stored (IDs `0`, `1`, and `2`) and you _delete_ the object with ID `1`, pfSense will resort the array so the object with ID `2` will now have an ID of `1`.
 - API queries will retain the object's ID in the response. In the event that the `data` response field is no longer a sequential array due to the query, the `data` field will be represented as an associative array with the array items` key being the objects ID.
+
+</details>
 
 ### Requirements for queries:
 - API call must be successful and return `0` in the `return` field.
 - Endpoints must return an array of objects in the data field (e.g. `[{"id": 0, "name": "Test"}, {"id": 1, "name": "Other Test"}]`).
 - At least two objects must be present within the data field to support queries.
 
+<<<<<<< HEAD
 ### Notes:
 - For those using the Local database or API token authentication types, `client-id` and `client-token` are excluded from queries by default
 - Both recursive queries and query filters are separated by double underscores (`__`)
@@ -12211,3 +12068,9 @@ URL: https://{{$hostname}}/api/v1/user/privilege
 
 ---
 [Back to top](#pfsense-rest-api-documentation)
+=======
+# Limitations
+There are a few key limitations to keep in mind while using this API:<br><br>
+- pfSense's XML configuration was not designed for quick simultaneous writes like a traditional database. It may be necessary to delay API calls in sequence to prevent unexpected behavior such as configuration overwrites.
+- By design, values stored in pfSense's XML configuration can only be parsed as strings, arrays or objects. This means that even though request data requires data to be of a  certain type, it will not necessarily be stored as that type. Data read from the API may be represented differently than the format it was requested as.
+>>>>>>> 14b5da3 (Updated contributing guidelines about updating documentation, removed endpoint documentation from README.md and prompt directing users to new Swagger docs after installation)
