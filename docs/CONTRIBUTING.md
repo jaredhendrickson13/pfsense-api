@@ -543,12 +543,10 @@ directories needed to build our package from the `files` directory. For more inf
 to `tools/README.md`
 
 ## Creating or Updating Documentation ##
-Documentation is written and maintained using Postman. The JSON export of the Postman collection can be found in 
-`tools/templates/documentation.json`. Both the README.md and embedded documentation are generated using this JSON file. To update
-or add documentation, you can either import this collection to Postman, make your changes in Postman and then export the
-updated collection as JSON, or you may edit the JSON file directly if you are familiar with the structure. To generate
-the README.md and embedded documentation pages, you may use the `tools/make_documentation.py` script. For more info on
-running the script, refer to `tools/README.md`
+Documentation is written using Swagger/OpenAPIv3. The OpenAPI configuration can be found at 
+`pfSense-pkg-API/files/usr/local/www/api/documentation/openapi.yml`. Whenever new functionality is added or updated, 
+the OpenAPI configuration must also be updated to reflect the changes. The OpenAPI configuration 
+must be in OpenAPIv3 spec at all times. 
  
 Questions
 ---------
