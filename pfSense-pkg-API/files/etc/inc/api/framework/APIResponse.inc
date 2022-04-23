@@ -603,6 +603,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Could not locate system certificate revocation list"
         ],
+        1083 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "System table with this name does not exist"
+        ],
 
         // 2000-2999 reserved for /services API calls
         2000 => [
