@@ -8389,6 +8389,14 @@ paths:
       description: 'Read existing table entries.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-tables`]'
+      parameters:
+        - name: name
+          in: query
+          schema:
+            type: string
+          description: >-
+            Name of the table to read. This must be an existing table. If no table name is specified, all tables will
+            be read. Depending on the size of the tables on the system, reading all tables may take a while.
       responses:
         200:
           $ref: '#/components/responses/Success'

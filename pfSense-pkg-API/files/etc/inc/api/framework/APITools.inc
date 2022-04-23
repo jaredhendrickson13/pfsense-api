@@ -64,7 +64,8 @@ function form_decode($array) {
         # Check for boolean type query strings
         if ($value === "true") {
             $array[$key] = true;
-        } else {
+        }
+        elseif ($value === "false") {
             $array[$key] = false;
         }
 
