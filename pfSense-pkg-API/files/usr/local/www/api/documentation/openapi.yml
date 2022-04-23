@@ -8953,6 +8953,19 @@ paths:
       summary: Create RADIUS authentication server
       tags:
         - User > Authentication Server
+  /api/v1/user/group:
+    get:
+      description: 'Read existing user groups.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read user groups
+      tags:
+        - User > Group
   /api/v1/user/group/member:
     delete:
       description: 'Remove a user from an existing group.<br><br>
@@ -9076,6 +9089,7 @@ tags:
   - name: User
   - name: User > Authentication Server
   - name: User > Privilege
+  - name: User > Group
   - name: User > Group > Member
   - name: Interface
   - name: Interface > Bridge
