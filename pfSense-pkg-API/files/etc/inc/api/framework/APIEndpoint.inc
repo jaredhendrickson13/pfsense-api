@@ -96,23 +96,10 @@ class APIEndpoint {
 
     # Encodes the API response data to the requested or most relevant content type
     public function content_type_encode($data) {
-        # Variables
-        $content_type = ($_SERVER["HTTP_ACCEPT"] !== "*/*") ? $_SERVER["HTTP_ACCEPT"] : $_SERVER["HTTP_CONTENT_TYPE"];
-
+        # TODO: in future if additional response Content-Types need to be supported we can add them here
+        # TODO: and control the requested content-type using the Accept HTTP header
         # Encode response as JSON if content type is application/json
-        if ($content_type === "application/json") {
-            header("Content-Type: application/json", true);
-            return json_encode($data);
-        }
-        # Encode response as YAML if content type is application/yaml
-        elseif ($content_type === "application/yaml") {
-            header("Content-Type: application/yaml", true);
-            return yaml_encode($data);
-        }
-        # Otherwise, just default to JSON
-        else {
-            header("Content-Type: application/json", true);
-            return json_encode($data);
-        }
+        header("Content-Type: application/json", true);
+        return json_encode($data);
     }
 }
