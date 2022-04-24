@@ -16,7 +16,6 @@ info:
     are made preventing the need for a reboot. All this results in the fastest, safest, and 
     easiest way to automate pfSense!
 
-
     # Requirements
     
     - pfSense CE 2.5.0 or later is supported. pfSense Plus is NOT compatible
@@ -8972,6 +8971,116 @@ paths:
         401:
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read user groups
+      tags:
+        - User > Group
+    post:
+      description: 'Create a new group.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  description: "Name of the group."
+                  type: string
+                  minLength: 1
+                  maxLength: 16
+                scope:
+                  description: "Scope of the group."
+                  type: string
+                  enum: ["local", "remote"]
+                  default: local
+                description:
+                  description: "Description of the group"
+                  type: string
+                  default: ""
+                member:
+                  description: UIDs of users to assign to this group.
+                  type: array
+                  default: []
+                  items:
+                    type: integer
+                priv:
+                  description: Privileges to assign to this group.
+                  type: array
+                  default: []
+                  items:
+                    type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Create user group
+      tags:
+        - User > Group
+    put:
+      description: 'Update an existing group.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id
+              properties:
+                id:
+                  description: "Name of the group to update."
+                  type: string
+                name:
+                  description: "New name of the group."
+                  type: string
+                  minLength: 1
+                  maxLength: 16
+                scope:
+                  description: "Scope of the group."
+                  type: string
+                  enum: ["local", "remote"]
+                description:
+                  description: "Description of the group"
+                  type: string
+                member:
+                  description: UIDs of users to assign to this group.
+                  type: array
+                  items:
+                    type: integer
+                priv:
+                  description: Privileges to assign to this group.
+                  type: array
+                  items:
+                    type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update user group
+      tags:
+        - User > Group
+    delete:
+      description: 'Delete an existing user group.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]'
+      parameters:
+        - name: id
+          description: "Name of the group to delete."
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Delete user group
       tags:
         - User > Group
   /api/v1/user/group/member:
