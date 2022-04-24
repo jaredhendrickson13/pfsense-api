@@ -9,13 +9,29 @@ pfSense API is a fast, safe, REST API package for pfSense firewalls. This works 
 
 # Installation
 To install pfSense API, simply run the following command from the pfSense shell:<br><br>
-``` pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.5-pkg-API.txz && /etc/rc.restart_webgui ```<br><br>
+
+```
+pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.5-pkg-API.txz && /etc/rc.restart_webgui
+```
+<br>
+
 To uninstall pfSense API, run the following command:<br><br>
-``` pfsense-api delete ```<br><br>
+```
+pfsense-api delete
+```
+<br>
+
 To update pfSense API to the latest stable version, run the following command:<br><br>
-``` pfsense-api update ```<br><br>
+```
+pfsense-api update
+```
+<br>
+
 To revert to a previous version of pfSense API (e.g. v1.1.7), run the following command:<br><br>
-``` pfsense-api revert v1.1.7 ```<br><br>
+```
+pfsense-api revert v1.1.7
+```
+<br>
 
 ### Notes:
 - To install the 2.6 package, simply change the `2.5` in the install URL to `2.6`.
@@ -38,7 +54,8 @@ To authenticate your API call, follow the instructions for your configured authe
     <summary>Local Database (default)</summary>
 
 Uses the same credentials as the pfSense webConfigurator. To authenticate API calls, pass in your username and password using basic authentication. For example:<br><br>
-`curl -u admin:pfsense https://pfsense.example.com/api/v1/firewall/rule`<br><br>
+`curl -u admin:pfsense https://pfsense.example.com/api/v1/firewall/rule`
+<br><br>
 _Note: in previous releases, local database authentication used the `client-id` and `client-token` fields in your request body to authenticate. This functionality still exists but is not recommended. It will be removed in a future release._
 </details>
 
@@ -46,7 +63,8 @@ _Note: in previous releases, local database authentication used the `client-id` 
     <summary>JWT</summary>
 
 Requires a bearer token to be included in the `Authorization` header of your request. To receive a bearer token, you may make a POST request to /api/v1/access_token and include a `client-id` value containing your pfSense username and a `client-token` value containing your pfSense password to your payload. For example:<br><br>
-`{"client-id": "admin", "client-token" "pfsense"}`<br><br>
+`{"client-id": "admin", "client-token" "pfsense"}`
+<br><br>
 Once you have your bearer token, you can authenticate your API call by adding it to the request's authorization header. (e.g. `Authorization: Bearer xxxxxxxx.xxxxxxxxx.xxxxxxxx`)
 </details>
 
