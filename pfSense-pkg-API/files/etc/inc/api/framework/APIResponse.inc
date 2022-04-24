@@ -3348,6 +3348,66 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "User certificate does not exist"
         ],
+        5042 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Group name is required"
+        ],
+        5043 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Group name contains invalid characters"
+        ],
+        5044 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Group name must be between 1 and 16 characters in length"
+        ],
+        5045 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Group name contains invalid characters"
+        ],
+        5046 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid group scope option"
+        ],
+        5047 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Group member UID does not match existing user"
+        ],
+        5048 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid group privilege specified"
+        ],
+        5049 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Group name is already in use"
+        ],
+        5050 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Group ID is required"
+        ],
+        5051 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Group with this ID does not exist"
+        ],
         // 6000-6999 reserved for /routing API calls
         6000 => [
             "status" => "bad request",

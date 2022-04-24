@@ -24,34 +24,48 @@ class APIUserGroupRead extends APIModel {
     }
 
     public function action() {
-        return APIResponse\get(0, $this->__to_representation($this->config["system"]["group"]));
+        return APIResponse\get(0, $this->to_representation($this->config["system"]["group"], true));
     }
 
-    private function __to_representation($groups) {
-        # Loop through each group and convert various values to their expected types
-        foreach($groups as $id=>$group) {
-            # Ensure GIDs are integers
-            $groups[$id]["gid"] = intval($groups[$id]["gid"]);
-
-            # Ensure each member item is an integer
-            if ($groups[$id]["member"]) {
-                foreach ($groups[$id]["member"] as $member_id=>$member) {
-                    $groups[$id]["member"][$member_id] = intval($member);
-                }
-            } else {
-                $groups[$id]["member"] = [];
-            }
-
-            # Ensure each priv item is a string
-            if ($groups[$id]["priv"]) {
-                foreach ($groups[$id]["priv"] as $priv_id=>$priv) {
-                    $groups[$id]["priv"][$priv_id] = strval($priv);
-                }
-            } else {
-                $groups[$id]["priv"] = [];
+    public static function to_representation($groups, $multiple=false) {
+        # Convert a list of groups to representation
+        if ($multiple) {
+            $representation = [];
+            # Loop through each group and convert various values to their expected types
+            foreach($groups as $group) {
+                $representation[] =  self::__type_map($group);
             }
         }
+        # Convert a single group to representation
+        else {
+            $representation = self::__type_map($groups);
+        }
 
-        return $groups;
+        return $representation;
+    }
+
+    private static function __type_map($group) {
+        # Ensure GIDs are integers
+        $group["gid"] = intval($group["gid"]);
+
+        # Ensure each member item is an integer
+        if ($group["member"]) {
+            foreach ($group["member"] as $member_id=>$member) {
+                $group["member"][$member_id] = intval($member);
+            }
+        } else {
+            $group["member"] = [];
+        }
+
+        # Ensure each priv item is a string
+        if ($group["priv"]) {
+            foreach ($group["priv"] as $priv_id=>$priv) {
+                $group["priv"][$priv_id] = strval($priv);
+            }
+        } else {
+            $group["priv"] = [];
+        }
+
+        return $group;
     }
 }
