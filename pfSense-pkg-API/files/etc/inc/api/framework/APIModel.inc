@@ -81,7 +81,6 @@ class APIModel {
         # Checks API status and requirements
         $this->check_enable();
         $this->check_server_ip();
-        $this->check_version();
         $this->check_packages();
 
         # Checks request data
@@ -135,17 +134,6 @@ class APIModel {
         if (!isset($api_config["enable"]) and !$this->ignore_enabled) {
             header("Location: /");
             die();
-        }
-    }
-
-    # Check if server is running a supported version of pfSense
-    private function check_version() {
-        # Local variables
-        $curr_ver = str_replace(".", "", explode("-", APITools\get_pfsense_version()["version"])[0]);
-        $min_ver = 244;
-        $curr_ver = is_numeric($curr_ver) ? intval($curr_ver) : 0;
-        if ($curr_ver < $min_ver) {
-            $this->errors[] = APIResponse\get(5);
         }
     }
 
