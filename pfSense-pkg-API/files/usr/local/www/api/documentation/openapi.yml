@@ -285,9 +285,8 @@ info:
         }
       ]
     }
-
     ```
-
+    <br><br>
     ### Ends With
 
     The `endswith` filter allows you to target objects whose values end with a specific substring. This will work on both
@@ -357,9 +356,8 @@ info:
         }
       ]
     }
-
     ```
-
+    <br><br>
     ### Contains
 
     The `contains` filter allows you to target objects whose values contain a specific substring. This will work on both
@@ -429,9 +427,8 @@ info:
         }
       ]
     }
-
     ```
-
+    <br><br>
     ### Less Than
 
     The `lt` filter allows you to target objects whose values are less than a specific number. This will work on both
@@ -471,7 +468,6 @@ info:
       ]
     } 
     ```
-
     If you wanted to target objects whose tag is less than `100`, you could use the payload `{"extra__tag__lt": 100}`. This
     returns:<br><br>
 
@@ -492,7 +488,6 @@ info:
         }
       ]
     }
-
     ```
 
     ### Less Than or Equal To
@@ -533,7 +528,6 @@ info:
         }
       ]
     }
-
     ```
 
     If you wanted to target objects whose tag is less than or equal to `100`, you could use the
@@ -564,7 +558,6 @@ info:
         }
       ]
     }
-
     ```
 
     ### Greater Than 
@@ -604,7 +597,6 @@ info:
         }
       ]
     }
-
     ```
 
     If you wanted to target objects whose tag is greater than `100`, you could use the payload `{"extra__tag__gt": 100}`.
@@ -627,7 +619,6 @@ info:
         }
       ]
     }
-
     ```
 
     ### Greater Than or Equal To
@@ -668,7 +659,6 @@ info:
         }
       ]
     }
-
     ```
 
     If you wanted to target objects whose tag is greater than or equal to `100`, you could use the
@@ -699,7 +689,6 @@ info:
         }
       ]
     }
-
     ```
 
     </details>
