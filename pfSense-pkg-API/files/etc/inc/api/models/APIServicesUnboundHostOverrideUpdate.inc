@@ -128,7 +128,6 @@ class APIServicesUnboundHostOverrideUpdate extends APIModel {
                 $alias_create->validate_host();
                 $alias_create->validate_domain();
                 $alias_create->validate_description();
-                $alias_create->alias_exists($this->validated_data, $this->id);
                 $this->errors = array_merge($this->errors, $alias_create->errors);
                 $this->validated_data["aliases"]["item"][] = $alias_create->validated_data;
             }
