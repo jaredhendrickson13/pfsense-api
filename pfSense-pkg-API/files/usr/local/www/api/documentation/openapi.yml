@@ -5,17 +5,6 @@ info:
   description: >-
     ---
 
-    # webConfigurator Settings & Documentation
-
-    After installation, you will be able to access the API user interface pages within the pfSense webConfigurator. These
-    will be found under System > API. The settings tab will allow you change various API settings such as enabled API
-    interfaces, authentication modes, and more. Additionally, the documentation tab will give you access to an embedded
-    documentation tool that makes it easy to view the full API documentation in context to your pfSense instance.
-
-    ### Notes:
-
-    - Users must hold the `page-all` or `page-system-api` privileges to access the API page within the webConfigurator.
-
     # Authentication & Authorization
 
     By default, pfSense API uses the same credentials as the webConfigurator. This behavior allows you to configure pfSense
