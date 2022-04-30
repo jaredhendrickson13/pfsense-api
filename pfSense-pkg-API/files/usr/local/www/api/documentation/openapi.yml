@@ -10757,6 +10757,7 @@ paths:
       summary: Assign user privileges
       tags:
         - User > Privilege
+
 tags:
   - name: Access Token
   - name: User
@@ -10818,6 +10819,7 @@ tags:
   - name: Status > System
   - name: Services
   - name: Services > OpenVPN > CSC
+  - name: Services > OpenVPN > Server
   - name: Services > Unbound
   - name: Services > Unbound > Access List
   - name: Services > Unbound > Access List > Row
