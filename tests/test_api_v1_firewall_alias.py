@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestFirewallAlias(unit_test_framework.APIUnitTest):
+class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/firewall/alias"
     get_tests = [
         {"name": "Read all aliases"}
@@ -25,7 +25,7 @@ class APIUnitTestFirewallAlias(unit_test_framework.APIUnitTest):
             "payload": {
                 "name": "RFC1918",
                 "type": "network",
-                "descr": "Unit Test",
+                "descr": "E2E Test",
                 "address": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/24"],
                 "detail": ["Class A", "Class B", "Class C"]
             },
@@ -36,7 +36,7 @@ class APIUnitTestFirewallAlias(unit_test_framework.APIUnitTest):
             "payload": {
                 "name": "HTTP_PORTS",
                 "type": "port",
-                "descr": "Unit Test",
+                "descr": "E2E Test",
                 "address": [80, 443, 8443, "8080:8081"],
                 "detail": ["HTTP", "HTTPS", "HTTPS-ALT"]
             },
@@ -47,7 +47,7 @@ class APIUnitTestFirewallAlias(unit_test_framework.APIUnitTest):
             "payload": {
                 "name": "DNS_SERVERS",
                 "type": "host",
-                "descr": "Unit Test",
+                "descr": "E2E Test",
                 "address": ["1.1.1.1", "8.8.8.8", "8.8.4.4", "RFC1918"],
                 "detail": ["Cloudflare DNS", "Google DNS", "Secondary Google DNS"]
             },
@@ -129,7 +129,7 @@ class APIUnitTestFirewallAlias(unit_test_framework.APIUnitTest):
                 "id": "RFC1918",
                 "name": "UPDATED_RFC1918",
                 "type": "network",
-                "descr": "Updated Unit Test",
+                "descr": "Updated E2E Test",
                 "address": ["10.0.0.0/32", "172.16.0.0/32", "192.168.0.0/32"],
                 "detail": ["New Class A", "New Class B", "New Class C"]
             },
@@ -141,7 +141,7 @@ class APIUnitTestFirewallAlias(unit_test_framework.APIUnitTest):
                 "id": "HTTP_PORTS",
                 "name": "UPDATED_HTTP_PORTS",
                 "type": "port",
-                "descr": "Updated Unit Test",
+                "descr": "Updated E2E Test",
                 "address": [8080, 4433, 443],
                 "detail": ["HTTP-ALT", "HTTPS-ALT"]
             },
@@ -153,7 +153,7 @@ class APIUnitTestFirewallAlias(unit_test_framework.APIUnitTest):
                 "id": "DNS_SERVERS",
                 "name": "UPDATED_DNS_SERVERS",
                 "type": "host",
-                "descr": "Updated Unit Test",
+                "descr": "Updated E2E Test",
                 "address": ["8.8.8.8"],
                 "detail": ["Google DNS"]
             },
@@ -251,4 +251,4 @@ class APIUnitTestFirewallAlias(unit_test_framework.APIUnitTest):
 
     ]
 
-APIUnitTestFirewallAlias()
+APIE2ETestFirewallAlias()

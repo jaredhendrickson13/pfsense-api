@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestInterfaceBridge(unit_test_framework.APIUnitTest):
+class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/interface/bridge"
     get_tests = [{"name": "Read all interface VLANs"}]
     post_tests = [
@@ -128,4 +128,4 @@ class APIUnitTestInterfaceBridge(unit_test_framework.APIUnitTest):
         }
     ]
 
-APIUnitTestInterfaceBridge()
+APIE2ETestInterfaceBridge()

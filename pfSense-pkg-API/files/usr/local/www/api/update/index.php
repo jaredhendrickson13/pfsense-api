@@ -21,7 +21,7 @@ require_once("api/models/APISystemAPIVersionRead.inc");
 # Initialize the pfSense UI page (note: $pgtitle must be defined before including head.inc)
 $pgtitle = array(gettext('System'), gettext('API'), gettext('Update'));
 include('head.inc');
-echo "<link rel='stylesheet' href='/css/api.css'/>";
+echo "<link rel='stylesheet' href='/css/api/api.css'/>";
 echo "<script type='application/javascript' src='/js/api.js'></script>";
 $update_tab = (APISystemAPIVersionRead::is_update_available()) ? "Update (New Release Available)" : "Update";
 $tab_array = [[gettext("Settings"), false, "/api/"], [gettext("Documentation"), false, "/api/documentation/"], [gettext($update_tab), true, "/api/update/"]];

@@ -24,12 +24,41 @@ class APIServicesRestartCreate extends APIModel {
     }
 
     public function action() {
-        $services = get_services();
-        // Loop through our service list and add our service status
-        foreach ($services as $key => $srvc) {
-            service_control_restart($srvc["name"], []);    // Start our service
-            $services[$key]["status"] = "restarted";
+        if (isset($this->validated_data["service"])) {
+            service_control_restart($this->validated_data["service"], []);
+            return APIResponse\get(0, $this->validated_data["service"]);
+        } else {
+            $services = get_services();
+            // Loop through our service list and add our service status
+            foreach ($services as $key => $srvc) {
+                service_control_restart($srvc["name"], []);    // Start our service
+                $services[$key]["status"] = "restarted";
+            }
+            return APIResponse\get(0, $services);
         }
-        return APIResponse\get(0, $services);
+    }
+
+    private function __validate_service() {
+        # Check if specified service exists
+        if (isset($this->initial_data["service"])) {
+            $services = get_services();
+            # Loop over services to find specified service
+            $found = false;
+            foreach($services as $key => $srvc) {
+                if ($this->initial_data["service"] === $srvc["name"]) {
+                    $found = true;
+                    break;
+                }
+            }
+            if (!$found) {
+                $this->errors[] = APIResponse\get(2999);
+            } else {
+                $this->validated_data["service"] = $this->initial_data["service"];
+            }
+        }
+    }
+
+    public function validate_payload() {
+        $this->__validate_service();
     }
 }

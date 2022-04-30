@@ -5,10 +5,10 @@
 Below are versions that are currently supported and will receive security updates when available.
 
 | Version | Supported          |
-| ------- | ------------------ |
+|---------| ------------------ |
+| 1.4.x   | :white_check_mark: |
 | 1.3.x   | :white_check_mark: |
-| 1.2.x   | :white_check_mark: |
-| 1.1.x   | :x:                |
+| 1.2.x   | :x:                |
 
 ## Reporting a Vulnerability
 

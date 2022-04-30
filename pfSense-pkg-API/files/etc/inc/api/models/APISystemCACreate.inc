@@ -228,7 +228,6 @@ class APISystemCACreate extends APIModel {
         # Local variables
         $key_lengths = [1024, 2048, 3072, 4096, 6144, 7680, 8192, 15360, 16384];
 
-
         # Validate the conditional 'keylen' field when the keytype is set to RSA
         if ($this->cert_attr["keytype"] === "RSA") {
             if (isset($this->initial_data['keylen'])) {

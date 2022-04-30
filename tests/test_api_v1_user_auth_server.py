@@ -1,9 +1,9 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestUserAuthServer(unit_test_framework.APIUnitTest):
+class APIE2ETestUserAuthServer(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/user/auth_server"
     get_tests = [{"name": "Read all auth servers"}]
 
 
-APIUnitTestUserAuthServer()
+APIE2ETestUserAuthServer()

@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestServicesSSHdRestart(unit_test_framework.APIUnitTest):
+class APIE2ETestServicesSSHdRestart(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/sshd/restart"
     post_tests = [{"name": "Restart the SSHd service"}]
 
-APIUnitTestServicesSSHdRestart()
+APIE2ETestServicesSSHdRestart()

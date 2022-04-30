@@ -411,21 +411,23 @@ class APIFirewallRuleUpdate extends APIModel {
         # Check for floating rule
         if ($this->initial_data["floating"] === true) {
             $this->validated_data["floating"] = "yes";
-        } else {
-            $this->validated_data["floating"] = "no";
+        } elseif ($this->initial_data["floating"] === false) {
+            unset($this->validated_data["floating"]);
+            unset($this->validated_data["direction"]);
         }
     }
 
     private function __validate_direction() {
         # Validate our optional 'floating' payload value
-        if ($this->initial_data["floating"] === true) {
+        if (!empty($this->validated_data["floating"])) {
             if (isset($this->initial_data["direction"])) {
+                # Validate our optional 'direction' payload value
                 if (in_array($this->initial_data["direction"], ["in", "out", "any"])) {
                     $this->validated_data["direction"] = $this->initial_data["direction"];
                 } else {
-                    $this->errors[] = APIResponse\get(6030);
+                    $this->errors[] = APIResponse\get(4239);
                 }
-            } else {
+            } elseif (empty($this->validated_data["direction"])) {
                 $this->validated_data["direction"] = "any";
             }
         }

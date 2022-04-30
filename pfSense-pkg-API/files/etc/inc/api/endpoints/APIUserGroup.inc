@@ -20,8 +20,16 @@ class APIUserGroup extends APIEndpoint {
         $this->url = "/api/v1/user/group";
     }
 
+    protected function get() {
+        return (new APIUserGroupRead())->call();
+    }
+
     protected function post() {
         return (new APIUserGroupCreate())->call();
+    }
+
+    protected function put() {
+        return (new APIUserGroupUpdate())->call();
     }
 
     protected function delete() {

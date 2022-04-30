@@ -1,7 +1,7 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestSystemReboot(unit_test_framework.APIUnitTest):
+class APIE2ETestSystemReboot(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/system/reboot"
     post_tests = [
         {
@@ -11,4 +11,4 @@ class APIUnitTestSystemReboot(unit_test_framework.APIUnitTest):
     ]
 
 
-APIUnitTestSystemReboot()
+APIE2ETestSystemReboot()

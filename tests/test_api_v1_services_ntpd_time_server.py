@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestServicesNTPdTimeServer(unit_test_framework.APIUnitTest):
+class APIE2ETestServicesNTPdTimeServer(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/ntpd/time_server"
     post_tests = [
         {
@@ -42,4 +42,4 @@ class APIUnitTestServicesNTPdTimeServer(unit_test_framework.APIUnitTest):
     ]
 
 
-APIUnitTestServicesNTPdTimeServer()
+APIE2ETestServicesNTPdTimeServer()

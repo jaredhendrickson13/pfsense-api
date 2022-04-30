@@ -21,48 +21,168 @@ class APIUserGroupCreate extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-groupmanager"];
-        $this->change_note = "Added group membership for user via API";
+        $this->change_note = "Added group via API";
     }
 
     public function action() {
-        local_user_set_groups($this->validated_data["user_config"], $this->validated_data["user_groups"]);    // Set our user's groups
+        # Add this group to configuration and apply OS changes.
+        $this->config["system"]["group"][] = $this->validated_data;
+        $this->__apply();
         $this->write_config();
-        return APIResponse\get(0, $this->validated_data["user_groups"]);
+        return APIResponse\get(0, APIUserGroupRead::to_representation($this->validated_data));
     }
 
     public function validate_payload() {
-        if (isset($this->initial_data['username'])) {
-            if (!array_key_exists($this->initial_data['username'], index_users())) {
-                $this->errors[] = APIResponse\get(5001);
-            } else {
-                $this->validated_data["username"] = $this->initial_data['username'];
-                $this->validated_data["user_config"] = getUserEntry($this->validated_data["username"]);
-                $user_groups = local_user_get_groups($this->validated_data["user_config"], true);
-            }
-        } else {
-            $this->errors[] = APIResponse\get(5000);
-        }
-        if (isset($this->initial_data['group'])) {
-            if (is_string($this->initial_data['group'])) {
-                $this->initial_data['group'] = array($this->initial_data['group']);
-            }
-            if (is_array($this->initial_data['group'])) {
-                $this->validated_data["user_groups"] = [];
-                foreach ($this->initial_data['group'] as $ng) {
-                    if (!array_key_exists($ng, index_groups())) {
-                        $this->errors[] = APIResponse\get(5008);
+        # Validate input fields
+        $this->__validate_name();
+        $this->__validate_scope();
+        $this->__validate_description();
+        $this->__validate_member();
+        $this->__validate_priv();
+
+        # Set static values
+        $this->validated_data["gid"] = $this->config["system"]["nextgid"]++;
+    }
+
+    private function __validate_name() {
+        # Validate the required 'name' field
+        if (isset($this->initial_data["name"])) {
+            # Ensure group name is 16 characters or less
+            if (strlen($this->initial_data["name"]) >= 1 and strlen($this->initial_data["name"]) <= 16) {
+                # Ensure group name is not already in use
+                if (!$this->is_existing_group($this->initial_data["name"])) {
+                    # Ensure group name does not use invalid characters
+                    if (preg_match("/[^a-zA-Z0-9\.\-_]/", $this->initial_data["name"])) {
+                        $this->errors[] = APIResponse\get(5045);
+                    } else {
+                        $this->validated_data["name"] = $this->initial_data["name"];
                     }
-                    if (!in_array($ng, $user_groups)) {
-                        $this->validated_data["user_groups"][] = $ng;
-                    }
+                } else {
+                    $this->errors[] = APIResponse\get(5049);
                 }
-                // Add our new groups to our existing groups
-                $this->validated_data["user_groups"] = array_merge($user_groups, $this->validated_data["user_groups"]);
             } else {
-                $this->errors[] = APIResponse\get(5009);
+                $this->errors[] = APIResponse\get(5044);
             }
         } else {
-            $this->errors[] = APIResponse\get(5007);
+            $this->errors[] = APIResponse\get(5042);
         }
     }
+
+    private function __validate_scope() {
+        # Validate the optional 'scope' field
+        if (isset($this->initial_data["scope"])) {
+            # Ensure the scope is a valid option
+            if (in_array($this->initial_data["scope"], ["local", "remote"])) {
+                $this->validated_data["scope"] = $this->initial_data["scope"];
+            } else {
+                $this->errors[] = APIResponse\get(5046);
+            }
+        } else {
+            # Default this value to 'local'
+            $this->validated_data["scope"] = "local";
+        }
+    }
+
+    private function __validate_description() {
+        # Validate the optional 'description' field
+        if (isset($this->initial_data["description"])) {
+            $this->validated_data["description"] = strval($this->initial_data["description"]);
+        } else {
+            # Default this value to empty string
+            $this->validated_data["description"] = "";
+        }
+    }
+
+    private function __validate_member() {
+        # Default members to empty array
+        $this->validated_data["member"] = [];
+
+        # Validate the optional 'member' field
+        if (isset($this->initial_data["member"])) {
+            # Convert non-array values to an array
+            if (!is_array($this->initial_data["member"])) {
+                $this->initial_data["member"] = array($this->initial_data["member"]);
+            }
+
+            # Loop through each array item and ensure it is an existing user ID
+            foreach ($this->initial_data["member"] as $uid) {
+                # Ensure value is an existing user's UID
+                if ($this->is_existing_uid($uid)) {
+                    $this->validated_data["member"][] = $uid;
+                } else {
+                    $this->errors[] = APIResponse\get(5047);
+                    break;
+                }
+            }
+        }
+    }
+
+    private function __validate_priv() {
+        global $priv_list;
+        $this->validated_data["priv"] = [];
+
+        # Validate the optional `priv` field
+        if ($this->initial_data["priv"]) {
+            # Ensure value is an array
+            if (!is_array($this->initial_data["priv"])) {
+                $this->initial_data["priv"] = array($this->initial_data["priv"]);
+            }
+
+            # Loop through each requested privilege and ensure it exists
+            foreach ($this->initial_data["priv"] as $priv) {
+                if (array_key_exists($priv, $priv_list)) {
+                    $this->validated_data["priv"][] = $priv;
+                    $this->validated_data["priv"] = array_unique($this->validated_data["priv"]);
+                } else {
+                    $this->errors[] = APIResponse\get(5048);
+                    break;
+                }
+            }
+        }
+    }
+
+    # Applies this user/group configuration to the OS user
+    private function __apply() {
+        # Sort groups alphabetically
+        usort($this->config['system']['group'], function($a, $b) {
+            return strcasecmp($a['name'], $b['name']);
+        });
+
+        # Add this group to the OS
+        local_group_set($this->validated_data);
+
+        # Sync group member's OS users
+        if (is_array($this->validated_data['member'])) {
+            init_config_arr(array('system', 'user'));
+
+            foreach ($this->config["system"]["user"] as $user) {
+                if (in_array($user['uid'], $this->validated_data['member'])) {
+                    local_user_set($user);
+                }
+            }
+        }
+    }
+
+    public function is_existing_uid($uid) {
+        # Loop through each existing user and change if the UID matches
+        foreach ($this->config["system"]["user"] as $user) {
+            if ($user["uid"] == $uid) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function is_existing_group($name) {
+        # Loop through each existing group and ensure this group name is not already used
+        foreach ($this->config["system"]["group"] as $group) {
+            if ($name === $group["name"]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
+
+

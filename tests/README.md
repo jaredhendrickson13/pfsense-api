@@ -1,11 +1,11 @@
 Tests
 =====
-This directory holds our unit tests. Any script or file that aides the testing of this projects functionality should be 
-placed here. Ideally, each supported API call should have some sort of unit test behind it to ensure functionality does
+This directory holds our E2E tests. Any script or file that aides the testing of this projects functionality should be 
+placed here. Ideally, each supported API call should have some sort of E2E test behind it to ensure functionality does
 not regress between releases.
 
 ## Overview
-Unit tests are written using Python3. These are standalone scripts that can be run from any command line with Python3
+E2E tests are written using Python3. These are standalone scripts that can be run from any command line with Python3
 installed. These scripts are using Python3's argparse package which includes an embedded help page by adding the `-h`
 argument to your commands
 
@@ -44,7 +44,7 @@ OK ------> [ POST https://172.16.209.139:443/api/v1/user/privilege ]: Response i
 
 ## Running All Tests
 `tests/run_all_tests.py` is a script that will run through all tests within the `tests/` directory. In order for
-unit tests to be included, they must start with `test_` and end with `.py`. 
+E2E tests to be included, they must start with `test_` and end with `.py`. 
 
 ### Example
 ```commandline
@@ -63,4 +63,4 @@ OK ------> [ PUT https://172.16.209.139:443/api/v1/status/carp ]: Response is va
 ```
 
 ## Notes
-- For information on writing API unit tests, check the contributors guide at `docs/CONTRIBUTING.md`
+- For information on writing API E2E tests, check the contributors guide at `docs/CONTRIBUTING.md`

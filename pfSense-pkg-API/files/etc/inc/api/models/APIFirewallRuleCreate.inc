@@ -360,7 +360,7 @@ class APIFirewallRuleCreate extends APIModel {
                 if (in_array($this->initial_data["direction"], ["in", "out", "any"])) {
                     $this->validated_data["direction"] = $this->initial_data["direction"];
                 } else {
-                    $this->errors[] = APIResponse\get(6030);
+                    $this->errors[] = APIResponse\get(4239);
                 }
             } else {
                 $this->validated_data["direction"] = "any";

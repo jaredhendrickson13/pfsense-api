@@ -1,7 +1,7 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestSystemDNSServer(unit_test_framework.APIUnitTest):
+class APIE2ETestSystemDNSServer(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/system/dns/server"
     post_tests = [
         {
@@ -31,4 +31,4 @@ class APIUnitTestSystemDNSServer(unit_test_framework.APIUnitTest):
     ]
 
 
-APIUnitTestSystemDNSServer()
+APIE2ETestSystemDNSServer()

@@ -23,4 +23,8 @@ class APIFirewallStates extends APIEndpoint {
     protected function get() {
         return (new APIFirewallStatesRead())->call();
     }
+
+    protected function delete() {
+        return (new APIFirewallStatesDelete())->call();
+    }
 }
