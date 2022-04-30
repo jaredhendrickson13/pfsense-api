@@ -32,6 +32,7 @@ require_once("auth.inc");
 require_once("functions.inc");
 require_once("openvpn.inc");
 require_once("certs.inc");
+require_once("pkg-utils.inc");
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
@@ -43,7 +44,7 @@ function get_request_data() {
     $_SERVER["HTTP_CONTENT_TYPE"] = (empty($_SERVER["HTTP_CONTENT_TYPE"])) ? "application/x-www-form-urlencoded" : $_SERVER["HTTP_CONTENT_TYPE"];
     $content_types = [
         "application/json" => json_decode(file_get_contents('php://input'), true),
-        "application/x-www-form-urlencoded" => (empty($_GET)) ? json_decode(file_get_contents('php://input'), true) : $_GET
+        "application/x-www-form-urlencoded" => (empty($_GET)) ? json_decode(file_get_contents('php://input'), true) : form_decode($_GET)
     ];
 
     # Check if content type is supported, if so return corresponding parsed request data
@@ -54,6 +55,27 @@ function get_request_data() {
     else {
         return false;
     }
+}
+
+# Decode query string into their appropriate data types
+function form_decode($array) {
+    # Loop through each query string item and check for expected data types
+    foreach ($array as $key=>$value) {
+        # Check for boolean type query strings
+        if ($value === "true") {
+            $array[$key] = true;
+        }
+        elseif ($value === "false") {
+            $array[$key] = false;
+        }
+
+        # Check for integer type query strings
+        if (is_numeric($value)) {
+            $array[$key] = intval($value);
+        }
+    }
+
+    return $array;
 }
 
 # Check our local pfSense version
@@ -426,6 +448,19 @@ function is_valid_rule_addr($addr, $direction) {
 function str_starts_with($needle, $haystack) {
     $length = strlen($needle);
     return (substr($haystack, 0, $length) === $needle);
+}
+
+function str_ends_with($needle, $haystack) {
+    # Variables
+    $length = strlen($needle);
+
+    # If the needle is empty, match everything.
+    if( !$length ) {
+        return true;
+    }
+
+    # Check if the end of the string matches the needle
+    return substr($haystack, -$length) === $needle;
 }
 
 // Remove virtual IP and bring down virtual interface
@@ -1022,8 +1057,8 @@ function is_ip_subnet_or_alias($value) {
     }
 }
 
-# Checks if a given IP is within a given CIDR
-function is_ip_in_cidr($ip, $cidr) {
+# Checks if a given IPv4 address is within a given CIDR
+function is_ipv4_in_cidr($ip, $cidr) {
     # Use IP2Long to determine if a specified IP is within a specified cidr
     $subnet = explode('/', $cidr)[0];
     $subnet = ip2long($subnet);
@@ -1032,6 +1067,45 @@ function is_ip_in_cidr($ip, $cidr) {
     $mask = -1 << (32 - $bits);
     $subnet &= $mask;
     return ($ip & $mask) == $subnet;
+}
+
+# Checks if a given IPv6 address is within a given CIDR
+# Note: the CIDR must use the CIDRs network address to work
+function is_ipv6_in_cidr($ip, $cidr) {
+    # Local variables
+    $subnet = inet_pton(explode('/', $cidr)[0]);
+    $mask = (!is_null(explode('/', $cidr)[1])) ? explode('/', $cidr)[1] : 128;
+    $mask_bits = str_repeat("f", $mask / 4);
+
+    # Calculate the addr based on the mask
+    if ($mask % 4 == 1) {
+        $mask_bits .= "8";
+    }
+    elseif ($mask % 4 == 2) {
+        $mask_bits .= "c";
+    }
+    elseif ($mask % 4 == 3) {
+        $mask_bits .= "e";
+    }
+
+    # Format our address and check if it is within our CIDR
+    $mask_bits = str_pad($mask_bits, 32, '0');
+    $mask_bits = pack("H*" , $mask_bits);
+    return (inet_pton($ip) & $mask_bits) == $subnet;
+}
+
+# Check if a given IPv4 or IPv6 address is within a given CIDR
+function is_ip_in_cidr($ip, $cidr) {
+    # Run the CIDR function for the corresponding IP version
+    if (is_ipaddrv4($ip) and is_subnetv4($cidr)) {
+        return is_ipv4_in_cidr($ip, $cidr);
+    }
+    if (is_ipaddrv6($ip) and is_subnetv6($cidr)) {
+        return is_ipv6_in_cidr($ip, $cidr);
+    }
+
+    # Default to false if no condition was met previously
+    return false;
 }
 
 # Check if a specified IP is a configured virtual IP

@@ -1,7 +1,7 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestUserAuthServerLDAP(unit_test_framework.APIUnitTest):
+class APIE2ETestUserAuthServerLDAP(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/user/auth_server/ldap"
     get_tests = [{"name": "Read LDAP auth servers"}]
     post_tests = [
@@ -35,4 +35,4 @@ class APIUnitTestUserAuthServerLDAP(unit_test_framework.APIUnitTest):
     ]
 
 
-APIUnitTestUserAuthServerLDAP()
+APIE2ETestUserAuthServerLDAP()

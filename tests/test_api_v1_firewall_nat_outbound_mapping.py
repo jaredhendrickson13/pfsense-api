@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestFirewallNATOutboundMapping(unit_test_framework.APIUnitTest):
+class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/firewall/nat/outbound/mapping"
     get_tests = [
         {"name": "Read all outbound NAT mappings"}
@@ -32,7 +32,7 @@ class APIUnitTestFirewallNATOutboundMapping(unit_test_framework.APIUnitTest):
                 "target": "192.168.1.123/24",
                 "natport": 443,
                 "poolopts": "round-robin",
-                "descr": "Unit Test",
+                "descr": "E2E Test",
                 "nosync": True,
                 "top": True
             }
@@ -46,7 +46,7 @@ class APIUnitTestFirewallNATOutboundMapping(unit_test_framework.APIUnitTest):
                 "dst": "1.1.1.1",
                 "target": "192.168.1.123/24",
                 "poolopts": "round-robin",
-                "descr": "Unit Test 2",
+                "descr": "E2E Test 2",
                 "nosync": True,
                 "top": True
             }
@@ -63,7 +63,7 @@ class APIUnitTestFirewallNATOutboundMapping(unit_test_framework.APIUnitTest):
                 "dst": "1.1.1.1",
                 "target": "192.168.1.123/24",
                 "poolopts": "round-robin",
-                "descr": "Updated Unit Test",
+                "descr": "Updated E2E Test",
                 "nonat": True,
                 "disabled": True,
                 "nosync": True,
@@ -83,7 +83,7 @@ class APIUnitTestFirewallNATOutboundMapping(unit_test_framework.APIUnitTest):
                 "target": "192.168.1.123/24",
                 "staticnatport": True,
                 "poolopts": "round-robin",
-                "descr": "Updated Unit Test",
+                "descr": "Updated E2E Test",
                 "nonat": False,
                 "disabled": True,
                 "nosync": True,
@@ -96,4 +96,4 @@ class APIUnitTestFirewallNATOutboundMapping(unit_test_framework.APIUnitTest):
         {"name": "Delete port-based outbound NAT mapping", "payload": {"id": 0}},
     ]
 
-APIUnitTestFirewallNATOutboundMapping()
+APIE2ETestFirewallNATOutboundMapping()

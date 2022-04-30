@@ -72,7 +72,7 @@ class APIFirewallScheduleTimeRangeCreate extends APIModel {
 
             # Loop through each position and ensure it is valid
             foreach ($this->positions as $position) {
-                # Ensure this month is numeric value 1-12
+                # Ensure this weekday is numeric value 1-7
                 if (!is_numeric($position) or intval($position) < 1 or intval($position) > 7) {
                     $this->errors[] = APIResponse\get(4160);
                     return;

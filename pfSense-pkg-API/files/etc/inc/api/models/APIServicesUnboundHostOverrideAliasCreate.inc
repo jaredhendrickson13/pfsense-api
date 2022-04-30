@@ -45,11 +45,6 @@ class APIServicesUnboundHostOverrideAliasCreate extends APIModel {
         $this->validate_host();
         $this->validate_domain();
         $this->validate_description();
-
-        # Ensure alias host/domain combo isn't already used
-        if (($this->alias_exists($this->validated_data))) {
-            $this->errors[] = APIResponse\get(2009);
-        }
     }
 
     private function __validate_id() {
@@ -98,35 +93,6 @@ class APIServicesUnboundHostOverrideAliasCreate extends APIModel {
         # Check for our optional 'description' payload value
         if (isset($this->initial_data["description"])) {
             $this->validated_data["description"] = strval($this->initial_data["description"]);
-        }
-    }
-
-    public function alias_exists($parent, $id=null) {
-        # Local variables
-        $host = $this->validated_data["host"];
-        $domain = $this->validated_data["domain"];
-
-        # Loop through each host override and check if the FQDN already exists
-        foreach ($this->config["unbound"]["hosts"] as $index=>$ent) {
-            # Check the FQDN matches this entry
-            if ($ent["host"] === $host and $ent["domain"] === $domain) {
-                $this->errors[] = APIResponse\get(2009);
-            }
-
-            # Check FQDN within host override aliases as well
-            if (is_array($ent["aliases"])) {
-                foreach ($ent["aliases"]["item"] as $alias_ent) {
-                    if ($alias_ent["host"] === $host and $alias_ent["domain"] === $domain) {
-                        $ip = $parent["ip"];
-                        # Aliases are allowed for an IPv4 and IPv6 alias, check if it already has one.
-                        if ((is_ipaddrv4($ent["ip"]) and is_ipaddrv4($ip)) or (is_ipaddrv6($ent["ip"]) and is_ipaddrv6($ip))){
-                            if ($index !== $id) {
-                                $this->errors[] = APIResponse\get(2009);
-                            }
-                        }
-                    }
-                }
-            }
         }
     }
 }

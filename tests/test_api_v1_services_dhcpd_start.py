@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestServicesDHCPdStart(unit_test_framework.APIUnitTest):
+class APIE2ETestServicesDHCPdStart(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/dhcpd/start"
     post_tests = [
         {"name": "Start the DHCPd service", "resp_time": 10}
     ]
 
-APIUnitTestServicesDHCPdStart()
+APIE2ETestServicesDHCPdStart()

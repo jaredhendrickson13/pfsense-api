@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestFirewallTrafficShaperQueue(unit_test_framework.APIUnitTest):
+class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/firewall/traffic_shaper/queue"
     post_tests = [
         {
@@ -37,7 +37,7 @@ class APIUnitTestFirewallTrafficShaperQueue(unit_test_framework.APIUnitTest):
                 "interface": "lan",
                 "name": "Test_Queue",
                 "priority": 15,
-                "description": "Traffic Shaper Queue unit test",
+                "description": "Traffic Shaper Queue E2E test",
                 "default": True
             }
         },
@@ -472,4 +472,4 @@ class APIUnitTestFirewallTrafficShaperQueue(unit_test_framework.APIUnitTest):
         },
     ]
 
-APIUnitTestFirewallTrafficShaperQueue()
+APIE2ETestFirewallTrafficShaperQueue()

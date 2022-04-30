@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestFirewallScheduleTimeRange(unit_test_framework.APIUnitTest):
+class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/firewall/schedule/time_range"
     post_tests = [
         {
@@ -22,12 +22,12 @@ class APIUnitTestFirewallScheduleTimeRange(unit_test_framework.APIUnitTest):
             "uri": "/api/v1/firewall/schedule",
             "payload": {
                 "name": "Test_Schedule",
-                "descr": "Unit test",
+                "descr": "E2E test",
                 "timerange": [
                     {
                         "position": "1,3,5",
                         "hour": "10:15-12:00",
-                        "rangedescr": "Unit test"
+                        "rangedescr": "E2E test"
                     }
                 ]
             }
@@ -39,7 +39,7 @@ class APIUnitTestFirewallScheduleTimeRange(unit_test_framework.APIUnitTest):
                 "month": "1,2",
                 "day": "1,17",
                 "hour": "0:00-22:59",
-                "rangedescr": "Unit test"
+                "rangedescr": "E2E test"
             }
         },
         {
@@ -48,7 +48,7 @@ class APIUnitTestFirewallScheduleTimeRange(unit_test_framework.APIUnitTest):
                 "name": "Test_Schedule",
                 "position": "1,2,3,4,5",
                 "hour": "0:00-22:59",
-                "rangedescr": "Unit test"
+                "rangedescr": "E2E test"
             }
         },
         {
@@ -411,4 +411,4 @@ class APIUnitTestFirewallScheduleTimeRange(unit_test_framework.APIUnitTest):
         },
     ]
 
-APIUnitTestFirewallScheduleTimeRange()
+APIE2ETestFirewallScheduleTimeRange()

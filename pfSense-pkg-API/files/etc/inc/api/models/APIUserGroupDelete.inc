@@ -20,55 +20,64 @@ class APIUserGroupDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-usermanager-addprivs", "page-system-groupmanager-addprivs"];
-        $this->change_note = "Deleted group membership for user via API";
+        $this->privileges = ["page-all", "page-system-groupmanager"];
+        $this->change_note = "Deleted group via API";
     }
 
     public function action() {
-        local_user_set_groups($this->validated_data["user_config"], $this->validated_data["new_groups"]);    // Set our user's groups
-        local_user_set($this->validated_data["user_config"]);    // Reset our user
-        $this->write_config();    // Write our config
-        // Update our current user's groups
-        $this->validated_data["user_config"] = getUserEntry($this->validated_data["username"]);
-        $this->validated_data["user_groups"] = local_user_get_groups($this->validated_data["user_config"], true);
-        return APIResponse\get(0, $this->validated_data["group"]);
+        # Add this group to configuration and apply OS changes.
+        unset($this->config["system"]["group"][$this->id]);
+        $this->__apply();
+        $this->write_config();
+        return APIResponse\get(0, APIUserGroupRead::to_representation($this->validated_data));
     }
 
     public function validate_payload() {
-        if (isset($this->initial_data['username'])) {
-            if (!array_key_exists($this->initial_data["username"], index_users())) {
-                $this->errors[] = APIResponse\get(5001);
-            } else {
-                $this->validated_data["username"] = $this->initial_data['username'];
-                $this->validated_data["username"] = trim($this->validated_data["username"]);
-            }
-        } else {
-            $this->errors[] = APIResponse\get(5000);
-        }
-        if (isset($this->initial_data['group'])) {
-            if (is_string($this->initial_data["group"])) {
-                $this->initial_data["group"] = array($this->initial_data["group"]);
-            }
-            $this->validated_data["group"] = $this->initial_data['group'];
-        } else {
-            $this->errors[] = APIResponse\get(5007);
-        }
+        # Validate input fields
+        $this->__validate_id();
+    }
 
-        if (is_array($this->validated_data["group"])) {
-            // Get our current user's groups
-            $this->validated_data["user_config"] = getUserEntry($this->validated_data["username"]);
-            $this->validated_data["user_groups"] = local_user_get_groups($this->validated_data["user_config"], true);
-            // Loop through our del group list and ensure it is valid
-            foreach ($this->validated_data["group"] as $dg) {
-                if (!array_key_exists($dg, index_groups())) {
-                    $this->errors[] = APIResponse\get(5008);
-                }
-                if (in_array($dg, $this->validated_data["user_groups"])) {
-                    $this->validated_data["new_groups"] = \array_diff($this->validated_data["user_groups"], array($dg));
-                }
+    private function __validate_id() {
+        # Validate the required 'id' field
+        if (isset($this->initial_data["id"])) {
+            # Get group ID by name
+            $id = $this->is_existing_group($this->initial_data["id"], true);
+            # Check if a group with this name (ID) exists
+            if ($id !== false) {
+                $this->id = $id;
+                $this->validated_data = $this->config["system"]["group"][$this->id];
+            } else {
+                $this->errors[] = APIResponse\get(5051);
             }
         } else {
-            $this->errors[] = APIResponse\get(5009);
+            $this->errors[] = APIResponse\get(5050);
         }
     }
+
+    # Applies this user/group configuration to the OS user
+    private function __apply() {
+        # Resort groups to correct IDs
+        $this->config["system"]["group"] = array_values($this->config["system"]["group"]);
+
+        # Sort groups alphabetically
+        usort($this->config['system']['group'], function($a, $b) {
+            return strcasecmp($a['name'], $b['name']);
+        });
+
+        local_group_del($this->validated_data);
+    }
+
+    public function is_existing_group($name, $ret_id=false) {
+        # Loop through each existing group and ensure this group name is not already used
+        foreach ($this->config["system"]["group"] as $id=>$group) {
+            # Check if names match. Allow names to match if the name matches this object's current name.
+            if ($name === $group["name"] and $name !== $this->validated_data["name"]) {
+                return ($ret_id) ? $id : true;
+            }
+        }
+
+        return false;
+    }
 }
+
+

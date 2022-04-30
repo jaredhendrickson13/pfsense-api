@@ -74,7 +74,7 @@ class APIFirewallScheduleCreate extends APIModel {
         # Check for the optional `timerange` payload value
         if (isset($this->initial_data["timerange"])) {
             # Initialize the array to store validated time ranges
-            $this->validated_data["timerange"];
+            $this->validated_data["timerange"] = [];
 
             # Require at least 1 time range to be configured
             if (is_array($this->initial_data["timerange"]) and count($this->initial_data["timerange"]) >= 1) {

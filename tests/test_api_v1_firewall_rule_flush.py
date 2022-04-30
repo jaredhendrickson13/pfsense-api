@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestFirewallRuleFlush(unit_test_framework.APIUnitTest):
+class APIE2ETestFirewallRuleFlush(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/firewall/rule/flush"
 
     delete_tests = [
@@ -35,4 +35,4 @@ class APIUnitTestFirewallRuleFlush(unit_test_framework.APIUnitTest):
         },
     ]
 
-APIUnitTestFirewallRuleFlush()
+APIE2ETestFirewallRuleFlush()

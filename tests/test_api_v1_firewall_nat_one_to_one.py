@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestFirewallNATOneToOne(unit_test_framework.APIUnitTest):
+class APIE2ETestFirewallNATOneToOne(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/firewall/nat/one_to_one"
     get_tests = [
         {"name": "Read all 1:1 NAT mappings"}
@@ -28,7 +28,7 @@ class APIUnitTestFirewallNATOneToOne(unit_test_framework.APIUnitTest):
                 "dst": "wanip",
                 "external": "192.168.1.123",
                 "natreflection": "enable",
-                "descr": "Unit Test",
+                "descr": "E2E Test",
                 "nobinat": True,
                 "top": True,
                 "disabled": True
@@ -45,7 +45,7 @@ class APIUnitTestFirewallNATOneToOne(unit_test_framework.APIUnitTest):
                 "dst": "1.2.3.4",
                 "external": "4.3.2.1",
                 "natreflection": "disable",
-                "descr": "Updated Unit Test",
+                "descr": "Updated E2E Test",
                 "disabled": False,
                 "nobinat": False,
                 "top": False,
@@ -62,4 +62,4 @@ class APIUnitTestFirewallNATOneToOne(unit_test_framework.APIUnitTest):
         }
     ]
 
-APIUnitTestFirewallNATOneToOne()
+APIE2ETestFirewallNATOneToOne()

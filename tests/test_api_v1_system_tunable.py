@@ -1,27 +1,27 @@
-import unit_test_framework
+import e2e_test_framework
 
 
-class APIUnitTestTunable(unit_test_framework.APIUnitTest):
+class APIE2ETestTunable(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/system/tunable"
     get_tests = [{"name": "Read system tunables"}]
     post_tests = [
         {
             "name": "Create system tunable",
-            "payload": {"tunable": unit_test_framework.APIUnitTest.uid, "value": 0, "descr": "Unit test"}
+            "payload": {"tunable": e2e_test_framework.APIE2ETest.uid, "value": 0, "descr": "E2E test"}
         }
     ]
     put_tests = [
         {
             "name": "Update system tunable",
-            "payload": {"id": unit_test_framework.APIUnitTest.uid, "value": 2, "descr": "Unit test updated"}
+            "payload": {"id": e2e_test_framework.APIE2ETest.uid, "value": 2, "descr": "E2E test updated"}
         }
     ]
     delete_tests = [
         {
             "name": "Delete system tunable",
-            "payload": {"id": unit_test_framework.APIUnitTest.uid}
+            "payload": {"id": e2e_test_framework.APIE2ETest.uid}
         }
     ]
 
 
-APIUnitTestTunable()
+APIE2ETestTunable()

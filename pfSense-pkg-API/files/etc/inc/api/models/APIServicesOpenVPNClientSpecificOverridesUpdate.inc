@@ -37,10 +37,15 @@ class APIServicesOpenVPNClientSpecificOverridesUpdate extends APIModel {
         return APIResponse\get(0, $this->validated_data);
     }
 
-    private function __validate_refid() {
-        if (isset($this->initial_data['refid'])) {
-            if (array_key_exists((int) $this->initial_data['refid'], $this->config['openvpn']['openvpn-csc'])) {
-                $this->id = (int) $this->initial_data['refid'];
+    private function __validate_id() {
+        # Originally referred to this field as 'refid'. Still allow that value for backwards compatibility.
+        if (isset($this->initial_data["refid"])) {
+            $this->initial_data["id"] = $this->initial_data["refid"];
+        }
+
+        if (isset($this->initial_data['id'])) {
+            if (array_key_exists((int) $this->initial_data['id'], $this->config['openvpn']['openvpn-csc'])) {
+                $this->id = (int) $this->initial_data['id'];
                 $this->validated_data = $this->config['openvpn']['openvpn-csc'][$this->id];
                 $this->original_csc = $this->config['openvpn']['openvpn-csc'][$this->id];
 
@@ -361,7 +366,7 @@ class APIServicesOpenVPNClientSpecificOverridesUpdate extends APIModel {
 
     public function validate_payload() {
         # Run each validation method
-        $this->__validate_refid();
+        $this->__validate_id();
         $this->__validate_server_list();
         $this->__validate_custom_options();
         $this->__validate_disabled();

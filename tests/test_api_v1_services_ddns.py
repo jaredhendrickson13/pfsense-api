@@ -12,10 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestServicesDDNS(unit_test_framework.APIUnitTest):
+class APIE2ETestServicesDDNS(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/ddns"
     get_tests = [{"name": "Read DDNS service configuration"}]
 
-APIUnitTestServicesDDNS()
+APIE2ETestServicesDDNS()

@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
+class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/firewall/schedule"
     get_tests = [
             {"name": "Read all firewall schedules"}
@@ -24,18 +24,18 @@ class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
             "name": "Create firewall schedule",
             "payload": {
                 "name": "Test_Create_Schedule",
-                "descr": "Unit test",
+                "descr": "E2E test",
                 "timerange": [
                     {
                         "month": "1,3,5",
                         "day": "10,20,25",
                         "hour": "0:15-20:00",
-                        "rangedescr": "Unit test"
+                        "rangedescr": "E2E test"
                     },
                     {
                         "position": "1,3,5",
                         "hour": "10:15-12:00",
-                        "rangedescr": "Unit test"
+                        "rangedescr": "E2E test"
                     }
                 ]
             }
@@ -113,18 +113,18 @@ class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
             "name": "Update firewall schedule",
             "payload": {
                 "name": "Test_Create_Schedule",
-                "descr": "Updated unit test",
+                "descr": "Updated E2E test",
                 "timerange": [
                     {
                         "month": "1,3,5,12",
                         "day": "10,20,25,25",
                         "hour": "0:15-23:00",
-                        "rangedescr": "Updated unit test"
+                        "rangedescr": "Updated E2E test"
                     },
                     {
                         "position": "1,3,5",
                         "hour": "10:15-12:00",
-                        "rangedescr": "Updated unit test"
+                        "rangedescr": "Updated E2E test"
                     }
                 ]
             }
@@ -152,7 +152,7 @@ class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
             "name": "Check update with changed description only",
             "payload": {
                 "name": "Test_Create_Schedule",
-                "descr": "Update unit test description only"
+                "descr": "Update E2E test description only"
             }
         },
         {
@@ -210,4 +210,4 @@ class APIUnitTestFirewallSchedule(unit_test_framework.APIUnitTest):
                 if self.post_responses[-1]["data"].get("tracker", None):
                     self.delete_tests[1]["payload"]["tracker"] = self.post_responses[-1]["data"]["tracker"]
 
-APIUnitTestFirewallSchedule()
+APIE2ETestFirewallSchedule()

@@ -25,7 +25,7 @@ from urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 
 
-class APIUnitTest:
+class APIE2ETest:
     # CLASS PROPERTIES #
     args = {}
     uid = str(uuid.uuid4())
@@ -48,7 +48,7 @@ class APIUnitTest:
         self.url = self.format_url(self.uri)
         self.auth_payload = {"client-id": self.args.username, "client-token": self.args.password}
 
-        # Run unit tests and exit on corresponding status code
+        # Run E2E tests and exit on corresponding status code
         try:
             self.post()
             self.get()
@@ -182,7 +182,7 @@ class APIUnitTest:
     @staticmethod
     def has_correct_return_code(req, test_params):
         # Check if our HTTP status was expect
-        if APIUnitTest.has_json_response(req) and req.json()["return"] == test_params.get("return", 0):
+        if APIE2ETest.has_json_response(req) and req.json()["return"] == test_params.get("return", 0):
             return True
         else:
             return False
@@ -200,20 +200,20 @@ class APIUnitTest:
         valid = False
 
         # Run each check and print the results
-        if not APIUnitTest.has_json_response(req):
+        if not APIE2ETest.has_json_response(req):
             msg = "Expected JSON response, received {content}".format(content=req.content)
             print(self.__format_msg__(req.request.method, test_params, msg))
-        elif not APIUnitTest.has_correct_http_status(req, test_params):
+        elif not APIE2ETest.has_correct_http_status(req, test_params):
             received_status = req.status_code
             expected_status = test_params.get("status", 200)
             msg = "Expected status code {e}, received {r}".format(e=expected_status, r=received_status)
             print(self.__format_msg__(req.request.method, test_params, msg))
-        elif not APIUnitTest.has_correct_return_code(req, test_params):
+        elif not APIE2ETest.has_correct_return_code(req, test_params):
             received_return = req.json()["return"]
             expected_return = test_params.get("return", 0)
             msg = "Expected return code {e}, received {r}".format(e=expected_return, r=received_return)
             print(self.__format_msg__(req.request.method, test_params, msg))
-        elif not APIUnitTest.has_correct_resp_time(req, test_params):
+        elif not APIE2ETest.has_correct_resp_time(req, test_params):
             received_resp_time = req.elapsed.total_seconds()
             expected_resp_time = test_params.get("resp_time", 1)
             msg = "Expected response time within {e}s, received {r}s".format(e=expected_resp_time, r=received_resp_time)
@@ -291,7 +291,7 @@ class APIUnitTest:
             '--timeout',
             dest="timeout",
             type=int,
-            default=12,
+            default=35,
             help="Connection timeout limit in seconds"
         )
         parser.add_argument(
@@ -319,7 +319,7 @@ class APIUnitTest:
         elif mode == "warning":
             msg = "\33[33mWARNING ->\33[0m"
         else:
-            raise ValueError("Unknown `mode` provided to APIUnitTest.__format_msg__")
+            raise ValueError("Unknown `mode` provided to APIE2ETest.__format_msg__")
 
         # Piece the message together
         msg = msg + " [ {m} {u} ][{n}]: {r}".format(

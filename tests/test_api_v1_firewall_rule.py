@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
+class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/firewall/rule"
     get_tests = [
         {"name": "Read all firewall rules"}
@@ -41,7 +41,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "interface": "wan",
                 "name": "Test_Altq",
                 "priority": 14,
-                "description": "Traffic Shaper Queue unit test",
+                "description": "Traffic Shaper Queue E2E test",
                 "default": True
             }
         },
@@ -52,7 +52,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "interface": "wan",
                 "name": "Test_Altq2",
                 "priority": 15,
-                "description": "Traffic Shaper Queue unit test",
+                "description": "Traffic Shaper Queue E2E test",
                 "default": False
             }
         },
@@ -64,7 +64,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "bandwidth": [{"bw": 100, "bwscale": "Mb"}],
                 "mask": "srcaddress",
                 "maskbits": 31,
-                "description": "Unit test",
+                "description": "E2E test",
                 "aqm": "codel",
                 "sched": "fq_pie",
                 "qlimit": 7000,
@@ -83,7 +83,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "name": "Test_DNQueue",
                 "mask": "srcaddress",
                 "maskbits": 31,
-                "description": "Unit test",
+                "description": "E2E test",
                 "aqm": "codel",
                 "qlimit": 7000,
                 "weight": 1,
@@ -101,7 +101,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "name": "Test_DNQueue2",
                 "mask": "srcaddress",
                 "maskbits": 31,
-                "description": "Unit test",
+                "description": "E2E test",
                 "aqm": "codel",
                 "qlimit": 7000,
                 "weight": 1,
@@ -122,7 +122,7 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "srcport": "any",
                 "dst": "127.0.0.1",
                 "dstport": "443",
-                "descr": "Unit test",
+                "descr": "E2E test",
                 "dnpipe": "Test_DNQueue",
                 "pdnpipe": "Test_DNQueue2",
                 "defaultqueue": "Test_Altq",
@@ -130,6 +130,22 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "gateway": "",
                 "log": True,
                 "top": True
+            },
+            "resp_time": 3    # Accommodate the mandatory 1 second delay for firewall rule creations
+        },
+        {
+            "name": "Create floating firewall rule",
+            "payload": {
+                "type": "block",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "172.16.77.121",
+                "srcport": "any",
+                "dst": "127.0.0.1",
+                "dstport": "443",
+                "descr": "Unit test",
+                "floating": True
             },
             "resp_time": 3    # Accommodate the mandatory 1 second delay for firewall rule creations
         },
@@ -483,6 +499,23 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "ackqueue": "Test_Altq"
             }
         },
+        {
+            "name": "Test unknown floating direction",
+            "status": 400,
+            "return": 4239,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "floating": True,
+                "direction": "Test_Direction"
+            }
+        },
     ]
     put_tests = [
         {
@@ -496,11 +529,27 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "srcport": "8080-8081",
                 "dst": "(self)",
                 "dstport": "2222-4444",
-                "descr": "Updated Unit test",
+                "descr": "Updated E2E test",
                 "gateway": "WAN_DHCP",
                 "log": False,
                 "top": True,
                 "apply": True
+            },
+            "resp_time": 3    # Allow a few seconds for the firewall filter to reload
+        },
+        {
+            "name": "Update floating firewall rule",
+            "payload": {
+                "type": "block",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "172.16.77.121",
+                "srcport": "any",
+                "dst": "127.0.0.1",
+                "dstport": "443",
+                "descr": "Unit test",
+                "direction": "out"
             },
             "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         },
@@ -653,9 +702,26 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
                 "sched": "INVALID"
             }
         },
+        {
+            "name": "Test unknown floating direction",
+            "status": 400,
+            "return": 4239,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "direction": "Test_Direction"
+            }
+        },
     ]
     delete_tests = [
         {"name": "Delete firewall rule", "payload": {}},    # Tracker ID gets populated by post_post() method
+        {"name": "Delete floating firewall rule", "payload": {}},    # Tracker ID gets populated by post_post() method
         {
             "name": "Delete traffic shaper queue used to test",
             "uri": "/api/v1/firewall/traffic_shaper/queue",
@@ -691,15 +757,16 @@ class APIUnitTestFirewallRule(unit_test_framework.APIUnitTest):
 
     # Override our PRE/POST methods
     def post_post(self):
-        # We create a firewall rule in the 7th test, ensure we have run at least 7 tests
-        if len(self.post_responses) == 7:
+        # We create a firewall rule in the 7th and 8th test, ensure we have run at least 8 tests
+        if len(self.post_responses) == 8:
             # Assign the required tracker ID created in the POST request to the PUT and DELETE payloads
             self.delete_tests[0]["payload"]["tracker"] = self.post_responses[6]["data"]["tracker"]
-
+            self.delete_tests[1]["payload"]["tracker"] = self.post_responses[7]["data"]["tracker"]
             key = 0
             for value in self.put_tests:
                 if "payload" in self.put_tests[key].keys():
                     self.put_tests[key]["payload"]["tracker"] = self.post_responses[6]["data"]["tracker"]
+                    self.put_tests[key]["payload"]["tracker"] = self.post_responses[7]["data"]["tracker"]
                 key += 1
 
-APIUnitTestFirewallRule()
+APIE2ETestFirewallRule()

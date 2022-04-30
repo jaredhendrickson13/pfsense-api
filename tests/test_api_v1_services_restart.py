@@ -12,15 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import unit_test_framework
+import e2e_test_framework
 
-class APIUnitTestServicesRestart(unit_test_framework.APIUnitTest):
+class APIE2ETestServicesRestart(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/restart"
     post_tests = [
         {
             "name": "Restart all services",
             "resp_time": 15    # Allow up to 15 seconds for all services to restart
+        },
+        {
+            "name": "Restart single service",
+            "resp_time": 15,    # Allow up to 15 seconds for all services to restart
+            "payload": {
+                "service": "sshd"
+            }
         }
     ]
 
-APIUnitTestServicesRestart()
+APIE2ETestServicesRestart()
