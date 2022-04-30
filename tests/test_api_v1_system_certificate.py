@@ -243,7 +243,7 @@ class APIE2ETestSystemCertificate(e2e_test_framework.APIE2ETest):
             "payload": {
                 "descr": "Unit Test",
                 "crt": crt,
-                "prv": prv
+                "prv": key
             }
         },
     ]
