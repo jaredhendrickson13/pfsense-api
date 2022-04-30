@@ -10,7 +10,7 @@ are made preventing the need for a reboot. All this results in the fastest, safe
 
 # Requirements
 
-- pfSense CE 2.5.0 and pfSense 22.01 or later is supported. (older pfSense versions may be compatible with older versions of pfSense API)
+- pfSense CE 2.5.0 and pfSense Plus 22.01 or later is supported. (older pfSense versions may be compatible with older versions of pfSense API)
 - pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the
   webConfigurator are required to make calls to the API endpoints.
 - While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of
