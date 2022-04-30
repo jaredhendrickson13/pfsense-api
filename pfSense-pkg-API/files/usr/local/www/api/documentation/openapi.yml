@@ -15,8 +15,7 @@ info:
 
     # Requirements
 
-    - pfSense CE 2.5.0 or later is supported. pfSense Plus is NOT compatible with this API and will break your pfSense Plus
-      installation. (older pfSense CE versions may be compatible with older versions of pfSense API)
+    - pfSense CE 2.5.0 and pfSense 22.01 or later is supported. (older pfSense versions may be compatible with older versions of pfSense API)
     - pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the
       webConfigurator are required to make calls to the API endpoints.
     - While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of
@@ -58,7 +57,8 @@ info:
 
     ### Notes:
 
-    - To install the 2.6 package, simply change the `2.5` in the install URL to `2.6`.
+    - To install the pfSense CE 2.6 package, simply change the `2.5` in the install URL to `2.6`.
+    - To install the pfSense Plus 22.01 package, simply change the `2.5` in the install URL `22.01`.
     - In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after
       installing the package.
     - If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to '
@@ -233,8 +233,9 @@ info:
         }
       ]
     }
+
     ```
-    <br><br>
+
     If you want the endpoint to only return the objects that have their `type` value set to `type1` you could
     add `{"type": "type1"}` to your payload. This returns:<br><br>
 
@@ -263,8 +264,9 @@ info:
         }
       ]
     }
+
     ```
-    <br><br>
+
     Additionally, if you need to target values that are nested within an array, you can add `{"extra__tag": 100}` to
     recursively target the `tag` value within the `extra` array. Note the double underscore separating the parent and child
     keys. This returns:<br><br>
@@ -286,6 +288,7 @@ info:
         }
       ]
     }
+
     ```
 
     </details>
@@ -334,8 +337,9 @@ info:
         }
       ]
     }
+
     ```
-    <br><br>
+
     If you wanted to target objects whose names started with `Other`, you could use the
     payload `{"name__startswith": "Other"}`. This returns:<br><br>
 
@@ -356,8 +360,9 @@ info:
         }
       ]
     }
+
     ```
-    <br><br>
+
     ### Ends With
 
     The `endswith` filter allows you to target objects whose values end with a specific substring. This will work on both
@@ -396,8 +401,9 @@ info:
         }
       ]
     }
+
     ```
-    <br><br>
+
     If you wanted to target objects whose names ended with `er Test`, you could use the
     payload `{"name__endswith" "er Test"}`. This returns:<br><br>
 
@@ -426,8 +432,9 @@ info:
         }
       ]
     }
+
     ```
-    <br><br>
+
     ### Contains
 
     The `contains` filter allows you to target objects whose values contain a specific substring. This will work on both
@@ -466,8 +473,9 @@ info:
         }
       ]
     }
+
     ```
-    <br><br>
+
     If you wanted to target objects whose names contain `ther`, you could use the payload `{"name__contains": "ther"}`. This
     returns:<br><br>
 
@@ -496,8 +504,9 @@ info:
         }
       ]
     }
+
     ```
-    <br><br>
+
     ### Less Than
 
     The `lt` filter allows you to target objects whose values are less than a specific number. This will work on both
@@ -537,7 +546,7 @@ info:
       ]
     } 
     ```
-    <br><br>
+
     If you wanted to target objects whose tag is less than `100`, you could use the payload `{"extra__tag__lt": 100}`. This
     returns:<br><br>
 
@@ -558,6 +567,7 @@ info:
         }
       ]
     }
+
     ```
 
     ### Less Than or Equal To
@@ -598,6 +608,7 @@ info:
         }
       ]
     }
+
     ```
 
     If you wanted to target objects whose tag is less than or equal to `100`, you could use the
@@ -628,6 +639,7 @@ info:
         }
       ]
     }
+
     ```
 
     ### Greater Than 
@@ -667,6 +679,7 @@ info:
         }
       ]
     }
+
     ```
 
     If you wanted to target objects whose tag is greater than `100`, you could use the payload `{"extra__tag__gt": 100}`.
@@ -689,6 +702,7 @@ info:
         }
       ]
     }
+
     ```
 
     ### Greater Than or Equal To
@@ -729,6 +743,7 @@ info:
         }
       ]
     }
+
     ```
 
     If you wanted to target objects whose tag is greater than or equal to `100`, you could use the
@@ -759,6 +774,7 @@ info:
         }
       ]
     }
+
     ```
 
     </details>
@@ -797,7 +813,6 @@ info:
     - By design, values stored in pfSense's XML configuration can only be parsed as strings, arrays or objects. This means
       that even though request data requires data to be of a certain type, it will not necessarily be stored as that type.
       Data read from the API may be represented differently than the format it was requested as.
-
 
 components:
   responses:
