@@ -10,8 +10,7 @@ are made preventing the need for a reboot. All this results in the fastest, safe
 
 # Requirements
 
-- pfSense CE 2.5.0 or later is supported. pfSense Plus is NOT compatible with this API and will break your pfSense Plus
-  installation. (older pfSense CE versions may be compatible with older versions of pfSense API)
+- pfSense CE 2.5.0 and pfSense 22.01 or later is supported. (older pfSense versions may be compatible with older versions of pfSense API)
 - pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the
   webConfigurator are required to make calls to the API endpoints.
 - While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of
@@ -53,7 +52,8 @@ pfsense-api revert v1.1.7
 
 ### Notes:
 
-- To install the 2.6 package, simply change the `2.5` in the install URL to `2.6`.
+- To install the pfSense CE 2.6 package, simply change the `2.5` in the install URL to `2.6`.
+- To install the pfSense Plus 22.01 package, simply change the `2.5` in the install URL `22.01`.
 - In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after
   installing the package.
 - If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to '
@@ -228,6 +228,7 @@ returns this response without a query:<br><br>
     }
   ]
 }
+
 ```
 
 If you want the endpoint to only return the objects that have their `type` value set to `type1` you could
@@ -258,6 +259,7 @@ add `{"type": "type1"}` to your payload. This returns:<br><br>
     }
   ]
 }
+
 ```
 
 Additionally, if you need to target values that are nested within an array, you can add `{"extra__tag": 100}` to
@@ -281,6 +283,7 @@ keys. This returns:<br><br>
     }
   ]
 }
+
 ```
 
 </details>
@@ -329,6 +332,7 @@ both string and integer data types. Below is an example response without any que
     }
   ]
 }
+
 ```
 
 If you wanted to target objects whose names started with `Other`, you could use the
@@ -351,6 +355,7 @@ payload `{"name__startswith": "Other"}`. This returns:<br><br>
     }
   ]
 }
+
 ```
 
 ### Ends With
@@ -391,6 +396,7 @@ string and integer data types. Below is an example response without any queries:
     }
   ]
 }
+
 ```
 
 If you wanted to target objects whose names ended with `er Test`, you could use the
@@ -421,6 +427,7 @@ payload `{"name__endswith" "er Test"}`. This returns:<br><br>
     }
   ]
 }
+
 ```
 
 ### Contains
@@ -461,6 +468,7 @@ string and integer data types. Below is an example response without any queries:
     }
   ]
 }
+
 ```
 
 If you wanted to target objects whose names contain `ther`, you could use the payload `{"name__contains": "ther"}`. This
@@ -491,6 +499,7 @@ returns:<br><br>
     }
   ]
 }
+
 ```
 
 ### Less Than
@@ -553,6 +562,7 @@ returns:<br><br>
     }
   ]
 }
+
 ```
 
 ### Less Than or Equal To
@@ -593,6 +603,7 @@ on both numeric strings and integer data types. Below is an example response wit
     }
   ]
 }
+
 ```
 
 If you wanted to target objects whose tag is less than or equal to `100`, you could use the
@@ -623,6 +634,7 @@ payload `{"extra__tag__lte": 100}`. This returns:<br><br>
     }
   ]
 }
+
 ```
 
 ### Greater Than 
@@ -662,6 +674,7 @@ The `gt` filter allows you to target objects whose values are greater than a spe
     }
   ]
 }
+
 ```
 
 If you wanted to target objects whose tag is greater than `100`, you could use the payload `{"extra__tag__gt": 100}`.
@@ -684,6 +697,7 @@ This returns:<br><br>
     }
   ]
 }
+
 ```
 
 ### Greater Than or Equal To
@@ -724,6 +738,7 @@ work on both numeric strings and integer data types. Below is an example respons
     }
   ]
 }
+
 ```
 
 If you wanted to target objects whose tag is greater than or equal to `100`, you could use the
@@ -754,6 +769,7 @@ payload `{"extra__tag__gte": 100}`. This returns:<br><br>
     }
   ]
 }
+
 ```
 
 </details>
