@@ -81,34 +81,47 @@ function form_decode($array) {
 # Check our local pfSense version
 function get_pfsense_version() {
     # VARIABLES
-    $ver_path = "/etc/version";    // Assign the path to our version file
-    $ver_patch_path = "/etc/version.patch";    // Assign the path to our version patch file
-    $ver_bt_path = "/etc/version.buildtime";    // Assign the path to our version build time file
-    $ver_lc_path = "/etc/version.lastcommit";    // Assign the path to our version last commit file
-    $ver_data = array();    // Init an empty array for our version data
+    $ver_path = "/etc/version";
+    $ver_patch_path = "/etc/version.patch";
+    $ver_bt_path = "/etc/version.buildtime";
+    $ver_lc_path = "/etc/version.lastcommit";
+    $ver_data = array();
 
-    // Check that our files exist, if so read the files. Otherwise return error
+    # Ensure each file exists, then read it's contents and save it to our version data.
     if (file_exists($ver_path)) {
-        $ver_file = fopen($ver_path, "r");    // Open our file
-        $ver = str_replace(PHP_EOL, "", fread($ver_file, filesize($ver_path)));    // Save our version data
-        $ver_data["version"] = $ver;    // Save to array
+        # Read full release version
+        $ver_file = fopen($ver_path, "r");
+        $ver = str_replace(PHP_EOL, "", fread($ver_file, filesize($ver_path)));
+        $ver_data["version"] = $ver;
+
+        # Discard everything but the version tag (e.g. 2.6.0)
+        $ver = explode("-", $ver)[0];
+
+        # Separate each version category into an array and piece together the major and minor categories as the base
+        $ver = explode(".", $ver);
+        $major_ver = $ver[0];
+        $minor_ver = $ver[1];
+        $ver_data["base"] = $major_ver.".".$minor_ver;
     }
     if (file_exists($ver_patch_path)) {
-        $ver_patch_file = fopen($ver_patch_path, "r");    // Open our file
-        $ver_patch = str_replace(PHP_EOL, "", fread($ver_patch_file, filesize($ver_patch_path)));    // Save patch
-        $ver_data["patch"] = $ver_patch;    // Save to array
+        $ver_patch_file = fopen($ver_patch_path, "r");
+        $ver_patch = str_replace(PHP_EOL, "", fread($ver_patch_file, filesize($ver_patch_path)));
+        $ver_data["patch"] = $ver_patch;
     }
     if (file_exists($ver_bt_path)) {
-        $ver_bt_file = fopen($ver_bt_path, "r");    // Open our file
-        $ver_bt = str_replace(PHP_EOL, "", fread($ver_bt_file, filesize($ver_bt_path)));    // Save bt data
-        $ver_data["buildtime"] = $ver_bt;    // Save to array
+        $ver_bt_file = fopen($ver_bt_path, "r");
+        $ver_bt = str_replace(PHP_EOL, "", fread($ver_bt_file, filesize($ver_bt_path)));
+        $ver_data["buildtime"] = $ver_bt;
     }
     if (file_exists($ver_lc_path)) {
-        $ver_lc_file = fopen($ver_lc_path, "r");    // Open our file
-        $ver_lc = str_replace(PHP_EOL, "", fread($ver_lc_file, filesize($ver_lc_path)));    // Save bt data
-        $ver_data["lastcommit"] = $ver_lc;    // Save to array
+        $ver_lc_file = fopen($ver_lc_path, "r");
+        $ver_lc = str_replace(PHP_EOL, "", fread($ver_lc_file, filesize($ver_lc_path)));
+        $ver_data["lastcommit"] = $ver_lc;
     }
-    $ver_data["program"] = floatval(str_replace(".", "", explode("-", $ver)[0]).".".$ver_patch);
+
+    # Format the version into a comparable numeric value
+    $ver_data["program"] = floatval(str_replace(".", "", explode("-", $ver_data["version"])[0]).".".$ver_patch);
+
     return $ver_data;
 }
 
