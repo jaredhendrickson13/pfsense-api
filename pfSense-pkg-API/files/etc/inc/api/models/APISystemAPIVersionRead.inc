@@ -92,7 +92,7 @@ class APISystemAPIVersionRead extends APIModel {
 
     public static function get_all_available_versions() {
         # Variables
-        $pf_version = substr(APITools\get_pfsense_version()["version"], 0, 3);
+        $pf_version = APITools\get_pfsense_version()["base"];
         $versions = [];
         $count = 0;
         $releases = self::get_github_releases()["releases"];
