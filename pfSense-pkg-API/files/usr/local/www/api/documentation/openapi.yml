@@ -4617,6 +4617,21 @@ paths:
       summary: Update interface
       tags:
         - Interface
+  /api/v1/interface/available:
+    get:
+      description: 'Read all interfaces available on the system. This will provide details for all interfaces regardless
+          if they are currently configured on pfSense.<br><br>
+
+
+          _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read all available interfaces
+      tags:
+        - Interface > Available
   /api/v1/interface/apply:
     post:
       description: 'Apply pending interface changes.<br><br>
@@ -9329,6 +9344,7 @@ tags:
   - name: User > Group
   - name: User > Group > Member
   - name: Interface
+  - name: Interface > Available
   - name: Interface > Bridge
   - name: Interface > VLAN
   - name: Interface > Apply
