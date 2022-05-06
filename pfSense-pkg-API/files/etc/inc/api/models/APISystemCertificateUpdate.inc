@@ -43,11 +43,11 @@ class APISystemCertificateUpdate extends APIModel {
                     break;
                 }
             }
-            # If we did not find an ID in the loop, return a not found error
-            if (is_null($this->id)) {
-                $this->errors[] = APIResponse\get(1009);
-            }
-        } 
+        }
+        # If we did not find an ID in the loop, return a not found error
+        if (is_null($this->id)) {
+            $this->errors[] = APIResponse\get(1009);
+        }
     }
 
     private function __validate_crt() {

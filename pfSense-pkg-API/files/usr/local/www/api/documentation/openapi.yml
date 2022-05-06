@@ -4628,6 +4628,21 @@ paths:
       summary: Update interface
       tags:
         - Interface
+  /api/v1/interface/available:
+    get:
+      description: 'Read all interfaces available on the system. This will provide details for all interfaces regardless
+          if they are currently configured on pfSense.<br><br>
+
+
+          _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read all available interfaces
+      tags:
+        - Interface > Available
   /api/v1/interface/apply:
     post:
       description: 'Apply pending interface changes.<br><br>
@@ -7282,6 +7297,22 @@ paths:
       summary: Create DNS Resolver (Unbound) host override alias
       tags:
         - Services > Unbound > Host Override > Alias
+  /api/v1/services/unbound/host_override/flush:
+    delete:
+      description: 'Deletes all existing DNS Resolver (Unbound) host overrides. This is useful for scripts
+          that need to setup host overrides from scratch.<br><br>_Note: this endpoint
+          will not reload the DNS Resolver (Unbound) service automatically, you must make another API
+          call to the /api/v1/services/unbound/apply endpoint to do so._<br><br>
+
+          _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Delete all DNS Resolver (Unbound) host overrides
+      tags:
+        - Services > Unbound > Host Override > Flush
   /api/v1/services/unbound/restart:
     post:
       description: 'Restart the DNS Resolver (Unbound) service.<br><br>
@@ -8026,25 +8057,29 @@ paths:
           application/json:
             schema:
               properties:
-                active:
-                  default: false
-                  description: Set this certificate as the active certificate used
-                    by the webConfigurator.
-                  type: boolean
+                refid:
+                  description: 'ID of the certificate to be updated.'
+                  type: string
                 crt:
                   description: 'Base64 encoded PEM certificate to import. _Note: previous
                     releases referred to the `crt` parameter as `cert`. Both `crt`
                     and `cert` can be used interchangeably._'
-                  type: string
-                descr:
-                  description: Descriptive name for the certificate.
                   type: string
                 prv:
                   description: 'Corresponding Base64 encoded certificate key. _Note:
                     previous releases referred to the `prv` parameter as `key`. Both
                     `prv` and `key` can be used interchangeably._'
                   type: string
+                descr:
+                  description: Descriptive name for the certificate.
+                  type: string
+                active:
+                  default: false
+                  description: Set this certificate as the active certificate used
+                    by the webConfigurator.
+                  type: boolean
               required:
+                - refid
                 - crt
                 - prv
               type: object
@@ -8470,24 +8505,10 @@ paths:
           application/json:
             schema:
               properties:
-                force:
-                  default: false
-                  description: Force the installation of the package. Forced installs
-                    will always force the package to re-install and bypasses certain
-                    warnings. Use extreme caution when using forced installs.
-                  type: boolean
                 name:
                   description: Name of pfSense package to install. This must be the
-                    pfSense package internal name including the  `pfSense-pkg-` prefix
-                    or a URL to an external package.
+                    pfSense package internal name including the  `pfSense-pkg-` prefix.
                   type: string
-                timeout:
-                  default: 90
-                  description: Amount of time (in seconds) to allow the package installation
-                    to take before timing out.
-                  maximum: 120
-                  minimum: 5
-                  type: integer
               required:
                 - name
               type: object
@@ -9338,6 +9359,7 @@ tags:
   - name: User > Group
   - name: User > Group > Member
   - name: Interface
+  - name: Interface > Available
   - name: Interface > Bridge
   - name: Interface > VLAN
   - name: Interface > Apply
@@ -9395,6 +9417,7 @@ tags:
   - name: Services > Unbound > Access List > Row
   - name: Services > Unbound > Host Override
   - name: Services > Unbound > Host Override > Alias
+  - name: Services > Unbound > Host Override > Flush
   - name: Services > DNSMASQ
   - name: Services > DNSMASQ > Host Override
   - name: Services > DNSMASQ > Host Override > Alias
