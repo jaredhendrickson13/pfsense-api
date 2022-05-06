@@ -26,22 +26,12 @@ class APISystemPackageDelete extends APIModel {
     }
 
     public function action() {
-        $this->delete_pkg();
+        pkg_delete($this->validated_data["name"]);
         return APIResponse\get(0);
     }
 
     public function validate_payload(){
         $this->__validate_name();
-    }
-
-    # Deletes the package specified in $this->validated_data["name"]
-    public function delete_pkg() {
-        # Remove the requested package and clean up dependencies afterwards
-        pkg_call("delete -y " . $this->validated_data["name"]);
-        pkg_call("autoremove -y");
-
-        # Force the action to be logged in the configuration history
-        $this->write_config();
     }
 
     private function __validate_name() {

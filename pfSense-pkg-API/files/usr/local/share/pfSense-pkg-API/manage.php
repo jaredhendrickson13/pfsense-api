@@ -85,7 +85,7 @@ function sync() {
 }
 
 function update() {
-    $pf_version = substr(file_get_contents("/etc/version"), 0, 3);
+    $pf_version = APITools\get_pfsense_version()["base"];
     echo shell_exec("/usr/sbin/pkg delete -y pfSense-pkg-API");
     echo shell_exec("/usr/sbin/pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-".$pf_version."-pkg-API.txz");
     echo shell_exec("/etc/rc.restart_webgui");
@@ -93,7 +93,7 @@ function update() {
 
 function revert($version) {
     # Local variables
-    $pf_version = substr(file_get_contents("/etc/version"), 0, 3);
+    $pf_version = APITools\get_pfsense_version()["base"];
     $url = "https://github.com/jaredhendrickson13/pfsense-api/releases/download/".urlencode($version)."/pfSense-".$pf_version."-pkg-API.txz";
     echo "Locating pfSense-pkg-API-".$version." at ".$url."... ";
 

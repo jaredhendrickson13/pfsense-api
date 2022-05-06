@@ -43,11 +43,11 @@ class APISystemCertificateUpdate extends APIModel {
                     break;
                 }
             }
-            # If we did not find an ID in the loop, return a not found error
-            if (is_null($this->id)) {
-                $this->errors[] = APIResponse\get(1009);
-            }
-        } 
+        }
+        # If we did not find an ID in the loop, return a not found error
+        if (is_null($this->id)) {
+            $this->errors[] = APIResponse\get(1009);
+        }
     }
 
     private function __validate_crt() {
@@ -66,7 +66,7 @@ class APISystemCertificateUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(1003);
             }
             else {
-                $this->validated_data["crt"] = $crt;
+                $this->validated_data["crt"] = base64_encode($crt);
             }
         } else {
             $this->errors[] = APIResponse\get(1003);
@@ -94,7 +94,7 @@ class APISystemCertificateUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(1049);
             }
             else {
-                $this->validated_data["prv"] = $key;
+                $this->validated_data["prv"] = base64_encode($key);
             }
         } else {
             $this->errors[] = APIResponse\get(1004);
