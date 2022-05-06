@@ -8475,24 +8475,10 @@ paths:
           application/json:
             schema:
               properties:
-                force:
-                  default: false
-                  description: Force the installation of the package. Forced installs
-                    will always force the package to re-install and bypasses certain
-                    warnings. Use extreme caution when using forced installs.
-                  type: boolean
                 name:
                   description: Name of pfSense package to install. This must be the
-                    pfSense package internal name including the  `pfSense-pkg-` prefix
-                    or a URL to an external package.
+                    pfSense package internal name including the  `pfSense-pkg-` prefix.
                   type: string
-                timeout:
-                  default: 90
-                  description: Amount of time (in seconds) to allow the package installation
-                    to take before timing out.
-                  maximum: 120
-                  minimum: 5
-                  type: integer
               required:
                 - name
               type: object

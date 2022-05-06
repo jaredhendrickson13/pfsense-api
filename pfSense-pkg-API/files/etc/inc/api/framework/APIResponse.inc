@@ -569,21 +569,9 @@ function get($id, $data=[], $all=false) {
         ],
         1077 => [
             "status" => "bad request",
-            "code" => 400,
+            "code" => 500,
             "return" => $id,
-            "message" => "Remote URL does not contain a pfSense package"
-        ],
-        1078 => [
-            "status" => "bad request",
-            "code" => 504,
-            "return" => $id,
-            "message" => "System package installation exceeded timeout"
-        ],
-        1079 => [
-            "status" => "bad request",
-            "code" => 400,
-            "return" => $id,
-            "message" => "System package installation timeout cannot be greater than 120 seconds"
+            "message" => "System package failed to install"
         ],
         1080 => [
             "status" => "bad request",
