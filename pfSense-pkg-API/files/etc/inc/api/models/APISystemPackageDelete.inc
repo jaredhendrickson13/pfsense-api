@@ -26,8 +26,7 @@ class APISystemPackageDelete extends APIModel {
     }
 
     public function action() {
-        uninstall_package($this->validated_data["name"]);
-        $this->write_config();
+        pkg_delete($this->validated_data["name"]);
         return APIResponse\get(0);
     }
 
