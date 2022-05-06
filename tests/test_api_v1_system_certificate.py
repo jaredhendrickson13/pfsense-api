@@ -233,15 +233,20 @@ class APIE2ETestSystemCertificate(e2e_test_framework.APIE2ETest):
     ]
     put_tests = [
         {
+            "name": "Check refid requirement",
+            "status": 400,
+            "return": 1009
+        },
+        {
             "name": "Check updating a non-existing certificate",
             "status": 400,
             "return": 1009,
-            "payload": {"descr": "INVALID"}
+            "payload": {"refid": "INVALID"}
         },
         {
             "name": "Update an existing certificate",
             "payload": {
-                "descr": "Unit Test",
+                "descr": "E2E Test",
                 "crt": crt,
                 "prv": key
             }
@@ -297,6 +302,9 @@ class APIE2ETestSystemCertificate(e2e_test_framework.APIE2ETest):
                 if "payload" in test.keys() and "no_caref" not in test.keys():
                     self.post_tests[counter]["payload"]["caref"] = self.post_responses[0]["data"]["refid"]
                 counter = counter + 1
+        # Add imported certifictes refid to the update certificate payload
+        elif len(self.post_responses) == 2:
+            self.put_tests[2]["payload"]["refid"] = self.post_responses[1]["data"]["refid"]
 
 
 APIE2ETestSystemCertificate()

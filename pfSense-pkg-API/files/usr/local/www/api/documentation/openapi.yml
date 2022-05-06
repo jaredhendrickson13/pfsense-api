@@ -7302,7 +7302,7 @@ paths:
       description: 'Deletes all existing DNS Resolver (Unbound) host overrides. This is useful for scripts
           that need to setup host overrides from scratch.<br><br>_Note: this endpoint
           will not reload the DNS Resolver (Unbound) service automatically, you must make another API
-          call to the /api/v1/services/unbound/apply endpoint to do so._.<br><br>
+          call to the /api/v1/services/unbound/apply endpoint to do so._<br><br>
 
           _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]'
       responses:
@@ -8057,25 +8057,29 @@ paths:
           application/json:
             schema:
               properties:
-                active:
-                  default: false
-                  description: Set this certificate as the active certificate used
-                    by the webConfigurator.
-                  type: boolean
+                refid:
+                  description: 'ID of the certificate to be updated.'
+                  type: string
                 crt:
                   description: 'Base64 encoded PEM certificate to import. _Note: previous
                     releases referred to the `crt` parameter as `cert`. Both `crt`
                     and `cert` can be used interchangeably._'
-                  type: string
-                descr:
-                  description: Descriptive name for the certificate.
                   type: string
                 prv:
                   description: 'Corresponding Base64 encoded certificate key. _Note:
                     previous releases referred to the `prv` parameter as `key`. Both
                     `prv` and `key` can be used interchangeably._'
                   type: string
+                descr:
+                  description: Descriptive name for the certificate.
+                  type: string
+                active:
+                  default: false
+                  description: Set this certificate as the active certificate used
+                    by the webConfigurator.
+                  type: boolean
               required:
+                - refid
                 - crt
                 - prv
               type: object
