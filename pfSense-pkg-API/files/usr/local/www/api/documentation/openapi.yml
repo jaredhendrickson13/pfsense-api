@@ -4877,7 +4877,7 @@ paths:
       summary: Update interface VLAN
       tags:
         - Interface > VLAN
-  /api/v1/openvpn/csc:
+  /api/v1/services/openvpn/csc:
     delete:
       parameters:
         - description: ID of the client specific override to update. Refer to the 'Obtaining

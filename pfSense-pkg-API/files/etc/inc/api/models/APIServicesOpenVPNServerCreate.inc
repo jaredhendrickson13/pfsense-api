@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2021 Jared Hendrickson
+//   Copyright 2022 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -447,7 +447,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                     $counter += 1;
                 }
             }
-            $this->validated_data["data_ciphers"] = $this->initial_data['data_ciphers']; 
+            $this->validated_data['data_ciphers'] = $this->initial_data['data_ciphers']; 
         } else {
             $this->validated_data["data_ciphers"] = "AES-256-GCM,AES-128-GCM,CHACHA20-POLY1305";
         }
