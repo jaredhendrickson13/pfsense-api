@@ -25,8 +25,10 @@ class APIServicesUnboundHostOverrideFlushDelete extends APIModel {
     }
 
     public function action() {
-        # Capture all host overrides, remove them from the config and save the changes.
-        $this->validated_data = $this->config["unbound"]["hosts"];
+        # Capture the host overrides being deleted, if empty, default to empty array
+        $this->validated_data = ($this->config["unbound"]["hosts"]) ?: [];
+
+        # Remove the host overrides from the configuration
         unset($this->config["unbound"]["hosts"]);
         $this->write_config();
 
