@@ -7293,7 +7293,7 @@ paths:
           will not reload the DNS Resolver (Unbound) service automatically, you must make another API
           call to the /api/v1/services/unbound/apply endpoint to do so._.<br><br>
 
-          _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules-edit`]'
+          _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]'
       responses:
         200:
           $ref: '#/components/responses/Success'
