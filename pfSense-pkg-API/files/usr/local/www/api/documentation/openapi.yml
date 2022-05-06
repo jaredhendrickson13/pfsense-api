@@ -7282,6 +7282,22 @@ paths:
       summary: Create DNS Resolver (Unbound) host override alias
       tags:
         - Services > Unbound > Host Override > Alias
+  /api/v1/services/unbound/host_override/flush:
+    delete:
+      description: 'Deletes all existing DNS Resolver (Unbound) host overrides. This is useful for scripts
+          that need to setup host overrides from scratch.<br><br>_Note: this endpoint
+          will not reload the DNS Resolver (Unbound) service automatically, you must make another API
+          call to the /api/v1/services/unbound/apply endpoint to do so._.<br><br>
+
+          _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules-edit`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Delete all DNS Resolver (Unbound) host overrides
+      tags:
+        - Services > Unbound > Host Override > Flush
   /api/v1/services/unbound/restart:
     post:
       description: 'Restart the DNS Resolver (Unbound) service.<br><br>
@@ -9395,6 +9411,7 @@ tags:
   - name: Services > Unbound > Access List > Row
   - name: Services > Unbound > Host Override
   - name: Services > Unbound > Host Override > Alias
+  - name: Services > Unbound > Host Override > Flush
   - name: Services > DNSMASQ
   - name: Services > DNSMASQ > Host Override
   - name: Services > DNSMASQ > Host Override > Alias
