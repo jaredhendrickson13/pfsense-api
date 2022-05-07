@@ -142,7 +142,7 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
             # Variables
             counter = 0
             for test in self.post_tests:
-                # Assign the required refid created in the POST request to the DELETE payloads]
+                # Assign the required refid created in the POST request to the POST payloads
                 if "payload" in test.keys() and "no_caref" not in test.keys():
                     self.post_tests[counter]["payload"]["caref"] = self.post_responses[0]["data"]["refid"]
                 counter = counter + 1

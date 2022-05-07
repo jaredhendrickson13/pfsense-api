@@ -5354,6 +5354,8 @@ paths:
                   description: 'Selects the interface, VIP, or failover group that the OpenVPN instance will use 
                     when communicating with peers.
                     This also controls which interface the traffic from the instance will exit.
+                    VIP can be provided as description, subnet or uniqid.
+                    Failover group can be provided as group name.
 
                     _Note: If you are using a failover group, the failover group must be configured to use the same_.'
                   type: string
@@ -5381,9 +5383,28 @@ paths:
                   description: TLS, or Transport Layer Security, can provide session 
                     authentication and encryption to ensure the validity of peers and to protect the control channel.
                     Paste the TLS key. This is not necessary for mode `p2p_shared_key`.
-                    Options are `""` for automatic TLS key generation and a raw TLS key.
+                    Options are `""` or `true` for automatic TLS key generation, `false` to disable TLS 
+                    or a raw TLS key as a string.
                     Omitting disable TLS configuration.
                   type: string
+                  example: '-----BEGIN OpenVPN Static key V1-----
+                              db8701afd882d746be67f084bae68470
+                              54a99ef3b61864cfe1864c6c02584335
+                              fe706df150250bf7e294b8c35911817c
+                              133c8d9b505573ebeb65259bc54c70ae
+                              88cc3163fd11a20f73d2c6fb3eea7cc2
+                              fdaefcde510486adc0acbb9481b3aef4
+                              930db91806469218b2a4f92e71787cf4
+                              635f5b3f773fefc28d492738d2648673
+                              8fa9b23d41e5999f58c3f0004a59ecda
+                              119162e598764d9c8f6b99e7054f3ea4
+                              fdb4461913d2e3273a8a0db29332406a
+                              237bcfccca2315445ef809eaa933fa30
+                              a9a7510d2d167033edfd3580a824f3e1
+                              1af57da6eee89e6318ec29c67da8a19d
+                              7c9d74c7afac6ee0f813a0278a6261d7
+                              a28e7bdbf1743527346bda359bc92fc9
+                            -----END OpenVPN Static key V1-----'
                 tls_type:
                   default: 'auth'
                   description: Enter TLS Key Usage Mode. This is not necessary for mode `p2p_shared_key`.
@@ -5409,6 +5430,24 @@ paths:
                   description: Enter Shared Key. This is only mandatory for mode `p2p_shared_key`.
                     Options are `""` for automatic shared key generation and a raw shared key.
                   type: string
+                  example: '-----BEGIN OpenVPN Static key V1-----
+                              db8701afd882d746be67f084bae68470
+                              54a99ef3b61864cfe1864c6c02584335
+                              fe706df150250bf7e294b8c35911817c
+                              133c8d9b505573ebeb65259bc54c70ae
+                              88cc3163fd11a20f73d2c6fb3eea7cc2
+                              fdaefcde510486adc0acbb9481b3aef4
+                              930db91806469218b2a4f92e71787cf4
+                              635f5b3f773fefc28d492738d2648673
+                              8fa9b23d41e5999f58c3f0004a59ecda
+                              119162e598764d9c8f6b99e7054f3ea4
+                              fdb4461913d2e3273a8a0db29332406a
+                              237bcfccca2315445ef809eaa933fa30
+                              a9a7510d2d167033edfd3580a824f3e1
+                              1af57da6eee89e6318ec29c67da8a19d
+                              7c9d74c7afac6ee0f813a0278a6261d7
+                              a28e7bdbf1743527346bda359bc92fc9
+                            -----END OpenVPN Static key V1-----'
                 caref:
                   description: Specify the unique reference ID of the certificate signing authority.
                   type: string
@@ -5964,7 +6003,7 @@ paths:
                   description: Disable this override without removing it.
                   type: boolean
               required:
-                - certref
+                # - certref
               type: object
       responses:
         200:
@@ -6038,6 +6077,8 @@ paths:
                   description: 'Selects the interface, VIP, or failover group that the OpenVPN instance will use 
                     when communicating with peers.
                     This also controls which interface the traffic from the instance will exit.
+                    VIP can be provided as description, subnet or uniqid.
+                    Failover group can be provided as group name.
 
                     _Note: If you are using a failover group, the failover group must be configured to use the same_.'
                   type: string
@@ -6065,9 +6106,28 @@ paths:
                   description: TLS, or Transport Layer Security, can provide session 
                     authentication and encryption to ensure the validity of peers and to protect the control channel.
                     Paste the TLS key. This is not necessary for mode `p2p_shared_key`.
-                    Options are `""` for automatic TLS key generation and a raw TLS key.
+                    Options are `""` or `true` for automatic TLS key generation, `false` to disable TLS 
+                    or a raw TLS key as a string.
                     Omitting disable TLS configuration.
                   type: string
+                  example: '-----BEGIN OpenVPN Static key V1-----
+                              db8701afd882d746be67f084bae68470
+                              54a99ef3b61864cfe1864c6c02584335
+                              fe706df150250bf7e294b8c35911817c
+                              133c8d9b505573ebeb65259bc54c70ae
+                              88cc3163fd11a20f73d2c6fb3eea7cc2
+                              fdaefcde510486adc0acbb9481b3aef4
+                              930db91806469218b2a4f92e71787cf4
+                              635f5b3f773fefc28d492738d2648673
+                              8fa9b23d41e5999f58c3f0004a59ecda
+                              119162e598764d9c8f6b99e7054f3ea4
+                              fdb4461913d2e3273a8a0db29332406a
+                              237bcfccca2315445ef809eaa933fa30
+                              a9a7510d2d167033edfd3580a824f3e1
+                              1af57da6eee89e6318ec29c67da8a19d
+                              7c9d74c7afac6ee0f813a0278a6261d7
+                              a28e7bdbf1743527346bda359bc92fc9
+                            -----END OpenVPN Static key V1-----'
                 tls_type:
                   default: 'auth'
                   description: Enter TLS Key Usage Mode. This is not necessary for mode `p2p_shared_key`.
@@ -6093,6 +6153,24 @@ paths:
                   description: Enter Shared Key. This is only mandatory for mode `p2p_shared_key`.
                     Options are `""` for automatic shared key generation and a raw shared key.
                   type: string
+                  example: '-----BEGIN OpenVPN Static key V1-----
+                              db8701afd882d746be67f084bae68470
+                              54a99ef3b61864cfe1864c6c02584335
+                              fe706df150250bf7e294b8c35911817c
+                              133c8d9b505573ebeb65259bc54c70ae
+                              88cc3163fd11a20f73d2c6fb3eea7cc2
+                              fdaefcde510486adc0acbb9481b3aef4
+                              930db91806469218b2a4f92e71787cf4
+                              635f5b3f773fefc28d492738d2648673
+                              8fa9b23d41e5999f58c3f0004a59ecda
+                              119162e598764d9c8f6b99e7054f3ea4
+                              fdb4461913d2e3273a8a0db29332406a
+                              237bcfccca2315445ef809eaa933fa30
+                              a9a7510d2d167033edfd3580a824f3e1
+                              1af57da6eee89e6318ec29c67da8a19d
+                              7c9d74c7afac6ee0f813a0278a6261d7
+                              a28e7bdbf1743527346bda359bc92fc9
+                            -----END OpenVPN Static key V1-----'
                 caref:
                   description: Specify the unique reference ID of the certificate signing authority.
                   type: string

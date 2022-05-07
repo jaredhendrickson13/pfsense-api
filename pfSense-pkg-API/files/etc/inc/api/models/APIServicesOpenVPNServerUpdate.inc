@@ -40,17 +40,6 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
     }
 
     private function __validate_vpnid() {
-        // if (isset($this->initial_data['vpnid'])) {
-        //     if (array_key_exists((string) $this->initial_data['vpnid'], $this->config['openvpn']['openvpn-server'])) {
-        //         $this->id = (string) $this->initial_data['vpnid'];
-        //         $this->validated_data['vpnid'] = $this->initial_data['vpnid'];
-        //         $this->original_server = $this->config['openvpn']['openvpn-server'][$this->id];
-        //     } else {
-        //         $this->errors[] = APIResponse\get(2133);
-        //     }
-        // } else {
-        //     $this->errors[] = APIResponse\get(2134);
-        // }
         if (isset($this->initial_data['vpnid'])) {
             foreach ($this->config["openvpn"]["openvpn-server"] as $i => $server) {
                 if ((string) $this->initial_data['vpnid'] === (string) $server['vpnid']) {
@@ -123,22 +112,37 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
         $match = false;
 
         # Validate Interface
-        # TODO add interfaces
-
-        
         if (($this->validated_data["protocol"] === "UDP") or ($this->validated_data["protocol"] === "TCP")) {
             $this->validated_data["interface"] = "wan";
             $this->validated_data["ipaddr"] = "";
         } elseif (isset($this->initial_data["interface"])) {
+            // Validate Virtual Interface
             foreach ($this->config["virtualip"]["vip"] as $vip) {
-                if (strtolower($this->initial_data["interface"]) === $vip["descr"]) {
-                    $this->validated_data["interface"] = "_vip" . $vip["uniqid"];
-                    $this->validated_data["ipaddr"] = $vip["subnet"];
-                    $match = true;
-                    break;
-                } elseif ((filter_var($vip["subnet"], FILTER_VALIDATE_IP)) and ($this->initial_data["interface"] === $vip["subnet"])) {
-                    $this->validated_data["interface"] = "_vip" . $vip["uniqid"];
-                    $this->validated_data["ipaddr"] = $vip["subnet"];
+                if (($vip["mode"] === "ipalias") or ($vip["mode"] === "carp") ) {
+                    if (strtolower($this->initial_data["interface"]) === strtolower($vip["descr"])) {
+                        $this->validated_data["interface"] = "_vip" . $vip["uniqid"];
+                        $this->validated_data["ipaddr"] = $vip["subnet"];
+                        $match = true;
+                        break;
+                    } elseif ((filter_var($vip["subnet"], FILTER_VALIDATE_IP)) and ($this->initial_data["interface"] === $vip["subnet"])) {
+                        $this->validated_data["interface"] = "_vip" . $vip["uniqid"];
+                        $this->validated_data["ipaddr"] = $vip["subnet"];
+                        $match = true;
+                        break;
+                    } elseif (strtolower($this->initial_data["interface"]) === $vip["uniqid"]) {
+                        $this->validated_data["interface"] = "_vip" . $vip["uniqid"];
+                        $this->validated_data["ipaddr"] = $vip["subnet"];
+                        $match = true;
+                        break;
+                    }
+                }
+            }
+
+            // Validate Gateway Group Interface
+            foreach ($this->config["gateways"]["gateway_group"] as $gateway_group) {
+                if (strtolower($this->initial_data["interface"]) === strtolower($gateway_group['name'])) {
+                    $this->validated_data["interface"] = $gateway_group['name'];
+                    $this->validated_data["ipaddr"] = "";
                     $match = true;
                     break;
                 }
@@ -154,8 +158,6 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(2101);
             }
         }
-
-        
     }
 
     private function __validate_local_port() {
@@ -191,21 +193,25 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
         # Check for our optional `TLS` payload value
         if (isset($this->initial_data["tls"])) {
             # Auto generate TLS key if empty
-            if ($this->initial_data["tls"] == "") {
+            if ($this->initial_data["tls"] == "" or $this->initial_data["tls"] == "true") {
                 $this->validated_data["tls"] = base64_encode(openvpn_create_key());
             } else {
                 $this->validated_data["tls"] = base64_encode($this->initial_data["tls"]);
             }
+
+            # Disable TLS if fasle
+            if ($this->initial_data["tls"] == "false") {
+                unset($this->validated_data["tls"]);
+            }
         }
     }
 
-    // TODO
     private function __validate_tls_type() {
         # Local variables
         $key_types = ["auth", "crypt"];
 
         # Validate TLS type if TLS set
-        if ($this->initial_data["tls"] !== "") {
+        if (isset($this->validated_data["tls"])) {
             if (isset($this->initial_data["tls_type"])) {
                 if (in_array($this->initial_data["tls_type"], $key_types)) {
                     $this->validated_data["tls_type"] = $this->initial_data["tls_type"];  
@@ -216,65 +222,49 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
         } else {
             unset($this->validated_data["tls_type"]);
         }
-        
-        if (($this->validated_data["mode"] !== "p2p_shared_key")) {
-            
-        } elseif (($this->validated_data["mode"] === "p2p_shared_key")) {
-            unset($this->validated_data["tls_type"]);
-        }
     }
 
-    // TODO
     private function __validate_tls_keydir() {
         # Local variables
         $key_types = ["default", "direction-0", "direction-1", "both-directions"];
 
         # Validate keydir direction if TLS set
-        if (($this->validated_data["mode"] !== "p2p_shared_key")) {
-            if (isset($this->validated_data["tls"])) {
-                if (isset($this->initial_data["tlsauth_keydir"])) {
-                    if (in_array($this->initial_data["tlsauth_keydir"], $key_types)) {
-                        switch ($this->initial_data["tlsauth_keydir"]) {
-                            case "default":
-                                $this->validated_data["tlsauth_keydir"] = "default";
-                                break;
-                            case "direction-0":
-                                $this->validated_data["tlsauth_keydir"] = "0";
-                                break;
-                            case "direction-1":
-                                $this->validated_data["tlsauth_keydir"] = "1";
-                                break;
-                            case "both-directions":
-                                $this->validated_data["tlsauth_keydir"] = "2";
-                                break;
-                        } 
-                    } else {
-                        $this->errors[] = APIResponse\get(2104);
-                    }
+        if (isset($this->validated_data["tls"])) {
+            if (isset($this->initial_data["tlsauth_keydir"])) {
+                if (in_array($this->initial_data["tlsauth_keydir"], $key_types)) {
+                    switch ($this->initial_data["tlsauth_keydir"]) {
+                        case "default":
+                            $this->validated_data["tlsauth_keydir"] = "default";
+                            break;
+                        case "direction-0":
+                            $this->validated_data["tlsauth_keydir"] = "0";
+                            break;
+                        case "direction-1":
+                            $this->validated_data["tlsauth_keydir"] = "1";
+                            break;
+                        case "both-directions":
+                            $this->validated_data["tlsauth_keydir"] = "2";
+                            break;
+                    } 
+                } else {
+                    $this->errors[] = APIResponse\get(2104);
                 }
-            } else {
-                unset($this->validated_data["tlsauth_keydir"]);
             }
-        } elseif (($this->validated_data["mode"] === "p2p_shared_key")) {
+        } else {
             unset($this->validated_data["tlsauth_keydir"]);
         }
     }
 
-    // TODO
     private function __validate_shared_key() {
-        if (($this->validated_data["mode"] === "p2p_shared_key")) {
-            # Check for our optional `Shared key` payload value
-            if (isset($this->initial_data["shared_key"])) {
-                # Auto generate Shared key if empty
-                if ($this->initial_data["shared_key"] === "") {
-                    $this->validated_data["shared_key"] = base64_encode(openvpn_create_key());
-                # Assume default if none was specified
-                } else {
-                    $this->validated_data["shared_key"] = base64_encode($this->initial_data["shared_key"]);
-                }
+        # Check for our optional `Shared key` payload value
+        if (isset($this->initial_data["shared_key"])) {
+            # Auto generate Shared key if empty
+            if ($this->initial_data["shared_key"] === "") {
+                $this->validated_data["shared_key"] = base64_encode(openvpn_create_key());
+            # Assume default if none was specified
+            } else {
+                $this->validated_data["shared_key"] = base64_encode($this->initial_data["shared_key"]);
             }
-        } else {
-            unset($this->validated_data["shared_key"]);
         }
     }
 
@@ -511,37 +501,51 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
         }
     }
 
-    // TODO
     private function __validate_serverbridge_dhcp() {
-        if ($this->validated_data['dev_mode'] === 'tap') {
+        if (($this->validated_data['dev_mode'] === 'tap') and (isset($this->initial_data["serverbridge_dhcp"]))) {
             if ($this->initial_data['serverbridge_dhcp'] === true) {
                 $this->validated_data['serverbridge_dhcp'] = 'yes';
             } else {
                 $this->validated_data['serverbridge_dhcp'] = "";
             }
-        } else {
-            $this->validated_data['serverbridge_dhcp'] = "";
         }
     }
 
-    // TODO
     private function __validate_serverbridge_interface() {
         $key_types = ["wan", "lan", "none"];
-        // TODO add validation to VIP, OPENVPN and etc... interfaces
+        $match = false;
+
         if (($this->validated_data['serverbridge_dhcp'] === 'yes') and (isset($this->initial_data['serverbridge_interface']))) {
+            // Validate Virtual Interface
+            foreach ($this->config["virtualip"]["vip"] as $vip) {
+                if (strtolower($this->initial_data["serverbridge_interface"]) === strtolower($vip["descr"])) {
+                    $this->validated_data["interface"] = "_vip" . $vip["uniqid"] . "|" . $vip["subnet"];
+                    $match = true;
+                    break;
+                } elseif ((filter_var($vip["subnet"], FILTER_VALIDATE_IP)) and ($this->initial_data["serverbridge_interface"] === $vip["subnet"])) {
+                    $this->validated_data["interface"] = "_vip" . $vip["uniqid"] . "|" . $vip["subnet"];
+                    $match = true;
+                    break;
+                } elseif (strtolower($this->initial_data["serverbridge_interface"]) === strtolower($vip["uniqid"])) {
+                    $this->validated_data["interface"] = "_vip" . $vip["uniqid"] . "|" . $vip["subnet"];
+                    $match = true;
+                    break;
+                }
+            }
+
             if (in_array(strtolower($this->initial_data['serverbridge_interface']), $key_types)) {
                 $this->validated_data["serverbridge_interface"] = strtolower($this->initial_data['serverbridge_interface']);
-            } else {
+                $match = true;
+            } 
+            
+            if (!$match) {
                 $this->errors[] = APIResponse\get(2140);
             }
-        } else {
-            $this->validated_data["serverbridge_interface"] = "none";
         }
     }
 
-    // TODO
     private function __validate_serverbridge_routegateway() {
-        if ($this->validated_data['serverbridge_dhcp'] === 'yes') {
+        if (($this->validated_data['serverbridge_dhcp'] === 'yes') and (isset($this->initial_data['serverbridge_routegateway']))) {
             if ($this->initial_data['serverbridge_routegateway'] === true) {
                 if ($this->validated_data["serverbridge_interface"] !== "none") {
                     $this->validated_data["serverbridge_routegateway"] = "yes";
@@ -551,34 +555,26 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             } else {
                 $this->validated_data["serverbridge_routegateway"] = "";
             }
-        } else {
-            $this->validated_data["serverbridge_routegateway"] = "";
         }
     }
 
-    // TODO
     private function __validate_serverbridge_dhcp_start() {
-        if ($this->validated_data['serverbridge_dhcp'] === 'yes') {
+        if (($this->validated_data['serverbridge_dhcp'] === 'yes') and (isset($this->initial_data['serverbridge_dhcp_start']))) {
             if ((isset($this->initial_data['serverbridge_dhcp_start'])) and (is_ipaddrv4($this->initial_data['serverbridge_dhcp_start'])) and (isset($this->initial_data['serverbridge_dhcp_end']))) {
                 $this->validated_data["serverbridge_dhcp_start"] = $this->initial_data['serverbridge_dhcp_start'];
             } else {
                 $this->errors[] = APIResponse\get(2142);
             }
-        } else {
-            $this->validated_data["serverbridge_dhcp_start"] = "";
         }
     }
 
-    // TODO
     private function __validate_serverbridge_dhcp_end() {
-        if ($this->validated_data['serverbridge_dhcp'] === 'yes') {
+        if (($this->validated_data['serverbridge_dhcp'] === 'yes') and (isset($this->initial_data['serverbridge_dhcp_end']))) {
             if ((isset($this->initial_data['serverbridge_dhcp_end'])) and (is_ipaddrv4($this->initial_data['serverbridge_dhcp_end'])) and (isset($this->initial_data['serverbridge_dhcp_start']))) {
                 $this->validated_data["serverbridge_dhcp_end"] = $this->initial_data['serverbridge_dhcp_end'];
             } else {
                 $this->errors[] = APIResponse\get(2142);
             }
-        } else {
-            $this->validated_data["serverbridge_dhcp_end"] = "";
         }
     }
 
@@ -998,82 +994,50 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
         }
     }
 
-    // TODO
     private function __validate_ntp_servers() {
-        if ($this->validated_data['mode'] !== "p2p_tls" and $this->validated_data['mode'] !== "p2p_shared_key") {
-            if (isset($this->initial_data['ntp_servers'])) {
-                $ntp_servers = explode(',', $this->initial_data['ntp_servers']);
-    
-                $counter = 1;
-    
-                foreach ($ntp_servers as $server) {
-                    if ($counter > 2)
-                    {
-                        break;
-                    }
-    
+        if (isset($this->initial_data['ntp_servers'])) {
+            $ntp_servers = explode(',', $this->initial_data['ntp_servers']);
+            $counter = 1;
+            foreach ($ntp_servers as $server) {
+                if ($counter > 2) {
+                    break;
+                } elseif (is_ipaddrv4(str_replace(" ", "", $server))) {
                     $this->validated_data["ntp_server" . $counter] = str_replace(" ", "", $server);
                     $counter += 1;
-                }
-            }
-        } else {
-            for ($i=1; $i < 3; $i++) { 
-                unset($this->validated_data["ntp_server" . $i]);
+                } else {
+                    $this->errors[] = APIResponse\get(2143);
+                } 
             }
         }
     }
 
-    // TODO
-    private function __validate_nbdd_server() {
-        if (isset($this->validated_data['ntp_servers'])) {
-            $this->validated_data["nbdd_server1"] = "";
-        } else {
-            unset($this->validated_data["nbdd_server1"]);
-        }
-    }
-
-    // TODO
     private function __validate_netbios_enable() {
-        if (($this->validated_data["mode"] !== "p2p_tls") and ($this->validated_data["mode"] !== "p2p_shared_key")) {
-            if (($this->initial_data['netbios_enable'] === true) and ($this->validated_data["netbios_enable"] === "")) {
-                $this->validated_data["netbios_enable"] = "yes";
-            } elseif (($this->initial_data['netbios_enable'] === false) and ($this->validated_data["netbios_enable"] === "yes")) {
-                $this->validated_data["netbios_enable"] = "";
-            }
-        } else {
+        if (($this->initial_data['netbios_enable'] === true) and ($this->validated_data["netbios_enable"] === "")) {
+            $this->validated_data["netbios_enable"] = "yes";
+        } elseif (($this->initial_data['netbios_enable'] === false) and ($this->validated_data["netbios_enable"] === "yes")) {
             $this->validated_data["netbios_enable"] = "";
         }
     }
 
-    // TODO
     private function __validate_netbios_ntype() {
-        if (($this->validated_data["mode"] !== "p2p_tls") and ($this->validated_data["mode"] !== "p2p_shared_key")) {
-            if (isset($this->initial_data['netbios_node_type'])) {
-                if ($this->initial_data['netbios_node_type'] == 'b') {
-                    $this->validated_data["netbios_ntype"] = "1";
-                } else if ($this->initial_data['netbios_node_type'] == 'p') {
-                    $this->validated_data["netbios_ntype"] = "2";
-                } else if ($this->initial_data['netbios_node_type'] == 'm') {
-                    $this->validated_data["netbios_ntype"] = "3";
-                } else if ($this->initial_data['netbios_node_type'] == 'h') {
-                    $this->validated_data["netbios_ntype"] = "4";
-                } else {
-                    $this->errors[] = APIResponse\get(2076);
-                }
+        if (isset($this->initial_data['netbios_node_type'])) {
+            if ($this->initial_data['netbios_node_type'] == 'b') {
+                $this->validated_data["netbios_ntype"] = "1";
+            } else if ($this->initial_data['netbios_node_type'] == 'p') {
+                $this->validated_data["netbios_ntype"] = "2";
+            } else if ($this->initial_data['netbios_node_type'] == 'm') {
+                $this->validated_data["netbios_ntype"] = "3";
+            } else if ($this->initial_data['netbios_node_type'] == 'h') {
+                $this->validated_data["netbios_ntype"] = "4";
+            } else {
+                $this->errors[] = APIResponse\get(2076);
             }
-        } else {
-            $this->validated_data["netbios_ntype"] = "0";
-        }  
+        }
     }
 
-    // TODO
     private function __validate_netbios_scope() {
-        if (($this->validated_data["mode"] !== "p2p_tls") and ($this->validated_data["mode"] !== "p2p_shared_key")) {
-            if (isset($this->initial_data['netbios_scope'])) {
-                $this->validated_data["netbios_scope"] = $this->initial_data['netbios_scope'];
-            }
-        } else {
-            $this->validated_data["netbios_scope"] = "";
+        if (isset($this->initial_data['netbios_scope'])) {
+            $this->validated_data["netbios_scope"] = $this->initial_data['netbios_scope'];
         }
     }
 
@@ -1115,28 +1079,30 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
         }
     }
 
-    // TODO
     private function __validate_wins_servers() {
-        if (($this->validated_data["mode"] !== "p2p_tls") and ($this->validated_data["mode"] !== "p2p_shared_key")) {
-            if (isset($this->initial_data['wins_servers'])) {
-                $win_servers = explode(',', $this->initial_data['wins_servers']);
-    
-                $counter = 1;
-    
-                foreach ($win_servers as $server) {
-                    if ($counter > 2)
-                    {
-                        break;
-                    }
-    
+        if (isset($this->initial_data['wins_servers'])) {
+            $win_servers = explode(',', $this->initial_data['wins_servers']);
+            $counter = 1;
+            foreach ($win_servers as $server) {
+                if ($counter > 2) {
+                    break;
+                } elseif (is_ipaddrv4(str_replace(" ", "", $server))) {
                     $this->validated_data["wins_server" . $counter] = str_replace(" ", "", $server);
                     $counter += 1;
+                }  else {
+                    $this->errors[] = APIResponse\get(2143);
                 }
             }
+        }
+    }
+
+
+    // TODO: Validate nbdd servers is not yet available
+    private function __validate_nbdd_server() {
+        if (isset($this->validated_data['wins_servers' . '1']) and ($this->validated_data["netbios_enable"] = "yes")) {
+            $this->validated_data["nbdd_server1"] = "";
         } else {
-            for ($i=1; $i < 3; $i++) { 
-                unset($this->validated_data["wins_server" . $i]);
-            }
+            unset($this->validated_data["nbdd_server1"]);
         }
     }
 
@@ -1208,6 +1174,10 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             $this->__validate_topology();
             $this->__validate_inactive_seconds();
             $this->__validate_exit_notify();
+
+            if (isset($this->validated_data["shared_key"])) {
+                unset($this->validated_data["shared_key"]);
+            }
         }
 
         # Run each validation method for ["p2p_tls", "p2p_shared_key"]
@@ -1231,6 +1201,18 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             for ($i=1; $i < 5; $i++) { 
                 if (isset($this->validated_data["dns_server" . $i])) {
                     unset($this->validated_data["dns_server" . $i]);
+                }
+            }
+
+            for ($i=1; $i < 3; $i++) { 
+                if (isset($this->validated_data["ntp_server" . $i])) {
+                    unset($this->validated_data["ntp_server" . $i]);
+                }
+            }
+
+            for ($i=1; $i < 3; $i++) { 
+                if (isset($this->validated_data["wins_server" . $i])) {
+                    unset($this->validated_data["wins_server" . $i]);
                 }
             }
 
@@ -1317,6 +1299,42 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
 
             if (isset($this->validated_data["tls_type"])) {
                 unset($this->validated_data["tls_type"]);
+            }
+
+            if (isset($this->validated_data["caref"])) {
+                unset($this->validated_data["caref"]);
+            }
+
+            if (isset($this->validated_data["certref"])) {
+                unset($this->validated_data["certref"]);
+            }
+
+            if (isset($this->validated_data["crlref"])) {
+                unset($this->validated_data["crlref"]);
+            }
+
+            if (isset($this->validated_data["cert_depth"])) {
+                unset($this->validated_data["cert_depth"]);
+            }
+
+            if (isset($this->validated_data["ocspcheck"])) {
+                unset($this->validated_data["ocspcheck"]);
+            }
+
+            if (isset($this->validated_data["ocspurl"])) {
+                unset($this->validated_data["ocspurl"]);
+            }
+
+            if (isset($this->validated_data["ocspurl"])) {
+                unset($this->validated_data["ocspurl"]);
+            }
+
+            if (isset($this->validated_data["dh_length"])) {
+                unset($this->validated_data["dh_length"]);
+            }
+
+            if (isset($this->validated_data["ecdh_curve"])) {
+                unset($this->validated_data["ecdh_curve"]);
             }
 
             if (isset($this->validated_data["cert_depth"])) {

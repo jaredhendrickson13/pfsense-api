@@ -41,19 +41,27 @@ class APIServicesOpenVPNServerDelete extends APIModel {
                     $this->validated_data['vpnid'] = (string) $this->initial_data['vpnid'];
                     break;
                 } 
-                
                 $counter += 1;
             }
 
             if (empty($this->validated_data["vpnid"])) {
-                $this->errors[] = APIResponse\get(6075);
+                $this->errors[] = APIResponse\get(2133);
             }
         } else {
-            $this->errors[] = APIResponse\get(6076);
+            $this->errors[] = APIResponse\get(2134);
+        }
+    }
+
+    public function __validate_ovpns() {
+        foreach ($this->config["interfaces"] as $interface) {
+            if (isset($interface["if"]) and ($interface["if"] == "ovpns" . $this->validated_data['vpnid'])) {
+                $this->errors[] = APIResponse\get(2145);
+            }
         }
     }
 
     public function validate_payload() {
         $this->__validate_vpnid();
+        $this->__validate_ovpns();
     }
 }
