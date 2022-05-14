@@ -733,12 +733,15 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
         }
     }
 
+    // TODO: Add validation for "topology"
     private function __validate_topology() {
         # Local variables
         $key_types = ["subnet", "net30"];
 
         # Validate Topology
-        if (isset($this->initial_data["topology"])) {
+        if ($this->validated_data["dev_mode"] === "tap") {
+            $this->validated_data["topology"] = "subnet";
+        } elseif (isset($this->initial_data["topology"])) {
             if (in_array($this->initial_data["topology"], $key_types)) {
                 $this->validated_data["topology"] = $this->initial_data["topology"];
             } else {
@@ -1245,14 +1248,6 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
 
             $this->validated_data["remote_network"] = "";
             $this->validated_data["remote_networkv6"] = "";
-
-            if (isset($this->validated_data["remote_network"])) {
-                unset($this->validated_data["remote_network"]);
-            }
-
-            if (isset($this->validated_data["remote_networkv6"])) {
-                unset($this->validated_data["remote_networkv6"]);
-            }
         }
         
         # Run each validation method for ["p2p_tls", "p2p_shared_key", "server_tls"]
@@ -1268,7 +1263,6 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
         if (($this->validate_data["mode"] === "server_user") or ($this->validated_data["mode"] === "server_tls_user")) {
             $this->__validate_authmode();
             $this->__validate_username_as_cn();
-
         }
 
         if ($this->validated_data['mode'] !== 'server_tls_user') {
@@ -1282,6 +1276,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
         # Run each validation method for ["p2p_shared_key"]
         if ($this->validated_data["mode"] === "p2p_shared_key") {
             $this->__validate_shared_key();
+
             $this->validated_data["gwredir"] = "";
             $this->validated_data["gwredir6"] = "";
             $this->validated_data["local_network"] = "";
@@ -1299,6 +1294,10 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
 
             if (isset($this->validated_data["tls_type"])) {
                 unset($this->validated_data["tls_type"]);
+            }
+
+            if (isset($this->validated_data["tlsauth_keydir"])) {
+                unset($this->validated_data["tlsauth_keydir"]);
             }
 
             if (isset($this->validated_data["caref"])) {
@@ -1325,20 +1324,12 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                 unset($this->validated_data["ocspurl"]);
             }
 
-            if (isset($this->validated_data["ocspurl"])) {
-                unset($this->validated_data["ocspurl"]);
-            }
-
             if (isset($this->validated_data["dh_length"])) {
                 unset($this->validated_data["dh_length"]);
             }
 
             if (isset($this->validated_data["ecdh_curve"])) {
                 unset($this->validated_data["ecdh_curve"]);
-            }
-
-            if (isset($this->validated_data["cert_depth"])) {
-                unset($this->validated_data["cert_depth"]);
             }
 
             if (isset($this->validated_data["duplicate_cn"])) {

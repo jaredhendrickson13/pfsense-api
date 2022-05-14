@@ -821,18 +821,15 @@ class APIServicesOpenVPNServerCreate extends APIModel {
         # Local variables
         $key_types = ["subnet", "net30"];
 
-        if ($this->validated_data["dev_mode"] !== "tap") {
-            # Validate Topology
-            if (isset($this->initial_data["topology"])) {
-                if (in_array($this->initial_data["topology"], $key_types)) {
-                    $this->validated_data["topology"] = $this->initial_data["topology"];
-                } else {
-                    $this->errors[] = APIResponse\get(2116);
-                }
-            # Assume default if none was specified
+        if ($this->validated_data["dev_mode"] === "tap") {
+            $this->validated_data["topology"] = "subnet";
+        } elseif (isset($this->initial_data["topology"])) {
+            if (in_array($this->initial_data["topology"], $key_types)) {
+                $this->validated_data["topology"] = $this->initial_data["topology"];
             } else {
-                $this->validated_data["topology"] = "subnet";
+                $this->errors[] = APIResponse\get(2116);
             }
+        # Assume default if none was specified
         } else {
             $this->validated_data["topology"] = "subnet";
         }
@@ -1277,6 +1274,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
         # Run each validation method for ["p2p_shared_key"]
         if ($this->validated_data["mode"] === "p2p_shared_key") {
             $this->__validate_shared_key();
+
             $this->validated_data["gwredir"] = "";
             $this->validated_data["gwredir6"] = "";
             $this->validated_data["local_network"] = "";
