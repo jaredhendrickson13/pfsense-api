@@ -1187,6 +1187,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "DHCPd option with type ip-address must be valid IPv4 address or hostname"
         ],
+        2098 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Host overrides must be contained within an array"
+        ],
         2999 => [
             "status" => "bad request",
             "code" => 400,

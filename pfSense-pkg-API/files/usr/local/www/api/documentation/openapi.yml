@@ -7298,6 +7298,62 @@ paths:
       tags:
         - Services > Unbound > Host Override > Alias
   /api/v1/services/unbound/host_override/flush:
+    put:
+      description: 'Replace all existing DNS Resolver (Unbound) host overrides with a specified set of host overrides.
+        This allows you to create multiple host overrides at once. If validation error is encountered when validating
+        the host overrides, the specific entry that triggered the error will be included in the `data` field of the 
+        response.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                host_overrides:
+                  type: array
+                  items:
+                    type: object
+                  description: Host override objects to replace existing host overrides with. Specifying an
+                    empty array will remove all existing host overrides. Each object within this array can use any
+                    properties available on the /api/v1/services/unbound/host_override endpoint.
+                  example:
+                    - host: example1
+                      domain: example.com
+                      ip: [127.0.0.1]
+                      descr: "Example entry #1"
+                      aliases:
+                        - host: example1-alias
+                          domain: example.com
+                          description: "Example entry #1 alias"
+                    - host: example2
+                      domain: example.com
+                      ip: [127.0.0.2]
+                      descr: "Example entry #2"
+                      aliases:
+                        - host: example2-alias
+                          domain: example.com
+                          description: "Example entry #2 alias"
+                apply:
+                  default: false
+                  description: Specify whether or not you would like these host overrides
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later. Typically, if you are creating multiple host
+                    override aliases at once it Is best to set this to false and apply
+                    the changes afterwards using the `/api/v1/services/unbound/apply`
+                    endpoint.
+                  type: boolean
+              required:
+                - host_overrides
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Replace all DNS Resolver (Unbound) host overrides
+      tags:
+        - Services > Unbound > Host Override > Flush
     delete:
       description: 'Deletes all existing DNS Resolver (Unbound) host overrides. This is useful for scripts
           that need to setup host overrides from scratch.<br><br>_Note: this endpoint

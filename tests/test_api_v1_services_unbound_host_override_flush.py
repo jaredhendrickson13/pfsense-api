@@ -16,9 +16,41 @@ import e2e_test_framework
 
 class APIE2ETestServicesUnboundHostOverrideFlush(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/unbound/host_override/flush"
-
+    put_tests = [
+        {
+            "name": "Check host_overrides field array requirement",
+            "return": 2098,
+            "status": 400
+        },
+        {
+            "name": "Check ability to replace all existing host overrides",
+            "payload": {
+                "host_overrides": [
+                    {
+                        "host": "test1",
+                        "domain": "example.com",
+                        "ip": ["127.0.0.1"],
+                        "descr": "Entry #1",
+                        "aliases": [
+                            {"host": "test1-alias", "domain": "example.com"}
+                        ]
+                    },
+                    {
+                        "host": "test2",
+                        "domain": "example.com",
+                        "ip": ["127.0.0.1"],
+                        "descr": "Entry #2",
+                        "aliases": [
+                            {"host": "test2-alias", "domain": "example.com"}
+                        ]
+                    }
+                ]
+            }
+        }
+    ]
     delete_tests = [
         {"name": "Flush all Unbound host overrides", "payload": {}},
     ]
+
 
 APIE2ETestServicesUnboundHostOverrideFlush()
