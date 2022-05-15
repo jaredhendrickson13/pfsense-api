@@ -7300,7 +7300,7 @@ paths:
   /api/v1/services/unbound/host_override/flush:
     put:
       description: 'Replace all existing DNS Resolver (Unbound) host overrides with a specified set of host overrides.
-        This allows you to create multiple host overrides at once. If validation error is encountered when validating
+        This allows you to create multiple host overrides at once. If a validation error is encountered when validating
         the host overrides, the specific entry that triggered the error will be included in the `data` field of the 
         response.<br><br>
 
