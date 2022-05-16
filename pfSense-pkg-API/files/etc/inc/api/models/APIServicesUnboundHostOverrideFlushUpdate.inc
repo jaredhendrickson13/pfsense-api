@@ -16,6 +16,10 @@
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
+function unbound_override_flush_host_cmp($a, $b) {
+    return strcasecmp($a['host'], $b['host']);
+}
+
 class APIServicesUnboundHostOverrideFlushUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
@@ -27,6 +31,7 @@ class APIServicesUnboundHostOverrideFlushUpdate extends APIModel {
     public function action() {
         # Replace any existing host overrides with the host overrides validated in this request
         $this->config["unbound"]["hosts"] = $this->validated_data;
+        usort($this->config["unbound"]["hosts"], "unbound_override_flush_host_cmp");
         $this->write_config();
 
         # Mark the Unbound subsystem as changed.
@@ -37,7 +42,7 @@ class APIServicesUnboundHostOverrideFlushUpdate extends APIModel {
             (new APIServicesUnboundApplyCreate)->action();
         }
 
-        return APIResponse\get(0, $this->validated_data);
+        return APIResponse\get(0, $this->config["unbound"]["hosts"]);
     }
 
     public function validate_payload() {
