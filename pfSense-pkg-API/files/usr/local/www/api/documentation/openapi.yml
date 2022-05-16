@@ -4253,7 +4253,8 @@ paths:
                   type: boolean
                 gateway:
                   description: Name of upstream IPv4 gateway for this interface. This
-                    is only necessary on WAN/UPLINK interfaces.
+                    is only necessary on WAN/UPLINK interfaces. This parameter is only
+                    available when `type` is set to `staticv4`.
                   type: string
                 gateway-6rd:
                   description: Set the 6RD interface IPv4 gateway address. This parameter
@@ -4514,7 +4515,8 @@ paths:
                   type: boolean
                 gateway:
                   description: Name of upstream IPv4 gateway for this interface. This
-                    is only necessary on WAN/UPLINK interfaces.
+                    is only necessary on WAN/UPLINK interfaces. This parameter is only
+                    available when `type` is set to `staticv4`.
                   type: string
                 gateway-6rd:
                   description: Set the 6RD interface IPv4 gateway address. This parameter
@@ -4602,13 +4604,17 @@ paths:
                     `track6`
                   type: integer
                 type:
-                  description: IPv4 configuration type.
+                  description: IPv4 configuration type. This parameter may be required in order to update
+                    specific parameters. For example, this parameter must be set to `staticv4` in order to 
+                    update the `gateway` parameter.
                   enum:
                     - staticv4
                     - dhcp
                   type: string
                 type6:
-                  description: IPv6 configuration type.
+                  description: IPv6 configuration type. This parameter may be required in order to update
+                    specific parameters. For example, this parameter must be set to `staticv6` in order to
+                    update the `gatewayv6` parameter.
                   enum:
                     - staticv6
                     - dhcp6
