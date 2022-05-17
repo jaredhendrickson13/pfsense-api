@@ -2401,8 +2401,60 @@ paths:
       tags:
         - Firewall > Rule
   /api/v1/firewall/rule/flush:
+    put:
+      description: 'Replace all existing firewall rules with a specified set of rules. This allows you to
+            create rules at once. If a validation error is encountered when validating the rules, the specific 
+            rule entry that triggered the error will be included in the `data` field of the response. <br><br>_Note:
+            the pfSense webConfigurator and /api/v1/firewall/rule API endpoint will create the `tracker` ID for
+            rules based on the time they were created, and essentially limits creations to 1 rule per second to
+            avoid conflicts. To get around this restriction, this endpoint will use randomized `tracker` IDs 
+            instead. The potential effects of this are somewhat unknown, proceed with caution._<br><br>
+
+            _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules-edit`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                rules:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                  description: Firewall rule objects to replace existing firewall rules with. Each object within this 
+                    array can use any properties available to the /api/v1/firewall/rule endpoint.
+                  example:
+                    - type: pass
+                      interface: wan
+                      ipprotocol: inet46
+                      protocol: any
+                      src: any
+                      dst: any
+                    - type: pass
+                      interface: lan
+                      ipprotocol: inet
+                      protocol: any
+                      src: lan
+                      dst: any
+                apply:
+                  default: false
+                  description: Specify whether or not you would like these firewall rules
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later using the /api/v1/firewall/apply endpoint.
+                  type: boolean
+              required:
+                - rules
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Replace all firewall rules
+      tags:
+        - Firewall > Rule > Flush
     delete:
-      description: 'Deletes all existing firewall rules. This is useful for scripts
+      description: 'Delete all existing firewall rules. This is useful for scripts
         that need to setup the firewall rules from scratch.<br><br>_Note: this endpoint
         will not reload the firewall filter automatically, you must make another API
         call to the /api/v1/firewall/apply endpoint to do so. Ensure firewall rules
@@ -7322,7 +7374,7 @@ paths:
                     type: object
                   description: Host override objects to replace existing host overrides with. Specifying an
                     empty array will remove all existing host overrides. Each object within this array can use any
-                    properties available on the /api/v1/services/unbound/host_override endpoint.
+                    properties available to the /api/v1/services/unbound/host_override endpoint.
                   example:
                     - host: example1
                       domain: example.com
@@ -7344,10 +7396,7 @@ paths:
                   default: false
                   description: Specify whether or not you would like these host overrides
                     to be applied immediately, or simply written to the configuration
-                    to be applied later. Typically, if you are creating multiple host
-                    override aliases at once it Is best to set this to false and apply
-                    the changes afterwards using the `/api/v1/services/unbound/apply`
-                    endpoint.
+                    to be applied later using the /api/v1/services/unbound/apply endpoint.
                   type: boolean
               required:
                 - host_overrides

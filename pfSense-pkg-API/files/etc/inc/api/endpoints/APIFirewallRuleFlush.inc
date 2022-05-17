@@ -20,6 +20,10 @@ class APIFirewallRuleFlush extends APIEndpoint {
         $this->url = "/api/v1/firewall/rule/flush";
     }
 
+    protected function put() {
+        return (new APIFirewallRuleFlushUpdate())->call();
+    }
+
     protected function delete() {
         return (new APIFirewallRuleFlushDelete())->call();
     }
