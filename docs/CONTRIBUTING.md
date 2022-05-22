@@ -366,6 +366,13 @@ Often times you will need to create functions to condense redundant tasks. You c
 
 `$some_variable = APITools\your_custom_tool_function();`
 
+As a general rule, functions should be kept within the API model they relate closest to. For example, a function that
+checks for the existence of an alias by name should be kept in the APIFirewallAlias* models, even if multiple models
+will use the function. Tool functions should only be used in one of the following situations:
+- Multiple models, endpoints or tools use the function and the function does not directly relate to any of the existing
+API models, or it directly relates to multiple models.
+- Use of the function causes an `include` or `require` loop.
+
 
 ## Writing API E2E Tests ##
 E2E tests are written using Python3. pfSense API includes a an e2e_test_framework module in the `tests` directory to make
