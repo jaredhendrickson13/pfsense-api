@@ -5652,6 +5652,43 @@ paths:
       summary: Update gateway
       tags:
         - Routing > Gateway
+  /api/v1/routing/gateway/default:
+    put:
+      description: 'Update the default gateways for IPv4 and/or IPv6. _Note: changing the default gateway can
+      prevent you from connecting to the system afterward. Proceed with caution._<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                defaultgw4:
+                  description: >-
+                    Set the IPv4 default gateway. This must be an existing IPv4 gateway name, `automatic` for automatic
+                    gateway selection, or `none` for no default gateway selection for IPv4.
+                  type: string
+                defaultgw6:
+                  description: >-
+                    Set the IPv6 default gateway. This must be an existing IPv6 gateway name, `automatic` for automatic
+                    gateway selection, or `none` for no default gateway selection for IPv6.
+                  type: string
+                apply:
+                  default: true
+                  description: Specify whether or not you would like this change
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later. If set to `false` you must apply the changes
+                    afterwards using the `/api/v1/routing/apply` endpoint.
+                  type: boolean
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update default gateways
+      tags:
+        - Routing > Gateway > Default
   /api/v1/routing/gateway/detail:
     get:
       description: 'Read verbose routing gateway details about both dynamic/system
@@ -9512,6 +9549,7 @@ tags:
   - name: System > Reboot
   - name: System > Halt
   - name: Routing > Gateway
+  - name: Routing > Gateway > Default
   - name: Routing > Gateway > Detail
   - name: Routing > Static Route
   - name: Routing > Apply
