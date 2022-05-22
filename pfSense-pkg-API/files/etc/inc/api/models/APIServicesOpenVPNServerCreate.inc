@@ -111,6 +111,28 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             $this->validated_data["interface"] = "wan";
             $this->validated_data["ipaddr"] = "";
         } elseif (isset($this->initial_data["interface"])) {
+            // Validate Interface by
+            foreach ($this->config["interfaces"] as $interface) {
+                if (($interface["mode"] === "ipalias") or ($vip["mode"] === "carp") ) {
+                    if (strtolower($this->initial_data["interface"]) === strtolower($vip["descr"])) {
+                        $this->validated_data["interface"] = "_vip" . $vip["uniqid"];
+                        $this->validated_data["ipaddr"] = $vip["subnet"];
+                        $match = true;
+                        break;
+                    } elseif ((filter_var($vip["subnet"], FILTER_VALIDATE_IP)) and ($this->initial_data["interface"] === $vip["subnet"])) {
+                        $this->validated_data["interface"] = "_vip" . $vip["uniqid"];
+                        $this->validated_data["ipaddr"] = $vip["subnet"];
+                        $match = true;
+                        break;
+                    } elseif (strtolower($this->initial_data["interface"]) === $vip["uniqid"]) {
+                        $this->validated_data["interface"] = "_vip" . $vip["uniqid"];
+                        $this->validated_data["ipaddr"] = $vip["subnet"];
+                        $match = true;
+                        break;
+                    }
+                }
+            }
+
             // Validate Virtual Interface
             foreach ($this->config["virtualip"]["vip"] as $vip) {
                 if (($vip["mode"] === "ipalias") or ($vip["mode"] === "carp") ) {
@@ -505,7 +527,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
     private function __validate_engine() {
         # Validate Hardware Crypto
         if (isset($this->initial_data["engine"])) {
-            if (in_array($this->initial_data["engine"], openvpn_get_engines())) {
+            if (array_key_exists($this->initial_data["engine"], openvpn_get_engines())) {
                 $this->validated_data["engine"] = $this->initial_data["engine"];
             } else {
                 $this->errors[] = APIResponse\get(2110);

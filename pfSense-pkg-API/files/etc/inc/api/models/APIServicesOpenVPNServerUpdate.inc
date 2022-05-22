@@ -463,7 +463,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
     private function __validate_engine() {
         # Validate Hardware Crypto
         if (isset($this->initial_data["engine"])) {
-            if (in_array($this->initial_data["engine"], openvpn_get_engines())) {
+            if (array_key_exists($this->initial_data["engine"], openvpn_get_engines())) {
                 $this->validated_data["engine"] = $this->initial_data["engine"];
             } else {
                 $this->errors[] = APIResponse\get(2110);
