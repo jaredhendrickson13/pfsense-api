@@ -1187,6 +1187,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "DHCPd option with type ip-address must be valid IPv4 address or hostname"
         ],
+        2098 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Host overrides must be contained within an array"
+        ],
         2999 => [
             "status" => "bad request",
             "code" => 400,
@@ -3081,7 +3087,18 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Unknown API floating rule direction specified"
         ],
-
+        4240 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Rules must be contained within an array"
+        ],
+        4241 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Rules must contain at least one item"
+        ],
 
         //5000-5999 reserved for /users API calls
         5000 => [

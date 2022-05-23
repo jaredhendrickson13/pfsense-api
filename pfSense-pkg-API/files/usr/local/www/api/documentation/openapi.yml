@@ -2401,8 +2401,60 @@ paths:
       tags:
         - Firewall > Rule
   /api/v1/firewall/rule/flush:
+    put:
+      description: 'Replace all existing firewall rules with a specified set of rules. This allows you to
+            create rules at once. If a validation error is encountered when validating the rules, the specific 
+            rule entry that triggered the error will be included in the `data` field of the response. <br><br>_Note:
+            the pfSense webConfigurator and /api/v1/firewall/rule API endpoint will create the `tracker` ID for
+            rules based on the time they were created, and essentially limits creations to 1 rule per second to
+            avoid conflicts. To get around this restriction, this endpoint will use randomized `tracker` IDs 
+            instead. The potential effects of this are somewhat unknown, proceed with caution._<br><br>
+
+            _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules-edit`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                rules:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                  description: Firewall rule objects to replace existing firewall rules with. Each object within this 
+                    array can use any properties available to the /api/v1/firewall/rule endpoint.
+                  example:
+                    - type: pass
+                      interface: wan
+                      ipprotocol: inet46
+                      protocol: any
+                      src: any
+                      dst: any
+                    - type: pass
+                      interface: lan
+                      ipprotocol: inet
+                      protocol: any
+                      src: lan
+                      dst: any
+                apply:
+                  default: false
+                  description: Specify whether or not you would like these firewall rules
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later using the /api/v1/firewall/apply endpoint.
+                  type: boolean
+              required:
+                - rules
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Replace all firewall rules
+      tags:
+        - Firewall > Rule > Flush
     delete:
-      description: 'Deletes all existing firewall rules. This is useful for scripts
+      description: 'Delete all existing firewall rules. This is useful for scripts
         that need to setup the firewall rules from scratch.<br><br>_Note: this endpoint
         will not reload the firewall filter automatically, you must make another API
         call to the /api/v1/firewall/apply endpoint to do so. Ensure firewall rules
@@ -4253,7 +4305,8 @@ paths:
                   type: boolean
                 gateway:
                   description: Name of upstream IPv4 gateway for this interface. This
-                    is only necessary on WAN/UPLINK interfaces.
+                    is only necessary on WAN/UPLINK interfaces. This parameter is only
+                    available when `type` is set to `staticv4`.
                   type: string
                 gateway-6rd:
                   description: Set the 6RD interface IPv4 gateway address. This parameter
@@ -4514,7 +4567,8 @@ paths:
                   type: boolean
                 gateway:
                   description: Name of upstream IPv4 gateway for this interface. This
-                    is only necessary on WAN/UPLINK interfaces.
+                    is only necessary on WAN/UPLINK interfaces. This parameter is only
+                    available when `type` is set to `staticv4`.
                   type: string
                 gateway-6rd:
                   description: Set the 6RD interface IPv4 gateway address. This parameter
@@ -4602,13 +4656,17 @@ paths:
                     `track6`
                   type: integer
                 type:
-                  description: IPv4 configuration type.
+                  description: IPv4 configuration type. This parameter may be required in order to update
+                    specific parameters. For example, this parameter must be set to `staticv4` in order to 
+                    update the `gateway` parameter.
                   enum:
                     - staticv4
                     - dhcp
                   type: string
                 type6:
-                  description: IPv6 configuration type.
+                  description: IPv6 configuration type. This parameter may be required in order to update
+                    specific parameters. For example, this parameter must be set to `staticv6` in order to
+                    update the `gatewayv6` parameter.
                   enum:
                     - staticv6
                     - dhcp6
@@ -5594,6 +5652,43 @@ paths:
       summary: Update gateway
       tags:
         - Routing > Gateway
+  /api/v1/routing/gateway/default:
+    put:
+      description: 'Update the default gateways for IPv4 and/or IPv6. _Note: changing the default gateway can
+      prevent you from connecting to the system afterward. Proceed with caution._<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                defaultgw4:
+                  description: >-
+                    Set the IPv4 default gateway. This must be an existing IPv4 gateway name, `automatic` for automatic
+                    gateway selection, or `none` for no default gateway selection for IPv4.
+                  type: string
+                defaultgw6:
+                  description: >-
+                    Set the IPv6 default gateway. This must be an existing IPv6 gateway name, `automatic` for automatic
+                    gateway selection, or `none` for no default gateway selection for IPv6.
+                  type: string
+                apply:
+                  default: true
+                  description: Specify whether or not you would like this change
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later. If set to `false` you must apply the changes
+                    afterwards using the `/api/v1/routing/apply` endpoint.
+                  type: boolean
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update default gateways
+      tags:
+        - Routing > Gateway > Default
   /api/v1/routing/gateway/detail:
     get:
       description: 'Read verbose routing gateway details about both dynamic/system
@@ -7298,6 +7393,59 @@ paths:
       tags:
         - Services > Unbound > Host Override > Alias
   /api/v1/services/unbound/host_override/flush:
+    put:
+      description: 'Replace all existing DNS Resolver (Unbound) host overrides with a specified set of host overrides.
+        This allows you to create multiple host overrides at once. If a validation error is encountered when validating
+        the host overrides, the specific entry that triggered the error will be included in the `data` field of the 
+        response.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                host_overrides:
+                  type: array
+                  items:
+                    type: object
+                  description: Host override objects to replace existing host overrides with. Specifying an
+                    empty array will remove all existing host overrides. Each object within this array can use any
+                    properties available to the /api/v1/services/unbound/host_override endpoint.
+                  example:
+                    - host: example1
+                      domain: example.com
+                      ip: [127.0.0.1]
+                      descr: "Example entry #1"
+                      aliases:
+                        - host: example1-alias
+                          domain: example.com
+                          description: "Example entry #1 alias"
+                    - host: example2
+                      domain: example.com
+                      ip: [127.0.0.2]
+                      descr: "Example entry #2"
+                      aliases:
+                        - host: example2-alias
+                          domain: example.com
+                          description: "Example entry #2 alias"
+                apply:
+                  default: false
+                  description: Specify whether or not you would like these host overrides
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later using the /api/v1/services/unbound/apply endpoint.
+                  type: boolean
+              required:
+                - host_overrides
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Replace all DNS Resolver (Unbound) host overrides
+      tags:
+        - Services > Unbound > Host Override > Flush
     delete:
       description: 'Deletes all existing DNS Resolver (Unbound) host overrides. This is useful for scripts
           that need to setup host overrides from scratch.<br><br>_Note: this endpoint
@@ -9401,6 +9549,7 @@ tags:
   - name: System > Reboot
   - name: System > Halt
   - name: Routing > Gateway
+  - name: Routing > Gateway > Default
   - name: Routing > Gateway > Detail
   - name: Routing > Static Route
   - name: Routing > Apply

@@ -368,7 +368,7 @@ class APIFirewallRuleCreate extends APIModel {
         }
     }
 
-    public function validate_payload() {
+    public function validate_payload($delay_tracker=true) {
         $this->__validate_type();
         $this->__validate_interface();
         $this->__validate_ipprotocol();
@@ -393,7 +393,7 @@ class APIFirewallRuleCreate extends APIModel {
 
         # Delay generating the tracker. Reduces the likelihood of two rules getting the same tracker in looped calls.
         # todo: this is a quick fix and still does not guarantee uniqueness, a better solution is needed
-        if (!$this->errors) {
+        if (!$this->errors and $delay_tracker) {
             sleep(1);
         }
 

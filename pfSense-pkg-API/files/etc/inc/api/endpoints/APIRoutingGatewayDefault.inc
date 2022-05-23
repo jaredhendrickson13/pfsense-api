@@ -15,17 +15,12 @@
 
 require_once("api/framework/APIEndpoint.inc");
 
-class APIFirewallRuleFlush extends APIEndpoint {
+class APIRoutingGatewayDefault extends APIEndpoint {
     public function __construct() {
-        $this->url = "/api/v1/firewall/rule/flush";
+        $this->url = "/api/v1/routing/gateway/default";
     }
 
     protected function put() {
-        return (new APIFirewallRuleFlushUpdate())->call();
+        return (new APIRoutingGatewayDefaultUpdate())->call();
     }
-
-    protected function delete() {
-        return (new APIFirewallRuleFlushDelete())->call();
-    }
-
 }
