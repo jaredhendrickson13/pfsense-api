@@ -107,51 +107,57 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
     }
 
     private function __validate_interface() {
-        # Local variables
-        $key_types = ["wan", "lan", "lo0", "any"];
-        $match = false;
-
-        # Validate Interface
         if (($this->validated_data["protocol"] === "UDP") or ($this->validated_data["protocol"] === "TCP")) {
             $this->validated_data["interface"] = "wan";
             $this->validated_data["ipaddr"] = "";
         } elseif (isset($this->initial_data["interface"])) {
+            # Local variables
+            $match = false;
+            $interface = $this->initial_data["interface"];
+
+            // Validate Interface
+            if (!empty(APITools\get_pfsense_if_id($interface))) {
+                if (isset($this->config["interfaces"][APITools\get_pfsense_if_id($interface)]["enable"])) {
+                    $this->validated_data["interface"] = APITools\get_pfsense_if_id($interface);
+                    $this->validated_data["ipaddr"] = "";
+                    $match = true;
+                }
+            }
+
             // Validate Virtual Interface
-            foreach ($this->config["virtualip"]["vip"] as $vip) {
-                if (($vip["mode"] === "ipalias") or ($vip["mode"] === "carp") ) {
-                    if (strtolower($this->initial_data["interface"]) === strtolower($vip["descr"])) {
-                        $this->validated_data["interface"] = "_vip" . $vip["uniqid"];
-                        $this->validated_data["ipaddr"] = $vip["subnet"];
-                        $match = true;
-                        break;
-                    } elseif ((filter_var($vip["subnet"], FILTER_VALIDATE_IP)) and ($this->initial_data["interface"] === $vip["subnet"])) {
-                        $this->validated_data["interface"] = "_vip" . $vip["uniqid"];
-                        $this->validated_data["ipaddr"] = $vip["subnet"];
-                        $match = true;
-                        break;
-                    } elseif (strtolower($this->initial_data["interface"]) === $vip["uniqid"]) {
-                        $this->validated_data["interface"] = "_vip" . $vip["uniqid"];
-                        $this->validated_data["ipaddr"] = $vip["subnet"];
-                        $match = true;
-                        break;
+            if (!$match) {
+                foreach ($this->config["virtualip"]["vip"] as $vip) {
+                    if (($vip["mode"] === "ipalias") or ($vip["mode"] === "carp") ) {
+                        if (strtolower($this->initial_data["interface"]) === strtolower($vip["descr"])) {
+                            $this->validated_data["interface"] = "_vip" . $vip["uniqid"];
+                            $this->validated_data["ipaddr"] = $vip["subnet"];
+                            $match = true;
+                            break;
+                        } elseif ((filter_var($vip["subnet"], FILTER_VALIDATE_IP)) and ($this->initial_data["interface"] === $vip["subnet"])) {
+                            $this->validated_data["interface"] = "_vip" . $vip["uniqid"];
+                            $this->validated_data["ipaddr"] = $vip["subnet"];
+                            $match = true;
+                            break;
+                        } elseif (strtolower($this->initial_data["interface"]) === $vip["uniqid"]) {
+                            $this->validated_data["interface"] = "_vip" . $vip["uniqid"];
+                            $this->validated_data["ipaddr"] = $vip["subnet"];
+                            $match = true;
+                            break;
+                        }
                     }
                 }
             }
 
             // Validate Gateway Group Interface
-            foreach ($this->config["gateways"]["gateway_group"] as $gateway_group) {
-                if (strtolower($this->initial_data["interface"]) === strtolower($gateway_group['name'])) {
-                    $this->validated_data["interface"] = $gateway_group['name'];
-                    $this->validated_data["ipaddr"] = "";
-                    $match = true;
-                    break;
+            if (!$match) {
+                foreach ($this->config["gateways"]["gateway_group"] as $gateway_group) {
+                    if (strtolower($this->initial_data["interface"]) === strtolower($gateway_group['name'])) {
+                        $this->validated_data["interface"] = $gateway_group['name'];
+                        $this->validated_data["ipaddr"] = "";
+                        $match = true;
+                        break;
+                    }
                 }
-            }
-
-            if ((in_array(strtolower($this->initial_data["interface"]), $key_types))) {
-                $this->validated_data["interface"] = strtolower($this->initial_data["interface"]);
-                $this->validated_data["ipaddr"] = "";
-                $match = true;
             }
 
             if (!$match) {

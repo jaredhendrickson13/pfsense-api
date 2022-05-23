@@ -5421,6 +5421,9 @@ paths:
                   description: 'Selects the interface, VIP, or failover group that the OpenVPN instance will use 
                     when communicating with peers.
                     This also controls which interface the traffic from the instance will exit.
+                    Interface can be provided as Interface ID (e.g. `wan`, `lan`, `opt1`, etc.),
+                    Interface physical name (e.g. `igb0`, `vtnet`, etc.) or Interface descriptive
+                    name (e.g. `MY_LAN`, `MY_WAN`, etc.).
                     VIP can be provided as description, subnet or uniqid.
                     Failover group can be provided as group name.
 
@@ -6154,6 +6157,9 @@ paths:
                   description: 'Selects the interface, VIP, or failover group that the OpenVPN instance will use 
                     when communicating with peers.
                     This also controls which interface the traffic from the instance will exit.
+                    Interface can be provided as Interface ID (e.g. `wan`, `lan`, `opt1`, etc.),
+                    Interface physical name (e.g. `igb0`, `vtnet`, etc.) or Interface descriptive
+                    name (e.g. `MY_LAN`, `MY_WAN`, etc.).
                     VIP can be provided as description, subnet or uniqid.
                     Failover group can be provided as group name.
 
@@ -11091,6 +11097,7 @@ tags:
   - name: Status > Interface
   - name: Status > System
   - name: Services
+  - name: Services > OpenVPN > Server
   - name: Services > OpenVPN > CSC
   - name: Services > Unbound
   - name: Services > Unbound > Access List
