@@ -7500,6 +7500,34 @@ paths:
       summary: Stop DNS Resolver (Unbound) service
       tags:
         - Services > Unbound
+  /api/v1/services/wol/send:
+    post:
+      description: 'Send a magic WOL packet to a host.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-wakeonlan`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                interface:
+                  description: Interface to which the host to be woken is connected.
+                  type: string
+                mac:
+                  description: MAC address of the host to be woken.
+                  type: string
+              required:
+                - interface
+                - mac
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Send a magic WOL packet to a host
+      tags:
+        - Services > WOL
   /api/v1/status/carp:
     get:
       description: 'Read the CARP (failover) status.<br><br>
@@ -9580,5 +9608,6 @@ tags:
   - name: Services > SSHD
   - name: Services > SYSLOGD
   - name: Services > DDNS
+  - name: Services > WOL
   - name: Diagnostics > Command Prompt
 
