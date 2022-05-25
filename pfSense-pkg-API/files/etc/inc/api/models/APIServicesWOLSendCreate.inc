@@ -55,7 +55,7 @@ class APIServicesWOLSendCreate extends APIModel {
                 $this->validated_data["interface"] = $this->initial_data["interface"];
                 $this->validated_data["interface_ip"] = $interface_ip;
             } else {
-                $this->errors[] = APIResponse\get(2100, ["interface" => $this->initial_data["interface"], "interface_ip" => $interface_ip]);
+                $this->errors[] = APIResponse\get(2100);
             }
         } else {
             $this->errors[] = APIResponse\get(2099);
