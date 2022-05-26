@@ -49,7 +49,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             if (in_array($this->initial_data["mode"], $key_types)) {
                 $this->validated_data["mode"] = $this->initial_data["mode"];
             } else {
-                $this->errors[] = APIResponse\get(2098);
+                $this->errors[] = APIResponse\get(2099);
             }
         # Assume default if none was specified
         } else {
@@ -76,7 +76,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             if (in_array(strtoupper($this->initial_data["protocol"]), $key_types)) {
                 $this->validated_data["protocol"] = strtoupper($this->initial_data["protocol"]);  
             } else {
-                $this->errors[] = APIResponse\get(2099);
+                $this->errors[] = APIResponse\get(2100);
             }
         # Assume default if none was specified
         } else {
@@ -93,7 +93,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             if (in_array($this->initial_data["dev_mode"], $key_types)) {
                 $this->validated_data["dev_mode"] = $this->initial_data["dev_mode"];  
             } else {
-                $this->errors[] = APIResponse\get(2100);
+                $this->errors[] = APIResponse\get(2101);
             }
         # Assume default if none was specified
         } else {
@@ -156,7 +156,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             }
 
             if (!$match) {
-                $this->errors[] = APIResponse\get(2101);
+                $this->errors[] = APIResponse\get(2102);
             }
         # Assume default if none was specified
         } else {
@@ -172,10 +172,10 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 if (openvpn_port_used($this->validated_data["protocol"], $this->validated_data["interface"], $this->initial_data["local_port"], 0) == 0) {
                     $this->validated_data["local_port"] = $this->initial_data["local_port"];
                 } else {
-                    $this->errors[] = APIResponse\get(2102);
+                    $this->errors[] = APIResponse\get(2103);
                 }
             } else {
-                $this->errors[] = APIResponse\get(2102);
+                $this->errors[] = APIResponse\get(2103);
             }
         # Assume default if none was specified
         } else {
@@ -226,7 +226,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 if (in_array($this->initial_data["tls_type"], $key_types)) {
                     $this->validated_data["tls_type"] = $this->initial_data["tls_type"];  
                 } else {
-                    $this->errors[] = APIResponse\get(2103);
+                    $this->errors[] = APIResponse\get(2104);
                 }
             # Assume default if none was specified
             } else {
@@ -258,7 +258,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                             break;
                     } 
                 } else {
-                    $this->errors[] = APIResponse\get(2104);
+                    $this->errors[] = APIResponse\get(2105);
                 }
             # Assume default if none was specified
             } else {
@@ -278,7 +278,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 $this->validated_data["shared_key"] = base64_encode($this->initial_data["shared_key"]);
             }
         } else {
-            $this->errors[] = APIResponse\get(2135);
+            $this->errors[] = APIResponse\get(2136);
         }
     }
 
@@ -293,13 +293,13 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 }
     
                 if (empty($this->validated_data["caref"])) {
-                    $this->errors[] = APIResponse\get(2136);
+                    $this->errors[] = APIResponse\get(2137);
                 }
             } else {
-                $this->errors[] = APIResponse\get(2130);
+                $this->errors[] = APIResponse\get(2131);
             }
         } else {
-            $this->errors[] = APIResponse\get(2138);
+            $this->errors[] = APIResponse\get(2139);
         }
     }
 
@@ -317,7 +317,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             }
 
             if (empty($this->validated_data["crlref"])) {
-                $this->errors[] = APIResponse\get(2131);
+                $this->errors[] = APIResponse\get(2132);
             }
 
         } else {
@@ -356,14 +356,14 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                     }
                 }
             } else {
-                $this->errors[] = APIResponse\get(2129);
+                $this->errors[] = APIResponse\get(2130);
             }
     
             if (empty($this->validated_data["certref"])) {
-                $this->errors[] = APIResponse\get(2137);
+                $this->errors[] = APIResponse\get(2138);
             }
         } else {
-            $this->errors[] = APIResponse\get(2139);
+            $this->errors[] = APIResponse\get(2140);
         } 
     }
 
@@ -380,7 +380,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                     $this->validated_data["dh_length"] = $this->initial_data["dh_length"];
                 }
             } else {
-                $this->errors[] = APIResponse\get(2105);
+                $this->errors[] = APIResponse\get(2106);
             }
         # Assume default if none was specified
         } else {
@@ -397,7 +397,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             if (in_array($this->initial_data["ecdh_curve"], $key_types)) {
                 $this->validated_data["ecdh_curve"] = $this->initial_data["ecdh_curve"];
             } else {
-                $this->errors[] = APIResponse\get(2106);
+                $this->errors[] = APIResponse\get(2107);
             }
         # Assume default if none was specified
         } else {
@@ -433,7 +433,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                         break;
                 } 
             } else {
-                $this->errors[] = APIResponse\get(2107);
+                $this->errors[] = APIResponse\get(2108);
             }
         # Assume default if none was specified
         } else {
@@ -464,7 +464,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             $counter = 1;
             foreach ($data_ciphers as $cipher) {
                 if (!array_key_exists($cipher, openvpn_get_cipherlist())) {
-                    $this->errors[] = APIResponse\get(2132);
+                    $this->errors[] = APIResponse\get(2133);
                 } elseif ($counter > 19) {
                     break;
                 } else {
@@ -483,7 +483,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             if (array_key_exists($this->initial_data["data_ciphers_fallback"], openvpn_get_cipherlist())) {
                 $this->validated_data["data_ciphers_fallback"] = $this->initial_data["data_ciphers_fallback"];
             } else {
-                $this->errors[] = APIResponse\get(2108);
+                $this->errors[] = APIResponse\get(2109);
             }
         # Assume default if none was specified
         } else {
@@ -500,7 +500,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             if (in_array($this->initial_data["digest"], $key_types)) {
                 $this->validated_data["digest"] = $this->initial_data["digest"];
             } else {
-                $this->errors[] = APIResponse\get(2109);
+                $this->errors[] = APIResponse\get(2110);
             }
         # Assume default if none was specified
         } else {
@@ -514,7 +514,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             if (array_key_exists($this->initial_data["engine"], openvpn_get_engines())) {
                 $this->validated_data["engine"] = $this->initial_data["engine"];
             } else {
-                $this->errors[] = APIResponse\get(2110);
+                $this->errors[] = APIResponse\get(2111);
             }
         # Assume default if none was specified
         } else {
@@ -529,10 +529,10 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 if (!openvpn_is_tunnel_network_in_use($this->initial_data['tunnel_network'])) {
                     $this->validated_data["tunnel_network"] = $this->initial_data['tunnel_network'];
                 } else {
-                    $this->errors[] = APIResponse\get(2111);
+                    $this->errors[] = APIResponse\get(2112);
                 }
             } else {
-                $this->errors[] = APIResponse\get(2111);
+                $this->errors[] = APIResponse\get(2112);
             }
         # Assume default if none was specified
         } else {
@@ -547,10 +547,10 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 if (!openvpn_is_tunnel_network_in_use($this->initial_data['tunnel_networkv6'])) {
                     $this->validated_data["tunnel_networkv6"] = $this->initial_data['tunnel_networkv6'];
                 } else {
-                    $this->errors[] = APIResponse\get(2111);
+                    $this->errors[] = APIResponse\get(2112);
                 }
             } else {
-                $this->errors[] = APIResponse\get(2111);
+                $this->errors[] = APIResponse\get(2112);
             }
         # Assume default if none was specified
         } else {
@@ -598,7 +598,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             }
 
             if (!$match) {
-                $this->errors[] = APIResponse\get(2140);
+                $this->errors[] = APIResponse\get(2141);
             }
 
         } else {
@@ -612,7 +612,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 if ($this->validated_data["serverbridge_interface"] !== "none") {
                     $this->validated_data["serverbridge_routegateway"] = "yes";
                 } else {
-                    $this->errors[] = APIResponse\get(2141);
+                    $this->errors[] = APIResponse\get(2142);
                 }
             } else {
                 $this->validated_data["serverbridge_routegateway"] = "";
@@ -627,7 +627,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             if ((isset($this->initial_data['serverbridge_dhcp_start'])) and (is_ipaddrv4($this->initial_data['serverbridge_dhcp_start'])) and (isset($this->initial_data['serverbridge_dhcp_end']))) {
                 $this->validated_data["serverbridge_dhcp_start"] = $this->initial_data['serverbridge_dhcp_start'];
             } else {
-                $this->errors[] = APIResponse\get(2142);
+                $this->errors[] = APIResponse\get(2143);
             }
         } else {
             $this->validated_data["serverbridge_dhcp_start"] = "";
@@ -639,7 +639,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             if ((isset($this->initial_data['serverbridge_dhcp_end'])) and (is_ipaddrv4($this->initial_data['serverbridge_dhcp_end'])) and (isset($this->initial_data['serverbridge_dhcp_start']))) {
                 $this->validated_data["serverbridge_dhcp_end"] = $this->initial_data['serverbridge_dhcp_end'];
             } else {
-                $this->errors[] = APIResponse\get(2142);
+                $this->errors[] = APIResponse\get(2143);
             }
         } else {
             $this->validated_data["serverbridge_dhcp_end"] = "";
@@ -652,7 +652,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             if (!openvpn_validate_cidr($this->initial_data['remote_network'], "", true, "ipv4")) {
                 $this->validated_data["remote_network"] = $this->initial_data['remote_network'];
             } else {
-                $this->errors[] = APIResponse\get(2112);
+                $this->errors[] = APIResponse\get(2113);
             }
         # Assume default if none was specified
         } else {
@@ -666,7 +666,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             if (!openvpn_validate_cidr($this->initial_data['remote_networkv6'], "", true, "ipv6")) {
                 $this->validated_data["remote_networkv6"] = $this->initial_data['remote_networkv6'];
             } else {
-                $this->errors[] = APIResponse\get(2112);
+                $this->errors[] = APIResponse\get(2113);
             }
         # Assume default if none was specified
         } else {
@@ -698,7 +698,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 if (!openvpn_validate_cidr($this->initial_data['local_network'], "", true, "ipv4")) {
                     $this->validated_data["local_network"] = $this->initial_data['local_network'];
                 } else {
-                    $this->errors[] = APIResponse\get(2113);
+                    $this->errors[] = APIResponse\get(2114);
                 }
             # Assume default if none was specified
             } else {
@@ -716,7 +716,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 if (!openvpn_validate_cidr($this->initial_data['local_networkv6'], "", true, "ipv6")) {
                     $this->validated_data["local_networkv6"] = $this->initial_data['local_networkv6'];
                 } else {
-                    $this->errors[] = APIResponse\get(2113);
+                    $this->errors[] = APIResponse\get(2114);
                 }
             # Assume default if none was specified 
             } else {
@@ -733,7 +733,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             if (is_numericint($this->initial_data['concurrent_connections']) and (int) $this->initial_data['concurrent_connections'] > 0) {
                 $this->validated_data["maxclients"] = $this->initial_data['concurrent_connections'];
             } else {
-                $this->errors[] = APIResponse\get(2127);
+                $this->errors[] = APIResponse\get(2128);
             }
         # Assume default if none was specified
         } else {
@@ -750,7 +750,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             if (in_array($this->initial_data["allow_compression"], $key_types)) {
                 $this->validated_data["allow_compression"] = $this->initial_data["allow_compression"];
             } else {
-                $this->errors[] = APIResponse\get(2114);
+                $this->errors[] = APIResponse\get(2115);
             }
         # Assume default if none was specified
         } else {
@@ -768,7 +768,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 if (in_array($this->initial_data["compression"], $key_types)) {
                     $this->validated_data["compression"] = $this->initial_data["compression"];
                 } else {
-                    $this->errors[] = APIResponse\get(2115);
+                    $this->errors[] = APIResponse\get(2116);
                 }
             # Assume default if none was specified
             } else {
@@ -833,7 +833,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             if (in_array($this->initial_data["topology"], $key_types)) {
                 $this->validated_data["topology"] = $this->initial_data["topology"];
             } else {
-                $this->errors[] = APIResponse\get(2116);
+                $this->errors[] = APIResponse\get(2117);
             }
         # Assume default if none was specified
         } else {
@@ -861,7 +861,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                     $this->validated_data["dns_server" . $counter] = str_replace(" ", "", $server);
                     $counter += 1;
                 } else {
-                    $this->errors[] = APIResponse\get(2144);
+                    $this->errors[] = APIResponse\get(2145);
                 }
             }
         }
@@ -879,7 +879,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 $this->validated_data["inactive_seconds"] = $this->initial_data['inactive_seconds'];
             # Assume default if none was specified
             } else {
-                $this->errors[] = APIResponse\get(2128);
+                $this->errors[] = APIResponse\get(2129);
             }
         # Assume default if none was specified
         } else {
@@ -896,7 +896,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             if (in_array($this->initial_data["ping_method"], $key_types)) {
                 $this->validated_data["ping_method"] = $this->initial_data["ping_method"];
             } else {
-                $this->errors[] = APIResponse\get(2117);
+                $this->errors[] = APIResponse\get(2118);
             }
         # Assume default if none was specified
         } else {
@@ -910,7 +910,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 if (is_numericint($this->initial_data['keepalive_interval']) and ((int) $this->initial_data['keepalive_interval'] >= 0)) {
                     $this->validated_data["keepalive_interval"] = $this->initial_data['keepalive_interval'];
                 } else {
-                    $this->errors[] = APIResponse\get(2118);
+                    $this->errors[] = APIResponse\get(2119);
                 }
             # Assume default if none was specified
             } else {
@@ -928,7 +928,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 if (is_numericint($this->initial_data['keepalive_timeout']) and ((int) $this->initial_data['keepalive_timeout'] >= 0)) {
                     $this->validated_data["keepalive_timeout"] = $this->initial_data['keepalive_timeout'];
                 } else {
-                    $this->errors[] = APIResponse\get(2119);
+                    $this->errors[] = APIResponse\get(2120);
                 }
             # Assume default if none was specified
             } else {
@@ -946,7 +946,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 if (is_numericint($this->initial_data['ping_seconds']) and ((int) $this->initial_data['ping_seconds'] >= 0)) {
                     $this->validated_data["ping_seconds"] = $this->initial_data['ping_seconds'];
                 } else {
-                    $this->errors[] = APIResponse\get(2120);
+                    $this->errors[] = APIResponse\get(2121);
                 }
             # Assume default if none was specified
             } else {
@@ -964,7 +964,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 if (is_numericint($this->initial_data['ping_action_seconds']) and ((int) $this->initial_data['ping_action_seconds'] >= 0)) {
                     $this->validated_data["ping_action_seconds"] = $this->initial_data['ping_action_seconds'];
                 } else {
-                    $this->errors[] = APIResponse\get(2121);
+                    $this->errors[] = APIResponse\get(2122);
                 }
             # Assume default if none was specified
             } else {
@@ -1015,7 +1015,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                 $this->validated_data["ping_action"] = $this->initial_data["ping_action"];
             }
             else {
-                $this->errors[] = APIResponse\get(2122);
+                $this->errors[] = APIResponse\get(2123);
             }
         # Assume default if none was specified
         } else {
@@ -1059,7 +1059,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                         break;
                 } 
             } else {
-                $this->errors[] = APIResponse\get(2123);
+                $this->errors[] = APIResponse\get(2124);
             }
         # Assume default if none was specified
         } else {
@@ -1098,7 +1098,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                         break;
                 }
             } else {
-                $this->errors[] = APIResponse\get(2124);
+                $this->errors[] = APIResponse\get(2125);
             }
         } else {
             $this->validated_data["sndrcvbuf"] = "";
@@ -1122,7 +1122,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                     $this->validated_data["ntp_server" . $counter] = str_replace(" ", "", $server);
                     $counter += 1;
                 } else {
-                    $this->errors[] = APIResponse\get(2143);
+                    $this->errors[] = APIResponse\get(2144);
                 } 
             }
         }
@@ -1186,7 +1186,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                         break;
                 } 
             } else {
-                $this->errors[] = APIResponse\get(2125);
+                $this->errors[] = APIResponse\get(2126);
             }
         # Assume default if none was specified
         } else {
@@ -1203,7 +1203,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
             } elseif ($this->initial_data['verbosity_level'] == "default") {
                 $this->validated_data["verbosity_level"] = "1";
             } else {
-                $this->errors[] = APIResponse\get(2126);
+                $this->errors[] = APIResponse\get(2127);
             }
         # Assume default if none was specified
         } else {
@@ -1222,7 +1222,7 @@ class APIServicesOpenVPNServerCreate extends APIModel {
                     $this->validated_data["wins_server" . $counter] = str_replace(" ", "", $server);
                     $counter += 1;
                 }  else {
-                    $this->errors[] = APIResponse\get(2143);
+                    $this->errors[] = APIResponse\get(2144);
                 }
             }
         }

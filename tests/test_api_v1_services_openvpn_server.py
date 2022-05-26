@@ -28,7 +28,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "OpenVPN Server No Certificate Authority found",
             "status": 400,
-            "return": 2138,
+            "return": 2139,
             "payload": {}
         },
         {
@@ -48,7 +48,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "OpenVPN Server No Server Certificate found",
             "status": 400,
-            "return": 2139,
+            "return": 2140,
             "payload": {}
         },
         {
@@ -106,7 +106,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Mode",
             "status": 400,
-            "return": 2098,
+            "return": 2099,
             "payload": {
                 "mode": "INVALID_MODE"
             }
@@ -114,7 +114,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Protocol",
             "status": 400,
-            "return": 2099,
+            "return": 2100,
             "payload": {
                 "protocol": "INVALID_PROTOCOL"
             }
@@ -122,7 +122,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Device mode",
             "status": 400,
-            "return": 2100,
+            "return": 2101,
             "payload": {
                 "dev_mode": "INVALID_DEV_MODE"
             }
@@ -130,7 +130,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Interface",
             "status": 400,
-            "return": 2101,
+            "return": 2102,
             "payload": {
                 "interface": "INVALID_INTERFACE"
             }
@@ -138,7 +138,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Invalid or taken OpenVPN Server Local port (allowed range 1-65535)",
             "status": 400,
-            "return": 2102,
+            "return": 2103,
             "payload": {
                 "local_port": "99999"
             }
@@ -146,7 +146,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server TLS Key Usage Mode",
             "status": 400,
-            "return": 2103,
+            "return": 2104,
             "payload": {
                 "tls": tls_key_text,
                 "tls_type": "INVALID_TLS_TYPE"
@@ -155,7 +155,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server TLS keydir direction",
             "status": 400,
-            "return": 2104,
+            "return": 2105,
             "payload": {
                 "tls": tls_key_text,
                 "tlsauth_keydir": "INVALID_TLS_KEYDIR"
@@ -164,7 +164,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server TLS DH Parameter Length",
             "status": 400,
-            "return": 2105,
+            "return": 2106,
             "payload": {
                 "dh_length": "INVALID_DH_LENGTH"
             }
@@ -172,7 +172,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server ECDH Curve",
             "status": 400,
-            "return": 2106,
+            "return": 2107,
             "payload": {
                 "ecdh_curve": "INVALID_ECDH_CURVE"
             }
@@ -180,7 +180,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Certificate Depth",
             "status": 400,
-            "return": 2107,
+            "return": 2108,
             "payload": {
                 "cert_depth": "INVALID_CERT_DEPTH"
             }
@@ -188,7 +188,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Fallback Data Encryption Algorithm",
             "status": 400,
-            "return": 2108,
+            "return": 2109,
             "payload": {
                 "data_ciphers_fallback": "INVALID_DATA_CIPHERS_FALLBACK"
             }
@@ -196,7 +196,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Auth Digest Algorithm",
             "status": 400,
-            "return": 2109,
+            "return": 2110,
             "payload": {
                 "digest": "INVALID_DIGEST"
             }
@@ -204,7 +204,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Hardware Crypto Engine",
             "status": 400,
-            "return": 2110,
+            "return": 2111,
             "payload": {
                 "engine": "INVALID_ENGINE"
             }
@@ -212,7 +212,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown or already in use OpenVPN Server Tunnel Network",
             "status": 400,
-            "return": 2111,
+            "return": 2112,
             "payload": {
                 "tunnel_network": "INVALID_TUNNEL_NETWORK"
             }
@@ -220,7 +220,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Remote network(s)",
             "status": 400,
-            "return": 2112,
+            "return": 2113,
             "payload": {
                 "remote_network": "INVALID_REMOTE_NETWORK"
             }
@@ -228,7 +228,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Local network(s)",
             "status": 400,
-            "return": 2113,
+            "return": 2114,
             "payload": {
                 "local_network": "INVALID_LOCAL_NETWORK"
             }
@@ -236,7 +236,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Allow Compression",
             "status": 400,
-            "return": 2114,
+            "return": 2115,
             "payload": {
                 "allow_compression": "INVALID_ALLOW_COMPRESSION"
             }
@@ -244,7 +244,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Compression",
             "status": 400,
-            "return": 2115,
+            "return": 2116,
             "payload": {
                 "allow_compression": "yes",
                 "compression": "INVALID_COMPRESSION"
@@ -253,7 +253,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Topology",
             "status": 400,
-            "return": 2116,
+            "return": 2117,
             "payload": {
                 "dev_mode": "tun",
                 "topology": "INVALID_TOPOLOGY"
@@ -262,7 +262,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Ping Method",
             "status": 400,
-            "return": 2117,
+            "return": 2118,
             "payload": {
                 "ping_method": "INVALID_PING_METHOD"
             }
@@ -270,7 +270,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Keepalive Interval",
             "status": 400,
-            "return": 2118,
+            "return": 2119,
             "payload": {
                 "ping_method": "keepalive",
                 "keepalive_interval": "INVALID_KEEPALIVE_INTERVAL"
@@ -279,7 +279,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Keepalive Timeout",
             "status": 400,
-            "return": 2119,
+            "return": 2120,
             "payload": {
                 "ping_method": "keepalive",
                 "keepalive_timeout": "INVALID_KEEPALIVE_TIMEOUT"
@@ -288,7 +288,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Ping Seconds",
             "status": 400,
-            "return": 2120,
+            "return": 2121,
             "payload": {
                 "ping_method": "ping",
                 "ping_seconds": "INVALID_PING_SECONDS"
@@ -297,7 +297,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Ping restart or exit seconds",
             "status": 400,
-            "return": 2121,
+            "return": 2122,
             "payload": {
                 "ping_method": "ping",
                 "ping_action_seconds": "INVALID_PING_ACTION_SECONDS"
@@ -306,7 +306,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Ping restart or exit",
             "status": 400,
-            "return": 2122,
+            "return": 2123,
             "payload": {
                 "ping_method": "ping",
                 "ping_action": "INVALID_PING_ACTION"
@@ -315,7 +315,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Exit Notify",
             "status": 400,
-            "return": 2123,
+            "return": 2124,
             "payload": {
                 "exit_notify": "INVALID_EXIT_NOTIFY"
             }
@@ -323,7 +323,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Send/Receive Buffer",
             "status": 400,
-            "return": 2124,
+            "return": 2125,
             "payload": {
                 "sndrcvbuf": "INVALID_SNDRCVBUF"
             }
@@ -331,7 +331,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Gateway Creation",
             "status": 400,
-            "return": 2125,
+            "return": 2126,
             "payload": {
                 "create_gw": "INVALID_CREATE_GW"
             }
@@ -339,7 +339,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Verbosity Level",
             "status": 400,
-            "return": 2126,
+            "return": 2127,
             "payload": {
                 "verbosity_level": "INVALID_VERBOSITY_LEVEL"
             }
@@ -347,7 +347,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Concurrent Connections",
             "status": 400,
-            "return": 2127,
+            "return": 2128,
             "payload": {
                 "concurrent_connections": "INVALID_CONCURRENT_CONNECTIONS"
             }
@@ -355,7 +355,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Inactive Time",
             "status": 400,
-            "return": 2128,
+            "return": 2129,
             "payload": {
                 "inactive_seconds": "INVALID_INACTIVE_SECONDS"
             }
@@ -363,21 +363,21 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Missing OpenVPN Server Certificate",
             "status": 400,
-            "return": 2129,
+            "return": 2130,
             "no_certref": True,    # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
             "payload": {}
         },
         {
             "name": "Missing OpenVPN Server Certificate Authority",
             "status": 400,
-            "return": 2130,
+            "return": 2131,
             "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
             "payload": {}
         },
         {
             "name": "Unknown OpenVPN Server Peer Certificate Revocation List",
             "status": 400,
-            "return": 2131,
+            "return": 2132,
             "payload": {
                 "crlref": "INVALID_CRLREF"
             }
@@ -385,7 +385,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Data Encryption Algorithms",
             "status": 400,
-            "return": 2132,
+            "return": 2133,
             "payload": {
                 "data_ciphers": "INVALID_CRLREF"
             }
@@ -393,7 +393,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Missing OpenVPN Server 'shared_key'. This parameter is needed for server mode 'p2p_shared_key'",
             "status": 400,
-            "return": 2135,
+            "return": 2136,
             "no_certref": True,    # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
             "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
             "payload": {
@@ -403,7 +403,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Certificate Authority",
             "status": 400,
-            "return": 2136,
+            "return": 2137,
             "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
             "payload": {
                 "caref": "INVALID_CA_REF",
@@ -412,7 +412,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Certificate",
             "status": 400,
-            "return": 2137,
+            "return": 2138,
             "no_certref": True,    # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
             "payload": {
                 "certref": "INVALID_CERT_REF",
@@ -421,7 +421,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Bridge Interface",
             "status": 400,
-            "return": 2140,
+            "return": 2141,
             "payload": {
                 "mode": "server_tls",
                 "dev_mode": "tap",
@@ -432,7 +432,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Bridge Route Gateway requires a valid Bridge Interface",
             "status": 400,
-            "return": 2141,
+            "return": 2142,
             "payload": {
                 "mode": "server_tls",
                 "dev_mode": "tap",
@@ -444,7 +444,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server Bridge DHCP Start and End must both be empty, or defined, or The Server Bridge DHCP range is invalid (start higher than end).",
             "status": 400,
-            "return": 2142,
+            "return": 2143,
             "payload": {
                 "mode": "server_tls",
                 "dev_mode": "tap",
@@ -455,7 +455,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "OpenVPN Server The field 'NTP Server' must contain a valid IP address.",
             "status": 400,
-            "return": 2143,
+            "return": 2144,
             "payload": {
                 "mode": "server_tls",
                 "ntp_servers": "INVALID_NTP_SERVER"
@@ -464,7 +464,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "OpenVPN Server The field 'DNS Server' must contain a valid IP address.",
             "status": 400,
-            "return": 2144,
+            "return": 2145,
             "payload": {
                 "mode": "server_tls",
                 "dns_servers": "INVALID_DHCP_START"
@@ -511,7 +511,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "OpenVPN Server cannot delete an OpenVPN instance while the interface is assigned. Remove the interface assignment first.",
             "status": 400,
-            "return": 2145,
+            "return": 2146,
             "payload": {}
         },
         {
@@ -545,7 +545,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Unknown OpenVPN Server vpnid",
             "status": 404,
-            "return": 2133,
+            "return": 2134,
             "payload": {
                 "vpnid": "INVALID_VPNID"
             }
@@ -553,7 +553,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Missing OpenVPN Server 'vpnid'. This parameter is needed to identify the server to modify/delete",
             "status": 400,
-            "return": 2134,
+            "return": 2135,
             "payload": {}
         },
     ]
