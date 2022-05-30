@@ -50,9 +50,10 @@ class APIServicesWOLSendCreate extends APIModel {
 
     private function __validate_interface() {
         if (isset($this->initial_data["interface"])) {
-            $interface_ip = get_interface_ip($this->initial_data["interface"]);
+            $interface = APITools\get_pfsense_if_id($this->initial_data['interface']);
+            $interface_ip = get_interface_ip($interface);
             if (is_ipaddr($interface_ip)) {
-                $this->validated_data["interface"] = $this->initial_data["interface"];
+                $this->validated_data["interface"] = $interface;
                 $this->validated_data["interface_ip"] = $interface_ip;
             } else {
                 $this->errors[] = APIResponse\get(2100);
