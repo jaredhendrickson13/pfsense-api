@@ -1193,6 +1193,36 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Host overrides must be contained within an array"
         ],
+        2099 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "No interface specified"
+        ],
+        2100 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Could not obtain IP address for interface"
+        ],
+        2101 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "No MAC address specified"
+        ],
+        2102 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Invalid MAC address specified"
+        ],
+        2103 => [
+            "status" => "server error",
+            "code" => 500,
+            "return" => $id,
+            "message" => "Please check the system_logs, the WOL command did not complete successfully"
+        ],
         2999 => [
             "status" => "bad request",
             "code" => 400,
