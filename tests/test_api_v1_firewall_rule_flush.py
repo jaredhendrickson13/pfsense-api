@@ -16,7 +16,45 @@ import e2e_test_framework
 
 class APIE2ETestFirewallRuleFlush(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/firewall/rule/flush"
-
+    put_tests = [
+        {
+            "name": "Check rules array type constraint",
+            "status": 400,
+            "return": 4240
+        },
+        {
+            "name": "Check rules array minimum items constraint",
+            "status": 400,
+            "return": 4241,
+            "payload": {
+                "rules": []
+            }
+        },
+        {
+            "name": "Flush and replace all rules",
+            "payload": {
+                "apply": "true",
+                "rules": [
+                    {
+                        "type": "pass",
+                        "interface": "wan",
+                        "ipprotocol": "inet",
+                        "protocol": "any",
+                        "src": "any",
+                        "dst": "any"
+                    },
+                    {
+                        "type": "pass",
+                        "interface": "wan",
+                        "ipprotocol": "inet",
+                        "protocol": "any",
+                        "src": "lan",
+                        "dst": "any"
+                    }
+                ]
+            }
+        }
+    ]
     delete_tests = [
         {"name": "Flush all firewall rules", "payload": {}},
         {

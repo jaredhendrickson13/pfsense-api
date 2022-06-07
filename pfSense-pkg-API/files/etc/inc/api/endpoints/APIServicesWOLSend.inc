@@ -15,17 +15,12 @@
 
 require_once("api/framework/APIEndpoint.inc");
 
-class APIFirewallRuleFlush extends APIEndpoint {
+class APIServicesWOLSend extends APIEndpoint {
     public function __construct() {
-        $this->url = "/api/v1/firewall/rule/flush";
+        $this->url = "/api/v1/services/wol/send";
     }
 
-    protected function put() {
-        return (new APIFirewallRuleFlushUpdate())->call();
+    protected function post() {
+        return (new APIServicesWOLSendCreate())->call();
     }
-
-    protected function delete() {
-        return (new APIFirewallRuleFlushDelete())->call();
-    }
-
 }

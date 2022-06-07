@@ -20,6 +20,10 @@ class APIServicesUnboundHostOverrideFlush extends APIEndpoint {
         $this->url = "/api/v1/services/unbound/host_override/flush";
     }
 
+    protected function put() {
+        return (new APIServicesUnboundHostOverrideFlushUpdate())->call();
+    }
+
     protected function delete() {
         return (new APIServicesUnboundHostOverrideFlushDelete())->call();
     }
