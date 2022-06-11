@@ -7714,7 +7714,7 @@ paths:
                     - jwt
                     - token
                   type: string
-                available_interfaces:
+                allowed_interfaces:
                   description: Interfaces that are allowed to answer API requests.
                     Each item in the array must be a valid real interface ID (e.g.
                     `em0`), pfSense interface ID, (e.g. `opt1`), or descriptive interface
