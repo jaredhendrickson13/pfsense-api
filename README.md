@@ -8,9 +8,22 @@ configurations. All API endpoints enforce input validation to prevent invalid co
 Configurations made via API are properly written to the master XML configuration and the correct backend configurations
 are made preventing the need for a reboot. All this results in the fastest, safest, and easiest way to automate pfSense!
 
+
+
 # Requirements
 
-- pfSense CE 2.5.0 and pfSense Plus 22.01 or later on AMD64 systems are supported. (older pfSense versions may be compatible with older versions of pfSense API)
+<details>
+    <summary>Supported pfSense Versions</summary>
+
+  - pfSense Plus 22.05 (AMD64)
+  - pfSense Plus 22.01 (AMD64)
+  - pfSense CE 2.6.0 (AMD64)
+  - pfSense CE 2.5.2 (AMD64)
+  - pfSense CE 2.5.1 (AMD64)
+  - pfSense CE 2.5.0 (AMD64)
+  ---
+</details>
+
 - pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the
   webConfigurator are required to make calls to the API endpoints.
 - While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of
