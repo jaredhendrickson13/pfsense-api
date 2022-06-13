@@ -22,6 +22,7 @@ are made preventing the need for a reboot. All this results in the fastest, safe
   - pfSense CE 2.5.1 (AMD64)
   - pfSense CE 2.5.0 (AMD64)
   ---
+  
 </details>
 
 - pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the
