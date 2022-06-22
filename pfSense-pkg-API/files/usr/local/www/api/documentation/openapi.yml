@@ -4702,11 +4702,33 @@ paths:
       tags:
         - Interface > Available
   /api/v1/interface/apply:
+    get:
+      description: 'Check if all pending interface changes have been applied.<br><br>
+
+              _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Poll interface apply status
+      tags:
+        - Interface > Apply
     post:
       description: 'Apply pending interface changes.<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
+      parameters:
+        - description: 'Apply pending interface changes in the background. This is sometimes necessary when
+          many interfaces are being applied to prevent gateway timeouts. The status of the interface application can
+          be polled with a GET request to the /api/v1/interface/apply endpoint.'
+          in: query
+          name: async
+          required: false
+          schema:
+            type: boolean
+            default: false
       responses:
         200:
           $ref: '#/components/responses/Success'

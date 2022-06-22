@@ -13,18 +13,18 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-require_once("api/framework/APIEndpoint.inc");
+require_once("api/framework/APIModel.inc");
+require_once("api/framework/APIResponse.inc");
 
-class APIInterfaceApply extends APIEndpoint {
+class APIInterfaceApplyRead extends APIModel {
+    # Create our method constructor
     public function __construct() {
-        $this->url = "/api/v1/interface/apply";
+        parent::__construct();
+        $this->privileges = ["page-all", "page-interfaces-assignnetworkports"];
     }
 
-    protected function get() {
-        return (new APIInterfaceApplyRead())->call();
-    }
-
-    protected function post() {
-        return (new APIInterfaceApplyCreate())->call();
+    public function action() {
+        global $g;
+        return APIResponse\get(0, ["applied" => !file_exists($g['tmp_path']."/.interfaces.apply")]);
     }
 }

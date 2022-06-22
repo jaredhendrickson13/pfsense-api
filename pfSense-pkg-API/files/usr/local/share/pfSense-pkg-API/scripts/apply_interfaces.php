@@ -13,18 +13,14 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-require_once("api/framework/APIEndpoint.inc");
 
-class APIInterfaceApply extends APIEndpoint {
-    public function __construct() {
-        $this->url = "/api/v1/interface/apply";
-    }
+# This script is intended to help API endpoints that need to reload pending interfaces changes. This allows
+# interfaces to be reloaded in the background instead of waiting for all interfaces to be applied preventing
+# API calls from receiving a 504 gateway timeout waiting for interfaces to be applied.
+# ---------------------------------------------------------------------------------------------------------------
+# Example: php -f apply_interfaces.php
 
-    protected function get() {
-        return (new APIInterfaceApplyRead())->call();
-    }
+require_once("api/framework/APITools.inc");
 
-    protected function post() {
-        return (new APIInterfaceApplyCreate())->call();
-    }
-}
+# Apply pending interface changes.
+APIInterfaceApplyCreate::apply();
