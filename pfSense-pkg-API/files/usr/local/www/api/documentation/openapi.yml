@@ -9315,7 +9315,7 @@ paths:
                   description: "Name of the group."
                   type: string
                   minLength: 1
-                  maxLength: 16
+                  maxLength: 64
                 scope:
                   description: "Scope of the group."
                   type: string
@@ -9364,7 +9364,7 @@ paths:
                   description: "New name of the group."
                   type: string
                   minLength: 1
-                  maxLength: 16
+                  maxLength: 64
                 scope:
                   description: "Scope of the group."
                   type: string
