@@ -4719,16 +4719,17 @@ paths:
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
-      parameters:
-        - description: 'Apply pending interface changes in the background. This is sometimes necessary when
-          many interfaces are being applied to prevent gateway timeouts. The status of the interface application can
-          be polled with a GET request to the /api/v1/interface/apply endpoint.'
-          in: query
-          name: async
-          required: false
-          schema:
-            type: boolean
-            default: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                async:
+                  description: 'Apply pending interface changes in the background. This is sometimes necessary to 
+                  prevent gateway timeouts when many interfaces are being applied. The status of the interface 
+                  application can be polled with a GET request to the /api/v1/interface/apply endpoint.'
+                  type: boolean
+                  default: false
       responses:
         200:
           $ref: '#/components/responses/Success'
