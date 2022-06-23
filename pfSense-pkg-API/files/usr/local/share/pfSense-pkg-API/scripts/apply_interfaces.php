@@ -20,7 +20,7 @@
 # ---------------------------------------------------------------------------------------------------------------
 # Example: php -f apply_interfaces.php
 
-require_once("api/framework/APITools.inc");
+require_once("api/models/APIInterfaceApplyCreate.inc");
 
 # Apply pending interface changes.
 APIInterfaceApplyCreate::apply();
