@@ -13,18 +13,17 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-require_once("api/framework/APIEndpoint.inc");
+require_once("api/framework/APIModel.inc");
+require_once("api/framework/APIResponse.inc");
 
-class APIServicesUnboundApply extends APIEndpoint {
+class APIServicesUnboundApplyRead extends APIModel {
+    # Create our method constructor
     public function __construct() {
-        $this->url = "/api/v1/services/unbound/apply";
+        parent::__construct();
+        $this->privileges = ["page-all", "page-services-dnsresolver"];
     }
 
-    protected function get() {
-        return (new APIServicesUnboundApplyRead())->call();
-    }
-
-    protected function post() {
-        return (new APIServicesUnboundApplyCreate())->call();
+    public function action() {
+        return APIResponse\get(0, ["applied" => !is_subsystem_dirty("unbound")]);
     }
 }

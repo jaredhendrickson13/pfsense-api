@@ -7199,10 +7199,32 @@ paths:
       tags:
         - Services > Unbound > Access List > Row
   /api/v1/services/unbound/apply:
+    get:
+      description: 'Check the DNS Resolver (Unbound) apply status.<br><br>
+
+            _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Poll DNS Resolver (Unbound) apply status
+      tags:
+        - Services > Unbound
     post:
       description: 'Apply pending DNS Resolver (Unbound) changes.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                async:
+                  default: false
+                  description: Apply Unbound changes in the background. The Unbound reload status can be polled using
+                  a GET request to /api/v1/services/unbound/apply.
+                  type: boolean
       responses:
         200:
           $ref: '#/components/responses/Success'

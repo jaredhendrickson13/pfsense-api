@@ -13,18 +13,14 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-require_once("api/framework/APIEndpoint.inc");
 
-class APIServicesUnboundApply extends APIEndpoint {
-    public function __construct() {
-        $this->url = "/api/v1/services/unbound/apply";
-    }
+# This script is intended to help API endpoints that need to reload pending Unbound changes. This allows
+# Unbound to be reloaded in the background instead of waiting thus preventing
+# API calls from receiving a 504 gateway timeout waiting for Unbound to be reloaded.
+# ---------------------------------------------------------------------------------------------------------------
+# Example: php -f apply_unbound.php
 
-    protected function get() {
-        return (new APIServicesUnboundApplyRead())->call();
-    }
+require_once("api/models/APIServicesUnboundApplyCreate.inc");
 
-    protected function post() {
-        return (new APIServicesUnboundApplyCreate())->call();
-    }
-}
+# Apply pending interface changes.
+APIServicesUnboundApplyCreate::apply();
