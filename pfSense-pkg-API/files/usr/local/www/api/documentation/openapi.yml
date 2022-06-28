@@ -7210,7 +7210,7 @@ paths:
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Poll DNS Resolver (Unbound) apply status
       tags:
-        - Services > Unbound
+        - Services > Unbound > Apply
     post:
       description: 'Apply pending DNS Resolver (Unbound) changes.<br><br>
 
@@ -7222,8 +7222,8 @@ paths:
               properties:
                 async:
                   default: false
-                  description: Apply Unbound changes in the background. The Unbound reload status can be polled using
-                  a GET request to /api/v1/services/unbound/apply.
+                  description: "Apply Unbound changes in the background. The Unbound reload status can be polled using
+                  a GET request to /api/v1/services/unbound/apply."
                   type: boolean
       responses:
         200:
@@ -7232,7 +7232,7 @@ paths:
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Apply pending DNS Resolver (Unbound) changes
       tags:
-        - Services > Unbound
+        - Services > Unbound > Apply
   /api/v1/services/unbound/host_override:
     delete:
       description: 'Delete host overrides from the DNS Resolver (Unbound).<br><br>
@@ -9635,6 +9635,7 @@ tags:
   - name: Services
   - name: Services > OpenVPN > CSC
   - name: Services > Unbound
+  - name: Services > Unbound > Apply
   - name: Services > Unbound > Access List
   - name: Services > Unbound > Access List > Row
   - name: Services > Unbound > Host Override
