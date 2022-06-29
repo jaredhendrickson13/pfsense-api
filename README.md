@@ -33,7 +33,7 @@ are made preventing the need for a reboot. All this results in the fastest, safe
 To install pfSense API, simply run the following command from the pfSense shell:<br>
 
 ```
-pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.5-pkg-API.txz && /etc/rc.restart_webgui
+pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.6-pkg-API.txz && /etc/rc.restart_webgui
 ```
 
 <br>
@@ -64,8 +64,9 @@ pfsense-api revert v1.1.7
 
 ### Notes:
 
-- To install the pfSense CE 2.6 package, simply change the `2.5` in the install URL to `2.6`.
-- To install the pfSense Plus 22.01 package, simply change the `2.5` in the install URL `22.01`.
+- While not always necessary, it's recommended to change the installation command to reference the package built for your
+  version of pfSense. You can check the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases)
+  for available versions.
 - In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after
   installing the package.
 - If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to '
