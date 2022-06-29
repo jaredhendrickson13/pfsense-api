@@ -4702,11 +4702,34 @@ paths:
       tags:
         - Interface > Available
   /api/v1/interface/apply:
+    get:
+      description: 'Check if all pending interface changes have been applied.<br><br>
+
+              _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Poll interface apply status
+      tags:
+        - Interface > Apply
     post:
       description: 'Apply pending interface changes.<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                async:
+                  description: 'Apply pending interface changes in the background. This is sometimes necessary to 
+                  prevent gateway timeouts when many interfaces are being applied. The status of the interface 
+                  application can be polled with a GET request to the /api/v1/interface/apply endpoint.'
+                  type: boolean
+                  default: false
       responses:
         200:
           $ref: '#/components/responses/Success'
@@ -4946,370 +4969,6 @@ paths:
       summary: Update interface VLAN
       tags:
         - Interface > VLAN
-  /api/v1/openvpn/csc:
-    delete:
-      parameters:
-        - description: ID of the client specific override to update. Refer to the 'Obtaining
-            Object IDs' section in the documentation intro for help obtaining this ID.
-          in: query
-          name: id
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Delete OpenVPN client specific override
-      tags:
-        - Services > OpenVPN > CSC
-    get:
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Read OpenVPN client specific overrides
-      tags:
-        - Services > OpenVPN > CSC
-    post:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                block:
-                  default: false
-                  description: Prevents the client from connecting to this server.
-                    Do not use this option to permanently disable a client due to
-                    a compromised key or password. Use a CRL (certificate revocation
-                    list) instead.
-                  type: boolean
-                common_name:
-                  description: X.509 common name for the client certificate, or the
-                    username for VPNs utilizing password authentication. This match
-                    is case sensitive.
-                  type: string
-                custom_options:
-                  description: Additional options to add for this client specific
-                    override, separated by a semicolon.
-                  type: string
-                description:
-                  default: ''
-                  description: Description for administrative reference.
-                  type: string
-                disable:
-                  default: false
-                  description: Disable this override without removing it.
-                  type: boolean
-                dns_domain:
-                  default: ''
-                  description: Domain name for DNS to provide to the client.
-                  type: string
-                dns_servers:
-                  default: ''
-                  description: Comma-separated list of no more than 4 DNS server IP
-                    addresses (i.e. 8.8.8.8). Any more than the first four are ignored.
-                    This list is provided to the clent.
-                  type: string
-                local_network:
-                  default: ''
-                  description: 'IPv4 server-side networks that will be accessible
-                    from this particular client. Expressed as a comma-separated list
-                    of one or more CIDR networks.
-
-                    NOTE: Networks do not need to be specified here if they have already
-                    been defined on the main server configuration.'
-                  type: string
-                local_networkv6:
-                  default: ''
-                  description: 'IPv6 server-side networks that will be accessible
-                    from this particular client. Expressed as a comma-separated list
-                    of one or more IP/PREFIX networks.
-
-                    NOTE: Networks do not need to be specified here if they have already
-                    been defined on the main server configuration.'
-                  type: string
-                netbios_enable:
-                  default: false
-                  description: Enable NetBIOS over TCP/IP. If this option is not set,
-                    all NetBIOS-over-TCP/IP options (including WINS) will be disabled.
-                  type: boolean
-                netbios_node_type:
-                  description: 'Possible options: b (broadcasts), p (point-to-point
-                    name queries to a WINS server), m (broadcast then query name server),
-                    and h (query name server, then broadcast). This parameter takes
-                    a single letter either b, p, m, or h. Any other string will result
-                    in this option being set to none.'
-                  enum:
-                    - b
-                    - p
-                    - m
-                    - h
-                  type: string
-                netbios_scope:
-                  default: ''
-                  description: NetBIOS Scope ID provides an extended naming service
-                    for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS
-                    traffic on a single network to only those nodes with the same
-                    NetBIOS scope ID.
-                  type: string
-                ntp_servers:
-                  default: ''
-                  description: Comma-separated list of no more than 2 NTP server IP
-                    addresses. Any more than the first two are ignored.
-                  type: string
-                prevent_server_definitions:
-                  default: false
-                  description: Prevent this client from receiving any server-defined
-                    client settings.
-                  type: boolean
-                redirect_gateway:
-                  default: false
-                  description: Force all client generated traffic through the tunnel.
-                  type: boolean
-                remote_network:
-                  default: ''
-                  description: 'IPv4 client-side networks that will be routed to this
-                    client specifically using iroute, so that a site-to-site VPN can
-                    be established. Expressed as a comma-separated list of one or
-                    more CIDR ranges. May be left blank if there are no client-side
-                    networks to be routed.
-
-                    NOTE: Remember to add these subnets to the IPv4 Remote Networks
-                    list on the corresponding OpenVPN server settings.'
-                  type: string
-                remote_networkv6:
-                  default: ''
-                  description: 'IPv6 client-side networks that will be routed to this
-                    client specifically using iroute, so that a site-to-site VPN can
-                    be established. Expressed as a comma-separated list of one or
-                    more IP/PREFIX networks. May be left blank if there are no client-side
-                    networks to be routed.
-
-                    NOTE: Remember to add these subnets to the IPv6 Remote Networks
-                    list on the corresponding OpenVPN server settings.'
-                  type: string
-                remove_server_routes:
-                  default: false
-                  description: Prevent this client from receiving any server-defined
-                    routes without removing any other options.
-                  type: boolean
-                server_list:
-                  description: Comma separated string containing the ids of the OpenVPN
-                    servers that use this override. Omitting this activates the override
-                    for all servers.
-                  type: string
-                tunnel_network:
-                  default: ''
-                  description: 'Virtual IPv4 network used for private communications
-                    between this client and the server expressed using CIDR (e.g.
-                    10.0.8.5/24).
-
-                    With subnet topology, enter the client IP address and the subnet
-                    mask must match the IPv4 Tunnel Network on the server.
-
-                    With net30 topology, the first network address of the /30 is assumed
-                    to be the server address and the second network address will be
-                    assigned to the client.'
-                  type: string
-                tunnel_networkv6:
-                  default: ''
-                  description: 'Virtual IPv6 network used for private communications
-                    between this client and the server expressed using prefix (e.g.
-                    2001:db9:1:1::100/64).
-
-                    Enter the client IPv6 address and prefix. The prefix must match
-                    the IPv6 Tunnel Network prefix on the server.'
-                  type: string
-                wins_servers:
-                  default: ''
-                  description: Comma-separated list of no more than 2 WINS server
-                    IP addresses. Any more than the first two are ignored.
-                  type: string
-              required:
-                - common_name
-              type: object
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Create OpenVPN client specific override
-      tags:
-        - Services > OpenVPN > CSC
-    put:
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                block:
-                  default: false
-                  description: Prevents the client from connecting to this server.
-                    Do not use this option to permanently disable a client due to
-                    a compromised key or password. Use a CRL (certificate revocation
-                    list) instead.
-                  type: boolean
-                common_name:
-                  description: X.509 common name for the client certificate, or the
-                    username for VPNs utilizing password authentication. This match
-                    is case sensitive.
-                  type: string
-                custom_options:
-                  description: Additional options to add for this client specific
-                    override, separated by a semicolon.
-                  type: string
-                description:
-                  default: ''
-                  description: Description for administrative reference.
-                  type: string
-                disable:
-                  default: false
-                  description: Disable this override without removing it.
-                  type: boolean
-                dns_domain:
-                  default: ''
-                  description: Domain name for DNS to provide to the client.
-                  type: string
-                dns_servers:
-                  default: ''
-                  description: Comma-separated list of no more than 4 DNS server IP
-                    addresses (i.e. 8.8.8.8). Any more than the first four are ignored.
-                    This list is provided to the clent.
-                  type: string
-                id:
-                  description: ID of the client specific override to update. Refer
-                    to the 'Obtaining Object IDs' section in the documentation intro
-                    for help obtaining this ID.
-                  type: string
-                local_network:
-                  default: ''
-                  description: 'IPv4 server-side networks that will be accessible
-                    from this particular client. Expressed as a comma-separated list
-                    of one or more CIDR networks.
-
-                    NOTE: Networks do not need to be specified here if they have already
-                    been defined on the main server configuration.'
-                  type: string
-                local_networkv6:
-                  default: ''
-                  description: 'IPv6 server-side networks that will be accessible
-                    from this particular client. Expressed as a comma-separated list
-                    of one or more IP/PREFIX networks.
-
-                    NOTE: Networks do not need to be specified here if they have already
-                    been defined on the main server configuration.'
-                  type: string
-                netbios_enable:
-                  default: false
-                  description: Enable NetBIOS over TCP/IP. If this option is not set,
-                    all NetBIOS-over-TCP/IP options (including WINS) will be disabled.
-                  type: boolean
-                netbios_node_type:
-                  description: 'Possible options: b (broadcasts), p (point-to-point
-                    name queries to a WINS server), m (broadcast then query name server),
-                    and h (query name server, then broadcast). This parameter takes
-                    a single letter either b, p, m, or h. Any other string will result
-                    in this option being set to none.'
-                  enum:
-                    - b
-                    - p
-                    - m
-                    - h
-                  type: string
-                netbios_scope:
-                  default: ''
-                  description: NetBIOS Scope ID provides an extended naming service
-                    for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS
-                    traffic on a single network to only those nodes with the same
-                    NetBIOS scope ID.
-                  type: string
-                ntp_servers:
-                  default: ''
-                  description: Comma-separated list of no more than 2 NTP server IP
-                    addresses. Any more than the first two are ignored.
-                  type: string
-                prevent_server_definitions:
-                  default: false
-                  description: Prevent this client from receiving any server-defined
-                    client settings.
-                  type: boolean
-                redirect_gateway:
-                  default: false
-                  description: Force all client generated traffic through the tunnel.
-                  type: boolean
-                remote_network:
-                  default: ''
-                  description: 'IPv4 client-side networks that will be routed to this
-                    client specifically using iroute, so that a site-to-site VPN can
-                    be established. Expressed as a comma-separated list of one or
-                    more CIDR ranges. May be left blank if there are no client-side
-                    networks to be routed.
-
-                    NOTE: Remember to add these subnets to the IPv4 Remote Networks
-                    list on the corresponding OpenVPN server settings.'
-                  type: string
-                remote_networkv6:
-                  default: ''
-                  description: 'IPv6 client-side networks that will be routed to this
-                    client specifically using iroute, so that a site-to-site VPN can
-                    be established. Expressed as a comma-separated list of one or
-                    more IP/PREFIX networks. May be left blank if there are no client-side
-                    networks to be routed.
-
-                    NOTE: Remember to add these subnets to the IPv6 Remote Networks
-                    list on the corresponding OpenVPN server settings.'
-                  type: string
-                remove_server_routes:
-                  default: false
-                  description: Prevent this client from receiving any server-defined
-                    routes without removing any other options.
-                  type: boolean
-                server_list:
-                  description: Comma separated string containing the ids of the OpenVPN
-                    servers that use this override. Omitting this activates the override
-                    for all servers.
-                  type: string
-                tunnel_network:
-                  default: ''
-                  description: 'Virtual IPv4 network used for private communications
-                    between this client and the server expressed using CIDR (e.g.
-                    10.0.8.5/24).
-
-                    With subnet topology, enter the client IP address and the subnet
-                    mask must match the IPv4 Tunnel Network on the server.
-
-                    With net30 topology, the first network address of the /30 is assumed
-                    to be the server address and the second network address will be
-                    assigned to the client.'
-                  type: string
-                tunnel_networkv6:
-                  default: ''
-                  description: 'Virtual IPv6 network used for private communications
-                    between this client and the server expressed using prefix (e.g.
-                    2001:db9:1:1::100/64).
-
-                    Enter the client IPv6 address and prefix. The prefix must match
-                    the IPv6 Tunnel Network prefix on the server.'
-                  type: string
-                wins_servers:
-                  default: ''
-                  description: Comma-separated list of no more than 2 WINS server
-                    IP addresses. Any more than the first two are ignored.
-                  type: string
-              required:
-                - id
-              type: object
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Update OpenVPN client specific override
-      tags:
-        - Services > OpenVPN > CSC
   /api/v1/routing/apply:
     post:
       description: 'Apply pending routing changes.<br><br>
@@ -6769,6 +6428,370 @@ paths:
       summary: Add NTP (ntpd) time server
       tags:
         - Services > NTPD > Time Server
+  /api/v1/services/openvpn/csc:
+    delete:
+      parameters:
+        - description: ID of the client specific override to update. Refer to the 'Obtaining
+            Object IDs' section in the documentation intro for help obtaining this ID.
+          in: query
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Delete OpenVPN client specific override
+      tags:
+        - Services > OpenVPN > CSC
+    get:
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read OpenVPN client specific overrides
+      tags:
+        - Services > OpenVPN > CSC
+    post:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                block:
+                  default: false
+                  description: Prevents the client from connecting to this server.
+                    Do not use this option to permanently disable a client due to
+                    a compromised key or password. Use a CRL (certificate revocation
+                    list) instead.
+                  type: boolean
+                common_name:
+                  description: X.509 common name for the client certificate, or the
+                    username for VPNs utilizing password authentication. This match
+                    is case sensitive.
+                  type: string
+                custom_options:
+                  description: Additional options to add for this client specific
+                    override, separated by a semicolon.
+                  type: string
+                description:
+                  default: ''
+                  description: Description for administrative reference.
+                  type: string
+                disable:
+                  default: false
+                  description: Disable this override without removing it.
+                  type: boolean
+                dns_domain:
+                  default: ''
+                  description: Domain name for DNS to provide to the client.
+                  type: string
+                dns_servers:
+                  default: ''
+                  description: Comma-separated list of no more than 4 DNS server IP
+                    addresses (i.e. 8.8.8.8). Any more than the first four are ignored.
+                    This list is provided to the clent.
+                  type: string
+                local_network:
+                  default: ''
+                  description: 'IPv4 server-side networks that will be accessible
+                      from this particular client. Expressed as a comma-separated list
+                      of one or more CIDR networks.
+
+                      NOTE: Networks do not need to be specified here if they have already
+                      been defined on the main server configuration.'
+                  type: string
+                local_networkv6:
+                  default: ''
+                  description: 'IPv6 server-side networks that will be accessible
+                      from this particular client. Expressed as a comma-separated list
+                      of one or more IP/PREFIX networks.
+
+                      NOTE: Networks do not need to be specified here if they have already
+                      been defined on the main server configuration.'
+                  type: string
+                netbios_enable:
+                  default: false
+                  description: Enable NetBIOS over TCP/IP. If this option is not set,
+                    all NetBIOS-over-TCP/IP options (including WINS) will be disabled.
+                  type: boolean
+                netbios_node_type:
+                  description: 'Possible options: b (broadcasts), p (point-to-point
+                      name queries to a WINS server), m (broadcast then query name server),
+                      and h (query name server, then broadcast). This parameter takes
+                      a single letter either b, p, m, or h. Any other string will result
+                      in this option being set to none.'
+                  enum:
+                    - b
+                    - p
+                    - m
+                    - h
+                  type: string
+                netbios_scope:
+                  default: ''
+                  description: NetBIOS Scope ID provides an extended naming service
+                    for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS
+                    traffic on a single network to only those nodes with the same
+                    NetBIOS scope ID.
+                  type: string
+                ntp_servers:
+                  default: ''
+                  description: Comma-separated list of no more than 2 NTP server IP
+                    addresses. Any more than the first two are ignored.
+                  type: string
+                prevent_server_definitions:
+                  default: false
+                  description: Prevent this client from receiving any server-defined
+                    client settings.
+                  type: boolean
+                redirect_gateway:
+                  default: false
+                  description: Force all client generated traffic through the tunnel.
+                  type: boolean
+                remote_network:
+                  default: ''
+                  description: 'IPv4 client-side networks that will be routed to this
+                      client specifically using iroute, so that a site-to-site VPN can
+                      be established. Expressed as a comma-separated list of one or
+                      more CIDR ranges. May be left blank if there are no client-side
+                      networks to be routed.
+
+                      NOTE: Remember to add these subnets to the IPv4 Remote Networks
+                      list on the corresponding OpenVPN server settings.'
+                  type: string
+                remote_networkv6:
+                  default: ''
+                  description: 'IPv6 client-side networks that will be routed to this
+                      client specifically using iroute, so that a site-to-site VPN can
+                      be established. Expressed as a comma-separated list of one or
+                      more IP/PREFIX networks. May be left blank if there are no client-side
+                      networks to be routed.
+
+                      NOTE: Remember to add these subnets to the IPv6 Remote Networks
+                      list on the corresponding OpenVPN server settings.'
+                  type: string
+                remove_server_routes:
+                  default: false
+                  description: Prevent this client from receiving any server-defined
+                    routes without removing any other options.
+                  type: boolean
+                server_list:
+                  description: Comma separated string containing the ids of the OpenVPN
+                    servers that use this override. Omitting this activates the override
+                    for all servers.
+                  type: string
+                tunnel_network:
+                  default: ''
+                  description: 'Virtual IPv4 network used for private communications
+                      between this client and the server expressed using CIDR (e.g.
+                      10.0.8.5/24).
+
+                      With subnet topology, enter the client IP address and the subnet
+                      mask must match the IPv4 Tunnel Network on the server.
+
+                      With net30 topology, the first network address of the /30 is assumed
+                      to be the server address and the second network address will be
+                      assigned to the client.'
+                  type: string
+                tunnel_networkv6:
+                  default: ''
+                  description: 'Virtual IPv6 network used for private communications
+                      between this client and the server expressed using prefix (e.g.
+                      2001:db9:1:1::100/64).
+
+                      Enter the client IPv6 address and prefix. The prefix must match
+                      the IPv6 Tunnel Network prefix on the server.'
+                  type: string
+                wins_servers:
+                  default: ''
+                  description: Comma-separated list of no more than 2 WINS server
+                    IP addresses. Any more than the first two are ignored.
+                  type: string
+              required:
+                - common_name
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Create OpenVPN client specific override
+      tags:
+        - Services > OpenVPN > CSC
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                block:
+                  default: false
+                  description: Prevents the client from connecting to this server.
+                    Do not use this option to permanently disable a client due to
+                    a compromised key or password. Use a CRL (certificate revocation
+                    list) instead.
+                  type: boolean
+                common_name:
+                  description: X.509 common name for the client certificate, or the
+                    username for VPNs utilizing password authentication. This match
+                    is case sensitive.
+                  type: string
+                custom_options:
+                  description: Additional options to add for this client specific
+                    override, separated by a semicolon.
+                  type: string
+                description:
+                  default: ''
+                  description: Description for administrative reference.
+                  type: string
+                disable:
+                  default: false
+                  description: Disable this override without removing it.
+                  type: boolean
+                dns_domain:
+                  default: ''
+                  description: Domain name for DNS to provide to the client.
+                  type: string
+                dns_servers:
+                  default: ''
+                  description: Comma-separated list of no more than 4 DNS server IP
+                    addresses (i.e. 8.8.8.8). Any more than the first four are ignored.
+                    This list is provided to the clent.
+                  type: string
+                id:
+                  description: ID of the client specific override to update. Refer
+                    to the 'Obtaining Object IDs' section in the documentation intro
+                    for help obtaining this ID.
+                  type: string
+                local_network:
+                  default: ''
+                  description: 'IPv4 server-side networks that will be accessible
+                      from this particular client. Expressed as a comma-separated list
+                      of one or more CIDR networks.
+
+                      NOTE: Networks do not need to be specified here if they have already
+                      been defined on the main server configuration.'
+                  type: string
+                local_networkv6:
+                  default: ''
+                  description: 'IPv6 server-side networks that will be accessible
+                      from this particular client. Expressed as a comma-separated list
+                      of one or more IP/PREFIX networks.
+
+                      NOTE: Networks do not need to be specified here if they have already
+                      been defined on the main server configuration.'
+                  type: string
+                netbios_enable:
+                  default: false
+                  description: Enable NetBIOS over TCP/IP. If this option is not set,
+                    all NetBIOS-over-TCP/IP options (including WINS) will be disabled.
+                  type: boolean
+                netbios_node_type:
+                  description: 'Possible options: b (broadcasts), p (point-to-point
+                      name queries to a WINS server), m (broadcast then query name server),
+                      and h (query name server, then broadcast). This parameter takes
+                      a single letter either b, p, m, or h. Any other string will result
+                      in this option being set to none.'
+                  enum:
+                    - b
+                    - p
+                    - m
+                    - h
+                  type: string
+                netbios_scope:
+                  default: ''
+                  description: NetBIOS Scope ID provides an extended naming service
+                    for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS
+                    traffic on a single network to only those nodes with the same
+                    NetBIOS scope ID.
+                  type: string
+                ntp_servers:
+                  default: ''
+                  description: Comma-separated list of no more than 2 NTP server IP
+                    addresses. Any more than the first two are ignored.
+                  type: string
+                prevent_server_definitions:
+                  default: false
+                  description: Prevent this client from receiving any server-defined
+                    client settings.
+                  type: boolean
+                redirect_gateway:
+                  default: false
+                  description: Force all client generated traffic through the tunnel.
+                  type: boolean
+                remote_network:
+                  default: ''
+                  description: 'IPv4 client-side networks that will be routed to this
+                      client specifically using iroute, so that a site-to-site VPN can
+                      be established. Expressed as a comma-separated list of one or
+                      more CIDR ranges. May be left blank if there are no client-side
+                      networks to be routed.
+
+                      NOTE: Remember to add these subnets to the IPv4 Remote Networks
+                      list on the corresponding OpenVPN server settings.'
+                  type: string
+                remote_networkv6:
+                  default: ''
+                  description: 'IPv6 client-side networks that will be routed to this
+                      client specifically using iroute, so that a site-to-site VPN can
+                      be established. Expressed as a comma-separated list of one or
+                      more IP/PREFIX networks. May be left blank if there are no client-side
+                      networks to be routed.
+
+                      NOTE: Remember to add these subnets to the IPv6 Remote Networks
+                      list on the corresponding OpenVPN server settings.'
+                  type: string
+                remove_server_routes:
+                  default: false
+                  description: Prevent this client from receiving any server-defined
+                    routes without removing any other options.
+                  type: boolean
+                server_list:
+                  description: Comma separated string containing the ids of the OpenVPN
+                    servers that use this override. Omitting this activates the override
+                    for all servers.
+                  type: string
+                tunnel_network:
+                  default: ''
+                  description: 'Virtual IPv4 network used for private communications
+                      between this client and the server expressed using CIDR (e.g.
+                      10.0.8.5/24).
+
+                      With subnet topology, enter the client IP address and the subnet
+                      mask must match the IPv4 Tunnel Network on the server.
+
+                      With net30 topology, the first network address of the /30 is assumed
+                      to be the server address and the second network address will be
+                      assigned to the client.'
+                  type: string
+                tunnel_networkv6:
+                  default: ''
+                  description: 'Virtual IPv6 network used for private communications
+                      between this client and the server expressed using prefix (e.g.
+                      2001:db9:1:1::100/64).
+
+                      Enter the client IPv6 address and prefix. The prefix must match
+                      the IPv6 Tunnel Network prefix on the server.'
+                  type: string
+                wins_servers:
+                  default: ''
+                  description: Comma-separated list of no more than 2 WINS server
+                    IP addresses. Any more than the first two are ignored.
+                  type: string
+              required:
+                - id
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update OpenVPN client specific override
+      tags:
+        - Services > OpenVPN > CSC
   /api/v1/services/restart:
     post:
       description: 'Restart available services.<br><br>
@@ -7176,10 +7199,32 @@ paths:
       tags:
         - Services > Unbound > Access List > Row
   /api/v1/services/unbound/apply:
+    get:
+      description: 'Check the DNS Resolver (Unbound) apply status.<br><br>
+
+            _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Poll DNS Resolver (Unbound) apply status
+      tags:
+        - Services > Unbound > Apply
     post:
       description: 'Apply pending DNS Resolver (Unbound) changes.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                async:
+                  default: false
+                  description: "Apply Unbound changes in the background. The Unbound reload status can be polled using
+                  a GET request to /api/v1/services/unbound/apply."
+                  type: boolean
       responses:
         200:
           $ref: '#/components/responses/Success'
@@ -7187,7 +7232,7 @@ paths:
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Apply pending DNS Resolver (Unbound) changes
       tags:
-        - Services > Unbound
+        - Services > Unbound > Apply
   /api/v1/services/unbound/host_override:
     delete:
       description: 'Delete host overrides from the DNS Resolver (Unbound).<br><br>
@@ -9315,7 +9360,7 @@ paths:
                   description: "Name of the group."
                   type: string
                   minLength: 1
-                  maxLength: 16
+                  maxLength: 64
                 scope:
                   description: "Scope of the group."
                   type: string
@@ -9364,7 +9409,7 @@ paths:
                   description: "New name of the group."
                   type: string
                   minLength: 1
-                  maxLength: 16
+                  maxLength: 64
                 scope:
                   description: "Scope of the group."
                   type: string
@@ -9590,6 +9635,7 @@ tags:
   - name: Services
   - name: Services > OpenVPN > CSC
   - name: Services > Unbound
+  - name: Services > Unbound > Apply
   - name: Services > Unbound > Access List
   - name: Services > Unbound > Access List > Row
   - name: Services > Unbound > Host Override
