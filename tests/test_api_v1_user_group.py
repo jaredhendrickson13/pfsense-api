@@ -23,19 +23,20 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             }
         },
         {
-            "name": "Check name maximum length constraint",
+            "name": "Check local group name maximum length constraint",
             "status": 400,
             "return": 5044,
             "payload": {
-                "name": "THISNAMEISTOOLONGFORAGROUP"
+                "name": "THISNAMEISTOOLONGFORAGROUP",
+                "scope": "local"
             }
         },
         {
-            "name": "Check name maximum length constraint",
+            "name": "Check remote group name maximum length constraint",
             "status": 400,
             "return": 5044,
             "payload": {
-                "name": "THISNAMEISTOOLONGFORAGROUP"
+                "name": "SDPUMWFf76c1NuDFmCgt28htYERm8SUOZJldH2VPzZXj446X9T0ijTXC935KcSax2"
             }
         },
         {

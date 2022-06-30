@@ -20,6 +20,10 @@ class APIServicesUnboundApply extends APIEndpoint {
         $this->url = "/api/v1/services/unbound/apply";
     }
 
+    protected function get() {
+        return (new APIServicesUnboundApplyRead())->call();
+    }
+
     protected function post() {
         return (new APIServicesUnboundApplyCreate())->call();
     }

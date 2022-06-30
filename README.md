@@ -10,7 +10,19 @@ are made preventing the need for a reboot. All this results in the fastest, safe
 
 # Requirements
 
-- pfSense CE 2.5.0 and pfSense Plus 22.01 or later on AMD64 systems are supported. (older pfSense versions may be compatible with older versions of pfSense API)
+<details>
+    <summary>Supported pfSense Versions</summary>
+
+  - pfSense Plus 22.05 (AMD64)
+  - pfSense Plus 22.01 (AMD64)
+  - pfSense CE 2.6.0 (AMD64)
+  - pfSense CE 2.5.2 (AMD64)
+  - pfSense CE 2.5.1 (AMD64)
+  - pfSense CE 2.5.0 (AMD64)
+  ---
+  
+</details>
+
 - pfSense API requires a local user account in pfSense. The same permissions required to make configurations in the
   webConfigurator are required to make calls to the API endpoints.
 - While not an enforced requirement, it is **strongly** recommended that you configure pfSense to use HTTPS instead of
@@ -21,7 +33,7 @@ are made preventing the need for a reboot. All this results in the fastest, safe
 To install pfSense API, simply run the following command from the pfSense shell:<br>
 
 ```
-pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.5-pkg-API.txz && /etc/rc.restart_webgui
+pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.6-pkg-API.txz && /etc/rc.restart_webgui
 ```
 
 <br>
@@ -52,8 +64,9 @@ pfsense-api revert v1.1.7
 
 ### Notes:
 
-- To install the pfSense CE 2.6 package, simply change the `2.5` in the install URL to `2.6`.
-- To install the pfSense Plus 22.01 package, simply change the `2.5` in the install URL `22.01`.
+- While not always necessary, it's recommended to change the installation command to reference the package built for your
+  version of pfSense. You can check the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases)
+  for available versions.
 - In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after
   installing the package.
 - If you do not have shell access to pfSense, you can still install via the webConfigurator by navigating to '

@@ -20,16 +20,35 @@ class APIServicesUnboundApplyCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-services-dnsresolver-edithost"];
-        $this->change_note = "Added DNS Resolver host override via API";
+        $this->privileges = ["page-all", "page-services-dnsresolver", "page-services-dnsresolver-edithost"];
     }
 
     public function action() {
-        // Check if application was successful
-        if (APITools\unbound_reload_config() === true) {
-            return APIResponse\get(0);
-        } else {
-            return APIResponse\get(1);
+        # Check if the client requested asynchronous application.
+        if ($this->initial_data["async"] === true) {
+            $this->apply_async();
+            return APIResponse\get(14);
         }
+        # Otherwise, apply Unbound and wait for it to reload.
+        else {
+            # Check if application was successful
+            if ($this->apply() === true) {
+                return APIResponse\get(0);
+            }
+            else {
+                return APIResponse\get(1);
+            }
+        }
+    }
+
+    # TODO: Move unbound_reload_config to this method instead.
+    public static function apply() {
+        return APITools\unbound_reload_config();
+    }
+
+    # Apply Unbound asynchronously
+    public static function apply_async() {
+        # Execute the helper script asynchronously.
+        shell_exec("nohup php -f /usr/local/share/pfSense-pkg-API/scripts/apply_unbound.php > /dev/null &");
     }
 }

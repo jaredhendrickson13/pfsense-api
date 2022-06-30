@@ -103,6 +103,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Failed to connect to upstream package repositories",
         ],
+        14 => [
+            "status" => "accepted",
+            "code" => 202,
+            "return" => $id,
+            "message" => "Request was successful and is processing in the background",
+        ],
 
         // 1000-1999 reserved for /system API calls
         1000 => [
