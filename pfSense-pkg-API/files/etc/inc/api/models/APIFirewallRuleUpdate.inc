@@ -79,7 +79,7 @@ class APIFirewallRuleUpdate extends APIModel {
     private function __validate_interface() {
         # Check for our optional 'interface' payload value
         if (isset($this->initial_data['interface'])) {
-            $this->initial_data['interface'] = APITools\get_pfsense_if_id($this->initial_data['interface'], false, true);
+            $this->initial_data['interface'] = APITools\get_pfsense_if_id($this->initial_data['interface'], false, true, true);
             # Check that we found the request pfSense interface ID
             if (is_string($this->initial_data["interface"])) {
                 $this->validated_data['interface'] = $this->initial_data['interface'];
