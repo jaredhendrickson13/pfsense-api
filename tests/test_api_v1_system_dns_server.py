@@ -9,7 +9,7 @@ class APIE2ETestSystemDNSServer(e2e_test_framework.APIE2ETest):
             "payload": {
                 "dnsserver": "1.1.1.1"
             },
-            "resp_time": 10    # Allow a few seconds for DNS services to be reloaded
+            "resp_time": 15    # Allow a few seconds for DNS services to be reloaded
         },
         {
             "name": "Test DNS server IP validation",
