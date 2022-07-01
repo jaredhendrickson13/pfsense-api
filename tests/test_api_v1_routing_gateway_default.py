@@ -31,7 +31,7 @@ class APIE2ETestRoutingGatewayDefault(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Check updating default gateways",
-            "timeout": 10,
+            "resp_time": 10,
             "payload": {"defaultgw4": "automatic", "defaultgw6": "automatic"}
         }
     ]
