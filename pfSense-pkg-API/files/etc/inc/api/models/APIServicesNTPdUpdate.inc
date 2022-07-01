@@ -37,13 +37,13 @@ class APIServicesNTPdUpdate extends APIModel {
         # Update our return values and return the response. Get the updated NTPd configuration and add the timeservers
         # from system > timeservers to provide full context of the NTP configuration.
         $this->validated_data = $this->config["ntpd"];
-        $this->validated_data["timeservers"] = explode(" ", $this->config["system"]["timeservers"]);;
+        $this->validated_data["timeservers"] = explode(" ", $this->config["system"]["timeservers"]);
         return APIResponse\get(0, $this->validated_data);
     }
 
     public function validate_payload() {
         # Pull the existing NTP configuration or default if it's empty
-        if (!empty($this->config["ntpd"])) {
+        if ($this->config["ntpd"]) {
             $this->validated_data = $this->config["ntpd"];
         } else {
             $this->validated_data = [];
