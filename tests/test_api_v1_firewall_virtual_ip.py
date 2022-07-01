@@ -148,7 +148,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "return": 4022,
             "payload": {
                 "mode": "carp",
-                "interface": "lan",
+                "interface": "wan",
                 "subnet": "172.16.77.23/32",
                 "vhid": 10
             }
