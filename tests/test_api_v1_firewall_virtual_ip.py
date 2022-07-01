@@ -22,7 +22,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Create CARP virtual IP",
             "payload": {
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.239/32",
                 "password": "testpass",
                 "descr": "E2E Test",
@@ -34,7 +34,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Create Proxy ARP virtual IP",
             "payload": {
                 "mode": "proxyarp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.240/32",
                 "descr": "E2E Test"
             },
@@ -44,7 +44,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Create IP Alias virtual IP",
             "payload": {
                 "mode": "ipalias",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.241/32",
                 "descr": "E2E Test"
             },
@@ -86,7 +86,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "return": 4021,
             "payload": {
                 "mode": "ipalias",
-                "interface": "wan"
+                "interface": "lan"
             }
         },
         {
@@ -95,7 +95,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "return": 4025,
             "payload": {
                 "mode": "ipalias",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "INVALID"
             }
         },
@@ -105,7 +105,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "return": 4026,
             "payload": {
                 "mode": "ipalias",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.241/32"
             }
         },
@@ -115,7 +115,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "return": 4028,
             "payload": {
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.252/32",
                 "vhid": -1
             }
@@ -126,7 +126,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "return": 4028,
             "payload": {
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.252/32",
                 "vhid": 4000000
             }
@@ -137,7 +137,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "return": 4027,
             "payload": {
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.252/32",
                 "vhid": 10
             }
@@ -149,7 +149,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "payload": {
                 "mode": "carp",
                 "interface": "lan",
-                "subnet": "192.168.1.252/32",
+                "subnet": "172.16.77.23/32",
                 "vhid": 10
             }
         },
@@ -159,7 +159,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "return": 4030,
             "payload": {
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.252/32",
                 "advskew": -1
             }
@@ -170,7 +170,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "return": 4030,
             "payload": {
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.252/32",
                 "advskew": 4030
             }
@@ -181,7 +181,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "return": 4029,
             "payload": {
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.252/32",
                 "advbase": 0
             }
@@ -192,7 +192,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "return": 4029,
             "payload": {
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.252/32",
                 "advbase": 4030
             }
@@ -204,7 +204,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "payload": {
                 "id": 0,
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.229/32",
                 "password": "newtestpass",
                 "vhid": 25,
@@ -217,7 +217,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "payload": {
                 "id": 1,
                 "mode": "proxyarp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.230/32",
                 "descr": "Updated E2E test",
             },
@@ -228,7 +228,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "payload": {
                 "id": 2,
                 "mode": "ipalias",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.231/32",
                 "descr": "Updated E2E test",
             },
@@ -241,7 +241,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "payload": {
                 "id": 2,
                 "mode": "ipalias",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "INVALID"
             }
         },
@@ -252,7 +252,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "payload": {
                 "id": 2,
                 "mode": "ipalias",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.230/32",
             }
         },
@@ -263,7 +263,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "payload": {
                 "id": 0,
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.252/32",
                 "vhid": -1
             }
@@ -275,7 +275,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "payload": {
                 "id": 0,
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.252/32",
                 "vhid": 4000000
             }
@@ -287,7 +287,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "payload": {
                 "id": 0,
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.252/32",
                 "advskew": -1
             }
@@ -299,7 +299,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "payload": {
                 "id": 0,
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.252/32",
                 "advskew": 4030
             }
@@ -311,7 +311,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "payload": {
                 "id": 0,
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.252/32",
                 "advbase": 0
             }
@@ -323,7 +323,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "payload": {
                 "id": 0,
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.252/32",
                 "advbase": 4030
             }
@@ -335,7 +335,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "payload": {
                 "id": 2,
                 "mode": "carp",
-                "interface": "wan",
+                "interface": "lan",
                 "subnet": "172.16.77.234/32",
             }
         },
