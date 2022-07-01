@@ -566,7 +566,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
                 "blockbogons": False,
                 "apply": True
             },
-            "resp_time": 8    # Allow a few seconds to bounce the interface when applying
+            "resp_time": 12    # Allow a few seconds to bounce the interface when applying
         }
     ]
     delete_tests = [

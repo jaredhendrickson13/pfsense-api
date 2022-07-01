@@ -218,12 +218,13 @@ class APIE2ETest:
             expected_resp_time = test_params.get("resp_time", 1)
             msg = "Expected response time within {e}s, received {r}s".format(e=expected_resp_time, r=received_resp_time)
             print(self.__format_msg__(req.request.method, test_params, msg, mode="warning"))
+            valid = True
         else:
             print(self.__format_msg__(req.request.method, test_params, "Response is valid", mode="ok"))
             valid = True
 
-        # Print request output if verbose mode
-        if verbose:
+        # Print detailed response information if test failed or verbose mode is enabled
+        if not valid or verbose:
             print("RESPONSE STATUS: " + str(req.status_code))
             print("RESPONSE TIME: " + str(req.elapsed.total_seconds()) + "s")
             print("RESPONSE DATA: " + req.content.decode())
