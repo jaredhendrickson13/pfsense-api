@@ -19,7 +19,7 @@ import sys
 
 # Variables
 tests_dir = pathlib.Path(__file__).parent.absolute()
-tests = [f for f in os.listdir(tests_dir) if f.startswith("test") and f.endswith(".py")]
+tests = sorted([f for f in os.listdir(tests_dir) if f.startswith("test") and f.endswith(".py")])
 success_count = 0
 exit_code = 0
 
