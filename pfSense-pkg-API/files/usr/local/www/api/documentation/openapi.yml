@@ -4845,6 +4845,113 @@ paths:
       summary: Update interface bridge
       tags:
         - Interface > Bridge
+  /api/v1/interface/group:
+    delete:
+      description: 'Delete interface group and configuration.<br><br>
+
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-group-edit`]'
+      parameters:
+        - description: 'Group ID of group to delete.'
+          in: query
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Delete interface group
+      tags:
+        - Interface > Group
+    get:
+      description: 'Read interface group and configuration.<br><br>
+
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-group`,
+        `page-interfaces-group-edit`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read interface groups
+      tags:
+        - Interface > Group
+    post:
+      description: 'Add a new interface group.<br><br>
+
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-group-edit`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                descr:
+                  default: ''
+                  description: Description for the new interface gropup.
+                  type: string
+                members:
+                  description: Interface members to add to this group. This can be
+                    the physical interface ID (e.g. em0), the pfSense interface ID
+                    (e.g. wan, lan, optx) or the interface description (e.g. WAN,
+                    LAN).
+                  default: ''
+                  items:
+                    type: string
+                  type: array
+                ifname:
+                  description: Name of the new interface group.
+                  type: string
+              required:
+                - ifname
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Create interface group
+      tags:
+        - Interface > Group
+    put:
+      description: 'Update an existing interface group configuration.<br><br>
+
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-group-edit`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                descr:
+                  description: New description for the interface group.
+                  type: string
+                id:
+                  description: 'Group ID of interface group to update.'
+                  type: string
+                members:
+                  description: Interface members to assign to this group. This can
+                    be the physical interface ID (e.g. em0), the pfSense interface
+                    ID (e.g. wan, lan, optx) or the interface description (e.g. WAN,
+                    LAN). Any existing values will be overwritten.
+                  items:
+                    type: string
+                  type: array
+              required:
+                - id
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update interface group
+      tags:
+        - Interface > Group
   /api/v1/interface/vlan:
     delete:
       description: 'Delete VLAN assignment and configuration.<br><br>
@@ -11091,6 +11198,7 @@ tags:
   - name: Interface
   - name: Interface > Available
   - name: Interface > Bridge
+  - name: Interface > Group
   - name: Interface > VLAN
   - name: Interface > Apply
   - name: Firewall > Alias
@@ -11142,7 +11250,6 @@ tags:
   - name: Status > Interface
   - name: Status > System
   - name: Services
-  - name: Services > OpenVPN > Server
   - name: Services > OpenVPN > CSC
   - name: Services > Unbound
   - name: Services > Unbound > Apply
