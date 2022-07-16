@@ -46,12 +46,6 @@ a28e7bdbf1743527346bda359bc92fc9 \
             },
         },
         {
-            "name": "OpenVPN Server No Server Certificate found",
-            "status": 400,
-            "return": 2145,
-            "payload": {}
-        },
-        {
             "name": "Create internal certificate with RSA key",
             "uri": "/api/v1/system/certificate",
             "no_certref": True,    # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
