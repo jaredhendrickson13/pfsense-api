@@ -35,17 +35,27 @@ class APIE2ETestUserGroupMember(e2e_test_framework.APIE2ETest):
             }
         },
         {
+            "name": "Create group for use in tests",
+            "uri": "/api/v1/user/group",
+            "payload": {
+                "name": "TEST_GROUP",
+                "scope": "local",
+                "member": [],
+                "priv": ["page-all"]
+            }
+        },
+        {
             "name": "Add user to admins group",
             "payload": {
                 "username": "admin",
-                "group": ["admins"]
+                "group": ["TEST_GROUP"]
             }
         },
         {
             "name": "Check ability to add single group as string",
             "payload": {
                 "username": "admin",
-                "group": "admins"
+                "group": "TEST_GROUP"
             }
         }
     ]
@@ -84,14 +94,29 @@ class APIE2ETestUserGroupMember(e2e_test_framework.APIE2ETest):
             "name": "Remove user from admins group",
             "payload": {
                 "username": "admin",
-                "group": ["admins"]
+                "group": ["TEST_GROUP"]
+            }
+        },
+        {
+            "name": "Re-add user to test group",
+            "method": "POST",
+            "payload": {
+                "username": "admin",
+                "group": ["TEST_GROUP"]
             }
         },
         {
             "name": "Check ability to remove single group as string",
             "payload": {
                 "username": "admin",
-                "group": "admins"
+                "group": "TEST_GROUP"
+            }
+        },
+        {
+            "name": "Delete test group",
+            "uri": "/api/v1/user/group",
+            "payload": {
+                "id": "TEST_GROUP"
             }
         }
     ]
