@@ -848,14 +848,14 @@ paths:
           schema:
             type: string
         - description: 'Specify whether or not you would like this alias to be applied
-            immediately, or simply written to the configuration to be applied later.
-            If you are creating modifying multiple aliases at once it is best to set
-            this to false and apply the changes afterwards using the `/api/v1/firewall/apply`
-            endpoint.
+          immediately, or simply written to the configuration to be applied later.
+          If you are creating modifying multiple aliases at once it is best to set
+          this to false and apply the changes afterwards using the `/api/v1/firewall/apply`
+          endpoint.
 
-            _Note: currently this defaults to always reload the firewall filter after
-            in order to remain backwards compatible with previous releases, this will
-            be changed to not reload the filter by default in a future release._'
+          _Note: currently this defaults to always reload the firewall filter after
+          in order to remain backwards compatible with previous releases, this will
+          be changed to not reload the filter by default in a future release._'
           in: query
           name: apply
           schema:
@@ -1035,12 +1035,12 @@ paths:
           schema:
             type: string
         - description: "Specify whether or not you would like this alias change to be\
-            \ applied immediately, or simply written to the configuration to be applied\
-            \ later. When modifying multiple aliases it is best to set this to  false\
-            \ and apply the changes afterwards using the `/api/v1/firewall/apply`  endpoint.\
-            \ \n_Note: currently this defaults to always reload the firewall filter\
-            \ after in order to remain backwards compatible with previous releases,\
-            \ this will be changed to not reload the filter by default in a future release._"
+          \ applied immediately, or simply written to the configuration to be applied\
+          \ later. When modifying multiple aliases it is best to set this to  false\
+          \ and apply the changes afterwards using the `/api/v1/firewall/apply`  endpoint.\
+          \ \n_Note: currently this defaults to always reload the firewall filter\
+          \ after in order to remain backwards compatible with previous releases,\
+          \ this will be changed to not reload the filter by default in a future release._"
           in: query
           name: apply
           schema:
@@ -2758,10 +2758,10 @@ paths:
           schema:
             type: string
         - description: 'Reset the entire firewall states table instead of specific states.
-            If `true`, all firewall states will be killed and the `source` and `destination`
-            fields will have no effect. Defaults to `false`. _Note: setting this field
-            to `true` when the `async` field is set to `false` OR the `sleep` field
-            is set too low may prevent the API from sending a response._'
+          If `true`, all firewall states will be killed and the `source` and `destination`
+          fields will have no effect. Defaults to `false`. _Note: setting this field
+          to `true` when the `async` field is set to `false` OR the `sleep` field
+          is set too low may prevent the API from sending a response._'
           in: query
           name: reset
           schema:
@@ -4702,11 +4702,34 @@ paths:
       tags:
         - Interface > Available
   /api/v1/interface/apply:
+    get:
+      description: 'Check if all pending interface changes have been applied.<br><br>
+
+              _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Poll interface apply status
+      tags:
+        - Interface > Apply
     post:
       description: 'Apply pending interface changes.<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                async:
+                  description: 'Apply pending interface changes in the background. This is sometimes necessary to 
+                  prevent gateway timeouts when many interfaces are being applied. The status of the interface 
+                  application can be polled with a GET request to the /api/v1/interface/apply endpoint.'
+                  type: boolean
+                  default: false
       responses:
         200:
           $ref: '#/components/responses/Success'
@@ -4723,8 +4746,8 @@ paths:
         _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge-edit`]'
       parameters:
         - description: 'Bridge ID of bridge to delete. Bridges cannot be deleted while
-            in use. _Note: This uses the `bridgeif` value (e.g. bridge0, bridge2, etc.)
-            NOT the configuration array index like other objects._'
+          in use. _Note: This uses the `bridgeif` value (e.g. bridge0, bridge2, etc.)
+          NOT the configuration array index like other objects._'
           in: query
           name: id
           required: true
@@ -4946,358 +4969,515 @@ paths:
       summary: Update interface VLAN
       tags:
         - Interface > VLAN
-  /api/v1/openvpn/csc:
+  /api/v1/routing/apply:
+    post:
+      description: 'Apply pending routing changes.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`,
+        `page-system-gateways-editgateway`, `page-system-staticroutes`, `page-system-staticroutes-editroute`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Apply routing changes
+      tags:
+        - Routing > Apply
+  /api/v1/routing/gateway:
     delete:
+      description: 'Delete an existing routing gateway.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]'
       parameters:
-        - description: ID of the client specific override to update. Refer to the 'Obtaining
-            Object IDs' section in the documentation intro for help obtaining this ID.
+        - description: ID of the gateway to delete. Refer to the 'Obtaining Object IDs'
+            section in the documentation intro for help obtaining this ID.
           in: query
           name: id
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         200:
           $ref: '#/components/responses/Success'
         401:
           $ref: '#/components/responses/AuthenticationFailed'
-      summary: Delete OpenVPN client specific override
+      summary: Delete gateway
       tags:
-        - Services > OpenVPN > CSC
+        - Routing > Gateway
     get:
+      description: 'Read existing gateways.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]
+
+        _Note: This endpoint originally returned verbose routing gateway details.
+        This functionality has moved to /api/v1/routing/gateway/detail._'
       responses:
         200:
           $ref: '#/components/responses/Success'
         401:
           $ref: '#/components/responses/AuthenticationFailed'
-      summary: Read OpenVPN client specific overrides
+      summary: Read gateways
       tags:
-        - Services > OpenVPN > CSC
+        - Routing > Gateway
     post:
+      description: 'Create a new gateway.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]'
       requestBody:
         content:
           application/json:
             schema:
               properties:
-                block:
+                action_disable:
                   default: false
-                  description: Prevents the client from connecting to this server.
-                    Do not use this option to permanently disable a client due to
-                    a compromised key or password. Use a CRL (certificate revocation
-                    list) instead.
+                  description: Disable any action taken on gateway events for this
+                    gateway. This will consider the gateway as always up.
                   type: boolean
-                common_name:
-                  description: X.509 common name for the client certificate, or the
-                    username for VPNs utilizing password authentication. This match
-                    is case sensitive.
-                  type: string
-                custom_options:
-                  description: Additional options to add for this client specific
-                    override, separated by a semicolon.
-                  type: string
-                description:
-                  default: ''
-                  description: Description for administrative reference.
-                  type: string
-                disable:
+                alert_interval:
+                  default: 1000
+                  description: Time interval (in milliseconds) which alert conditions
+                    will be checked. This value must be greater than or equal to the
+                    `interval` value.
+                  type: integer
+                apply:
                   default: false
-                  description: Disable this override without removing it.
+                  description: Specify whether or not you would like this gateway
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later. Typically, if you are creating multiple gateways
+                    at once it is best to set this to false and apply the changes
+                    afterwards using the `/api/v1/routing/apply` endpoint.
                   type: boolean
-                dns_domain:
-                  default: ''
-                  description: Domain name for DNS to provide to the client.
+                data_payload:
+                  default: 1
+                  description: Data payload to send in ICMP packets sent to the gateway
+                    monitor IP.
+                  minimum: 1
+                  type: integer
+                descr:
+                  description: Description for this gateway.
                   type: string
-                dns_servers:
-                  default: ''
-                  description: Comma-separated list of no more than 4 DNS server IP
-                    addresses (i.e. 8.8.8.8). Any more than the first four are ignored.
-                    This list is provided to the clent.
-                  type: string
-                local_network:
-                  default: ''
-                  description: 'IPv4 server-side networks that will be accessible
-                    from this particular client. Expressed as a comma-separated list
-                    of one or more CIDR networks.
-
-                    NOTE: Networks do not need to be specified here if they have already
-                    been defined on the main server configuration.'
-                  type: string
-                local_networkv6:
-                  default: ''
-                  description: 'IPv6 server-side networks that will be accessible
-                    from this particular client. Expressed as a comma-separated list
-                    of one or more IP/PREFIX networks.
-
-                    NOTE: Networks do not need to be specified here if they have already
-                    been defined on the main server configuration.'
-                  type: string
-                netbios_enable:
+                disabled:
                   default: false
-                  description: Enable NetBIOS over TCP/IP. If this option is not set,
-                    all NetBIOS-over-TCP/IP options (including WINS) will be disabled.
+                  description: Disable this gateway.
                   type: boolean
-                netbios_node_type:
-                  description: 'Possible options: b (broadcasts), p (point-to-point
-                    name queries to a WINS server), m (broadcast then query name server),
-                    and h (query name server, then broadcast). This parameter takes
-                    a single letter either b, p, m, or h. Any other string will result
-                    in this option being set to none.'
+                force_down:
+                  default: false
+                  description: Force this gateway to always be considered down.
+                  type: boolean
+                gateway:
+                  description: IP address of the gateway. This value must be a valid
+                    IPv4 address if  `ipprotocol` is set to `inet`, or a valid IPv6  address
+                    if `ipprotocol` is set to `inet6`.
+                  type: string
+                interface:
+                  description: Interface the gateway will apply to. You may specify
+                    either the interface's descriptive name, the pfSense ID (wan,
+                    lan, optx), or the real interface ID (e.g. igb0).
+                  type: string
+                interval:
+                  default: 500
+                  description: How often (in milliseconds) gateway monitor ICMP probes
+                    will be sent.
+                  maximum: 3600000
+                  minimum: 1
+                  type: integer
+                ipprotocol:
+                  description: IP protocol this gateway will apply to.
                   enum:
-                    - b
-                    - p
-                    - m
-                    - h
+                    - inet
+                    - inet6
                   type: string
-                netbios_scope:
-                  default: ''
-                  description: NetBIOS Scope ID provides an extended naming service
-                    for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS
-                    traffic on a single network to only those nodes with the same
-                    NetBIOS scope ID.
+                latencyhigh:
+                  default: 500
+                  description: High threshold (in milliseconds) for latency. Any packet
+                    that exceeds this threshold will trigger a major latency gateway
+                    event. This value must be greater than the `latencylow` value.
+                  type: integer
+                latencylow:
+                  default: 200
+                  description: Low threshold (in milliseconds) for latency. Any packet
+                    that exceeds this threshold will trigger a minor latency gateway
+                    event.
+                  minimum: 1
+                  type: integer
+                loss_interval:
+                  default: 2000
+                  description: How long (in milliseconds) the gateway monitor will
+                    wait for response packets before considering the packet lost.
+                    This value must be greater than or equal to the `latencyhigh`
+                    value.
+                  type: integer
+                losshigh:
+                  default: 10
+                  description: High threshold (in %) for packet loss. If total packet
+                    loss exceeds this percentage, a major packet loss gateway event
+                    will be triggered. This value must be greater than the `losslow`
+                    value.
+                  maximum: 100
+                  minimum: 1
+                  type: integer
+                losslow:
+                  default: 10
+                  description: Low threshold (in %) for packet loss. If total packet
+                    loss exceeds this percentage, a minor packet loss gateway event
+                    will be triggered.
+                  maximum: 100
+                  minimum: 1
+                  type: integer
+                monitor:
+                  description: IP address used to monitor this gateway. This is only
+                    necessary if the `gateway` IP does not accept ICMP probes. Defaults
+                    to the `gateway` value.
                   type: string
-                ntp_servers:
-                  default: ''
-                  description: Comma-separated list of no more than 2 NTP server IP
-                    addresses. Any more than the first two are ignored.
-                  type: string
-                prevent_server_definitions:
+                monitor_disable:
                   default: false
-                  description: Prevent this client from receiving any server-defined
-                    client settings.
+                  description: Disable gateway monitoring for this gateway.
                   type: boolean
-                redirect_gateway:
-                  default: false
-                  description: Force all client generated traffic through the tunnel.
-                  type: boolean
-                remote_network:
-                  default: ''
-                  description: 'IPv4 client-side networks that will be routed to this
-                    client specifically using iroute, so that a site-to-site VPN can
-                    be established. Expressed as a comma-separated list of one or
-                    more CIDR ranges. May be left blank if there are no client-side
-                    networks to be routed.
-
-                    NOTE: Remember to add these subnets to the IPv4 Remote Networks
-                    list on the corresponding OpenVPN server settings.'
+                name:
+                  description: Descriptive name for this gateway. This name must be
+                    unique, and can only contain alphanumeric characters and underscores.
                   type: string
-                remote_networkv6:
-                  default: ''
-                  description: 'IPv6 client-side networks that will be routed to this
-                    client specifically using iroute, so that a site-to-site VPN can
-                    be established. Expressed as a comma-separated list of one or
-                    more IP/PREFIX networks. May be left blank if there are no client-side
-                    networks to be routed.
-
-                    NOTE: Remember to add these subnets to the IPv6 Remote Networks
-                    list on the corresponding OpenVPN server settings.'
-                  type: string
-                remove_server_routes:
-                  default: false
-                  description: Prevent this client from receiving any server-defined
-                    routes without removing any other options.
-                  type: boolean
-                server_list:
-                  description: Comma separated string containing the ids of the OpenVPN
-                    servers that use this override. Omitting this activates the override
-                    for all servers.
-                  type: string
-                tunnel_network:
-                  default: ''
-                  description: 'Virtual IPv4 network used for private communications
-                    between this client and the server expressed using CIDR (e.g.
-                    10.0.8.5/24).
-
-                    With subnet topology, enter the client IP address and the subnet
-                    mask must match the IPv4 Tunnel Network on the server.
-
-                    With net30 topology, the first network address of the /30 is assumed
-                    to be the server address and the second network address will be
-                    assigned to the client.'
-                  type: string
-                tunnel_networkv6:
-                  default: ''
-                  description: 'Virtual IPv6 network used for private communications
-                    between this client and the server expressed using prefix (e.g.
-                    2001:db9:1:1::100/64).
-
-                    Enter the client IPv6 address and prefix. The prefix must match
-                    the IPv6 Tunnel Network prefix on the server.'
-                  type: string
-                wins_servers:
-                  default: ''
-                  description: Comma-separated list of no more than 2 WINS server
-                    IP addresses. Any more than the first two are ignored.
-                  type: string
+                time_period:
+                  default: 60000
+                  description: Time period (in milliseconds) for gateway monitor metrics
+                    to be averaged. This value must be greater than  twice the `interval`
+                    value plus the `loss_interval` value.
+                  type: integer
+                weight:
+                  default: 1
+                  description: Gateway's weight when utilizing gateway load balancing
+                    within a gateway group.
+                  maximum: 30
+                  minimum: 1
+                  type: integer
               required:
-                - common_name
+                - interface
+                - ipprotocol
+                - name
+                - gateway
               type: object
       responses:
         200:
           $ref: '#/components/responses/Success'
         401:
           $ref: '#/components/responses/AuthenticationFailed'
-      summary: Create OpenVPN client specific override
+      summary: Create gateway
       tags:
-        - Services > OpenVPN > CSC
+        - Routing > Gateway
     put:
+      description: 'Update an existing gateway.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]'
       requestBody:
         content:
           application/json:
             schema:
               properties:
-                block:
+                action_disable:
                   default: false
-                  description: Prevents the client from connecting to this server.
-                    Do not use this option to permanently disable a client due to
-                    a compromised key or password. Use a CRL (certificate revocation
-                    list) instead.
+                  description: Disable any action taken on gateway events for this
+                    gateway. This will consider the gateway as always up.
                   type: boolean
-                common_name:
-                  description: X.509 common name for the client certificate, or the
-                    username for VPNs utilizing password authentication. This match
-                    is case sensitive.
-                  type: string
-                custom_options:
-                  description: Additional options to add for this client specific
-                    override, separated by a semicolon.
-                  type: string
-                description:
-                  default: ''
-                  description: Description for administrative reference.
-                  type: string
-                disable:
+                alert_interval:
+                  default: 1000
+                  description: Time interval (in milliseconds) which alert conditions
+                    will be checked. This value must be greater than or equal to the
+                    `interval` value.
+                  type: integer
+                apply:
                   default: false
-                  description: Disable this override without removing it.
+                  description: Specify whether or not you would like this gateway
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later. Typically, if you are creating multiple gateways
+                    at once it is best to set this to false and apply the changes
+                    afterwards using the `/api/v1/routing/apply` endpoint.
                   type: boolean
-                dns_domain:
-                  default: ''
-                  description: Domain name for DNS to provide to the client.
+                data_payload:
+                  default: 1
+                  description: Data payload to send in ICMP packets sent to the gateway
+                    monitor IP.
+                  minimum: 1
+                  type: integer
+                descr:
+                  description: Description for this gateway.
                   type: string
-                dns_servers:
-                  default: ''
-                  description: Comma-separated list of no more than 4 DNS server IP
-                    addresses (i.e. 8.8.8.8). Any more than the first four are ignored.
-                    This list is provided to the clent.
+                disabled:
+                  default: false
+                  description: Disable this gateway.
+                  type: boolean
+                force_down:
+                  default: false
+                  description: Force this gateway to always be considered down.
+                  type: boolean
+                gateway:
+                  description: IP address of the gateway. This value must be a valid
+                    IPv4 address if  `ipprotocol` is set to `inet`, or a valid IPv6  address
+                    if `ipprotocol` is set to `inet6`.
                   type: string
                 id:
-                  description: ID of the client specific override to update. Refer
-                    to the 'Obtaining Object IDs' section in the documentation intro
-                    for help obtaining this ID.
+                  description: ID of the gateway to update. Refer to the 'Obtaining
+                    Object IDs' section in the documentation intro for help obtaining
+                    this ID.
+                  type: integer
+                interface:
+                  description: Interface the gateway will apply to. You may specify
+                    either the interface's descriptive name, the pfSense ID (wan,
+                    lan, optx), or the real interface ID (e.g. igb0).
                   type: string
-                local_network:
-                  default: ''
-                  description: 'IPv4 server-side networks that will be accessible
-                    from this particular client. Expressed as a comma-separated list
-                    of one or more CIDR networks.
-
-                    NOTE: Networks do not need to be specified here if they have already
-                    been defined on the main server configuration.'
-                  type: string
-                local_networkv6:
-                  default: ''
-                  description: 'IPv6 server-side networks that will be accessible
-                    from this particular client. Expressed as a comma-separated list
-                    of one or more IP/PREFIX networks.
-
-                    NOTE: Networks do not need to be specified here if they have already
-                    been defined on the main server configuration.'
-                  type: string
-                netbios_enable:
-                  default: false
-                  description: Enable NetBIOS over TCP/IP. If this option is not set,
-                    all NetBIOS-over-TCP/IP options (including WINS) will be disabled.
-                  type: boolean
-                netbios_node_type:
-                  description: 'Possible options: b (broadcasts), p (point-to-point
-                    name queries to a WINS server), m (broadcast then query name server),
-                    and h (query name server, then broadcast). This parameter takes
-                    a single letter either b, p, m, or h. Any other string will result
-                    in this option being set to none.'
+                interval:
+                  default: 500
+                  description: How often (in milliseconds) gateway monitor ICMP probes
+                    will be sent.
+                  maximum: 3600000
+                  minimum: 1
+                  type: integer
+                ipprotocol:
+                  description: IP protocol this gateway will apply to.
                   enum:
-                    - b
-                    - p
-                    - m
-                    - h
+                    - inet
+                    - inet6
                   type: string
-                netbios_scope:
-                  default: ''
-                  description: NetBIOS Scope ID provides an extended naming service
-                    for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS
-                    traffic on a single network to only those nodes with the same
-                    NetBIOS scope ID.
+                latencyhigh:
+                  default: 500
+                  description: High threshold (in milliseconds) for latency. Any packet
+                    that exceeds this threshold will trigger a major latency gateway
+                    event. This value must be greater than the `latencylow` value.
+                  type: integer
+                latencylow:
+                  default: 200
+                  description: Low threshold (in milliseconds) for latency. Any packet
+                    that exceeds this threshold will trigger a minor latency gateway
+                    event.
+                  minimum: 1
+                  type: integer
+                loss_interval:
+                  default: 2000
+                  description: How long (in milliseconds) the gateway monitor will
+                    wait for response packets before considering the packet lost.
+                    This value must be greater than or equal to the `latencyhigh`
+                    value.
+                  type: integer
+                losshigh:
+                  default: 10
+                  description: High threshold (in %) for packet loss. If total packet
+                    loss exceeds this percentage, a major packet loss gateway event
+                    will be triggered. This value must be greater than the `losslow`
+                    value.
+                  maximum: 100
+                  minimum: 1
+                  type: integer
+                losslow:
+                  default: 10
+                  description: Low threshold (in %) for packet loss. If total packet
+                    loss exceeds this percentage, a minor packet loss gateway event
+                    will be triggered.
+                  maximum: 100
+                  minimum: 1
+                  type: integer
+                monitor:
+                  description: IP address used to monitor this gateway. This is only
+                    necessary if the `gateway` IP does not accept ICMP probes. Defaults
+                    to the `gateway` value.
                   type: string
-                ntp_servers:
-                  default: ''
-                  description: Comma-separated list of no more than 2 NTP server IP
-                    addresses. Any more than the first two are ignored.
-                  type: string
-                prevent_server_definitions:
+                monitor_disable:
                   default: false
-                  description: Prevent this client from receiving any server-defined
-                    client settings.
+                  description: Disable gateway monitoring for this gateway.
                   type: boolean
-                redirect_gateway:
+                name:
+                  description: Descriptive name for this gateway. This name must be
+                    unique, and can only contain alphanumeric characters and underscores.
+                  type: string
+                time_period:
+                  default: 60000
+                  description: Time period (in milliseconds) for gateway monitor metrics
+                    to be averaged. This value must be greater than  twice the `interval`
+                    value plus the `loss_interval` value.
+                  type: integer
+                weight:
+                  default: 1
+                  description: Gateway's weight when utilizing gateway load balancing
+                    within a gateway group.
+                  maximum: 30
+                  minimum: 1
+                  type: integer
+              required:
+                - id
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update gateway
+      tags:
+        - Routing > Gateway
+  /api/v1/routing/gateway/default:
+    put:
+      description: 'Update the default gateways for IPv4 and/or IPv6. _Note: changing the default gateway can
+      prevent you from connecting to the system afterward. Proceed with caution._<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                defaultgw4:
+                  description: >-
+                    Set the IPv4 default gateway. This must be an existing IPv4 gateway name, `automatic` for automatic
+                    gateway selection, or `none` for no default gateway selection for IPv4.
+                  type: string
+                defaultgw6:
+                  description: >-
+                    Set the IPv6 default gateway. This must be an existing IPv6 gateway name, `automatic` for automatic
+                    gateway selection, or `none` for no default gateway selection for IPv6.
+                  type: string
+                apply:
+                  default: true
+                  description: Specify whether or not you would like this change
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later. If set to `false` you must apply the changes
+                    afterwards using the `/api/v1/routing/apply` endpoint.
+                  type: boolean
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update default gateways
+      tags:
+        - Routing > Gateway > Default
+  /api/v1/routing/gateway/detail:
+    get:
+      description: 'Read verbose routing gateway details about both dynamic/system
+        gateways and static gateways.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read gateway details
+      tags:
+        - Routing > Gateway > Detail
+  /api/v1/routing/static_route:
+    delete:
+      description: 'Delete existing static routes. __Note: route deletions will be
+        applied immediately, there is no need to apply routing changes afterwards__<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]'
+      parameters:
+        - description: ID of the static route to delete. Refer to the 'Obtaining Object
+            IDs' section in the documentation intro for help obtaining this ID.
+          in: query
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Delete static route
+      tags:
+        - Routing > Static Route
+    get:
+      description: 'Read existing static routes.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read static routes
+      tags:
+        - Routing > Static Route
+    post:
+      description: 'Create a new static route.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                apply:
                   default: false
-                  description: Force all client generated traffic through the tunnel.
+                  description: Specify whether or not you would like this route to
+                    be applied immediately, or simply written to the configuration
+                    to be applied later. Typically, if you are creating multiple routes
+                    at once it Is best to set this to false and apply the changes
+                    afterwards using the `/api/v1/routing/apply` endpoint.
                   type: boolean
-                remote_network:
+                descr:
                   default: ''
-                  description: 'IPv4 client-side networks that will be routed to this
-                    client specifically using iroute, so that a site-to-site VPN can
-                    be established. Expressed as a comma-separated list of one or
-                    more CIDR ranges. May be left blank if there are no client-side
-                    networks to be routed.
-
-                    NOTE: Remember to add these subnets to the IPv4 Remote Networks
-                    list on the corresponding OpenVPN server settings.'
+                  description: Description for this route.
                   type: string
-                remote_networkv6:
-                  default: ''
-                  description: 'IPv6 client-side networks that will be routed to this
-                    client specifically using iroute, so that a site-to-site VPN can
-                    be established. Expressed as a comma-separated list of one or
-                    more IP/PREFIX networks. May be left blank if there are no client-side
-                    networks to be routed.
-
-                    NOTE: Remember to add these subnets to the IPv6 Remote Networks
-                    list on the corresponding OpenVPN server settings.'
-                  type: string
-                remove_server_routes:
+                disabled:
                   default: false
-                  description: Prevent this client from receiving any server-defined
-                    routes without removing any other options.
+                  description: Disable this route.
                   type: boolean
-                server_list:
-                  description: Comma separated string containing the ids of the OpenVPN
-                    servers that use this override. Omitting this activates the override
-                    for all servers.
+                gateway:
+                  description: Name of the gateway traffic matching this route will
+                    use.
                   type: string
-                tunnel_network:
-                  default: ''
-                  description: 'Virtual IPv4 network used for private communications
-                    between this client and the server expressed using CIDR (e.g.
-                    10.0.8.5/24).
-
-                    With subnet topology, enter the client IP address and the subnet
-                    mask must match the IPv4 Tunnel Network on the server.
-
-                    With net30 topology, the first network address of the /30 is assumed
-                    to be the server address and the second network address will be
-                    assigned to the client.'
+                network:
+                  description: IPv4 CIDR, IPv6 CIDR or network alias this route will
+                    apply to.
                   type: string
-                tunnel_networkv6:
-                  default: ''
-                  description: 'Virtual IPv6 network used for private communications
-                    between this client and the server expressed using prefix (e.g.
-                    2001:db9:1:1::100/64).
+              required:
+                - network
+                - gateway
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Create static route
+      tags:
+        - Routing > Static Route
+    put:
+      description: 'Update an existing static route.<br><br>
 
-                    Enter the client IPv6 address and prefix. The prefix must match
-                    the IPv6 Tunnel Network prefix on the server.'
-                  type: string
-                wins_servers:
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                apply:
+                  default: false
+                  description: Specify whether or not you would like this route to
+                    be applied immediately, or simply written to the configuration
+                    to be applied later. Typically, if you are creating multiple routes
+                    at once it Is best to set this to false and apply the changes
+                    afterwards using the `/api/v1/routing/apply` endpoint.
+                  type: boolean
+                descr:
                   default: ''
-                  description: Comma-separated list of no more than 2 WINS server
-                    IP addresses. Any more than the first two are ignored.
+                  description: Description for this route.
+                  type: string
+                disabled:
+                  default: false
+                  description: Disable this route.
+                  type: boolean
+                gateway:
+                  description: Name of the gateway traffic matching this route will
+                    use.
+                  type: string
+                id:
+                  description: ID of the static route to update. Refer to the 'Obtaining
+                    Object IDs' section in the documentation intro for help obtaining
+                    this ID.
+                  type: integer
+                network:
+                  description: IPv4 CIDR, IPv6 CIDR or network alias this route will
+                    apply to.
                   type: string
               required:
                 - id
@@ -5307,9 +5487,947 @@ paths:
           $ref: '#/components/responses/Success'
         401:
           $ref: '#/components/responses/AuthenticationFailed'
-      summary: Update OpenVPN client specific override
+      summary: Update static route
       tags:
-        - Services > OpenVPN > CSC
+        - Routing > Static Route
+  /api/v1/services:
+    get:
+      description: 'Read available services.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read all service statuses
+      tags:
+        - Services
+  /api/v1/services/ddns:
+    get:
+      description: 'Read configured dynamic DNS settings and statuses.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dynamicdnsclients`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read dynamic DNS configuration
+      tags:
+        - Services > DDNS
+  /api/v1/services/dhcpd:
+    get:
+      description: 'Read the entire DHCP Server (dhcpd) configuration.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserverpage-services-dhcpserver`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read DHCP Server (dhcpd) configuration
+      tags:
+        - Services > DHCPD
+    put:
+      description: 'Update the current DHCP Server (dhcpd) configuration for a specified
+        interface.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                defaultleasetime:
+                  description: Default DHCP lease time. This must be a value of `60`
+                    or greater and must be less than `maxleasetime`. This field can
+                    be unset to the system default by passing in an empty string.
+                  oneOf:
+                    - type: string
+                    - type: integer
+                denyunknown:
+                  description: Deny unknown MAC addresses. If true, you must specify
+                    MAC addresses in the `mac_allow` field or add a static DHCP entry
+                    to receive DHCP requests.
+                  type: boolean
+                dnsserver:
+                  description: DNS servers to hand out in DHCP leases.
+                  items:
+                    type: string
+                  type: array
+                domain:
+                  description: Domain name to include in DHCP leass. This must be
+                    a valid domain name or an empty string to assume the system default.
+                  type: string
+                domainsearchlist:
+                  description: Search domains to include in DHCP leases. Each entry
+                    must be a valid domain name.
+                  items:
+                    type: string
+                  type: array
+                enable:
+                  description: Enable the DHCP server for this interface.
+                  type: boolean
+                gateway:
+                  description: Gateway to hand out in DHCP leases. This value must
+                    be a valid IPv4 address within the interface's subnet. This field
+                    can be unset to the system default by passing in an empty string.
+                  type: string
+                ignorebootp:
+                  description: Ignore BOOTP requests.
+                  type: boolean
+                interface:
+                  description: Interface of DHCP server configuration to update. You
+                    may specify either the interface's descriptive name, the pfSense
+                    ID (wan, lan, optx), or the real interface ID (e.g. igb0). This
+                    interface must host a static IPv4 subnet that has more than one
+                    available within the subnet.
+                  type: string
+                mac_allow:
+                  description: MAC addresses allowed to register DHCP leases.
+                  items:
+                    type: string
+                  type: array
+                mac_deny:
+                  description: MAC addresses denied from registering DHCP leases.
+                  items:
+                    type: string
+                  type: array
+                maxleasetime:
+                  description: Maximum DHCP lease time. This must be a value of `60`
+                    or greater and must be greater than `defaultleasetime`. This field
+                    can be unset to the system default by passing in an empty string.
+                  oneOf:
+                    - type: string
+                    - type: integer
+                numberoptions:
+                  description: Set DHCP options. This must be an array of option objects.
+                    See documentation for the /api/v1/services/dhcpd/options endpoint
+                    to object fields. To unset DHCP options, pass in an empty array.
+                  properties:
+                    number:
+                      type: integer
+                    type:
+                      type: string
+                    value:
+                      oneOf:
+                        - type: string
+                        - type: integer
+                        - type: boolean
+                  type: object
+                range_from:
+                  description: DHCP pool's starting IPv4 address. This must be an
+                    available address within the interface's subnet and be less than
+                    the `range_to` value. This field is required if no `range_from`
+                    value has been set previously.
+                  type: string
+                range_to:
+                  description: DHCP pool's ending IPv4 address. This must be an available
+                    address within the interface's subnet and be greater than the
+                    `range_from` value. This field is required if no `range_to` has
+                    been set previously.
+                  type: string
+                staticarp:
+                  description: Create a static ARP entry for DHCP leases on this interface.
+                  type: boolean
+              required:
+                - interface
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update DHCP Server (dhcpd) configuration
+      tags:
+        - Services > DHCPD
+  /api/v1/services/dhcpd/lease:
+    get:
+      description: 'Read the current DHCP Server (dhcpd) leases.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-dhcpleases`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read DHCP Server (dhcpd) leases
+      tags:
+        - Services > DHCPD > Lease
+  /api/v1/services/dhcpd/options:
+    post:
+      description: 'Set new DHCP Server (dhcpd) option.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                interface:
+                  description: Interface to create the DHCP option for. You may specify
+                    either the interface's descriptive name, the pfSense ID (wan,
+                    lan, optx), or the real interface ID (e.g. igb0).
+                  type: string
+                number:
+                  description: DHCP option number to set. This must be a value between
+                    1 and 254.
+                  maximum: 254
+                  minimum: 1
+                  type: integer
+                type:
+                  description: DHCP option type.
+                  enum:
+                    - text
+                    - string
+                    - boolean
+                    - unsigned integer 8
+                    - unsigned integer 16
+                    - unsigned integer 32
+                    - signed integer 8
+                    - signed integer 16
+                    - signed integer 32
+                    - ip-address
+                  type: string
+                value:
+                  description: DHCP option's value. If `type` is set to `text`, this
+                    field must be string that does not contain quotations marks. If
+                    `type` is set to `string`, this field must be string enclosed
+                    in quotes or is a hexadecimal value. If `type` is set to `boolean`,
+                    this value must be `true` or `false` as a boolean OR `true`, `false`,
+                    `on` or `off` as a string. If `type` is set to `unsigned integer
+                    8`, this field must be an integer between `1` and `255`. If `type`
+                    is set to `unsigned integer 16`, this field must be an integer
+                    between `1` and `65535`. If `type` is set to `unsigned integer
+                    32`, this field must be an integer between `1` and `4294967295`.
+                    If `type` is set to `signed integer 8`, this field must be an
+                    integer between `-128` and `127`. If `type` is set to `signed
+                    integer 16`, this field must be an integer between `-32768` and
+                    `32767`. If `type` is set to `signed integer 32`, this field must
+                    be an integer between `-2147483648` and `2147483647`. If `type`
+                    is set to `ip-address`, this field must be a string containing
+                    a valid IPv4 address or hostname.
+                  oneOf:
+                    - type: string
+                    - type: integer
+                    - type: boolean
+              required:
+                - interface
+                - number
+                - type
+                - value
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Set DHCP Server (dhcpd) option
+      tags:
+        - Services > DHCPD > Options
+  /api/v1/services/dhcpd/restart:
+    post:
+      description: 'Restart the DHCP Server (dhcpd) service.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Restart DHCP Server (dhcpd) service
+      tags:
+        - Services > DHCPD
+  /api/v1/services/dhcpd/start:
+    post:
+      description: 'Start the DHCP Server (dhcpd) service.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Start DHCP Server (dhcpd) service
+      tags:
+        - Services > DHCPD
+  /api/v1/services/dhcpd/static_mapping:
+    delete:
+      description: 'Delete an existing DHCP Server (dhcpd) static mapping.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
+      parameters:
+        - description: ID of the static mapping to delete. Refer to the 'Obtaining Object
+            IDs' section in the documentation intro for help obtaining this ID.
+          in: query
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Interface of the static mapping to delete. You may specify either
+            the interface's descriptive name, the pfSense interface ID (e.g. wan, lan,
+            optx), or the real interface ID (e.g. igb0).
+          in: query
+          name: interface
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Delete DHCP Server (dhcpd) static mapping
+      tags:
+        - Services > DHCPD > Static Mapping
+    get:
+      description: 'Read existing DHCP Server (dhcpd) static mappings.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
+      parameters:
+        - description: Interface to read static mappings from. You may specify either
+            the interface's descriptive name, the pfSense interface ID (e.g. wan, lan,
+            optx), or the real interface ID (e.g. igb0).
+          in: query
+          name: interface
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read DHCP Server (dhcpd) static mappings
+      tags:
+        - Services > DHCPD > Static Mapping
+    post:
+      description: 'Create a new DHCP Server (dhcpd) static mapping.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                arp_table_static_entry:
+                  default: false
+                  description: Create a static ARP entry for this static mapping.
+                  type: boolean
+                cid:
+                  description: Set a client identifier.
+                  type: string
+                descr:
+                  description: Description for this mapping.
+                  type: string
+                dnsserver:
+                  description: DNS servers to assign this client. Each value must
+                    be a valid IPv4 address.
+                  items:
+                    type: string
+                  type: array
+                domain:
+                  description: Domain for this host.
+                  type: string
+                domainsearchlist:
+                  description: Search domains to assign to this host. Each value must
+                    be a valid domain name.
+                  items:
+                    type: string
+                  type: array
+                gateway:
+                  description: Gateway to assign this host. This value must be a valid
+                    IPv4 address within the interface's subnet.
+                  type: string
+                hostname:
+                  description: Hostname for this host.
+                  type: string
+                interface:
+                  description: Interface to assign this static mapping to. You may
+                    specify either the interface's descriptive name, the pfSense interface
+                    ID (e.g. wan, lan, optx), or the real interface ID (e.g. igb0).
+                  type: string
+                ipaddr:
+                  description: IPv4 address the MAC address will be assigned.
+                  type: string
+                mac:
+                  description: MAC address of the host this mapping will apply to.
+                  type: string
+              required:
+                - interface
+                - mac
+                - ipaddr
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Create DHCP Server (dhcpd) static mapping
+      tags:
+        - Services > DHCPD > Static Mapping
+    put:
+      description: 'Update an existing DHCP Server (dhcpd) static mapping.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                arp_table_static_entry:
+                  default: false
+                  description: Create a static ARP entry for this static mapping.
+                  type: boolean
+                cid:
+                  description: Set a client identifier.
+                  type: string
+                descr:
+                  description: Description for this mapping.
+                  type: string
+                dnsserver:
+                  description: DNS servers to assign this client. Each value must
+                    be a valid IPv4 address.
+                  items:
+                    type: string
+                  type: array
+                domain:
+                  description: Domain for this host.
+                  type: string
+                domainsearchlist:
+                  description: Search domains to assign to this host. Each value must
+                    be a valid domain name.
+                  items:
+                    type: string
+                  type: array
+                gateway:
+                  description: Gateway to assign this host. This value must be a valid
+                    IPv4 address within the interface's subnet. You  may pass in an
+                    empty string to revert to the default gateway.
+                  type: string
+                hostname:
+                  description: Hostname for this host.
+                  type: string
+                id:
+                  description: ID of the static mapping to update. Refer to the 'Obtaining
+                    Object IDs' section in the documentation intro for help obtaining
+                    this ID.
+                  type: integer
+                interface:
+                  description: Interface of the static mapping to update. You may
+                    specify either the interface's descriptive name, the pfSense interface
+                    ID (e.g. wan, lan, optx), or the real interface ID (e.g. igb0).
+                  type: string
+                ipaddr:
+                  description: IPv4 address the MAC address will be assigned.
+                  type: string
+                mac:
+                  description: MAC address of the host this mapping will apply to.
+                  type: string
+              required:
+                - id
+                - interface
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update DHCP Server (dhcpd) static mapping
+      tags:
+        - Services > DHCPD > Static Mapping
+  /api/v1/services/dhcpd/stop:
+    post:
+      description: 'Stop the DHCP Server (dhcpd) service.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Stop DHCP Server (dhcpd) service
+      tags:
+        - Services > DHCPD
+  /api/v1/services/dnsmasq:
+    get:
+      description: 'Read the entire DNS Forwarder (dnsmasq) configuration.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read DNS Forwarder (dnsmasq) configuration
+      tags:
+        - Services > DNSMASQ
+  /api/v1/services/dnsmasq/apply:
+    post:
+      description: 'Apply pending DNS Forwarder (dnsmasq) changes.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Apply pending DNS Forwarder (dnsmasq) changes
+      tags:
+        - Services > DNSMASQ
+  /api/v1/services/dnsmasq/host_override:
+    delete:
+      description: 'Delete an existing host override from the DNS Forwarder (dnsmasq).<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
+      parameters:
+        - description: ID of the host override to delete. Refer to the 'Obtaining Object
+            IDs' section in the documentation intro for help obtaining this ID.
+          in: query
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Specify whether or not you would like this host override to be
+            applied immediately, or simply written to the configuration to be applied
+            later. Typically, if you are modifying multiple host overrides at once it
+            Is best to set this to false and apply the changes afterwards using the
+            `/api/v1/services/dnsmasq/apply` endpoint.
+          in: query
+          name: apply
+          schema:
+            default: false
+            type: boolean
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Delete DNS Forwarder (dnsmasq) host override
+      tags:
+        - Services > DNSMASQ > Host Override
+    get:
+      description: 'Read host overrides from the DNS Forwarder (dnsmasq).<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read DNS Forwarder (dnsmasq) host overrides
+      tags:
+        - Services > DNSMASQ > Host Override
+    post:
+      description: 'Add a new host override to the DNS Forwarder (dnsmasq).<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                aliases:
+                  default: []
+                  description: Host override aliases to associate with this host override.
+                    For more information on alias object fields, see documentation
+                    for /api/v1/services/dnsmasq/host_override/alias.
+                  items:
+                    type: object
+                  type: array
+                apply:
+                  default: false
+                  description: Specify whether or not you would like this host override
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later. Typically, if you are modifying multiple
+                    host overrides at once it Is best to set this to false and apply
+                    the changes afterwards using the `/api/v1/services/dnsmasq/apply`
+                    endpoint.
+                  type: boolean
+                descr:
+                  description: Description of the host override.
+                  type: string
+                domain:
+                  description: Domain of the host override.
+                  type: string
+                host:
+                  description: Hostname of the host override.
+                  type: string
+                ip:
+                  description: IPv4 or IPv6 of the host override.
+                  type: string
+              required:
+                - host
+                - domain
+                - ip
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Create DNS Forwarder (dnsmasq) host override
+      tags:
+        - Services > DNSMASQ > Host Override
+    put:
+      description: 'Modify an existing host override from the DNS Forwarder (dnsmasq).<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                aliases:
+                  default: []
+                  description: Host override aliases to associate with this host override.
+                    For more information on alias object fields, see documentation
+                    for /api/v1/services/dnsmasq/host_override/alias. Existing entries
+                    will be overwritten.
+                  items:
+                    type: object
+                  type: array
+                apply:
+                  default: false
+                  description: Specify whether or not you would like this host override
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later. Typically, if you are modifying multiple
+                    host overrides at once it Is best to set this to false and apply
+                    the changes afterwards using the `/api/v1/services/dnsmasq/apply`
+                    endpoint.
+                  type: boolean
+                descr:
+                  description: Description of the host override.
+                  type: string
+                domain:
+                  description: Domain of the host override.
+                  type: string
+                host:
+                  description: Hostname of the host override.
+                  type: string
+                id:
+                  description: ID of the host override to update. Refer to the 'Obtaining
+                    Object IDs' section in the documentation intro for help obtaining
+                    this ID.
+                  type: integer
+                ip:
+                  description: IPv4 or IPv6 of the host override.
+                  type: string
+              required:
+                - id
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update DNS Forwarder (dnsmasq) host override
+      tags:
+        - Services > DNSMASQ > Host Override
+  /api/v1/services/dnsmasq/host_override/alias:
+    post:
+      description: 'Add a new host override alias to the DNS Forwarder (dnsmasq).<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                apply:
+                  default: false
+                  description: Specify whether or not you would like this host override
+                    alias to be applied immediately, or simply written to the configuration
+                    to be applied later. Typically, if you are creating multiple host
+                    override aliases at once it Is best to set this to false and apply
+                    the changes afterwards using the `/api/v1/services/dnsmasq/apply`
+                    endpoint.
+                  type: boolean
+                description:
+                  description: Description for the alias.
+                  type: string
+                domain:
+                  description: Domain of the alias
+                  type: string
+                host:
+                  description: Hostname of the alias.
+                  type: string
+                id:
+                  description: ID of the host override to apply this alias to. Refer
+                    to the 'Obtaining Object IDs' section in the documentation intro
+                    for help obtaining this ID.
+                  type: integer
+              required:
+                - id
+                - host
+                - domain
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Create DNS Forwarder (dnsmasq) host override alias
+      tags:
+        - Services > DNSMASQ > Host Override > Alias
+  /api/v1/services/dnsmasq/restart:
+    post:
+      description: 'Restart the DNS Forwarder (dnsmasq) service.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Restart DNS Forwarder (dnsmasq) service
+      tags:
+        - Services > DNSMASQ
+  /api/v1/services/dnsmasq/start:
+    post:
+      description: 'Start the DNS Forwarder (dnsmasq) service.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Start DNS Forwarder (dnsmasq) service
+      tags:
+        - Services > DNSMASQ
+  /api/v1/services/dnsmasq/stop:
+    post:
+      description: 'Stop the DNS Forwarder (dnsmasq) service.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Stop DNS Forwarder (dnsmasq) service
+      tags:
+        - Services > DNSMASQ
+  /api/v1/services/dpinger/restart:
+    post:
+      description: 'Restart the Gateway Monitoring (dpinger) service.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Restart Gateway Monitoring (dpinger) service
+      tags:
+        - Services > DPINGER
+  /api/v1/services/dpinger/start:
+    post:
+      description: 'Start the Gateway Monitoring (dpinger) service.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Start Gateway Monitoring (dpinger) service
+      tags:
+        - Services > DPINGER
+  /api/v1/services/dpinger/stop:
+    post:
+      description: 'Stop the Gateway Monitoring (dpinger) service.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Stop Gateway Monitoring (dpinger) service
+      tags:
+        - Services > DPINGER
+  /api/v1/services/ntpd:
+    get:
+      description: 'Read the NTP (ntpd) service configuration.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read NTP (ntpd) service
+      tags:
+        - Services > NTPD
+    put:
+      description: 'Update the NTP (ntpd) service configuration.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                clockstats:
+                  description: Enable logging of reference clock statistics.
+                  type: boolean
+                interface:
+                  description: Update the interfaces NTP will listen on. You may specify
+                    either the physical Interface ID, the pfSense Interface ID or
+                    the descriptive Interface name. To match any interface, you may
+                    pass in an empty array.
+                  items:
+                    type: string
+                  type: array
+                leapsec:
+                  description: Update the leap seconds configuration. This should
+                    be the contents of the leap seconds file received from the IERS.
+                  type: string
+                logpeer:
+                  description: Enable logging of peer messages.
+                  type: boolean
+                logsys:
+                  description: Enable logging of system messages.
+                  type: boolean
+                loopstats:
+                  description: Enable logging of clock discipline statistics.
+                  type: boolean
+                orphan:
+                  description: Update the orphan mode value. This must be a value
+                    between `1` and `15`. Orphan mode allows the system clock to be
+                    used when no other clocks are available. The number here specifies
+                    the stratum reported during orphan mode and should normally be
+                    set to a number high enough to insure that any other servers available
+                    to clients are preferred over this server.
+                  maximum: 15
+                  minimum: 1
+                  type: integer
+                peerstats:
+                  description: Enable logging of NTP peer statistics.
+                  type: boolean
+                statsgraph:
+                  description: Enable RRD graphs of NTP metrics.
+                  type: boolean
+                time_servers:
+                  description: Update the time servers used by the system. Each object
+                    may use the parameters available in the /api/v1/services/ntpd/time_server
+                    endpoint. To revert to the default timeserver, you may pass in
+                    an  empty array. Existing values will be overwritten.
+                  items:
+                    type: object
+                  type: array
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update NTP (ntpd) service
+      tags:
+        - Services > NTPD
+  /api/v1/services/ntpd/restart:
+    post:
+      description: 'Restart the NTP (ntpd) service.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Restart NTP (ntpd) Service
+      tags:
+        - Services > NTPD
+  /api/v1/services/ntpd/start:
+    post:
+      description: 'Start the NTP (ntpd) service.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Start NTP (ntpd) service
+      tags:
+        - Services > NTPD
+  /api/v1/services/ntpd/stop:
+    post:
+      description: 'Stop the NTP (ntpd) service.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Stop NTP (ntpd) Service
+      tags:
+        - Services > NTPD
+  /api/v1/services/ntpd/time_server:
+    delete:
+      description: 'Delete an existing NTP time server from the NTP (ntpd) configuration.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
+      parameters:
+        - description: IP or hostname of the NTP time server to delete. If more than
+            one time server exists with this value, only the first match will be deleted.
+            In the case that the last remaining time server was deleted, the default
+            time server `pool.ntp.org` will be written.
+          in: query
+          name: timeserver
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Delete NTP (ntpd) time server
+      tags:
+        - Services > NTPD > Time Server
+    post:
+      description: 'Add a new NTP time server to the NTP (ntpd) configuration.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                ispool:
+                  default: false
+                  description: Specify whether or not this time server represents
+                    an NTP server pool or a single NTP server.
+                  type: boolean
+                noselect:
+                  default: false
+                  description: Prevent this NTP server from being selected for time.
+                  type: boolean
+                prefer:
+                  default: false
+                  description: Set this NTP time server as a preferred NTP time server.
+                    If `true`, this time server will take preference over other time
+                    servers.
+                  type: boolean
+                timeserver:
+                  description: IP or hostname of the NTP time server to add.
+                  type: string
+              required:
+                - timeserver
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Add NTP (ntpd) time server
+      tags:
+        - Services > NTPD > Time Server
   /api/v1/services/openvpn/server:
     delete:
       description: 'Delete OpenVPN Server instance.<br><br>
@@ -6819,807 +7937,13 @@ paths:
       summary: Update OpenVPN Server
       tags:
         - Services > OpenVPN > Server
-  /api/v1/routing/apply:
-    post:
-      description: 'Apply pending routing changes.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`,
-        `page-system-gateways-editgateway`, `page-system-staticroutes`, `page-system-staticroutes-editroute`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Apply routing changes
-      tags:
-        - Routing > Apply
-  /api/v1/routing/gateway:
+  /api/v1/services/openvpn/csc:
     delete:
-      description: 'Delete an existing routing gateway.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]'
       parameters:
-        - description: ID of the gateway to delete. Refer to the 'Obtaining Object IDs'
-            section in the documentation intro for help obtaining this ID.
+        - description: ID of the client specific override to update. Refer to the 'Obtaining
+            Object IDs' section in the documentation intro for help obtaining this ID.
           in: query
           name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Delete gateway
-      tags:
-        - Routing > Gateway
-    get:
-      description: 'Read existing gateways.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]
-
-        _Note: This endpoint originally returned verbose routing gateway details.
-        This functionality has moved to /api/v1/routing/gateway/detail._'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Read gateways
-      tags:
-        - Routing > Gateway
-    post:
-      description: 'Create a new gateway.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                action_disable:
-                  default: false
-                  description: Disable any action taken on gateway events for this
-                    gateway. This will consider the gateway as always up.
-                  type: boolean
-                alert_interval:
-                  default: 1000
-                  description: Time interval (in milliseconds) which alert conditions
-                    will be checked. This value must be greater than or equal to the
-                    `interval` value.
-                  type: integer
-                apply:
-                  default: false
-                  description: Specify whether or not you would like this gateway
-                    to be applied immediately, or simply written to the configuration
-                    to be applied later. Typically, if you are creating multiple gateways
-                    at once it is best to set this to false and apply the changes
-                    afterwards using the `/api/v1/routing/apply` endpoint.
-                  type: boolean
-                data_payload:
-                  default: 1
-                  description: Data payload to send in ICMP packets sent to the gateway
-                    monitor IP.
-                  minimum: 1
-                  type: integer
-                descr:
-                  description: Description for this gateway.
-                  type: string
-                disabled:
-                  default: false
-                  description: Disable this gateway.
-                  type: boolean
-                force_down:
-                  default: false
-                  description: Force this gateway to always be considered down.
-                  type: boolean
-                gateway:
-                  description: IP address of the gateway. This value must be a valid
-                    IPv4 address if  `ipprotocol` is set to `inet`, or a valid IPv6  address
-                    if `ipprotocol` is set to `inet6`.
-                  type: string
-                interface:
-                  description: Interface the gateway will apply to. You may specify
-                    either the interface's descriptive name, the pfSense ID (wan,
-                    lan, optx), or the real interface ID (e.g. igb0).
-                  type: string
-                interval:
-                  default: 500
-                  description: How often (in milliseconds) gateway monitor ICMP probes
-                    will be sent.
-                  maximum: 3600000
-                  minimum: 1
-                  type: integer
-                ipprotocol:
-                  description: IP protocol this gateway will apply to.
-                  enum:
-                    - inet
-                    - inet6
-                  type: string
-                latencyhigh:
-                  default: 500
-                  description: High threshold (in milliseconds) for latency. Any packet
-                    that exceeds this threshold will trigger a major latency gateway
-                    event. This value must be greater than the `latencylow` value.
-                  type: integer
-                latencylow:
-                  default: 200
-                  description: Low threshold (in milliseconds) for latency. Any packet
-                    that exceeds this threshold will trigger a minor latency gateway
-                    event.
-                  minimum: 1
-                  type: integer
-                loss_interval:
-                  default: 2000
-                  description: How long (in milliseconds) the gateway monitor will
-                    wait for response packets before considering the packet lost.
-                    This value must be greater than or equal to the `latencyhigh`
-                    value.
-                  type: integer
-                losshigh:
-                  default: 10
-                  description: High threshold (in %) for packet loss. If total packet
-                    loss exceeds this percentage, a major packet loss gateway event
-                    will be triggered. This value must be greater than the `losslow`
-                    value.
-                  maximum: 100
-                  minimum: 1
-                  type: integer
-                losslow:
-                  default: 10
-                  description: Low threshold (in %) for packet loss. If total packet
-                    loss exceeds this percentage, a minor packet loss gateway event
-                    will be triggered.
-                  maximum: 100
-                  minimum: 1
-                  type: integer
-                monitor:
-                  description: IP address used to monitor this gateway. This is only
-                    necessary if the `gateway` IP does not accept ICMP probes. Defaults
-                    to the `gateway` value.
-                  type: string
-                monitor_disable:
-                  default: false
-                  description: Disable gateway monitoring for this gateway.
-                  type: boolean
-                name:
-                  description: Descriptive name for this gateway. This name must be
-                    unique, and can only contain alphanumeric characters and underscores.
-                  type: string
-                time_period:
-                  default: 60000
-                  description: Time period (in milliseconds) for gateway monitor metrics
-                    to be averaged. This value must be greater than  twice the `interval`
-                    value plus the `loss_interval` value.
-                  type: integer
-                weight:
-                  default: 1
-                  description: Gateway's weight when utilizing gateway load balancing
-                    within a gateway group.
-                  maximum: 30
-                  minimum: 1
-                  type: integer
-              required:
-                - interface
-                - ipprotocol
-                - name
-                - gateway
-              type: object
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Create gateway
-      tags:
-        - Routing > Gateway
-    put:
-      description: 'Update an existing gateway.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                action_disable:
-                  default: false
-                  description: Disable any action taken on gateway events for this
-                    gateway. This will consider the gateway as always up.
-                  type: boolean
-                alert_interval:
-                  default: 1000
-                  description: Time interval (in milliseconds) which alert conditions
-                    will be checked. This value must be greater than or equal to the
-                    `interval` value.
-                  type: integer
-                apply:
-                  default: false
-                  description: Specify whether or not you would like this gateway
-                    to be applied immediately, or simply written to the configuration
-                    to be applied later. Typically, if you are creating multiple gateways
-                    at once it is best to set this to false and apply the changes
-                    afterwards using the `/api/v1/routing/apply` endpoint.
-                  type: boolean
-                data_payload:
-                  default: 1
-                  description: Data payload to send in ICMP packets sent to the gateway
-                    monitor IP.
-                  minimum: 1
-                  type: integer
-                descr:
-                  description: Description for this gateway.
-                  type: string
-                disabled:
-                  default: false
-                  description: Disable this gateway.
-                  type: boolean
-                force_down:
-                  default: false
-                  description: Force this gateway to always be considered down.
-                  type: boolean
-                gateway:
-                  description: IP address of the gateway. This value must be a valid
-                    IPv4 address if  `ipprotocol` is set to `inet`, or a valid IPv6  address
-                    if `ipprotocol` is set to `inet6`.
-                  type: string
-                id:
-                  description: ID of the gateway to update. Refer to the 'Obtaining
-                    Object IDs' section in the documentation intro for help obtaining
-                    this ID.
-                  type: integer
-                interface:
-                  description: Interface the gateway will apply to. You may specify
-                    either the interface's descriptive name, the pfSense ID (wan,
-                    lan, optx), or the real interface ID (e.g. igb0).
-                  type: string
-                interval:
-                  default: 500
-                  description: How often (in milliseconds) gateway monitor ICMP probes
-                    will be sent.
-                  maximum: 3600000
-                  minimum: 1
-                  type: integer
-                ipprotocol:
-                  description: IP protocol this gateway will apply to.
-                  enum:
-                    - inet
-                    - inet6
-                  type: string
-                latencyhigh:
-                  default: 500
-                  description: High threshold (in milliseconds) for latency. Any packet
-                    that exceeds this threshold will trigger a major latency gateway
-                    event. This value must be greater than the `latencylow` value.
-                  type: integer
-                latencylow:
-                  default: 200
-                  description: Low threshold (in milliseconds) for latency. Any packet
-                    that exceeds this threshold will trigger a minor latency gateway
-                    event.
-                  minimum: 1
-                  type: integer
-                loss_interval:
-                  default: 2000
-                  description: How long (in milliseconds) the gateway monitor will
-                    wait for response packets before considering the packet lost.
-                    This value must be greater than or equal to the `latencyhigh`
-                    value.
-                  type: integer
-                losshigh:
-                  default: 10
-                  description: High threshold (in %) for packet loss. If total packet
-                    loss exceeds this percentage, a major packet loss gateway event
-                    will be triggered. This value must be greater than the `losslow`
-                    value.
-                  maximum: 100
-                  minimum: 1
-                  type: integer
-                losslow:
-                  default: 10
-                  description: Low threshold (in %) for packet loss. If total packet
-                    loss exceeds this percentage, a minor packet loss gateway event
-                    will be triggered.
-                  maximum: 100
-                  minimum: 1
-                  type: integer
-                monitor:
-                  description: IP address used to monitor this gateway. This is only
-                    necessary if the `gateway` IP does not accept ICMP probes. Defaults
-                    to the `gateway` value.
-                  type: string
-                monitor_disable:
-                  default: false
-                  description: Disable gateway monitoring for this gateway.
-                  type: boolean
-                name:
-                  description: Descriptive name for this gateway. This name must be
-                    unique, and can only contain alphanumeric characters and underscores.
-                  type: string
-                time_period:
-                  default: 60000
-                  description: Time period (in milliseconds) for gateway monitor metrics
-                    to be averaged. This value must be greater than  twice the `interval`
-                    value plus the `loss_interval` value.
-                  type: integer
-                weight:
-                  default: 1
-                  description: Gateway's weight when utilizing gateway load balancing
-                    within a gateway group.
-                  maximum: 30
-                  minimum: 1
-                  type: integer
-              required:
-                - id
-              type: object
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Update gateway
-      tags:
-        - Routing > Gateway
-  /api/v1/routing/gateway/default:
-    put:
-      description: 'Update the default gateways for IPv4 and/or IPv6. _Note: changing the default gateway can
-      prevent you from connecting to the system afterward. Proceed with caution._<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                defaultgw4:
-                  description: >-
-                    Set the IPv4 default gateway. This must be an existing IPv4 gateway name, `automatic` for automatic
-                    gateway selection, or `none` for no default gateway selection for IPv4.
-                  type: string
-                defaultgw6:
-                  description: >-
-                    Set the IPv6 default gateway. This must be an existing IPv6 gateway name, `automatic` for automatic
-                    gateway selection, or `none` for no default gateway selection for IPv6.
-                  type: string
-                apply:
-                  default: true
-                  description: Specify whether or not you would like this change
-                    to be applied immediately, or simply written to the configuration
-                    to be applied later. If set to `false` you must apply the changes
-                    afterwards using the `/api/v1/routing/apply` endpoint.
-                  type: boolean
-              type: object
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Update default gateways
-      tags:
-        - Routing > Gateway > Default
-  /api/v1/routing/gateway/detail:
-    get:
-      description: 'Read verbose routing gateway details about both dynamic/system
-        gateways and static gateways.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Read gateway details
-      tags:
-        - Routing > Gateway > Detail
-  /api/v1/routing/static_route:
-    delete:
-      description: 'Delete existing static routes. __Note: route deletions will be
-        applied immediately, there is no need to apply routing changes afterwards__<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]'
-      parameters:
-        - description: ID of the static route to delete. Refer to the 'Obtaining Object
-            IDs' section in the documentation intro for help obtaining this ID.
-          in: query
-          name: id
-          required: true
-          schema:
-            type: integer
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Delete static route
-      tags:
-        - Routing > Static Route
-    get:
-      description: 'Read existing static routes.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Read static routes
-      tags:
-        - Routing > Static Route
-    post:
-      description: 'Create a new static route.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                apply:
-                  default: false
-                  description: Specify whether or not you would like this route to
-                    be applied immediately, or simply written to the configuration
-                    to be applied later. Typically, if you are creating multiple routes
-                    at once it Is best to set this to false and apply the changes
-                    afterwards using the `/api/v1/routing/apply` endpoint.
-                  type: boolean
-                descr:
-                  default: ''
-                  description: Description for this route.
-                  type: string
-                disabled:
-                  default: false
-                  description: Disable this route.
-                  type: boolean
-                gateway:
-                  description: Name of the gateway traffic matching this route will
-                    use.
-                  type: string
-                network:
-                  description: IPv4 CIDR, IPv6 CIDR or network alias this route will
-                    apply to.
-                  type: string
-              required:
-                - network
-                - gateway
-              type: object
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Create static route
-      tags:
-        - Routing > Static Route
-    put:
-      description: 'Update an existing static route.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                apply:
-                  default: false
-                  description: Specify whether or not you would like this route to
-                    be applied immediately, or simply written to the configuration
-                    to be applied later. Typically, if you are creating multiple routes
-                    at once it Is best to set this to false and apply the changes
-                    afterwards using the `/api/v1/routing/apply` endpoint.
-                  type: boolean
-                descr:
-                  default: ''
-                  description: Description for this route.
-                  type: string
-                disabled:
-                  default: false
-                  description: Disable this route.
-                  type: boolean
-                gateway:
-                  description: Name of the gateway traffic matching this route will
-                    use.
-                  type: string
-                id:
-                  description: ID of the static route to update. Refer to the 'Obtaining
-                    Object IDs' section in the documentation intro for help obtaining
-                    this ID.
-                  type: integer
-                network:
-                  description: IPv4 CIDR, IPv6 CIDR or network alias this route will
-                    apply to.
-                  type: string
-              required:
-                - id
-              type: object
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Update static route
-      tags:
-        - Routing > Static Route
-  /api/v1/services:
-    get:
-      description: 'Read available services.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Read all service statuses
-      tags:
-        - Services
-  /api/v1/services/ddns:
-    get:
-      description: 'Read configured dynamic DNS settings and statuses.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dynamicdnsclients`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Read dynamic DNS configuration
-      tags:
-        - Services > DDNS
-  /api/v1/services/dhcpd:
-    get:
-      description: 'Read the entire DHCP Server (dhcpd) configuration.<br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserverpage-services-dhcpserver`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Read DHCP Server (dhcpd) configuration
-      tags:
-        - Services > DHCPD
-    put:
-      description: 'Update the current DHCP Server (dhcpd) configuration for a specified
-        interface.<br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver`]'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                defaultleasetime:
-                  description: Default DHCP lease time. This must be a value of `60`
-                    or greater and must be less than `maxleasetime`. This field can
-                    be unset to the system default by passing in an empty string.
-                  oneOf:
-                    - type: string
-                    - type: integer
-                denyunknown:
-                  description: Deny unknown MAC addresses. If true, you must specify
-                    MAC addresses in the `mac_allow` field or add a static DHCP entry
-                    to receive DHCP requests.
-                  type: boolean
-                dnsserver:
-                  description: DNS servers to hand out in DHCP leases.
-                  items:
-                    type: string
-                  type: array
-                domain:
-                  description: Domain name to include in DHCP leass. This must be
-                    a valid domain name or an empty string to assume the system default.
-                  type: string
-                domainsearchlist:
-                  description: Search domains to include in DHCP leases. Each entry
-                    must be a valid domain name.
-                  items:
-                    type: string
-                  type: array
-                enable:
-                  description: Enable the DHCP server for this interface.
-                  type: boolean
-                gateway:
-                  description: Gateway to hand out in DHCP leases. This value must
-                    be a valid IPv4 address within the interface's subnet. This field
-                    can be unset to the system default by passing in an empty string.
-                  type: string
-                ignorebootp:
-                  description: Ignore BOOTP requests.
-                  type: boolean
-                interface:
-                  description: Interface of DHCP server configuration to update. You
-                    may specify either the interface's descriptive name, the pfSense
-                    ID (wan, lan, optx), or the real interface ID (e.g. igb0). This
-                    interface must host a static IPv4 subnet that has more than one
-                    available within the subnet.
-                  type: string
-                mac_allow:
-                  description: MAC addresses allowed to register DHCP leases.
-                  items:
-                    type: string
-                  type: array
-                mac_deny:
-                  description: MAC addresses denied from registering DHCP leases.
-                  items:
-                    type: string
-                  type: array
-                maxleasetime:
-                  description: Maximum DHCP lease time. This must be a value of `60`
-                    or greater and must be greater than `defaultleasetime`. This field
-                    can be unset to the system default by passing in an empty string.
-                  oneOf:
-                    - type: string
-                    - type: integer
-                numberoptions:
-                  description: Set DHCP options. This must be an array of option objects.
-                    See documentation for the /api/v1/services/dhcpd/options endpoint
-                    to object fields. To unset DHCP options, pass in an empty array.
-                  properties:
-                    number:
-                      type: integer
-                    type:
-                      type: string
-                    value:
-                      oneOf:
-                        - type: string
-                        - type: integer
-                        - type: boolean
-                  type: object
-                range_from:
-                  description: DHCP pool's starting IPv4 address. This must be an
-                    available address within the interface's subnet and be less than
-                    the `range_to` value. This field is required if no `range_from`
-                    value has been set previously.
-                  type: string
-                range_to:
-                  description: DHCP pool's ending IPv4 address. This must be an available
-                    address within the interface's subnet and be greater than the
-                    `range_from` value. This field is required if no `range_to` has
-                    been set previously.
-                  type: string
-                staticarp:
-                  description: Create a static ARP entry for DHCP leases on this interface.
-                  type: boolean
-              required:
-                - interface
-              type: object
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Update DHCP Server (dhcpd) configuration
-      tags:
-        - Services > DHCPD
-  /api/v1/services/dhcpd/lease:
-    get:
-      description: 'Read the current DHCP Server (dhcpd) leases.<br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-status-dhcpleases`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Read DHCP Server (dhcpd) leases
-      tags:
-        - Services > DHCPD > Lease
-  /api/v1/services/dhcpd/options:
-    post:
-      description: 'Set new DHCP Server (dhcpd) option.<br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver`]'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                interface:
-                  description: Interface to create the DHCP option for. You may specify
-                    either the interface's descriptive name, the pfSense ID (wan,
-                    lan, optx), or the real interface ID (e.g. igb0).
-                  type: string
-                number:
-                  description: DHCP option number to set. This must be a value between
-                    1 and 254.
-                  maximum: 254
-                  minimum: 1
-                  type: integer
-                type:
-                  description: DHCP option type.
-                  enum:
-                    - text
-                    - string
-                    - boolean
-                    - unsigned integer 8
-                    - unsigned integer 16
-                    - unsigned integer 32
-                    - signed integer 8
-                    - signed integer 16
-                    - signed integer 32
-                    - ip-address
-                  type: string
-                value:
-                  description: DHCP option's value. If `type` is set to `text`, this
-                    field must be string that does not contain quotations marks. If
-                    `type` is set to `string`, this field must be string enclosed
-                    in quotes or is a hexadecimal value. If `type` is set to `boolean`,
-                    this value must be `true` or `false` as a boolean OR `true`, `false`,
-                    `on` or `off` as a string. If `type` is set to `unsigned integer
-                    8`, this field must be an integer between `1` and `255`. If `type`
-                    is set to `unsigned integer 16`, this field must be an integer
-                    between `1` and `65535`. If `type` is set to `unsigned integer
-                    32`, this field must be an integer between `1` and `4294967295`.
-                    If `type` is set to `signed integer 8`, this field must be an
-                    integer between `-128` and `127`. If `type` is set to `signed
-                    integer 16`, this field must be an integer between `-32768` and
-                    `32767`. If `type` is set to `signed integer 32`, this field must
-                    be an integer between `-2147483648` and `2147483647`. If `type`
-                    is set to `ip-address`, this field must be a string containing
-                    a valid IPv4 address or hostname.
-                  oneOf:
-                    - type: string
-                    - type: integer
-                    - type: boolean
-              required:
-                - interface
-                - number
-                - type
-                - value
-              type: object
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Set DHCP Server (dhcpd) option
-      tags:
-        - Services > DHCPD > Options
-  /api/v1/services/dhcpd/restart:
-    post:
-      description: 'Restart the DHCP Server (dhcpd) service.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Restart DHCP Server (dhcpd) service
-      tags:
-        - Services > DHCPD
-  /api/v1/services/dhcpd/start:
-    post:
-      description: 'Start the DHCP Server (dhcpd) service.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Start DHCP Server (dhcpd) service
-      tags:
-        - Services > DHCPD
-  /api/v1/services/dhcpd/static_mapping:
-    delete:
-      description: 'Delete an existing DHCP Server (dhcpd) static mapping.<br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
-      parameters:
-        - description: ID of the static mapping to delete. Refer to the 'Obtaining Object
-            IDs' section in the documentation intro for help obtaining this ID.
-          in: query
-          name: id
-          required: true
-          schema:
-            type: integer
-        - description: Interface of the static mapping to delete. You may specify either
-            the interface's descriptive name, the pfSense interface ID (e.g. wan, lan,
-            optx), or the real interface ID (e.g. igb0).
-          in: query
-          name: interface
           required: true
           schema:
             type: string
@@ -7628,656 +7952,355 @@ paths:
           $ref: '#/components/responses/Success'
         401:
           $ref: '#/components/responses/AuthenticationFailed'
-      summary: Delete DHCP Server (dhcpd) static mapping
+      summary: Delete OpenVPN client specific override
       tags:
-        - Services > DHCPD > Static Mapping
+        - Services > OpenVPN > CSC
     get:
-      description: 'Read existing DHCP Server (dhcpd) static mappings.<br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
-      parameters:
-        - description: Interface to read static mappings from. You may specify either
-            the interface's descriptive name, the pfSense interface ID (e.g. wan, lan,
-            optx), or the real interface ID (e.g. igb0).
-          in: query
-          name: interface
-          required: true
-          schema:
-            type: string
       responses:
         200:
           $ref: '#/components/responses/Success'
         401:
           $ref: '#/components/responses/AuthenticationFailed'
-      summary: Read DHCP Server (dhcpd) static mappings
+      summary: Read OpenVPN client specific overrides
       tags:
-        - Services > DHCPD > Static Mapping
+        - Services > OpenVPN > CSC
     post:
-      description: 'Create a new DHCP Server (dhcpd) static mapping.<br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
       requestBody:
         content:
           application/json:
             schema:
               properties:
-                arp_table_static_entry:
+                block:
                   default: false
-                  description: Create a static ARP entry for this static mapping.
+                  description: Prevents the client from connecting to this server.
+                    Do not use this option to permanently disable a client due to
+                    a compromised key or password. Use a CRL (certificate revocation
+                    list) instead.
                   type: boolean
-                cid:
-                  description: Set a client identifier.
+                common_name:
+                  description: X.509 common name for the client certificate, or the
+                    username for VPNs utilizing password authentication. This match
+                    is case sensitive.
                   type: string
-                descr:
-                  description: Description for this mapping.
+                custom_options:
+                  description: Additional options to add for this client specific
+                    override, separated by a semicolon.
                   type: string
-                dnsserver:
-                  description: DNS servers to assign this client. Each value must
-                    be a valid IPv4 address.
-                  items:
-                    type: string
-                  type: array
-                domain:
-                  description: Domain for this host.
-                  type: string
-                domainsearchlist:
-                  description: Search domains to assign to this host. Each value must
-                    be a valid domain name.
-                  items:
-                    type: string
-                  type: array
-                gateway:
-                  description: Gateway to assign this host. This value must be a valid
-                    IPv4 address within the interface's subnet.
-                  type: string
-                hostname:
-                  description: Hostname for this host.
-                  type: string
-                interface:
-                  description: Interface to assign this static mapping to. You may
-                    specify either the interface's descriptive name, the pfSense interface
-                    ID (e.g. wan, lan, optx), or the real interface ID (e.g. igb0).
-                  type: string
-                ipaddr:
-                  description: IPv4 address the MAC address will be assigned.
-                  type: string
-                mac:
-                  description: MAC address of the host this mapping will apply to.
-                  type: string
-              required:
-                - interface
-                - mac
-                - ipaddr
-              type: object
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Create DHCP Server (dhcpd) static mapping
-      tags:
-        - Services > DHCPD > Static Mapping
-    put:
-      description: 'Update an existing DHCP Server (dhcpd) static mapping.<br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                arp_table_static_entry:
-                  default: false
-                  description: Create a static ARP entry for this static mapping.
-                  type: boolean
-                cid:
-                  description: Set a client identifier.
-                  type: string
-                descr:
-                  description: Description for this mapping.
-                  type: string
-                dnsserver:
-                  description: DNS servers to assign this client. Each value must
-                    be a valid IPv4 address.
-                  items:
-                    type: string
-                  type: array
-                domain:
-                  description: Domain for this host.
-                  type: string
-                domainsearchlist:
-                  description: Search domains to assign to this host. Each value must
-                    be a valid domain name.
-                  items:
-                    type: string
-                  type: array
-                gateway:
-                  description: Gateway to assign this host. This value must be a valid
-                    IPv4 address within the interface's subnet. You  may pass in an
-                    empty string to revert to the default gateway.
-                  type: string
-                hostname:
-                  description: Hostname for this host.
-                  type: string
-                id:
-                  description: ID of the static mapping to update. Refer to the 'Obtaining
-                    Object IDs' section in the documentation intro for help obtaining
-                    this ID.
-                  type: integer
-                interface:
-                  description: Interface of the static mapping to update. You may
-                    specify either the interface's descriptive name, the pfSense interface
-                    ID (e.g. wan, lan, optx), or the real interface ID (e.g. igb0).
-                  type: string
-                ipaddr:
-                  description: IPv4 address the MAC address will be assigned.
-                  type: string
-                mac:
-                  description: MAC address of the host this mapping will apply to.
-                  type: string
-              required:
-                - id
-                - interface
-              type: object
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Update DHCP Server (dhcpd) static mapping
-      tags:
-        - Services > DHCPD > Static Mapping
-  /api/v1/services/dhcpd/stop:
-    post:
-      description: 'Stop the DHCP Server (dhcpd) service.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Stop DHCP Server (dhcpd) service
-      tags:
-        - Services > DHCPD
-  /api/v1/services/dnsmasq:
-    get:
-      description: 'Read the entire DNS Forwarder (dnsmasq) configuration.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Read DNS Forwarder (dnsmasq) configuration
-      tags:
-        - Services > DNSMASQ
-  /api/v1/services/dnsmasq/apply:
-    post:
-      description: 'Apply pending DNS Forwarder (dnsmasq) changes.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Apply pending DNS Forwarder (dnsmasq) changes
-      tags:
-        - Services > DNSMASQ
-  /api/v1/services/dnsmasq/host_override:
-    delete:
-      description: 'Delete an existing host override from the DNS Forwarder (dnsmasq).<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
-      parameters:
-        - description: ID of the host override to delete. Refer to the 'Obtaining Object
-            IDs' section in the documentation intro for help obtaining this ID.
-          in: query
-          name: id
-          required: true
-          schema:
-            type: integer
-        - description: Specify whether or not you would like this host override to be
-            applied immediately, or simply written to the configuration to be applied
-            later. Typically, if you are modifying multiple host overrides at once it
-            Is best to set this to false and apply the changes afterwards using the
-            `/api/v1/services/dnsmasq/apply` endpoint.
-          in: query
-          name: apply
-          schema:
-            default: false
-            type: boolean
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Delete DNS Forwarder (dnsmasq) host override
-      tags:
-        - Services > DNSMASQ > Host Override
-    get:
-      description: 'Read host overrides from the DNS Forwarder (dnsmasq).<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Read DNS Forwarder (dnsmasq) host overrides
-      tags:
-        - Services > DNSMASQ > Host Override
-    post:
-      description: 'Add a new host override to the DNS Forwarder (dnsmasq).<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                aliases:
-                  default: []
-                  description: Host override aliases to associate with this host override.
-                    For more information on alias object fields, see documentation
-                    for /api/v1/services/dnsmasq/host_override/alias.
-                  items:
-                    type: object
-                  type: array
-                apply:
-                  default: false
-                  description: Specify whether or not you would like this host override
-                    to be applied immediately, or simply written to the configuration
-                    to be applied later. Typically, if you are modifying multiple
-                    host overrides at once it Is best to set this to false and apply
-                    the changes afterwards using the `/api/v1/services/dnsmasq/apply`
-                    endpoint.
-                  type: boolean
-                descr:
-                  description: Description of the host override.
-                  type: string
-                domain:
-                  description: Domain of the host override.
-                  type: string
-                host:
-                  description: Hostname of the host override.
-                  type: string
-                ip:
-                  description: IPv4 or IPv6 of the host override.
-                  type: string
-              required:
-                - host
-                - domain
-                - ip
-              type: object
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Create DNS Forwarder (dnsmasq) host override
-      tags:
-        - Services > DNSMASQ > Host Override
-    put:
-      description: 'Modify an existing host override from the DNS Forwarder (dnsmasq).<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                aliases:
-                  default: []
-                  description: Host override aliases to associate with this host override.
-                    For more information on alias object fields, see documentation
-                    for /api/v1/services/dnsmasq/host_override/alias. Existing entries
-                    will be overwritten.
-                  items:
-                    type: object
-                  type: array
-                apply:
-                  default: false
-                  description: Specify whether or not you would like this host override
-                    to be applied immediately, or simply written to the configuration
-                    to be applied later. Typically, if you are modifying multiple
-                    host overrides at once it Is best to set this to false and apply
-                    the changes afterwards using the `/api/v1/services/dnsmasq/apply`
-                    endpoint.
-                  type: boolean
-                descr:
-                  description: Description of the host override.
-                  type: string
-                domain:
-                  description: Domain of the host override.
-                  type: string
-                host:
-                  description: Hostname of the host override.
-                  type: string
-                id:
-                  description: ID of the host override to update. Refer to the 'Obtaining
-                    Object IDs' section in the documentation intro for help obtaining
-                    this ID.
-                  type: integer
-                ip:
-                  description: IPv4 or IPv6 of the host override.
-                  type: string
-              required:
-                - id
-              type: object
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Update DNS Forwarder (dnsmasq) host override
-      tags:
-        - Services > DNSMASQ > Host Override
-  /api/v1/services/dnsmasq/host_override/alias:
-    post:
-      description: 'Add a new host override alias to the DNS Forwarder (dnsmasq).<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                apply:
-                  default: false
-                  description: Specify whether or not you would like this host override
-                    alias to be applied immediately, or simply written to the configuration
-                    to be applied later. Typically, if you are creating multiple host
-                    override aliases at once it Is best to set this to false and apply
-                    the changes afterwards using the `/api/v1/services/dnsmasq/apply`
-                    endpoint.
-                  type: boolean
                 description:
-                  description: Description for the alias.
+                  default: ''
+                  description: Description for administrative reference.
                   type: string
-                domain:
-                  description: Domain of the alias
+                disable:
+                  default: false
+                  description: Disable this override without removing it.
+                  type: boolean
+                dns_domain:
+                  default: ''
+                  description: Domain name for DNS to provide to the client.
                   type: string
-                host:
-                  description: Hostname of the alias.
+                dns_servers:
+                  default: ''
+                  description: Comma-separated list of no more than 4 DNS server IP
+                    addresses (i.e. 8.8.8.8). Any more than the first four are ignored.
+                    This list is provided to the clent.
+                  type: string
+                local_network:
+                  default: ''
+                  description: 'IPv4 server-side networks that will be accessible
+                      from this particular client. Expressed as a comma-separated list
+                      of one or more CIDR networks.
+
+                      NOTE: Networks do not need to be specified here if they have already
+                      been defined on the main server configuration.'
+                  type: string
+                local_networkv6:
+                  default: ''
+                  description: 'IPv6 server-side networks that will be accessible
+                      from this particular client. Expressed as a comma-separated list
+                      of one or more IP/PREFIX networks.
+
+                      NOTE: Networks do not need to be specified here if they have already
+                      been defined on the main server configuration.'
+                  type: string
+                netbios_enable:
+                  default: false
+                  description: Enable NetBIOS over TCP/IP. If this option is not set,
+                    all NetBIOS-over-TCP/IP options (including WINS) will be disabled.
+                  type: boolean
+                netbios_node_type:
+                  description: 'Possible options: b (broadcasts), p (point-to-point
+                      name queries to a WINS server), m (broadcast then query name server),
+                      and h (query name server, then broadcast). This parameter takes
+                      a single letter either b, p, m, or h. Any other string will result
+                      in this option being set to none.'
+                  enum:
+                    - b
+                    - p
+                    - m
+                    - h
+                  type: string
+                netbios_scope:
+                  default: ''
+                  description: NetBIOS Scope ID provides an extended naming service
+                    for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS
+                    traffic on a single network to only those nodes with the same
+                    NetBIOS scope ID.
+                  type: string
+                ntp_servers:
+                  default: ''
+                  description: Comma-separated list of no more than 2 NTP server IP
+                    addresses. Any more than the first two are ignored.
+                  type: string
+                prevent_server_definitions:
+                  default: false
+                  description: Prevent this client from receiving any server-defined
+                    client settings.
+                  type: boolean
+                redirect_gateway:
+                  default: false
+                  description: Force all client generated traffic through the tunnel.
+                  type: boolean
+                remote_network:
+                  default: ''
+                  description: 'IPv4 client-side networks that will be routed to this
+                      client specifically using iroute, so that a site-to-site VPN can
+                      be established. Expressed as a comma-separated list of one or
+                      more CIDR ranges. May be left blank if there are no client-side
+                      networks to be routed.
+
+                      NOTE: Remember to add these subnets to the IPv4 Remote Networks
+                      list on the corresponding OpenVPN server settings.'
+                  type: string
+                remote_networkv6:
+                  default: ''
+                  description: 'IPv6 client-side networks that will be routed to this
+                      client specifically using iroute, so that a site-to-site VPN can
+                      be established. Expressed as a comma-separated list of one or
+                      more IP/PREFIX networks. May be left blank if there are no client-side
+                      networks to be routed.
+
+                      NOTE: Remember to add these subnets to the IPv6 Remote Networks
+                      list on the corresponding OpenVPN server settings.'
+                  type: string
+                remove_server_routes:
+                  default: false
+                  description: Prevent this client from receiving any server-defined
+                    routes without removing any other options.
+                  type: boolean
+                server_list:
+                  description: Comma separated string containing the ids of the OpenVPN
+                    servers that use this override. Omitting this activates the override
+                    for all servers.
+                  type: string
+                tunnel_network:
+                  default: ''
+                  description: 'Virtual IPv4 network used for private communications
+                      between this client and the server expressed using CIDR (e.g.
+                      10.0.8.5/24).
+
+                      With subnet topology, enter the client IP address and the subnet
+                      mask must match the IPv4 Tunnel Network on the server.
+
+                      With net30 topology, the first network address of the /30 is assumed
+                      to be the server address and the second network address will be
+                      assigned to the client.'
+                  type: string
+                tunnel_networkv6:
+                  default: ''
+                  description: 'Virtual IPv6 network used for private communications
+                      between this client and the server expressed using prefix (e.g.
+                      2001:db9:1:1::100/64).
+
+                      Enter the client IPv6 address and prefix. The prefix must match
+                      the IPv6 Tunnel Network prefix on the server.'
+                  type: string
+                wins_servers:
+                  default: ''
+                  description: Comma-separated list of no more than 2 WINS server
+                    IP addresses. Any more than the first two are ignored.
+                  type: string
+              required:
+                - common_name
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Create OpenVPN client specific override
+      tags:
+        - Services > OpenVPN > CSC
+    put:
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                block:
+                  default: false
+                  description: Prevents the client from connecting to this server.
+                    Do not use this option to permanently disable a client due to
+                    a compromised key or password. Use a CRL (certificate revocation
+                    list) instead.
+                  type: boolean
+                common_name:
+                  description: X.509 common name for the client certificate, or the
+                    username for VPNs utilizing password authentication. This match
+                    is case sensitive.
+                  type: string
+                custom_options:
+                  description: Additional options to add for this client specific
+                    override, separated by a semicolon.
+                  type: string
+                description:
+                  default: ''
+                  description: Description for administrative reference.
+                  type: string
+                disable:
+                  default: false
+                  description: Disable this override without removing it.
+                  type: boolean
+                dns_domain:
+                  default: ''
+                  description: Domain name for DNS to provide to the client.
+                  type: string
+                dns_servers:
+                  default: ''
+                  description: Comma-separated list of no more than 4 DNS server IP
+                    addresses (i.e. 8.8.8.8). Any more than the first four are ignored.
+                    This list is provided to the clent.
                   type: string
                 id:
-                  description: ID of the host override to apply this alias to. Refer
+                  description: ID of the client specific override to update. Refer
                     to the 'Obtaining Object IDs' section in the documentation intro
                     for help obtaining this ID.
-                  type: integer
+                  type: string
+                local_network:
+                  default: ''
+                  description: 'IPv4 server-side networks that will be accessible
+                      from this particular client. Expressed as a comma-separated list
+                      of one or more CIDR networks.
+
+                      NOTE: Networks do not need to be specified here if they have already
+                      been defined on the main server configuration.'
+                  type: string
+                local_networkv6:
+                  default: ''
+                  description: 'IPv6 server-side networks that will be accessible
+                      from this particular client. Expressed as a comma-separated list
+                      of one or more IP/PREFIX networks.
+
+                      NOTE: Networks do not need to be specified here if they have already
+                      been defined on the main server configuration.'
+                  type: string
+                netbios_enable:
+                  default: false
+                  description: Enable NetBIOS over TCP/IP. If this option is not set,
+                    all NetBIOS-over-TCP/IP options (including WINS) will be disabled.
+                  type: boolean
+                netbios_node_type:
+                  description: 'Possible options: b (broadcasts), p (point-to-point
+                      name queries to a WINS server), m (broadcast then query name server),
+                      and h (query name server, then broadcast). This parameter takes
+                      a single letter either b, p, m, or h. Any other string will result
+                      in this option being set to none.'
+                  enum:
+                    - b
+                    - p
+                    - m
+                    - h
+                  type: string
+                netbios_scope:
+                  default: ''
+                  description: NetBIOS Scope ID provides an extended naming service
+                    for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS
+                    traffic on a single network to only those nodes with the same
+                    NetBIOS scope ID.
+                  type: string
+                ntp_servers:
+                  default: ''
+                  description: Comma-separated list of no more than 2 NTP server IP
+                    addresses. Any more than the first two are ignored.
+                  type: string
+                prevent_server_definitions:
+                  default: false
+                  description: Prevent this client from receiving any server-defined
+                    client settings.
+                  type: boolean
+                redirect_gateway:
+                  default: false
+                  description: Force all client generated traffic through the tunnel.
+                  type: boolean
+                remote_network:
+                  default: ''
+                  description: 'IPv4 client-side networks that will be routed to this
+                      client specifically using iroute, so that a site-to-site VPN can
+                      be established. Expressed as a comma-separated list of one or
+                      more CIDR ranges. May be left blank if there are no client-side
+                      networks to be routed.
+
+                      NOTE: Remember to add these subnets to the IPv4 Remote Networks
+                      list on the corresponding OpenVPN server settings.'
+                  type: string
+                remote_networkv6:
+                  default: ''
+                  description: 'IPv6 client-side networks that will be routed to this
+                      client specifically using iroute, so that a site-to-site VPN can
+                      be established. Expressed as a comma-separated list of one or
+                      more IP/PREFIX networks. May be left blank if there are no client-side
+                      networks to be routed.
+
+                      NOTE: Remember to add these subnets to the IPv6 Remote Networks
+                      list on the corresponding OpenVPN server settings.'
+                  type: string
+                remove_server_routes:
+                  default: false
+                  description: Prevent this client from receiving any server-defined
+                    routes without removing any other options.
+                  type: boolean
+                server_list:
+                  description: Comma separated string containing the ids of the OpenVPN
+                    servers that use this override. Omitting this activates the override
+                    for all servers.
+                  type: string
+                tunnel_network:
+                  default: ''
+                  description: 'Virtual IPv4 network used for private communications
+                      between this client and the server expressed using CIDR (e.g.
+                      10.0.8.5/24).
+
+                      With subnet topology, enter the client IP address and the subnet
+                      mask must match the IPv4 Tunnel Network on the server.
+
+                      With net30 topology, the first network address of the /30 is assumed
+                      to be the server address and the second network address will be
+                      assigned to the client.'
+                  type: string
+                tunnel_networkv6:
+                  default: ''
+                  description: 'Virtual IPv6 network used for private communications
+                      between this client and the server expressed using prefix (e.g.
+                      2001:db9:1:1::100/64).
+
+                      Enter the client IPv6 address and prefix. The prefix must match
+                      the IPv6 Tunnel Network prefix on the server.'
+                  type: string
+                wins_servers:
+                  default: ''
+                  description: Comma-separated list of no more than 2 WINS server
+                    IP addresses. Any more than the first two are ignored.
+                  type: string
               required:
                 - id
-                - host
-                - domain
               type: object
       responses:
         200:
           $ref: '#/components/responses/Success'
         401:
           $ref: '#/components/responses/AuthenticationFailed'
-      summary: Create DNS Forwarder (dnsmasq) host override alias
+      summary: Update OpenVPN client specific override
       tags:
-        - Services > DNSMASQ > Host Override > Alias
-  /api/v1/services/dnsmasq/restart:
-    post:
-      description: 'Restart the DNS Forwarder (dnsmasq) service.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Restart DNS Forwarder (dnsmasq) service
-      tags:
-        - Services > DNSMASQ
-  /api/v1/services/dnsmasq/start:
-    post:
-      description: 'Start the DNS Forwarder (dnsmasq) service.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Start DNS Forwarder (dnsmasq) service
-      tags:
-        - Services > DNSMASQ
-  /api/v1/services/dnsmasq/stop:
-    post:
-      description: 'Stop the DNS Forwarder (dnsmasq) service.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Stop DNS Forwarder (dnsmasq) service
-      tags:
-        - Services > DNSMASQ
-  /api/v1/services/dpinger/restart:
-    post:
-      description: 'Restart the Gateway Monitoring (dpinger) service.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Restart Gateway Monitoring (dpinger) service
-      tags:
-        - Services > DPINGER
-  /api/v1/services/dpinger/start:
-    post:
-      description: 'Start the Gateway Monitoring (dpinger) service.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Start Gateway Monitoring (dpinger) service
-      tags:
-        - Services > DPINGER
-  /api/v1/services/dpinger/stop:
-    post:
-      description: 'Stop the Gateway Monitoring (dpinger) service.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Stop Gateway Monitoring (dpinger) service
-      tags:
-        - Services > DPINGER
-  /api/v1/services/ntpd:
-    get:
-      description: 'Read the NTP (ntpd) service configuration.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Read NTP (ntpd) service
-      tags:
-        - Services > NTPD
-    put:
-      description: 'Update the NTP (ntpd) service configuration.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                clockstats:
-                  description: Enable logging of reference clock statistics.
-                  type: boolean
-                interface:
-                  description: Update the interfaces NTP will listen on. You may specify
-                    either the physical Interface ID, the pfSense Interface ID or
-                    the descriptive Interface name. To match any interface, you may
-                    pass in an empty array.
-                  items:
-                    type: string
-                  type: array
-                leapsec:
-                  description: Update the leap seconds configuration. This should
-                    be the contents of the leap seconds file received from the IERS.
-                  type: string
-                logpeer:
-                  description: Enable logging of peer messages.
-                  type: boolean
-                logsys:
-                  description: Enable logging of system messages.
-                  type: boolean
-                loopstats:
-                  description: Enable logging of clock discipline statistics.
-                  type: boolean
-                orphan:
-                  description: Update the orphan mode value. This must be a value
-                    between `1` and `15`. Orphan mode allows the system clock to be
-                    used when no other clocks are available. The number here specifies
-                    the stratum reported during orphan mode and should normally be
-                    set to a number high enough to insure that any other servers available
-                    to clients are preferred over this server.
-                  maximum: 15
-                  minimum: 1
-                  type: integer
-                peerstats:
-                  description: Enable logging of NTP peer statistics.
-                  type: boolean
-                statsgraph:
-                  description: Enable RRD graphs of NTP metrics.
-                  type: boolean
-                time_servers:
-                  description: Update the time servers used by the system. Each object
-                    may use the parameters available in the /api/v1/services/ntpd/time_server
-                    endpoint. To revert to the default timeserver, you may pass in
-                    an  empty array. Existing values will be overwritten.
-                  items:
-                    type: object
-                  type: array
-              type: object
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Update NTP (ntpd) service
-      tags:
-        - Services > NTPD
-  /api/v1/services/ntpd/restart:
-    post:
-      description: 'Restart the NTP (ntpd) service.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Restart NTP (ntpd) Service
-      tags:
-        - Services > NTPD
-  /api/v1/services/ntpd/start:
-    post:
-      description: 'Start the NTP (ntpd) service.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Start NTP (ntpd) service
-      tags:
-        - Services > NTPD
-  /api/v1/services/ntpd/stop:
-    post:
-      description: 'Stop the NTP (ntpd) service.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Stop NTP (ntpd) Service
-      tags:
-        - Services > NTPD
-  /api/v1/services/ntpd/time_server:
-    delete:
-      description: 'Delete an existing NTP time server from the NTP (ntpd) configuration.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
-      parameters:
-        - description: IP or hostname of the NTP time server to delete. If more than
-            one time server exists with this value, only the first match will be deleted.
-            In the case that the last remaining time server was deleted, the default
-            time server `pool.ntp.org` will be written.
-          in: query
-          name: timeserver
-          required: true
-          schema:
-            type: string
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Delete NTP (ntpd) time server
-      tags:
-        - Services > NTPD > Time Server
-    post:
-      description: 'Add a new NTP time server to the NTP (ntpd) configuration.<br><br>
-
-        _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
-      requestBody:
-        content:
-          application/json:
-            schema:
-              properties:
-                ispool:
-                  default: false
-                  description: Specify whether or not this time server represents
-                    an NTP server pool or a single NTP server.
-                  type: boolean
-                noselect:
-                  default: false
-                  description: Prevent this NTP server from being selected for time.
-                  type: boolean
-                prefer:
-                  default: false
-                  description: Set this NTP time server as a preferred NTP time server.
-                    If `true`, this time server will take preference over other time
-                    servers.
-                  type: boolean
-                timeserver:
-                  description: IP or hostname of the NTP time server to add.
-                  type: string
-              required:
-                - timeserver
-              type: object
-      responses:
-        200:
-          $ref: '#/components/responses/Success'
-        401:
-          $ref: '#/components/responses/AuthenticationFailed'
-      summary: Add NTP (ntpd) time server
-      tags:
-        - Services > NTPD > Time Server
+        - Services > OpenVPN > CSC
   /api/v1/services/restart:
     post:
       description: 'Restart available services.<br><br>
@@ -8685,10 +8708,32 @@ paths:
       tags:
         - Services > Unbound > Access List > Row
   /api/v1/services/unbound/apply:
+    get:
+      description: 'Check the DNS Resolver (Unbound) apply status.<br><br>
+
+            _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Poll DNS Resolver (Unbound) apply status
+      tags:
+        - Services > Unbound > Apply
     post:
       description: 'Apply pending DNS Resolver (Unbound) changes.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                async:
+                  default: false
+                  description: "Apply Unbound changes in the background. The Unbound reload status can be polled using
+                  a GET request to /api/v1/services/unbound/apply."
+                  type: boolean
       responses:
         200:
           $ref: '#/components/responses/Success'
@@ -8696,7 +8741,7 @@ paths:
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Apply pending DNS Resolver (Unbound) changes
       tags:
-        - Services > Unbound
+        - Services > Unbound > Apply
   /api/v1/services/unbound/host_override:
     delete:
       description: 'Delete host overrides from the DNS Resolver (Unbound).<br><br>
@@ -9223,7 +9268,7 @@ paths:
                     - jwt
                     - token
                   type: string
-                available_interfaces:
+                allowed_interfaces:
                   description: Interfaces that are allowed to answer API requests.
                     Each item in the array must be a valid real interface ID (e.g.
                     `em0`), pfSense interface ID, (e.g. `opt1`), or descriptive interface
@@ -10824,7 +10869,7 @@ paths:
                   description: "Name of the group."
                   type: string
                   minLength: 1
-                  maxLength: 16
+                  maxLength: 64
                 scope:
                   description: "Scope of the group."
                   type: string
@@ -10873,7 +10918,7 @@ paths:
                   description: "New name of the group."
                   type: string
                   minLength: 1
-                  maxLength: 16
+                  maxLength: 64
                 scope:
                   description: "Scope of the group."
                   type: string
@@ -11100,6 +11145,7 @@ tags:
   - name: Services > OpenVPN > Server
   - name: Services > OpenVPN > CSC
   - name: Services > Unbound
+  - name: Services > Unbound > Apply
   - name: Services > Unbound > Access List
   - name: Services > Unbound > Access List > Row
   - name: Services > Unbound > Host Override
@@ -11120,4 +11166,3 @@ tags:
   - name: Services > DDNS
   - name: Services > WOL
   - name: Diagnostics > Command Prompt
-
