@@ -26,8 +26,17 @@ class APIInterfaceApplyCreate extends APIModel {
     }
 
     public function action() {
-        $this->apply();
-        return APIResponse\get(0);
+        # Check if the client requested asynchronous application
+        if ($this->initial_data["async"] === true) {
+            $this->apply_async();
+            return APIResponse\get(14);
+        }
+        # Otherwise, apply interfaces in sequence
+        else {
+            $this->apply();
+            return APIResponse\get(0);
+        }
+
     }
 
     # Write the pending changes to a serialized file to apply later
@@ -138,5 +147,11 @@ class APIInterfaceApplyCreate extends APIModel {
         # After all is said and done, clear the interface subsystem status and remove the pending interface change file
         clear_subsystem_dirty('interfaces');
         @unlink($g['tmp_path']."/.interfaces.apply");
+    }
+
+    # Apply interfaces asynchronously
+    public static function apply_async() {
+        # Execute the helper script asynchronously.
+        shell_exec("nohup php -f /usr/local/share/pfSense-pkg-API/scripts/apply_interfaces.php > /dev/null &");
     }
 }

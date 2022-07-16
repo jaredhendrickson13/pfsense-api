@@ -103,6 +103,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Failed to connect to upstream package repositories",
         ],
+        14 => [
+            "status" => "accepted",
+            "code" => 202,
+            "return" => $id,
+            "message" => "Request was successful and is processing in the background",
+        ],
 
         // 1000-1999 reserved for /system API calls
         1000 => [
@@ -1968,6 +1974,48 @@ function get($id, $data=[], $all=false) {
             "code" => 400,
             "return" => $id,
             "message" => "Interface bridge cannot be deleted while it's in use"
+        ],
+        3074 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface group member must be a valid interface"
+        ],
+        3075 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface group name must consist of only letters (A-Z), digits (0-9) and underscores '_'"
+        ],
+        3076 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface group name is already in use by an interface"
+        ],
+        3077 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface group already exists"
+        ],
+        3078 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface group name too long, max 15 characters allowed"
+        ],
+        3079 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface group id is required"
+        ],
+        3080 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface group does not exist"
         ],
 
         // 4000-4999 reserved for /firewall API calls

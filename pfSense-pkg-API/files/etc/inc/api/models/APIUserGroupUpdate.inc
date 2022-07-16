@@ -35,8 +35,8 @@ class APIUserGroupUpdate extends APIModel {
     public function validate_payload() {
         # Validate input fields
         $this->__validate_id();
+        $this->__validate_scope();    # This must be validated before 'name' for conditional char length
         $this->__validate_name();
-        $this->__validate_scope();
         $this->__validate_description();
         $this->__validate_member();
         $this->__validate_priv();
@@ -60,10 +60,13 @@ class APIUserGroupUpdate extends APIModel {
     }
 
     private function __validate_name() {
+        # Variables
+        $max_length = ($this->validated_data["scope"] === "remote") ? 64 : 16;
+
         # Validate the optional 'name' field
         if (isset($this->initial_data["name"])) {
-            # Ensure group name is 16 characters or less
-            if (strlen($this->initial_data["name"]) >= 1 and strlen($this->initial_data["name"]) <= 16) {
+            # Ensure group name length is within range
+            if (strlen($this->initial_data["name"]) >= 1 and strlen($this->initial_data["name"]) <= $max_length) {
                 # Ensure group name is not already in use
                 if (!$this->is_existing_group($this->initial_data["name"])) {
                     # Ensure group name does not use invalid characters
