@@ -50,10 +50,10 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                 }                 
             }
             if (empty($this->validated_data["vpnid"])) {
-                $this->errors[] = APIResponse\get(2134);
+                $this->errors[] = APIResponse\get(2139);
             }
         } else {
-            $this->errors[] = APIResponse\get(2135);
+            $this->errors[] = APIResponse\get(2140);
         }
     }
 
@@ -66,7 +66,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             if (in_array($this->initial_data["mode"], $key_types)) {
                 $this->validated_data["mode"] = $this->initial_data["mode"];
             } else {
-                $this->errors[] = APIResponse\get(2099);
+                $this->errors[] = APIResponse\get(2104);
             }
         }
     }
@@ -87,7 +87,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             if (in_array(strtoupper($this->initial_data["protocol"]), $key_types)) {
                 $this->validated_data["protocol"] = strtoupper($this->initial_data["protocol"]);  
             } else {
-                $this->errors[] = APIResponse\get(2100);
+                $this->errors[] = APIResponse\get(2105);
             }
         }
     }
@@ -101,7 +101,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             if (in_array($this->initial_data["dev_mode"], $key_types)) {
                 $this->validated_data["dev_mode"] = $this->initial_data["dev_mode"];  
             } else {
-                $this->errors[] = APIResponse\get(2101);
+                $this->errors[] = APIResponse\get(2106);
             }
         }
     }
@@ -161,7 +161,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             }
 
             if (!$match) {
-                $this->errors[] = APIResponse\get(2102);
+                $this->errors[] = APIResponse\get(2107);
             }
         }
     }
@@ -173,10 +173,10 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                 if (openvpn_port_used($this->validated_data["protocol"], $this->validated_data["interface"], $this->initial_data["local_port"], 0) == 0) {
                     $this->validated_data["local_port"] = $this->initial_data["local_port"];
                 } else {
-                    $this->errors[] = APIResponse\get(2103);
+                    $this->errors[] = APIResponse\get(2108);
                 }
             } else {
-                $this->errors[] = APIResponse\get(2103);
+                $this->errors[] = APIResponse\get(2108);
             }
         }
     }
@@ -222,7 +222,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                 if (in_array($this->initial_data["tls_type"], $key_types)) {
                     $this->validated_data["tls_type"] = $this->initial_data["tls_type"];  
                 } else {
-                    $this->errors[] = APIResponse\get(2104);
+                    $this->errors[] = APIResponse\get(2109);
                 }
             }
         } else {
@@ -253,7 +253,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                             break;
                     } 
                 } else {
-                    $this->errors[] = APIResponse\get(2105);
+                    $this->errors[] = APIResponse\get(2110);
                 }
             }
         } else {
@@ -284,7 +284,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             }
 
             if ($this->validated_data["caref"] !== $this->initial_data["caref"]) {
-                $this->errors[] = APIResponse\get(2137);
+                $this->errors[] = APIResponse\get(2142);
             }
         }
     }
@@ -301,7 +301,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                     }
 
                     if ((empty($this->validated_data["crlref"])) or ($this->validated_data["crlref"] !== $this->initial_data["crlref"])) {
-                        $this->errors[] = APIResponse\get(2132);
+                        $this->errors[] = APIResponse\get(2137);
                     }
                 }
             }
@@ -338,7 +338,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             }
 
             if ($this->validated_data["certref"] !== $this->initial_data["certref"]) {
-                $this->errors[] = APIResponse\get(2138);
+                $this->errors[] = APIResponse\get(2143);
             }
         } 
     }
@@ -356,7 +356,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                     $this->validated_data["dh_length"] = $this->initial_data["dh_length"];
                 }
             } else {
-                $this->errors[] = APIResponse\get(2106);
+                $this->errors[] = APIResponse\get(2111);
             }
         }
     }
@@ -370,7 +370,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             if (in_array($this->initial_data["ecdh_curve"], $key_types)) {
                 $this->validated_data["ecdh_curve"] = $this->initial_data["ecdh_curve"];
             } else {
-                $this->errors[] = APIResponse\get(2107);
+                $this->errors[] = APIResponse\get(2112);
             }
         }
     }
@@ -403,7 +403,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                         break;
                 } 
             } else {
-                $this->errors[] = APIResponse\get(2108);
+                $this->errors[] = APIResponse\get(2113);
             }
         }
     }
@@ -430,7 +430,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             $counter = 1;
             foreach ($data_ciphers as $cipher) {
                 if (!array_key_exists($cipher, openvpn_get_cipherlist())) {
-                    $this->errors[] = APIResponse\get(2133);
+                    $this->errors[] = APIResponse\get(2138);
                 } elseif ($counter > 19) {
                     break;
                 } else {
@@ -447,7 +447,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             if (array_key_exists($this->initial_data["data_ciphers_fallback"], openvpn_get_cipherlist())) {
                 $this->validated_data["data_ciphers_fallback"] = $this->initial_data["data_ciphers_fallback"];
             } else {
-                $this->errors[] = APIResponse\get(2109);
+                $this->errors[] = APIResponse\get(2114);
             }
         }
     }
@@ -461,7 +461,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             if (in_array($this->initial_data["digest"], $key_types)) {
                 $this->validated_data["digest"] = $this->initial_data["digest"];
             } else {
-                $this->errors[] = APIResponse\get(2110);
+                $this->errors[] = APIResponse\get(2115);
             }
         }
     }
@@ -472,7 +472,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             if (array_key_exists($this->initial_data["engine"], openvpn_get_engines())) {
                 $this->validated_data["engine"] = $this->initial_data["engine"];
             } else {
-                $this->errors[] = APIResponse\get(2111);
+                $this->errors[] = APIResponse\get(2116);
             }
         }
     }
@@ -484,10 +484,10 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                 if (!openvpn_is_tunnel_network_in_use($this->initial_data['tunnel_network'])) {
                     $this->validated_data["tunnel_network"] = $this->initial_data['tunnel_network'];
                 } else {
-                    $this->errors[] = APIResponse\get(2112);
+                    $this->errors[] = APIResponse\get(2117);
                 }
             } else {
-                $this->errors[] = APIResponse\get(2112);
+                $this->errors[] = APIResponse\get(2117);
             }
         }
     }
@@ -499,10 +499,10 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                 if (!openvpn_is_tunnel_network_in_use($this->initial_data['tunnel_networkv6'])) {
                     $this->validated_data["tunnel_networkv6"] = $this->initial_data['tunnel_networkv6'];
                 } else {
-                    $this->errors[] = APIResponse\get(2112);
+                    $this->errors[] = APIResponse\get(2117);
                 }
             } else {
-                $this->errors[] = APIResponse\get(2112);
+                $this->errors[] = APIResponse\get(2117);
             }
         }
     }
@@ -545,7 +545,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             } 
             
             if (!$match) {
-                $this->errors[] = APIResponse\get(2141);
+                $this->errors[] = APIResponse\get(2146);
             }
         }
     }
@@ -569,7 +569,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             if ((isset($this->initial_data['serverbridge_dhcp_start'])) and (is_ipaddrv4($this->initial_data['serverbridge_dhcp_start'])) and (isset($this->initial_data['serverbridge_dhcp_end']))) {
                 $this->validated_data["serverbridge_dhcp_start"] = $this->initial_data['serverbridge_dhcp_start'];
             } else {
-                $this->errors[] = APIResponse\get(2143);
+                $this->errors[] = APIResponse\get(2148);
             }
         }
     }
@@ -579,7 +579,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             if ((isset($this->initial_data['serverbridge_dhcp_end'])) and (is_ipaddrv4($this->initial_data['serverbridge_dhcp_end'])) and (isset($this->initial_data['serverbridge_dhcp_start']))) {
                 $this->validated_data["serverbridge_dhcp_end"] = $this->initial_data['serverbridge_dhcp_end'];
             } else {
-                $this->errors[] = APIResponse\get(2143);
+                $this->errors[] = APIResponse\get(2148);
             }
         }
     }
@@ -590,7 +590,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             if (!openvpn_validate_cidr($this->initial_data['remote_network'], "", true, "ipv4")) {
                 $this->validated_data["remote_network"] = $this->initial_data['remote_network'];
             } else {
-                $this->errors[] = APIResponse\get(2113);
+                $this->errors[] = APIResponse\get(2118);
             }
         }
     }
@@ -601,7 +601,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             if (!openvpn_validate_cidr($this->initial_data['remote_networkv6'], "", true, "ipv6") === false) {
                 $this->validated_data["remote_networkv6"] = $this->initial_data['remote_networkv6'];
             } else {
-                $this->errors[] = APIResponse\get(2113);
+                $this->errors[] = APIResponse\get(2118);
             }
         }
     }
@@ -632,7 +632,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                 if (!openvpn_validate_cidr($this->initial_data['local_network'], "", true, "ipv4")) {
                     $this->validated_data["local_network"] = $this->initial_data['local_network'];
                 } else {
-                    $this->errors[] = APIResponse\get(2114);
+                    $this->errors[] = APIResponse\get(2119);
                 }
             }
         } else {
@@ -646,7 +646,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                 if (!openvpn_validate_cidr($this->initial_data['local_networkv6'], "", true, "ipv6")) {
                     $this->validated_data["local_networkv6"] = $this->initial_data['local_networkv6'];
                 } else {
-                    $this->errors[] = APIResponse\get(2114);
+                    $this->errors[] = APIResponse\get(2119);
                 }
             }
         } else {
@@ -659,7 +659,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             if (is_numericint($this->initial_data['concurrent_connections']) and (int) $this->initial_data['concurrent_connections'] > 0) {
                 $this->validated_data["maxclients"] = $this->initial_data['concurrent_connections'];
             } else {
-                $this->errors[] = APIResponse\get(2128);
+                $this->errors[] = APIResponse\get(2133);
             }
         }
     }
@@ -673,7 +673,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             if (in_array($this->initial_data["allow_compression"], $key_types)) {
                 $this->validated_data["allow_compression"] = $this->initial_data["allow_compression"];
             } else {
-                $this->errors[] = APIResponse\get(2115);
+                $this->errors[] = APIResponse\get(2120);
             }
         }
     }
@@ -688,7 +688,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                 if (in_array($this->initial_data["compression"], $key_types)) {
                     $this->validated_data["compression"] = $this->initial_data["compression"];
                 } else {
-                    $this->errors[] = APIResponse\get(2116);
+                    $this->errors[] = APIResponse\get(2121);
                 }
             }
         # Assume default if none was specified
@@ -751,7 +751,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             if (in_array($this->initial_data["topology"], $key_types)) {
                 $this->validated_data["topology"] = $this->initial_data["topology"];
             } else {
-                $this->errors[] = APIResponse\get(2117);
+                $this->errors[] = APIResponse\get(2122);
             }
         }
     }
@@ -791,7 +791,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                 $this->validated_data["inactive_seconds"] = $this->initial_data['inactive_seconds'];
             # Assume default if none was specified
             } else {
-                $this->errors[] = APIResponse\get(2129);
+                $this->errors[] = APIResponse\get(2134);
             }
         }
     }
@@ -805,7 +805,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             if (in_array($this->initial_data["ping_method"], $key_types)) {
                 $this->validated_data["ping_method"] = $this->initial_data["ping_method"];
             } else {
-                $this->errors[] = APIResponse\get(2118);
+                $this->errors[] = APIResponse\get(2123);
             }
         }
     }
@@ -816,7 +816,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                 if (is_numericint($this->initial_data['keepalive_interval']) and ((int) $this->initial_data['keepalive_interval'] >= 0)) {
                     $this->validated_data["keepalive_interval"] = $this->initial_data['keepalive_interval'];
                 } else {
-                    $this->errors[] = APIResponse\get(2119);
+                    $this->errors[] = APIResponse\get(2124);
                 }
             }
         # Assume default if none was specified
@@ -831,7 +831,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                 if (is_numericint($this->initial_data['keepalive_timeout']) and ((int) $this->initial_data['keepalive_timeout'] >= 0)) {
                     $this->validated_data["keepalive_timeout"] = $this->initial_data['keepalive_timeout'];
                 } else {
-                    $this->errors[] = APIResponse\get(2120);
+                    $this->errors[] = APIResponse\get(2125);
                 }
             }
         # Assume default if none was specified
@@ -846,7 +846,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                 if (is_numericint($this->initial_data['ping_seconds']) and ((int) $this->initial_data['ping_seconds'] >= 0)) {
                     $this->validated_data["ping_seconds"] = $this->initial_data['ping_seconds'];
                 } else {
-                    $this->errors[] = APIResponse\get(2121);
+                    $this->errors[] = APIResponse\get(2126);
                 }
             }
         # Assume default if none was specified
@@ -861,7 +861,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                 if (is_numericint($this->initial_data['ping_action_seconds']) and ((int) $this->initial_data['ping_action_seconds'] >= 0)) {
                     $this->validated_data["ping_action_seconds"] = $this->initial_data['ping_action_seconds'];
                 } else {
-                    $this->errors[] = APIResponse\get(2122);
+                    $this->errors[] = APIResponse\get(2127);
                 }
             }
         # Assume default if none was specified
@@ -907,7 +907,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                     $this->validated_data["ping_action"] = $this->initial_data["ping_action"];
                 }
                 else {
-                    $this->errors[] = APIResponse\get(2123);
+                    $this->errors[] = APIResponse\get(2128);
                 }
             }
         # Assume default if none was specified
@@ -954,7 +954,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                         break;
                 } 
             } else {
-                $this->errors[] = APIResponse\get(2124);
+                $this->errors[] = APIResponse\get(2129);
             }
         }
     }
@@ -990,7 +990,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                         break;
                 }
             } else {
-                $this->errors[] = APIResponse\get(2125);
+                $this->errors[] = APIResponse\get(2130);
             }
         }
     }
@@ -1014,7 +1014,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                     $this->validated_data["ntp_server" . $counter] = str_replace(" ", "", $server);
                     $counter += 1;
                 } else {
-                    $this->errors[] = APIResponse\get(2144);
+                    $this->errors[] = APIResponse\get(2149);
                 } 
             }
         }
@@ -1069,7 +1069,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                         break;
                 } 
             } else {
-                $this->errors[] = APIResponse\get(2126);
+                $this->errors[] = APIResponse\get(2131);
             }
         }
     }
@@ -1083,7 +1083,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
             } elseif ($this->initial_data['verbosity_level'] == "default") {
                 $this->validated_data["verbosity_level"] = "1";
             } else {
-                $this->errors[] = APIResponse\get(2127);
+                $this->errors[] = APIResponse\get(2132);
             }
         }
     }
@@ -1099,12 +1099,11 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
                     $this->validated_data["wins_server" . $counter] = str_replace(" ", "", $server);
                     $counter += 1;
                 }  else {
-                    $this->errors[] = APIResponse\get(2144);
+                    $this->errors[] = APIResponse\get(2151);
                 }
             }
         }
     }
-
 
     // TODO: Validate nbdd servers is not yet available
     private function __validate_nbdd_server() {
