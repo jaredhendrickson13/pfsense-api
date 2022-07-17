@@ -101,7 +101,7 @@ class MakePackage:
         self.run_ssh_cmd(" && ".join(build_cmds))
 
         # Retrieve the built package
-        src = "{u}@{h}:~/build/pfsense-api/pfSense-pkg-API/work/pkg/pfSense-pkg-API-{v}{r}.txz"
+        src = "{u}@{h}:~/build/pfsense-api/pfSense-pkg-API/work/pkg/pfSense-pkg-API-{v}{r}.pkg"
         src = src.format(
             u=self.args.username,
             h=self.args.host,
