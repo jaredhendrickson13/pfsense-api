@@ -101,24 +101,14 @@ class MakePackage:
         self.run_ssh_cmd(" && ".join(build_cmds))
 
         # Retrieve the built package
-        if self.args.freebsd == 11:
-            src = "{u}@{h}:~/build/pfsense-api/pfSense-pkg-API/pfSense-pkg-API-{v}{r}.txz"
-            src = src.format(
-                u=self.args.username,
-                h=self.args.host,
-                v=self.port_version,
-                r="_" + self.port_revision if self.port_revision != "0" else ""
-            )
-            self.run_scp_cmd(src, ".")
-        else:
-            src = "{u}@{h}:~/build/pfsense-api/pfSense-pkg-API/work/pkg/pfSense-pkg-API-{v}{r}.txz"
-            src = src.format(
-                u=self.args.username,
-                h=self.args.host,
-                v=self.port_version,
-                r="_" + self.port_revision if self.port_revision != "0" else ""
-            )
-            self.run_scp_cmd(src, ".")
+        src = "{u}@{h}:~/build/pfsense-api/pfSense-pkg-API/work/pkg/pfSense-pkg-API-{v}{r}.txz"
+        src = src.format(
+            u=self.args.username,
+            h=self.args.host,
+            v=self.port_version,
+            r="_" + self.port_revision if self.port_revision != "0" else ""
+        )
+        self.run_scp_cmd(src, ".")
 
     def __start_argparse__(self):
         # Custom port type for argparse
@@ -150,13 +140,6 @@ class MakePackage:
             type=str,
             required=True if "--remote" in sys.argv or "-r" in sys.argv else False,
             help="The host to connect to when using --build mode"
-        )
-        parser.add_argument(
-            '--freebsd', '-f',
-            dest="freebsd",
-            type=int,
-            default=12,
-            help="The version of FreeBSD running on the remote host"
         )
         parser.add_argument(
             '--branch', '-b',
