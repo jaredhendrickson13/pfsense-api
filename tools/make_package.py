@@ -29,7 +29,7 @@ class MakePackage:
         self.port_revision = self.args.tag.split(".")[2]
 
         # Run tasks for build mode
-        if self.args.build:
+        if self.args.host:
             self.build_on_remote_host()
         else:
             self.generate_makefile()
@@ -161,13 +161,6 @@ class MakePackage:
             type=tag,
             required=True,
             help="The version tag to use when building."
-        )
-        parser.add_argument(
-            '--remote', '-r',
-            dest="build",
-            action="store_true",
-            required=False,
-            help='Enable remote build mode'
         )
         self.args = parser.parse_args()
 
