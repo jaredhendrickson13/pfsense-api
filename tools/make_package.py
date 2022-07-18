@@ -29,7 +29,7 @@ class MakePackage:
         self.port_revision = self.args.tag.split(".")[2]
 
         # Run tasks for build mode
-        if self.args.build:
+        if self.args.host:
             self.build_on_remote_host()
         else:
             self.generate_makefile()
@@ -101,24 +101,14 @@ class MakePackage:
         self.run_ssh_cmd(" && ".join(build_cmds))
 
         # Retrieve the built package
-        if self.args.freebsd == 11:
-            src = "{u}@{h}:~/build/pfsense-api/pfSense-pkg-API/pfSense-pkg-API-{v}{r}.txz"
-            src = src.format(
-                u=self.args.username,
-                h=self.args.host,
-                v=self.port_version,
-                r="_" + self.port_revision if self.port_revision != "0" else ""
-            )
-            self.run_scp_cmd(src, ".")
-        else:
-            src = "{u}@{h}:~/build/pfsense-api/pfSense-pkg-API/work/pkg/pfSense-pkg-API-{v}{r}.txz"
-            src = src.format(
-                u=self.args.username,
-                h=self.args.host,
-                v=self.port_version,
-                r="_" + self.port_revision if self.port_revision != "0" else ""
-            )
-            self.run_scp_cmd(src, ".")
+        src = "{u}@{h}:~/build/pfsense-api/pfSense-pkg-API/work/pkg/pfSense-pkg-API-{v}{r}.pkg"
+        src = src.format(
+            u=self.args.username,
+            h=self.args.host,
+            v=self.port_version,
+            r="_" + self.port_revision if self.port_revision != "0" else ""
+        )
+        self.run_scp_cmd(src, ".")
 
     def __start_argparse__(self):
         # Custom port type for argparse
@@ -152,13 +142,6 @@ class MakePackage:
             help="The host to connect to when using --build mode"
         )
         parser.add_argument(
-            '--freebsd', '-f',
-            dest="freebsd",
-            type=int,
-            default=12,
-            help="The version of FreeBSD running on the remote host"
-        )
-        parser.add_argument(
             '--branch', '-b',
             dest="branch",
             type=str,
@@ -178,13 +161,6 @@ class MakePackage:
             type=tag,
             required=True,
             help="The version tag to use when building."
-        )
-        parser.add_argument(
-            '--remote', '-r',
-            dest="build",
-            action="store_true",
-            required=False,
-            help='Enable remote build mode'
         )
         self.args = parser.parse_args()
 
