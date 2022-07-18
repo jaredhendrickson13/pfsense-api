@@ -1,6 +1,6 @@
 Tests
 =====
-This directory holds our E2E tests. Any script or file that aides the testing of this projects functionality should be 
+This directory holds our E2E tests. Any script or file that aids the testing of this project's functionality should be 
 placed here. Ideally, each supported API call should have some sort of E2E test behind it to ensure functionality does
 not regress between releases.
 
@@ -35,8 +35,8 @@ optional arguments:
 ```
 
 ## Output
-Tests print an OK or ERROR status to the console depending on the tests outcome. These scripts will also
-set the command's exit code to 1 upon error or 0 upon success.
+Tests print an OK, WARNING or ERROR status to the console depending on the tests outcome. These scripts will also
+set the command's exit code to 1 upon error or 0 upon success or warning.
 
 ```
 OK ------> [ POST https://172.16.209.139:443/api/v1/user/privilege ]: Response is valid
@@ -45,6 +45,19 @@ OK ------> [ POST https://172.16.209.139:443/api/v1/user/privilege ]: Response i
 ## Running All Tests
 `tests/run_all_tests.py` is a script that will run through all tests within the `tests/` directory. In order for
 E2E tests to be included, they must start with `test_` and end with `.py`. 
+
+## Environment Requirements
+E2E test are written to be executed against a fresh pfSense install. While precautions are taken to prevent dependency
+on specific environment configurations, there are some environment requirements that must be met to run tests successfully:
+- The pfSense-API package must be installed on the pfSense instance before running tests.
+- Available interfaces on pfSense must be `em0`, `em1`, `em2`, and `em3`. Most virtualization software will use these 
+by default for most virtual network adapters.
+- pfSense must use the default DHCP enabled WAN interface. Testing routing and gateways requires the default DHCP dynamic
+gateway to be present. Do not manually add any gateways or static routes before running tests.
+- The default pfSense LAN interface must be up. In some virtualization software you will need to ensure the network adapter
+is connected and the interface is up.
+- pfSense must have public internet access and ability to resolver DNS. Some API calls make subsequent calls to upstream resources.
+These tests will require public internet access and DNS resolution to work properly.
 
 ### Example
 ```commandline
