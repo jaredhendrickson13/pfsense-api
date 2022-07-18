@@ -1,6 +1,5 @@
-from operator import truediv
 import e2e_test_framework
-import base64
+
 
 class APIE2ETestOpenVPNClient(e2e_test_framework.APIE2ETest):
     uri = "/api/v1/services/openvpn/client"
@@ -50,9 +49,10 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "OpenVPN Server/Client No Server Certificate found",
             "status": 400,
-            "return": 2145,
+            "return": 2135,
             "payload": {
-                "server_addr": "openvpn.example.com",}
+                "server_addr": "openvpn.example.com"
+            }
         },
         {
             "name": "Create internal certificate with RSA key",
@@ -365,7 +365,8 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "return": 2136,
             "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
             "payload": {
-                "server_addr": "openvpn.example.com",}
+                "server_addr": "openvpn.example.com"
+            }
         },
         {
             "name": "Unknown OpenVPN Server/Client Peer Certificate Revocation List",
@@ -582,7 +583,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         if len(self.post_responses) == 5:
             # Variables
             # counter = 0
-            for test in self.post_tests:
+            for _ in self.post_tests:
                 # Assign the required vpnid created in the POST request to the DELETE/PUT payloads
                 self.delete_tests[0]["payload"]["vpnid"] = self.post_responses[4]["data"]["vpnid"]
                 self.delete_tests[2]["payload"]["vpnid"] = self.post_responses[4]["data"]["vpnid"]
@@ -593,8 +594,9 @@ a28e7bdbf1743527346bda359bc92fc9 \
         if len(self.post_responses) == 6:
             # Variables
             # counter = 0
-            for test in self.post_tests:
+            for _ in self.post_tests:
                 # Assign the required vpnid created in the POST request to the DELETE payloads
                 self.delete_tests[1]["payload"]["if"] = self.post_responses[5]["data"]["if"]
+
 
 APIE2ETestOpenVPNClient()
