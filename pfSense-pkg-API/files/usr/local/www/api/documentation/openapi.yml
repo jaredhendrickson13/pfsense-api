@@ -8044,6 +8044,1224 @@ paths:
       summary: Update OpenVPN Server
       tags:
         - Services > OpenVPN > Server
+  /api/v1/services/openvpn/client:
+    delete:
+      description: 'Delete OpenVPN Client instance.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-client`]'
+      parameters:
+        - description: This id indicates the id of the client you want to delete.
+            This id is static and not an index of an entry in the config array. 
+            Best to first get all clients and get the id of the one you want to 
+            delete before calling this endpoint.
+          in: query
+          name: vpnid
+          required: true
+          schema:
+            oneOf:
+              - type: integer
+              - type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                vpnid:
+                  description: This id indicates the id of the client you want to delete.
+                    This id is static and not an index of an entry in the config array. 
+                    Best to first get all clients and get the id of the one you want to 
+                    delete before calling this endpoint.
+                  oneOf:
+                    - type: integer
+                    - type: string
+                  example: "1"
+              required:
+                - vpnid
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Delete OpenVPN Client
+      tags:
+        - Services > OpenVPN > Client
+    get:
+      description: 'Read All OpenVPN Client instances.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-client`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read OpenVPN Client
+      tags:
+        - Services > OpenVPN > Client
+    post:
+      description: 'Create OpenVPN Client instance.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-client`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                mode:
+                  default: 'p2p_tls'
+                  description: The role for the client, which specifies how peers connect to a 
+                    server instance. Changing this also affects which options the
+                    GUI displays on the rest of the page.
+                  enum:
+                    - p2p_tls
+                    - p2p_shared_key
+                  type: string
+                protocol:
+                  default: 'udp4'
+                  description: The IP protocol clients will use to connect to this VPN.
+                  enum:
+                    - udp4
+                    - udp6
+                    - tcp4
+                    - tcp6
+                    - udp
+                    - tcp
+                  type: string
+                dev_mode:
+                  default: 'tun'
+                  description: OpenVPN can run in one of two device modes.
+                  enum:
+                    - tun
+                    - tap
+                  type: string
+                interface:
+                  default: 'wan'
+                  description: 'Selects the interface, VIP, or failover group that the OpenVPN instance will use 
+                    when communicating with peers.
+                    This also controls which interface the traffic from the instance will exit.
+                    VIP can be provided as description, subnet or uniqid.
+                    Failover group can be provided as group name.
+
+                    _Note: If you are using a failover group, the failover group must be configured to use the same_.'
+                  type: string
+                local_port:
+                  description: For clients, the local port should be blank in nearly every case so that OpenVPN 
+                    will use a randomized local port. This behavior is more secure, but some server configurations
+                    may require a specific source port.
+                  type: integer
+                  example: 999
+                description:
+                  description: Enter a description for this VPN instance, for reference.
+                  type: string
+                  example: 'My VPN'
+                custom_options:
+                  description: Custom options may be added in using the Custom option box separated by a semicolon (;) 
+                    and the firewall will pass the custom directives to OpenVPN.
+                  type: string
+                  example: 'push "route 10.0.0.0 255.255.255.0";'
+                tls:
+                  default: ''
+                  description: TLS, or Transport Layer Security, can provide session 
+                    authentication and encryption to ensure the validity of peers and to protect the control channel.
+                    Paste the TLS key. This is not necessary for mode `p2p_shared_key`.
+                    Options are `""` or `true` for automatic TLS key generation, `false` to disable TLS 
+                    or a raw TLS key as a string.
+                    Omitting disable TLS configuration.
+                  type: string
+                  example: '-----BEGIN OpenVPN Static key V1-----
+                              db8701afd882d746be67f084bae68470
+                              54a99ef3b61864cfe1864c6c02584335
+                              fe706df150250bf7e294b8c35911817c
+                              133c8d9b505573ebeb65259bc54c70ae
+                              88cc3163fd11a20f73d2c6fb3eea7cc2
+                              fdaefcde510486adc0acbb9481b3aef4
+                              930db91806469218b2a4f92e71787cf4
+                              635f5b3f773fefc28d492738d2648673
+                              8fa9b23d41e5999f58c3f0004a59ecda
+                              119162e598764d9c8f6b99e7054f3ea4
+                              fdb4461913d2e3273a8a0db29332406a
+                              237bcfccca2315445ef809eaa933fa30
+                              a9a7510d2d167033edfd3580a824f3e1
+                              1af57da6eee89e6318ec29c67da8a19d
+                              7c9d74c7afac6ee0f813a0278a6261d7
+                              a28e7bdbf1743527346bda359bc92fc9
+                            -----END OpenVPN Static key V1-----'
+                tls_type:
+                  default: 'auth'
+                  description: Enter TLS Key Usage Mode. This is not necessary for mode `p2p_shared_key`.
+                  enum:
+                    - auth
+                    - crypt
+                  type: string
+                tlsauth_keydir:
+                  default: 'default'
+                  description: The direction in which this VPN endpoint uses the TLS key. 
+                    The TLS Key Direction must be set to complementary values on the server and clients. 
+                    The default behavior uses 0 on server instances and 1 on client instances.
+
+                    Enter TLS keydir direction. This is not necessary for mode `p2p_shared_key`.
+                  enum:
+                    - default
+                    - direction-0
+                    - direction-1
+                    - both-directions
+                  type: string
+                shared_key:
+                  default: ''
+                  description: Enter Shared Key. This is only mandatory for mode `p2p_shared_key`.
+                    Options are `""` for automatic shared key generation and a raw shared key.
+                  type: string
+                  example: '-----BEGIN OpenVPN Static key V1-----
+                              db8701afd882d746be67f084bae68470
+                              54a99ef3b61864cfe1864c6c02584335
+                              fe706df150250bf7e294b8c35911817c
+                              133c8d9b505573ebeb65259bc54c70ae
+                              88cc3163fd11a20f73d2c6fb3eea7cc2
+                              fdaefcde510486adc0acbb9481b3aef4
+                              930db91806469218b2a4f92e71787cf4
+                              635f5b3f773fefc28d492738d2648673
+                              8fa9b23d41e5999f58c3f0004a59ecda
+                              119162e598764d9c8f6b99e7054f3ea4
+                              fdb4461913d2e3273a8a0db29332406a
+                              237bcfccca2315445ef809eaa933fa30
+                              a9a7510d2d167033edfd3580a824f3e1
+                              1af57da6eee89e6318ec29c67da8a19d
+                              7c9d74c7afac6ee0f813a0278a6261d7
+                              a28e7bdbf1743527346bda359bc92fc9
+                            -----END OpenVPN Static key V1-----'
+                caref:
+                  description: Specify the unique reference ID of the certificate signing authority.
+                  type: string
+                  example: 61c7fbce3a351
+                crlref:
+                  default: 'none'
+                  description: This optional field is for the Certificate Revocation List (CRL) 
+                    this tunnel will use to check the validity of peer certificates.
+
+                    A CRL is a list of certificates signed by a CA which are no longer valid. 
+                    This could be due to a certificate being compromised or lost, such as from 
+                    a stolen laptop, spyware infection, etc.
+
+                    Specify the unique reference ID of the certificate.
+                  type: string
+                  example: 61c467cd2fd4f
+                certref:
+                  description: The certificate used by the VPN instance to identify itself to peers. 
+                    This certificate must contain appropriate properties marking it as a server 
+                    certificate and not a user or client certificate.
+
+                    Specify the unique reference ID of the certificate revocation list.
+                  type: string
+                  example: 61c4121240420
+                ncp_enable:
+                  default: false
+                  description: Enable Data Encryption Negotiation. 
+                    Disabling this feature is deprecated.
+                    Omitting will enable.
+                  type: boolean
+                data_ciphers:
+                  default: 'AES-256-GCM,AES-128-GCM,CHACHA20-POLY1305'
+                  description: These options define the cryptographic ciphers OpenVPN will use for this VPN.
+                    Enter comma sepereted data encryption algorithms
+                    (e.g. `AES-256-GCM,AES-128-GCM,CHACHA20-POLY1305`).
+                    Data encryption algorithms will be truncated to 19.
+                  type: string
+                data_ciphers_fallback:
+                  default: 'AES-256-CBC'
+                  description: Enter fallback data encryption algorithm.
+                  type: string
+                digest:
+                  default: 'SHA256'
+                  description: Selects the message digest algorithm OpenVPN uses for HMAC authentication of 
+                    incoming packets. This is used for the data channel and if also for the control channel 
+                    when the tunnel uses a TLS key. The GUI default of SHA256 is a good balance of security and speed.
+
+                    When using AEAD ciphers such as AES-GCM, OpenVPN ignores this value for the data channel 
+                    since AEAD ciphers already perform authentication. Even with an AEAD cipher, OpenVPN still 
+                    uses this algorithm to authenticate the control channel when the tunnel uses a TLS key.
+                  enum:
+                    - BLAKE2b512
+                    - BLAKE2b256
+                    - MD4
+                    - MD5
+                    - MD5-SHA1
+                    - MDC2
+                    - RIPEMD160
+                    - SHA1
+                    - SHA224
+                    - SHA256
+                    - SHA3-224
+                    - SHA3-256
+                    - SHA3-384
+                    - SHA3-512
+                    - SHA384
+                    - SHA512
+                    - SHA512-224
+                    - SHA512-256
+                    - SHAKE128
+                    - SHAKE256
+                    - SM3
+                    - whirlpool
+                    - none
+                  type: string
+                engine:
+                  default: 'none'
+                  description: If available, this option controls which hardware cryptographic accelerator 
+                    will be used by OpenVPN. When left unspecified, OpenVPN will choose automatically based 
+                    on what is available in the operating system to accelerate ciphers OpenVPN wants to use.
+
+                    Some hardware acceleration, such as AES-NI, happens automatically in OpenVPN via OpenSSL 
+                    and cannot be enabled or disabled by this option.
+
+                    Enter Hardware crypto. Options are `none` and any enabled
+                    hardware crypto.
+                  type: string
+                tunnel_network:
+                  default: ''
+                  description: 'Virtual IPv4 network used for private communications
+                    between this client and the server expressed using CIDR (e.g.
+                    10.0.8.5/24).
+
+                    With subnet topology, enter the client IP address and the subnet
+                    mask must match the IPv4 Tunnel Network on the server.
+
+                    With net30 topology, the first network address of the /30 is assumed
+                    to be the server address and the second network address will be
+                    assigned to the client.'
+                  type: string
+                tunnel_networkv6:
+                  default: ''
+                  description: 'Virtual IPv6 network used for private communications
+                    between this client and the server expressed using prefix (e.g.
+                    2001:db9:1:1::100/64).
+
+                    Enter the client IPv6 address and prefix. The prefix must match
+                    the IPv6 Tunnel Network prefix on the server.'
+                  type: string
+                remote_network:
+                  default: ''
+                  description: 'IPv4 client-side networks that will be routed to this
+                    client specifically using iroute, so that a site-to-site VPN can
+                    be established. Expressed as a comma-separated list of one or
+                    more CIDR ranges. May be left blank if there are no client-side
+                    networks to be routed.
+
+                    NOTE: Remember to add these subnets to the IPv4 Remote Networks
+                    list on the corresponding OpenVPN server settings.'
+                  type: string
+                remote_networkv6:
+                  default: ''
+                  description: 'IPv6 client-side networks that will be routed to this
+                    client specifically using iroute, so that a site-to-site VPN can
+                    be established. Expressed as a comma-separated list of one or
+                    more IP/PREFIX networks. May be left blank if there are no client-side
+                    networks to be routed.
+
+                    NOTE: Remember to add these subnets to the IPv6 Remote Networks
+                    list on the corresponding OpenVPN server settings.'
+                  type: string
+                compression:
+                  default: 'none'
+                  description: Compression to be used with this VPN instance. This is only 
+                    necessary for `allow_compression` set to `yes` or `asym`.
+                    Compression can potentially dangerous and insecure. Deprecated. 
+                    Compress tunnel packets using the LZO algorithm.
+                  enum:
+                    - none
+                    - stub
+                    - stub-v2
+                    - lz4
+                    - lz4-v2
+                    - lzo
+                    - noadapt
+                    - adaptive
+                    - yes
+                    - no
+                  type: string
+                passtos:
+                  default: false
+                  description: When this option is enabled OpenVPN sets the Type-of-Service (TOS) 
+                    IP header value of tunnel packets to match the encapsulated packet value. 
+                    This may cause important traffic to be handled faster over the tunnel by 
+                    intermediate hops at the cost of minor information disclosure.
+                  type: boolean
+                topology:
+                  default: 'subnet'
+                  description: Sets the method OpenVPN uses to allocate addresses for clients in a 
+                    client/server setup on tun device mode VPNs. The Topology option is relevant 
+                    only when supplying a virtual adapter IP address to clients using tun mode on IPv4. 
+                    Some clients may require this even for IPv6, such as OpenVPN Connect, though in 
+                    reality IPv6 always runs with a subnet topology even when IPv4 uses net30. 
+                    OpenVPN instances using tap mode always use subnet topology as well.
+                  enum:
+                    - subnet
+                    - net30
+                  type: string
+                inactive_seconds:
+                  default: 300
+                  description: The amount of time, in seconds, which a client can be inactive before 
+                    OpenVPN disconnects it for inactivity. OpenVPN bases activity on the last incoming
+                    or outgoing data channel packet, not control channel packets.
+
+                    `0` disables this feature.
+                  type: integer
+                ping_method:
+                  default: 'keepalive'
+                  description: The Ping Method controls OpenVPN monitoring of peers through the 
+                    control channel and how it deals with unresponsive peers. 
+                  enum:
+                    - keepalive
+                    - ping
+                  type: string
+                keepalive_interval:
+                  default: 10
+                  description: Enter keepalive interval.
+                  type: integer
+                keepalive_timeout:
+                  default: 60
+                  description: Enter keepalive timeout.
+                  type: integer
+                ping_seconds:
+                  default: 10
+                  description: Enter ping seconds. This is only necessary for `ping` method.
+                  type: integer
+                ping_action_seconds:
+                  default: 60
+                  description: Enter ping action seconds. This is only necessary for `ping` method.
+                  type: integer
+                ping_push:
+                  default: false
+                  description: Push ping to VPN client. This is only necessary for `ping` method.
+                  type: boolean
+                ping_action_push:
+                  default: false
+                  description: Push ping-restart/ping-exit to VPN client.
+                    This is only necessary for `ping` method.
+                  type: boolean
+                ping_action:
+                  default: 'ping_restart'
+                  description: Exit or restart OpenVPN after timeout from remote.
+                    This is only necessary for `ping` method.
+                  enum:
+                    - ping_restart
+                    - ping_exit
+                  type: string
+                udp_fast_io:
+                  default: false
+                  description: Controls whether or not OpenVPN will use fast I/O operations with UDP writes 
+                    to its tun or tap device. This behavior optimizes the packet write event loop, 
+                    improving CPU efficiency by 5% to 10%. Experimental.
+                  type: boolean
+                exit_notify:
+                  default: 'none'
+                  description: Controls whether or not OpenVPN will send an explicit exit notification to 
+                    connected UDP clients or peers when restarting or shutting down. This notification 
+                    allows peers to immediately disconnect rather than wait for a timeout. 
+                    This is only relevant to UDP modes as TCP natively supports closing connections.
+                  enum:
+                    - once
+                    - twice
+                    - none
+                    - ''
+                  type: string
+                sndrcvbuf:
+                  default: 'default'
+                  description: Configures a Send and Receive Buffer size for OpenVPN. 
+                    The default buffer size can be too small in many cases, depending on hardware
+                    and network uplink speeds. Finding the best buffer size can take experimentation. 
+                    To test the best value for a site, start at 512KiB and test higher and lower 
+                    values until testing results in peak performance.
+                  enum:
+                    - 64KiB
+                    - 128KiB
+                    - 256KiB
+                    - 512KiB
+                    - 1MiB
+                    - 2MiB
+                    - default
+                    - none
+                  type: string
+                create_gw:
+                  default: 'both'
+                  description: If you assign a virtual interface to this OpenVPN server,
+                    this setting controls which gateway types will be created.
+                  enum:
+                    - v4only
+                    - v6only
+                    - both
+                  type: string
+                verbosity_level:
+                  default: '3'
+                  description: Configures the amount of detail OpenVPN will log for this instance,
+                    which is useful for troubleshooting problems. Higher numbers will result in 
+                    higher amounts of detail in the log. 
+                    During normal operation the default selection is ideal.
+                    Level `3` is recommended for a good summary of what's happening without 
+                    being swamped by output. Maximum level `11`.
+                    The `default` setting is equivalent to level `1`.
+                  enum:
+                    - 0
+                    - 1
+                    - 2
+                    - 3
+                    - 4
+                    - 5
+                    - 6
+                    - 7
+                    - 8
+                    - 9
+                    - 10
+                    - 11
+                    - 'default'
+                  type: string
+                disable:
+                  default: false
+                  description: Disable this override without removing it.
+                  type: boolean
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Create OpenVPN Client
+      tags:
+        - Services > OpenVPN > Client
+    put:
+      description: 'Update OpenVPN Client instance.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-client`]'
+      parameters:
+        - description: This id indicates the id of the client you want to delete.
+            This id is static and not an index of an entry in the config array. 
+            Best to first get all clients and get the id of the one you want to 
+            delete before calling this endpoint.
+          in: query
+          name: vpnid
+          required: true
+          schema:
+            oneOf:
+              - type: integer
+              - type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                vpnid:
+                  description: This id indicates the id of the client you want to delete.
+                    This id is static and not an index of an entry in the config array. 
+                    Best to first get all clients and get the id of the one you want to 
+                    delete before calling this endpoint.
+                  type: string
+                  example: '1'
+                mode:
+                  default: 'p2p_tls'
+                  description: The role for the server, which specifies how peers connect to a 
+                    server instance. Changing this also affects which options the
+                    GUI displays on the rest of the page.
+                  enum:
+                    - p2p_tls
+                    - p2p_shared_key
+                    - server_tls
+                    - server_user
+                    - server_tls_user
+                  type: string
+                protocol:
+                  default: 'udp4'
+                  description: The IP protocol clients will use to connect to this VPN.
+                  enum:
+                    - udp4
+                    - udp6
+                    - tcp4
+                    - tcp6
+                    - udp
+                    - tcp
+                  type: string
+                authmode:
+                  default: 'Local Database'
+                  description: One or more authentication servers to use when checking user credentials. 
+                    This can be the Local Database (user manager) or it can be a RADIUS or LDAP server 
+                    configured in the user manager.
+
+                    Selecting multiple entries will use each one in turn. If authentication against an entry fails, 
+                    the VPN will try the next server. It will continue this process until it has tried 
+                    all selected entries.
+
+                    This field is only present when using a Server Mode (`server_user` or `server_tls_user`) 
+                    which requires user authentication.
+                  type: string
+                dev_mode:
+                  default: 'tun'
+                  description: OpenVPN can run in one of two device modes.
+                  enum:
+                    - tun
+                    - tap
+                  type: string
+                interface:
+                  default: 'wan'
+                  description: 'Selects the interface, VIP, or failover group that the OpenVPN instance will use 
+                    when communicating with peers.
+                    This also controls which interface the traffic from the instance will exit.
+                    VIP can be provided as description, subnet or uniqid.
+                    Failover group can be provided as group name.
+
+                    _Note: If you are using a failover group, the failover group must be configured to use the same_.'
+                  type: string
+                local_port:
+                  description: The port number upon which OpenVPN will listen for incoming connections from peers. 
+                    Firewall rules must allow traffic to this port and this port must be specified in the client configuration.
+
+                    The port for each server must be unique for each interface when using a standard 
+                    UDP or TCP Protocol choice and must be globally unique if using a multihome Protocol.
+
+                    Omitting this will default to next available port.
+                  type: integer
+                  example: 1194
+                description:
+                  description: Enter a description for this VPN instance, for reference.
+                  type: string
+                  example: 'My VPN'
+                custom_options:
+                  description: Custom options may be added in using the Custom option box separated by a semicolon (;) 
+                    and the firewall will pass the custom directives to OpenVPN.
+                  type: string
+                  example: 'push "route 10.0.0.0 255.255.255.0";'
+                tls:
+                  default: ''
+                  description: TLS, or Transport Layer Security, can provide session 
+                    authentication and encryption to ensure the validity of peers and to protect the control channel.
+                    Paste the TLS key. This is not necessary for mode `p2p_shared_key`.
+                    Options are `""` or `true` for automatic TLS key generation, `false` to disable TLS 
+                    or a raw TLS key as a string.
+                    Omitting disable TLS configuration.
+                  type: string
+                  example: '-----BEGIN OpenVPN Static key V1-----
+                              db8701afd882d746be67f084bae68470
+                              54a99ef3b61864cfe1864c6c02584335
+                              fe706df150250bf7e294b8c35911817c
+                              133c8d9b505573ebeb65259bc54c70ae
+                              88cc3163fd11a20f73d2c6fb3eea7cc2
+                              fdaefcde510486adc0acbb9481b3aef4
+                              930db91806469218b2a4f92e71787cf4
+                              635f5b3f773fefc28d492738d2648673
+                              8fa9b23d41e5999f58c3f0004a59ecda
+                              119162e598764d9c8f6b99e7054f3ea4
+                              fdb4461913d2e3273a8a0db29332406a
+                              237bcfccca2315445ef809eaa933fa30
+                              a9a7510d2d167033edfd3580a824f3e1
+                              1af57da6eee89e6318ec29c67da8a19d
+                              7c9d74c7afac6ee0f813a0278a6261d7
+                              a28e7bdbf1743527346bda359bc92fc9
+                            -----END OpenVPN Static key V1-----'
+                tls_type:
+                  default: 'auth'
+                  description: Enter TLS Key Usage Mode. This is not necessary for mode `p2p_shared_key`.
+                  enum:
+                    - auth
+                    - crypt
+                  type: string
+                tlsauth_keydir:
+                  default: 'default'
+                  description: The direction in which this VPN endpoint uses the TLS key. 
+                    The TLS Key Direction must be set to complementary values on the server and clients. 
+                    The default behavior uses 0 on server instances and 1 on client instances.
+
+                    Enter TLS keydir direction. This is not necessary for mode `p2p_shared_key`.
+                  enum:
+                    - default
+                    - direction-0
+                    - direction-1
+                    - both-directions
+                  type: string
+                shared_key:
+                  default: ''
+                  description: Enter Shared Key. This is only mandatory for mode `p2p_shared_key`.
+                    Options are `""` for automatic shared key generation and a raw shared key.
+                  type: string
+                  example: '-----BEGIN OpenVPN Static key V1-----
+                              db8701afd882d746be67f084bae68470
+                              54a99ef3b61864cfe1864c6c02584335
+                              fe706df150250bf7e294b8c35911817c
+                              133c8d9b505573ebeb65259bc54c70ae
+                              88cc3163fd11a20f73d2c6fb3eea7cc2
+                              fdaefcde510486adc0acbb9481b3aef4
+                              930db91806469218b2a4f92e71787cf4
+                              635f5b3f773fefc28d492738d2648673
+                              8fa9b23d41e5999f58c3f0004a59ecda
+                              119162e598764d9c8f6b99e7054f3ea4
+                              fdb4461913d2e3273a8a0db29332406a
+                              237bcfccca2315445ef809eaa933fa30
+                              a9a7510d2d167033edfd3580a824f3e1
+                              1af57da6eee89e6318ec29c67da8a19d
+                              7c9d74c7afac6ee0f813a0278a6261d7
+                              a28e7bdbf1743527346bda359bc92fc9
+                            -----END OpenVPN Static key V1-----'
+                caref:
+                  description: Specify the unique reference ID of the certificate signing authority.
+                  type: string
+                  example: 61c7fbce3a351
+                crlref:
+                  default: 'none'
+                  description: This optional field is for the Certificate Revocation List (CRL) 
+                    this tunnel will use to check the validity of peer certificates.
+
+                    A CRL is a list of certificates signed by a CA which are no longer valid. 
+                    This could be due to a certificate being compromised or lost, such as from 
+                    a stolen laptop, spyware infection, etc.
+
+                    Specify the unique reference ID of the certificate.
+                  type: string
+                  example: 61c467cd2fd4f
+                certref:
+                  description: The certificate used by the VPN instance to identify itself to peers. 
+                    This certificate must contain appropriate properties marking it as a server 
+                    certificate and not a user or client certificate.
+
+                    Specify the unique reference ID of the certificate revocation list.
+                  type: string
+                  example: 61c4121240420
+                ocspcheck:
+                  default: false
+                  description: When set, OpenVPN will attempt to confirm client certificate validity 
+                    using Online Certificate Status Protocol (OCSP) against the site listed in the OCSP URL field.
+                  type: boolean
+                ocspurl:
+                  default: ''
+                  description: Enter OCSP URL. This is only necessary for `ocspcheck`.
+                  type: string
+                  format: uri
+                dh_length:
+                  default: '2048'
+                  description: The Diffie-Hellman (DH) key exchange parameters are used for establishing a 
+                    secure communications channel. They may be regenerated at any time, and they are not 
+                    specific to an OpenVPN instance. When importing an existing OpenVPN configuration 
+                    these parameters do not need to be copied from the previous server nor does it require 
+                    generating new parameters. The length of the desired DH parameters may be chosen from 
+                    the drop-down box, either 1024, 2048, or 4096. There is an additional choice for 
+                    ECDH Only which disables traditional DH parameters and uses only ECDH.
+                  enum:
+                    - 1024
+                    - 2048
+                    - 3072
+                    - 4096
+                    - 6144
+                    - 7680
+                    - 8192
+                    - 15360
+                    - 16384
+                    - 'ECDH Only'
+                  type: string
+                ecdh_curve:
+                  default: 'none'
+                  description: Configures a specific elliptic curve to use for Elliptic Curve Diffie-Hellman 
+                    key exchanges. This is only for use with ECDH TLS encryption.
+                  enum:
+                    - none
+                    - prime256v1
+                    - secp384r1
+                    - secp521r1
+                  type: string
+                cert_depth:
+                  default: 'one'
+                  description: This option limits the valid length of a certificate chain. The default value 
+                    limits a chain to One (Client+Server). With that value, if an unauthorized intermediate 
+                    CA signs a certificate, certificates signed by the rogue intermediate would fail validation. 
+                    In cases when the certificate stricture requires chaining with intermediates, 
+                    raise this limit to accommodate the longest allowed chain.
+                  enum:
+                    - none
+                    - one
+                    - two
+                    - three
+                    - four
+                    - five
+                  type: string
+                strictusercn:
+                  default: false
+                  description: Controls whether the firewall will enforce a strict match between the username 
+                    supplied by the user and the Common Name of their user certificate when the firewall 
+                    authenticates a user. When enabled, authentication fails if the two values do not match.
+
+                    This prevents users from using their own credentials with the certificate from a different 
+                    user and vice versa.
+
+                    This is only necessary for mode `server_tls_user`.
+                    Omitting will disable.
+                  type: boolean
+                ncp_enable:
+                  default: false
+                  description: Enable Data Encryption Negotiation. 
+                    Disabling this feature is deprecated.
+                    Omitting will enable.
+                  type: boolean
+                data_ciphers:
+                  default: 'AES-256-GCM,AES-128-GCM,CHACHA20-POLY1305'
+                  description: These options define the cryptographic ciphers OpenVPN will use for this VPN.
+                    Enter comma sepereted data encryption algorithms
+                    (e.g. `AES-256-GCM,AES-128-GCM,CHACHA20-POLY1305`).
+                    Data encryption algorithms will be truncated to 19.
+                  type: string
+                data_ciphers_fallback:
+                  default: 'AES-256-CBC'
+                  description: Enter fallback data encryption algorithm.
+                  type: string
+                digest:
+                  default: 'SHA256'
+                  description: Selects the message digest algorithm OpenVPN uses for HMAC authentication of 
+                    incoming packets. This is used for the data channel and if also for the control channel 
+                    when the tunnel uses a TLS key. The GUI default of SHA256 is a good balance of security and speed.
+
+                    When using AEAD ciphers such as AES-GCM, OpenVPN ignores this value for the data channel 
+                    since AEAD ciphers already perform authentication. Even with an AEAD cipher, OpenVPN still 
+                    uses this algorithm to authenticate the control channel when the tunnel uses a TLS key.
+                  enum:
+                    - BLAKE2b512
+                    - BLAKE2b256
+                    - MD4
+                    - MD5
+                    - MD5-SHA1
+                    - MDC2
+                    - RIPEMD160
+                    - SHA1
+                    - SHA224
+                    - SHA256
+                    - SHA3-224
+                    - SHA3-256
+                    - SHA3-384
+                    - SHA3-512
+                    - SHA384
+                    - SHA512
+                    - SHA512-224
+                    - SHA512-256
+                    - SHAKE128
+                    - SHAKE256
+                    - SM3
+                    - whirlpool
+                    - none
+                  type: string
+                engine:
+                  default: 'none'
+                  description: If available, this option controls which hardware cryptographic accelerator 
+                    will be used by OpenVPN. When left unspecified, OpenVPN will choose automatically based 
+                    on what is available in the operating system to accelerate ciphers OpenVPN wants to use.
+
+                    Some hardware acceleration, such as AES-NI, happens automatically in OpenVPN via OpenSSL 
+                    and cannot be enabled or disabled by this option.
+
+                    Enter Hardware crypto. Options are `none` and any enabled
+                    hardware crypto.
+                  type: string
+                tunnel_network:
+                  default: ''
+                  description: 'Virtual IPv4 network used for private communications
+                    between this client and the server expressed using CIDR (e.g.
+                    10.0.8.5/24).
+
+                    With subnet topology, enter the client IP address and the subnet
+                    mask must match the IPv4 Tunnel Network on the server.
+
+                    With net30 topology, the first network address of the /30 is assumed
+                    to be the server address and the second network address will be
+                    assigned to the client.'
+                  type: string
+                tunnel_networkv6:
+                  default: ''
+                  description: 'Virtual IPv6 network used for private communications
+                    between this client and the server expressed using prefix (e.g.
+                    2001:db9:1:1::100/64).
+
+                    Enter the client IPv6 address and prefix. The prefix must match
+                    the IPv6 Tunnel Network prefix on the server.'
+                  type: string
+                local_network:
+                  default: ''
+                  description: 'IPv4 server-side networks that will be accessible
+                    from this particular client. Expressed as a comma-separated list
+                    of one or more CIDR networks.
+
+                    NOTE: Networks do not need to be specified here if they have already
+                    been defined on the main server configuration.'
+                  type: string
+                local_networkv6:
+                  default: ''
+                  description: 'IPv6 server-side networks that will be accessible
+                    from this particular client. Expressed as a comma-separated list
+                    of one or more IP/PREFIX networks.
+
+                    NOTE: Networks do not need to be specified here if they have already
+                    been defined on the main server configuration.'
+                  type: string
+                remote_network:
+                  default: ''
+                  description: 'IPv4 client-side networks that will be routed to this
+                    client specifically using iroute, so that a site-to-site VPN can
+                    be established. Expressed as a comma-separated list of one or
+                    more CIDR ranges. May be left blank if there are no client-side
+                    networks to be routed.
+
+                    NOTE: Remember to add these subnets to the IPv4 Remote Networks
+                    list on the corresponding OpenVPN server settings.'
+                  type: string
+                remote_networkv6:
+                  default: ''
+                  description: 'IPv6 client-side networks that will be routed to this
+                    client specifically using iroute, so that a site-to-site VPN can
+                    be established. Expressed as a comma-separated list of one or
+                    more IP/PREFIX networks. May be left blank if there are no client-side
+                    networks to be routed.
+
+                    NOTE: Remember to add these subnets to the IPv6 Remote Networks
+                    list on the corresponding OpenVPN server settings.'
+                  type: string
+                redirect_gateway:
+                  default: false
+                  description: When a Redirect IPv4 Gateway option is selected the server 
+                    pushes a message to clients instructing them to forward all traffic for 
+                    that address family, including Internet traffic, over the VPN tunnel.
+                  type: boolean
+                redirect_gateway6:
+                  default: false
+                  description: When a Redirect IPv6 Gateway option is selected the server 
+                    pushes a message to clients instructing them to forward all traffic for 
+                    that address family, including Internet traffic, over the VPN tunnel.
+                  type: boolean
+                serverbridge_dhcp:
+                  default: ""
+                  description: When using `tap` mode for a remote access SSL/TLS VPN,
+                    (`server_tls`, `server_user`, `server_tls_user`), additional options 
+                    to control bridging behavior in OpenVPN and client address assignment.
+
+                    When selected, OpenVPN passes through DHCP to the bridged. 
+                    In the most common scenario, this is LAN.
+
+                    Using this method connecting clients receive IP addresses from the 
+                    same DHCP pool used by clients on the LAN.
+                  type: string
+                  format: ipv4
+                serverbridge_interface:
+                  default: "none"
+                  description: This setting indicates to OpenVPN which interface will be used for the bridge.
+                    In most cases this is LAN.
+                    This option controls which existing IP address and subnet mask are used by OpenVPN for the bridge. 
+                    Setting this to none will cause the Server Bridge DHCP (`serverbridge_dhcp_start`, `serverbridge_dhcp_end`) settings below to be ignored.
+                  enum:
+                    - wan
+                    - lan
+                    - none
+                  type: string
+                serverbridge_routegateway:
+                  description: Makes OpenVPN push the Bridge Interface IPv4 address to connecting 
+                    clients as a route gateway.
+
+                    When the IPv4 Tunnel Network in OpenVPN is empty for a bridged VPN, 
+                    connecting clients cannot automatically determine a server-side gateway for 
+                    use with routes pushed to clients by the server.
+                  type: boolean
+                  example: true
+                serverbridge_dhcp_start:
+                  default: ""
+                  description: Defines a DHCP range from which OpenVPN can assign addresses to clients. 
+                    If these settings are left blank, OpenVPN passes DHCP through to the bridge interface 
+                    and it ignores the interface setting above.
+
+                    When set, this range should be within the same subnet as the Bridge Interface 
+                    (`serverbridge_interface`) but it should not overlap an existing in-use portion 
+                    of the subnet, such as the current DHCP pool.
+
+                    This allows a range of IP addresses to be set aside for use only by OpenVPN clients so they may be contained within a portion of the internal network rather than consuming IP addresses from the existing DHCP pool.
+                  type: string
+                  format: ipv4
+                serverbridge_dhcp_end:
+                  default: ""
+                  description: Defines a DHCP range from which OpenVPN can assign addresses to clients. 
+                    If these settings are left blank, OpenVPN passes DHCP through to the bridge interface 
+                    and it ignores the interface setting above.
+
+                    When set, this range should be within the same subnet as the Bridge Interface 
+                    (`serverbridge_interface`) but it should not overlap an existing in-use portion 
+                    of the subnet, such as the current DHCP pool.
+
+                    This allows a range of IP addresses to be set aside for use only by OpenVPN clients so they may be contained within a portion of the internal network rather than consuming IP addresses from the existing DHCP pool.
+                  type: string
+                  format: ipv4
+                concurrent_connections:
+                  description: Specifies the number of clients that may be simultaneously 
+                    connected to this OpenVPN server instance at any given time.
+                  type: integer
+                  example: '10'
+                allow_compression:
+                  default: 'no'
+                  description: Controls whether or not compression is allowed on the VPN, and how it is handled.
+                  enum:
+                    - asym
+                    - no
+                    - yes
+                  type: string
+                compression:
+                  default: 'none'
+                  description: Compression to be used with this VPN instance. This is only 
+                    necessary for `allow_compression` set to `yes` or `asym`.
+                    Compression can potentially dangerous and insecure. Deprecated. 
+                    Compress tunnel packets using the LZO algorithm.
+                  enum:
+                    - none
+                    - stub
+                    - stub-v2
+                    - lz4
+                    - lz4-v2
+                    - lzo
+                    - noadapt
+                    - adaptive
+                    - yes
+                    - no
+                  type: string
+                compression_push:
+                  default: false
+                  description: Push the selected Compression setting to connecting clients.
+                    This is only necessary for `allow_compression` set to `yes` or `asym`.
+                  type: boolean
+                passtos:
+                  default: false
+                  description: When this option is enabled OpenVPN sets the Type-of-Service (TOS) 
+                    IP header value of tunnel packets to match the encapsulated packet value. 
+                    This may cause important traffic to be handled faster over the tunnel by 
+                    intermediate hops at the cost of minor information disclosure.
+                  type: boolean
+                client2client:
+                  default: false
+                  description: This option controls whether or not connected clients are able to 
+                    communicate with one another. To allow this behavior, check the option. 
+                    When unchecked, clients can only send traffic to the server or destinations 
+                    beyond the server such as routed networks or the Internet.
+                  type: boolean
+                duplicate_cn:
+                  default: false
+                  description: Controls whether or not OpenVPN will allow multiple connections 
+                    from the same user to work simultaneously.
+                    This is only necessary for mode `p2p_shared_key`.
+                  type: boolean
+                dynamic_ip:
+                  default: false
+                  description: For clients on Internet connections where the IP address changes frequently, 
+                    or mobile users who commonly move between different Internet connections, 
+                    check this option for more stable connectivity. Where the client IP address 
+                    is static or rarely changes, not using this option offers a small security improvement.
+                  type: boolean
+                topology:
+                  default: 'subnet'
+                  description: Sets the method OpenVPN uses to allocate addresses for clients in a 
+                    client/server setup on tun device mode VPNs. The Topology option is relevant 
+                    only when supplying a virtual adapter IP address to clients using tun mode on IPv4. 
+                    Some clients may require this even for IPv6, such as OpenVPN Connect, though in 
+                    reality IPv6 always runs with a subnet topology even when IPv4 uses net30. 
+                    OpenVPN instances using tap mode always use subnet topology as well.
+                  enum:
+                    - subnet
+                    - net30
+                  type: string
+                dns_domain:
+                  default: ''
+                  description: Configures a default domain name which clients will append to DNS requests. 
+                    This can be helpful to ensure name resolution works properly for hosts on the local 
+                    network where DNS name resolution is used.
+                  type: string
+                  example: example.com
+                dns_servers:
+                  default: ''
+                  description: Comma-separated list of no more than 4 DNS server IP
+                    addresses (i.e. 8.8.8.8). Any more than the first four are ignored.
+                    This list is provided to the clent.
+                  type: string
+                  example: "8.8.8.8, 8.8.4.4, 8.8.3.3, 8.8.2.2"
+                push_blockoutsidedns:
+                  default: false
+                  description: Make Windows 10 Clients Block access to DNS servers except 
+                    across OpenVPN while connected, forcing clients to use only VPN DNS servers.
+                  type: boolean
+                push_register_dns:
+                  default: false
+                  description: Run "net stop dnscache", "net start dnscache",
+                    "ipconfig /flushdns" and "ipconfig /registerdns" on connection initiation.
+                  type: boolean
+                inactive_seconds:
+                  default: 300
+                  description: The amount of time, in seconds, which a client can be inactive before 
+                    OpenVPN disconnects it for inactivity. OpenVPN bases activity on the last incoming
+                    or outgoing data channel packet, not control channel packets.
+
+                    `0` disables this feature.
+                  type: integer
+                ping_method:
+                  default: 'keepalive'
+                  description: The Ping Method controls OpenVPN monitoring of peers through the 
+                    control channel and how it deals with unresponsive peers. 
+                  enum:
+                    - keepalive
+                    - ping
+                  type: string
+                keepalive_interval:
+                  default: 10
+                  description: Enter keepalive interval.
+                  type: integer
+                keepalive_timeout:
+                  default: 60
+                  description: Enter keepalive timeout.
+                  type: integer
+                ping_seconds:
+                  default: 10
+                  description: Enter ping seconds. This is only necessary for `ping` method.
+                  type: integer
+                ping_action_seconds:
+                  default: 60
+                  description: Enter ping action seconds. This is only necessary for `ping` method.
+                  type: integer
+                ping_push:
+                  default: false
+                  description: Push ping to VPN client. This is only necessary for `ping` method.
+                  type: boolean
+                ping_action_push:
+                  default: false
+                  description: Push ping-restart/ping-exit to VPN client.
+                    This is only necessary for `ping` method.
+                  type: boolean
+                ping_action:
+                  default: 'ping_restart'
+                  description: Exit or restart OpenVPN after timeout from remote.
+                    This is only necessary for `ping` method.
+                  enum:
+                    - ping_restart
+                    - ping_exit
+                  type: string
+                username_as_common_name:
+                  default: false
+                  description: Controls whether or not OpenVPN will use the username given by the 
+                    client in place of the certificate common name (CN) for purposes such as determining 
+                    Client Specific Overrides. This is only relevant when user authentication is enabled. 
+                    This is typically the best practice, but not a requirement.
+
+                    This is only necessary for mode `server_user` or `server_tls_user`.
+                  type: boolean
+                udp_fast_io:
+                  default: false
+                  description: Controls whether or not OpenVPN will use fast I/O operations with UDP writes 
+                    to its tun or tap device. This behavior optimizes the packet write event loop, 
+                    improving CPU efficiency by 5% to 10%. Experimental.
+                  type: boolean
+                exit_notify:
+                  default: 'none'
+                  description: Controls whether or not OpenVPN will send an explicit exit notification to 
+                    connected UDP clients or peers when restarting or shutting down. This notification 
+                    allows peers to immediately disconnect rather than wait for a timeout. 
+                    This is only relevant to UDP modes as TCP natively supports closing connections.
+                  enum:
+                    - once
+                    - twice
+                    - none
+                    - ''
+                  type: string
+                sndrcvbuf:
+                  default: 'default'
+                  description: Configures a Send and Receive Buffer size for OpenVPN. 
+                    The default buffer size can be too small in many cases, depending on hardware
+                    and network uplink speeds. Finding the best buffer size can take experimentation. 
+                    To test the best value for a site, start at 512KiB and test higher and lower 
+                    values until testing results in peak performance.
+                  enum:
+                    - 64KiB
+                    - 128KiB
+                    - 256KiB
+                    - 512KiB
+                    - 1MiB
+                    - 2MiB
+                    - default
+                    - none
+                  type: string
+                ntp_servers:
+                  default: ''
+                  description: Comma-separated list of no more than 2 NTP server IP
+                    addresses. Any more than the first two are ignored.
+                  type: string
+                  example: "192.168.56.101, 192.168.56.102"
+                netbios_enable:
+                  default: false
+                  description: Enable NetBIOS over TCP/IP. If this option is not set,
+                    all NetBIOS-over-TCP/IP options (including WINS) will be disabled.
+                  type: boolean
+                netbios_node_type:
+                  description: 'Possible options: b (broadcasts), p (point-to-point
+                    name queries to a WINS server), m (broadcast then query name server),
+                    and h (query name server, then broadcast). This parameter takes
+                    a single letter either b, p, m, or h. Any other string will result
+                    in this option being set to none.'
+                  enum:
+                    - b
+                    - p
+                    - m
+                    - h
+                  type: string
+                  example: b
+                netbios_scope:
+                  description: NetBIOS Scope ID provides an extended naming service
+                    for NetBIOS over TCP/IP. The NetBIOS scope ID isolates NetBIOS
+                    traffic on a single network to only those nodes with the same
+                    NetBIOS scope ID.
+                  type: string
+                  example: '5'
+                create_gw:
+                  default: 'both'
+                  description: If you assign a virtual interface to this OpenVPN server,
+                    this setting controls which gateway types will be created.
+                  enum:
+                    - v4only
+                    - v6only
+                    - both
+                  type: string
+                verbosity_level:
+                  default: '3'
+                  description: Configures the amount of detail OpenVPN will log for this instance,
+                    which is useful for troubleshooting problems. Higher numbers will result in 
+                    higher amounts of detail in the log. 
+                    During normal operation the default selection is ideal.
+                    Level `3` is recommended for a good summary of what's happening without 
+                    being swamped by output. Maximum level `11`.
+                    The `default` setting is equivalent to level `1`.
+                  enum:
+                    - 0
+                    - 1
+                    - 2
+                    - 3
+                    - 4
+                    - 5
+                    - 6
+                    - 7
+                    - 8
+                    - 9
+                    - 10
+                    - 11
+                    - 'default'
+                  type: string
+                wins_servers:
+                  default: ''
+                  description: Comma-separated list of no more than 2 WINS server
+                    IP addresses. Any more than the first two are ignored.
+                  type: string
+                  example: "192.168.56.103, 192.168.56.104"
+                disable:
+                  default: false
+                  description: Disable this override without removing it.
+                  type: boolean
+              required:
+                - vpnid
+              type: object
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update OpenVPN Client
+      tags:
+        - Services > OpenVPN > Client
   /api/v1/services/openvpn/csc:
     delete:
       parameters:
@@ -11250,6 +12468,8 @@ tags:
   - name: Status > Interface
   - name: Status > System
   - name: Services
+  - name: Services > OpenVPN > Server
+  - name: Services > OpenVPN > Client
   - name: Services > OpenVPN > CSC
   - name: Services > Unbound
   - name: Services > Unbound > Apply
