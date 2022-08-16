@@ -42,7 +42,7 @@ def get_exit_code():
 
     # Print the number successful/failed tests
     print(
-        f"------------------------------------------------------------------------"
+        f"------------------------------------------------------------------------\n"
         f"Ran all tests: {success_count}/{success_count + fail_count} tests passed."
     )
     return exit_code
