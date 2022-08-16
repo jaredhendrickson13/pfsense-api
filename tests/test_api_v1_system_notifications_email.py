@@ -1,7 +1,9 @@
+"""Class used to test the /api/v1/system/notifications/email endpoint."""
 import e2e_test_framework
 
 
 class APIE2ETestSystemNotificationsEmail(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/system/notifications/email endpoint."""
     uri = "/api/v1/system/notifications/email"
     get_tests = [{"name": "Read the system email notification settings"}]
     put_tests = [

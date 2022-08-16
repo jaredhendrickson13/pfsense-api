@@ -1,7 +1,9 @@
+"""Script used to test the /api/v1/user/auth_server/radius endpoint."""
 import e2e_test_framework
 
 
 class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/user/auth_server/radius endpoint."""
     uri = "/api/v1/user/auth_server/radius"
     get_tests = [{"name": "Read RADIUS auth servers"}]
     post_tests = [

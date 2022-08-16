@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/firewall/states endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestFirewallStates(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/firewall/states endpoint."""
     uri = "/api/v1/firewall/states"
     get_tests = [{"name": "Read all firewalls states"}]
     delete_tests = [
@@ -52,5 +54,6 @@ class APIE2ETestFirewallStates(e2e_test_framework.APIE2ETest):
             "payload": {"source": "1.2.3.4", "sleep": 301}
         }
     ]
+
 
 APIE2ETestFirewallStates()

@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/services/openvpn/csc endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestOpenVPNClientSpecificOverrides(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/services/openvpn/csc endpoint."""
     uri = "/api/v1/services/openvpn/csc"
     get_tests = [
         {"name": "Read all OpenVPN client specific overrides"}
@@ -160,5 +162,6 @@ class APIE2ETestOpenVPNClientSpecificOverrides(e2e_test_framework.APIE2ETest):
             "status": 404
         },
     ]
+
 
 APIE2ETestOpenVPNClientSpecificOverrides()

@@ -11,21 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-import pfsense_vshell
-import requests
+"""Module for the e2e test framework that is used to test pfSense-API."""
 import argparse
 import json
-import uuid
 import sys
-import os
-import signal
 import time
-from urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
+import uuid
+import requests
+import urllib3
+
+# Disable insecure request warnings as they cause a lot of noise in the tests.
+urllib3.disable_warnings(category=urllib3.exceptions.InsecureRequestWarning)
 
 
 class APIE2ETest:
+    """Base class for the e2e test framework that is used to test pfSense-API."""
     # CLASS PROPERTIES #
     args = {}
     uid = str(uuid.uuid4())
@@ -59,9 +59,11 @@ class APIE2ETest:
             sys.exit(1)
 
     def format_url(self, uri):
+        """Formats the object's attributes into a fully formatted URL"""
         return self.args.scheme + "://" + self.args.host + ":" + str(self.args.port) + uri
 
     def get(self):
+        """Makes a GET request for every GET test found in the 'get_tests' attribute."""
         # Loop through each GET payload and check that it's response is expected
         for test_params in self.get_tests:
             self.pre_get()
@@ -72,6 +74,7 @@ class APIE2ETest:
                 time.sleep(self.time_delay)
 
     def post(self):
+        """Makes a POST request for every POST test found in the 'post_tests' attribute."""
         # Loop through each POST payload and check that it's response is expected
         for test_params in self.post_tests:
             self.pre_post()
@@ -80,7 +83,9 @@ class APIE2ETest:
             # For speed, only delay time if test is a non-200 OK test
             if test_params.get("status", 200) == 200:
                 time.sleep(self.time_delay)
+
     def put(self):
+        """Makes a PUT request for every PUT test found in the 'put_tests' attribute."""
         # Loop through each PUT payload and check that it's response is expected
         for test_params in self.put_tests:
             self.pre_put()
@@ -89,7 +94,9 @@ class APIE2ETest:
             # For speed, only delay time if test is a non-200 OK test
             if test_params.get("status", 200) == 200:
                 time.sleep(self.time_delay)
+
     def delete(self):
+        """Makes a DELETE request for every DELETE test found in the 'delete_tests' attribute."""
         # Loop through each DELETE payload and check that it's response is expected
         for test_params in self.delete_tests:
             self.pre_delete()
@@ -98,32 +105,50 @@ class APIE2ETest:
             # For speed, only delay time if test is a non-200 OK test
             if test_params.get("status", 200) == 200:
                 time.sleep(self.time_delay)
+
     # PRE/POST REQUEST METHODS. These are intended to be overwritten by a child class.
     def pre_post(self):
-        pass
+        """
+        Method that is run BEFORE any DELETE request is called. This method is intended to be overwritten by a subclass.
+        """
 
     def post_post(self):
-        pass
+        """
+        Method that is run AFTER any POST request is called. This method is intended to be overwritten by a subclass.
+        """
 
     def pre_get(self):
-        pass
+        """
+        Method that is run BEFORE any DELETE request is called. This method is intended to be overwritten by a subclass.
+        """
 
     def post_get(self):
-        pass
+        """
+        Method that is run AFTER any GET request is called. This method is intended to be overwritten by a subclass.
+        """
 
     def pre_put(self):
-        pass
+        """
+        Method that is run BEFORE any DELETE request is called. This method is intended to be overwritten by a subclass.
+        """
 
     def post_put(self):
-        pass
+        """
+        Method that is run AFTER any PUT request is called. This method is intended to be overwritten by a subclass.
+        """
 
     def pre_delete(self):
-        pass
+        """
+        Method that is run BEFORE any DELETE request is called. This method is intended to be overwritten by a subclass.
+        """
 
     def post_delete(self):
-        pass
+        """
+        Method that is run AFTER any DELETE request is called. This method is intended to be overwritten by a subclass.
+        """
 
     def make_request(self, method, test_params, req_only=False):
+        """Makes an API request based on the test's parameters."""
         # Local variables
         method = test_params.get("method", method)    # Allow custom method override
 
@@ -152,19 +177,20 @@ class APIE2ETest:
                 headers=headers
             )
         except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
-            print(self.__format_msg__(method, test_params, "Exceeded timeout of {t}s".format(t=self.args.timeout)))
-            return None
+            print(self.__format_msg__(method, test_params, f"Exceeded timeout of {self.args.timeout}s"))
 
         # If this is a request only execution, just return the request/response object
         if req_only:
             return req
         # Otherwise, check if the response is valid
-        elif self.check_response(req, test_params, verbose=self.args.verbose):
+        if self.check_response(req, test_params, verbose=self.args.verbose):
             return req.json()
+
+        return None
 
     @staticmethod
     def has_json_response(req):
-        # Check if our request's response is valid JSON
+        """Checks that our request's response is valid a JSON string."""
         try:
             req.json()
             return True
@@ -173,50 +199,51 @@ class APIE2ETest:
 
     @staticmethod
     def has_correct_http_status(req, test_params):
-        # Check if our HTTP status was expect
-        if req != None and int(req.status_code) == int(test_params.get("status", 200)):
+        """Checks if the HTTP status was the expected value."""
+        if req is not None and int(req.status_code) == int(test_params.get("status", 200)):
             return True
-        else:
-            return False
+
+        return False
 
     @staticmethod
     def has_correct_return_code(req, test_params):
-        # Check if our HTTP status was expect
+        """Checks if the API return code was the expected value."""
         if APIE2ETest.has_json_response(req) and req.json()["return"] == test_params.get("return", 0):
             return True
-        else:
-            return False
+
+        return False
 
     @staticmethod
     def has_correct_resp_time(req, test_params):
-        # Check if response time is within an acceptable threshold. Allow within 1 second variance.
+        """Checks if response time is within an acceptable threshold. Allow within 1 second variance."""
         if req.elapsed.total_seconds() < test_params.get("resp_time", 1) + 1:
             return True
-        else:
-            return False
+
+        return False
 
     def check_response(self, req, test_params, verbose=False):
+        """Checks if the API response is within the test parameters."""
         # Local variables
         valid = False
 
         # Run each check and print the results
         if not APIE2ETest.has_json_response(req):
-            msg = "Expected JSON response, received {content}".format(content=req.content)
+            msg = f"Expected JSON response, received {req.content}"
             print(self.__format_msg__(req.request.method, test_params, msg))
         elif not APIE2ETest.has_correct_http_status(req, test_params):
             received_status = req.status_code
             expected_status = test_params.get("status", 200)
-            msg = "Expected status code {e}, received {r}".format(e=expected_status, r=received_status)
+            msg = f"Expected status code {expected_status}, received {received_status}"
             print(self.__format_msg__(req.request.method, test_params, msg))
         elif not APIE2ETest.has_correct_return_code(req, test_params):
             received_return = req.json()["return"]
             expected_return = test_params.get("return", 0)
-            msg = "Expected return code {e}, received {r}".format(e=expected_return, r=received_return)
+            msg = f"Expected return code {expected_return}, received {received_return}"
             print(self.__format_msg__(req.request.method, test_params, msg))
         elif not APIE2ETest.has_correct_resp_time(req, test_params):
             received_resp_time = req.elapsed.total_seconds()
             expected_resp_time = test_params.get("resp_time", 1)
-            msg = "Expected response time within {e}s, received {r}s".format(e=expected_resp_time, r=received_resp_time)
+            msg = f"Expected response time within {expected_resp_time}s, received {received_resp_time}s"
             print(self.__format_msg__(req.request.method, test_params, msg, mode="warning"))
             valid = True
         else:
@@ -237,7 +264,7 @@ class APIE2ETest:
         def port(value_string):
             value = int(value_string)
             if value not in range(1, 65535):
-                raise argparse.ArgumentTypeError("%s is out of range, choose from [1-65535]" % value)
+                raise argparse.ArgumentTypeError(f"{value} is out of range, choose from [1-65535]")
             return value
 
         parser = argparse.ArgumentParser(
@@ -323,23 +350,15 @@ class APIE2ETest:
             raise ValueError("Unknown `mode` provided to APIE2ETest.__format_msg__")
 
         # Piece the message together
-        msg = msg + " [ {m} {u} ][{n}]: {r}".format(
-            m=methods[method],
-            u=self.url,
-            n=test_params.get("name", "Unnamed test"),
-            r=result
-        )
+        msg = msg + f" [ {methods[method]} {self.url} ][{test_params.get('name', 'Unnamed test')}]: {result}"
         return msg
 
     def __request_jwt__(self, auth_payload):
-        try:
-            req = requests.request(
-                "POST",
-                url=self.args.scheme + "://" + self.args.host + ":" + str(self.args.port) + "/api/v1/access_token",
-                data=json.dumps(auth_payload),
-                verify=False,
-                timeout=self.args.timeout
-            )
-            return req.json()["data"]["token"]
-        except Exception:
-            return ""
+        req = requests.request(
+            "POST",
+            url=self.args.scheme + "://" + self.args.host + ":" + str(self.args.port) + "/api/v1/access_token",
+            data=json.dumps(auth_payload),
+            verify=False,
+            timeout=self.args.timeout
+        )
+        return req.json()["data"]["token"]

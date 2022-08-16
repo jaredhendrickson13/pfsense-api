@@ -1,8 +1,9 @@
+"""Script used to test the /api/v1/system/crl endpoint."""
 import e2e_test_framework
-import base64
 
 
 class APIE2ETestSystemCRL(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/system/crl endpoint."""
     uri = "/api/v1/system/crl"
     crl_text = "-----BEGIN X509 CRL----- \
 MIICnzCCAYcCAQEwDQYJKoZIhvcNAQEFBQAwgYUxKjAoBgNVBAMTIWludGVybmFs \
@@ -116,7 +117,8 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
         },
     ]
     delete_tests = [
-        {"name": "Delete CRL certificate with refid", "payload": {}, "resp_time": 10}, # refid gets populated by post_post() method
+        # refid gets populated by post_post() method
+        {"name": "Delete CRL certificate with refid", "payload": {}, "resp_time": 10},
         {
             "name": "Delete CRL certificate with descr",
             "payload": {"descr": "EXISTING_CRL_TEST"},
@@ -132,10 +134,9 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
             "status": 400,
             "return": 1082,
             "payload": {"refid": "INVALID"}
-        },
-        # TODO: add test to check that CRLs in use cannot be deleted
+        }
     ]
-    
+
     # Override our PRE/POST methods
     def post_post(self):
         if len(self.post_responses) == 1:
@@ -143,7 +144,7 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
             counter = 0
             for test in self.post_tests:
                 # Assign the required refid created in the POST request to the DELETE payloads]
-                if "payload" in test.keys() and "no_caref" not in test.keys():
+                if "payload" in test and "no_caref" not in test:
                     self.post_tests[counter]["payload"]["caref"] = self.post_responses[0]["data"]["refid"]
                 counter = counter + 1
 
@@ -151,5 +152,6 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
             for test in self.post_tests:
                 # Assign the required refid created in the POST request to the DELETE payloads
                 self.delete_tests[0]["payload"]["refid"] = self.post_responses[3]["data"]["refid"]
+
 
 APIE2ETestSystemCRL()

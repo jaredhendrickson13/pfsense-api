@@ -1,0 +1,6 @@
+[DEFAULT]
+disable=duplicate-code
+
+[FORMAT]
+# Follow normal pep8 restriction
+max-line-length=120

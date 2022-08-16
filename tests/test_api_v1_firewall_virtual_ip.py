@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/firewall/virtual_ip endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/firewall/virtual_ip endpoint."""
     uri = "/api/v1/firewall/virtual_ip"
     get_tests = [{"name": "Read all virtual IPs"}]
     post_tests = [
@@ -357,5 +359,6 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "resp_time": 10  # Allow up to ten seconds for vips
         }
     ]
+
 
 APIE2ETestFirewallVirtualIP()

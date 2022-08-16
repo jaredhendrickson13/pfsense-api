@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/routing/gateway/default endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestRoutingGatewayDefault(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/routing/gateway/default endpoint."""
     uri = "/api/v1/routing/gateway/default"
     put_tests = [
         {
@@ -35,5 +37,6 @@ class APIE2ETestRoutingGatewayDefault(e2e_test_framework.APIE2ETest):
             "payload": {"defaultgw4": "automatic", "defaultgw6": "automatic"}
         }
     ]
+
 
 APIE2ETestRoutingGatewayDefault()

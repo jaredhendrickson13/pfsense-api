@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# Copyright [2020] [Jared Hendrickson]
+# Copyright 2022 Jared Hendrickson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,17 +12,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+"""Script that is used to build the pfSense-pkg-API package on FreeBSD."""
 
+import argparse
+import getpass
 import os
-import sys
 import pathlib
-import jinja2
 import platform
 import subprocess
-import getpass
-import argparse
+import sys
+import jinja2
+
 
 class MakePackage:
+    """Class that groups together variables and methods required to build the pfSense-pkg-API FreeBSD package."""
     def __init__(self):
         self.__start_argparse__()
         self.port_version = ".".join(self.args.tag.split(".")[0:2])
@@ -34,11 +37,15 @@ class MakePackage:
         else:
             self.generate_makefile()
 
-    # Custom filter for Jinja2 to determine the directory of a given file path
     def dirname(self, path):
+        """Custom filter for Jinja2 to determine the directory of a given file path"""
         return os.path.dirname(path)
 
     def generate_makefile(self):
+        """Generates the Makefile for this build."""
+        # Many variables are needed for various files and filepaths
+        # pylint: disable=too-many-locals
+
         # Set filepath and file variables
         root_dir = pathlib.Path(__file__).absolute().parent.parent
         pkg_dir = root_dir.joinpath("pfSense-pkg-API")
@@ -54,47 +61,51 @@ class MakePackage:
         makefile_template = j2_env.get_template("Makefile.j2")
 
         # Loop through each of our files and directories and store them for Jinja2 to render
-        for root, dirs, files in os.walk(files_dir, topdown=True):
+        for root, directories, files in os.walk(files_dir, topdown=True):
             root = pathlib.Path(str(root).replace(str(files_dir), ""))
-            for dir in dirs:
-                if dir not in excluded_files:
-                    file_paths["dir"].append(str(root.joinpath(dir)))
+            for directory in directories:
+                if directory not in excluded_files:
+                    file_paths["dir"].append(str(root.joinpath(directory)))
             for file in files:
                 if file not in excluded_files:
                     file_paths["file"].append(str(root.joinpath(file)))
 
         # Generate pkg-plist file
-        with open(pkg_dir.joinpath("pkg-plist"), "w") as pw:
-            pw.write(plist_template.render(files=file_paths))
+        with open(pkg_dir.joinpath("pkg-plist"), "w", encoding="utf-8") as pkg_plist:
+            pkg_plist.write(plist_template.render(files=file_paths))
         # Generate Makefile file
-        with open(pkg_dir.joinpath("Makefile"), "w") as mw:
-            mw.write(makefile_template.render(files=file_paths).replace("   ", "\t"))
+        with open(pkg_dir.joinpath("Makefile"), "w", encoding="utf-8") as makefile:
+            makefile.write(makefile_template.render(files=file_paths).replace("   ", "\t"))
 
         self.build_package(pkg_dir)
 
     def run_ssh_cmd(self, cmd):
-        ssh_cmd = "ssh {u}@{h} '{c}'".format(u=self.args.username, h=self.args.host, c=cmd)
+        """Formats the SSH command to use when building on remote hosts."""
+        ssh_cmd = f"ssh {self.args.username}@{self.args.host} '{cmd}'"
         return subprocess.call(ssh_cmd, shell=True)
 
     def run_scp_cmd(self, src, dst, recurse=False):
-        scp_cmd = "scp {r} {s} {d}".format(r="-r" if recurse else "", s=src, d=dst)
+        """Formats the SCP command to use when copying over the built package."""
+        scp_cmd = f"scp {'-r' if recurse else ''} {src} {dst}"
         return subprocess.call(scp_cmd, shell=True)
 
     def build_package(self, pkg_dir):
+        """Builds the package when the local system is FreeBSD."""
         # If we are running on FreeBSD, make package. Otherwise display warning that package was not compiled
         if platform.system() == "FreeBSD":
-            s = subprocess.call(["/usr/bin/make", "package", "-C", pkg_dir, "DISABLE_VULNERABILITIES=yes"])
+            subprocess.call(["/usr/bin/make", "package", "-C", pkg_dir, "DISABLE_VULNERABILITIES=yes"])
         else:
             print("WARNING: System is not FreeBSD. Generated Makefile and pkg-plist but did not attempt to build pkg.")
 
     def build_on_remote_host(self):
+        """Runs the build on a remote host using SSH."""
         # Automate the process to pull, build and retrieve the package on a remote host
         build_cmds = [
             "mkdir -p ~/build/",
             "rm -rf ~/build/pfsense-api",
             "git clone https://github.com/jaredhendrickson13/pfsense-api.git ~/build/pfsense-api/",
             "git -C ~/build/pfsense-api checkout " + self.args.branch,
-            "python3 ~/build/pfsense-api/tools/make_package.py --tag {t}".format(t=self.args.tag)
+            f"python3 ~/build/pfsense-api/tools/make_package.py --tag {self.args.tag}"
         ]
 
         # Join our build commands into a single command to run via SSH
@@ -128,8 +139,8 @@ class MakePackage:
             # Return value if valid, otherwise throw error
             if valid:
                 return value_string
-            else:
-                raise argparse.ArgumentTypeError("%s is not a semantic version tag" % value_string)
+
+            raise argparse.ArgumentTypeError(f"{value_string} is not a semantic version tag")
 
         parser = argparse.ArgumentParser(
             description="Build the pfSense API on FreeBSD"
@@ -138,7 +149,7 @@ class MakePackage:
             '--host', '-i',
             dest="host",
             type=str,
-            required=True if "--remote" in sys.argv or "-r" in sys.argv else False,
+            required=bool("--remote" in sys.argv or "-r" in sys.argv),
             help="The host to connect to when using --build mode"
         )
         parser.add_argument(

@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/diagnostics/command_prompt endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestDiagnosticsCommandPrompt(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/diagnostics/command_prompt endpoint."""
     uri = "/api/v1/diagnostics/command_prompt"
     post_tests = [
         {
@@ -29,5 +31,6 @@ class APIE2ETestDiagnosticsCommandPrompt(e2e_test_framework.APIE2ETest):
             "return": 7000
         }
     ]
+
 
 APIE2ETestDiagnosticsCommandPrompt()

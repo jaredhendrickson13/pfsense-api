@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/interface/bridge endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/interface/bridge endpoint."""
     uri = "/api/v1/interface/bridge"
     get_tests = [{"name": "Read all interface VLANs"}]
     post_tests = [
@@ -94,17 +96,7 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
                 "id": "bridge0",
                 "members": ["NonexistingIface"]
             }
-        },
-#         Currently don't have a standard way to test this in a VM
-#         {
-#             "name": "Check 1 bridge per member constraint",
-#             "status": 400,
-#             "return": 3068,
-#             "payload": {
-#                 "id": "bridge0",
-#                 "members": ["lan"]
-#             }
-#         }
+        }
     ]
     delete_tests = [
         {
@@ -127,5 +119,6 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
             }
         }
     ]
+
 
 APIE2ETestInterfaceBridge()

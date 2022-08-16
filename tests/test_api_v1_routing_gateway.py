@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/routing/gateway endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/routing/gateway endpoint."""
     uri = "/api/v1/routing/gateway"
     get_tests = [{"name": "Read all routing gateways"}]
     post_tests = [
@@ -707,5 +709,6 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "resp_time": 5    # Allow a few seconds to safely remove the gateway and reload the route table
         }
     ]
+
 
 APIE2ETestRoutingGateway()

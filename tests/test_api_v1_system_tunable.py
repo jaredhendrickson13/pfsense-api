@@ -1,7 +1,9 @@
+"""Script used to test the /api/v1/system/tunable endpoint."""
 import e2e_test_framework
 
 
 class APIE2ETestTunable(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/system/tunable endpoint."""
     uri = "/api/v1/system/tunable"
     get_tests = [{"name": "Read system tunables"}]
     post_tests = [

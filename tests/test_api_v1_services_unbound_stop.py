@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/services/unbound/stop endpoint."""
 import e2e_test_framework
 
 
 class APIE2ETestServicesUnboundStop(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/services/unbound/stop endpoint."""
     uri = "/api/v1/services/unbound/stop"
     post_tests = [{"name": "Stop the Unbound service"}]
 

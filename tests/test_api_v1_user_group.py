@@ -1,7 +1,9 @@
+"""Script used to test the /api/v1/user/group endpoint."""
 import e2e_test_framework
 
 
 class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/user/group endpoint."""
     uri = "/api/v1/user/group"
     get_tests = [
         {

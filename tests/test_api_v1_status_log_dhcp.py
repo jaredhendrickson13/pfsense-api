@@ -11,11 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/status/log/firewall endpoint."""
 import e2e_test_framework
 
 
 class APIE2ETestStatusLogDHCP(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/status/log/dhcp endpoint."""
     uri = "/api/v1/status/log/dhcp"
     get_tests = [{"name": "Read the DHCP log"}]
 

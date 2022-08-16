@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/firewall/alias endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/firewall/alias endpoint."""
     uri = "/api/v1/firewall/alias"
     get_tests = [
         {"name": "Read all aliases"}
@@ -250,5 +252,6 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
         },
 
     ]
+
 
 APIE2ETestFirewallAlias()

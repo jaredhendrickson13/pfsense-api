@@ -1,7 +1,9 @@
+"""Script used to test the /api/v1/user endpoint."""
 import e2e_test_framework
 
 
 class APIE2ETestUser(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/user endpoint."""
     uri = "/api/v1/user"
     get_tests = [{"name": "Read local users"}]
     post_tests = [
@@ -270,39 +272,40 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
     ]
 
     def post_post(self):
-            # Check our first POST response for the created CA's refid
-            if len(self.post_responses) == 1:
-                # Variables
-                counter = 0
+        # Check our first POST response for the created CA's refid
+        if len(self.post_responses) == 1:
+            # Variables
+            counter = 0
 
-                # Loop through all tests and auto-add the caref ID to tests that have the caref key set
-                for test in self.post_tests:
-                    if "payload" in test.keys() and "caref" in test.keys():
-                        self.post_tests[counter]["payload"]["caref"] = self.post_responses[0]["data"]["refid"]
-                    counter = counter + 1
+            # Loop through all tests and auto-add the caref ID to tests that have the caref key set
+            for test in self.post_tests:
+                if "payload" in test and "caref" in test:
+                    self.post_tests[counter]["payload"]["caref"] = self.post_responses[0]["data"]["refid"]
+                counter = counter + 1
 
-            # Check the second and third POST responses for the user and server certificates
-            if len(self.post_responses) == 3:
-                # Variables
-                post_counter = 0
-                put_counter = 0
+        # Check the second and third POST responses for the user and server certificates
+        if len(self.post_responses) == 3:
+            # Variables
+            post_counter = 0
+            put_counter = 0
 
-                # Loop through all tests and auto-add the refid to payloads that have the user_cert or server_cert set
-                for test in self.post_tests:
-                    if "payload" in test.keys() and "user_cert" in test.keys():
-                        self.post_tests[post_counter]["payload"]["cert"] = [self.post_responses[1]["data"]["refid"]]
+            # Loop through all tests and auto-add the refid to payloads that have the user_cert or server_cert set
+            for test in self.post_tests:
+                if "payload" in test and "user_cert" in test:
+                    self.post_tests[post_counter]["payload"]["cert"] = [self.post_responses[1]["data"]["refid"]]
 
-                    if "payload" in test.keys() and "server_cert" in test.keys():
-                        self.post_tests[post_counter]["payload"]["cert"] = [self.post_responses[2]["data"]["refid"]]
-                    post_counter = post_counter + 1
+                if "payload" in test and "server_cert" in test:
+                    self.post_tests[post_counter]["payload"]["cert"] = [self.post_responses[2]["data"]["refid"]]
+                post_counter = post_counter + 1
 
-                # Do the same for PUT tests
-                for test in self.put_tests:
-                    if "payload" in test.keys() and "user_cert" in test.keys():
-                        self.put_tests[put_counter]["payload"]["cert"] = [self.post_responses[1]["data"]["refid"]]
+            # Do the same for PUT tests
+            for test in self.put_tests:
+                if "payload" in test and "user_cert" in test:
+                    self.put_tests[put_counter]["payload"]["cert"] = [self.post_responses[1]["data"]["refid"]]
 
-                    if "payload" in test.keys() and "server_cert" in test.keys():
-                        self.put_tests[put_counter]["payload"]["cert"] = [self.post_responses[2]["data"]["refid"]]
-                    put_counter = put_counter + 1
+                if "payload" in test and "server_cert" in test:
+                    self.put_tests[put_counter]["payload"]["cert"] = [self.post_responses[2]["data"]["refid"]]
+                put_counter = put_counter + 1
+
 
 APIE2ETestUser()

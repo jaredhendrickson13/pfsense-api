@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/firewall/nat/outbound/mapping endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestFirewallNATOutbound(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/firewall/nat/outbound endpoint."""
     uri = "/api/v1/firewall/nat/outbound"
     get_tests = [
         {"name": "Read entire outbound NAT configuration"}
@@ -25,5 +27,6 @@ class APIE2ETestFirewallNATOutbound(e2e_test_framework.APIE2ETest):
         {"name": "Set outbound NAT mode to disabled", "payload": {"mode": "disabled"}},
         {"name": "Set outbound NAT mode to automatic", "payload": {"mode": "automatic"}}
     ]
+
 
 APIE2ETestFirewallNATOutbound()

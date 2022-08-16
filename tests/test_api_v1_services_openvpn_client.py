@@ -1,7 +1,9 @@
+"""Script used to test the /api/v1/services/openvpn/client endpoint."""
 import e2e_test_framework
 
 
 class APIE2ETestOpenVPNClient(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/services/openvpn/client endpoint."""
     uri = "/api/v1/services/openvpn/client"
     tls_key_text = "-----BEGIN OpenVPN Static key V1----- \
 db8701afd882d746be67f084bae68470 \
@@ -35,7 +37,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Create RSA internal CA",
             "uri": "/api/v1/system/ca",
-            "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
+            "no_caref": True,  # Prevents the overriden post_post() method from auto-adding the created CA ref ID
             "payload": {
                 "method": "internal",
                 "descr": "INTERNAL_CA_TEST",
@@ -57,7 +59,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Create internal certificate with RSA key",
             "uri": "/api/v1/system/certificate",
-            "no_certref": True,    # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
+            "no_certref": True,  # Prevents overriden post_post() method from auto-adding created Certificate ref ID
             "payload": {
                 "method": "internal",
                 "descr": "INTERNAL_CERT_RSA",
@@ -108,8 +110,9 @@ a28e7bdbf1743527346bda359bc92fc9 \
         {
             "name": "Create Interface (ovpnc1)",
             "uri": "/api/v1/interface",
-            "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
-            "no_certref": True,    # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
+            "no_caref": True,  # Prevents the overriden post_post() method from auto-adding the created CA ref ID
+            "no_certref": True,
+            # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
             # "resp_time": 30,
             "payload": {
                 "if": "ovpnc1",
@@ -354,7 +357,8 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Missing OpenVPN Server/Client Certificate",
             "status": 400,
             "return": 2135,
-            "no_certref": True,    # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
+            "no_certref": True,
+            # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
             "payload": {
                 "server_addr": "openvpn.example.com",
             }
@@ -363,7 +367,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Missing OpenVPN Server/Client Certificate Authority",
             "status": 400,
             "return": 2136,
-            "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
+            "no_caref": True,  # Prevents the overriden post_post() method from auto-adding the created CA ref ID
             "payload": {
                 "server_addr": "openvpn.example.com"
             }
@@ -387,11 +391,11 @@ a28e7bdbf1743527346bda359bc92fc9 \
             }
         },
         {
-            "name": "Missing OpenVPN Server/Client 'shared_key'. This parameter is needed for server mode 'p2p_shared_key'",
+            "name": "Missing OpenVPN Server/Client 'shared_key', parameter is needed for server mode 'p2p_shared_key'",
             "status": 400,
             "return": 2141,
-            "no_certref": True,    # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
-            "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
+            "no_certref": True, # Prevents overriden post_post() method from auto-adding the created Certificate ref ID
+            "no_caref": True,  # Prevents the overriden post_post() method from auto-adding the created CA ref ID
             "payload": {
                 "mode": "p2p_shared_key",
                 "server_addr": "openvpn.example.com",
@@ -401,7 +405,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Certificate Authority",
             "status": 400,
             "return": 2142,
-            "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
+            "no_caref": True,  # Prevents the overriden post_post() method from auto-adding the created CA ref ID
             "payload": {
                 "caref": "INVALID_CA_REF",
                 "server_addr": "openvpn.example.com",
@@ -411,7 +415,8 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Certificate",
             "status": 400,
             "return": 2143,
-            "no_certref": True,    # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
+            "no_certref": True,
+            # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
             "payload": {
                 "certref": "INVALID_CERT_REF",
                 "server_addr": "openvpn.example.com",
@@ -474,8 +479,9 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "OpenVPN Client Update 1",
             "status": 200,
             "return": 0,
-            "no_certref": True,    # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
-            "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
+            "no_certref": True,
+            # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
+            "no_caref": True,  # Prevents the overriden post_post() method from auto-adding the created CA ref ID
             "payload": {
                 "description": "TEST_Update_OpenVPN_Client_1",
                 "mode": "p2p_shared_key",
@@ -508,7 +514,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
     ]
     delete_tests = [
         {
-            "name": "OpenVPN Server/Client cannot delete an OpenVPN instance while the interface is assigned. Remove the interface assignment first.",
+            "name": "OpenVPN Server/Client cannot delete an OpenVPN instance while interface is assigned",
             "status": 400,
             "return": 2152,
             "payload": {}
@@ -526,7 +532,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "return": 0,
             "payload": {},
             "resp_time": 10
-        }, # vpnid gets populated by post_post() method
+        },  # vpnid gets populated by post_post() method
         {
             "name": "Delete Certificate",
             "uri": "/api/v1/system/certificate",
@@ -550,13 +556,13 @@ a28e7bdbf1743527346bda359bc92fc9 \
             }
         },
         {
-            "name": "Missing OpenVPN Server/Client 'vpnid'. This parameter is needed to identify the server to modify/delete",
+            "name": "Missing OpenVPN Server/Client 'vpnid', parameter is needed to identify server to modify/delete",
             "status": 400,
             "return": 2140,
             "payload": {}
         },
     ]
-    
+
     # Override our PRE/POST methods
     def post_post(self):
         if len(self.post_responses) == 2:
@@ -564,22 +570,22 @@ a28e7bdbf1743527346bda359bc92fc9 \
             counter = 0
             for test in self.post_tests:
                 # Assign the required refid created in the POST request to the POST/PUT payloads
-                if "payload" in test.keys() and "no_caref" not in test.keys():
+                if "payload" in test and "no_caref" not in test:
                     self.post_tests[counter]["payload"]["caref"] = self.post_responses[1]["data"]["refid"]
                     self.put_tests[1]["payload"]["caref"] = self.post_responses[1]["data"]["refid"]
                     # self.put_tests[1]["payload"]["caref"] = self.post_responses[1]["data"]["refid"]
                 counter = counter + 1
-        
+
         if len(self.post_responses) == 4:
             # Variables
             counter = 0
             for test in self.post_tests:
                 # Assign the required refid created in the POST request to the POST/PUT payloads
-                if "payload" in test.keys() and "no_certref" not in test.keys():
+                if "payload" in test and "no_certref" not in test:
                     self.post_tests[counter]["payload"]["certref"] = self.post_responses[3]["data"]["refid"]
-                    self.put_tests[1]["payload"]["certref"] = self.post_responses[3]["data"]["refid"]                    
+                    self.put_tests[1]["payload"]["certref"] = self.post_responses[3]["data"]["refid"]
                 counter = counter + 1
-        
+
         if len(self.post_responses) == 5:
             # Variables
             # counter = 0

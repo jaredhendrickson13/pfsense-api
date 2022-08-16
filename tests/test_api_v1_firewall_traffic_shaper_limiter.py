@@ -12,9 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Script used to test the /api/v1/firewall/traffic_shaper/limiter endpoint."""
 import e2e_test_framework
 
+# This test requires lots of field validation hence the length of the module.
+# pylint: disable=too-many-lines
+
+
 class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/firewall/traffic_shaper/limiter endpoint."""
     uri = "/api/v1/firewall/traffic_shaper/limiter"
     get_tests = [{"name": "Read all traffic shaper limiters"}]
     post_tests = [

@@ -1,7 +1,9 @@
+"""Script used to test the /api/v1/user/privilege endpoint."""
 import e2e_test_framework
 
 
 class APIE2ETestUserPrivilege(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/user/privilege endpoint."""
     uri = "/api/v1/user/privilege"
     post_tests = [
         {

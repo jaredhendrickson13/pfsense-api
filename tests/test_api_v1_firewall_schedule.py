@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/firewall/schedule endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/firewall/schedule endpoint."""
     uri = "/api/v1/firewall/schedule"
     get_tests = [
             {"name": "Read all firewall schedules"}
@@ -198,16 +200,16 @@ class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
                 "name": "INVALID"
             }
         }
-        # TODO: Add test to check inability to delete schedules while they're in use
     ]
 
     def post_post(self):
         # Only proceed if we have a valid post response
         if self.post_responses:
             # Check if the last request was a successful firewall rule creation
-            if self.post_responses[-1] and type(self.post_responses[-1]["data"]) == dict:
+            if self.post_responses[-1] and isinstance(self.post_responses[-1]["data"], dict):
                 # Add the tracker to delete payload that deletes the firewall rule using the schedule
                 if self.post_responses[-1]["data"].get("tracker", None):
                     self.delete_tests[1]["payload"]["tracker"] = self.post_responses[-1]["data"]["tracker"]
+
 
 APIE2ETestFirewallSchedule()

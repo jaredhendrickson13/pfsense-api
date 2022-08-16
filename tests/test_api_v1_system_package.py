@@ -1,7 +1,9 @@
+"""Script used to test the /api/v1/system/package endpoint."""
 import e2e_test_framework
 
 
 class APIE2ETestSystemPackage(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/system/package endpoint."""
     uri = "/api/v1/system/package"
     get_tests = [{"name": "Read installed packages"}]
     post_tests = [

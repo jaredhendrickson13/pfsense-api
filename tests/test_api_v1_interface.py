@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/interface endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/interface endpoint."""
     uri = "/api/v1/interface"
     get_tests = [
         {"name": "Read all configured interfaces"}
@@ -149,7 +151,6 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
                 "descr": "10051"
             }
         },
-        # TODO: Add test to ensure description cannot match gateway group once an endpoint exists for gateway groups
         {
             "name": "Check description cannot be in use",
             "status": 400,
@@ -226,7 +227,6 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
                 "alias-address": "INVALID"
             }
         },
-        # TODO: a specific error code was never setup for this error, add one and update this test
         {
             "name": "Check DHCP IPv4 alias subnet validation",
             "status": 400,
@@ -361,7 +361,6 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
                 "ipaddrv6": "INVALID"
             }
         },
-        # TODO: Add test to check if IPv6 address is already in use
         {
             "name": "Check static IPv6 address subnet requirement",
             "status": 400,
@@ -499,7 +498,6 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
                 "track6-interface": "INVALID"
             }
         },
-        # TODO: Add test to check track6 prefix hex ID validation
         {
             "name": "Create interface bridge for testing",
             "uri": "/api/v1/interface/bridge",
@@ -613,5 +611,6 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             }
         }
     ]
+
 
 APIE2ETestInterface()

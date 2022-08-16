@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/firewall/rule endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/firewall/rule endpoint."""
     uri = "/api/v1/firewall/rule"
     get_tests = [
         {"name": "Read all firewall rules"}
@@ -763,10 +765,11 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             self.delete_tests[0]["payload"]["tracker"] = self.post_responses[6]["data"]["tracker"]
             self.delete_tests[1]["payload"]["tracker"] = self.post_responses[7]["data"]["tracker"]
             key = 0
-            for value in self.put_tests:
-                if "payload" in self.put_tests[key].keys():
+            for _ in self.put_tests:
+                if "payload" in self.put_tests[key]:
                     self.put_tests[key]["payload"]["tracker"] = self.post_responses[6]["data"]["tracker"]
                     self.put_tests[key]["payload"]["tracker"] = self.post_responses[7]["data"]["tracker"]
                 key += 1
+
 
 APIE2ETestFirewallRule()
