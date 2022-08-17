@@ -10470,6 +10470,19 @@ paths:
       summary: Read interface status
       tags:
         - Status > Interface
+  /api/v1/status/ipsec:
+    get:
+      description: 'Read IPsec status and metrics.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-ipsec`]'
+      responses:
+        200:
+          $ref: '#/components/responses/Success'
+        401:
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read IPsec status
+      tags:
+        - Status > IPsec
   /api/v1/status/log/config_history:
     get:
       description: 'Read the configuration history log.<br><br>
@@ -12466,6 +12479,7 @@ tags:
   - name: Status > Log
   - name: Status > Gateway
   - name: Status > Interface
+  - name: Status > IPsec
   - name: Status > System
   - name: Services
   - name: Services > OpenVPN > Server
