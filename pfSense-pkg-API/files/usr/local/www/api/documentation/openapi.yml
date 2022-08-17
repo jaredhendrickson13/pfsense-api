@@ -6794,7 +6794,9 @@ paths:
                     - 15360
                     - 16384
                     - 'ECDH Only'
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: integer
                 ecdh_curve:
                   default: 'none'
                   description: Configures a specific elliptic curve to use for Elliptic Curve Diffie-Hellman 
@@ -7280,7 +7282,9 @@ paths:
                     - 10
                     - 11
                     - 'default'
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: integer
                 wins_servers:
                   default: ''
                   description: Comma-separated list of no more than 2 WINS server
@@ -7526,7 +7530,9 @@ paths:
                     - 15360
                     - 16384
                     - 'ECDH Only'
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: integer
                 ecdh_curve:
                   default: 'none'
                   description: Configures a specific elliptic curve to use for Elliptic Curve Diffie-Hellman 
@@ -8012,7 +8018,9 @@ paths:
                     - 10
                     - 11
                     - 'default'
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: integer
                 wins_servers:
                   default: ''
                   description: Comma-separated list of no more than 2 WINS server
@@ -8503,7 +8511,9 @@ paths:
                     - 10
                     - 11
                     - 'default'
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: integer
                 disable:
                   default: false
                   description: Disable this override without removing it.
@@ -8740,7 +8750,9 @@ paths:
                     - 15360
                     - 16384
                     - 'ECDH Only'
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: integer
                 ecdh_curve:
                   default: 'none'
                   description: Configures a specific elliptic curve to use for Elliptic Curve Diffie-Hellman 
@@ -9226,7 +9238,9 @@ paths:
                     - 10
                     - 11
                     - 'default'
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: integer
                 wins_servers:
                   default: ''
                   description: Comma-separated list of no more than 2 WINS server
