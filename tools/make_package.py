@@ -105,15 +105,17 @@ class MakePackage:
             "rm -rf ~/build/pfsense-api",
             "git clone https://github.com/jaredhendrickson13/pfsense-api.git ~/build/pfsense-api/",
             "git -C ~/build/pfsense-api checkout " + self.args.branch,
-            "pkill ntpd && ntpdate pool.ntp.org",
             "composer install --working-dir ~/build/pfsense-api",
-            "rm -rf ~/build/pfsense-api/vendor/composer && rm ~/build/pfsense-api/vendor/autoload.php"
-            "cp -r ~/build/pfsense-api/vendor/* ~/build/pfsense-api/pfSense-pkg-API/files/etc/inc/"
+            "rm -rf ~/build/pfsense-api/vendor/composer && rm ~/build/pfsense-api/vendor/autoload.php",
+            "cp -r ~/build/pfsense-api/vendor/* ~/build/pfsense-api/pfSense-pkg-API/files/etc/inc/",
             f"python3 ~/build/pfsense-api/tools/make_package.py --tag {self.args.tag}"
         ]
 
-        # Join our build commands into a single command to run via SSH
-        self.run_ssh_cmd(" && ".join(build_cmds))
+        # Run each command and exit on bad status if failure
+        for cmd in build_cmds:
+            if self.run_ssh_cmd(cmd) != 0:
+                print(f"Command '{cmd}' failed.")
+                sys.exit(1)
 
         # Retrieve the built package
         src = "{u}@{h}:~/build/pfsense-api/pfSense-pkg-API/work/pkg/pfSense-pkg-API-{v}{r}.pkg"
