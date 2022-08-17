@@ -1,7 +1,19 @@
 openapi: 3.0.0
+servers:
+  - url: /
+
 info:
   title: pfSense REST API Documentation
   version: "v1"
+  contact:
+    name: "Report bugs & issues"
+    url: "https://github.com/jaredhendrickson13/pfsense-api"
+    email: "github@jaredhendrickson.com"
+
+  license:
+    name: "Apache 2.0"
+    url: "https://raw.githubusercontent.com/jaredhendrickson13/pfsense-api/master/LICENSE"
+
   description: >-
     ---
 
@@ -794,14 +806,15 @@ security:
 paths:
   /api/v1/access_token:
     post:
+      operationId: APIAccessTokenCreate
       description: Receive a temporary access token using your pfSense local database
         credentials. Basic authentication must be used to authenticate on this endpoint
         and this token is only applicable when the API is configured to use the JWT
         authentication type.
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       security:
         - local: []
@@ -810,6 +823,7 @@ paths:
         - Access Token
   /api/v1/diagnostics/command_prompt:
     post:
+      operationId: APIDiagnosticsCommandPromptCreate
       description: 'Execute a shell command.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-command`]'
@@ -827,15 +841,16 @@ paths:
                 - shell_cmd
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Execute shell command
       tags:
         - Diagnostics > Command Prompt
   /api/v1/firewall/alias:
     delete:
+      operationId: APIFirewallAliasDelete
       description: 'Delete an existing alias.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-alias-edit`]'
@@ -862,27 +877,29 @@ paths:
             default: true
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete firewall alias
       tags:
         - Firewall > Alias
     get:
+      operationId: APIFirewallAliasRead
       description: 'Read existing firewall aliases.<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-aliases`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read firewall aliases
       tags:
         - Firewall > Alias
     post:
+      operationId: APIFirewallAliasCreate
       description: 'Add a new host, network or port firewall alias.<br><br>
 
 
@@ -942,14 +959,15 @@ paths:
                 - address
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create firewall alias
       tags:
         - Firewall > Alias
     put:
+      operationId: APIFirewallAliasUpdate
       description: 'Modify an existing firewall alias.<br><br>
 
 
@@ -1008,15 +1026,16 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update firewall alias
       tags:
         - Firewall > Alias
   /api/v1/firewall/alias/entry:
     delete:
+      operationId: APIFirewallAliasEntryDelete
       description: 'Delete existing entry from an existing firewall alias.<br><br>
 
 
@@ -1047,14 +1066,15 @@ paths:
             default: true
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Remove firewall alias entry
       tags:
         - Firewall > Alias > Entry
     post:
+      operationId: APIFirewallAliasEntryCreate
       description: 'Add new entries to an existing firewall alias.<br><br>
 
 
@@ -1099,15 +1119,16 @@ paths:
                 - name
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Add firewall alias entries
       tags:
         - Firewall > Alias > Entry
   /api/v1/firewall/apply:
     post:
+      operationId: APIFirewallApplyCreate
       description: 'Apply pending firewall changes. This will reload all firewall
         items.<br><br>
 
@@ -1117,15 +1138,16 @@ paths:
         `page-firewall-nat-1-1`, `page-firewall-nat-1-1-edit`, `page-firewall-nat-outbound`,
         `page-firewall-nat-outbound-edit`, `page-firewall-nat-portforward`, `page-firewall-nat-portforward-edit`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Apply firewall changes
       tags:
         - Firewall > Apply
   /api/v1/firewall/nat/one_to_one:
     delete:
+      operationId: APIFirewallNATOneToOneDelete
       description: 'Delete an existing NAT 1:1 mapping by ID.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1-edit`]'
@@ -1148,26 +1170,28 @@ paths:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete NAT 1-to-1 mapping
       tags:
         - Firewall > NAT > One-To-One
     get:
+      operationId: APIFirewallNATOneToOneRead
       description: 'Read existing 1:1 NAT mappings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read NAT 1-to-1 mappings
       tags:
         - Firewall > NAT > One-To-One
     post:
+      operationId: APIFirewallNATOneToOneCreate
       description: 'Create a new NAT 1:1 mapping.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1-edit`]'
@@ -1243,14 +1267,15 @@ paths:
                 - external
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create NAT 1-to-1 mapping
       tags:
         - Firewall > NAT > One-To-One
     put:
+      operationId: APIFirewallNATOneToOneUpdate
       description: 'Update an existing NAT 1:1 mapping.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1-edit`]'
@@ -1325,27 +1350,29 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update NAT 1-to-1 mapping
       tags:
         - Firewall > NAT > One-To-One
   /api/v1/firewall/nat/outbound:
     get:
+      operationId: APIFirewallNATOutboundRead
       description: 'Read outbound NAT settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read outbound NAT settings
       tags:
         - Firewall > NAT > Outbound
     put:
+      operationId: APIFirewallNATOutboundUpdate
       description: 'Update outbound NAT settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]'
@@ -1376,15 +1403,16 @@ paths:
                   type: string
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update outbound NAT settings
       tags:
         - Firewall > NAT > Outbound
   /api/v1/firewall/nat/outbound/mapping:
     delete:
+      operationId: APIFirewallNATOutboundMappingDelete
       description: 'Delete an existing outbound NAT mapping.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound-edit`]'
@@ -1407,26 +1435,28 @@ paths:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete outbound NAT mapping
       tags:
         - Firewall > NAT > Outbound > Mapping
     get:
+      operationId: APIFirewallNATOutboundMappingRead
       description: 'Read existing outbound NAT mappings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read outbound NAT mappings
       tags:
         - Firewall > NAT > Outbound > Mapping
     post:
+      operationId: APIFirewallNATOutboundMappingCreate
       description: 'Create new outbound NAT mapping.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound-edit`]'
@@ -1543,14 +1573,15 @@ paths:
                 - target
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create outbound NAT mapping
       tags:
         - Firewall > NAT > Outbound > Mapping
     put:
+      operationId: APIFirewallNATOutboundMappingUpdate
       description: 'Update an existing outbound NAT mapping.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound-edit`]'
@@ -1668,15 +1699,16 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update outbound NAT mapping
       tags:
         - Firewall > NAT > Outbound > Mapping
   /api/v1/firewall/nat/port_forward:
     delete:
+      operationId: APIFirewallNATOutboundPortForwardDelete
       description: 'Delete an existing NAT rule by ID.<br> _Note: use caution when
         making this call, removing rules may result in API/webConfigurator lockout_<br><br>
 
@@ -1700,26 +1732,28 @@ paths:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete NAT port forward
       tags:
         - Firewall > NAT > Port Forward
     get:
+      operationId: APIFirewallNATOutboundPortForwardRead
       description: 'Read NAT port forward rules.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-portforward`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read NAT port forwards
       tags:
         - Firewall > NAT > Port Forward
     post:
+      operationId: APIFirewallNATOutboundPortForwardCreate
       description: 'Create a new NAT port forward rule.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-portforward-edit`]'
@@ -1834,14 +1868,15 @@ paths:
                 - target
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create NAT port forward
       tags:
         - Firewall > NAT > Port Forward
     put:
+      operationId: APIFirewallNATOutboundPortForwardUpdate
       description: 'Update an existing port forward rule.<br><br>
 
 
@@ -1957,15 +1992,16 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update NAT port forward
       tags:
         - Firewall > NAT > Port Forward
   /api/v1/firewall/rule:
     delete:
+      operationId: APIFirewallRuleDelete
       description: 'Delete an existing firewall rule.<br>
 
         _Note: use caution when making this call, removing certain rules can result
@@ -1984,34 +2020,35 @@ paths:
             later. If you are modifying multiple rules at once it Is best to set this
             to false and apply the changes afterwards using the `/api/v1/firewall/apply`
             endpoint.
-          example: boolean
           in: query
           name: apply
           schema:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete firewall rule
       tags:
         - Firewall > Rule
     get:
+      operationId: APIFirewallRuleRead
       description: 'Read firewall rules.<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read existing firewall rules.
       tags:
         - Firewall > Rule
     post:
+      operationId: APIFirewallRuleCreate
       description: 'Add a new firewall rule.<br><br>
 
 
@@ -2202,14 +2239,15 @@ paths:
                 - dst
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create firewall rule
       tags:
         - Firewall > Rule
     put:
+      operationId: APIFirewallRuleUpdate
       description: 'Update an existing firewall rule.<br><br>
 
 
@@ -2393,15 +2431,16 @@ paths:
                 - tracker
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update firewall rule
       tags:
         - Firewall > Rule
   /api/v1/firewall/rule/flush:
     put:
+      operationId: APIFirewallRuleFlushUpdate
       description: 'Replace all existing firewall rules with a specified set of rules. This allows you to
             create rules at once. If a validation error is encountered when validating the rules, the specific 
             rule entry that triggered the error will be included in the `data` field of the response. <br><br>_Note:
@@ -2446,14 +2485,15 @@ paths:
                 - rules
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Replace all firewall rules
       tags:
         - Firewall > Rule > Flush
     delete:
+      operationId: APIFirewallRuleFlushDelete
       description: 'Delete all existing firewall rules. This is useful for scripts
         that need to setup the firewall rules from scratch.<br><br>_Note: this endpoint
         will not reload the firewall filter automatically, you must make another API
@@ -2462,15 +2502,16 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules-edit`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete all firewall rules
       tags:
         - Firewall > Rule > Flush
   /api/v1/firewall/rule/sort:
     put:
+      operationId: APIFirewallRuleSortUpdate
       description: 'Sorts firewall rules based on specified criteria. Use caution
         if sorting firewall rules when block rules are present.<br><br>
 
@@ -2520,15 +2561,16 @@ paths:
                 - field
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Sort existing firewall rules
       tags:
         - Firewall > Rule > Sort
   /api/v1/firewall/schedule:
     delete:
+      operationId: APIFirewallScheduleDelete
       description: 'Delete an existing firewall schedule.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]'
@@ -2540,26 +2582,28 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete schedule
       tags:
         - Firewall > Schedule
     get:
+      operationId: APIFirewallScheduleRead
       description: 'Read all existing firewall schedules.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read schedules
       tags:
         - Firewall > Schedule
     post:
+      operationId: APIFirewallScheduleCreate
       description: 'Create a firewall schedule.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]'
@@ -2600,14 +2644,15 @@ paths:
                 - timerange
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create schedule
       tags:
         - Firewall > Schedule
     put:
+      operationId: APIFirewallScheduleUpdate
       description: 'Update an existing firewall schedule.<br><br>
 
 
@@ -2644,15 +2689,16 @@ paths:
                 - name
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update schedule
       tags:
         - Firewall > Schedule
   /api/v1/firewall/schedule/time_range:
     delete:
+      operationId: APIFirewallScheduleTimeRangeDelete
       description: 'Remove a time range from an existing firewall schedule.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]'
@@ -2673,14 +2719,15 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete schedule time range
       tags:
         - Firewall > Schedule > Time Range
     post:
+      operationId: APIFirewallScheduleTimeRangeCreate
       description: 'Add a new time range to an existing firewall schedule.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]'
@@ -2732,15 +2779,16 @@ paths:
                 - hour
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create schedule time range
       tags:
         - Firewall > Schedule > Time Range
   /api/v1/firewall/states:
     delete:
+      operationId: APIFirewallStatesDelete
       description: 'Delete existing firewall states.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-showstates`]'
@@ -2784,41 +2832,44 @@ paths:
             minimum: 0
             type: integer
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete firewall states
       tags:
         - Firewall > States
     get:
+      operationId: APIFirewallStatesRead
       description: 'Read the current firewall states table.<br> _Note: excessively
         large states tables may cause API calls to this endpoint to timeout._<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-statessummary`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read firewall states
       tags:
         - Firewall > States
   /api/v1/firewall/states/size:
     get:
+      operationId: APIFirewallStatesSizeRead
       description: 'Read information about the firewall state table''s current, default
         and maximum sizes.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-statessummary`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read firewall state size
       tags:
         - Firewall > States > Size
     put:
+      operationId: APIFirewallStatesSizeUpdate
       description: 'Modify the maximum number of firewall state table entries allowed
         by the system.<br>_Note: use caution when making this call, setting the maximum
         state table size to a value lower than the current number of firewall state
@@ -2839,15 +2890,16 @@ paths:
                 - maximumstates
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update firewall state size
       tags:
         - Firewall > States > Size
   /api/v1/firewall/traffic_shaper:
     delete:
+      operationId: APIFirewallTrafficShaperDelete
       description: 'Delete the traffic shaper policy for a specific interface.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper`]'
@@ -2871,26 +2923,28 @@ paths:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete traffic shaper
       tags:
         - Firewall > Traffic Shaper
     get:
+      operationId: APIFirewallTrafficShaperRead
       description: 'Read all configured traffic shaper policies.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read traffic shapers
       tags:
         - Firewall > Traffic Shaper
     post:
+      operationId: APIFirewallTrafficShaperCreate
       description: 'Add a new traffic shaper policy to an interface.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper`]'
@@ -2958,14 +3012,15 @@ paths:
                 - bandwidth
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create traffic shaper
       tags:
         - Firewall > Traffic Shaper
     put:
+      operationId: APIFirewallTrafficShaperUpdate
       description: 'Update an existing traffic shaper policy for an interface.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper`]'
@@ -3032,15 +3087,16 @@ paths:
                 - interface
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update traffic shaper
       tags:
         - Firewall > Traffic Shaper
   /api/v1/firewall/traffic_shaper/limiter:
     delete:
+      operationId: APIFirewallTrafficShaperLimiterDelete
       description: 'Delete traffic shaper limiter.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]'
@@ -3061,26 +3117,28 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete limiter
       tags:
         - Firewall > Traffic Shaper > Limiter
     get:
+      operationId: APIFirewallTrafficShaperLimiterRead
       description: 'Read all existing traffic shaper limiters.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read limiters
       tags:
         - Firewall > Traffic Shaper > Limiter
     post:
+      operationId: APIFirewallTrafficShaperLimiterCreate
       description: 'Create a new traffic shaper limiter.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]'
@@ -3365,15 +3423,16 @@ paths:
                 - sched
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create limiter
       tags:
         - Firewall > Traffic Shaper > Limiter
   /api/v1/firewall/traffic_shaper/limiter/bandwidth:
     delete:
+      operationId: APIFirewallTrafficShaperLimiterBandwidthDelete
       description: 'Delete a limiter bandwidth setting.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]'
@@ -3404,14 +3463,15 @@ paths:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete limiter bandwidth
       tags:
         - Firewall > Traffic Shaper > Limiter > Bandwidth
     post:
+      operationId: APIFirewallTrafficShaperLimiterBandwidthCreate
       description: 'Create a limiter bandwidth setting.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]'
@@ -3454,15 +3514,16 @@ paths:
                 - bwscale
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create limiter bandwidth
       tags:
         - Firewall > Traffic Shaper > Limiter > Bandwidth
   /api/v1/firewall/traffic_shaper/limiter/queue:
     delete:
+      operationId: APIFirewallTrafficShaperLimiterQueueDelete
       description: 'Delete an existing queue from an existing traffic shaper limiter.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]'
@@ -3489,14 +3550,15 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete limiter queue
       tags:
         - Firewall > Traffic Shaper > Limiter > Queue
     post:
+      operationId: APIFirewallTrafficShaperLimiterQueueCreate
       description: 'Add a new child queue to an existing traffic shaper limiter.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]'
@@ -3565,7 +3627,7 @@ paths:
                   description: IPv6 subnet bitmask to apply the limiter queue to.
                     This parameter is only available when `mask` is set to `srcaddress`
                     or `dstaddress`.
-                  maximum: 32
+                  maximum: 128
                   minimum: 1
                   type: integer
                 name:
@@ -3694,15 +3756,16 @@ paths:
                 - aqm
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create limiter queue
       tags:
         - Firewall > Traffic Shaper > Limiter > Queue
   /api/v1/firewall/traffic_shaper/queue:
     delete:
+      operationId: APIFirewallTrafficShaperQueueDelete
       description: 'Delete a queue from an existing traffic shaper interface.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-queues`]'
@@ -3723,14 +3786,15 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete traffic shaper queue
       tags:
         - Firewall > Traffic Shaper > Queue
     post:
+      operationId: APIFirewallTrafficShaperQueueCreate
       description: 'Add a queue to an existing traffic shaper interface.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-queues`]'
@@ -3926,15 +3990,16 @@ paths:
                 - name
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create traffic shapper queue
       tags:
         - Firewall > Traffic Shaper > Queue
   /api/v1/firewall/virtual_ip:
     delete:
+      operationId: APIFirewallVirtualIPDelete
       description: 'Delete an existing virtual IP.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-virtualipaddress-edit`]'
@@ -3947,27 +4012,29 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete virtual IP
       tags:
         - Firewall > Virtual IP
     get:
+      operationId: APIFirewallVirtualIPRead
       description: 'Read existing virtual IP assignments.<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-virtualipaddresses`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read virtual IPs
       tags:
         - Firewall > Virtual IP
     post:
+      operationId: APIFirewallVirtualIPCreate
       description: 'Add a new virtual IP.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-virtualipaddress-edit`]'
@@ -4034,14 +4101,15 @@ paths:
                 - subnet
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create virtual IP
       tags:
         - Firewall > Virtual IP
     put:
+      operationId: APIFirewallVirtualIPUpdate
       description: 'Update an existing virtual IP.<br><br>
 
 
@@ -4110,15 +4178,16 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update virtual IP
       tags:
         - Firewall > Virtual IP
   /api/v1/interface:
     delete:
+      operationId: APIInterfaceDelete
       description: 'Delete an existing interface. __Note: interface deletions will
         be applied immediately, there is no need to apply interface changes afterwards__<br><br>
 
@@ -4134,27 +4203,29 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete interface
       tags:
         - Interface
     get:
+      operationId: APIInterfaceRead
       description: 'Read interface assignments and configuration.<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read interfaces
       tags:
         - Interface
     post:
+      operationId: APIInterfaceCreate
       description: 'Configure a new interface.<br><br>
 
 
@@ -4409,14 +4480,15 @@ paths:
                 - descr
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create interface
       tags:
         - Interface
     put:
+      operationId: APIInterfaceUpdate
       description: 'Update an existing interface.<br><br>
 
 
@@ -4679,42 +4751,45 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update interface
       tags:
         - Interface
   /api/v1/interface/available:
     get:
+      operationId: APIInterfaceAvailableRead
       description: 'Read all interfaces available on the system. This will provide details for all interfaces regardless
           if they are currently configured on pfSense.<br><br>
 
 
           _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read all available interfaces
       tags:
         - Interface > Available
   /api/v1/interface/apply:
     get:
+      operationId: APIInterfaceApplyRead
       description: 'Check if all pending interface changes have been applied.<br><br>
 
               _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Poll interface apply status
       tags:
         - Interface > Apply
     post:
+      operationId: APIInterfaceApplyCreate
       description: 'Apply pending interface changes.<br><br>
 
 
@@ -4731,15 +4806,16 @@ paths:
                   type: boolean
                   default: false
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Apply interfaces
       tags:
         - Interface > Apply
   /api/v1/interface/bridge:
     delete:
+      operationId: APIInterfaceBridgeDelete
       description: 'Delete bridge assignment and configuration.<br><br>
 
 
@@ -4754,28 +4830,30 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete interface bridge
       tags:
         - Interface > Bridge
     get:
+      operationId: APIInterfaceBridgeRead
       description: 'Read bridge assignments and configuration.<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge`,
         `page-interfaces-bridge-edit`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read interface bridges
       tags:
         - Interface > Bridge
     post:
+      operationId: APIInterfaceBridgeCreate
       description: 'Add a new bridge interface.<br><br>
 
 
@@ -4801,14 +4879,15 @@ paths:
                 - members
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create interface bridge
       tags:
         - Interface > Bridge
     put:
+      operationId: APIInterfaceBridgeUpdate
       description: 'Update an existing bridge configuration.<br><br>
 
 
@@ -4838,15 +4917,16 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update interface bridge
       tags:
         - Interface > Bridge
   /api/v1/interface/group:
     delete:
+      operationId: APIInterfaceGroupDelete
       description: 'Delete interface group and configuration.<br><br>
 
 
@@ -4859,28 +4939,30 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete interface group
       tags:
         - Interface > Group
     get:
+      operationId: APIInterfaceGroupRead
       description: 'Read interface group and configuration.<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-group`,
         `page-interfaces-group-edit`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read interface groups
       tags:
         - Interface > Group
     post:
+      operationId: APIInterfaceGroupCreate
       description: 'Add a new interface group.<br><br>
 
 
@@ -4899,7 +4981,6 @@ paths:
                     the physical interface ID (e.g. em0), the pfSense interface ID
                     (e.g. wan, lan, optx) or the interface description (e.g. WAN,
                     LAN).
-                  default: ''
                   items:
                     type: string
                   type: array
@@ -4910,14 +4991,15 @@ paths:
                 - ifname
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create interface group
       tags:
         - Interface > Group
     put:
+      operationId: APIInterfaceGroupUpdate
       description: 'Update an existing interface group configuration.<br><br>
 
 
@@ -4945,15 +5027,16 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update interface group
       tags:
         - Interface > Group
   /api/v1/interface/vlan:
     delete:
+      operationId: APIInterfaceVLANDelete
       description: 'Delete VLAN assignment and configuration.<br><br>
 
 
@@ -4967,28 +5050,30 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete Interface VLAN
       tags:
         - Interface > VLAN
     get:
+      operationId: APIInterfaceVLANRead
       description: 'Read VLAN assignments and configuration.<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-vlan`,
         `page-interfaces-vlan-edit`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read interface VLANs
       tags:
         - Interface > VLAN
     post:
+      operationId: APIInterfaceVLANCreate
       description: 'Add a new VLAN interface.<br><br>
 
 
@@ -5020,14 +5105,15 @@ paths:
                 - tag
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create interface VLAN
       tags:
         - Interface > VLAN
     put:
+      operationId: APIInterfaceVLANUpdate
       description: 'Modify an existing VLAN configuration
 
 
@@ -5069,29 +5155,31 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update interface VLAN
       tags:
         - Interface > VLAN
   /api/v1/routing/apply:
     post:
+      operationId: APIRoutingApplyCreate
       description: 'Apply pending routing changes.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`,
         `page-system-gateways-editgateway`, `page-system-staticroutes`, `page-system-staticroutes-editroute`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Apply routing changes
       tags:
         - Routing > Apply
   /api/v1/routing/gateway:
     delete:
+      operationId: APIRoutingGatewayDelete
       description: 'Delete an existing routing gateway.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]'
@@ -5104,14 +5192,15 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete gateway
       tags:
         - Routing > Gateway
     get:
+      operationId: APIRoutingGatewayRead
       description: 'Read existing gateways.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]
@@ -5119,14 +5208,15 @@ paths:
         _Note: This endpoint originally returned verbose routing gateway details.
         This functionality has moved to /api/v1/routing/gateway/detail._'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read gateways
       tags:
         - Routing > Gateway
     post:
+      operationId: APIRoutingGatewayCreate
       description: 'Create a new gateway.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]'
@@ -5264,14 +5354,15 @@ paths:
                 - gateway
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create gateway
       tags:
         - Routing > Gateway
     put:
+      operationId: APIRoutingGatewayUpdate
       description: 'Update an existing gateway.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]'
@@ -5411,15 +5502,16 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update gateway
       tags:
         - Routing > Gateway
   /api/v1/routing/gateway/default:
     put:
+      operationId: APIRoutingGatewayDefaultUpdate
       description: 'Update the default gateways for IPv4 and/or IPv6. _Note: changing the default gateway can
       prevent you from connecting to the system afterward. Proceed with caution._<br><br>
 
@@ -5448,29 +5540,31 @@ paths:
                   type: boolean
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update default gateways
       tags:
         - Routing > Gateway > Default
   /api/v1/routing/gateway/detail:
     get:
+      operationId: APIRoutingGatewayDetailRead
       description: 'Read verbose routing gateway details about both dynamic/system
         gateways and static gateways.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read gateway details
       tags:
         - Routing > Gateway > Detail
   /api/v1/routing/static_route:
     delete:
+      operationId: APIRoutingStaticRouteDelete
       description: 'Delete existing static routes. __Note: route deletions will be
         applied immediately, there is no need to apply routing changes afterwards__<br><br>
 
@@ -5484,26 +5578,28 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete static route
       tags:
         - Routing > Static Route
     get:
+      operationId: APIRoutingStaticRouteRead
       description: 'Read existing static routes.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read static routes
       tags:
         - Routing > Static Route
     post:
+      operationId: APIRoutingStaticRouteCreate
       description: 'Create a new static route.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]'
@@ -5541,14 +5637,15 @@ paths:
                 - gateway
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create static route
       tags:
         - Routing > Static Route
     put:
+      operationId: APIRoutingStaticRouteUpdate
       description: 'Update an existing static route.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]'
@@ -5590,53 +5687,57 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update static route
       tags:
         - Routing > Static Route
   /api/v1/services:
     get:
+      operationId: APIServicesRead
       description: 'Read available services.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read all service statuses
       tags:
         - Services
   /api/v1/services/ddns:
     get:
+      operationId: APIServicesDDNSRead
       description: 'Read configured dynamic DNS settings and statuses.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dynamicdnsclients`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read dynamic DNS configuration
       tags:
         - Services > DDNS
   /api/v1/services/dhcpd:
     get:
+      operationId: APIServicesDHCPdRead
       description: 'Read the entire DHCP Server (dhcpd) configuration.<br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserverpage-services-dhcpserver`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DHCP Server (dhcpd) configuration
       tags:
         - Services > DHCPD
     put:
+      operationId: APIServicesDHCPdUpdate
       description: 'Update the current DHCP Server (dhcpd) configuration for a specified
         interface.<br>
 
@@ -5742,28 +5843,30 @@ paths:
                 - interface
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update DHCP Server (dhcpd) configuration
       tags:
         - Services > DHCPD
   /api/v1/services/dhcpd/lease:
     get:
+      operationId: APIServicesDHCPdLeaseRead
       description: 'Read the current DHCP Server (dhcpd) leases.<br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-dhcpleases`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DHCP Server (dhcpd) leases
       tags:
         - Services > DHCPD > Lease
   /api/v1/services/dhcpd/options:
     post:
+      operationId: APIServicesDHCPdOptionsCreate
       description: 'Set new DHCP Server (dhcpd) option.<br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver`]'
@@ -5826,41 +5929,44 @@ paths:
                 - value
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Set DHCP Server (dhcpd) option
       tags:
         - Services > DHCPD > Options
   /api/v1/services/dhcpd/restart:
     post:
+      operationId: APIServicesDHCPdRestartCreate
       description: 'Restart the DHCP Server (dhcpd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart DHCP Server (dhcpd) service
       tags:
         - Services > DHCPD
   /api/v1/services/dhcpd/start:
     post:
+      operationId: APIServicesDHCPdStartCreate
       description: 'Start the DHCP Server (dhcpd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start DHCP Server (dhcpd) service
       tags:
         - Services > DHCPD
   /api/v1/services/dhcpd/static_mapping:
     delete:
+      operationId: APIServicesDHCPdStaticMappingDelete
       description: 'Delete an existing DHCP Server (dhcpd) static mapping.<br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
@@ -5881,14 +5987,15 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete DHCP Server (dhcpd) static mapping
       tags:
         - Services > DHCPD > Static Mapping
     get:
+      operationId: APIServicesDHCPdStaticMappingRead
       description: 'Read existing DHCP Server (dhcpd) static mappings.<br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
@@ -5902,14 +6009,15 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DHCP Server (dhcpd) static mappings
       tags:
         - Services > DHCPD > Static Mapping
     post:
+      operationId: APIServicesDHCPdStaticMappingCreate
       description: 'Create a new DHCP Server (dhcpd) static mapping.<br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
@@ -5967,14 +6075,15 @@ paths:
                 - ipaddr
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create DHCP Server (dhcpd) static mapping
       tags:
         - Services > DHCPD > Static Mapping
     put:
+      operationId: APIServicesDHCPdStaticMappingUpdate
       description: 'Update an existing DHCP Server (dhcpd) static mapping.<br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
@@ -6037,54 +6146,58 @@ paths:
                 - interface
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update DHCP Server (dhcpd) static mapping
       tags:
         - Services > DHCPD > Static Mapping
   /api/v1/services/dhcpd/stop:
     post:
+      operationId: APIServicesDHCPdStopCreate
       description: 'Stop the DHCP Server (dhcpd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop DHCP Server (dhcpd) service
       tags:
         - Services > DHCPD
   /api/v1/services/dnsmasq:
     get:
+      operationId: APIServicesDnsmasqRead
       description: 'Read the entire DNS Forwarder (dnsmasq) configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DNS Forwarder (dnsmasq) configuration
       tags:
         - Services > DNSMASQ
   /api/v1/services/dnsmasq/apply:
     post:
+      operationId: APIServicesDnsmasqApplyCreate
       description: 'Apply pending DNS Forwarder (dnsmasq) changes.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Apply pending DNS Forwarder (dnsmasq) changes
       tags:
         - Services > DNSMASQ
   /api/v1/services/dnsmasq/host_override:
     delete:
+      operationId: APIServicesDnsmasqHostOverrideDelete
       description: 'Delete an existing host override from the DNS Forwarder (dnsmasq).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
@@ -6107,26 +6220,28 @@ paths:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete DNS Forwarder (dnsmasq) host override
       tags:
         - Services > DNSMASQ > Host Override
     get:
+      operationId: APIServicesDnsmasqHostOverrideRead
       description: 'Read host overrides from the DNS Forwarder (dnsmasq).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DNS Forwarder (dnsmasq) host overrides
       tags:
         - Services > DNSMASQ > Host Override
     post:
+      operationId: APIServicesDnsmasqHostOverrideCreate
       description: 'Add a new host override to the DNS Forwarder (dnsmasq).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
@@ -6170,14 +6285,15 @@ paths:
                 - ip
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create DNS Forwarder (dnsmasq) host override
       tags:
         - Services > DNSMASQ > Host Override
     put:
+      operationId: APIServicesDnsmasqHostOverrideUpdate
       description: 'Modify an existing host override from the DNS Forwarder (dnsmasq).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
@@ -6225,15 +6341,16 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update DNS Forwarder (dnsmasq) host override
       tags:
         - Services > DNSMASQ > Host Override
   /api/v1/services/dnsmasq/host_override/alias:
     post:
+      operationId: APIServicesDnsmasqHostOverrideAliasCreate
       description: 'Add a new host override alias to the DNS Forwarder (dnsmasq).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
@@ -6271,105 +6388,113 @@ paths:
                 - domain
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create DNS Forwarder (dnsmasq) host override alias
       tags:
         - Services > DNSMASQ > Host Override > Alias
   /api/v1/services/dnsmasq/restart:
     post:
+      operationId: APIServicesDnsmasqRestartCreate
       description: 'Restart the DNS Forwarder (dnsmasq) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart DNS Forwarder (dnsmasq) service
       tags:
         - Services > DNSMASQ
   /api/v1/services/dnsmasq/start:
     post:
+      operationId: APIServicesDnsmasqStartCreate
       description: 'Start the DNS Forwarder (dnsmasq) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start DNS Forwarder (dnsmasq) service
       tags:
         - Services > DNSMASQ
   /api/v1/services/dnsmasq/stop:
     post:
+      operationId: APIServicesDnsmasqStopCreate
       description: 'Stop the DNS Forwarder (dnsmasq) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop DNS Forwarder (dnsmasq) service
       tags:
         - Services > DNSMASQ
   /api/v1/services/dpinger/restart:
     post:
+      operationId: APIServicesDpingerRestartCreate
       description: 'Restart the Gateway Monitoring (dpinger) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart Gateway Monitoring (dpinger) service
       tags:
         - Services > DPINGER
   /api/v1/services/dpinger/start:
     post:
+      operationId: APIServicesDpingerStartCreate
       description: 'Start the Gateway Monitoring (dpinger) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start Gateway Monitoring (dpinger) service
       tags:
         - Services > DPINGER
   /api/v1/services/dpinger/stop:
     post:
+      operationId: APIServicesDpingerStopCreate
       description: 'Stop the Gateway Monitoring (dpinger) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop Gateway Monitoring (dpinger) service
       tags:
         - Services > DPINGER
   /api/v1/services/ntpd:
     get:
+      operationId: APIServicesNTPdRead
       description: 'Read the NTP (ntpd) service configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read NTP (ntpd) service
       tags:
         - Services > NTPD
     put:
+      operationId: APIServicesNTPdUpdate
       description: 'Update the NTP (ntpd) service configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
@@ -6428,54 +6553,58 @@ paths:
                   type: array
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update NTP (ntpd) service
       tags:
         - Services > NTPD
   /api/v1/services/ntpd/restart:
     post:
+      operationId: APIServicesNTPdRestartCreate
       description: 'Restart the NTP (ntpd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart NTP (ntpd) Service
       tags:
         - Services > NTPD
   /api/v1/services/ntpd/start:
     post:
+      operationId: APIServicesNTPdStartCreate
       description: 'Start the NTP (ntpd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start NTP (ntpd) service
       tags:
         - Services > NTPD
   /api/v1/services/ntpd/stop:
     post:
+      operationId: APIServicesNTPdStopCreate
       description: 'Stop the NTP (ntpd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop NTP (ntpd) Service
       tags:
         - Services > NTPD
   /api/v1/services/ntpd/time_server:
     delete:
+      operationId: APIServicesNTPdTimeServerDelete
       description: 'Delete an existing NTP time server from the NTP (ntpd) configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
@@ -6490,14 +6619,15 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete NTP (ntpd) time server
       tags:
         - Services > NTPD > Time Server
     post:
+      operationId: APIServicesNTPdTimeServerCreate
       description: 'Add a new NTP time server to the NTP (ntpd) configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
@@ -6528,15 +6658,16 @@ paths:
                 - timeserver
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Add NTP (ntpd) time server
       tags:
         - Services > NTPD > Time Server
   /api/v1/services/openvpn/server:
     delete:
+      operationId: APIServicesOpenVPNServerDelete
       description: 'Delete OpenVPN Server instance.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
@@ -6570,26 +6701,28 @@ paths:
                 - vpnid
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete OpenVPN Server
       tags:
         - Services > OpenVPN > Server
     get:
+      operationId: APIServicesOpenVPNServerRead
       description: 'Read All OpenVPN Server instances.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read OpenVPN Server
       tags:
         - Services > OpenVPN > Server
     post:
+      operationId: APIServicesOpenVPNServerCreate
       description: 'Create OpenVPN Server instance.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
@@ -6773,12 +6906,11 @@ paths:
                     using Online Certificate Status Protocol (OCSP) against the site listed in the OCSP URL field.
                   type: boolean
                 ocspurl:
-                  default: ''
                   description: Enter OCSP URL. This is only necessary for `ocspcheck`.
                   type: string
                   format: uri
                 dh_length:
-                  default: '2048'
+                  default: 2048
                   description: The Diffie-Hellman (DH) key exchange parameters are used for establishing a 
                     secure communications channel. They may be regenerated at any time, and they are not 
                     specific to an OpenVPN instance. When importing an existing OpenVPN configuration 
@@ -6797,7 +6929,9 @@ paths:
                     - 15360
                     - 16384
                     - 'ECDH Only'
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: integer
                 ecdh_curve:
                   default: 'none'
                   description: Configures a specific elliptic curve to use for Elliptic Curve Diffie-Hellman 
@@ -6973,7 +7107,6 @@ paths:
                     that address family, including Internet traffic, over the VPN tunnel.
                   type: boolean
                 serverbridge_dhcp:
-                  default: ""
                   description: When using `tap` mode for a remote access SSL/TLS VPN,
                     (`server_tls`, `server_user`, `server_tls_user`), additional options 
                     to control bridging behavior in OpenVPN and client address assignment.
@@ -7006,7 +7139,6 @@ paths:
                   type: boolean
                   example: true
                 serverbridge_dhcp_start:
-                  default: ""
                   description: Defines a DHCP range from which OpenVPN can assign addresses to clients. 
                     If these settings are left blank, OpenVPN passes DHCP through to the bridge interface 
                     and it ignores the interface setting above.
@@ -7019,7 +7151,6 @@ paths:
                   type: string
                   format: ipv4
                 serverbridge_dhcp_end:
-                  default: ""
                   description: Defines a DHCP range from which OpenVPN can assign addresses to clients. 
                     If these settings are left blank, OpenVPN passes DHCP through to the bridge interface 
                     and it ignores the interface setting above.
@@ -7035,7 +7166,7 @@ paths:
                   description: Specifies the number of clients that may be simultaneously 
                     connected to this OpenVPN server instance at any given time.
                   type: integer
-                  example: '10'
+                  example: 10
                 allow_compression:
                   default: 'no'
                   description: Controls whether or not compression is allowed on the VPN, and how it is handled.
@@ -7264,7 +7395,7 @@ paths:
                     - both
                   type: string
                 verbosity_level:
-                  default: '3'
+                  default: 3
                   description: Configures the amount of detail OpenVPN will log for this instance,
                     which is useful for troubleshooting problems. Higher numbers will result in 
                     higher amounts of detail in the log. 
@@ -7286,7 +7417,9 @@ paths:
                     - 10
                     - 11
                     - 'default'
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: integer
                 wins_servers:
                   default: ''
                   description: Comma-separated list of no more than 2 WINS server
@@ -7299,14 +7432,15 @@ paths:
                   type: boolean
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create OpenVPN Server
       tags:
         - Services > OpenVPN > Server
     put:
+      operationId: APIServicesOpenVPNServerUpdate
       description: 'Update OpenVPN Server instance.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
@@ -7509,12 +7643,11 @@ paths:
                     using Online Certificate Status Protocol (OCSP) against the site listed in the OCSP URL field.
                   type: boolean
                 ocspurl:
-                  default: ''
                   description: Enter OCSP URL. This is only necessary for `ocspcheck`.
                   type: string
                   format: uri
                 dh_length:
-                  default: '2048'
+                  default: 2048
                   description: The Diffie-Hellman (DH) key exchange parameters are used for establishing a 
                     secure communications channel. They may be regenerated at any time, and they are not 
                     specific to an OpenVPN instance. When importing an existing OpenVPN configuration 
@@ -7533,7 +7666,9 @@ paths:
                     - 15360
                     - 16384
                     - 'ECDH Only'
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: integer
                 ecdh_curve:
                   default: 'none'
                   description: Configures a specific elliptic curve to use for Elliptic Curve Diffie-Hellman 
@@ -7709,7 +7844,6 @@ paths:
                     that address family, including Internet traffic, over the VPN tunnel.
                   type: boolean
                 serverbridge_dhcp:
-                  default: ""
                   description: When using `tap` mode for a remote access SSL/TLS VPN,
                     (`server_tls`, `server_user`, `server_tls_user`), additional options 
                     to control bridging behavior in OpenVPN and client address assignment.
@@ -7742,7 +7876,6 @@ paths:
                   type: boolean
                   example: true
                 serverbridge_dhcp_start:
-                  default: ""
                   description: Defines a DHCP range from which OpenVPN can assign addresses to clients. 
                     If these settings are left blank, OpenVPN passes DHCP through to the bridge interface 
                     and it ignores the interface setting above.
@@ -7755,7 +7888,6 @@ paths:
                   type: string
                   format: ipv4
                 serverbridge_dhcp_end:
-                  default: ""
                   description: Defines a DHCP range from which OpenVPN can assign addresses to clients. 
                     If these settings are left blank, OpenVPN passes DHCP through to the bridge interface 
                     and it ignores the interface setting above.
@@ -7771,7 +7903,7 @@ paths:
                   description: Specifies the number of clients that may be simultaneously 
                     connected to this OpenVPN server instance at any given time.
                   type: integer
-                  example: '10'
+                  example: 10
                 allow_compression:
                   default: 'no'
                   description: Controls whether or not compression is allowed on the VPN, and how it is handled.
@@ -8000,7 +8132,7 @@ paths:
                     - both
                   type: string
                 verbosity_level:
-                  default: '3'
+                  default: 3
                   description: Configures the amount of detail OpenVPN will log for this instance,
                     which is useful for troubleshooting problems. Higher numbers will result in 
                     higher amounts of detail in the log. 
@@ -8022,7 +8154,9 @@ paths:
                     - 10
                     - 11
                     - 'default'
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: integer
                 wins_servers:
                   default: ''
                   description: Comma-separated list of no more than 2 WINS server
@@ -8037,15 +8171,16 @@ paths:
                 - vpnid
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update OpenVPN Server
       tags:
         - Services > OpenVPN > Server
   /api/v1/services/openvpn/client:
     delete:
+      operationId: APIServicesOpenVPNClientDelete
       description: 'Delete OpenVPN Client instance.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-client`]'
@@ -8079,26 +8214,28 @@ paths:
                 - vpnid
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete OpenVPN Client
       tags:
         - Services > OpenVPN > Client
     get:
+      operationId: APIServicesOpenVPNClientRead
       description: 'Read All OpenVPN Client instances.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-client`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read OpenVPN Client
       tags:
         - Services > OpenVPN > Client
     post:
+      operationId: APIServicesOpenVPNClientCreate
       description: 'Create OpenVPN Client instance.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-client`]'
@@ -8491,7 +8628,7 @@ paths:
                     - both
                   type: string
                 verbosity_level:
-                  default: '3'
+                  default: 3
                   description: Configures the amount of detail OpenVPN will log for this instance,
                     which is useful for troubleshooting problems. Higher numbers will result in 
                     higher amounts of detail in the log. 
@@ -8513,21 +8650,24 @@ paths:
                     - 10
                     - 11
                     - 'default'
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: integer
                 disable:
                   default: false
                   description: Disable this override without removing it.
                   type: boolean
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create OpenVPN Client
       tags:
         - Services > OpenVPN > Client
     put:
+      operationId: APIServicesOpenVPNClientUpdate
       description: 'Update OpenVPN Client instance.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-client`]'
@@ -8727,12 +8867,11 @@ paths:
                     using Online Certificate Status Protocol (OCSP) against the site listed in the OCSP URL field.
                   type: boolean
                 ocspurl:
-                  default: ''
                   description: Enter OCSP URL. This is only necessary for `ocspcheck`.
                   type: string
                   format: uri
                 dh_length:
-                  default: '2048'
+                  default: 2048
                   description: The Diffie-Hellman (DH) key exchange parameters are used for establishing a 
                     secure communications channel. They may be regenerated at any time, and they are not 
                     specific to an OpenVPN instance. When importing an existing OpenVPN configuration 
@@ -8751,7 +8890,9 @@ paths:
                     - 15360
                     - 16384
                     - 'ECDH Only'
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: integer
                 ecdh_curve:
                   default: 'none'
                   description: Configures a specific elliptic curve to use for Elliptic Curve Diffie-Hellman 
@@ -8927,7 +9068,6 @@ paths:
                     that address family, including Internet traffic, over the VPN tunnel.
                   type: boolean
                 serverbridge_dhcp:
-                  default: ""
                   description: When using `tap` mode for a remote access SSL/TLS VPN,
                     (`server_tls`, `server_user`, `server_tls_user`), additional options 
                     to control bridging behavior in OpenVPN and client address assignment.
@@ -8960,7 +9100,6 @@ paths:
                   type: boolean
                   example: true
                 serverbridge_dhcp_start:
-                  default: ""
                   description: Defines a DHCP range from which OpenVPN can assign addresses to clients. 
                     If these settings are left blank, OpenVPN passes DHCP through to the bridge interface 
                     and it ignores the interface setting above.
@@ -8973,7 +9112,6 @@ paths:
                   type: string
                   format: ipv4
                 serverbridge_dhcp_end:
-                  default: ""
                   description: Defines a DHCP range from which OpenVPN can assign addresses to clients. 
                     If these settings are left blank, OpenVPN passes DHCP through to the bridge interface 
                     and it ignores the interface setting above.
@@ -8989,7 +9127,7 @@ paths:
                   description: Specifies the number of clients that may be simultaneously 
                     connected to this OpenVPN server instance at any given time.
                   type: integer
-                  example: '10'
+                  example: 10
                 allow_compression:
                   default: 'no'
                   description: Controls whether or not compression is allowed on the VPN, and how it is handled.
@@ -9218,7 +9356,7 @@ paths:
                     - both
                   type: string
                 verbosity_level:
-                  default: '3'
+                  default: 3
                   description: Configures the amount of detail OpenVPN will log for this instance,
                     which is useful for troubleshooting problems. Higher numbers will result in 
                     higher amounts of detail in the log. 
@@ -9240,7 +9378,9 @@ paths:
                     - 10
                     - 11
                     - 'default'
-                  type: string
+                  oneOf:
+                    - type: string
+                    - type: integer
                 wins_servers:
                   default: ''
                   description: Comma-separated list of no more than 2 WINS server
@@ -9255,15 +9395,19 @@ paths:
                 - vpnid
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update OpenVPN Client
       tags:
         - Services > OpenVPN > Client
   /api/v1/services/openvpn/csc:
     delete:
+      operationId: APIServicesOpenVPNClientSpecificOverridesDelete
+      description: 'Delete OpenVPN Client Specific Override.<br><br>
+
+              _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
       parameters:
         - description: ID of the client specific override to update. Refer to the 'Obtaining
             Object IDs' section in the documentation intro for help obtaining this ID.
@@ -9273,23 +9417,32 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete OpenVPN client specific override
       tags:
         - Services > OpenVPN > CSC
     get:
+
+      operationId: APIServicesOpenVPNClientSpecificOverridesRead
+      description: 'Read existing OpenVPN Client Specific Overrides.<br><br>
+
+                    _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read OpenVPN client specific overrides
       tags:
         - Services > OpenVPN > CSC
     post:
+      operationId: APIServicesOpenVPNClientSpecificOverridesCreate
+      description: 'Create a new OpenVPN Client Specific Overrides.<br><br>
+
+          _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
       requestBody:
         content:
           application/json:
@@ -9448,14 +9601,18 @@ paths:
                 - common_name
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create OpenVPN client specific override
       tags:
         - Services > OpenVPN > CSC
     put:
+      operationId: APIServicesOpenVPNClientSpecificOverridesUpdate
+      description: 'Update an existing OpenVPN Client Specific Overrides.<br><br>
+
+          _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
       requestBody:
         content:
           application/json:
@@ -9619,15 +9776,16 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update OpenVPN client specific override
       tags:
         - Services > OpenVPN > CSC
   /api/v1/services/restart:
     post:
+      operationId: APIServicesRestartCreate
       description: 'Restart available services.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -9642,27 +9800,29 @@ paths:
                   type: string
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart services
       tags:
         - Services
   /api/v1/services/sshd:
     get:
+      operationId: APIServicesSSHdRead
       description: 'Read the current Secure Shell (sshd) configuration. <br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-admin`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read Secure Shell (sshd) configuration
       tags:
         - Services > SSHD
     put:
+      operationId: APIServicesSSHdUpdate
       description: 'Modify the Secure Shell (sshd) service configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-admin`]'
@@ -9693,68 +9853,73 @@ paths:
                   type: string
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update Secure Shell (sshd) configuration
       tags:
         - Services > SSHD
   /api/v1/services/sshd/restart:
     post:
+      operationId: APIServicesSSHdRestartCreate
       description: 'Restart the Secure Shell (sshd) service.<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart Secure Shell (sshd) service
       tags:
         - Services > SSHD
   /api/v1/services/sshd/start:
     post:
+      operationId: APIServicesSSHdStartCreate
       description: 'Start the Secure Shell (sshd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start Secure Shell (sshd) service
       tags:
         - Services > SSHD
   /api/v1/services/sshd/stop:
     post:
+      operationId: APIServicesSSHdStopCreate
       description: 'Stop the Secure Shell (sshd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop Secure Shell (sshd) service
       tags:
         - Services > SSHD
   /api/v1/services/start:
     post:
+      operationId: APIServicesStartCreate
       description: 'Start all available services.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start all services
       tags:
         - Services
   /api/v1/services/stop:
     post:
+      operationId: APIServicesStopCreate
       description: 'Stop all available services.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -9765,67 +9930,72 @@ paths:
               example: {}
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop all services
       tags:
         - Services
   /api/v1/services/syslogd/restart:
     post:
+      operationId: APIServicesSyslogdRestartCreate
       description: 'Restart the System Logger (syslogd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart System Logger (syslogd) service
       tags:
         - Services > SYSLOGD
   /api/v1/services/syslogd/start:
     post:
+      operationId: APIServicesSyslogdStartCreate
       description: 'Start the System Logger (syslogd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start System Logger (syslogd) service
       tags:
         - Services > SYSLOGD
   /api/v1/services/syslogd/stop:
     post:
+      operationId: APIServicesSyslogdStopCreate
       description: 'Stop the System Logger (syslogd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop System Logger (syslogd) service
       tags:
         - Services > SYSLOGD
   /api/v1/services/unbound:
     get:
+      operationId: APIServicesUnboundRead
       description: 'Read the entire DNS Resolver (Unbound) configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DNS Resolver (Unbound) configuration
       tags:
         - Services > Unbound
   /api/v1/services/unbound/access_list:
     delete:
+      operationId: APIServicesUnboundAccessListDelete
       description: 'Delete DNS Resolver (Unbound) access list.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]'
@@ -9848,26 +10018,28 @@ paths:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete DNS Resolver (Unbound) access list
       tags:
         - Services > Unbound > Access List
     get:
+      operationId: APIServicesUnboundAccessListRead
       description: 'Read configured DNS Resolver (Unbound) access lists.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DNS Resolver (Unbound) access lists
       tags:
         - Services > Unbound > Access List
     post:
+      operationId: APIServicesUnboundAccessListCreate
       description: 'Create a new DNS Resolver (Unbound) access list.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]'
@@ -9915,14 +10087,15 @@ paths:
                 - row
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create DNS Resolver (Unbound) access list
       tags:
         - Services > Unbound > Access List
     put:
+      operationId: APIServicesUnboundAccessListUpdate
       description: 'Modify an existing DNS Resolver (Unbound) access list.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]'
@@ -9975,15 +10148,16 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update DNS Resolver (Unbound) access list
       tags:
         - Services > Unbound > Access List
   /api/v1/services/unbound/access_list/row:
     post:
+      operationId: APIServicesUnboundAccessListRowCreate
       description: 'Add a new row (network entry) to an existing DNS Resolver (Unbound)
         access list.<br><br>
 
@@ -10025,27 +10199,29 @@ paths:
                 - mask
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Add DNS Resolver (Unbound) access list row
       tags:
         - Services > Unbound > Access List > Row
   /api/v1/services/unbound/apply:
     get:
+      operationId: APIServicesUnboundApplyRead
       description: 'Check the DNS Resolver (Unbound) apply status.<br><br>
 
             _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Poll DNS Resolver (Unbound) apply status
       tags:
         - Services > Unbound > Apply
     post:
+      operationId: APIServicesUnboundApplyCreate
       description: 'Apply pending DNS Resolver (Unbound) changes.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
@@ -10060,15 +10236,16 @@ paths:
                   a GET request to /api/v1/services/unbound/apply."
                   type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Apply pending DNS Resolver (Unbound) changes
       tags:
         - Services > Unbound > Apply
   /api/v1/services/unbound/host_override:
     delete:
+      operationId: APIServicesUnboundHostOverrideDelete
       description: 'Delete host overrides from the DNS Resolver (Unbound).<br><br>
 
 
@@ -10091,26 +10268,28 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete DNS Resolver (Unbound) host override
       tags:
         - Services > Unbound > Host Override
     get:
+      operationId: APIServicesUnboundHostOverrideRead
       description: 'Read host overrides from the DNS Resolver (Unbound).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DNS Resolver (Unbound) host overrides
       tags:
         - Services > Unbound > Host Override
     post:
+      operationId: APIServicesUnboundHostOverrideCreate
       description: 'Add a new host override to the DNS Resolver (Unbound).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]'
@@ -10158,14 +10337,15 @@ paths:
                 - ip
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create DNS Resolver (Unbound) host override
       tags:
         - Services > Unbound > Host Override
     put:
+      operationId: APIServicesUnboundHostOverrideUpdate
       description: 'Modify host overrides from the DNS Resolver (Unbound).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]'
@@ -10218,15 +10398,16 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update DNS Resolver (Unbound) host override
       tags:
         - Services > Unbound > Host Override
   /api/v1/services/unbound/host_override/alias:
     post:
+      operationId: APIServicesUnboundHostOverrideAliasCreate
       description: 'Add a new host override alias to the DNS Resolver (Unbound).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]'
@@ -10264,15 +10445,16 @@ paths:
                 - domain
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create DNS Resolver (Unbound) host override alias
       tags:
         - Services > Unbound > Host Override > Alias
   /api/v1/services/unbound/host_override/flush:
     put:
+      operationId: APIServicesUnboundHostOverrideFlushUpdate
       description: 'Replace all existing DNS Resolver (Unbound) host overrides with a specified set of host overrides.
         This allows you to create multiple host overrides at once. If a validation error is encountered when validating
         the host overrides, the specific entry that triggered the error will be included in the `data` field of the 
@@ -10318,14 +10500,15 @@ paths:
                 - host_overrides
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Replace all DNS Resolver (Unbound) host overrides
       tags:
         - Services > Unbound > Host Override > Flush
     delete:
+      operationId: APIServicesUnboundHostOverrideFlushDelete
       description: 'Deletes all existing DNS Resolver (Unbound) host overrides. This is useful for scripts
           that need to setup host overrides from scratch.<br><br>_Note: this endpoint
           will not reload the DNS Resolver (Unbound) service automatically, you must make another API
@@ -10333,54 +10516,58 @@ paths:
 
           _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete all DNS Resolver (Unbound) host overrides
       tags:
         - Services > Unbound > Host Override > Flush
   /api/v1/services/unbound/restart:
     post:
+      operationId: APIServicesUnboundRestartCreate
       description: 'Restart the DNS Resolver (Unbound) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart DNS Resolver (Unbound) service
       tags:
         - Services > Unbound
   /api/v1/services/unbound/start:
     post:
+      operationId: APIServicesUnboundStartCreate
       description: 'Start the DNS Resolver (Unbound) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start DNS Resolver (Unbound) service
       tags:
         - Services > Unbound
   /api/v1/services/unbound/stop:
     post:
+      operationId: APIServicesUnboundStopCreate
       description: 'Stop the DNS Resolver (Unbound) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop DNS Resolver (Unbound) service
       tags:
         - Services > Unbound
   /api/v1/services/wol/send:
     post:
+      operationId: APIServicesWOLSendCreate
       description: 'Send a magic WOL packet to a host.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-wakeonlan`]'
@@ -10400,27 +10587,29 @@ paths:
                 - mac
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Send a magic WOL packet to a host
       tags:
         - Services > WOL
   /api/v1/status/carp:
     get:
+      operationId: APIStatusCARPRead
       description: 'Read the CARP (failover) status.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-carp`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read CARP status
       tags:
         - Status > CARP
     put:
+      operationId: APIStatusCARPUpdate
       description: 'Update the CARP (failover) status.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-carp`]'
@@ -10437,106 +10626,128 @@ paths:
                   type: boolean
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update CARP status
       tags:
         - Status > CARP
   /api/v1/status/gateway:
     get:
+      operationId: APIStatusGatewayRead
       description: 'Read gateway status and metrics.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-gateway`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read gateway status
       tags:
         - Status > Gateway
   /api/v1/status/interface:
     get:
+      operationId: APIStatusInterfaceRead
       description: 'Read interface status and metrics.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-interfaces`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read interface status
       tags:
         - Status > Interface
+  /api/v1/status/ipsec:
+    get:
+      operationId: APIStatusIPsecRead
+      description: 'Read IPsec status and metrics.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-status-ipsec`]'
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read IPsec status
+      tags:
+        - Status > IPsec
   /api/v1/status/log/config_history:
     get:
+      operationId: APIStatusLogConfigHistoryRead
       description: 'Read the configuration history log.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-configurationhistory`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read configuration history log
       tags:
         - Status > Log
   /api/v1/status/log/dhcp:
     get:
+      operationId: APIStatusLogDHCPRead
       description: 'Read the dhcpd.log file.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-logs-dhcp`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DHCP log
       tags:
         - Status > Log
   /api/v1/status/log/firewall:
     get:
+      operationId: APIStatusLogFirewallRead
       description: 'Read the filter.log file.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-logs-firewall`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read firewall log
       tags:
         - Status > Log
   /api/v1/status/log/system:
     get:
+      operationId: APIStatusLogSystemRead
       description: 'Read the system.log file.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-logs-system`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read system log
       tags:
         - Status > Log
   /api/v1/status/openvpn:
     get:
+      operationId: APIStatusOpenVPNRead
       description: 'Read the OpenVPN status.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-openvpn`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read OpenVPN status
       tags:
         - Status > OpenVPN
   /api/v1/status/system:
     get:
+      operationId: APIStatusSystemRead
       description: 'Read system status and metrics. All usage values are represented
         as a decimal percentage. Temperature readings require thermal sensor and/or
         driver configuration.<br><br>
@@ -10544,27 +10755,29 @@ paths:
         _Requires at least one of the following privileges:_ [`page-all`, `page-dashboard-widgets`,
         `page-dashboard-all`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read system status
       tags:
         - Status > System
   /api/v1/system/api:
     get:
+      operationId: APISystemAPIRead
       description: 'Read the current API configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read API configuration
       tags:
         - System > API
     put:
+      operationId: APISystemAPIUpdate
       description: 'Update the API configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]'
@@ -10680,41 +10893,44 @@ paths:
                   type: boolean
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update API configuration
       tags:
         - System > API
   /api/v1/system/api/error:
     get:
+      operationId: APISystemAPIErrorRead
       description: Read the error code library. This function does not require authentication
         and is intended to be used by third-party scripts/software to translate error
         codes to their full error message.
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read API error library
       tags:
         - System > API
   /api/v1/system/api/version:
     get:
+      operationId: APISystemAPIVersionRead
       description: 'Read the current API version and locate available version updates.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read API version
       tags:
         - System > API
   /api/v1/system/arp:
     delete:
+      operationId: APISystemARPDelete
       description: 'Delete an IP from the ARP table.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-arptable`]'
@@ -10726,27 +10942,29 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete ARP table entry
       tags:
         - System > ARP
     get:
+      operationId: APISystemARPRead
       description: 'Read the current ARP table.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-arptable`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read ARP table
       tags:
         - System > ARP
   /api/v1/system/ca:
     delete:
+      operationId: APISystemCADelete
       description: 'Delete an existing CA certificate.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]'
@@ -10758,26 +10976,28 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete CA certificate
       tags:
         - System > CA
     get:
+      operationId: APISystemCARead
       description: 'Read installed CA certificates.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read CA certificates
       tags:
         - System > CA
     post:
+      operationId: APISystemCACreate
       description: 'Generate or import a new CA certificate.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]'
@@ -10913,15 +11133,16 @@ paths:
                 - descr
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create or import CA certificate
       tags:
         - System > CA
   /api/v1/system/certificate:
     delete:
+      operationId: APISystemCertificateDelete
       description: 'Delete an existing SSL/TLS certificate.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]'
@@ -10933,26 +11154,28 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete certificate
       tags:
         - System > Certificate
     get:
+      operationId: APISystemCertificateRead
       description: 'Read installed SSL/TLS certificates.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read certificates
       tags:
         - System > Certificate
     post:
+      operationId: APISystemCertificateCreate
       description: 'Generate or import a new SSL/TLS certificate.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]'
@@ -11096,14 +11319,15 @@ paths:
                 - descr
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create or import certificate
       tags:
         - System > Certificate
     put:
+      operationId: APISystemCertificateUpdate
       description: 'Update an imported SSL/TLS certificate.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]'
@@ -11139,28 +11363,30 @@ paths:
                 - prv
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update certificate
       tags:
         - System > Certificate
   /api/v1/system/config:
     get:
+      operationId: APISystemConfigRead
       description: 'Read the entire pfSense configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-backup-restore`,
         `page-diagnostics-command`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read pfSense configuration
       tags:
         - System > Config
     put:
+      operationId: APISystemConfigUpdate
       description: 'Updates the entire pfSense configuration. This endpoint simply
         replaces the entire configuration with the values submitted in your request.
         This can be used to interface with configuration areas that may not be available
@@ -11172,15 +11398,16 @@ paths:
       requestBody:
         content: {}
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update pfSense configuration
       tags:
         - System > Config
   /api/v1/system/console:
     put:
+      operationId: APISystemConsoleUpdate
       description: 'Update console settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-admin`]'
@@ -11194,15 +11421,16 @@ paths:
                   type: boolean
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update console settings
       tags:
         - System > Console
   /api/v1/system/crl:
     delete:
+      operationId: APISystemCRLDelete
       description: 'Delete an existing CRL.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-crlmanager`]'
@@ -11214,26 +11442,28 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete CRL
       tags:
         - System > CRL
     get:
+      operationId: APISystemCRLRead
       description: 'Read installed CRLs.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-crlmanager`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read CRLs
       tags:
         - System > CRL
     post:
+      operationId: APISystemCRLCreate
       description: 'Add a new CRL.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-crlmanager`]'
@@ -11285,27 +11515,29 @@ paths:
                 - descr
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create CRL
       tags:
         - System > CRL
   /api/v1/system/dns:
     get:
+      operationId: APISystemDNSRead
       description: 'Read current system DNS settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read system DNS settings
       tags:
         - System > DNS
     put:
+      operationId: APISystemDNSUpdate
       description: 'Modify the existing system DNS settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
@@ -11330,15 +11562,16 @@ paths:
                   type: array
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update system DNS settings
       tags:
         - System > DNS
   /api/v1/system/dns/server:
     delete:
+      operationId: APISystemDNSServerDelete
       description: 'Remove existing system DNS servers.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
@@ -11350,14 +11583,15 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Remove system DNS servers
       tags:
         - System > DNS > Server
     post:
+      operationId: APISystemDNSServerCreate
       description: 'Add new DNS servers to the system DNS servers.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
@@ -11373,40 +11607,43 @@ paths:
                   type: array
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Add system DNS servers
       tags:
         - System > DNS > Server
   /api/v1/system/halt:
     post:
+      operationId: APISystemHaltCreate
       description: 'Shutdown the pfSense system.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-haltsystem`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Initiate system shutdown
       tags:
         - System > Halt
   /api/v1/system/hostname:
     get:
+      operationId: APISystemHostnameRead
       description: 'Read the system''s hostname.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read system hostname
       tags:
         - System > Hostname
     put:
+      operationId: APISystemHostnameUpdate
       description: 'Modify the system hostname.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
@@ -11425,27 +11662,29 @@ paths:
                   type: string
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update system hostname
       tags:
         - System > Hostname
   /api/v1/system/notifications/email:
     get:
+      operationId: APISystemNotificationsEmailRead
       description: 'Read the current email notification settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-notifications`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read email notification settings
       tags:
         - System > Notifications > Email
     put:
+      operationId: APISystemNotificationsEmailUpdate
       description: 'Update the email notification settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-notifications`]'
@@ -11510,15 +11749,16 @@ paths:
                 - authentication_mechanism
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update email notification settings
       tags:
         - System > Notifications > Email
   /api/v1/system/package:
     delete:
+      operationId: APISystemPackageDelete
       description: 'Remove an existing pfSense package.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installed`]'
@@ -11532,26 +11772,28 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Remove system package
       tags:
         - System > Package
     get:
+      operationId: APISystemPackageRead
       description: 'Read all pfSense packages that are currently installed.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installed`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read system packages
       tags:
         - System > Package
     post:
+      operationId: APISystemPackageCreate
       description: 'Install a pfSense package.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installpackage`]'
@@ -11568,28 +11810,30 @@ paths:
                 - name
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Install system package
       tags:
         - System > Package
   /api/v1/system/reboot:
     post:
+      operationId: APISystemRebootCreate
       description: 'Reboot the pfSense system.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-rebootsystem`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Initiate system reboot
       tags:
         - System > Reboot
   /api/v1/system/table:
     get:
+      operationId: APISystemTableRead
       description: 'Read existing table entries.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-tables`]'
@@ -11602,15 +11846,16 @@ paths:
             Name of the table to read. This must be an existing table. If no table name is specified, all tables will
             be read. Depending on the size of the tables on the system, reading all tables may take a while.
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read tables
       tags:
         - System > Table
   /api/v1/system/tunable:
     delete:
+      operationId: APISystemTunableDelete
       description: 'Delete an existing system tunable.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-sysctl`]'
@@ -11622,26 +11867,28 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete system tunable
       tags:
         - System > Tunable
     get:
+      operationId: APISystemTunableRead
       description: 'Read current system tunable configurations.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-sysctl`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read system tunables
       tags:
         - System > Tunable
     post:
+      operationId: APISystemTunableCreate
       description: 'Create a new system tunable.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-sysctl`]'
@@ -11665,14 +11912,15 @@ paths:
                 - value
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create system tunable
       tags:
         - System > Tunable
     put:
+      operationId: APISystemTunableUpdate
       description: 'Update an existing system tunable.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-sysctl`]'
@@ -11698,30 +11946,32 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update system tunable
       tags:
         - System > Tunable
   /api/v1/system/version:
     get:
+      operationId: APISystemVersionRead
       description: 'Read the pfSense version data. This includes base version, patch
         version, buildtime, and last commit.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-dashboard-widgets`,
         `page-diagnostics-command`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read system version
       tags:
         - System > Version
   /api/v1/user:
     delete:
+      operationId: APIUserDelete
       description: 'Delete an existing pfSense user from the local database.<br><br>
 
 
@@ -11734,27 +11984,29 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete user
       tags:
         - User
     get:
+      operationId: APIUserRead
       description: 'Read users from the local user database.<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-usermanager`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read users
       tags:
         - User
     post:
+      operationId: APIUserCreate
       description: 'Add a new user to the local database.<br><br>
 
 
@@ -11810,14 +12062,15 @@ paths:
                 - password
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create user
       tags:
         - User
     put:
+      operationId: APIUserUpdate
       description: 'Update an existing user.<br><br>
 
 
@@ -11869,15 +12122,16 @@ paths:
                 - username
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update user
       tags:
         - User
   /api/v1/user/auth_server:
     delete:
+      operationId: APIUserAuthServerDelete
       description: 'Delete an existing authentication server. This can be either a
         RADIUS or LDAP authentication server.<br><br>
 
@@ -11891,28 +12145,30 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete authentication server
       tags:
         - User > Authentication Server
     get:
+      operationId: APIUserAuthServerRead
       description: 'Read configured LDAP and RADIUS authentication servers.<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-authservers`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read authentication servers
       tags:
         - User > Authentication Server
   /api/v1/user/auth_server/ldap:
     delete:
+      operationId: APIUserAuthServerLDAPDelete
       description: 'Delete an existing LDAP authentication server.<br><br>
 
 
@@ -11925,27 +12181,29 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete LDAP authentication server
       tags:
         - User > Authentication Server
     get:
+      operationId: APIUserAuthServerLDAPRead
       description: 'Read configured LDAP authentication servers.<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-authservers`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read LDAP authentication servers
       tags:
         - User > Authentication Server
     post:
+      operationId: APIUserAuthServerLDAPCreate
       description: 'Add a new remote LDAP authentication server.<br><br>
 
 
@@ -12047,15 +12305,16 @@ paths:
                 - ldap_attr_member
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create LDAP authentication server
       tags:
         - User > Authentication Server
   /api/v1/user/auth_server/radius:
     delete:
+      operationId: APIUserAuthServerRADIUSDelete
       description: 'Delete an existing RADIUS authentication server.<br><br>
 
 
@@ -12068,27 +12327,29 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete RADIUS authentication server
       tags:
         - User > Authentication Server
     get:
+      operationId: APIUserAuthServerRADIUSRead
       description: 'Read configured RADIUS authentication servers.<br><br>
 
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-authservers`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read RADIUS authentication servers
       tags:
         - User > Authentication Server
     post:
+      operationId: APIUserAuthServerRADIUSCreate
       description: 'Create a new RADIUS authentication server.<br><br>
 
 
@@ -12158,27 +12419,29 @@ paths:
                 - radius_secret
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create RADIUS authentication server
       tags:
         - User > Authentication Server
   /api/v1/user/group:
     get:
+      operationId: APIUserGroupRead
       description: 'Read existing user groups.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read user groups
       tags:
         - User > Group
     post:
+      operationId: APIUserGroupCreate
       description: 'Create a new group.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]'
@@ -12217,14 +12480,15 @@ paths:
                   items:
                     type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create user group
       tags:
         - User > Group
     put:
+      operationId: APIUserGroupUpdate
       description: 'Update an existing group.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]'
@@ -12262,14 +12526,15 @@ paths:
                   items:
                     type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update user group
       tags:
         - User > Group
     delete:
+      operationId: APIUserGroupDelete
       description: 'Delete an existing user group.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]'
@@ -12281,15 +12546,16 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete user group
       tags:
         - User > Group
   /api/v1/user/group/member:
     delete:
+      operationId: APIUserGroupMemberDelete
       description: 'Remove a user from an existing group.<br><br>
 
 
@@ -12302,22 +12568,22 @@ paths:
           schema:
             type: string
         - description: Name of group to remove user from.
-          example:
-            - admins
+          example: admins
           in: query
           name: group
           required: true
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Remove group member
       tags:
         - User > Group > Member
     post:
+      operationId: APIUserGroupMemberCreate
       description: 'Assign a user to an existing group.<br><br>
 
 
@@ -12340,15 +12606,16 @@ paths:
                 - group
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Assign group member
       tags:
         - User > Group > Member
   /api/v1/user/privilege:
     delete:
+      operationId: APIUserPrivilegeDelete
       description: 'Remove privilege from an existing user.<br><br>
 
 
@@ -12361,22 +12628,22 @@ paths:
           schema:
             type: string
         - description: Name of the privilege to remove from the user.
-          example:
-            - page-all
+          example: page-all
           in: query
           name: priv
           required: true
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Remove user privilege
       tags:
         - User > Privilege
     post:
+      operationId: APIUserPrivilegeCreate
       description: 'Assign new privileges to an existing user.<br><br>
 
 
@@ -12399,9 +12666,9 @@ paths:
                 - username
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Assign user privileges
       tags:
@@ -12466,6 +12733,7 @@ tags:
   - name: Status > Log
   - name: Status > Gateway
   - name: Status > Interface
+  - name: Status > IPsec
   - name: Status > System
   - name: Services
   - name: Services > OpenVPN > Server
