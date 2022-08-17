@@ -1984,7 +1984,6 @@ paths:
             later. If you are modifying multiple rules at once it Is best to set this
             to false and apply the changes afterwards using the `/api/v1/firewall/apply`
             endpoint.
-          example: boolean
           in: query
           name: apply
           schema:
@@ -3565,7 +3564,7 @@ paths:
                   description: IPv6 subnet bitmask to apply the limiter queue to.
                     This parameter is only available when `mask` is set to `srcaddress`
                     or `dstaddress`.
-                  maximum: 32
+                  maximum: 128
                   minimum: 1
                   type: integer
                 name:
@@ -4899,7 +4898,6 @@ paths:
                     the physical interface ID (e.g. em0), the pfSense interface ID
                     (e.g. wan, lan, optx) or the interface description (e.g. WAN,
                     LAN).
-                  default: ''
                   items:
                     type: string
                   type: array
@@ -6773,12 +6771,11 @@ paths:
                     using Online Certificate Status Protocol (OCSP) against the site listed in the OCSP URL field.
                   type: boolean
                 ocspurl:
-                  default: ''
                   description: Enter OCSP URL. This is only necessary for `ocspcheck`.
                   type: string
                   format: uri
                 dh_length:
-                  default: '2048'
+                  default: 2048
                   description: The Diffie-Hellman (DH) key exchange parameters are used for establishing a 
                     secure communications channel. They may be regenerated at any time, and they are not 
                     specific to an OpenVPN instance. When importing an existing OpenVPN configuration 
@@ -6973,7 +6970,6 @@ paths:
                     that address family, including Internet traffic, over the VPN tunnel.
                   type: boolean
                 serverbridge_dhcp:
-                  default: ""
                   description: When using `tap` mode for a remote access SSL/TLS VPN,
                     (`server_tls`, `server_user`, `server_tls_user`), additional options 
                     to control bridging behavior in OpenVPN and client address assignment.
@@ -7006,7 +7002,6 @@ paths:
                   type: boolean
                   example: true
                 serverbridge_dhcp_start:
-                  default: ""
                   description: Defines a DHCP range from which OpenVPN can assign addresses to clients. 
                     If these settings are left blank, OpenVPN passes DHCP through to the bridge interface 
                     and it ignores the interface setting above.
@@ -7019,7 +7014,6 @@ paths:
                   type: string
                   format: ipv4
                 serverbridge_dhcp_end:
-                  default: ""
                   description: Defines a DHCP range from which OpenVPN can assign addresses to clients. 
                     If these settings are left blank, OpenVPN passes DHCP through to the bridge interface 
                     and it ignores the interface setting above.
@@ -7035,7 +7029,7 @@ paths:
                   description: Specifies the number of clients that may be simultaneously 
                     connected to this OpenVPN server instance at any given time.
                   type: integer
-                  example: '10'
+                  example: 10
                 allow_compression:
                   default: 'no'
                   description: Controls whether or not compression is allowed on the VPN, and how it is handled.
@@ -7264,7 +7258,7 @@ paths:
                     - both
                   type: string
                 verbosity_level:
-                  default: '3'
+                  default: 3
                   description: Configures the amount of detail OpenVPN will log for this instance,
                     which is useful for troubleshooting problems. Higher numbers will result in 
                     higher amounts of detail in the log. 
@@ -7509,12 +7503,11 @@ paths:
                     using Online Certificate Status Protocol (OCSP) against the site listed in the OCSP URL field.
                   type: boolean
                 ocspurl:
-                  default: ''
                   description: Enter OCSP URL. This is only necessary for `ocspcheck`.
                   type: string
                   format: uri
                 dh_length:
-                  default: '2048'
+                  default: 2048
                   description: The Diffie-Hellman (DH) key exchange parameters are used for establishing a 
                     secure communications channel. They may be regenerated at any time, and they are not 
                     specific to an OpenVPN instance. When importing an existing OpenVPN configuration 
@@ -7709,7 +7702,6 @@ paths:
                     that address family, including Internet traffic, over the VPN tunnel.
                   type: boolean
                 serverbridge_dhcp:
-                  default: ""
                   description: When using `tap` mode for a remote access SSL/TLS VPN,
                     (`server_tls`, `server_user`, `server_tls_user`), additional options 
                     to control bridging behavior in OpenVPN and client address assignment.
@@ -7742,7 +7734,6 @@ paths:
                   type: boolean
                   example: true
                 serverbridge_dhcp_start:
-                  default: ""
                   description: Defines a DHCP range from which OpenVPN can assign addresses to clients. 
                     If these settings are left blank, OpenVPN passes DHCP through to the bridge interface 
                     and it ignores the interface setting above.
@@ -7755,7 +7746,6 @@ paths:
                   type: string
                   format: ipv4
                 serverbridge_dhcp_end:
-                  default: ""
                   description: Defines a DHCP range from which OpenVPN can assign addresses to clients. 
                     If these settings are left blank, OpenVPN passes DHCP through to the bridge interface 
                     and it ignores the interface setting above.
@@ -7771,7 +7761,7 @@ paths:
                   description: Specifies the number of clients that may be simultaneously 
                     connected to this OpenVPN server instance at any given time.
                   type: integer
-                  example: '10'
+                  example: 10
                 allow_compression:
                   default: 'no'
                   description: Controls whether or not compression is allowed on the VPN, and how it is handled.
@@ -8000,7 +7990,7 @@ paths:
                     - both
                   type: string
                 verbosity_level:
-                  default: '3'
+                  default: 3
                   description: Configures the amount of detail OpenVPN will log for this instance,
                     which is useful for troubleshooting problems. Higher numbers will result in 
                     higher amounts of detail in the log. 
@@ -8491,7 +8481,7 @@ paths:
                     - both
                   type: string
                 verbosity_level:
-                  default: '3'
+                  default: 3
                   description: Configures the amount of detail OpenVPN will log for this instance,
                     which is useful for troubleshooting problems. Higher numbers will result in 
                     higher amounts of detail in the log. 
@@ -8727,12 +8717,11 @@ paths:
                     using Online Certificate Status Protocol (OCSP) against the site listed in the OCSP URL field.
                   type: boolean
                 ocspurl:
-                  default: ''
                   description: Enter OCSP URL. This is only necessary for `ocspcheck`.
                   type: string
                   format: uri
                 dh_length:
-                  default: '2048'
+                  default: 2048
                   description: The Diffie-Hellman (DH) key exchange parameters are used for establishing a 
                     secure communications channel. They may be regenerated at any time, and they are not 
                     specific to an OpenVPN instance. When importing an existing OpenVPN configuration 
@@ -8927,7 +8916,6 @@ paths:
                     that address family, including Internet traffic, over the VPN tunnel.
                   type: boolean
                 serverbridge_dhcp:
-                  default: ""
                   description: When using `tap` mode for a remote access SSL/TLS VPN,
                     (`server_tls`, `server_user`, `server_tls_user`), additional options 
                     to control bridging behavior in OpenVPN and client address assignment.
@@ -8960,7 +8948,6 @@ paths:
                   type: boolean
                   example: true
                 serverbridge_dhcp_start:
-                  default: ""
                   description: Defines a DHCP range from which OpenVPN can assign addresses to clients. 
                     If these settings are left blank, OpenVPN passes DHCP through to the bridge interface 
                     and it ignores the interface setting above.
@@ -8973,7 +8960,6 @@ paths:
                   type: string
                   format: ipv4
                 serverbridge_dhcp_end:
-                  default: ""
                   description: Defines a DHCP range from which OpenVPN can assign addresses to clients. 
                     If these settings are left blank, OpenVPN passes DHCP through to the bridge interface 
                     and it ignores the interface setting above.
@@ -8989,7 +8975,7 @@ paths:
                   description: Specifies the number of clients that may be simultaneously 
                     connected to this OpenVPN server instance at any given time.
                   type: integer
-                  example: '10'
+                  example: 10
                 allow_compression:
                   default: 'no'
                   description: Controls whether or not compression is allowed on the VPN, and how it is handled.
@@ -9218,7 +9204,7 @@ paths:
                     - both
                   type: string
                 verbosity_level:
-                  default: '3'
+                  default: 3
                   description: Configures the amount of detail OpenVPN will log for this instance,
                     which is useful for troubleshooting problems. Higher numbers will result in 
                     higher amounts of detail in the log. 
@@ -12315,8 +12301,7 @@ paths:
           schema:
             type: string
         - description: Name of group to remove user from.
-          example:
-            - admins
+          example: admins
           in: query
           name: group
           required: true
@@ -12374,8 +12359,7 @@ paths:
           schema:
             type: string
         - description: Name of the privilege to remove from the user.
-          example:
-            - page-all
+          example: page-all
           in: query
           name: priv
           required: true
