@@ -1,0 +1,5 @@
+{
+  "require": {
+    "firebase/php-jwt": "v6.3.*"
+  }
+}
