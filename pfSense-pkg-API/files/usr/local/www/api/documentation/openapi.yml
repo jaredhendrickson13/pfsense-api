@@ -799,9 +799,9 @@ paths:
         and this token is only applicable when the API is configured to use the JWT
         authentication type.
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       security:
         - local: []
@@ -827,9 +827,9 @@ paths:
                 - shell_cmd
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Execute shell command
       tags:
@@ -862,9 +862,9 @@ paths:
             default: true
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete firewall alias
       tags:
@@ -875,9 +875,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-aliases`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read firewall aliases
       tags:
@@ -942,9 +942,9 @@ paths:
                 - address
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create firewall alias
       tags:
@@ -1008,9 +1008,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update firewall alias
       tags:
@@ -1047,9 +1047,9 @@ paths:
             default: true
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Remove firewall alias entry
       tags:
@@ -1099,9 +1099,9 @@ paths:
                 - name
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Add firewall alias entries
       tags:
@@ -1117,9 +1117,9 @@ paths:
         `page-firewall-nat-1-1`, `page-firewall-nat-1-1-edit`, `page-firewall-nat-outbound`,
         `page-firewall-nat-outbound-edit`, `page-firewall-nat-portforward`, `page-firewall-nat-portforward-edit`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Apply firewall changes
       tags:
@@ -1148,9 +1148,9 @@ paths:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete NAT 1-to-1 mapping
       tags:
@@ -1160,9 +1160,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read NAT 1-to-1 mappings
       tags:
@@ -1243,9 +1243,9 @@ paths:
                 - external
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create NAT 1-to-1 mapping
       tags:
@@ -1325,9 +1325,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update NAT 1-to-1 mapping
       tags:
@@ -1338,9 +1338,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read outbound NAT settings
       tags:
@@ -1376,9 +1376,9 @@ paths:
                   type: string
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update outbound NAT settings
       tags:
@@ -1407,9 +1407,9 @@ paths:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete outbound NAT mapping
       tags:
@@ -1419,9 +1419,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read outbound NAT mappings
       tags:
@@ -1543,9 +1543,9 @@ paths:
                 - target
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create outbound NAT mapping
       tags:
@@ -1668,9 +1668,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update outbound NAT mapping
       tags:
@@ -1700,9 +1700,9 @@ paths:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete NAT port forward
       tags:
@@ -1712,9 +1712,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-portforward`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read NAT port forwards
       tags:
@@ -1834,9 +1834,9 @@ paths:
                 - target
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create NAT port forward
       tags:
@@ -1957,9 +1957,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update NAT port forward
       tags:
@@ -1991,9 +1991,9 @@ paths:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete firewall rule
       tags:
@@ -2004,9 +2004,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read existing firewall rules.
       tags:
@@ -2202,9 +2202,9 @@ paths:
                 - dst
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create firewall rule
       tags:
@@ -2393,9 +2393,9 @@ paths:
                 - tracker
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update firewall rule
       tags:
@@ -2446,9 +2446,9 @@ paths:
                 - rules
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Replace all firewall rules
       tags:
@@ -2462,9 +2462,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-rules-edit`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete all firewall rules
       tags:
@@ -2520,9 +2520,9 @@ paths:
                 - field
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Sort existing firewall rules
       tags:
@@ -2540,9 +2540,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete schedule
       tags:
@@ -2552,9 +2552,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read schedules
       tags:
@@ -2600,9 +2600,9 @@ paths:
                 - timerange
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create schedule
       tags:
@@ -2644,9 +2644,9 @@ paths:
                 - name
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update schedule
       tags:
@@ -2673,9 +2673,9 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete schedule time range
       tags:
@@ -2732,9 +2732,9 @@ paths:
                 - hour
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create schedule time range
       tags:
@@ -2784,9 +2784,9 @@ paths:
             minimum: 0
             type: integer
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete firewall states
       tags:
@@ -2797,9 +2797,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-statessummary`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read firewall states
       tags:
@@ -2811,9 +2811,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-statessummary`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read firewall state size
       tags:
@@ -2839,9 +2839,9 @@ paths:
                 - maximumstates
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update firewall state size
       tags:
@@ -2871,9 +2871,9 @@ paths:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete traffic shaper
       tags:
@@ -2883,9 +2883,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read traffic shapers
       tags:
@@ -2958,9 +2958,9 @@ paths:
                 - bandwidth
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create traffic shaper
       tags:
@@ -3032,9 +3032,9 @@ paths:
                 - interface
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update traffic shaper
       tags:
@@ -3061,9 +3061,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete limiter
       tags:
@@ -3073,9 +3073,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read limiters
       tags:
@@ -3365,9 +3365,9 @@ paths:
                 - sched
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create limiter
       tags:
@@ -3404,9 +3404,9 @@ paths:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete limiter bandwidth
       tags:
@@ -3454,9 +3454,9 @@ paths:
                 - bwscale
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create limiter bandwidth
       tags:
@@ -3489,9 +3489,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete limiter queue
       tags:
@@ -3694,9 +3694,9 @@ paths:
                 - aqm
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create limiter queue
       tags:
@@ -3723,9 +3723,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete traffic shaper queue
       tags:
@@ -3926,9 +3926,9 @@ paths:
                 - name
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create traffic shapper queue
       tags:
@@ -3947,9 +3947,9 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete virtual IP
       tags:
@@ -3960,9 +3960,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-virtualipaddresses`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read virtual IPs
       tags:
@@ -4034,9 +4034,9 @@ paths:
                 - subnet
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create virtual IP
       tags:
@@ -4110,9 +4110,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update virtual IP
       tags:
@@ -4134,9 +4134,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete interface
       tags:
@@ -4147,9 +4147,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read interfaces
       tags:
@@ -4409,9 +4409,9 @@ paths:
                 - descr
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create interface
       tags:
@@ -4679,9 +4679,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update interface
       tags:
@@ -4694,9 +4694,9 @@ paths:
 
           _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read all available interfaces
       tags:
@@ -4707,9 +4707,9 @@ paths:
 
               _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Poll interface apply status
       tags:
@@ -4731,9 +4731,9 @@ paths:
                   type: boolean
                   default: false
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Apply interfaces
       tags:
@@ -4754,9 +4754,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete interface bridge
       tags:
@@ -4768,9 +4768,9 @@ paths:
         _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-bridge`,
         `page-interfaces-bridge-edit`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read interface bridges
       tags:
@@ -4801,9 +4801,9 @@ paths:
                 - members
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create interface bridge
       tags:
@@ -4838,9 +4838,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update interface bridge
       tags:
@@ -4859,9 +4859,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete interface group
       tags:
@@ -4873,9 +4873,9 @@ paths:
         _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-group`,
         `page-interfaces-group-edit`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read interface groups
       tags:
@@ -4910,9 +4910,9 @@ paths:
                 - ifname
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create interface group
       tags:
@@ -4945,9 +4945,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update interface group
       tags:
@@ -4967,9 +4967,9 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete Interface VLAN
       tags:
@@ -4981,9 +4981,9 @@ paths:
         _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-vlan`,
         `page-interfaces-vlan-edit`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read interface VLANs
       tags:
@@ -5020,9 +5020,9 @@ paths:
                 - tag
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create interface VLAN
       tags:
@@ -5069,9 +5069,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update interface VLAN
       tags:
@@ -5083,9 +5083,9 @@ paths:
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`,
         `page-system-gateways-editgateway`, `page-system-staticroutes`, `page-system-staticroutes-editroute`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Apply routing changes
       tags:
@@ -5104,9 +5104,9 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete gateway
       tags:
@@ -5119,9 +5119,9 @@ paths:
         _Note: This endpoint originally returned verbose routing gateway details.
         This functionality has moved to /api/v1/routing/gateway/detail._'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read gateways
       tags:
@@ -5264,9 +5264,9 @@ paths:
                 - gateway
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create gateway
       tags:
@@ -5411,9 +5411,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update gateway
       tags:
@@ -5448,9 +5448,9 @@ paths:
                   type: boolean
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update default gateways
       tags:
@@ -5462,9 +5462,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read gateway details
       tags:
@@ -5484,9 +5484,9 @@ paths:
           schema:
             type: integer
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete static route
       tags:
@@ -5496,9 +5496,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read static routes
       tags:
@@ -5541,9 +5541,9 @@ paths:
                 - gateway
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create static route
       tags:
@@ -5590,9 +5590,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update static route
       tags:
@@ -5603,9 +5603,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read all service statuses
       tags:
@@ -5616,9 +5616,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dynamicdnsclients`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read dynamic DNS configuration
       tags:
@@ -5629,9 +5629,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserverpage-services-dhcpserver`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DHCP Server (dhcpd) configuration
       tags:
@@ -5742,9 +5742,9 @@ paths:
                 - interface
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update DHCP Server (dhcpd) configuration
       tags:
@@ -5755,9 +5755,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-dhcpleases`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DHCP Server (dhcpd) leases
       tags:
@@ -5826,9 +5826,9 @@ paths:
                 - value
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Set DHCP Server (dhcpd) option
       tags:
@@ -5839,9 +5839,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart DHCP Server (dhcpd) service
       tags:
@@ -5852,9 +5852,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start DHCP Server (dhcpd) service
       tags:
@@ -5881,9 +5881,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete DHCP Server (dhcpd) static mapping
       tags:
@@ -5902,9 +5902,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DHCP Server (dhcpd) static mappings
       tags:
@@ -5967,9 +5967,9 @@ paths:
                 - ipaddr
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create DHCP Server (dhcpd) static mapping
       tags:
@@ -6037,9 +6037,9 @@ paths:
                 - interface
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update DHCP Server (dhcpd) static mapping
       tags:
@@ -6050,9 +6050,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop DHCP Server (dhcpd) service
       tags:
@@ -6063,9 +6063,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DNS Forwarder (dnsmasq) configuration
       tags:
@@ -6076,9 +6076,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Apply pending DNS Forwarder (dnsmasq) changes
       tags:
@@ -6107,9 +6107,9 @@ paths:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete DNS Forwarder (dnsmasq) host override
       tags:
@@ -6119,9 +6119,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DNS Forwarder (dnsmasq) host overrides
       tags:
@@ -6170,9 +6170,9 @@ paths:
                 - ip
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create DNS Forwarder (dnsmasq) host override
       tags:
@@ -6225,9 +6225,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update DNS Forwarder (dnsmasq) host override
       tags:
@@ -6271,9 +6271,9 @@ paths:
                 - domain
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create DNS Forwarder (dnsmasq) host override alias
       tags:
@@ -6284,9 +6284,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart DNS Forwarder (dnsmasq) service
       tags:
@@ -6297,9 +6297,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start DNS Forwarder (dnsmasq) service
       tags:
@@ -6310,9 +6310,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop DNS Forwarder (dnsmasq) service
       tags:
@@ -6323,9 +6323,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart Gateway Monitoring (dpinger) service
       tags:
@@ -6336,9 +6336,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start Gateway Monitoring (dpinger) service
       tags:
@@ -6349,9 +6349,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop Gateway Monitoring (dpinger) service
       tags:
@@ -6362,9 +6362,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read NTP (ntpd) service
       tags:
@@ -6428,9 +6428,9 @@ paths:
                   type: array
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update NTP (ntpd) service
       tags:
@@ -6441,9 +6441,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart NTP (ntpd) Service
       tags:
@@ -6454,9 +6454,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start NTP (ntpd) service
       tags:
@@ -6467,9 +6467,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop NTP (ntpd) Service
       tags:
@@ -6490,9 +6490,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete NTP (ntpd) time server
       tags:
@@ -6528,9 +6528,9 @@ paths:
                 - timeserver
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Add NTP (ntpd) time server
       tags:
@@ -6570,9 +6570,9 @@ paths:
                 - vpnid
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete OpenVPN Server
       tags:
@@ -6582,9 +6582,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read OpenVPN Server
       tags:
@@ -7299,9 +7299,9 @@ paths:
                   type: boolean
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create OpenVPN Server
       tags:
@@ -8037,9 +8037,9 @@ paths:
                 - vpnid
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update OpenVPN Server
       tags:
@@ -8079,9 +8079,9 @@ paths:
                 - vpnid
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete OpenVPN Client
       tags:
@@ -8091,9 +8091,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-client`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read OpenVPN Client
       tags:
@@ -8520,9 +8520,9 @@ paths:
                   type: boolean
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create OpenVPN Client
       tags:
@@ -9255,9 +9255,9 @@ paths:
                 - vpnid
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update OpenVPN Client
       tags:
@@ -9273,18 +9273,18 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete OpenVPN client specific override
       tags:
         - Services > OpenVPN > CSC
     get:
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read OpenVPN client specific overrides
       tags:
@@ -9448,9 +9448,9 @@ paths:
                 - common_name
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create OpenVPN client specific override
       tags:
@@ -9619,9 +9619,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update OpenVPN client specific override
       tags:
@@ -9642,9 +9642,9 @@ paths:
                   type: string
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart services
       tags:
@@ -9655,9 +9655,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-admin`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read Secure Shell (sshd) configuration
       tags:
@@ -9693,9 +9693,9 @@ paths:
                   type: string
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update Secure Shell (sshd) configuration
       tags:
@@ -9707,9 +9707,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart Secure Shell (sshd) service
       tags:
@@ -9720,9 +9720,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start Secure Shell (sshd) service
       tags:
@@ -9733,9 +9733,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop Secure Shell (sshd) service
       tags:
@@ -9746,9 +9746,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start all services
       tags:
@@ -9765,9 +9765,9 @@ paths:
               example: {}
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop all services
       tags:
@@ -9778,9 +9778,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart System Logger (syslogd) service
       tags:
@@ -9791,9 +9791,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start System Logger (syslogd) service
       tags:
@@ -9804,9 +9804,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop System Logger (syslogd) service
       tags:
@@ -9817,9 +9817,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DNS Resolver (Unbound) configuration
       tags:
@@ -9848,9 +9848,9 @@ paths:
             default: false
             type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete DNS Resolver (Unbound) access list
       tags:
@@ -9860,9 +9860,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DNS Resolver (Unbound) access lists
       tags:
@@ -9915,9 +9915,9 @@ paths:
                 - row
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create DNS Resolver (Unbound) access list
       tags:
@@ -9975,9 +9975,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update DNS Resolver (Unbound) access list
       tags:
@@ -10025,9 +10025,9 @@ paths:
                 - mask
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Add DNS Resolver (Unbound) access list row
       tags:
@@ -10038,9 +10038,9 @@ paths:
 
             _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Poll DNS Resolver (Unbound) apply status
       tags:
@@ -10060,9 +10060,9 @@ paths:
                   a GET request to /api/v1/services/unbound/apply."
                   type: boolean
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Apply pending DNS Resolver (Unbound) changes
       tags:
@@ -10091,9 +10091,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete DNS Resolver (Unbound) host override
       tags:
@@ -10103,9 +10103,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DNS Resolver (Unbound) host overrides
       tags:
@@ -10158,9 +10158,9 @@ paths:
                 - ip
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create DNS Resolver (Unbound) host override
       tags:
@@ -10218,9 +10218,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update DNS Resolver (Unbound) host override
       tags:
@@ -10264,9 +10264,9 @@ paths:
                 - domain
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create DNS Resolver (Unbound) host override alias
       tags:
@@ -10318,9 +10318,9 @@ paths:
                 - host_overrides
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Replace all DNS Resolver (Unbound) host overrides
       tags:
@@ -10333,9 +10333,9 @@ paths:
 
           _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete all DNS Resolver (Unbound) host overrides
       tags:
@@ -10346,9 +10346,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Restart DNS Resolver (Unbound) service
       tags:
@@ -10359,9 +10359,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Start DNS Resolver (Unbound) service
       tags:
@@ -10372,9 +10372,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Stop DNS Resolver (Unbound) service
       tags:
@@ -10400,9 +10400,9 @@ paths:
                 - mac
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Send a magic WOL packet to a host
       tags:
@@ -10413,9 +10413,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-carp`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read CARP status
       tags:
@@ -10437,9 +10437,9 @@ paths:
                   type: boolean
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update CARP status
       tags:
@@ -10450,9 +10450,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-gateway`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read gateway status
       tags:
@@ -10463,9 +10463,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-interfaces`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read interface status
       tags:
@@ -10476,9 +10476,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-ipsec`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read IPsec status
       tags:
@@ -10489,9 +10489,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-configurationhistory`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read configuration history log
       tags:
@@ -10502,9 +10502,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-logs-dhcp`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DHCP log
       tags:
@@ -10515,9 +10515,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-logs-firewall`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read firewall log
       tags:
@@ -10528,9 +10528,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-logs-system`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read system log
       tags:
@@ -10541,9 +10541,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-openvpn`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read OpenVPN status
       tags:
@@ -10557,9 +10557,9 @@ paths:
         _Requires at least one of the following privileges:_ [`page-all`, `page-dashboard-widgets`,
         `page-dashboard-all`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read system status
       tags:
@@ -10570,9 +10570,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read API configuration
       tags:
@@ -10693,9 +10693,9 @@ paths:
                   type: boolean
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update API configuration
       tags:
@@ -10706,9 +10706,9 @@ paths:
         and is intended to be used by third-party scripts/software to translate error
         codes to their full error message.
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read API error library
       tags:
@@ -10719,9 +10719,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read API version
       tags:
@@ -10739,9 +10739,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete ARP table entry
       tags:
@@ -10751,9 +10751,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-arptable`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read ARP table
       tags:
@@ -10771,9 +10771,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete CA certificate
       tags:
@@ -10783,9 +10783,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read CA certificates
       tags:
@@ -10926,9 +10926,9 @@ paths:
                 - descr
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create or import CA certificate
       tags:
@@ -10946,9 +10946,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete certificate
       tags:
@@ -10958,9 +10958,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read certificates
       tags:
@@ -11109,9 +11109,9 @@ paths:
                 - descr
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create or import certificate
       tags:
@@ -11152,9 +11152,9 @@ paths:
                 - prv
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update certificate
       tags:
@@ -11166,9 +11166,9 @@ paths:
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-backup-restore`,
         `page-diagnostics-command`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read pfSense configuration
       tags:
@@ -11185,9 +11185,9 @@ paths:
       requestBody:
         content: {}
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update pfSense configuration
       tags:
@@ -11207,9 +11207,9 @@ paths:
                   type: boolean
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update console settings
       tags:
@@ -11227,9 +11227,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete CRL
       tags:
@@ -11239,9 +11239,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-crlmanager`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read CRLs
       tags:
@@ -11298,9 +11298,9 @@ paths:
                 - descr
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create CRL
       tags:
@@ -11311,9 +11311,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read system DNS settings
       tags:
@@ -11343,9 +11343,9 @@ paths:
                   type: array
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update system DNS settings
       tags:
@@ -11363,9 +11363,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Remove system DNS servers
       tags:
@@ -11386,9 +11386,9 @@ paths:
                   type: array
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Add system DNS servers
       tags:
@@ -11399,9 +11399,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-haltsystem`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Initiate system shutdown
       tags:
@@ -11412,9 +11412,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read system hostname
       tags:
@@ -11438,9 +11438,9 @@ paths:
                   type: string
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update system hostname
       tags:
@@ -11451,9 +11451,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-notifications`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read email notification settings
       tags:
@@ -11523,9 +11523,9 @@ paths:
                 - authentication_mechanism
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update email notification settings
       tags:
@@ -11545,9 +11545,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Remove system package
       tags:
@@ -11557,9 +11557,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installed`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read system packages
       tags:
@@ -11581,9 +11581,9 @@ paths:
                 - name
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Install system package
       tags:
@@ -11594,9 +11594,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-rebootsystem`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Initiate system reboot
       tags:
@@ -11615,9 +11615,9 @@ paths:
             Name of the table to read. This must be an existing table. If no table name is specified, all tables will
             be read. Depending on the size of the tables on the system, reading all tables may take a while.
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read tables
       tags:
@@ -11635,9 +11635,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete system tunable
       tags:
@@ -11647,9 +11647,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-sysctl`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read system tunables
       tags:
@@ -11678,9 +11678,9 @@ paths:
                 - value
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create system tunable
       tags:
@@ -11711,9 +11711,9 @@ paths:
                 - id
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update system tunable
       tags:
@@ -11726,9 +11726,9 @@ paths:
         _Requires at least one of the following privileges:_ [`page-all`, `page-dashboard-widgets`,
         `page-diagnostics-command`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read system version
       tags:
@@ -11747,9 +11747,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete user
       tags:
@@ -11760,9 +11760,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-usermanager`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read users
       tags:
@@ -11823,9 +11823,9 @@ paths:
                 - password
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create user
       tags:
@@ -11882,9 +11882,9 @@ paths:
                 - username
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update user
       tags:
@@ -11904,9 +11904,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete authentication server
       tags:
@@ -11917,9 +11917,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-authservers`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read authentication servers
       tags:
@@ -11938,9 +11938,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete LDAP authentication server
       tags:
@@ -11951,9 +11951,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-authservers`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read LDAP authentication servers
       tags:
@@ -12060,9 +12060,9 @@ paths:
                 - ldap_attr_member
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create LDAP authentication server
       tags:
@@ -12081,9 +12081,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete RADIUS authentication server
       tags:
@@ -12094,9 +12094,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-authservers`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read RADIUS authentication servers
       tags:
@@ -12171,9 +12171,9 @@ paths:
                 - radius_secret
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create RADIUS authentication server
       tags:
@@ -12184,9 +12184,9 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]'
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read user groups
       tags:
@@ -12230,9 +12230,9 @@ paths:
                   items:
                     type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Create user group
       tags:
@@ -12275,9 +12275,9 @@ paths:
                   items:
                     type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update user group
       tags:
@@ -12294,9 +12294,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Delete user group
       tags:
@@ -12323,9 +12323,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Remove group member
       tags:
@@ -12353,9 +12353,9 @@ paths:
                 - group
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Assign group member
       tags:
@@ -12382,9 +12382,9 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Remove user privilege
       tags:
@@ -12412,9 +12412,9 @@ paths:
                 - username
               type: object
       responses:
-        200:
+        "200":
           $ref: '#/components/responses/Success'
-        401:
+        "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Assign user privileges
       tags:
