@@ -25,5 +25,4 @@ do-install:
     {% for file in files["file"] -%}
     ${INSTALL_DATA} ${FILESDIR}{{ file }} ${STAGEDIR}{{ file | dirname }}
     {% endfor %}
-    $(composer install)
 .include <bsd.port.mk>
