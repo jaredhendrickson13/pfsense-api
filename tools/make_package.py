@@ -99,12 +99,15 @@ class MakePackage:
 
     def build_on_remote_host(self):
         """Runs the build on a remote host using SSH."""
-        # Automate the process to pull, build and retrieve the package on a remote host
+        # Automate the process to pull, install dependencies, build and retrieve the package on a remote host
         build_cmds = [
             "mkdir -p ~/build/",
             "rm -rf ~/build/pfsense-api",
             "git clone https://github.com/jaredhendrickson13/pfsense-api.git ~/build/pfsense-api/",
             "git -C ~/build/pfsense-api checkout " + self.args.branch,
+            "composer install --working-dir ~/build/pfsense-api",
+            "rm -rf ~/build/pfsense-api/vendor/composer && rm ~/build/pfsense-api/vendor/autoload.php"
+            "cp -r ~/build/pfsense-api/vendor/* ~/build/pfsense-api/pfSense-pkg-API/files/etc/inc/"
             f"python3 ~/build/pfsense-api/tools/make_package.py --tag {self.args.tag}"
         ]
 
