@@ -1,4 +1,7 @@
 openapi: 3.0.0
+servers:
+  - url: /
+
 info:
   title: pfSense REST API Documentation
   version: "v1"
@@ -9402,6 +9405,9 @@ paths:
   /api/v1/services/openvpn/csc:
     delete:
       operationId: APIServicesOpenVPNClientSpecificOverridesDelete
+      description: 'Delete OpenVPN Client Specific Override.<br><br>
+
+              _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
       parameters:
         - description: ID of the client specific override to update. Refer to the 'Obtaining
             Object IDs' section in the documentation intro for help obtaining this ID.
@@ -9419,7 +9425,11 @@ paths:
       tags:
         - Services > OpenVPN > CSC
     get:
+
       operationId: APIServicesOpenVPNClientSpecificOverridesRead
+      description: 'Read existing OpenVPN Client Specific Overrides.<br><br>
+
+                    _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
       responses:
         "200":
           $ref: '#/components/responses/Success'
@@ -9430,6 +9440,9 @@ paths:
         - Services > OpenVPN > CSC
     post:
       operationId: APIServicesOpenVPNClientSpecificOverridesCreate
+      description: 'Create a new OpenVPN Client Specific Overrides.<br><br>
+
+          _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
       requestBody:
         content:
           application/json:
@@ -9597,6 +9610,9 @@ paths:
         - Services > OpenVPN > CSC
     put:
       operationId: APIServicesOpenVPNClientSpecificOverridesUpdate
+      description: 'Update an existing OpenVPN Client Specific Overrides.<br><br>
+
+          _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
       requestBody:
         content:
           application/json:
