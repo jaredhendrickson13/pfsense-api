@@ -2,6 +2,15 @@ openapi: 3.0.0
 info:
   title: pfSense REST API Documentation
   version: "v1"
+  contact:
+    name: "Report bugs & issues",
+    url: "https://github.com/jaredhendrickson13/pfsense-api"
+    email: "github@jaredhendrickson.com"
+
+  license:
+    name: "Apache 2.0"
+    url: "https://raw.githubusercontent.com/jaredhendrickson13/pfsense-api/master/LICENSE"
+
   description: >-
     ---
 
@@ -794,6 +803,7 @@ security:
 paths:
   /api/v1/access_token:
     post:
+      operationId: APIAccessTokenCreate
       description: Receive a temporary access token using your pfSense local database
         credentials. Basic authentication must be used to authenticate on this endpoint
         and this token is only applicable when the API is configured to use the JWT
@@ -810,6 +820,7 @@ paths:
         - Access Token
   /api/v1/diagnostics/command_prompt:
     post:
+      operationId: APIDiagnosticsCommandPromptCreate
       description: 'Execute a shell command.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-command`]'
@@ -836,6 +847,7 @@ paths:
         - Diagnostics > Command Prompt
   /api/v1/firewall/alias:
     delete:
+      operationId: APIFirewallAliasDelete
       description: 'Delete an existing alias.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-alias-edit`]'
@@ -870,6 +882,7 @@ paths:
       tags:
         - Firewall > Alias
     get:
+      operationId: APIFirewallAliasRead
       description: 'Read existing firewall aliases.<br><br>
 
 
@@ -883,6 +896,7 @@ paths:
       tags:
         - Firewall > Alias
     post:
+      operationId: APIFirewallAliasCreate
       description: 'Add a new host, network or port firewall alias.<br><br>
 
 
@@ -950,6 +964,7 @@ paths:
       tags:
         - Firewall > Alias
     put:
+      operationId: APIFirewallAliasUpdate
       description: 'Modify an existing firewall alias.<br><br>
 
 
@@ -1017,6 +1032,7 @@ paths:
         - Firewall > Alias
   /api/v1/firewall/alias/entry:
     delete:
+      operationId: APIFirewallAliasEntryDelete
       description: 'Delete existing entry from an existing firewall alias.<br><br>
 
 
@@ -1055,6 +1071,7 @@ paths:
       tags:
         - Firewall > Alias > Entry
     post:
+      operationId: APIFirewallAliasEntryCreate
       description: 'Add new entries to an existing firewall alias.<br><br>
 
 
@@ -1108,6 +1125,7 @@ paths:
         - Firewall > Alias > Entry
   /api/v1/firewall/apply:
     post:
+      operationId: APIFirewallApplyCreate
       description: 'Apply pending firewall changes. This will reload all firewall
         items.<br><br>
 
@@ -1126,6 +1144,7 @@ paths:
         - Firewall > Apply
   /api/v1/firewall/nat/one_to_one:
     delete:
+      operationId: APIFirewallNATOneToOneDelete
       description: 'Delete an existing NAT 1:1 mapping by ID.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1-edit`]'
@@ -1156,6 +1175,7 @@ paths:
       tags:
         - Firewall > NAT > One-To-One
     get:
+      operationId: APIFirewallNATOneToOneRead
       description: 'Read existing 1:1 NAT mappings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1`]'
@@ -1168,6 +1188,7 @@ paths:
       tags:
         - Firewall > NAT > One-To-One
     post:
+      operationId: APIFirewallNATOneToOneCreate
       description: 'Create a new NAT 1:1 mapping.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1-edit`]'
@@ -1251,6 +1272,7 @@ paths:
       tags:
         - Firewall > NAT > One-To-One
     put:
+      operationId: APIFirewallNATOneToOneUpdate
       description: 'Update an existing NAT 1:1 mapping.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-1-1-edit`]'
@@ -1334,6 +1356,7 @@ paths:
         - Firewall > NAT > One-To-One
   /api/v1/firewall/nat/outbound:
     get:
+      operationId: APIFirewallNATOutboundRead
       description: 'Read outbound NAT settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]'
@@ -1346,6 +1369,7 @@ paths:
       tags:
         - Firewall > NAT > Outbound
     put:
+      operationId: APIFirewallNATOutboundUpdate
       description: 'Update outbound NAT settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]'
@@ -1385,6 +1409,7 @@ paths:
         - Firewall > NAT > Outbound
   /api/v1/firewall/nat/outbound/mapping:
     delete:
+      operationId: APIFirewallNATOutboundMappingDelete
       description: 'Delete an existing outbound NAT mapping.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound-edit`]'
@@ -1415,6 +1440,7 @@ paths:
       tags:
         - Firewall > NAT > Outbound > Mapping
     get:
+      operationId: APIFirewallNATOutboundMappingRead
       description: 'Read existing outbound NAT mappings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound`]'
@@ -1427,6 +1453,7 @@ paths:
       tags:
         - Firewall > NAT > Outbound > Mapping
     post:
+      operationId: APIFirewallNATOutboundMappingCreate
       description: 'Create new outbound NAT mapping.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound-edit`]'
@@ -1551,6 +1578,7 @@ paths:
       tags:
         - Firewall > NAT > Outbound > Mapping
     put:
+      operationId: APIFirewallNATOutboundMappingUpdate
       description: 'Update an existing outbound NAT mapping.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-outbound-edit`]'
@@ -1677,6 +1705,7 @@ paths:
         - Firewall > NAT > Outbound > Mapping
   /api/v1/firewall/nat/port_forward:
     delete:
+      operationId: APIFirewallNATOutboundPortForwardDelete
       description: 'Delete an existing NAT rule by ID.<br> _Note: use caution when
         making this call, removing rules may result in API/webConfigurator lockout_<br><br>
 
@@ -1708,6 +1737,7 @@ paths:
       tags:
         - Firewall > NAT > Port Forward
     get:
+      operationId: APIFirewallNATOutboundPortForwardRead
       description: 'Read NAT port forward rules.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-portforward`]'
@@ -1720,6 +1750,7 @@ paths:
       tags:
         - Firewall > NAT > Port Forward
     post:
+      operationId: APIFirewallNATOutboundPortForwardCreate
       description: 'Create a new NAT port forward rule.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-nat-portforward-edit`]'
@@ -1842,6 +1873,7 @@ paths:
       tags:
         - Firewall > NAT > Port Forward
     put:
+      operationId: APIFirewallNATOutboundPortForwardUpdate
       description: 'Update an existing port forward rule.<br><br>
 
 
@@ -1966,6 +1998,7 @@ paths:
         - Firewall > NAT > Port Forward
   /api/v1/firewall/rule:
     delete:
+      operationId: APIFirewallRuleDelete
       description: 'Delete an existing firewall rule.<br>
 
         _Note: use caution when making this call, removing certain rules can result
@@ -1998,6 +2031,7 @@ paths:
       tags:
         - Firewall > Rule
     get:
+      operationId: APIFirewallRuleRead
       description: 'Read firewall rules.<br><br>
 
 
@@ -2011,6 +2045,7 @@ paths:
       tags:
         - Firewall > Rule
     post:
+      operationId: APIFirewallRuleCreate
       description: 'Add a new firewall rule.<br><br>
 
 
@@ -2209,6 +2244,7 @@ paths:
       tags:
         - Firewall > Rule
     put:
+      operationId: APIFirewallRuleUpdate
       description: 'Update an existing firewall rule.<br><br>
 
 
@@ -2401,6 +2437,7 @@ paths:
         - Firewall > Rule
   /api/v1/firewall/rule/flush:
     put:
+      operationId: APIFirewallRuleFlushUpdate
       description: 'Replace all existing firewall rules with a specified set of rules. This allows you to
             create rules at once. If a validation error is encountered when validating the rules, the specific 
             rule entry that triggered the error will be included in the `data` field of the response. <br><br>_Note:
@@ -2453,6 +2490,7 @@ paths:
       tags:
         - Firewall > Rule > Flush
     delete:
+      operationId: APIFirewallRuleFlushDelete
       description: 'Delete all existing firewall rules. This is useful for scripts
         that need to setup the firewall rules from scratch.<br><br>_Note: this endpoint
         will not reload the firewall filter automatically, you must make another API
@@ -2470,6 +2508,7 @@ paths:
         - Firewall > Rule > Flush
   /api/v1/firewall/rule/sort:
     put:
+      operationId: APIFirewallRuleSortUpdate
       description: 'Sorts firewall rules based on specified criteria. Use caution
         if sorting firewall rules when block rules are present.<br><br>
 
@@ -2528,6 +2567,7 @@ paths:
         - Firewall > Rule > Sort
   /api/v1/firewall/schedule:
     delete:
+      operationId: APIFirewallScheduleDelete
       description: 'Delete an existing firewall schedule.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]'
@@ -2547,6 +2587,7 @@ paths:
       tags:
         - Firewall > Schedule
     get:
+      operationId: APIFirewallScheduleRead
       description: 'Read all existing firewall schedules.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules`]'
@@ -2559,6 +2600,7 @@ paths:
       tags:
         - Firewall > Schedule
     post:
+      operationId: APIFirewallScheduleCreate
       description: 'Create a firewall schedule.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]'
@@ -2607,6 +2649,7 @@ paths:
       tags:
         - Firewall > Schedule
     put:
+      operationId: APIFirewallScheduleUpdate
       description: 'Update an existing firewall schedule.<br><br>
 
 
@@ -2652,6 +2695,7 @@ paths:
         - Firewall > Schedule
   /api/v1/firewall/schedule/time_range:
     delete:
+      operationId: APIFirewallScheduleTimeRangeDelete
       description: 'Remove a time range from an existing firewall schedule.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]'
@@ -2680,6 +2724,7 @@ paths:
       tags:
         - Firewall > Schedule > Time Range
     post:
+      operationId: APIFirewallScheduleTimeRangeCreate
       description: 'Add a new time range to an existing firewall schedule.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-schedules-edit`]'
@@ -2740,6 +2785,7 @@ paths:
         - Firewall > Schedule > Time Range
   /api/v1/firewall/states:
     delete:
+      operationId: APIFirewallStatesDelete
       description: 'Delete existing firewall states.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-showstates`]'
@@ -2791,6 +2837,7 @@ paths:
       tags:
         - Firewall > States
     get:
+      operationId: APIFirewallStatesRead
       description: 'Read the current firewall states table.<br> _Note: excessively
         large states tables may cause API calls to this endpoint to timeout._<br><br>
 
@@ -2805,6 +2852,7 @@ paths:
         - Firewall > States
   /api/v1/firewall/states/size:
     get:
+      operationId: APIFirewallStatesSizeRead
       description: 'Read information about the firewall state table''s current, default
         and maximum sizes.<br><br>
 
@@ -2818,6 +2866,7 @@ paths:
       tags:
         - Firewall > States > Size
     put:
+      operationId: APIFirewallStatesSizeUpdate
       description: 'Modify the maximum number of firewall state table entries allowed
         by the system.<br>_Note: use caution when making this call, setting the maximum
         state table size to a value lower than the current number of firewall state
@@ -2847,6 +2896,7 @@ paths:
         - Firewall > States > Size
   /api/v1/firewall/traffic_shaper:
     delete:
+      operationId: APIFirewallTrafficShaperDelete
       description: 'Delete the traffic shaper policy for a specific interface.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper`]'
@@ -2878,6 +2928,7 @@ paths:
       tags:
         - Firewall > Traffic Shaper
     get:
+      operationId: APIFirewallTrafficShaperRead
       description: 'Read all configured traffic shaper policies.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper`]'
@@ -2890,6 +2941,7 @@ paths:
       tags:
         - Firewall > Traffic Shaper
     post:
+      operationId: APIFirewallTrafficShaperCreate
       description: 'Add a new traffic shaper policy to an interface.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper`]'
@@ -2965,6 +3017,7 @@ paths:
       tags:
         - Firewall > Traffic Shaper
     put:
+      operationId: APIFirewallTrafficShaperUpdate
       description: 'Update an existing traffic shaper policy for an interface.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper`]'
@@ -3040,6 +3093,7 @@ paths:
         - Firewall > Traffic Shaper
   /api/v1/firewall/traffic_shaper/limiter:
     delete:
+      operationId: APIFirewallTrafficShaperLimiterDelete
       description: 'Delete traffic shaper limiter.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]'
@@ -3068,6 +3122,7 @@ paths:
       tags:
         - Firewall > Traffic Shaper > Limiter
     get:
+      operationId: APIFirewallTrafficShaperLimiterRead
       description: 'Read all existing traffic shaper limiters.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]'
@@ -3080,6 +3135,7 @@ paths:
       tags:
         - Firewall > Traffic Shaper > Limiter
     post:
+      operationId: APIFirewallTrafficShaperLimiterCreate
       description: 'Create a new traffic shaper limiter.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]'
@@ -3373,6 +3429,7 @@ paths:
         - Firewall > Traffic Shaper > Limiter
   /api/v1/firewall/traffic_shaper/limiter/bandwidth:
     delete:
+      operationId: APIFirewallTrafficShaperLimiterBandwidthDelete
       description: 'Delete a limiter bandwidth setting.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]'
@@ -3411,6 +3468,7 @@ paths:
       tags:
         - Firewall > Traffic Shaper > Limiter > Bandwidth
     post:
+      operationId: APIFirewallTrafficShaperLimiterBandwidthCreate
       description: 'Create a limiter bandwidth setting.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]'
@@ -3462,6 +3520,7 @@ paths:
         - Firewall > Traffic Shaper > Limiter > Bandwidth
   /api/v1/firewall/traffic_shaper/limiter/queue:
     delete:
+      operationId: APIFirewallTrafficShaperLimiterQueueDelete
       description: 'Delete an existing queue from an existing traffic shaper limiter.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]'
@@ -3496,6 +3555,7 @@ paths:
       tags:
         - Firewall > Traffic Shaper > Limiter > Queue
     post:
+      operationId: APIFirewallTrafficShaperLimiterQueueCreate
       description: 'Add a new child queue to an existing traffic shaper limiter.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-limiter`]'
@@ -3702,6 +3762,7 @@ paths:
         - Firewall > Traffic Shaper > Limiter > Queue
   /api/v1/firewall/traffic_shaper/queue:
     delete:
+      operationId: APIFirewallTrafficShaperQueueDelete
       description: 'Delete a queue from an existing traffic shaper interface.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-queues`]'
@@ -3730,6 +3791,7 @@ paths:
       tags:
         - Firewall > Traffic Shaper > Queue
     post:
+      operationId: APIFirewallTrafficShaperQueueCreate
       description: 'Add a queue to an existing traffic shaper interface.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-trafficshaper-queues`]'
@@ -3934,6 +3996,7 @@ paths:
         - Firewall > Traffic Shaper > Queue
   /api/v1/firewall/virtual_ip:
     delete:
+      operationId: APIFirewallVirtualIPDelete
       description: 'Delete an existing virtual IP.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-virtualipaddress-edit`]'
@@ -3954,6 +4017,7 @@ paths:
       tags:
         - Firewall > Virtual IP
     get:
+      operationId: APIFirewallVirtualIPRead
       description: 'Read existing virtual IP assignments.<br><br>
 
 
@@ -3967,6 +4031,7 @@ paths:
       tags:
         - Firewall > Virtual IP
     post:
+      operationId: APIFirewallVirtualIPCreate
       description: 'Add a new virtual IP.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-firewall-virtualipaddress-edit`]'
@@ -4041,6 +4106,7 @@ paths:
       tags:
         - Firewall > Virtual IP
     put:
+      operationId: APIFirewallVirtualIPUpdate
       description: 'Update an existing virtual IP.<br><br>
 
 
@@ -4118,6 +4184,7 @@ paths:
         - Firewall > Virtual IP
   /api/v1/interface:
     delete:
+      operationId: APIInterfaceDelete
       description: 'Delete an existing interface. __Note: interface deletions will
         be applied immediately, there is no need to apply interface changes afterwards__<br><br>
 
@@ -4141,6 +4208,7 @@ paths:
       tags:
         - Interface
     get:
+      operationId: APIInterfaceRead
       description: 'Read interface assignments and configuration.<br><br>
 
 
@@ -4154,6 +4222,7 @@ paths:
       tags:
         - Interface
     post:
+      operationId: APIInterfaceCreate
       description: 'Configure a new interface.<br><br>
 
 
@@ -4416,6 +4485,7 @@ paths:
       tags:
         - Interface
     put:
+      operationId: APIInterfaceUpdate
       description: 'Update an existing interface.<br><br>
 
 
@@ -4687,6 +4757,7 @@ paths:
         - Interface
   /api/v1/interface/available:
     get:
+      operationId: APIInterfaceAvailableRead
       description: 'Read all interfaces available on the system. This will provide details for all interfaces regardless
           if they are currently configured on pfSense.<br><br>
 
@@ -4702,6 +4773,7 @@ paths:
         - Interface > Available
   /api/v1/interface/apply:
     get:
+      operationId: APIInterfaceApplyRead
       description: 'Check if all pending interface changes have been applied.<br><br>
 
               _Requires at least one of the following privileges:_ [`page-all`, `page-interfaces-assignnetworkports`]'
@@ -4714,6 +4786,7 @@ paths:
       tags:
         - Interface > Apply
     post:
+      operationId: APIInterfaceApplyCreate
       description: 'Apply pending interface changes.<br><br>
 
 
@@ -4739,6 +4812,7 @@ paths:
         - Interface > Apply
   /api/v1/interface/bridge:
     delete:
+      operationId: APIInterfaceBridgeDelete
       description: 'Delete bridge assignment and configuration.<br><br>
 
 
@@ -4775,6 +4849,7 @@ paths:
       tags:
         - Interface > Bridge
     post:
+      operationId: APIInterfaceBridgeCreate
       description: 'Add a new bridge interface.<br><br>
 
 
@@ -4808,6 +4883,7 @@ paths:
       tags:
         - Interface > Bridge
     put:
+      operationId: APIInterfaceBridgeUpdate
       description: 'Update an existing bridge configuration.<br><br>
 
 
@@ -4846,6 +4922,7 @@ paths:
         - Interface > Bridge
   /api/v1/interface/group:
     delete:
+      operationId: APIInterfaceGroupDelete
       description: 'Delete interface group and configuration.<br><br>
 
 
@@ -4866,6 +4943,7 @@ paths:
       tags:
         - Interface > Group
     get:
+      operationId: APIInterfaceGroupRead
       description: 'Read interface group and configuration.<br><br>
 
 
@@ -4880,6 +4958,7 @@ paths:
       tags:
         - Interface > Group
     post:
+      operationId: APIInterfaceGroupCreate
       description: 'Add a new interface group.<br><br>
 
 
@@ -4916,6 +4995,7 @@ paths:
       tags:
         - Interface > Group
     put:
+      operationId: APIInterfaceGroupUpdate
       description: 'Update an existing interface group configuration.<br><br>
 
 
@@ -4952,6 +5032,7 @@ paths:
         - Interface > Group
   /api/v1/interface/vlan:
     delete:
+      operationId: APIInterfaceVLANDelete
       description: 'Delete VLAN assignment and configuration.<br><br>
 
 
@@ -4973,6 +5054,7 @@ paths:
       tags:
         - Interface > VLAN
     get:
+      operationId: APIInterfaceVLANRead
       description: 'Read VLAN assignments and configuration.<br><br>
 
 
@@ -4987,6 +5069,7 @@ paths:
       tags:
         - Interface > VLAN
     post:
+      operationId: APIInterfaceVLANCreate
       description: 'Add a new VLAN interface.<br><br>
 
 
@@ -5026,6 +5109,7 @@ paths:
       tags:
         - Interface > VLAN
     put:
+      operationId: APIInterfaceVLANUpdate
       description: 'Modify an existing VLAN configuration
 
 
@@ -5076,6 +5160,7 @@ paths:
         - Interface > VLAN
   /api/v1/routing/apply:
     post:
+      operationId: APIRoutingApplyCreate
       description: 'Apply pending routing changes.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`,
@@ -5090,6 +5175,7 @@ paths:
         - Routing > Apply
   /api/v1/routing/gateway:
     delete:
+      operationId: APIRoutingGatewayDelete
       description: 'Delete an existing routing gateway.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]'
@@ -5110,6 +5196,7 @@ paths:
       tags:
         - Routing > Gateway
     get:
+      operationId: APIRoutingGatewayRead
       description: 'Read existing gateways.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways`]
@@ -5125,6 +5212,7 @@ paths:
       tags:
         - Routing > Gateway
     post:
+      operationId: APIRoutingGatewayCreate
       description: 'Create a new gateway.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]'
@@ -5270,6 +5358,7 @@ paths:
       tags:
         - Routing > Gateway
     put:
+      operationId: APIRoutingGatewayUpdate
       description: 'Update an existing gateway.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]'
@@ -5418,6 +5507,7 @@ paths:
         - Routing > Gateway
   /api/v1/routing/gateway/default:
     put:
+      operationId: APIRoutingGatewayDefaultUpdate
       description: 'Update the default gateways for IPv4 and/or IPv6. _Note: changing the default gateway can
       prevent you from connecting to the system afterward. Proceed with caution._<br><br>
 
@@ -5455,6 +5545,7 @@ paths:
         - Routing > Gateway > Default
   /api/v1/routing/gateway/detail:
     get:
+      operationId: APIRoutingGatewayDetailRead
       description: 'Read verbose routing gateway details about both dynamic/system
         gateways and static gateways.<br><br>
 
@@ -5469,6 +5560,7 @@ paths:
         - Routing > Gateway > Detail
   /api/v1/routing/static_route:
     delete:
+      operationId: APIRoutingStaticRouteDelete
       description: 'Delete existing static routes. __Note: route deletions will be
         applied immediately, there is no need to apply routing changes afterwards__<br><br>
 
@@ -5490,6 +5582,7 @@ paths:
       tags:
         - Routing > Static Route
     get:
+      operationId: APIRoutingStaticRouteRead
       description: 'Read existing static routes.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes`]'
@@ -5502,6 +5595,7 @@ paths:
       tags:
         - Routing > Static Route
     post:
+      operationId: APIRoutingStaticRouteCreate
       description: 'Create a new static route.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]'
@@ -5547,6 +5641,7 @@ paths:
       tags:
         - Routing > Static Route
     put:
+      operationId: APIRoutingStaticRouteUpdate
       description: 'Update an existing static route.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-staticroutes-editroute`]'
@@ -5597,6 +5692,7 @@ paths:
         - Routing > Static Route
   /api/v1/services:
     get:
+      operationId: APIServicesRead
       description: 'Read available services.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -5610,6 +5706,7 @@ paths:
         - Services
   /api/v1/services/ddns:
     get:
+      operationId: APIServicesDDNSRead
       description: 'Read configured dynamic DNS settings and statuses.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dynamicdnsclients`]'
@@ -5623,6 +5720,7 @@ paths:
         - Services > DDNS
   /api/v1/services/dhcpd:
     get:
+      operationId: APIServicesDHCPdRead
       description: 'Read the entire DHCP Server (dhcpd) configuration.<br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserverpage-services-dhcpserver`]'
@@ -5635,6 +5733,7 @@ paths:
       tags:
         - Services > DHCPD
     put:
+      operationId: APIServicesDHCPdUpdate
       description: 'Update the current DHCP Server (dhcpd) configuration for a specified
         interface.<br>
 
@@ -5749,6 +5848,7 @@ paths:
         - Services > DHCPD
   /api/v1/services/dhcpd/lease:
     get:
+      operationId: APIServicesDHCPdLeaseRead
       description: 'Read the current DHCP Server (dhcpd) leases.<br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-dhcpleases`]'
@@ -5762,6 +5862,7 @@ paths:
         - Services > DHCPD > Lease
   /api/v1/services/dhcpd/options:
     post:
+      operationId: APIServicesDHCPdOptionsCreate
       description: 'Set new DHCP Server (dhcpd) option.<br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver`]'
@@ -5833,6 +5934,7 @@ paths:
         - Services > DHCPD > Options
   /api/v1/services/dhcpd/restart:
     post:
+      operationId: APIServicesDHCPdRestartCreate
       description: 'Restart the DHCP Server (dhcpd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -5846,6 +5948,7 @@ paths:
         - Services > DHCPD
   /api/v1/services/dhcpd/start:
     post:
+      operationId: APIServicesDHCPdStartCreate
       description: 'Start the DHCP Server (dhcpd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -5859,6 +5962,7 @@ paths:
         - Services > DHCPD
   /api/v1/services/dhcpd/static_mapping:
     delete:
+      operationId: APIServicesDHCPdStaticMappingDelete
       description: 'Delete an existing DHCP Server (dhcpd) static mapping.<br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
@@ -5887,6 +5991,7 @@ paths:
       tags:
         - Services > DHCPD > Static Mapping
     get:
+      operationId: APIServicesDHCPdStaticMappingRead
       description: 'Read existing DHCP Server (dhcpd) static mappings.<br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
@@ -5908,6 +6013,7 @@ paths:
       tags:
         - Services > DHCPD > Static Mapping
     post:
+      operationId: APIServicesDHCPdStaticMappingCreate
       description: 'Create a new DHCP Server (dhcpd) static mapping.<br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
@@ -5973,6 +6079,7 @@ paths:
       tags:
         - Services > DHCPD > Static Mapping
     put:
+      operationId: APIServicesDHCPdStaticMappingUpdate
       description: 'Update an existing DHCP Server (dhcpd) static mapping.<br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dhcpserver-editstaticmapping`]'
@@ -6044,6 +6151,7 @@ paths:
         - Services > DHCPD > Static Mapping
   /api/v1/services/dhcpd/stop:
     post:
+      operationId: APIServicesDHCPdStopCreate
       description: 'Stop the DHCP Server (dhcpd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -6057,6 +6165,7 @@ paths:
         - Services > DHCPD
   /api/v1/services/dnsmasq:
     get:
+      operationId: APIServicesDnsmasqRead
       description: 'Read the entire DNS Forwarder (dnsmasq) configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
@@ -6070,6 +6179,7 @@ paths:
         - Services > DNSMASQ
   /api/v1/services/dnsmasq/apply:
     post:
+      operationId: APIServicesDnsmasqApplyCreate
       description: 'Apply pending DNS Forwarder (dnsmasq) changes.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
@@ -6083,6 +6193,7 @@ paths:
         - Services > DNSMASQ
   /api/v1/services/dnsmasq/host_override:
     delete:
+      operationId: APIServicesDnsmasqHostOverrideDelete
       description: 'Delete an existing host override from the DNS Forwarder (dnsmasq).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
@@ -6113,6 +6224,7 @@ paths:
       tags:
         - Services > DNSMASQ > Host Override
     get:
+      operationId: APIServicesDnsmasqHostOverrideRead
       description: 'Read host overrides from the DNS Forwarder (dnsmasq).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
@@ -6125,6 +6237,7 @@ paths:
       tags:
         - Services > DNSMASQ > Host Override
     post:
+      operationId: APIServicesDnsmasqHostOverrideCreate
       description: 'Add a new host override to the DNS Forwarder (dnsmasq).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
@@ -6176,6 +6289,7 @@ paths:
       tags:
         - Services > DNSMASQ > Host Override
     put:
+      operationId: APIServicesDnsmasqHostOverrideUpdate
       description: 'Modify an existing host override from the DNS Forwarder (dnsmasq).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
@@ -6232,6 +6346,7 @@ paths:
         - Services > DNSMASQ > Host Override
   /api/v1/services/dnsmasq/host_override/alias:
     post:
+      operationId: APIServicesDnsmasqHostOverrideAliasCreate
       description: 'Add a new host override alias to the DNS Forwarder (dnsmasq).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder-edithost`]'
@@ -6278,6 +6393,7 @@ paths:
         - Services > DNSMASQ > Host Override > Alias
   /api/v1/services/dnsmasq/restart:
     post:
+      operationId: APIServicesDnsmasqRestartCreate
       description: 'Restart the DNS Forwarder (dnsmasq) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -6291,6 +6407,7 @@ paths:
         - Services > DNSMASQ
   /api/v1/services/dnsmasq/start:
     post:
+      operationId: APIServicesDnsmasqStartCreate
       description: 'Start the DNS Forwarder (dnsmasq) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -6304,6 +6421,7 @@ paths:
         - Services > DNSMASQ
   /api/v1/services/dnsmasq/stop:
     post:
+      operationId: APIServicesDnsmasqStopCreate
       description: 'Stop the DNS Forwarder (dnsmasq) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -6317,6 +6435,7 @@ paths:
         - Services > DNSMASQ
   /api/v1/services/dpinger/restart:
     post:
+      operationId: APIServicesDpingerRestartCreate
       description: 'Restart the Gateway Monitoring (dpinger) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -6330,6 +6449,7 @@ paths:
         - Services > DPINGER
   /api/v1/services/dpinger/start:
     post:
+      operationId: APIServicesDpingerStartCreate
       description: 'Start the Gateway Monitoring (dpinger) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -6343,6 +6463,7 @@ paths:
         - Services > DPINGER
   /api/v1/services/dpinger/stop:
     post:
+      operationId: APIServicesDpingerStopCreate
       description: 'Stop the Gateway Monitoring (dpinger) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -6356,6 +6477,7 @@ paths:
         - Services > DPINGER
   /api/v1/services/ntpd:
     get:
+      operationId: APIServicesNTPdRead
       description: 'Read the NTP (ntpd) service configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
@@ -6368,6 +6490,7 @@ paths:
       tags:
         - Services > NTPD
     put:
+      operationId: APIServicesNTPdUpdate
       description: 'Update the NTP (ntpd) service configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
@@ -6435,6 +6558,7 @@ paths:
         - Services > NTPD
   /api/v1/services/ntpd/restart:
     post:
+      operationId: APIServicesNTPdRestartCreate
       description: 'Restart the NTP (ntpd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -6448,6 +6572,7 @@ paths:
         - Services > NTPD
   /api/v1/services/ntpd/start:
     post:
+      operationId: APIServicesNTPdStartCreate
       description: 'Start the NTP (ntpd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -6461,6 +6586,7 @@ paths:
         - Services > NTPD
   /api/v1/services/ntpd/stop:
     post:
+      operationId: APIServicesNTPdStopCreate
       description: 'Stop the NTP (ntpd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -6474,6 +6600,7 @@ paths:
         - Services > NTPD
   /api/v1/services/ntpd/time_server:
     delete:
+      operationId: APIServicesNTPdTimeServerDelete
       description: 'Delete an existing NTP time server from the NTP (ntpd) configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
@@ -6496,6 +6623,7 @@ paths:
       tags:
         - Services > NTPD > Time Server
     post:
+      operationId: APIServicesNTPdTimeServerCreate
       description: 'Add a new NTP time server to the NTP (ntpd) configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-ntpd`]'
@@ -6535,6 +6663,7 @@ paths:
         - Services > NTPD > Time Server
   /api/v1/services/openvpn/server:
     delete:
+      operationId: APIServicesOpenVPNServerDelete
       description: 'Delete OpenVPN Server instance.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
@@ -6588,6 +6717,7 @@ paths:
       tags:
         - Services > OpenVPN > Server
     post:
+      operationId: APIServicesOpenVPNServerCreate
       description: 'Create OpenVPN Server instance.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
@@ -7305,6 +7435,7 @@ paths:
       tags:
         - Services > OpenVPN > Server
     put:
+      operationId: APIServicesOpenVPNServerUpdate
       description: 'Update OpenVPN Server instance.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
@@ -8044,6 +8175,7 @@ paths:
         - Services > OpenVPN > Server
   /api/v1/services/openvpn/client:
     delete:
+      operationId: APIServicesOpenVPNClientDelete
       description: 'Delete OpenVPN Client instance.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-client`]'
@@ -8085,6 +8217,7 @@ paths:
       tags:
         - Services > OpenVPN > Client
     get:
+      operationId: APIServicesOpenVPNClientRead
       description: 'Read All OpenVPN Client instances.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-client`]'
@@ -8097,6 +8230,7 @@ paths:
       tags:
         - Services > OpenVPN > Client
     post:
+      operationId: APIServicesOpenVPNClientCreate
       description: 'Create OpenVPN Client instance.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-client`]'
@@ -8528,6 +8662,7 @@ paths:
       tags:
         - Services > OpenVPN > Client
     put:
+      operationId: APIServicesOpenVPNClientUpdate
       description: 'Update OpenVPN Client instance.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-client`]'
@@ -9264,6 +9399,7 @@ paths:
         - Services > OpenVPN > Client
   /api/v1/services/openvpn/csc:
     delete:
+      operationId: APIServicesOpenVPNClientSpecificOverridesDelete
       parameters:
         - description: ID of the client specific override to update. Refer to the 'Obtaining
             Object IDs' section in the documentation intro for help obtaining this ID.
@@ -9281,6 +9417,7 @@ paths:
       tags:
         - Services > OpenVPN > CSC
     get:
+      operationId: APIServicesOpenVPNClientSpecificOverridesRead
       responses:
         "200":
           $ref: '#/components/responses/Success'
@@ -9290,6 +9427,7 @@ paths:
       tags:
         - Services > OpenVPN > CSC
     post:
+      operationId: APIServicesOpenVPNClientSpecificOverridesCreate
       requestBody:
         content:
           application/json:
@@ -9456,6 +9594,7 @@ paths:
       tags:
         - Services > OpenVPN > CSC
     put:
+      operationId: APIServicesOpenVPNClientSpecificOverridesUpdate
       requestBody:
         content:
           application/json:
@@ -9628,6 +9767,7 @@ paths:
         - Services > OpenVPN > CSC
   /api/v1/services/restart:
     post:
+      operationId: APIServicesRestartCreate
       description: 'Restart available services.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -9651,6 +9791,7 @@ paths:
         - Services
   /api/v1/services/sshd:
     get:
+      operationId: APIServicesSSHdRead
       description: 'Read the current Secure Shell (sshd) configuration. <br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-admin`]'
@@ -9663,6 +9804,7 @@ paths:
       tags:
         - Services > SSHD
     put:
+      operationId: APIServicesSSHdUpdate
       description: 'Modify the Secure Shell (sshd) service configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-admin`]'
@@ -9702,6 +9844,7 @@ paths:
         - Services > SSHD
   /api/v1/services/sshd/restart:
     post:
+      operationId: APIServicesSSHdRestartCreate
       description: 'Restart the Secure Shell (sshd) service.<br><br>
 
 
@@ -9716,6 +9859,7 @@ paths:
         - Services > SSHD
   /api/v1/services/sshd/start:
     post:
+      operationId: APIServicesSSHdStartCreate
       description: 'Start the Secure Shell (sshd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -9729,6 +9873,7 @@ paths:
         - Services > SSHD
   /api/v1/services/sshd/stop:
     post:
+      operationId: APIServicesSSHdStopCreate
       description: 'Stop the Secure Shell (sshd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -9742,6 +9887,7 @@ paths:
         - Services > SSHD
   /api/v1/services/start:
     post:
+      operationId: APIServicesStartCreate
       description: 'Start all available services.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -9755,6 +9901,7 @@ paths:
         - Services
   /api/v1/services/stop:
     post:
+      operationId: APIServicesStopCreate
       description: 'Stop all available services.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -9774,6 +9921,7 @@ paths:
         - Services
   /api/v1/services/syslogd/restart:
     post:
+      operationId: APIServicesSyslogdRestartCreate
       description: 'Restart the System Logger (syslogd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -9787,6 +9935,7 @@ paths:
         - Services > SYSLOGD
   /api/v1/services/syslogd/start:
     post:
+      operationId: APIServicesSyslogdStartCreate
       description: 'Start the System Logger (syslogd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -9800,6 +9949,7 @@ paths:
         - Services > SYSLOGD
   /api/v1/services/syslogd/stop:
     post:
+      operationId: APIServicesSyslogdStopCreate
       description: 'Stop the System Logger (syslogd) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -9813,6 +9963,7 @@ paths:
         - Services > SYSLOGD
   /api/v1/services/unbound:
     get:
+      operationId: APIServicesUnboundRead
       description: 'Read the entire DNS Resolver (Unbound) configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
@@ -9826,6 +9977,7 @@ paths:
         - Services > Unbound
   /api/v1/services/unbound/access_list:
     delete:
+      operationId: APIServicesUnboundAccessListDelete
       description: 'Delete DNS Resolver (Unbound) access list.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]'
@@ -9856,6 +10008,7 @@ paths:
       tags:
         - Services > Unbound > Access List
     get:
+      operationId: APIServicesUnboundAccessListRead
       description: 'Read configured DNS Resolver (Unbound) access lists.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]'
@@ -9868,6 +10021,7 @@ paths:
       tags:
         - Services > Unbound > Access List
     post:
+      operationId: APIServicesUnboundAccessListCreate
       description: 'Create a new DNS Resolver (Unbound) access list.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]'
@@ -9923,6 +10077,7 @@ paths:
       tags:
         - Services > Unbound > Access List
     put:
+      operationId: APIServicesUnboundAccessListUpdate
       description: 'Modify an existing DNS Resolver (Unbound) access list.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-acls`]'
@@ -9984,6 +10139,7 @@ paths:
         - Services > Unbound > Access List
   /api/v1/services/unbound/access_list/row:
     post:
+      operationId: APIServicesUnboundAccessListRowCreate
       description: 'Add a new row (network entry) to an existing DNS Resolver (Unbound)
         access list.<br><br>
 
@@ -10034,6 +10190,7 @@ paths:
         - Services > Unbound > Access List > Row
   /api/v1/services/unbound/apply:
     get:
+      operationId: APIServicesUnboundApplyRead
       description: 'Check the DNS Resolver (Unbound) apply status.<br><br>
 
             _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
@@ -10046,6 +10203,7 @@ paths:
       tags:
         - Services > Unbound > Apply
     post:
+      operationId: APIServicesUnboundApplyCreate
       description: 'Apply pending DNS Resolver (Unbound) changes.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
@@ -10069,6 +10227,7 @@ paths:
         - Services > Unbound > Apply
   /api/v1/services/unbound/host_override:
     delete:
+      operationId: APIServicesUnboundHostOverrideDelete
       description: 'Delete host overrides from the DNS Resolver (Unbound).<br><br>
 
 
@@ -10099,6 +10258,7 @@ paths:
       tags:
         - Services > Unbound > Host Override
     get:
+      operationId: APIServicesUnboundHostOverrideRead
       description: 'Read host overrides from the DNS Resolver (Unbound).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
@@ -10111,6 +10271,7 @@ paths:
       tags:
         - Services > Unbound > Host Override
     post:
+      operationId: APIServicesUnboundHostOverrideCreate
       description: 'Add a new host override to the DNS Resolver (Unbound).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]'
@@ -10166,6 +10327,7 @@ paths:
       tags:
         - Services > Unbound > Host Override
     put:
+      operationId: APIServicesUnboundHostOverrideUpdate
       description: 'Modify host overrides from the DNS Resolver (Unbound).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]'
@@ -10227,6 +10389,7 @@ paths:
         - Services > Unbound > Host Override
   /api/v1/services/unbound/host_override/alias:
     post:
+      operationId: APIServicesUnboundHostOverrideAliasCreate
       description: 'Add a new host override alias to the DNS Resolver (Unbound).<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver-edithost`]'
@@ -10273,6 +10436,7 @@ paths:
         - Services > Unbound > Host Override > Alias
   /api/v1/services/unbound/host_override/flush:
     put:
+      operationId: APIServicesUnboundHostOverrideFlushUpdate
       description: 'Replace all existing DNS Resolver (Unbound) host overrides with a specified set of host overrides.
         This allows you to create multiple host overrides at once. If a validation error is encountered when validating
         the host overrides, the specific entry that triggered the error will be included in the `data` field of the 
@@ -10326,6 +10490,7 @@ paths:
       tags:
         - Services > Unbound > Host Override > Flush
     delete:
+      operationId: APIServicesUnboundHostOverrideFlushDelete
       description: 'Deletes all existing DNS Resolver (Unbound) host overrides. This is useful for scripts
           that need to setup host overrides from scratch.<br><br>_Note: this endpoint
           will not reload the DNS Resolver (Unbound) service automatically, you must make another API
@@ -10342,6 +10507,7 @@ paths:
         - Services > Unbound > Host Override > Flush
   /api/v1/services/unbound/restart:
     post:
+      operationId: APIServicesUnboundRestartCreate
       description: 'Restart the DNS Resolver (Unbound) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -10355,6 +10521,7 @@ paths:
         - Services > Unbound
   /api/v1/services/unbound/start:
     post:
+      operationId: APIServicesUnboundStartCreate
       description: 'Start the DNS Resolver (Unbound) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -10368,6 +10535,7 @@ paths:
         - Services > Unbound
   /api/v1/services/unbound/stop:
     post:
+      operationId: APIServicesUnboundStopCreate
       description: 'Stop the DNS Resolver (Unbound) service.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-services`]'
@@ -10381,6 +10549,7 @@ paths:
         - Services > Unbound
   /api/v1/services/wol/send:
     post:
+      operationId: APIServicesWOLSendCreate
       description: 'Send a magic WOL packet to a host.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-services-wakeonlan`]'
@@ -10409,6 +10578,7 @@ paths:
         - Services > WOL
   /api/v1/status/carp:
     get:
+      operationId: APIStatusCARPRead
       description: 'Read the CARP (failover) status.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-carp`]'
@@ -10421,6 +10591,7 @@ paths:
       tags:
         - Status > CARP
     put:
+      operationId: APIStatusCARPUpdate
       description: 'Update the CARP (failover) status.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-carp`]'
@@ -10446,6 +10617,7 @@ paths:
         - Status > CARP
   /api/v1/status/gateway:
     get:
+      operationId: APIStatusGatewayRead
       description: 'Read gateway status and metrics.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-gateway`]'
@@ -10459,6 +10631,7 @@ paths:
         - Status > Gateway
   /api/v1/status/interface:
     get:
+      operationId: APIStatusInterfaceRead
       description: 'Read interface status and metrics.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-interfaces`]'
@@ -10472,6 +10645,7 @@ paths:
         - Status > Interface
   /api/v1/status/ipsec:
     get:
+      operationId: APIStatusIPsecRead
       description: 'Read IPsec status and metrics.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-ipsec`]'
@@ -10485,6 +10659,7 @@ paths:
         - Status > IPsec
   /api/v1/status/log/config_history:
     get:
+      operationId: APIStatusLogConfigHistoryRead
       description: 'Read the configuration history log.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-configurationhistory`]'
@@ -10498,6 +10673,7 @@ paths:
         - Status > Log
   /api/v1/status/log/dhcp:
     get:
+      operationId: APIStatusLogDHCPRead
       description: 'Read the dhcpd.log file.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-logs-dhcp`]'
@@ -10511,6 +10687,7 @@ paths:
         - Status > Log
   /api/v1/status/log/firewall:
     get:
+      operationId: APIStatusLogFirewallRead
       description: 'Read the filter.log file.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-logs-firewall`]'
@@ -10524,6 +10701,7 @@ paths:
         - Status > Log
   /api/v1/status/log/system:
     get:
+      operationId: APIStatusLogSystemRead
       description: 'Read the system.log file.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-logs-system`]'
@@ -10537,6 +10715,7 @@ paths:
         - Status > Log
   /api/v1/status/openvpn:
     get:
+      operationId: APIStatusOpenVPNRead
       description: 'Read the OpenVPN status.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-status-openvpn`]'
@@ -10550,6 +10729,7 @@ paths:
         - Status > OpenVPN
   /api/v1/status/system:
     get:
+      operationId: APIStatusSystemRead
       description: 'Read system status and metrics. All usage values are represented
         as a decimal percentage. Temperature readings require thermal sensor and/or
         driver configuration.<br><br>
@@ -10566,6 +10746,7 @@ paths:
         - Status > System
   /api/v1/system/api:
     get:
+      operationId: APISystemAPIRead
       description: 'Read the current API configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]'
@@ -10578,6 +10759,7 @@ paths:
       tags:
         - System > API
     put:
+      operationId: APISystemAPIUpdate
       description: 'Update the API configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]'
@@ -10702,6 +10884,7 @@ paths:
         - System > API
   /api/v1/system/api/error:
     get:
+      operationId: APISystemAPIErrorRead
       description: Read the error code library. This function does not require authentication
         and is intended to be used by third-party scripts/software to translate error
         codes to their full error message.
@@ -10715,6 +10898,7 @@ paths:
         - System > API
   /api/v1/system/api/version:
     get:
+      operationId: APISystemAPIVersionRead
       description: 'Read the current API version and locate available version updates.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-api`]'
@@ -10728,6 +10912,7 @@ paths:
         - System > API
   /api/v1/system/arp:
     delete:
+      operationId: APISystemARPDelete
       description: 'Delete an IP from the ARP table.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-arptable`]'
@@ -10747,6 +10932,7 @@ paths:
       tags:
         - System > ARP
     get:
+      operationId: APISystemARPRead
       description: 'Read the current ARP table.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-arptable`]'
@@ -10760,6 +10946,7 @@ paths:
         - System > ARP
   /api/v1/system/ca:
     delete:
+      operationId: APISystemCADelete
       description: 'Delete an existing CA certificate.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]'
@@ -10779,6 +10966,7 @@ paths:
       tags:
         - System > CA
     get:
+      operationId: APISystemCARead
       description: 'Read installed CA certificates.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]'
@@ -10791,6 +10979,7 @@ paths:
       tags:
         - System > CA
     post:
+      operationId: APISystemCACreate
       description: 'Generate or import a new CA certificate.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-camanager`]'
@@ -10935,6 +11124,7 @@ paths:
         - System > CA
   /api/v1/system/certificate:
     delete:
+      operationId: APISystemCertificateDelete
       description: 'Delete an existing SSL/TLS certificate.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]'
@@ -10954,6 +11144,7 @@ paths:
       tags:
         - System > Certificate
     get:
+      operationId: APISystemCertificateRead
       description: 'Read installed SSL/TLS certificates.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]'
@@ -10966,6 +11157,7 @@ paths:
       tags:
         - System > Certificate
     post:
+      operationId: APISystemCertificateCreate
       description: 'Generate or import a new SSL/TLS certificate.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]'
@@ -11117,6 +11309,7 @@ paths:
       tags:
         - System > Certificate
     put:
+      operationId: APISystemCertificateUpdate
       description: 'Update an imported SSL/TLS certificate.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-certmanager`]'
@@ -11161,6 +11354,7 @@ paths:
         - System > Certificate
   /api/v1/system/config:
     get:
+      operationId: APISystemConfigRead
       description: 'Read the entire pfSense configuration.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-backup-restore`,
@@ -11174,6 +11368,7 @@ paths:
       tags:
         - System > Config
     put:
+      operationId: APISystemConfigUpdate
       description: 'Updates the entire pfSense configuration. This endpoint simply
         replaces the entire configuration with the values submitted in your request.
         This can be used to interface with configuration areas that may not be available
@@ -11194,6 +11389,7 @@ paths:
         - System > Config
   /api/v1/system/console:
     put:
+      operationId: APISystemConsoleUpdate
       description: 'Update console settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-admin`]'
@@ -11216,6 +11412,7 @@ paths:
         - System > Console
   /api/v1/system/crl:
     delete:
+      operationId: APISystemCRLDelete
       description: 'Delete an existing CRL.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-crlmanager`]'
@@ -11235,6 +11432,7 @@ paths:
       tags:
         - System > CRL
     get:
+      operationId: APISystemCRLRead
       description: 'Read installed CRLs.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-crlmanager`]'
@@ -11247,6 +11445,7 @@ paths:
       tags:
         - System > CRL
     post:
+      operationId: APISystemCRLCreate
       description: 'Add a new CRL.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-crlmanager`]'
@@ -11307,6 +11506,7 @@ paths:
         - System > CRL
   /api/v1/system/dns:
     get:
+      operationId: APISystemDNSRead
       description: 'Read current system DNS settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
@@ -11319,6 +11519,7 @@ paths:
       tags:
         - System > DNS
     put:
+      operationId: APISystemDNSUpdate
       description: 'Modify the existing system DNS settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
@@ -11352,6 +11553,7 @@ paths:
         - System > DNS
   /api/v1/system/dns/server:
     delete:
+      operationId: APISystemDNSServerDelete
       description: 'Remove existing system DNS servers.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
@@ -11371,6 +11573,7 @@ paths:
       tags:
         - System > DNS > Server
     post:
+      operationId: APISystemDNSServerCreate
       description: 'Add new DNS servers to the system DNS servers.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
@@ -11395,6 +11598,7 @@ paths:
         - System > DNS > Server
   /api/v1/system/halt:
     post:
+      operationId: APISystemHaltCreate
       description: 'Shutdown the pfSense system.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-haltsystem`]'
@@ -11408,6 +11612,7 @@ paths:
         - System > Halt
   /api/v1/system/hostname:
     get:
+      operationId: APISystemHostnameRead
       description: 'Read the system''s hostname.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
@@ -11420,6 +11625,7 @@ paths:
       tags:
         - System > Hostname
     put:
+      operationId: APISystemHostnameUpdate
       description: 'Modify the system hostname.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
@@ -11447,6 +11653,7 @@ paths:
         - System > Hostname
   /api/v1/system/notifications/email:
     get:
+      operationId: APISystemNotificationsEmailRead
       description: 'Read the current email notification settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-notifications`]'
@@ -11459,6 +11666,7 @@ paths:
       tags:
         - System > Notifications > Email
     put:
+      operationId: APISystemNotificationsEmailUpdate
       description: 'Update the email notification settings.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-notifications`]'
@@ -11532,6 +11740,7 @@ paths:
         - System > Notifications > Email
   /api/v1/system/package:
     delete:
+      operationId: APISystemPackageDelete
       description: 'Remove an existing pfSense package.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installed`]'
@@ -11553,6 +11762,7 @@ paths:
       tags:
         - System > Package
     get:
+      operationId: APISystemPackageRead
       description: 'Read all pfSense packages that are currently installed.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installed`]'
@@ -11565,6 +11775,7 @@ paths:
       tags:
         - System > Package
     post:
+      operationId: APISystemPackageCreate
       description: 'Install a pfSense package.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installpackage`]'
@@ -11590,6 +11801,7 @@ paths:
         - System > Package
   /api/v1/system/reboot:
     post:
+      operationId: APISystemRebootCreate
       description: 'Reboot the pfSense system.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-rebootsystem`]'
@@ -11603,6 +11815,7 @@ paths:
         - System > Reboot
   /api/v1/system/table:
     get:
+      operationId: APISystemTableRead
       description: 'Read existing table entries.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-tables`]'
@@ -11624,6 +11837,7 @@ paths:
         - System > Table
   /api/v1/system/tunable:
     delete:
+      operationId: APISystemTunableDelete
       description: 'Delete an existing system tunable.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-sysctl`]'
@@ -11643,6 +11857,7 @@ paths:
       tags:
         - System > Tunable
     get:
+      operationId: APISystemTunableRead
       description: 'Read current system tunable configurations.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-sysctl`]'
@@ -11655,6 +11870,7 @@ paths:
       tags:
         - System > Tunable
     post:
+      operationId: APISystemTunableCreate
       description: 'Create a new system tunable.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-sysctl`]'
@@ -11686,6 +11902,7 @@ paths:
       tags:
         - System > Tunable
     put:
+      operationId: APISystemTunableUpdate
       description: 'Update an existing system tunable.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-sysctl`]'
@@ -11720,6 +11937,7 @@ paths:
         - System > Tunable
   /api/v1/system/version:
     get:
+      operationId: APISystemVersionRead
       description: 'Read the pfSense version data. This includes base version, patch
         version, buildtime, and last commit.<br><br>
 
@@ -11735,6 +11953,7 @@ paths:
         - System > Version
   /api/v1/user:
     delete:
+      operationId: APIUserDelete
       description: 'Delete an existing pfSense user from the local database.<br><br>
 
 
@@ -11755,6 +11974,7 @@ paths:
       tags:
         - User
     get:
+      operationId: APIUserRead
       description: 'Read users from the local user database.<br><br>
 
 
@@ -11768,6 +11988,7 @@ paths:
       tags:
         - User
     post:
+      operationId: APIUserCreate
       description: 'Add a new user to the local database.<br><br>
 
 
@@ -11831,6 +12052,7 @@ paths:
       tags:
         - User
     put:
+      operationId: APIUserUpdate
       description: 'Update an existing user.<br><br>
 
 
@@ -11891,6 +12113,7 @@ paths:
         - User
   /api/v1/user/auth_server:
     delete:
+      operationId: APIUserAuthServerDelete
       description: 'Delete an existing authentication server. This can be either a
         RADIUS or LDAP authentication server.<br><br>
 
@@ -11912,6 +12135,7 @@ paths:
       tags:
         - User > Authentication Server
     get:
+      operationId: APIUserAuthServerRead
       description: 'Read configured LDAP and RADIUS authentication servers.<br><br>
 
 
@@ -11926,6 +12150,7 @@ paths:
         - User > Authentication Server
   /api/v1/user/auth_server/ldap:
     delete:
+      operationId: APIUserAuthServerLDAPDelete
       description: 'Delete an existing LDAP authentication server.<br><br>
 
 
@@ -11946,6 +12171,7 @@ paths:
       tags:
         - User > Authentication Server
     get:
+      operationId: APIUserAuthServerLDAPRead
       description: 'Read configured LDAP authentication servers.<br><br>
 
 
@@ -11959,6 +12185,7 @@ paths:
       tags:
         - User > Authentication Server
     post:
+      operationId: APIUserAuthServerLDAPCreate
       description: 'Add a new remote LDAP authentication server.<br><br>
 
 
@@ -12069,6 +12296,7 @@ paths:
         - User > Authentication Server
   /api/v1/user/auth_server/radius:
     delete:
+      operationId: APIUserAuthServerRADIUSDelete
       description: 'Delete an existing RADIUS authentication server.<br><br>
 
 
@@ -12089,6 +12317,7 @@ paths:
       tags:
         - User > Authentication Server
     get:
+      operationId: APIUserAuthServerRADIUSRead
       description: 'Read configured RADIUS authentication servers.<br><br>
 
 
@@ -12102,6 +12331,7 @@ paths:
       tags:
         - User > Authentication Server
     post:
+      operationId: APIUserAuthServerRADIUSCreate
       description: 'Create a new RADIUS authentication server.<br><br>
 
 
@@ -12180,6 +12410,7 @@ paths:
         - User > Authentication Server
   /api/v1/user/group:
     get:
+      operationId: APIUserGroupRead
       description: 'Read existing user groups.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]'
@@ -12192,6 +12423,7 @@ paths:
       tags:
         - User > Group
     post:
+      operationId: APIUserGroupCreate
       description: 'Create a new group.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]'
@@ -12238,6 +12470,7 @@ paths:
       tags:
         - User > Group
     put:
+      operationId: APIUserGroupUpdate
       description: 'Update an existing group.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]'
@@ -12283,6 +12516,7 @@ paths:
       tags:
         - User > Group
     delete:
+      operationId: APIUserGroupDelete
       description: 'Delete an existing user group.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-groupmanager`]'
@@ -12303,6 +12537,7 @@ paths:
         - User > Group
   /api/v1/user/group/member:
     delete:
+      operationId: APIUserGroupMemberDelete
       description: 'Remove a user from an existing group.<br><br>
 
 
@@ -12330,6 +12565,7 @@ paths:
       tags:
         - User > Group > Member
     post:
+      operationId: APIUserGroupMemberCreate
       description: 'Assign a user to an existing group.<br><br>
 
 
@@ -12361,6 +12597,7 @@ paths:
         - User > Group > Member
   /api/v1/user/privilege:
     delete:
+      operationId: APIUserPrivilegeDelete
       description: 'Remove privilege from an existing user.<br><br>
 
 
@@ -12388,6 +12625,7 @@ paths:
       tags:
         - User > Privilege
     post:
+      operationId: APIUserPrivilegeCreate
       description: 'Assign new privileges to an existing user.<br><br>
 
 
