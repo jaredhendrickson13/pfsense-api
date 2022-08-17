@@ -3,7 +3,7 @@ info:
   title: pfSense REST API Documentation
   version: "v1"
   contact:
-    name: "Report bugs & issues",
+    name: "Report bugs & issues"
     url: "https://github.com/jaredhendrickson13/pfsense-api"
     email: "github@jaredhendrickson.com"
 
@@ -4835,6 +4835,7 @@ paths:
       tags:
         - Interface > Bridge
     get:
+      operationId: APIInterfaceBridgeRead
       description: 'Read bridge assignments and configuration.<br><br>
 
 
@@ -6705,6 +6706,7 @@ paths:
       tags:
         - Services > OpenVPN > Server
     get:
+      operationId: APIServicesOpenVPNServerRead
       description: 'Read All OpenVPN Server instances.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-openvpn-server`]'
