@@ -59,6 +59,35 @@ class APIStatusLogSettingsUpdate extends APIModel {
         return APIResponse\get(0, []);
     }
 
+    public function validate_payload() {
+        # Validate payload fields
+        $this->__validate_format();
+        $this->__validate_reverse();
+        $this->__validate_nentries();
+        $this->__validate_logdefaultblock();
+        $this->__validate_logdefaultpass();
+        $this->__validate_logbogons();
+        $this->__validate_logprivatenets();
+        $this->__validate_lognginx();
+        $this->__validate_rawfilter();
+        $this->__validate_disablelocallogging();
+        $this->__validate_logconfigchanges();
+        $this->__validate_filterdescriptions();
+        $this->__validate_enable();
+        $this->__validate_logfilesize();
+        $this->__validate_rotatecount();
+        $this->__validate_logcompressiontype();
+        $this->__validate_remoteserver();
+        $this->__validate_remoteserver2();
+        $this->__validate_remoteserver3();
+        $this->__validate_sourceip();
+        $this->__validate_ipprotocol();
+        $this->__validate_rsyslog_contents();
+
+        # Ensure remote syslog servers are ordered correctly
+        $this->__cleanup_remote_servers();
+    }
+
     private function __validate_format() {
         global $syslog_formats;
 
@@ -180,10 +209,10 @@ class APIStatusLogSettingsUpdate extends APIModel {
     private function __validate_logconfigchanges() {
         # Check for the optional 'logconfigchanges' field
         if ($this->initial_data["logconfigchanges"] === true) {
-            $this->validated_data["logconfigchanges"] = true;
+            $this->validated_data["logconfigchanges"] = "enabled";
         }
         elseif ($this->initial_data["logconfigchanges"] === false) {
-            $this->validated_data["logconfigchanges"] = false;
+            $this->validated_data["logconfigchanges"] = "disabled";
         }
     }
 
@@ -191,8 +220,8 @@ class APIStatusLogSettingsUpdate extends APIModel {
         # Check for the optional 'filterdescriptions' field
         if (isset($this->initial_data["filterdescriptions"])) {
             # Ensure value is supported
-            if (in_array($this->initial_data["format"], [0, 1, 2])) {
-                $this->validated_data["format"] = $this->initial_data["format"];
+            if (in_array($this->initial_data["filterdescriptions"], [0, 1, 2])) {
+                $this->validated_data["filterdescriptions"] = $this->initial_data["filterdescriptions"];
             }
             else {
                 $this->errors[] = APIResponse\get(8002);
@@ -271,8 +300,12 @@ class APIStatusLogSettingsUpdate extends APIModel {
         if ($this->validated_data["enable"]) {
             # Check for the optional 'remoteserver' field
             if (isset($this->initial_data["remoteserver"])) {
+                # Allow value to be unset using empty string
+                if ($this->initial_data["remoteserver"] === "") {
+                    unset($this->validated_data["remoteserver"]);
+                }
                 # Require remote server to be valid IP or hostname with or without port
-                if ($this->is_valid_syslog_server($this->initial_data["remoteserver"])) {
+                elseif ($this->is_valid_syslog_server($this->initial_data["remoteserver"])) {
                     $this->validated_data["remoteserver"] = $this->initial_data["remoteserver"];
                 }
                 else {
@@ -287,8 +320,12 @@ class APIStatusLogSettingsUpdate extends APIModel {
         if ($this->validated_data["remoteserver"]) {
             # Check for the optional 'remoteserver2' field
             if (isset($this->initial_data["remoteserver2"])) {
+                # Allow value to be unset using empty string
+                if ($this->initial_data["remoteserver2"] === "") {
+                    unset($this->validated_data["remoteserver2"]);
+                }
                 # Require remote server to be valid IP or hostname with or without port
-                if ($this->is_valid_syslog_server($this->initial_data["remoteserver2"])) {
+                elseif ($this->is_valid_syslog_server($this->initial_data["remoteserver2"])) {
                     $this->validated_data["remoteserver2"] = $this->initial_data["remoteserver2"];
                 }
                 else {
@@ -303,8 +340,12 @@ class APIStatusLogSettingsUpdate extends APIModel {
         if ($this->validated_data["remoteserver2"]) {
             # Check for the optional 'remoteserver3' field
             if (isset($this->initial_data["remoteserver3"])) {
+                # Allow value to be unset using empty string
+                if ($this->initial_data["remoteserver3"] === "") {
+                    unset($this->validated_data["remoteserver3"]);
+                }
                 # Require remote server to be valid IP or hostname with or without port
-                if ($this->is_valid_syslog_server($this->initial_data["remoteserver3"])) {
+                elseif ($this->is_valid_syslog_server($this->initial_data["remoteserver3"])) {
                     $this->validated_data["remoteserver3"] = $this->initial_data["remoteserver3"];
                 }
                 else {
@@ -348,13 +389,14 @@ class APIStatusLogSettingsUpdate extends APIModel {
                 }
             }
         }
+        # Default this field to
     }
 
     private function __validate_rsyslog_contents() {
         # Set supported fields
         $rsyslog_content_fields = [
             "logall", "filter", "dhcp", "auth", "portalauth", "vpn", "dpinger", "hostapd", "system", "resolver", "ppp",
-            "routing", "ntpd"
+            "routing", "routing"
         ];
 
         # Only validate this field if rsyslog is enabled
@@ -371,6 +413,24 @@ class APIStatusLogSettingsUpdate extends APIModel {
                      }
                  }
              }
+        }
+    }
+
+    private function __cleanup_remote_servers() {
+        # Move other remote servers up if primary server was unset
+        if (!isset($this->validated_data["remoteserver"])) {
+            # Check if the remote server 2 is set and move it one space up if so.
+            if (isset($this->validated_data["remoteserver2"])) {
+                $this->validated_data["remoteserver"] = $this->validated_data["remoteserver2"];
+            }
+            # Check if the remote server 3 is set and move it one space up if so.
+            if (isset($this->validated_data["remoteserver3"])) {
+                $this->validated_data["remoteserver2"] = $this->validated_data["remoteserver3"];
+            }
+        }
+        # Move remote server 3 up if it is set and remote server 2 was unset
+        if (!isset($this->validated_data["remoteserver2"]) and isset($this->validated_data["remoteserver3"])) {
+            $this->validated_data["remoteserver2"] = $this->validated_data["remoteserver3"];
         }
     }
 

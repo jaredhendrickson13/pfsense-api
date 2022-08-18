@@ -4060,10 +4060,6 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Unknown remote syslog IP protocol specified"
         ],
-
-
-
-
     ];
     $response = $responses[(array_key_exists($id, $responses)) ? $id : 1];
     $response["data"] = $data;
