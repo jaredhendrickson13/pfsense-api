@@ -22,7 +22,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
         {
             "name": "Update log settings",
             "payload": {
-                "format": "rfc3164",    # rfc5424
+                "format": "rfc3164",
                 "reverse": True,
                 "nentries": 5,
                 "logdefaultblock": True,
@@ -54,7 +54,6 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
                 "system": True,
                 "resolver": True,
                 "ppp": True,
-                "routing": True,
                 "routing": True
             },
         },
@@ -195,7 +194,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
                 "enable": True,
                 "remoteserver": "127.0.0.1",
                 "remoteserver2": "127.0.0.2",
-                "remoteserver2": "@@@INVALID@@@"
+                "remoteserver3": "@@@INVALID@@@"
             }
         },
         {
@@ -220,4 +219,4 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
     ]
 
 
-APIE2ETestSystemAPI()
+APIE2ETestStatusLogSettings()
