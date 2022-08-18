@@ -1,4 +1,4 @@
-name: OpenAPI-Lint
+name: OpenAPI
 on: [push]
 
 jobs:
