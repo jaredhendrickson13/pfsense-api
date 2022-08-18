@@ -18,7 +18,7 @@ namespace APIResponse;
 # Pulls a assoc array API response from our response library. Optionally formats descriptive data into messages.
 function get($id, $data=[], $all=false) {
     $responses = [
-        // 0-999 reserved for system API level responses
+        // 0-999 reserved for /api/v1core API level responses
         0 => [
             "status" => "ok",
             "code" => 200,
@@ -110,7 +110,7 @@ function get($id, $data=[], $all=false) {
             "message" => "Request was successful and is processing in the background",
         ],
 
-        // 1000-1999 reserved for /system API calls
+        // 1000-1999 reserved for /api/v1/system API calls
         1000 => [
             "status" => "bad request",
             "code" => 400,
@@ -604,7 +604,7 @@ function get($id, $data=[], $all=false) {
             "message" => "System table with this name does not exist"
         ],
 
-        // 2000-2999 reserved for /services API calls
+        // 2000-2999 reserved for /api/v1/services API calls
         2000 => [
             "status" => "bad request",
             "code" => 400,
@@ -1560,7 +1560,7 @@ function get($id, $data=[], $all=false) {
             "message" => "Invalid service name specified."
         ],
 
-        // 3000-3999 reserved for /interfaces API calls
+        // 3000-3999 reserved for /api/v1/interfaces API calls
         3000 => [
             "status" => "bad request",
             "code" => 400,
@@ -2048,7 +2048,7 @@ function get($id, $data=[], $all=false) {
             "message" => "Interface group does not exist"
         ],
 
-        // 4000-4999 reserved for /firewall API calls
+        // 4000-4999 reserved for /api/v1/firewall API calls
         4000 => [
             "status" => "bad request",
             "code" => 400,
@@ -3502,7 +3502,7 @@ function get($id, $data=[], $all=false) {
             "message" => "Rules must contain at least one item"
         ],
 
-        //5000-5999 reserved for /users API calls
+        //5000-5999 reserved for /api/v1/user API calls
         5000 => [
             "status" => "bad request",
             "code" => 400,
@@ -3815,7 +3815,7 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Group with this ID does not exist"
         ],
-        // 6000-6999 reserved for /routing API calls
+        // 6000-6999 reserved for /api/v1/routing API calls
         6000 => [
             "status" => "bad request",
             "code" => 400,
@@ -3997,13 +3997,70 @@ function get($id, $data=[], $all=false) {
             "message" => "Only 1 dynamic gateway per eligible interface is allowed"
         ],
 
-        // 7000-7999 reserved for /diagnostics API calls
+        // 7000-7999 reserved for /api/v1/diagnostics API calls
         7000 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
             "message" => "Shell command is required"
         ],
+        
+        // 8000-8999 reserved for /api/v1/status API calls
+        8000 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown syslog format specified"
+        ],
+        8001 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Number of log entries must be between 5 and 200000"
+        ],
+        8002 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown syslog filter description specified"
+        ],
+        8003 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Log file size must a numeric value between 100000 and 2147483648"
+        ],
+        8004 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Log retention count must a numeric value between 0 and 99"
+        ],
+        8005 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown log compression type specified"
+        ],
+        8006 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "All remote syslog servers must be valid IP address or hostname with or without port"
+        ],
+        8007 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Remote syslog source IP must be existing interface name or any"
+        ],
+        8008 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown remote syslog IP protocol specified"
+        ],
+
 
 
 
