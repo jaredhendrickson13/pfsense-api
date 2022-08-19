@@ -396,7 +396,7 @@ class APIStatusLogSettingsUpdate extends APIModel {
         # Set supported fields
         $rsyslog_content_fields = [
             "logall", "filter", "dhcp", "auth", "portalauth", "vpn", "dpinger", "hostapd", "system", "resolver", "ppp",
-            "routing", "routing"
+            "routing", "ntpd"
         ];
 
         # Only validate this field if rsyslog is enabled
