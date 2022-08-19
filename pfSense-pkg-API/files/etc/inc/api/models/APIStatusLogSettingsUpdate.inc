@@ -41,6 +41,7 @@ class APIStatusLogSettingsUpdate extends APIModel {
 
         # Write the config changes are restart syslogd
         $this->config["syslog"] = $this->validated_data;
+        $this->write_config();
         system_syslogd_start();
 
         # Restart the webConfigurator is nginx logs were changed
@@ -56,7 +57,7 @@ class APIStatusLogSettingsUpdate extends APIModel {
         # Restart pflog
         filter_pflog_start(true);
 
-        return APIResponse\get(0, []);
+        return APIResponse\get(0, [$this->validated_data]);
     }
 
     public function validate_payload() {
