@@ -1405,7 +1405,7 @@ EOD;
 
 	/* Disable file logging */
 	$nginx_config .= "error_log /dev/null;\n";
-	if (!isset($config['syslog']['nolognginx'])) {
+	if (!isset($config['syslog']['nonolognginx'])) {
 		/* Send nginx error log to syslog */
 		$nginx_config .= "error_log  syslog:server=unix:/var/run/log,facility=local5;\n";
 	}

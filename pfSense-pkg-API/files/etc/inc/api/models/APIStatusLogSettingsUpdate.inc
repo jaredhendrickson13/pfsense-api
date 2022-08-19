@@ -65,11 +65,11 @@ class APIStatusLogSettingsUpdate extends APIModel {
         $this->__validate_format();
         $this->__validate_reverse();
         $this->__validate_nentries();
-        $this->__validate_logdefaultblock();
-        $this->__validate_logdefaultpass();
-        $this->__validate_logbogons();
-        $this->__validate_logprivatenets();
-        $this->__validate_lognginx();
+        $this->__validate_nologdefaultblock();
+        $this->__validate_nologdefaultpass();
+        $this->__validate_nologbogons();
+        $this->__validate_nologprivatenets();
+        $this->__validate_nolognginx();
         $this->__validate_rawfilter();
         $this->__validate_disablelocallogging();
         $this->__validate_logconfigchanges();
@@ -127,63 +127,63 @@ class APIStatusLogSettingsUpdate extends APIModel {
         }
     }
 
-    private function __validate_logdefaultblock() {
-        # Check for the optional 'logdefaultblock' field
-        if ($this->initial_data["logdefaultblock"] === true) {
-            $this->filter_log_changed = !isset($this->validated_data["logdefaultblock"]);
-            $this->validated_data["logdefaultblock"] = true;
+    private function __validate_nologdefaultblock() {
+        # Check for the optional 'nologdefaultblock' field
+        if ($this->initial_data["nologdefaultblock"] === true) {
+            $this->filter_log_changed = !isset($this->validated_data["nologdefaultblock"]);
+            $this->validated_data["nologdefaultblock"] = true;
         }
-        elseif ($this->initial_data["logdefaultblock"] === false) {
-            $this->filter_log_changed = isset($this->validated_data["logdefaultblock"]);
-            $this->validated_data["logdefaultblock"] = false;
-        }
-    }
-
-    private function __validate_logdefaultpass() {
-        # Check for the optional 'logdefaultpass' field
-        if ($this->initial_data["logdefaultpass"] === true) {
-            $this->filter_log_changed = !isset($this->validated_data["logdefaultpass"]);
-            $this->validated_data["logdefaultpass"] = true;
-        }
-        elseif ($this->initial_data["logdefaultpass"] === false) {
-            $this->filter_log_changed = isset($this->validated_data["logdefaultpass"]);
-            $this->validated_data["logdefaultpass"] = false;
+        elseif ($this->initial_data["nologdefaultblock"] === false) {
+            $this->filter_log_changed = isset($this->validated_data["nologdefaultblock"]);
+            $this->validated_data["nologdefaultblock"] = false;
         }
     }
 
-    private function __validate_logbogons() {
-        # Check for the optional 'logbogons' field
-        if ($this->initial_data["logbogons"] === true) {
-            $this->filter_log_changed = !isset($this->validated_data["logbogons"]);
-            $this->validated_data["logbogons"] = true;
+    private function __validate_nologdefaultpass() {
+        # Check for the optional 'nologdefaultpass' field
+        if ($this->initial_data["nologdefaultpass"] === true) {
+            $this->filter_log_changed = !isset($this->validated_data["nologdefaultpass"]);
+            $this->validated_data["nologdefaultpass"] = true;
         }
-        elseif ($this->initial_data["logbogons"] === false) {
-            $this->filter_log_changed = isset($this->validated_data["logbogons"]);
-            $this->validated_data["logbogons"] = false;
-        }
-    }
-
-    private function __validate_logprivatenets() {
-        # Check for the optional 'logprivatenets' field
-        if ($this->initial_data["logprivatenets"] === true) {
-            $this->filter_log_changed = !isset($this->validated_data["logprivatenets"]);
-            $this->validated_data["logprivatenets"] = true;
-        }
-        elseif ($this->initial_data["logprivatenets"] === false) {
-            $this->filter_log_changed = isset($this->validated_data["logprivatenets"]);
-            $this->validated_data["logprivatenets"] = false;
+        elseif ($this->initial_data["nologdefaultpass"] === false) {
+            $this->filter_log_changed = isset($this->validated_data["nologdefaultpass"]);
+            $this->validated_data["nologdefaultpass"] = false;
         }
     }
 
-    private function __validate_lognginx() {
-        # Check for the optional 'lognginx' field
-        if ($this->initial_data["lognginx"] === true) {
-            $this->nginx_log_changed = !isset($this->validated_data["lognginx"]);
-            $this->validated_data["lognginx"] = true;
+    private function __validate_nologbogons() {
+        # Check for the optional 'nologbogons' field
+        if ($this->initial_data["nologbogons"] === true) {
+            $this->filter_log_changed = !isset($this->validated_data["nologbogons"]);
+            $this->validated_data["nologbogons"] = true;
         }
-        elseif ($this->initial_data["lognginx"] === false) {
-            $this->nginx_log_changed = isset($this->validated_data["lognginx"]);
-            $this->validated_data["lognginx"] = false;
+        elseif ($this->initial_data["nologbogons"] === false) {
+            $this->filter_log_changed = isset($this->validated_data["nologbogons"]);
+            $this->validated_data["nologbogons"] = false;
+        }
+    }
+
+    private function __validate_nologprivatenets() {
+        # Check for the optional 'nologprivatenets' field
+        if ($this->initial_data["nologprivatenets"] === true) {
+            $this->filter_log_changed = !isset($this->validated_data["nologprivatenets"]);
+            $this->validated_data["nologprivatenets"] = true;
+        }
+        elseif ($this->initial_data["nologprivatenets"] === false) {
+            $this->filter_log_changed = isset($this->validated_data["nologprivatenets"]);
+            $this->validated_data["nologprivatenets"] = false;
+        }
+    }
+
+    private function __validate_nolognginx() {
+        # Check for the optional 'nolognginx' field
+        if ($this->initial_data["nolognginx"] === true) {
+            $this->nginx_log_changed = !isset($this->validated_data["nolognginx"]);
+            $this->validated_data["nolognginx"] = true;
+        }
+        elseif ($this->initial_data["nolognginx"] === false) {
+            $this->nginx_log_changed = isset($this->validated_data["nolognginx"]);
+            $this->validated_data["nolognginx"] = false;
         }
     }
 
