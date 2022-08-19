@@ -10770,6 +10770,10 @@ paths:
                   description: Show the applied rule description below or in the firewall log rows. `0` to not display
                     descriptions, `1` to display as a column, or `2` to display as a separate row.
                   type: integer
+                  enum:
+                    - 0
+                    - 1
+                    - 2
                 logfilesize:
                   description: Size (in bytes) at which logs will be rotated.
                   type: integer
