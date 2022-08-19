@@ -40,7 +40,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
                 "logcompressiontype": "bzip2",
                 "remoteserver": "127.0.0.1",
                 "remoteserver2": "127.0.0.1:55555",
-                "remoteserver3": "::1:55555",
+                "remoteserver3": "0000:0000:0000:0000:0000:0000:0000:0001:55555",
                 "sourceip": "any",
                 "ipprotocol": "ipv4",
                 "logall": True,
@@ -78,7 +78,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
                 "logcompressiontype": "gzip",
                 "remoteserver": "",
                 "remoteserver2": "",
-                "remoteserver3": "::1:55555",
+                "remoteserver3": "0000:0000:0000:0000:0000:0000:0000:0001:55555",
                 "sourceip": "WAN",
                 "ipprotocol": "ipv6",
                 "logall": False,
@@ -132,7 +132,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 8003,
             "payload": {
-                "logfilesize": 100001
+                "logfilesize": 99999
             }
         },
         {
@@ -170,7 +170,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
         {
             "name": "Check remoteserver IP or hostname constraint",
             "status": 400,
-            "return": 8005,
+            "return": 8006,
             "payload": {
                 "enable": True,
                 "remoteserver": "@@@INVALID@@@"
@@ -179,7 +179,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
         {
             "name": "Check remoteserver2 IP or hostname constraint",
             "status": 400,
-            "return": 8005,
+            "return": 8006,
             "payload": {
                 "enable": True,
                 "remoteserver": "127.0.0.1",
@@ -189,7 +189,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
         {
             "name": "Check remoteserver3 IP or hostname constraint",
             "status": 400,
-            "return": 8005,
+            "return": 8006,
             "payload": {
                 "enable": True,
                 "remoteserver": "127.0.0.1",
