@@ -40,7 +40,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
                 "logcompressiontype": "bzip2",
                 "remoteserver": "127.0.0.1",
                 "remoteserver2": "127.0.0.1:55555",
-                "remoteserver3": "0000:0000:0000:0000:0000:0000:0000:0001:55555",
+                "remoteserver3": "0000:0000:0000:0000:0000:0000:0000:0001",
                 "sourceip": "any",
                 "ipprotocol": "ipv4",
                 "logall": True,
