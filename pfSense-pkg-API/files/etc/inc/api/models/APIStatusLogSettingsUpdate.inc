@@ -57,7 +57,7 @@ class APIStatusLogSettingsUpdate extends APIModel {
         # Restart pflog
         filter_pflog_start(true);
 
-        return APIResponse\get(0, [$this->validated_data]);
+        return APIResponse\get(0, $this->validated_data);
     }
 
     public function validate_payload() {
