@@ -3501,6 +3501,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Rules must contain at least one item"
         ],
+        4242 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Alias resolve interval must be numeric"
+        ],
 
         //5000-5999 reserved for /api/v1/user API calls
         5000 => [
