@@ -67,7 +67,7 @@ class APIFirewallAliasAdvancedUpdate extends APIModel {
             $this->validated_data["checkaliasesurlcert"] = true;
         }
         elseif ($this->initial_data["checkaliasesurlcert"] === false) {
-            unset($this->validated_data["checkaliasesurlcert"]);
+            unset($this->config["system"]["checkaliasesurlcert"]);
         }
     }
 
