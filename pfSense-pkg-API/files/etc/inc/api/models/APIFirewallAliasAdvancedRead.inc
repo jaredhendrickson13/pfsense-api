@@ -30,7 +30,7 @@ class APIFirewallAliasAdvancedRead extends APIModel {
     public function get_config() {
          return [
             "aliasesresolveinterval" => intval($this->config["system"]["aliasesresolveinterval"]),
-            "checkaliasesurlcert" => boolval($this->config["system"]["checkaliasesurlcert"])
+            "checkaliasesurlcert" => isset($this->config["system"]["checkaliasesurlcert"])
         ];
     }
 }
