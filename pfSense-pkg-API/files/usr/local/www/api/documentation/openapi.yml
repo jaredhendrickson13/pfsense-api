@@ -1126,6 +1126,47 @@ paths:
       summary: Add firewall alias entries
       tags:
         - Firewall > Alias > Entry
+  /api/v1/firewall/alias/advanced:
+    get:
+      operationId: APIFirewallAliasAdvancedRead
+      description: 'Read existing advanced alias settings.<br><br>
+
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-firewall`]'
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read advanced alias settings
+      tags:
+        - Firewall > Alias > Advanced
+    put:
+      operationId: APIFirewallAliasAdvancedUpdate
+      description: 'Update advanced firewall alias settings.<br><br>
+
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-firewall`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                aliasesresolveinterval:
+                  description: Interval (in seconds) at which hostnames in firewall aliases are updated.
+                  type: integer
+                checkaliasesurlcert:
+                  description: Enable or disable certificate verification when updating aliases via URL.
+                  type: boolean
+              type: object
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update advanced alias settings
+      tags:
+        - Firewall > Alias > Advanced
   /api/v1/firewall/apply:
     post:
       operationId: APIFirewallApplyCreate
@@ -12850,6 +12891,7 @@ tags:
   - name: Interface > Apply
   - name: Firewall > Alias
   - name: Firewall > Alias > Entry
+  - name: Firewall > Alias > Advanced
   - name: Firewall > Rule
   - name: Firewall > Rule > Flush
   - name: Firewall > Rule > Sort
