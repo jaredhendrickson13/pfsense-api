@@ -389,25 +389,32 @@ function get_pfsense_if_id($interface, $include_carp=false, $include_ifgroup=fal
     }
 
     # Only include CARP interfaces if they are explicitly requested
-    if ($include_carp) {
-        # Loop on carp _vip interfaces
-        foreach ($config['virtualip']['vip'] as $carp) {
-            if ($carp['mode'] == "carp") {
-                if ($interface === '_vip'.$carp['uniqid']) {
-                    return $interface;
-                }
-            }
-        }
+    if ($include_carp and is_vip($interface, "carp")) {
+        return $interface;
     }
 
     # Only include interface groups if they are explicitly requested
-    if(is_ifgroup($interface)) {
+    if($include_ifgroup and is_ifgroup($interface)) {
         return $interface;
     }
     
     # Only include the default IPsec interface (enc0) if explicitly requested
     if ($include_ipsec and $interface === "enc0") {
         return $interface;
+    }
+}
+
+# Check if a string is a virtual IPs unique ID
+function is_vip($value, $vip_type="all") {
+    global $config;
+
+    # Loop through each configured virtual IP
+    foreach ($config['virtualip']['vip'] as $vip) {
+        if ($vip['mode'] == $vip_type or $vip_type === "all") {
+            if ($value === '_vip'.$vip['uniqid']) {
+                return $value;
+            }
+        }
     }
 }
 
