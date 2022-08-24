@@ -418,6 +418,32 @@ function is_vip($value, $vip_type="all") {
     }
 }
 
+# Checks if a string is an existing certificate's ref ID
+function is_certificate($refid) {
+    global $config;
+
+    # Loop through each configured certificate and check if this value matches its refid
+    foreach ($config["cert"] as $cert) {
+        if ($cert["refid"] === $refid) {
+            return true;
+        }
+    }
+    return false;
+}
+
+# Checks if a string is an existing ca's ref ID
+function is_ca($refid) {
+    global $config;
+
+    # Loop through each configured ca and check if this value matches its refid
+    foreach ($config["ca"] as $ca) {
+        if ($ca["refid"] === $refid) {
+            return true;
+        }
+    }
+    return false;
+}
+
 # Check if input is valid for rule source and destination
 # TODO: this function is messy, clean it up
 function is_valid_rule_addr($addr, $direction) {
