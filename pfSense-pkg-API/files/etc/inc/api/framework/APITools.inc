@@ -1181,6 +1181,21 @@ function is_ip_vip($ip, $if=null) {
     return false;
 }
 
+# Gets the config ID of a IPsec phase 1 entry
+function get_config_id_from_ikeid($ikeid) {
+    global $config;
+
+    # Loop through each IPsec phase1 entry and check for a match
+    foreach ($config["ipsec"]["phase1"] as $index=>$p1) {
+        # Check if this IKE ID matches
+        if ((int)$ikeid === (int)$p1["ikeid"]) {
+            return $index;
+        }
+    }
+
+    return false;
+}
+
 # Checks if an array is a associative array. Returns true if assoc, false if numeric, or null if not array
 function is_assoc_array($array, $strict_seq=false) {
     # Local variables

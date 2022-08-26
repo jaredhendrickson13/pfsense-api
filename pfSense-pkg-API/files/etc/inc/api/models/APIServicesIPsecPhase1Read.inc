@@ -13,26 +13,17 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-require_once("api/framework/APIEndpoint.inc");
+require_once("api/framework/APIModel.inc");
+require_once("api/framework/APIResponse.inc");
 
-class APIServicesIPsecPhase1 extends APIEndpoint {
+class APIServicesIPsecPhase1Read extends APIModel {
+    # Create our method constructor
     public function __construct() {
-        $this->url = "/api/v1/services/ipsec/phase1";
+        parent::__construct();
+        $this->privileges = ["page-all", "page-vpn-ipsec-editphase1"];
     }
 
-    protected function get() {
-        return (new APIServicesIPsecPhase1Read())->call();
-    }
-
-    protected function post() {
-        return (new APIServicesIPsecPhase1Create())->call();
-    }
-
-    protected function put() {
-        return (new APIServicesIPsecPhase1Update())->call();
-    }
-
-    protected function delete() {
-        return (new APIServicesIPsecPhase1Delete())->call();
+    public function action() {
+        return APIResponse\get(0, $this->config["ipsec"]["phase1"]);
     }
 }

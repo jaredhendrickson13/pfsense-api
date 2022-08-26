@@ -50,7 +50,7 @@ class APIServicesIPsecPhase1Delete extends APIModel {
         # Validate the required 'ikeid' field
         if (isset($this->initial_data["ikeid"])) {
             # Attempt to get the config ID from this IKE ID
-            $this->id = $this->get_config_id_from_ikeid($this->initial_data["ikeid"]);
+            $this->id = APITools\get_config_id_from_ikeid($this->initial_data["ikeid"]);
 
             # Return an error if this IKE ID was not found in any existing IPsec phase1 entry
             if ($this->id === false) {
@@ -59,18 +59,5 @@ class APIServicesIPsecPhase1Delete extends APIModel {
         } else {
             $this->errors[] = APIResponse\get(2207);
         }
-    }
-
-
-    public function get_config_id_from_ikeid($ikeid) {
-        # Loop through each IPsec phase1 entry and check for a match
-        foreach ($this->config["ipsec"]["phase1"] as $index=>$p1) {
-            # Check if this IKE ID matches
-            if ((int)$ikeid === (int)$p1["ikeid"]) {
-                return $index;
-            }
-        }
-
-        return false;
     }
 }
