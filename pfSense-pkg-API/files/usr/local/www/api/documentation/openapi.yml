@@ -6520,6 +6520,469 @@ paths:
       summary: Stop Gateway Monitoring (dpinger) service
       tags:
         - Services > DPINGER
+  /api/v1/services/ipsec/phase1:
+    delete:
+      operationId: APIServicesIPsecPhase1Delete
+      description: 'Delete an existing IPsec phase 1 entry.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-vpn-ipsec-editphase1`]'
+      parameters:
+        - description: IKE ID of the phase 1 entry to delete.
+          in: query
+          name: ikeid
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Delete IPsec phase 1 entry
+      tags:
+        - Services > IPsec > Phase 1
+    get:
+      operationId: APIServicesIPsecPhase1Read
+      description: 'Read existing IPsec phase 1 entries.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-vpn-ipsec-editphase1`]'
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read IPsec phase 1 entries
+      tags:
+        - Services > IPsec > Phase 1
+    post:
+      operationId: APIServicesIPsecPhase1Create
+      description: 'Create a new IPsec phase 1 entry.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-vpn-ipsec-editphase1`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                descr:
+                  description: Description for this IPsec phase 1 entry.
+                  type: string
+                disabled:
+                  description: Disable this IPsec phase 1 entry.
+                  default: false
+                  type: boolean
+                iketype:
+                  description: IKE version this IPsec phase 1 entry will use.
+                  type: string
+                  enum:
+                    - ikev1
+                    - ikev2
+                    - auto
+                protocol:
+                  description: IP protocol this IPsec phase 1 entry will use.
+                  type: string
+                  enum:
+                    - inet
+                    - inet6
+                    - both
+                interface:
+                  description: Interface to enable this IPsec phase1 entry on. You may
+                    specify either the interface's descriptive name, the pfSense interface
+                    ID (e.g. wan, lan, optx), or the real interface ID (e.g. igb0).
+                  type: string
+                remote-gateway:
+                  description: IP address or hostname of the remote IPsec gateway.
+                  type: string
+                authentication_method:
+                  description: Authentication method used for this IPsec phase 1 entry.
+                  type: string
+                  enum:
+                    - pre_shared_key
+                    - cert
+                myid_type:
+                  description: Identifier for the local (my) side of the IPsec connection. Options for this field are
+                    set by pfSense itself. These options may vary based on your pfSense version.
+                  type: string
+                  enum:
+                    - myaddress
+                    - address
+                    - fqdn
+                    - user_fqdn
+                    - asn1dn
+                    - keyid tag
+                    - dyn_dns
+                    - auto
+                myid_data:
+                  description: Identifier value for the local (my) side of the IPsec connection. This field is required
+                    unless `myid_type` is set to `myaddress`.
+                  type: string
+                peerid_type:
+                  description: Identifier for the peer (remote) side of the IPsec connection. Options for this field are
+                    set by pfSense itself. These options may vary based on your pfSense version.
+                  type: string
+                  enum:
+                    - any
+                    - peeraddress
+                    - address
+                    - fqdn
+                    - user_fqdn
+                    - asn1dn
+                    - keyid tag
+                    - auto
+                peerid_data:
+                  description: Identifier value for the peer (remote) side of the IPsec connection. This field is 
+                    required unless `peerid_type` is set to `peeraddress`.
+                  type: string
+                pre-shared-key:
+                  description: Pre-shared key to use for authentication between peers. This field is required if 
+                    `authentication_method` is set to `pre_shared_key`.
+                  type: string
+                certref:
+                  description: Certificate to use for authentication between peers. This field is required if 
+                    `authentication_method` is set to `cert`. This value must be an existing certificate object's
+                    `refid`.
+                  type: string
+                caref:
+                  description: Certificate authority to use for authentication between peers. This field is required if 
+                    `authentication_method` is set to `cert`. This value must be an existing certificate authority 
+                    object's `refid`.
+                  type: string
+                mode:
+                  description: IKE mode to use for this IPsec phase 1 entry. This field is not available if `iketype` is
+                    set to `ikev2`.
+                  type: string
+                  default: main
+                  enum:
+                    - main
+                    - aggressive
+                rekey_time:
+                  description: Time, in seconds, before an IKE SA establishes new keys. This value must be less than
+                    the `lifetime` value. If not specified, this field will default to 90% of the `lifetime` value.
+                  type: integer
+                  minimum: 0
+                reauth_time:
+                  description: Time, in seconds, before an IKE SA is torn down and recreated from scratch, including 
+                    authentication. This value must be less than the `lifetime` value. If not specified, this field 
+                    will default to 90% of the `lifetime` value.
+                  type: integer
+                  minimum: 0
+                rand_time:
+                  description: Random value up to this amount will be subtracted from `rekey_time`/`reauth_time` to avoid 
+                    simultaneous renegotiation. This value must be less than the `lifetime` value. If not specified, 
+                    this field will default to 10% of the `lifetime` value.
+                  type: integer
+                  minimum: 0
+                lifetime:
+                  description: Hard IKE SA life time, in seconds, after which the IKE SA will be expired. This value 
+                    must be greater than `rekey_time` and `reauth_time`.
+                  default: 28800
+                  minimum: 0
+                  type: integer
+                startaction:
+                  description: Option to force specific initiation/responder behavior for child SA (P2) entries. Options 
+                    for this field are set by pfSense itself. These options may vary based on your pfSense version.
+                  type: string
+                  default: ""
+                  enum:
+                    - ""
+                    - none
+                    - start
+                    - trap
+                closeaction:
+                  description: Option to to control the behavior when the remote peer unexpectedly closes a child SA 
+                    (P2). Options for this field are set by pfSense itself. These options may vary based on your 
+                    pfSense version.
+                  type: string
+                  default: ""
+                  enum:
+                    - ""
+                    - none
+                    - start
+                    - trap
+                nattraversal:
+                  description: Enables the use of NAT-T which can help with clients that are behind restrictive firewalls.
+                  type: string
+                  default: on
+                  enum:
+                    - on
+                    - force
+                gw_duplicates:
+                  description: Allow phase 1 entries with duplicate `remote-gateway` values.
+                  default: false
+                  type: boolean
+                mobike:
+                  description: Enable the use of MOBIKE.
+                  default: false
+                  type: boolean
+                splitconn:
+                  description: Enable split connections between multiple IPsec phase 2 entries.
+                  default: false
+                  type: boolean
+                prfselect_enable:
+                  description: Enable the use of pseudo-random function selection.
+                  default: false
+                  type: boolean
+                ikeport:
+                  description: Port used by IKE. This value cannot match the value set in `nattport`.
+                  default: 500
+                  minimum: 1
+                  maximum: 65535
+                  type: integer
+                nattport:
+                  description: Port used by NAT-T. This value cannot match the value set in `ikeport`.
+                  default: 4500
+                  minimum: 1
+                  maximum: 65535
+                  type: integer
+                dpd_enable:
+                  description: Enable dead-peer detection for this IPsec phase 1 entry.
+                  default: false
+                  type: boolean
+                dpd_delay:
+                  description: Delay between sending peer acknowledgement messages.
+                  default: 10
+                  minimum: 0
+                  type: integer
+                dpd_maxfail:
+                  description: Number of consecutive failures allowed before disconnecting.
+                  default: 5
+                  minimum: 0
+                  type: integer
+                encryption:
+                  description: Encryption options available to this IPsec phase 1 entry. This must be a list of 
+                    encryption objects. For more information on encryption object fields, see documentation
+                    for the /api/v1/services/ipsec/phase1/encryption endpoint.
+                  minItems: 1
+                  type: array
+                  items:
+                    type: object
+                apply:
+                  description: Apply the IPsec configuration immediately after writing this configuration. If you are
+                    making multiple IPsec modifications, it is typically best to set this value to `false` and call the
+                    /api/v1/services/ipsec/apply endpoint once you are ready to apply the configuration.
+                  default: false
+                  type: boolean
+              required:
+                - iketype
+                - protocol
+                - interface
+                - remote-gateway
+                - authentication_method
+                - myid_type
+                - peerid_type
+                - encryption
+              type: object
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Create IPsec phase 1 entry
+      tags:
+        - Services > IPsec > Phase 1
+    put:
+      operationId: APIServicesIPsecPhase1Update
+      description: 'Update an existing IPsec phase 1 entry.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-vpn-ipsec-editphase1`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                ikeid:
+                  description: IKE ID of the phase 1 entry to delete.
+                  type: integer
+                descr:
+                  description: Description for this IPsec phase 1 entry.
+                  type: string
+                disabled:
+                  description: Disable this IPsec phase 1 entry.
+                  type: boolean
+                iketype:
+                  description: IKE version this IPsec phase 1 entry will use.
+                  type: string
+                  enum:
+                    - ikev1
+                    - ikev2
+                    - auto
+                protocol:
+                  description: IP protocol this IPsec phase 1 entry will use.
+                  type: string
+                  enum:
+                    - inet
+                    - inet6
+                    - both
+                interface:
+                  description: Interface to enable this IPsec phase1 entry on. You may
+                    specify either the interface's descriptive name, the pfSense interface
+                    ID (e.g. wan, lan, optx), or the real interface ID (e.g. igb0).
+                  type: string
+                remote-gateway:
+                  description: IP address or hostname of the remote IPsec gateway.
+                  type: string
+                authentication_method:
+                  description: Authentication method used for this IPsec phase 1 entry.
+                  type: string
+                  enum:
+                    - pre_shared_key
+                    - cert
+                myid_type:
+                  description: Identifier for the local (my) side of the IPsec connection. Options for this field are
+                    set by pfSense itself. These options may vary based on your pfSense version.
+                  type: string
+                  enum:
+                    - myaddress
+                    - address
+                    - fqdn
+                    - user_fqdn
+                    - asn1dn
+                    - keyid tag
+                    - dyn_dns
+                    - auto
+                myid_data:
+                  description: Identifier value for the local (my) side of the IPsec connection.
+                  type: string
+                peerid_type:
+                  description: Identifier for the peer (remote) side of the IPsec connection. Options for this field are
+                    set by pfSense itself. These options may vary based on your pfSense version.
+                  type: string
+                  enum:
+                    - any
+                    - peeraddress
+                    - address
+                    - fqdn
+                    - user_fqdn
+                    - asn1dn
+                    - keyid tag
+                    - auto
+                peerid_data:
+                  description: Identifier value for the peer (remote) side of the IPsec connection.
+                  type: string
+                pre-shared-key:
+                  description: Pre-shared key to use for authentication between peers. This field is required if 
+                    `authentication_method` is set to `pre_shared_key`.
+                  type: string
+                certref:
+                  description: Certificate to use for authentication between peers. This field is required if 
+                    `authentication_method` is changed to `cert`. This value must be an existing certificate object's
+                    `refid`.
+                  type: string
+                caref:
+                  description: Certificate authority to use for authentication between peers. This field is required if 
+                    `authentication_method` is changed to `cert`. This value must be an existing certificate authority 
+                    object's `refid`.
+                  type: string
+                mode:
+                  description: IKE mode to use for this IPsec phase 1 entry. This field is not available if `iketype` is
+                    set to `ikev2`.
+                  type: string
+                  enum:
+                    - main
+                    - aggressive
+                rekey_time:
+                  description: Time, in seconds, before an IKE SA establishes new keys. This value must be less than
+                    the `lifetime` value.
+                  type: integer
+                  minimum: 0
+                reauth_time:
+                  description: Time, in seconds, before an IKE SA is torn down and recreated from scratch, including 
+                    authentication. This value must be less than the `lifetime` value.
+                  type: integer
+                  minimum: 0
+                rand_time:
+                  description: Random value up to this amount will be subtracted from `rekey_time`/`reauth_time` to avoid 
+                    simultaneous renegotiation. This value must be less than the `lifetime` value.
+                  type: integer
+                  minimum: 0
+                lifetime:
+                  description: Hard IKE SA life time, in seconds, after which the IKE SA will be expired. This value 
+                    must be greater than `rekey_time` and `reauth_time`.
+                  minimum: 0
+                  type: integer
+                startaction:
+                  description: Option to force specific initiation/responder behavior for child SA (P2) entries. Options 
+                    for this field are set by pfSense itself. These options may vary based on your pfSense version.
+                  type: string
+                  enum:
+                    - ""
+                    - none
+                    - start
+                    - trap
+                closeaction:
+                  description: Option to to control the behavior when the remote peer unexpectedly closes a child SA 
+                    (P2). Options for this field are set by pfSense itself. These options may vary based on your 
+                    pfSense version.
+                  type: string
+                  enum:
+                    - ""
+                    - none
+                    - start
+                    - trap
+                nattraversal:
+                  description: Enables the use of NAT-T which can help with clients that are behind restrictive firewalls.
+                  type: string
+                  enum:
+                    - on
+                    - force
+                gw_duplicates:
+                  description: Allow phase 1 entries with duplicate `remote-gateway` values.
+                  type: boolean
+                mobike:
+                  description: Enable the use of MOBIKE.
+                  type: boolean
+                splitconn:
+                  description: Enable split connections between multiple IPsec phase 2 entries.
+                  type: boolean
+                prfselect_enable:
+                  description: Enable the use of pseudo-random function selection.
+                  type: boolean
+                ikeport:
+                  description: Port used by IKE. This value cannot match the value set in `nattport`.
+                  minimum: 1
+                  maximum: 65535
+                  type: integer
+                nattport:
+                  description: Port used by NAT-T. This value cannot match the value set in `ikeport`.
+                  minimum: 1
+                  maximum: 65535
+                  type: integer
+                dpd_enable:
+                  description: Enable dead-peer detection for this IPsec phase 1 entry.
+                  type: boolean
+                dpd_delay:
+                  description: Delay between sending peer acknowledgement messages.
+                  minimum: 0
+                  type: integer
+                dpd_maxfail:
+                  description: Number of consecutive failures allowed before disconnecting.
+                  minimum: 0
+                  type: integer
+                encryption:
+                  description: Encryption options available to this IPsec phase 1 entry. This must be a list of 
+                    encryption objects. For more information on encryption object fields, see documentation
+                    for the /api/v1/services/ipsec/phase1/encryption endpoint.
+                  minItems: 1
+                  type: array
+                  items:
+                    type: object
+                apply:
+                  description: Apply the IPsec configuration immediately after writing this configuration. If you are
+                    making multiple IPsec modifications, it is typically best to set this value to `false` and call the
+                    /api/v1/services/ipsec/apply endpoint once you are ready to apply the configuration.
+                  default: false
+                  type: boolean
+              required:
+                - ikeid
+              type: object
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update IPsec phase 1 entry
+      tags:
+        - Services > IPsec > Phase 1
   /api/v1/services/ntpd:
     get:
       operationId: APIServicesNTPdRead
@@ -12958,6 +13421,7 @@ tags:
   - name: Services > DHCPD > Options
   - name: Services > DHCPD > Lease
   - name: Services > DPINGER
+  - name: Services > IPsec > Phase 1
   - name: Services > NTPD
   - name: Services > NTPD > Time Server
   - name: Services > SSHD
