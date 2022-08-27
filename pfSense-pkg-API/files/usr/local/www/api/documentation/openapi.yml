@@ -6520,6 +6520,99 @@ paths:
       summary: Stop Gateway Monitoring (dpinger) service
       tags:
         - Services > DPINGER
+  /api/v1/services/ipsec/apply:
+    post:
+      operationId: APIServicesIPsecApplyCreate
+      description: 'Apply pending IPsec changes.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-vpn-ipsec`, `page-vpn-ipsec-editphase1`,
+        `page-vpn-ipsec-editphase2`, `page-vpn-ipsec-editkeys`, `page-vpn-ipsec-mobile`, `page-vpn-ipsec-settings`]'
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Apply pending IPsec changes
+      tags:
+        - Services > IPsec > Apply
+  /api/v1/services/ipsec/phase1/encryption:
+    post:
+      operationId: APIServicesIPsecPhase1EncryptionCreate
+      description: 'Add a new encryption item to an existing IPsec phase 1 entry.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-vpn-ipsec-editphase1`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                ikeid:
+                  description: IKE ID of the existing IPsec phase 1 entry to add this encryption item to.
+                  type: integer
+                encryption-algorithm:
+                  description: Encryption algorithm to use. Options for this field are set by pfSense itself and may
+                    vary based on your version of pfSense.
+                  type: object
+                  enum:
+                    - {"name":"aes","keylen":128}
+                    - {"name":"aes","keylen":192}
+                    - {"name":"aes","keylen":256}
+                    - {"name":"aes128gcm","keylen":64}
+                    - {"name":"aes128gcm","keylen":96}
+                    - {"name":"aes128gcm","keylen":128}
+                    - {"name":"aes192gcm","keylen":64}
+                    - {"name":"aes192gcm","keylen":96}
+                    - {"name":"aes192gcm","keylen":128}
+                    - {"name":"aes256gcm","keylen":64}
+                    - {"name":"aes256gcm","keylen":96}
+                    - {"name":"aes256gcm","keylen":128}
+                    - {"name":"blowfish","keylen":128}
+                    - {"name":"blowfish","keylen":192}
+                    - {"name":"blowfish","keylen":256}
+                    - {"name":"3des"}
+                    - {"name":"cast128"}
+                hash-algorithm:
+                  description: Hashing algorithm to use. Options for this field are set by pfSense itself and may
+                    vary based on your version of pfSense.
+                  type: string
+                  enum:
+                    - md5
+                    - sha1
+                    - sha256
+                    - sha384
+                    - sha512
+                    - aesxcbc
+                dhgroup:
+                  description: Diffie-Hellman group to use. Options for this field are set by pfSense itself and may
+                    vary based on your version of pfSense.
+                  type: integer
+                  enum: [1, 2, 5, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
+                prf_algorithm:
+                  description: PRF algorithm group to use. Options for this field are set by pfSense itself and may
+                    vary based on your version of pfSense. This field is required if the parent phase 1 entry
+                    has `prfselect_enable` enabled.
+                  type: string
+                  enum:
+                    - md5
+                    - sha1
+                    - sha256
+                    - sha384
+                    - sha512
+                    - aesxcbc
+              required:
+                - ikeid
+                - encryption-algorithm
+                - hash-algorithm
+                - dhgroup
+              type: object
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Create DNS Forwarder (dnsmasq) host override alias
+      tags:
+        - Services > DNSMASQ > Host Override > Alias
   /api/v1/services/ipsec/phase1:
     delete:
       operationId: APIServicesIPsecPhase1Delete
@@ -13384,6 +13477,7 @@ tags:
   - name: Services > DNSMASQ > Host Override
   - name: Services > DNSMASQ > Host Override > Alias
   - name: Services > DPINGER
+  - name: Services > IPsec > Apply
   - name: Services > IPsec > Phase 1
   - name: Services > NTPD
   - name: Services > NTPD > Time Server
