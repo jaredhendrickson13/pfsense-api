@@ -1,14 +1,14 @@
 openapi: 3.0.0
 servers:
   - url: /
+    description: This firewall
 
 info:
   title: pfSense REST API Documentation
   version: "v1"
   contact:
-    name: "Report bugs & issues"
+    name: "GitHub"
     url: "https://github.com/jaredhendrickson13/pfsense-api"
-    email: "github@jaredhendrickson.com"
 
   license:
     name: "Apache 2.0"
@@ -6550,27 +6550,28 @@ paths:
                   description: IKE ID of the existing IPsec phase 1 entry to add this encryption item to.
                   type: integer
                 encryption-algorithm:
-                  description: Encryption algorithm to use. Options for this field are set by pfSense itself and may
-                    vary based on your version of pfSense.
+                  description: >-
+                    'Encryption algorithm to use. Options for this field are set by pfSense itself and may
+                    vary based on your version of pfSense. Options are:
+
+                    `{ "name": "aes","keylen": 128 }`,
+                    `{ "name": "aes","keylen": 192 }`,
+                    `{ "name": "aes","keylen": 256 }`,
+                    `{ "name": "aes128gcm","keylen": 64 }`,
+                    `{ "name": "aes128gcm","keylen": 96 }`,
+                    `{ "name": "aes128gcm","keylen": 128 }`,
+                    `{ "name": "aes192gcm","keylen": 64 }`,
+                    `{ "name": "aes192gcm","keylen": 96 }`,
+                    `{ "name": "aes192gcm","keylen": 128 }`,
+                    `{ "name": "aes256gcm","keylen": 64 }`,
+                    `{ "name": "aes256gcm","keylen": 96 }`,
+                    `{ "name": "aes256gcm","keylen": 128 }`,
+                    `{ "name": "blowfish","keylen": 128 }`,
+                    `{ "name": "blowfish","keylen": 192 }`,
+                    `{ "name": "blowfish","keylen": 256 }`,
+                    `{ "name": "3des" }`,
+                    `{ "name": "cast128" }`
                   type: object
-                  enum:
-                    - {"name":"aes","keylen":128}
-                    - {"name":"aes","keylen":192}
-                    - {"name":"aes","keylen":256}
-                    - {"name":"aes128gcm","keylen":64}
-                    - {"name":"aes128gcm","keylen":96}
-                    - {"name":"aes128gcm","keylen":128}
-                    - {"name":"aes192gcm","keylen":64}
-                    - {"name":"aes192gcm","keylen":96}
-                    - {"name":"aes192gcm","keylen":128}
-                    - {"name":"aes256gcm","keylen":64}
-                    - {"name":"aes256gcm","keylen":96}
-                    - {"name":"aes256gcm","keylen":128}
-                    - {"name":"blowfish","keylen":128}
-                    - {"name":"blowfish","keylen":192}
-                    - {"name":"blowfish","keylen":256}
-                    - {"name":"3des"}
-                    - {"name":"cast128"}
                 hash-algorithm:
                   description: Hashing algorithm to use. Options for this field are set by pfSense itself and may
                     vary based on your version of pfSense.
@@ -6610,9 +6611,9 @@ paths:
           $ref: '#/components/responses/Success'
         "401":
           $ref: '#/components/responses/AuthenticationFailed'
-      summary: Create DNS Forwarder (dnsmasq) host override alias
+      summary: Create IPsec phase 1 encryption entry
       tags:
-        - Services > DNSMASQ > Host Override > Alias
+        - Services > IPsec > Phase 1
   /api/v1/services/ipsec/phase1:
     delete:
       operationId: APIServicesIPsecPhase1Delete
