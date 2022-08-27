@@ -1,5 +1,6 @@
 [DEFAULT]
-disable=duplicate-code
+# Tests require duplicate code and may contain many test cases that require many lines of code
+disable=duplicate-code,too-many-lines
 
 [FORMAT]
 # Follow normal pep8 restriction
