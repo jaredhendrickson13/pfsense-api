@@ -632,7 +632,7 @@ class APIServicesIPsecPhase1Update extends APIModel {
                 $this->errors[] = APIResponse\get(2203);
             }
             # Ensure value is not the same as the IKE port
-            elseif ($this->validated_data["ikeport"] === (int)$this->initial_data["nattport"]) {
+            elseif ((int)$this->validated_data["ikeport"] === (int)$this->initial_data["nattport"]) {
                 $this->errors[] = APIResponse\get(2204);
             }
             else {

@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestServicesIPsecPhase1(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/ipsec/phase1 endpoint."""
     uri = "/api/v1/services/ipsec/phase1"
+    get_tests = [{"name": "Read IPsec phase1 entries"}]
     post_tests = [
         {
             "name": "Create RSA internal CA for IPsec testing",
@@ -1150,6 +1151,233 @@ class APIE2ETestServicesIPsecPhase1(e2e_test_framework.APIE2ETest):
         }
     ]
 
+    put_tests = [
+        {
+            "name": "Check updating valid IPsec phase 1 with PSK auth",
+            "payload": {
+                "ikeid": 1,
+                "iketype": "ikev2",
+                "protocol": "inet",
+                "interface": "wan",
+                "remote-gateway": "127.0.0.9",
+                "authentication_method": "pre_shared_key",
+                "pre-shared-key": "new_example",
+                "myid_type": "myaddress",
+                "peerid_type": "peeraddress",
+                "encryption": [
+                    {
+                        "encryption-algorithm": {"name": "aes", "keylen": 128},
+                        "hash-algorithm": "sha512",
+                        "dhgroup": 14
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Check updating valid IPsec phase 1 with cert auth",
+            "needs_certref": True,
+            "needs_caref": True,
+            "payload": {
+                "ikeid": 2,
+                "iketype": "ikev2",
+                "protocol": "inet",
+                "interface": "wan",
+                "remote-gateway": "127.0.0.8",
+                "authentication_method": "cert",
+                "myid_type": "myaddress",
+                "peerid_type": "peeraddress",
+                "encryption": [
+                    {
+                        "encryption-algorithm": {"name": "3des"},
+                        "hash-algorithm": "sha384",
+                        "dhgroup": 15
+                    }
+                ],
+                "apply": True
+            }
+        },
+        {
+            "name": "Check updating phase1 with no changes",
+            "needs_certref": True,
+            "needs_caref": True,
+            "payload": {
+                "ikeid": 2,
+                "iketype": "ikev2",
+                "protocol": "inet",
+                "interface": "wan",
+                "remote-gateway": "127.0.0.8",
+                "authentication_method": "cert",
+                "myid_type": "myaddress",
+                "peerid_type": "peeraddress",
+                "encryption": [
+                    {
+                        "encryption-algorithm": {"name": "3des"},
+                        "hash-algorithm": "sha384",
+                        "dhgroup": 15
+                    }
+                ],
+                "apply": True
+            }
+        },
+        {
+            "name": "Check updating myid_type to 'address' requires 'myid_data' to be IP",
+            "status": 400,
+            "return": 2176,
+            "payload": {
+                "ikeid": 1,
+                "myid_type": "address"
+            }
+        },
+        {
+            "name": "Check updating myid_type to 'fqdn' requires 'myid_data' to be FQDN",
+            "status": 400,
+            "return": 2177,
+            "payload": {
+                "ikeid": 1,
+                "myid_type": "fqdn"
+            }
+        },
+        {
+            "name": "Check updating myid_type to 'user_fqdn' requires 'myid_data' to be email address",
+            "status": 400,
+            "return": 2178,
+            "payload": {
+                "ikeid": 1,
+                "myid_type": "user_fqdn"
+            }
+        },
+        {
+            "name": "Check updating myid_type to 'dyn_dns' requires 'myid_data' to be hostname",
+            "status": 400,
+            "return": 2179,
+            "payload": {
+                "ikeid": 1,
+                "myid_type": "dyn_dns"
+            }
+        },
+        {
+            "name": "Check updating peerid_type to 'address' requires 'peerid_data' to be IP",
+            "status": 400,
+            "return": 2183,
+            "payload": {
+                "ikeid": 1,
+                "peerid_type": "address"
+            }
+        },
+        {
+            "name": "Check updating peerid_type to 'fqdn' requires 'peerid_data' to be FQDN",
+            "status": 400,
+            "return": 2184,
+            "payload": {
+                "ikeid": 1,
+                "peerid_type": "fqdn"
+            }
+        },
+        {
+            "name": "Check updating peerid_type to 'user_fqdn' requires 'peerid_data' to be email address",
+            "status": 400,
+            "return": 2185,
+            "payload": {
+                "ikeid": 1,
+                "peerid_type": "user_fqdn"
+            }
+        },
+        {
+            "name": "Check pre-shared-key required constraint when updating from 'cert' authentication_method",
+            "status": 400,
+            "return": 2187,
+            "payload": {
+                "ikeid": 2,
+                "authentication_method": "pre_shared_key"
+            }
+        },
+        {
+            "name": "Check certificate required constraint when updating from 'pre_shared_key' authentication_method",
+            "status": 400,
+            "return": 2188,
+            "payload": {
+                "ikeid": 1,
+                "authentication_method": "cert"
+            }
+        },
+        {
+            "name": "Check certificate exists constraint when updating from 'pre_shared_key' authentication_method",
+            "status": 400,
+            "return": 2189,
+            "payload": {
+                "ikeid": 1,
+                "authentication_method": "cert",
+                "certref": "INVALID"
+            }
+        },
+        {
+            "name": "Check CA required constraint when updating from 'pre_shared_key' authentication_method",
+            "status": 400,
+            "return": 2190,
+            "needs_certref": True,
+            "payload": {
+                "ikeid": 1,
+                "authentication_method": "cert"
+            }
+        },
+        {
+            "name": "Check CA exists constraint when updating from 'pre_shared_key' authentication_method",
+            "status": 400,
+            "return": 2191,
+            "needs_certref": True,
+            "payload": {
+                "ikeid": 1,
+                "authentication_method": "cert",
+                "caref": "INVALID"
+            }
+        },
+        {
+            "name": "Check lifetime minimum constraint when updating to value below rekey_time or reauth_time",
+            "status": 400,
+            "return": 2197,
+            "payload": {
+                "ikeid": 1,
+                "lifetime": 1000
+            }
+        },
+        {
+            "name": "Check startaction must be 'none' constraint when 'remote-gateway' is updated to 0.0.0.0",
+            "status": 400,
+            "return": 2199,
+            "payload": {
+                "ikeid": 1,
+                "remote-gateway": "0.0.0.0"
+            }
+        },
+        {
+            "name": "Check `nattport` unique constraint when updating `ikeport`",
+            "status": 400,
+            "return": 2204,
+            "payload": {
+                "ikeid": 1,
+                "ikeport": 4500
+            }
+        },
+        {
+            "name": "Check `ikeport` unique constraint when updating `nattport`",
+            "status": 400,
+            "return": 2204,
+            "payload": {
+                "ikeid": 1,
+                "nattport": 500
+            }
+        },
+        {
+            "name": "Check `encryption` minimum length constraint when updating",
+            "status": 400,
+            "return": 2218,
+            "payload": {
+                "ikeid": 1,
+                "encryption": []
+            }
+        }
+    ]
+
     delete_tests = [
         {
             "name": "Check IKE ID required constraint",
@@ -1169,6 +1397,7 @@ class APIE2ETestServicesIPsecPhase1(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Delete ikeid 2 used for IPsec testing",
+            "resp_time": 10,    # Allow a few seconds for IPsec to restart
             "payload": {"ikeid": 2, "apply": True}
         },
         {
@@ -1186,22 +1415,32 @@ class APIE2ETestServicesIPsecPhase1(e2e_test_framework.APIE2ETest):
     def post_post(self):
         # Check our first POST response for the created CA's refid
         if len(self.post_responses) == 1:
-            # Variables
-            counter = 0
             # Loop through all tests and auto-add the caref ID to tests that do not have the needs_caref key set
+            counter = 0
             for test in self.post_tests:
                 if "needs_caref" in test:
                     self.post_tests[counter]["payload"]["caref"] = self.post_responses[0]["data"]["refid"]
                 counter = counter + 1
 
+            counter = 0
+            for test in self.put_tests:
+                if "needs_caref" in test:
+                    self.put_tests[counter]["payload"]["caref"] = self.post_responses[0]["data"]["refid"]
+                counter = counter + 1
+
         # Check our second POST response for the created certs's refid
         if len(self.post_responses) == 2:
-            # Variables
-            counter = 0
             # Loop through all tests and auto-add the certref ID to tests that do not have the needs_certref key set
+            counter = 0
             for test in self.post_tests:
                 if "needs_certref" in test:
                     self.post_tests[counter]["payload"]["certref"] = self.post_responses[1]["data"]["refid"]
+                counter = counter + 1
+
+            counter = 0
+            for test in self.put_tests:
+                if "needs_certref" in test:
+                    self.put_tests[counter]["payload"]["certref"] = self.post_responses[1]["data"]["refid"]
                 counter = counter + 1
 
 
