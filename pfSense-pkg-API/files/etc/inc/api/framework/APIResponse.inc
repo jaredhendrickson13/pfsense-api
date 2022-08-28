@@ -1919,6 +1919,228 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "IPsec phase 1 encryption must be an array with at least 1 item"
         ],
+        2219 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 mode is required"
+        ],
+        2220 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 mode is not supported"
+        ],
+        2221 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 protocol is required"
+        ],
+        2222 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 protocol is not supported"
+        ],
+        2223 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) is required"
+        ],
+        2224 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) type is required"
+        ],
+        2225 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) type is not supported"
+        ],
+        2226 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) address is required"
+        ],
+        2227 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) address must valid IP address when mode is 'vti'"
+        ],
+        2228 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) address must valid IPv4 address when mode is 'tunnel'"
+        ],
+        2229 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) address must valid IPv6 address when mode is 'tunnel6'"
+        ],
+        2230 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) netbits is required"
+        ],
+        2231 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) netbits must be between 0 and 32"
+        ],
+        2232 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) netbits must be between 0 and 128"
+        ],
+        2233 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT type is required"
+        ],
+        2234 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT type is not supported"
+        ],
+        2235 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT type must match local ID (network) type"
+        ],
+        2236 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT address is required"
+        ],
+        2237 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT address must valid IPv4 address when mode is 'tunnel'"
+        ],
+        2238 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT address must valid IPv6 address when mode is 'tunnel6'"
+        ],
+        2239 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT netbits is required"
+        ],
+        2240 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT netbits must match local ID (network) netbits"
+        ],
+        2241 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) type is required"
+        ],
+        2242 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) type is not supported"
+        ],
+        2243 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) address is required"
+        ],
+        2244 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) address must valid IPv4 address when mode is 'tunnel'"
+        ],
+        2245 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) address must valid IPv6 address when mode is 'tunnel6'"
+        ],
+        2246 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) netbits is required"
+        ],
+        2247 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) netbits must be between 0 and 32"
+        ],
+        2248 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) netbits must be between 0 and 128"
+        ],
+        2249 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 encryption is required"
+        ],
+        2250 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 encryption must be an array with at least 1 item"
+        ],
+        2251 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 hash algorithms is required"
+        ],
+        2252 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 hash algorithms must be an array with at least 1 item"
+        ],
+        2253 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "One or more IPsec phase 2 hash algorithms are not supported"
+        ],
+        2254 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 PFS group is required"
+        ],
+        2255 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 PFS group is not supported"
+        ],
 
         // 3000-3999 reserved for /api/v1/interfaces API calls
         3000 => [

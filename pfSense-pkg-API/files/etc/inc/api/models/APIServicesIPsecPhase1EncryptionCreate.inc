@@ -18,7 +18,7 @@ require_once("api/framework/APIResponse.inc");
 
 class APIServicesIPsecPhase1EncryptionCreate extends APIModel {
     # Create our method constructor
-    public function __construct() {
+    public function construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-vpn-ipsec-editphase1"];
         $this->change_note = "Added IPsec phase 1 encryption via API";
@@ -45,13 +45,13 @@ class APIServicesIPsecPhase1EncryptionCreate extends APIModel {
         }
 
         # Validate fields
-        $this->__validate_encryption_algorithm();
-        $this->__validate_hash_algorithm();
-        $this->__validate_dhgroup();
+        $this->validate_encryption_algorithm();
+        $this->validate_hash_algorithm();
+        $this->validate_dhgroup();
 
         # Only validate PRF fields if the parent phase 1 entry has it enabled or it's explicitly requested
         if ($prf or $this->is_parent_prf_enabled()) {
-            $this->__validate_prf_algorithm();
+            $this->validate_prf_algorithm();
         }
         # Default prf-algorithm to the specified hash-algorithm
         else {
@@ -76,11 +76,11 @@ class APIServicesIPsecPhase1EncryptionCreate extends APIModel {
         }
     }
 
-    private function __validate_encryption_algorithm() {
+    public function validate_encryption_algorithm($include_auto=false) {
         # Check for the required 'encryption-algorithm' field
         if (isset($this->initial_data["encryption-algorithm"])) {
             # Ensure value is valid option
-            if (in_array($this->initial_data["encryption-algorithm"], $this->get_encryption_algos())) {
+            if (in_array($this->initial_data["encryption-algorithm"], $this->get_encryption_algos($include_auto))) {
                 $this->validated_data["encryption-algorithm"] = $this->initial_data["encryption-algorithm"];
             }
             else {
@@ -92,7 +92,7 @@ class APIServicesIPsecPhase1EncryptionCreate extends APIModel {
         }
     }
 
-    private function __validate_hash_algorithm() {
+    public function validate_hash_algorithm() {
         global $p1_halgos;
 
         # Check for the required 'hash-algorithm' field
@@ -110,7 +110,7 @@ class APIServicesIPsecPhase1EncryptionCreate extends APIModel {
         }
     }
 
-    private function __validate_dhgroup() {
+    public function validate_dhgroup() {
         global $p1_dhgroups;
 
         # Check for the required 'dhgroup' field
@@ -128,7 +128,7 @@ class APIServicesIPsecPhase1EncryptionCreate extends APIModel {
         }
     }
 
-    private function __validate_prf_algorithm() {
+    public function validate_prf_algorithm() {
         global $p1_halgos;
 
         # Check for the required 'prf-algorithm' field
@@ -151,7 +151,7 @@ class APIServicesIPsecPhase1EncryptionCreate extends APIModel {
     }
 
     # Determines every possible encryption algorithm combination
-    public function get_encryption_algos() {
+    public function get_encryption_algos($include_auto=false) {
         global $p1_ealgos;
         $algo_options = [];
 
@@ -163,6 +163,11 @@ class APIServicesIPsecPhase1EncryptionCreate extends APIModel {
                 $key_len = $p1_ealgo["keysel"]["lo"];
                 $key_len_max = $p1_ealgo["keysel"]["hi"];
                 $key_len_step = $p1_ealgo["keysel"]["step"];
+
+                # Include auto option if enabled (used for phase 2 entries)
+                if ($include_auto) {
+                    $algo_options[] = ["name"=>$p1_ealgo_name, "keylen"=>"auto"];
+                }
 
                 # Loop until key length steps are exhausted
                 while ($key_len <= $key_len_max) {
