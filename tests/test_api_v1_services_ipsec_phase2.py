@@ -21,7 +21,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
     get_tests = [{"name": "Read IPsec phase2 entries"}]
     post_tests = [
         {
-            "name": "Check creating valid IPsec phase 1 with PSK auth",
+            "name": "Create IPsec phase 1 for testing",
             "uri": "/api/v1/services/ipsec/phase1",
             "payload": {
                 "iketype": "ikev2",
@@ -39,6 +39,19 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
                         "dhgroup": 14
                     }
                 ]
+            }
+        },
+        {
+            "name": "Create valid IPsec phase 2",
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
+                "hash-algorithm-option": ["hmac_sha256"],
+                "pfsgroup": 14
             }
         },
         {
@@ -153,7 +166,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "payload": {
                 "ikeid": 1,
                 "mode": "tunnel6",
-                "localid": {"type": "network", "address": "127.0.0.1", "netbits": -1}
+                "localid": {"type": "network", "address": "::1", "netbits": -1}
             }
         },
         {
@@ -163,7 +176,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "payload": {
                 "ikeid": 1,
                 "mode": "tunnel6",
-                "localid": {"type": "network", "address": "127.0.0.1", "netbits": 129}
+                "localid": {"type": "network", "address": "::1", "netbits": 129}
             }
         },
         {
@@ -178,24 +191,13 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             }
         },
         {
-            "name": "Check natlocalid type options constraint",
-            "status": 400,
-            "return": 2234,
-            "payload": {
-                "ikeid": 1,
-                "mode": "tunnel",
-                "localid": {"type": "lan"},
-                "natlocalid": {"type": "INVALID"}
-            }
-        },
-        {
             "name": "Check natlocalid type must match localid type constraint",
             "status": 400,
             "return": 2235,
             "payload": {
                 "ikeid": 1,
                 "mode": "tunnel",
-                "localid": {"type": "address"},
+                "localid": {"type": "address", "address": "127.0.0.1"},
                 "natlocalid": {"type": "network"}
             }
         },
@@ -238,7 +240,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "return": 2239,
             "payload": {
                 "ikeid": 1,
-                "mode": "tunnel6",
+                "mode": "tunnel",
                 "localid": {"type": "lan"},
                 "natlocalid": {"type": "network", "address": "127.0.0.1"}
             }

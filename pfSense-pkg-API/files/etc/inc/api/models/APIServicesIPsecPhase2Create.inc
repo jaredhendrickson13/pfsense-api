@@ -52,16 +52,16 @@ class APIServicesIPsecPhase2Create extends APIModel {
         $this->__validate_descr();
         $this->__validate_disabled();
         $this->__validate_mode();
-        $this->__validate_protocol();
-        $this->__validate_rekey_time();
-        $this->__validate_reauth_time();
-        $this->__validate_lifetime();
         $this->__validate_localid();
         $this->__validate_natlocalid();
         $this->__validate_remoteid();
+        $this->__validate_protocol();
         $this->__validate_encryption_algorithm_option();
         $this->__validate_hash_algorithm_option();
         $this->__validate_pfsgroup();
+        $this->__validate_rekey_time();
+        $this->__validate_reauth_time();
+        $this->__validate_lifetime();
         $this->__validate_pinghost();
         $this->__validate_keepalive();
     }
@@ -231,10 +231,11 @@ class APIServicesIPsecPhase2Create extends APIModel {
         # Validate the required the 'type' natlocalid subfield
         if (isset($this->initial_data["natlocalid"]["type"])) {
             # Find interfaces that match this value
+            $localid_type = $this->validated_data["localid"]["type"];
             $type_if = APITools\get_pfsense_if_id($this->initial_data["natlocalid"]["type"]);
 
             # Don't allow value to be 'network' while localid type is 'address'
-            if ($this->validated_data["localid"]["type"] !== $this->initial_data["natlocalid"]["type"]) {
+            if ($localid_type === "address" and $this->initial_data["natlocalid"]["type"] === "network") {
                 $this->errors[] = APIResponse\get(2235);
             }
             # Validate corresponding fields if type is 'address'
@@ -411,8 +412,8 @@ class APIServicesIPsecPhase2Create extends APIModel {
     }
 
     public function __validate_encryption_algorithm_option() {
-        # Only validate this field if 'protocol' is 'ah'
-        if ($this->validated_data["protocol"] === "ah") {
+        # Only validate this field if 'protocol' is 'esp'
+        if ($this->validated_data["protocol"] === "esp") {
             # Check for the required 'encryption-algorithm-option' field
             if (isset($this->initial_data["encryption-algorithm-option"])) {
                 # Ensure value is an array and contains at least 1 item
@@ -480,8 +481,8 @@ class APIServicesIPsecPhase2Create extends APIModel {
         # Check for the required 'pfsgroup' field
         if (isset($this->initial_data["pfsgroup"])) {
             # Ensure value is a valid option
-            if (array_key_exists((int)$this->initial_data["pfsgroup"], $p2_pfskeygroups)) {
-                $this->validated_data["pfsgroup"] = (int)$this->initial_data["pfsgroup"];
+            if (array_key_exists($this->initial_data["pfsgroup"], $p2_pfskeygroups)) {
+                $this->validated_data["pfsgroup"] = $this->initial_data["pfsgroup"];
             }
             else {
                 $this->errors[] = APIResponse\get(2255);
