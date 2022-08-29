@@ -19,6 +19,242 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/ipsec/phase2 endpoint."""
     uri = "/api/v1/services/ipsec/phase2"
     get_tests = [{"name": "Read IPsec phase2 entries"}]
+    post_tests = [
+        {
+            "name": "Check creating valid IPsec phase 1 with PSK auth",
+            "uri": "/api/v1/services/ipsec/phase1",
+            "payload": {
+                "iketype": "ikev2",
+                "protocol": "inet",
+                "interface": "wan",
+                "remote-gateway": "127.0.0.3",
+                "authentication_method": "pre_shared_key",
+                "pre-shared-key": "example",
+                "myid_type": "myaddress",
+                "peerid_type": "peeraddress",
+                "encryption": [
+                    {
+                        "encryption-algorithm": {"name": "aes", "keylen": 256},
+                        "hash-algorithm": "sha256",
+                        "dhgroup": 14
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Check ikeid required constraint",
+            "status": 400,
+            "return": 2207
+        },
+        {
+            "name": "Check ikeid exists constraint",
+            "status": 400,
+            "return": 2208,
+            "payload": {"ikeid": "INVALID"}
+        },
+        {
+            "name": "Check mode required constraint",
+            "status": 400,
+            "return": 2219,
+            "payload": {"ikeid": 1}
+        },
+        {
+            "name": "Check mode options constraint",
+            "status": 400,
+            "return": 2220,
+            "payload": {"ikeid": 1, "mode": "INVALID"}
+        },
+        {
+            "name": "Check localid required constraint",
+            "status": 400,
+            "return": 2223,
+            "payload": {"ikeid": 1, "mode": "tunnel"}
+        },
+        {
+            "name": "Check localid type options constraint",
+            "status": 400,
+            "return": 2225,
+            "payload": {"ikeid": 1, "mode": "tunnel", "localid": {"type": "INVALID"}}
+        },
+        {
+            "name": "Check localid address required constraint",
+            "status": 400,
+            "return": 2226,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "address"}
+            }
+        },
+        {
+            "name": "Check localid address IP constraint when 'mode' is 'vti'",
+            "status": 400,
+            "return": 2227,
+            "payload": {
+                "ikeid": 1,
+                "mode": "vti",
+                "localid": {"type": "address", "address": "INVALID"}
+            }
+        },
+        {
+            "name": "Check localid address IPv4 constraint when 'mode' is 'tunnel'",
+            "status": 400,
+            "return": 2228,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "address", "address": "::1"}
+            }
+        },
+        {
+            "name": "Check localid address IPv6 constraint when 'mode' is 'tunnel6'",
+            "status": 400,
+            "return": 2229,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel6",
+                "localid": {"type": "address", "address": "127.0.0.1"}
+            }
+        },
+        {
+            "name": "Check localid netbits required constraint when 'type' is 'network'",
+            "status": 400,
+            "return": 2230,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.0.1"}
+            }
+        },
+        {
+            "name": "Check localid IPv4 netbits minimum constraint when 'type' is 'network'",
+            "status": 400,
+            "return": 2231,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.0.1", "netbits": -1}
+            }
+        },
+        {
+            "name": "Check localid IPv4 netbits maxmimum constraint when 'type' is 'network'",
+            "status": 400,
+            "return": 2231,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.0.1", "netbits": 33}
+            }
+        },
+        {
+            "name": "Check localid IPv6 netbits minimum constraint when 'type' is 'network'",
+            "status": 400,
+            "return": 2232,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel6",
+                "localid": {"type": "network", "address": "127.0.0.1", "netbits": -1}
+            }
+        },
+        {
+            "name": "Check localid IPv6 netbits maxmimum constraint when 'type' is 'network'",
+            "status": 400,
+            "return": 2232,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel6",
+                "localid": {"type": "network", "address": "127.0.0.1", "netbits": 129}
+            }
+        },
+        {
+            "name": "Check natlocalid type required constraint",
+            "status": 400,
+            "return": 2233,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "lan"},
+                "natlocalid": {}
+            }
+        },
+        {
+            "name": "Check natlocalid type options constraint",
+            "status": 400,
+            "return": 2234,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "lan"},
+                "natlocalid": {"type": "INVALID"}
+            }
+        },
+        {
+            "name": "Check natlocalid type must match localid type constraint",
+            "status": 400,
+            "return": 2235,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "address"},
+                "natlocalid": {"type": "network"}
+            }
+        },
+        {
+            "name": "Check natlocalid address required constraint",
+            "status": 400,
+            "return": 2236,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "lan"},
+                "natlocalid": {"type": "address"}
+            }
+        },
+        {
+            "name": "Check natlocalid address IPv4 constraint when 'mode' is set to 'tunnel'",
+            "status": 400,
+            "return": 2237,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "lan"},
+                "natlocalid": {"type": "address", "address": "::1"}
+            }
+        },
+        {
+            "name": "Check natlocalid address IPv6 constraint when 'mode' is set to 'tunnel6'",
+            "status": 400,
+            "return": 2238,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel6",
+                "localid": {"type": "lan"},
+                "natlocalid": {"type": "address", "address": "127.0.0.1"}
+            }
+        },
+        {
+            "name": "Check natlocalid netbits required constraint when 'type' is 'network'",
+            "status": 400,
+            "return": 2239,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel6",
+                "localid": {"type": "lan"},
+                "natlocalid": {"type": "network", "address": "127.0.0.1"}
+            }
+        },
+        {
+            "name": "Check natlocalid netbits matches localid netbits constraint",
+            "status": 400,
+            "return": 2240,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.0.1", "netbits": 24},
+                "natlocalid": {"type": "network", "address": "127.0.0.2", "netbits": 25}
+            }
+        },
+    ]
 
 
 APIE2ETestServicesIPsecPhase2()

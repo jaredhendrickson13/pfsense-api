@@ -2141,6 +2141,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "IPsec phase 2 PFS group is not supported"
         ],
+        2256 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) is required"
+        ],
 
         // 3000-3999 reserved for /api/v1/interfaces API calls
         3000 => [

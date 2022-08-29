@@ -314,6 +314,9 @@ class APIServicesIPsecPhase2Create extends APIModel {
                 $this->validated_data["remoteid"] = [];
                 $this->__validate_remoteid_type();
             }
+            else {
+                $this->errors[] = APIResponse\get(2256);
+            }
         }
     }
 
