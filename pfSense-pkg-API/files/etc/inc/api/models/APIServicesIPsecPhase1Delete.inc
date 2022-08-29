@@ -17,6 +17,7 @@ require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
 class APIServicesIPsecPhase1Delete extends APIModel {
+    public $ikeid = null;
     # Create our method constructor
     public function __construct() {
         parent::__construct();
@@ -52,6 +53,7 @@ class APIServicesIPsecPhase1Delete extends APIModel {
         if (isset($this->initial_data["ikeid"])) {
             # Attempt to get the config ID from this IKE ID
             $this->id = APITools\get_phase1_config_id_from_ikeid($this->initial_data["ikeid"]);
+            $this->ikeid = (int)$this->initial_data["ikeid"];
 
             # Return an error if this IKE ID was not found in any existing IPsec phase1 entry
             if ($this->id === false) {
@@ -66,7 +68,7 @@ class APIServicesIPsecPhase1Delete extends APIModel {
         # Loop through all phase2 entries and remove them if they reference this phase1 entry
         foreach ($this->config["ipsec"]["phase2"] as $index=>$p2) {
             # Remove this phase2 entry if it's IKE ID matches the phase 1 we're deleting
-            if ($this->id === (int)$p2["ikeid"]) {
+            if ($this->ikeid === (int)$p2["ikeid"]) {
                 unset($this->config["ipsec"]["phase2"][$index]);
             }
         }

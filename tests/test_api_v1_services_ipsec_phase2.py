@@ -648,6 +648,30 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             }
         }
     ]
+    delete_tests = [
+        {
+            "name": "Check uniqueid required constraint",
+            "status": 400,
+            "return": 2257
+        },
+        {
+            "name": "Check uniqid required constraint",
+            "status": 400,
+            "return": 2258,
+            "payload": {
+                "uniqid": "INVALID"
+            }
+        },
+        {
+            "name": "Delete phase 1 parent",
+            "uri": "/api/v1/services/ipsec/phase1",
+            "resp_time": 10,
+            "payload": {
+                "ikeid": 1,
+                "apply": True
+            }
+        }
+    ]
 
 
 APIE2ETestServicesIPsecPhase2()
