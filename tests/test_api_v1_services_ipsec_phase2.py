@@ -434,6 +434,233 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
                 "protocol": "esp",
                 "encryption-algorithm-option": []
             }
+        },
+        {
+            "name": "Check encryption-algorithm-option options constraint",
+            "status": 400,
+            "return": 2210,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [False]
+            }
+        },
+        {
+            "name": "Check hash-algorithm-option required constraint",
+            "status": 400,
+            "return": 2251,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}]
+            }
+        },
+        {
+            "name": "Check hash-algorithm-option type constraint",
+            "status": 400,
+            "return": 2252,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
+                "hash-algorithm-option": False
+            }
+        },
+        {
+            "name": "Check hash-algorithm-option minimum length constraint",
+            "status": 400,
+            "return": 2252,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
+                "hash-algorithm-option": []
+            }
+        },
+        {
+            "name": "Check hash-algorithm-option options constraint",
+            "status": 400,
+            "return": 2253,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
+                "hash-algorithm-option": ["INVALID"]
+            }
+        },
+        {
+            "name": "Check pfsgroup requirement constraint",
+            "status": 400,
+            "return": 2254,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
+                "hash-algorithm-option": ["hmac_sha256"]
+            }
+        },
+        {
+            "name": "Check pfsgroup options constraint",
+            "status": 400,
+            "return": 2255,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
+                "hash-algorithm-option": ["hmac_sha256"],
+                "pfsgroup": "INVALID"
+            }
+        },
+        {
+            "name": "Check rekey_time numeric constraint",
+            "status": 400,
+            "return": 2193,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
+                "hash-algorithm-option": ["hmac_sha256"],
+                "pfsgroup": 14,
+                "rekey_time": "INVALID"
+            }
+        },
+        {
+            "name": "Check rekey_time minimum constraint",
+            "status": 400,
+            "return": 2193,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
+                "hash-algorithm-option": ["hmac_sha256"],
+                "pfsgroup": 14,
+                "rekey_time": -1
+            }
+        },
+        {
+            "name": "Check reauth_time numeric constraint",
+            "status": 400,
+            "return": 2194,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
+                "hash-algorithm-option": ["hmac_sha256"],
+                "pfsgroup": 14,
+                "reauth_time": "INVALID"
+            }
+        },
+        {
+            "name": "Check reauth_time minimum constraint",
+            "status": 400,
+            "return": 2194,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
+                "hash-algorithm-option": ["hmac_sha256"],
+                "pfsgroup": 14,
+                "reauth_time": -1
+            }
+        },
+        {
+            "name": "Check lifetime numeric constraint",
+            "status": 400,
+            "return": 2196,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
+                "hash-algorithm-option": ["hmac_sha256"],
+                "pfsgroup": 14,
+                "lifetime": "INVALID"
+            }
+        },
+        {
+            "name": "Check lifetime minimum constraint",
+            "status": 400,
+            "return": 2196,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
+                "hash-algorithm-option": ["hmac_sha256"],
+                "pfsgroup": 14,
+                "lifetime": -1
+            }
+        },
+        {
+            "name": "Check lifetime greater than rekey_time constraint",
+            "status": 400,
+            "return": 2197,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
+                "hash-algorithm-option": ["hmac_sha256"],
+                "pfsgroup": 14,
+                "rekey_time": 2,
+                "lifetime": 1
+            }
+        },
+        {
+            "name": "Check lifetime greater than reauth_time constraint",
+            "status": 400,
+            "return": 2197,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
+                "hash-algorithm-option": ["hmac_sha256"],
+                "pfsgroup": 14,
+                "reauth_time": 2,
+                "lifetime": 1
+            }
         }
     ]
 
