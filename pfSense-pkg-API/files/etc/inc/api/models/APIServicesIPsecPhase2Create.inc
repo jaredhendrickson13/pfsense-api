@@ -411,30 +411,33 @@ class APIServicesIPsecPhase2Create extends APIModel {
     }
 
     public function __validate_encryption_algorithm_option() {
-        # Check for the required 'encryption-algorithm-option' field
-        if (isset($this->initial_data["encryption-algorithm-option"])) {
-            # Ensure value is an array and contains at least 1 item
-            if (is_array($this->initial_data["encryption-algorithm-option"]) and count($this->initial_data["encryption-algorithm-option"]) >= 1) {
-                # Initialize the validated data array that will hold valid configuration
-                $this->validated_data["encryption-algorithm-option"] = [];
+        # Only validate this field if 'protocol' is 'ah'
+        if ($this->validated_data["protocol"] === "ah") {
+            # Check for the required 'encryption-algorithm-option' field
+            if (isset($this->initial_data["encryption-algorithm-option"])) {
+                # Ensure value is an array and contains at least 1 item
+                if (is_array($this->initial_data["encryption-algorithm-option"]) and count($this->initial_data["encryption-algorithm-option"]) >= 1) {
+                    # Initialize the validated data array that will hold valid configuration
+                    $this->validated_data["encryption-algorithm-option"] = [];
 
-                # Loop through each encryption-algorithm-option item and ensure it is valid
-                foreach ($this->initial_data["encryption-algorithm-option"] as $enc_conf) {
-                    # Call the APIServicesIPsecPhase1EncryptionCreate model to validate entries
-                    $enc_create = new APIServicesIPsecPhase1EncryptionCreate();
-                    $enc_create->initial_data = $enc_conf;
-                    $enc_create->validate_encryption_algorithm(true);
-                    $this->validated_data["encryption-algorithm-option"][] = $enc_conf;
+                    # Loop through each encryption-algorithm-option item and ensure it is valid
+                    foreach ($this->initial_data["encryption-algorithm-option"] as $enc_conf) {
+                        # Call the APIServicesIPsecPhase1EncryptionCreate model to validate entries
+                        $enc_create = new APIServicesIPsecPhase1EncryptionCreate();
+                        $enc_create->initial_data = $enc_conf;
+                        $enc_create->validate_encryption_algorithm(true);
+                        $this->validated_data["encryption-algorithm-option"][] = $enc_conf;
 
-                    # Add any encountered errors to this model's error array
-                    $this->errors = array_merge($this->errors,  $enc_create->errors);
+                        # Add any encountered errors to this model's error array
+                        $this->errors = array_merge($this->errors,  $enc_create->errors);
+                    }
                 }
+                else {
+                    $this->errors[] = APIResponse\get(2250);
+                }
+            } else {
+                $this->errors[] = APIResponse\get(2249);
             }
-            else {
-                $this->errors[] = APIResponse\get(2250);
-            }
-        } else {
-            $this->errors[] = APIResponse\get(2249);
         }
     }
 

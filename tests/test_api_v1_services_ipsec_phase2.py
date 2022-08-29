@@ -254,6 +254,187 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
                 "natlocalid": {"type": "network", "address": "127.0.0.2", "netbits": 25}
             }
         },
+        {
+            "name": "Check remoteid required constraint",
+            "status": 400,
+            "return": 2256,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.0.1", "netbits": 24}
+            }
+        },
+        {
+            "name": "Check remoteid type required constraint",
+            "status": 400,
+            "return": 2241,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "address", "address": "127.0.0.1"},
+                "remoteid": {}
+            }
+        },
+        {
+            "name": "Check remoteid type options constraint",
+            "status": 400,
+            "return": 2242,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "address", "address": "127.0.0.1"},
+                "remoteid": {"type": "INVALID"}
+            }
+        },
+        {
+            "name": "Check remoteid address required constraint",
+            "status": 400,
+            "return": 2243,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "address", "address": "127.0.0.1"},
+                "remoteid": {"type": "address"}
+            }
+        },
+        {
+            "name": "Check remoteid address IPv4 constraint when 'mode' is 'tunnel'",
+            "status": 400,
+            "return": 2244,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "address", "address": "127.0.0.1"},
+                "remoteid": {"type": "address", "address": "::1"}
+            }
+        },
+        {
+            "name": "Check remoteid address IPv6 constraint when 'mode' is 'tunnel6'",
+            "status": 400,
+            "return": 2245,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel6",
+                "localid": {"type": "address", "address": "::1"},
+                "remoteid": {"type": "address", "address": "127.0.0.2"}
+            }
+        },
+        {
+            "name": "Check remoteid netbits required constraint when 'type' is 'network'",
+            "status": 400,
+            "return": 2246,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.0.1", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.0.2"}
+            }
+        },
+        {
+            "name": "Check remoteid netbits minimum constraint when 'mode' is 'tunnel'",
+            "status": 400,
+            "return": 2247,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.0.1", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.0.2", "netbits": -1}
+            }
+        },
+        {
+            "name": "Check remoteid netbits maximum constraint when 'mode' is 'tunnel'",
+            "status": 400,
+            "return": 2247,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.0.1", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.0.2", "netbits": 33}
+            }
+        },
+        {
+            "name": "Check remoteid netbits minimum constraint when 'mode' is 'tunnel6'",
+            "status": 400,
+            "return": 2248,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel6",
+                "localid": {"type": "network", "address": "::1", "netbits": 24},
+                "remoteid": {"type": "network", "address": "0::", "netbits": -1}
+            }
+        },
+        {
+            "name": "Check remoteid netbits maximum constraint when 'mode' is 'tunnel6'",
+            "status": 400,
+            "return": 2248,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel6",
+                "localid": {"type": "network", "address": "::1", "netbits": 24},
+                "remoteid": {"type": "network", "address": "0::", "netbits": 129}
+            }
+        },
+        {
+            "name": "Check protocol required constraint",
+            "status": 400,
+            "return": 2221,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24}
+            }
+        },
+        {
+            "name": "Check protocol options constraint",
+            "status": 400,
+            "return": 2222,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "INVALID"
+            }
+        },
+        {
+            "name": "Check encryption-algorithm-option required constraint when 'protocol' is 'esp'",
+            "status": 400,
+            "return": 2249,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp"
+            }
+        },
+        {
+            "name": "Check encryption-algorithm-option type constraint",
+            "status": 400,
+            "return": 2250,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": False
+            }
+        },
+        {
+            "name": "Check encryption-algorithm-option minimum length constraint",
+            "status": 400,
+            "return": 2250,
+            "payload": {
+                "ikeid": 1,
+                "mode": "tunnel",
+                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
+                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "protocol": "esp",
+                "encryption-algorithm-option": []
+            }
+        }
     ]
 
 
