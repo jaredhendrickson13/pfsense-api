@@ -28,7 +28,8 @@ class APIServicesIPsecPhase1Delete extends APIModel {
         # Capture the entry being delete before deleting it
         $this->validated_data = $this->config["ipsec"]["phase1"][$this->id];
 
-        # Remote the entry and mark the changes as pending
+        # Remove child phase2 entries, this phase1 entry and mark the changes as pending
+        $this->delete_child_phase2_entries();
         unset($this->config["ipsec"]["phase1"][$this->id]);
         $this->write_config();
         mark_subsystem_dirty('ipsec');
@@ -50,7 +51,7 @@ class APIServicesIPsecPhase1Delete extends APIModel {
         # Validate the required 'ikeid' field
         if (isset($this->initial_data["ikeid"])) {
             # Attempt to get the config ID from this IKE ID
-            $this->id = APITools\get_config_id_from_ikeid($this->initial_data["ikeid"]);
+            $this->id = APITools\get_phase1_config_id_from_ikeid($this->initial_data["ikeid"]);
 
             # Return an error if this IKE ID was not found in any existing IPsec phase1 entry
             if ($this->id === false) {
@@ -58,6 +59,16 @@ class APIServicesIPsecPhase1Delete extends APIModel {
             }
         } else {
             $this->errors[] = APIResponse\get(2207);
+        }
+    }
+
+    public function delete_child_phase2_entries() {
+        # Loop through all phase2 entries and remove them if they reference this phase1 entry
+        foreach ($this->config["ipsec"]["phase2"] as $index=>$p2) {
+            # Remove this phase2 entry if it's IKE ID matches the phase 1 we're deleting
+            if ($this->id === (int)$p2["ikeid"]) {
+                unset($this->config["ipsec"]["phase2"][$index]);
+            }
         }
     }
 }

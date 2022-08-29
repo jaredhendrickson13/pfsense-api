@@ -27,4 +27,8 @@ class APIServicesIPsecPhase2 extends APIEndpoint {
     protected function post() {
         return (new APIServicesIPsecPhase2Create())->call();
     }
+
+    protected function delete() {
+        return (new APIServicesIPsecPhase2Delete())->call();
+    }
 }

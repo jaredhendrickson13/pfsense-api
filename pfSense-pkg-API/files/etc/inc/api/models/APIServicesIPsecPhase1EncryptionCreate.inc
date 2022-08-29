@@ -64,7 +64,7 @@ class APIServicesIPsecPhase1EncryptionCreate extends APIModel {
         # Validate the required 'ikeid' field
         if (isset($this->initial_data["ikeid"])) {
             # Attempt to get the config ID from this IKE ID
-            $this->id = APITools\get_config_id_from_ikeid($this->initial_data["ikeid"]);
+            $this->id = APITools\get_phase1_config_id_from_ikeid($this->initial_data["ikeid"]);
 
             # Return an error if this IKE ID was not found in any existing IPsec phase1 entry
             if ($this->id === false) {

@@ -70,7 +70,7 @@ class APIServicesIPsecPhase2Create extends APIModel {
         # Validate the required 'ikeid' field
         if (isset($this->initial_data["ikeid"])) {
             # Return an error if this IKE ID was not found in any existing IPsec phase 1 entry
-            if (APITools\get_config_id_from_ikeid($this->initial_data["ikeid"]) !== false) {
+            if (APITools\get_phase1_config_id_from_ikeid($this->initial_data["ikeid"]) !== false) {
                 $this->validated_data["ikeid"] = (int)$this->initial_data["ikeid"];
             } else {
                 $this->errors[] = APIResponse\get(2208);
