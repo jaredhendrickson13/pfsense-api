@@ -18,7 +18,7 @@ require_once("api/framework/APIResponse.inc");
 
 class APIServicesIPsecPhase2Create extends APIModel {
     public $def_rekey_time = false;
-    public $def_reauth_time = false;
+    public $def_rand_time = false;
 
     # Create our method constructor
     public function __construct() {
@@ -60,7 +60,7 @@ class APIServicesIPsecPhase2Create extends APIModel {
         $this->__validate_hash_algorithm_option();
         $this->__validate_pfsgroup();
         $this->__validate_rekey_time();
-        $this->__validate_reauth_time();
+        $this->__validate_rand_time();
         $this->__validate_lifetime();
         $this->__validate_pinghost();
         $this->__validate_keepalive();
@@ -510,27 +510,26 @@ class APIServicesIPsecPhase2Create extends APIModel {
         }
     }
 
-    private function __validate_reauth_time() {
-        # Check for the optional 'reauth_time' field
-        if (isset($this->initial_data["reauth_time"])) {
+    private function __validate_rand_time() {
+        # Check for the optional 'rand_time' field
+        if (isset($this->initial_data["rand_time"])) {
             # Ensure value is a numeric greater than or equal to 0
-            if (is_numeric($this->initial_data["reauth_time"]) and (int)$this->initial_data["reauth_time"] >= 0) {
-                $this->validated_data["reauth_time"] = (int)$this->initial_data["reauth_time"];
+            if (is_numeric($this->initial_data["rand_time"]) and (int)$this->initial_data["rand_time"] >= 0) {
+                $this->validated_data["rand_time"] = (int)$this->initial_data["rand_time"];
             }
             else {
-                $this->errors[] = APIResponse\get(2194);
+                $this->errors[] = APIResponse\get(2195);
             }
         }
         # Sets a flag that will populate the default for this field. Default is 90% of the 'lifetime' value.
         else {
-            $this->def_reauth_time = true;
+            $this->def_rand_time = true;
         }
     }
 
     private function __validate_lifetime() {
-        # Use shorthand variables for rekey_time, reauth_time for readability
+        # Use shorthand variables for rekey_time, rand_time for readability
         $rekey_time = $this->validated_data["rekey_time"];
-        $reauth_time = $this->validated_data["reauth_time"];
 
         # Set default value if not specified. Even the default value needs to be validated for this field.
         if (!isset($this->initial_data["lifetime"])) {
@@ -545,21 +544,17 @@ class APIServicesIPsecPhase2Create extends APIModel {
         elseif(!$this->def_rekey_time and $rekey_time >= (int)$this->initial_data["lifetime"]) {
             $this->errors[] = APIResponse\get(2197);
         }
-        # If default 'reauth_time' was not assumed, ensure re-key time is less than lifetime.
-        elseif(!$this->def_reauth_time and $reauth_time >= (int)$this->initial_data["lifetime"]) {
-            $this->errors[] = APIResponse\get(2197);
-        }
         # Otherwise, input is valid.
         else {
             $this->validated_data["lifetime"] = (int)$this->initial_data["lifetime"];
         }
 
-        # Now we know the lifetime value, populate defaults on the rand_time, rekey_time and reauth_time if requested
+        # Now we know the lifetime value, populate defaults on the rand_time, rekey_time and rand_time if requested
         if ($this->def_rekey_time) {
             $this->validated_data["rekey_time"] = intval($this->validated_data["lifetime"] * 0.9);
         }
-        if ($this->def_reauth_time) {
-            $this->validated_data["reauth_time"] = intval($this->validated_data["lifetime"] * 0.9);
+        if ($this->def_rand_time) {
+            $this->validated_data["rand_time"] = intval($this->validated_data["lifetime"] * 0.1);
         }
     }
 

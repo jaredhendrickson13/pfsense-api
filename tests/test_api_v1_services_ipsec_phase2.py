@@ -567,9 +567,9 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             }
         },
         {
-            "name": "Check reauth_time numeric constraint",
+            "name": "Check rand_time numeric constraint",
             "status": 400,
-            "return": 2194,
+            "return": 2195,
             "payload": {
                 "ikeid": 1,
                 "mode": "tunnel",
@@ -579,13 +579,13 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
                 "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
                 "hash-algorithm-option": ["hmac_sha256"],
                 "pfsgroup": 14,
-                "reauth_time": "INVALID"
+                "rand_time": "INVALID"
             }
         },
         {
-            "name": "Check reauth_time minimum constraint",
+            "name": "Check rand_time minimum constraint",
             "status": 400,
-            "return": 2194,
+            "return": 2195,
             "payload": {
                 "ikeid": 1,
                 "mode": "tunnel",
@@ -595,7 +595,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
                 "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
                 "hash-algorithm-option": ["hmac_sha256"],
                 "pfsgroup": 14,
-                "reauth_time": -1
+                "rand_time": -1
             }
         },
         {
@@ -644,23 +644,6 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
                 "hash-algorithm-option": ["hmac_sha256"],
                 "pfsgroup": 14,
                 "rekey_time": 2,
-                "lifetime": 1
-            }
-        },
-        {
-            "name": "Check lifetime greater than reauth_time constraint",
-            "status": 400,
-            "return": 2197,
-            "payload": {
-                "ikeid": 1,
-                "mode": "tunnel",
-                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
-                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
-                "protocol": "esp",
-                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
-                "hash-algorithm-option": ["hmac_sha256"],
-                "pfsgroup": 14,
-                "reauth_time": 2,
                 "lifetime": 1
             }
         }
