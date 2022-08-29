@@ -51,7 +51,7 @@ class APIServicesIPsecPhase2Delete extends APIModel {
             # Attempt to get the config ID from this phase 2 unique ID
             $this->id = APITools\get_phase2_config_id_from_uniqid($this->initial_data["uniqid"]);
 
-            # Return an error if this phase 2 unique was not found in any existing IPsec phase1 entry
+            # Return an error if this phase 2 unique was not found in any existing IPsec entry
             if ($this->id === false) {
                 $this->errors[] = APIResponse\get(2258);
             }

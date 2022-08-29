@@ -28,6 +28,10 @@ class APIServicesIPsecPhase2 extends APIEndpoint {
         return (new APIServicesIPsecPhase2Create())->call();
     }
 
+    protected function put() {
+        return (new APIServicesIPsecPhase2Update())->call();
+    }
+
     protected function delete() {
         return (new APIServicesIPsecPhase2Delete())->call();
     }
