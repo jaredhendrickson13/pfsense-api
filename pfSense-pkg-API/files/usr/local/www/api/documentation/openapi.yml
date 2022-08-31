@@ -7077,6 +7077,355 @@ paths:
       summary: Update IPsec phase 1 entry
       tags:
         - Services > IPsec > Phase 1
+  /api/v1/services/ipsec/phase2:
+    delete:
+      operationId: APIServicesIPsecPhase2Delete
+      description: 'Delete an existing IPsec phase 2 entry.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-vpn-ipsec-editphase2`]'
+      parameters:
+        - description: Unique ID of the phase 2 entry to delete.
+          in: query
+          name: uniqid
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Delete IPsec phase 2 entry
+      tags:
+        - Services > IPsec > Phase 2
+    get:
+      operationId: APIServicesIPsecPhase2Read
+      description: 'Read existing IPsec phase 2 entries.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-vpn-ipsec-editphase2`]'
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read IPsec phase 2 entries
+      tags:
+        - Services > IPsec > Phase 2
+    post:
+      operationId: APIServicesIPsecPhase2Create
+      description: 'Create a new IPsec phase 2 entry.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-vpn-ipsec-editphase2`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                ikeid:
+                  description: IKE ID of the parent phase 1 entry to link this phase 2 entry to.
+                  type: integer
+                descr:
+                  description: Description for this IPsec phase 2 entry.
+                  type: string
+                disabled:
+                  description: Disable this IPsec phase 2 entry.
+                  default: false
+                  type: boolean
+                mode:
+                  description: IPsec phase2 tunnel mode to use.
+                  type: string
+                  enum:
+                    - tunnel
+                    - tunnel6
+                    - vti
+                    - transport
+                localid:
+                  description: Local network parameters. This field is not available if `mode` is set to `transport`.
+                  type: object
+                  properties:
+                    type:
+                      description: Local ID type. This sets the scope of the local network. Options are `address` for 
+                        a single IP address, `network` for a subnet or an existing interface.
+                      type: string
+                    address:
+                      description: Address portion of local network. This must be a valid IPv4 or IPv6 address 
+                        (depending on the specified `mode`).
+                      type: string
+                    netbits:
+                      description: Subnet bit count of the local network. This field is only available when `type` is 
+                        set to `network`.
+                      type: integer
+                      minimum: 0
+                      maximum: 128
+                natlocalid:
+                  description: NAT/BINAT translation parameters. This field is not available if `mode` is set to 
+                    `transport` or `vti`.
+                  type: object
+                  properties:
+                    type:
+                      description: NAT ID type. This sets the scope of the NAT network. Options are `address` for
+                        a single IP address, `network` for a subnet or an existing interface.
+                      type: string
+                    address:
+                      description: Address portion of NAT network. This must be a valid IPv4 or IPv6 address
+                        (depending on the specified `mode`).
+                      type: string
+                    netbits:
+                      description: Subnet bit count of the NAT network. This field is only available when `type` is set 
+                        to `network`.
+                      type: integer
+                      minimum: 0
+                      maximum: 128
+                remoteid:
+                  description: Remote network parameters. This field is not available if `mode` is set to `transport`.
+                  type: object
+                  properties:
+                    type:
+                      description: Remote ID type. This sets the scope of the remote network. Options are `address` for 
+                        a single IP address, or `network` for a subnet.
+                      type: string
+                    address:
+                      description: Address portion of remote network. This must be a valid IPv4 or IPv6 address 
+                        (depending on the specified `mode`).
+                      type: string
+                    netbits:
+                      description: Subnet bit count of the remote network. This field is only available when `type` is 
+                        set to `network`.
+                      type: integer
+                      minimum: 0
+                      maximum: 128
+                protocol:
+                  description: IPsec phase 2 protocol to use.
+                  type: string
+                  enum:
+                    - esp
+                    - ah
+                encryption-algorithm-option:
+                  description: Encryption algorithms available to this IPsec phase 2 entry. This must be a list of
+                    encryption objects. For more information on encryption object fields, see documentation
+                    for the /api/v1/services/ipsec/phase1/encryption endpoint's `encryption-algorithm` field.
+                  minItems: 1
+                  type: array
+                  items:
+                    type: object
+                hash-algorithm-option:
+                  description: Hash algorithms supported by this IPsec phase 2 entry.
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - hmac_md5
+                      - hmac_sha1
+                      - hmac_sha256
+                      - hmac_sha384
+                      - hmac_sha512
+                      - aesxcbc
+                pfsgroup:
+                  description: PFS group this IPsec phase 2 entry will use.
+                  type: integer
+                  enum: [1, 2, 5, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
+                rekey_time:
+                  description: Time, in seconds, before a child SA establishes new keys. This value must be less than
+                    the `lifetime` value. If not specified, this field will default to 90% of the `lifetime` value.
+                  type: integer
+                  minimum: 0
+                rand_time:
+                  description: Random value up to this amount will be subtracted from `rekey_time` to avoid 
+                    simultaneous renegotiation. This value must be less than the `lifetime` value. If not specified, 
+                    this field will default to 10% of the `lifetime` value.
+                  type: integer
+                  minimum: 0
+                lifetime:
+                  description: Hard child SA life time, in seconds, after which the child SA will be expired. This value 
+                    must be greater than `rekey_time`.
+                  default: 3600
+                  minimum: 0
+                  type: integer
+                pinghost:
+                  description: IP address to send ICMP echo requests inside the tunnel.
+                  type: string
+                keepalive:
+                  description: Enable keep alive for this IPsec phase 2 entry.
+                  default: false
+                  type: boolean
+                apply:
+                  description: Apply the IPsec configuration immediately after writing this configuration. If you are
+                    making multiple IPsec modifications, it is typically best to set this value to `false` and call the
+                    /api/v1/services/ipsec/apply endpoint once you are ready to apply the configuration.
+                  default: false
+                  type: boolean
+              required:
+                - iketype
+                - mode
+                - protocol
+                - hash-algorithm-option
+                - pfsgroup
+              type: object
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Create IPsec phase 2 entry
+      tags:
+        - Services > IPsec > Phase 2
+    put:
+      operationId: APIServicesIPsecPhase2Update
+      description: 'Update an existing IPsec phase 2 entry.<br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-vpn-ipsec-editphase2`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                uniqid:
+                  description: Unique ID of the IPsec phase 2 entry to update.
+                  type: string
+                ikeid:
+                  description: IKE ID of the parent phase 1 entry to link this phase 2 entry to.
+                  type: integer
+                descr:
+                  description: Description for this IPsec phase 2 entry.
+                  type: string
+                disabled:
+                  description: Disable this IPsec phase 2 entry.
+                  default: false
+                  type: boolean
+                mode:
+                  description: IPsec phase2 tunnel mode to use.
+                  type: string
+                  enum:
+                    - tunnel
+                    - tunnel6
+                    - vti
+                    - transport
+                localid:
+                  description: Local network parameters. This field is not available if `mode` is set to `transport`.
+                  type: object
+                  properties:
+                    type:
+                      description: Local ID type. This sets the scope of the local network. Options are `address` for 
+                        a single IP address, `network` for a subnet or an existing interface.
+                      type: string
+                    address:
+                      description: Address portion of local network. This must be a valid IPv4 or IPv6 address 
+                        (depending on the specified `mode`).
+                      type: string
+                    netbits:
+                      description: Subnet bit count of the local network. This field is only available when `type` is 
+                        set to `network`.
+                      type: integer
+                      minimum: 0
+                      maximum: 128
+                natlocalid:
+                  description: NAT/BINAT translation parameters. This field is not available if `mode` is set to 
+                    `transport` or `vti`.
+                  type: object
+                  properties:
+                    type:
+                      description: NAT ID type. This sets the scope of the NAT network. Options are `address` for
+                        a single IP address, `network` for a subnet or an existing interface.
+                      type: string
+                    address:
+                      description: Address portion of NAT network. This must be a valid IPv4 or IPv6 address
+                        (depending on the specified `mode`).
+                      type: string
+                    netbits:
+                      description: Subnet bit count of the NAT network. This field is only available when `type` is set 
+                        to `network`.
+                      type: integer
+                      minimum: 0
+                      maximum: 128
+                remoteid:
+                  description: Remote network parameters. This field is not available if `mode` is set to `transport`.
+                  type: object
+                  properties:
+                    type:
+                      description: Remote ID type. This sets the scope of the remote network. Options are `address` for 
+                        a single IP address, or `network` for a subnet.
+                      type: string
+                    address:
+                      description: Address portion of remote network. This must be a valid IPv4 or IPv6 address 
+                        (depending on the specified `mode`).
+                      type: string
+                    netbits:
+                      description: Subnet bit count of the remote network. This field is only available when `type` is 
+                        set to `network`.
+                      type: integer
+                      minimum: 0
+                      maximum: 128
+                protocol:
+                  description: IPsec phase 2 protocol to use.
+                  type: string
+                  enum:
+                    - esp
+                    - ah
+                encryption-algorithm-option:
+                  description: Encryption algorithms available to this IPsec phase 2 entry. This must be a list of
+                    encryption objects. For more information on encryption object fields, see documentation
+                    for the /api/v1/services/ipsec/phase1/encryption endpoint's `encryption-algorithm` field.
+                  minItems: 1
+                  type: array
+                  items:
+                    type: object
+                hash-algorithm-option:
+                  description: Hash algorithms supported by this IPsec phase 2 entry.
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - hmac_md5
+                      - hmac_sha1
+                      - hmac_sha256
+                      - hmac_sha384
+                      - hmac_sha512
+                      - aesxcbc
+                pfsgroup:
+                  description: PFS group this IPsec phase 2 entry will use.
+                  type: integer
+                  enum: [1, 2, 5, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]
+                rekey_time:
+                  description: Time, in seconds, before a child SA establishes new keys. This value must be less than
+                    the `lifetime` value. If not specified, this field will default to 90% of the `lifetime` value.
+                  type: integer
+                  minimum: 0
+                rand_time:
+                  description: Random value up to this amount will be subtracted from `rekey_time` to avoid 
+                    simultaneous renegotiation. This value must be less than the `lifetime` value. If not specified, 
+                    this field will default to 10% of the `lifetime` value.
+                  type: integer
+                  minimum: 0
+                lifetime:
+                  description: Hard child SA life time, in seconds, after which the child SA will be expired. This value 
+                    must be greater than `rekey_time`.
+                  default: 3600
+                  minimum: 0
+                  type: integer
+                pinghost:
+                  description: IP address to send ICMP echo requests inside the tunnel.
+                  type: string
+                keepalive:
+                  description: Enable keep alive for this IPsec phase 2 entry.
+                  default: false
+                  type: boolean
+                apply:
+                  description: Apply the IPsec configuration immediately after writing this configuration. If you are
+                    making multiple IPsec modifications, it is typically best to set this value to `false` and call the
+                    /api/v1/services/ipsec/apply endpoint once you are ready to apply the configuration.
+                  default: false
+                  type: boolean
+              required:
+                - uniqid
+              type: object
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update IPsec phase 2 entry
+      tags:
+        - Services > IPsec > Phase 2
   /api/v1/services/ntpd:
     get:
       operationId: APIServicesNTPdRead
@@ -13480,6 +13829,7 @@ tags:
   - name: Services > DPINGER
   - name: Services > IPsec > Apply
   - name: Services > IPsec > Phase 1
+  - name: Services > IPsec > Phase 2
   - name: Services > NTPD
   - name: Services > NTPD > Time Server
   - name: Services > OpenVPN > CSC
