@@ -51,7 +51,7 @@ class APIServicesIPsecPhase1Update extends APIModel {
         $this->__validate_ikeid();
 
         # Only proceed if we located the phase 1 entry
-        if (isset($this->id)) {
+        if ($this->id !== false and $this->id !== null) {
             # Determine fields that need to be re-validated
             $this->__set_fields_to_revalidate();
 
@@ -532,7 +532,7 @@ class APIServicesIPsecPhase1Update extends APIModel {
         $remotegw = $this->validated_data["remote-gateway"];
 
         # This field doesn't exist on pfSense 2.5.0-2.5.1, still allow these versions to set this field for tests.
-        $ipsec_startactions = ($ipsec_startactions) ?: ["", "none", "start", "trap"];
+        $ipsec_startactions = ($ipsec_startactions) ?: [""=>0, "none"=>0, "start"=>0, "trap"=>0];
 
         # Ensure this value is a known IPsec start action
         if (!array_key_exists($this->initial_data["startaction"], $ipsec_startactions)) {
