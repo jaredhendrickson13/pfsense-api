@@ -47,43 +47,48 @@ class APIServicesIPsecPhase1Update extends APIModel {
     }
 
     public function validate_payload() {
-        # Get the IKE ID and determine fields that need to be revalidated
+        # Get the IKE ID of the phase 1 entry to update
         $this->__validate_ikeid();
-        $this->__set_fields_to_revalidate();
 
-        # Validate individual fields. Do not change the order at which these are validated!
-        $this->__validate_descr();
-        $this->__validate_disabled();
-        $this->__validate_iketype();
-        $this->__validate_protocol();
-        $this->__validate_interface();
-        $this->__validate_remote_gateway();
-        $this->__validate_authentication_method();
-        $this->__validate_myid_type();
-        $this->__validate_myid_data();
-        $this->__validate_peerid_type();
-        $this->__validate_peerid_data();
-        $this->__validate_pre_shared_key();
-        $this->__validate_certref();
-        $this->__validate_caref();
-        $this->__validate_mode();
-        $this->__validate_rekey_time();
-        $this->__validate_reauth_time();
-        $this->__validate_rand_time();
-        $this->__validate_lifetime();
-        $this->__validate_startaction();
-        $this->__validate_closeaction();
-        $this->__validate_nat_traversal();
-        $this->__validate_mobike();
-        $this->__validate_splitconn();
-        $this->__validate_prfselect_enable();
-        $this->__validate_gw_duplicates();
-        $this->__validate_ikeport();
-        $this->__validate_nattport();
-        $this->__validate_dpd_enable();
-        $this->__validate_dpd_delay();
-        $this->__validate_dpd_maxfail();
-        $this->__validate_encryption();
+        # Only proceed if we located the phase 1 entry
+        if (isset($this->id)) {
+            # Determine fields that need to be re-validated
+            $this->__set_fields_to_revalidate();
+
+            # Validate individual fields. Do not change the order at which these are validated!
+            $this->__validate_descr();
+            $this->__validate_disabled();
+            $this->__validate_iketype();
+            $this->__validate_protocol();
+            $this->__validate_interface();
+            $this->__validate_remote_gateway();
+            $this->__validate_authentication_method();
+            $this->__validate_myid_type();
+            $this->__validate_myid_data();
+            $this->__validate_peerid_type();
+            $this->__validate_peerid_data();
+            $this->__validate_pre_shared_key();
+            $this->__validate_certref();
+            $this->__validate_caref();
+            $this->__validate_mode();
+            $this->__validate_rekey_time();
+            $this->__validate_reauth_time();
+            $this->__validate_rand_time();
+            $this->__validate_lifetime();
+            $this->__validate_startaction();
+            $this->__validate_closeaction();
+            $this->__validate_nat_traversal();
+            $this->__validate_mobike();
+            $this->__validate_splitconn();
+            $this->__validate_prfselect_enable();
+            $this->__validate_gw_duplicates();
+            $this->__validate_ikeport();
+            $this->__validate_nattport();
+            $this->__validate_dpd_enable();
+            $this->__validate_dpd_delay();
+            $this->__validate_dpd_maxfail();
+            $this->__validate_encryption();
+        }
     }
 
     private function __set_fields_to_revalidate() {
@@ -525,6 +530,9 @@ class APIServicesIPsecPhase1Update extends APIModel {
     private function __validate_startaction() {
         global $ipsec_startactions;
         $remotegw = $this->validated_data["remote-gateway"];
+
+        # This field doesn't exist on pfSense 2.5.0-2.5.1, still allow these versions to set this field for tests.
+        $ipsec_startactions = ($ipsec_startactions) ?: ["", "none", "start", "trap"];
 
         # Ensure this value is a known IPsec start action
         if (!array_key_exists($this->initial_data["startaction"], $ipsec_startactions)) {

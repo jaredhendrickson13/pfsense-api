@@ -6775,6 +6775,7 @@ paths:
                 startaction:
                   description: Option to force specific initiation/responder behavior for child SA (P2) entries. Options 
                     for this field are set by pfSense itself. These options may vary based on your pfSense version.
+                    This field is not supported on pfSense 2.5.1 or pfSense 2.5.0.
                   type: string
                   default: ""
                   enum:
@@ -6997,6 +6998,7 @@ paths:
                 startaction:
                   description: Option to force specific initiation/responder behavior for child SA (P2) entries. Options 
                     for this field are set by pfSense itself. These options may vary based on your pfSense version.
+                    This field is not supported on pfSense 2.5.1 or pfSense 2.5.0.
                   type: string
                   enum:
                     - ""

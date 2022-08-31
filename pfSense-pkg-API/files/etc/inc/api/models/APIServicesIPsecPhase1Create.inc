@@ -482,6 +482,9 @@ class APIServicesIPsecPhase1Create extends APIModel {
         global $ipsec_startactions;
         $remotegw = $this->validated_data["remote-gateway"];
 
+        # This field doesn't exist on pfSense 2.5.0-2.5.1, still allow these versions to set this field for tests.
+        $ipsec_startactions = ($ipsec_startactions) ?: ["", "none", "start", "trap"];
+
         # Set default value if not specified. Even the default value needs to be validated for this field.
         if (!isset($this->initial_data["startaction"])) {
             $this->initial_data["startaction"] = "";
