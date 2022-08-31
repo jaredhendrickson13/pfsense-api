@@ -114,6 +114,9 @@ class APIServicesIPsecPhase2Update extends APIModel {
         if ($this->initial_data["disabled"] === true) {
             $this->validated_data["disabled"] = true;
         }
+        elseif ($this->initial_data["disabled"] === false) {
+            unset($this->validated_data["disabled"]);
+        }
     }
 
     private function __validate_mode() {
@@ -590,7 +593,7 @@ class APIServicesIPsecPhase2Update extends APIModel {
         if ($this->initial_data["keepalive"] === true) {
             $this->validated_data["keepalive"] = "enabled";
         }
-        else {
+        elseif ($this->initial_data["keepalive"] === false) {
             $this->validated_data["keepalive"] = "disabled";
         }
     }

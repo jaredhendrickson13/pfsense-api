@@ -655,12 +655,13 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "payload": {
                 "ikeid": 1,
                 "mode": "tunnel",
-                "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
-                "remoteid": {"type": "network", "address": "127.0.2.0", "netbits": 24},
+                "localid": {"type": "address", "address": "127.0.1.0"},
+                "remoteid": {"type": "address", "address": "127.0.2.0"},
                 "protocol": "esp",
-                "encryption-algorithm-option": [{"name": "aes", "keylen": "auto"}],
+                "encryption-algorithm-option": [{"name": "aes", "keylen": 256}],
                 "hash-algorithm-option": ["hmac_sha256"],
-                "pfsgroup": 14
+                "pfsgroup": 5,
+                "keepalive": True
             }
         },
         {
@@ -745,6 +746,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check localid netbits required constraint when 'type' is 'network'",
             "status": 400,
             "return": 2230,
+            "needs_uniqid": True,
             "payload": {
                 "ikeid": 1,
                 "mode": "tunnel",
@@ -1268,7 +1270,6 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
                 # Add the unique ID of the phase 2 entry if needed
                 if "needs_uniqid" in test and "payload" in test:
                     self.put_tests[i]["payload"]["uniqid"] = self.post_responses[1]["data"]["uniqid"]
-            print(self.put_tests)
 
 
 APIE2ETestServicesIPsecPhase2()
