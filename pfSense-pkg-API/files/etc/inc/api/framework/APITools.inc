@@ -1203,7 +1203,7 @@ function get_phase2_config_id_from_uniqid($uniqid) {
     # Loop through each IPsec phase2 entry and check for a match
     foreach ($config["ipsec"]["phase2"] as $index=>$p2) {
         # Check if this IKE ID matches
-        if ($uniqid === $p2["ikeid"]) {
+        if ($uniqid === $p2["uniqid"]) {
             return $index;
         }
     }
