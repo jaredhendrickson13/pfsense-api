@@ -1553,11 +1553,611 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "OpenVPN Client the field 'User shaper' must be in valid range, ranging from 100 to 100,000,000."
         ],
-        2999 => [
+        2158 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
             "message" => "Invalid service name specified."
+        ],
+        2159 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec IKE type is required"
+        ],
+        2160 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown IPsec IKE type specified"
+        ],
+        2161 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec IP protocol is required"
+        ],
+        2162 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown IPsec IP protocol specified"
+        ],
+        2163 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec interface is required"
+        ],
+        2164 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec interface does not exist"
+        ],
+        2165 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec remote gateway is required"
+        ],
+        2166 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec remote gateway must be valid IP address or hostname"
+        ],
+        2167 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec remote gateway must be IPv4 address when protocol is set to 'inet'"
+        ],
+        2168 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec remote gateway must be IPv6 address when protocol is set to 'inet6'"
+        ],
+        2169 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec remote gateway cannot be a hostname unless protocol is set to 'both'"
+        ],
+        2170 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec remote gateway is already in use"
+        ],
+        2171 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec authentication method is required"
+        ],
+        2172 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown IPsec authentication method specified"
+        ],
+        2173 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec my identifier type is required"
+        ],
+        2174 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown IPsec my identifier type specified"
+        ],
+        2175 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec my identifier data is required"
+        ],
+        2176 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec my identifier data must be an IP address when my identifier type is 'address'"
+        ],
+        2177 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec my identifier data must be an FQDN when my identifier type is 'fqdn'"
+        ],
+        2178 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec my identifier data must be an email address when my identifier type is 'user_fqdn'"
+        ],
+        2179 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec my identifier data must be an FQDN when my identifier type is 'dyn_dns'"
+        ],
+        2180 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec peer identifier type is required"
+        ],
+        2181 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown IPsec peer identifier type specified"
+        ],
+        2182 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec peer identifier data is required"
+        ],
+        2183 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec peer identifier data must be an IP address when peer identifier type is 'address'"
+        ],
+        2184 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec peer identifier data must be an FQDN when peer identifier type is 'fqdn'"
+        ],
+        2185 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec peer identifier data must be an email address when peer identifier type is 'user_fqdn'"
+        ],
+        2186 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec peer identifier data must be an FQDN when peer identifier type is 'dyn_dns'"
+        ],
+        2187 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec pre-shared key is required when authentication method is set to 'pre_shared_key'"
+        ],
+        2188 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec certificate is required when authentication mode is set to 'cert'"
+        ],
+        2189 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec certificate does not exist"
+        ],
+        2190 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec CA is required when authentication mode is set to 'cert'"
+        ],
+        2191 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec CA does not exist"
+        ],
+        2192 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown IPsec IKE negotiation mode specified"
+        ],
+        2193 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec re-key time must be a numeric value greater than or equal to 0"
+        ],
+        2194 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec re-auth time must be a numeric value greater than or equal to 0"
+        ],
+        2195 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec rand time must be a numeric value greater than or equal to 0"
+        ],
+        2196 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec lifetime must be a numeric value greater than or equal to 0"
+        ],
+        2197 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec lifetime must be greater than both re-key and re-auth times"
+        ],
+        2198 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown IPsec start action specified"
+        ],
+        2199 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec start action must be 'none' when remote gateway is '0.0.0.0' or '::'"
+        ],
+        2200 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown IPsec close action specified"
+        ],
+        2201 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown IPsec NAT traversal option specified"
+        ],
+        2202 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec IKE port must be a valid port number"
+        ],
+        2203 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec NAT-T port must be a valid port number"
+        ],
+        2204 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec IKE and NAT-T ports cannot be the same"
+        ],
+        2205 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec dead peer detection delay must be a numeric value greater or equal to 0"
+        ],
+        2206 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec dead peer detection max failures must be a numeric value greater or equal to 0"
+        ],
+        2207 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec IKE ID is required"
+        ],
+        2208 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec IKE ID does not exist"
+        ],
+        2209 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec encryption algorithm is required"
+        ],
+        2210 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec encryption algorithm is not supported"
+        ],
+        2211 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec hash algorithm is required"
+        ],
+        2212 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec hash algorithm is not supported"
+        ],
+        2213 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec DH group is required"
+        ],
+        2214 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec DH group is not supported"
+        ],
+        2215 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec PRF algorithm is required"
+        ],
+        2216 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec PRF algorithm is not supported"
+        ],
+        2217 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 1 encryption is required"
+        ],
+        2218 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 1 encryption must be an array with at least 1 item"
+        ],
+        2219 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 mode is required"
+        ],
+        2220 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 mode is not supported"
+        ],
+        2221 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 protocol is required"
+        ],
+        2222 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 protocol is not supported"
+        ],
+        2223 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) is required"
+        ],
+        2224 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) type is required"
+        ],
+        2225 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) type is not supported"
+        ],
+        2226 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) address is required"
+        ],
+        2227 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) address must valid IP address when mode is 'vti'"
+        ],
+        2228 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) address must valid IPv4 address when mode is 'tunnel'"
+        ],
+        2229 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) address must valid IPv6 address when mode is 'tunnel6'"
+        ],
+        2230 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) netbits is required"
+        ],
+        2231 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) netbits must be between 0 and 32"
+        ],
+        2232 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 local ID (network) netbits must be between 0 and 128"
+        ],
+        2233 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT type is required"
+        ],
+        2234 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT type is not supported"
+        ],
+        2235 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT type must match local ID (network) type"
+        ],
+        2236 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT address is required"
+        ],
+        2237 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT address must valid IPv4 address when mode is 'tunnel'"
+        ],
+        2238 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT address must valid IPv6 address when mode is 'tunnel6'"
+        ],
+        2239 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT netbits is required"
+        ],
+        2240 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 NAT/BINAT netbits must match local ID (network) netbits"
+        ],
+        2241 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) type is required"
+        ],
+        2242 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) type is not supported"
+        ],
+        2243 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) address is required"
+        ],
+        2244 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) address must valid IPv4 address when mode is 'tunnel'"
+        ],
+        2245 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) address must valid IPv6 address when mode is 'tunnel6'"
+        ],
+        2246 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) netbits is required"
+        ],
+        2247 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) netbits must be between 0 and 32"
+        ],
+        2248 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) netbits must be between 0 and 128"
+        ],
+        2249 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 encryption is required"
+        ],
+        2250 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 encryption must be an array with at least 1 item"
+        ],
+        2251 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 hash algorithms is required"
+        ],
+        2252 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 hash algorithms must be an array with at least 1 item"
+        ],
+        2253 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "One or more IPsec phase 2 hash algorithms are not supported"
+        ],
+        2254 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 PFS group is required"
+        ],
+        2255 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 PFS group is not supported"
+        ],
+        2256 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 remote ID (network) is required"
+        ],
+        2257 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 unique ID is required"
+        ],
+        2258 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPsec phase 2 unique ID does not exist"
         ],
 
         // 3000-3999 reserved for /api/v1/interfaces API calls

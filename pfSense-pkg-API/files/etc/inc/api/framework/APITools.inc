@@ -389,19 +389,12 @@ function get_pfsense_if_id($interface, $include_carp=false, $include_ifgroup=fal
     }
 
     # Only include CARP interfaces if they are explicitly requested
-    if ($include_carp) {
-        # Loop on carp _vip interfaces
-        foreach ($config['virtualip']['vip'] as $carp) {
-            if ($carp['mode'] == "carp") {
-                if ($interface === '_vip'.$carp['uniqid']) {
-                    return $interface;
-                }
-            }
-        }
+    if ($include_carp and is_vip($interface, "carp")) {
+        return $interface;
     }
 
     # Only include interface groups if they are explicitly requested
-    if(is_ifgroup($interface)) {
+    if($include_ifgroup and is_ifgroup($interface)) {
         return $interface;
     }
     
@@ -409,6 +402,46 @@ function get_pfsense_if_id($interface, $include_carp=false, $include_ifgroup=fal
     if ($include_ipsec and $interface === "enc0") {
         return $interface;
     }
+}
+
+# Check if a string is a virtual IPs unique ID
+function is_vip($value, $vip_type="all") {
+    global $config;
+
+    # Loop through each configured virtual IP
+    foreach ($config['virtualip']['vip'] as $vip) {
+        if ($vip['mode'] == $vip_type or $vip_type === "all") {
+            if ($value === '_vip'.$vip['uniqid']) {
+                return $value;
+            }
+        }
+    }
+}
+
+# Checks if a string is an existing certificate's ref ID
+function is_certificate($refid) {
+    global $config;
+
+    # Loop through each configured certificate and check if this value matches its refid
+    foreach ($config["cert"] as $cert) {
+        if ($cert["refid"] === $refid) {
+            return true;
+        }
+    }
+    return false;
+}
+
+# Checks if a string is an existing ca's ref ID
+function is_ca($refid) {
+    global $config;
+
+    # Loop through each configured ca and check if this value matches its refid
+    foreach ($config["ca"] as $ca) {
+        if ($ca["refid"] === $refid) {
+            return true;
+        }
+    }
+    return false;
 }
 
 # Check if input is valid for rule source and destination
@@ -1145,6 +1178,36 @@ function is_ip_vip($ip, $if=null) {
             }
         }
     }
+    return false;
+}
+
+# Gets the config ID of a IPsec phase 1 entry
+function get_phase1_config_id_from_ikeid($ikeid) {
+    global $config;
+
+    # Loop through each IPsec phase1 entry and check for a match
+    foreach ($config["ipsec"]["phase1"] as $index=>$p1) {
+        # Check if this IKE ID matches
+        if ((int)$ikeid === (int)$p1["ikeid"]) {
+            return $index;
+        }
+    }
+
+    return false;
+}
+
+# Gets the config ID of IPsec phase2 entry by it's uniqid
+function get_phase2_config_id_from_uniqid($uniqid) {
+    global $config;
+
+    # Loop through each IPsec phase2 entry and check for a match
+    foreach ($config["ipsec"]["phase2"] as $index=>$p2) {
+        # Check if this IKE ID matches
+        if ($uniqid === $p2["uniqid"]) {
+            return $index;
+        }
+    }
+
     return false;
 }
 
