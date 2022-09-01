@@ -339,6 +339,33 @@ class APIFirewallRuleCreate extends APIModel {
         }
     }
 
+    private function __validate_statetype() {
+        # Variables
+        $protocol = $this->validated_data["protocol"];
+        $gateway = $this->validated_data["gateway"];
+        $statetype_options = ["keep state", "sloppy state", "synproxy state"];
+
+        # Check for the optional 'statetype' field
+        if (isset($this->initial_data["statetype"])) {
+            # Require value to be supported state type
+            if (!in_array($this->initial_data["statetype"], $statetype_options)) {
+                $this->errors[] = APIResponse\get(4243);
+            }
+            # Require protocol to be 'tcp' if synproxy state is specified
+            elseif ($this->initial_data["statetype"] === "synproxy state" and $protocol !== "tcp") {
+                $this->errors[] = APIResponse\get(4244);
+            }
+            # Require the default gateway to be used if synproxy state is specified
+            elseif ($this->initial_data["statetype"] === "synproxy state" and $gateway) {
+                $this->errors[] = APIResponse\get(4245);
+            }
+            # Otherwise this value is valid.
+            else {
+                $this->validated_data["statetype"] = $this->initial_data["statetype"];
+            }
+        }
+    }
+
     private function __validate_top() {
         # Check for our optional 'top' payload value
         if ($this->initial_data['top'] === true) {
@@ -387,6 +414,7 @@ class APIFirewallRuleCreate extends APIModel {
         $this->__validate_disabled();
         $this->__validate_descr();
         $this->__validate_log();
+        $this->__validate_statetype();
         $this->__validate_top();
         $this->__validate_floating();
         $this->__validate_direction();

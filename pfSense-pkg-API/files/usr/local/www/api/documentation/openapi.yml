@@ -2259,6 +2259,13 @@ paths:
                     port. This parameter is required when `protocol` is set to `tcp`,
                     `udp`, or `tcp/udp`.
                   type: string
+                statetype:
+                  description: State type to use when this rule is matched.
+                  type: string
+                  enum:
+                    - keep state
+                    - sloppy state
+                    - synproxy state
                 top:
                   default: false
                   description: Place this firewall rule at the top of the access control
@@ -2453,6 +2460,13 @@ paths:
                     port. This parameter is required when `protocol` is set to `tcp`,
                     `udp`, or `tcp/udp`.
                   type: string
+                statetype:
+                  description: State type to use when this rule is matched.
+                  type: string
+                  enum:
+                    - keep state
+                    - sloppy state
+                    - synproxy state
                 top:
                   default: false
                   description: Place this firewall rule at the top of the access control

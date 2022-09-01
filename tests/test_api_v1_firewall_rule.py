@@ -518,6 +518,55 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
                 "direction": "Test_Direction"
             }
         },
+        {
+            "name": "Check statetype options constraint",
+            "status": 400,
+            "return": 4243,
+             "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "statetype": "INVALID"
+            }
+        },
+        {
+            "name": "Check protocol must be 'tcp' when statetype is 'synproxy state' constraint",
+            "status": 400,
+            "return": 4244,
+             "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "statetype": "synproxy state"
+            }
+        },
+        {
+            "name": "Check gateway must be default when statetype is 'synproxy state' constraint",
+            "status": 400,
+            "return": 4245,
+             "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "statetype": "synproxy state",
+                "gateway": "WAN_DHCP"
+            }
+        }
     ]
     put_tests = [
         {
@@ -720,6 +769,55 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
                 "direction": "Test_Direction"
             }
         },
+        {
+            "name": "Check statetype options constraint",
+            "status": 400,
+            "return": 4243,
+             "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "statetype": "INVALID"
+            }
+        },
+        {
+            "name": "Check protocol must be 'tcp' when statetype is 'synproxy state' constraint",
+            "status": 400,
+            "return": 4244,
+             "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "statetype": "synproxy state"
+            }
+        },
+        {
+            "name": "Check gateway must be default when statetype is 'synproxy state' constraint",
+            "status": 400,
+            "return": 4245,
+             "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "statetype": "synproxy state",
+                "gateway": "WAN_DHCP"
+            }
+        }
     ]
     delete_tests = [
         {"name": "Delete firewall rule", "payload": {}},    # Tracker ID gets populated by post_post() method
