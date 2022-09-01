@@ -2239,6 +2239,10 @@ paths:
                     - carp
                     - pfsync
                   type: string
+                quick:
+                  description: Apply action immediately upon match. This field is only available for `floating` rules.
+                  type: boolean
+                  default: false
                 sched:
                   description: Firewall schedule to apply to this rule. This must
                     be an existing firewall schedule name.
@@ -2440,6 +2444,9 @@ paths:
                     - carp
                     - pfsync
                   type: string
+                quick:
+                  description: Apply action immediately upon match. This field is only available for `floating` rules.
+                  type: boolean
                 sched:
                   description: Firewall schedule to apply to this rule. This must
                     be an existing firewall schedule name.

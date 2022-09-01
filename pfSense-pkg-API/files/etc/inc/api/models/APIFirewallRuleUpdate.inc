@@ -464,6 +464,18 @@ class APIFirewallRuleUpdate extends APIModel {
         }
     }
 
+    private function __validate_quick() {
+        # Only validate this field if floating is enabled
+        if ($this->validated_data["floating"]) {
+            if ($this->initial_data["quick"] === true) {
+                $this->validated_data["quick"] = "yes";
+            }
+            elseif ($this->initial_data["quick"] === false) {
+                unset($this->validated_data["quick"]);
+            }
+        }
+    }
+
     public function validate_payload() {
         $this->__validate_tracker();
         $this->__validate_type();
@@ -488,6 +500,7 @@ class APIFirewallRuleUpdate extends APIModel {
         $this->__validate_top();
         $this->__validate_floating();
         $this->__validate_direction();
+        $this->__validate_quick();
 
         # Update our 'updated' value
         $this->validated_data["updated"] = [

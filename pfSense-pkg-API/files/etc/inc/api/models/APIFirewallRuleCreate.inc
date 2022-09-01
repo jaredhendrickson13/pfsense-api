@@ -395,6 +395,15 @@ class APIFirewallRuleCreate extends APIModel {
         }
     }
 
+    private function __validate_quick() {
+        # Only validate this field if floating is enabled
+        if ($this->validated_data["floating"]) {
+            if ($this->initial_data["quick"] === true) {
+                $this->validated_data["quick"] = "yes";
+            }
+        }
+    }
+
     public function validate_payload($delay_tracker=true) {
         $this->__validate_type();
         $this->__validate_interface();
@@ -418,6 +427,7 @@ class APIFirewallRuleCreate extends APIModel {
         $this->__validate_top();
         $this->__validate_floating();
         $this->__validate_direction();
+        $this->__validate_quick();
 
         # Delay generating the tracker. Reduces the likelihood of two rules getting the same tracker in looped calls.
         # todo: this is a quick fix and still does not guarantee uniqueness, a better solution is needed
