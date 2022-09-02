@@ -89,9 +89,7 @@ class APIFirewallRuleUpdate extends APIModel {
 
     private function __validate_interface() {
         # Always revalidate this field in case 'floating' was changed.
-        if (!isset($this->initial_data['interface'])) {
-            $this->initial_data["interface"] = $this->validated_data["interface"];
-        }
+        $this->initial_data["interface"] = ($this->initial_data["interface"]) ?: $this->validated_data["interface"];
 
         # Check for our optional 'interface' payload value
         if (isset($this->initial_data['interface'])) {
@@ -116,9 +114,9 @@ class APIFirewallRuleUpdate extends APIModel {
 
                 # Check that we found the request pfSense interface ID
                 if ($if) {
-                    $this->validated_data["interface"] = $if;
+                    $this->validated_data["interface"][] = $if;
                 } else {
-                    $this->errors[] = APIResponse\get(4034);
+                    $this->errors[] = APIResponse\get(4040);
                     return;
                 }
             }

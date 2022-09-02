@@ -175,7 +175,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         {
             "name": "Test interface validation",
             "status": 400,
-            "return": 4034,
+            "return": 4040,
             "payload": {
                 "type": "pass",
                 "interface": "INVALID"

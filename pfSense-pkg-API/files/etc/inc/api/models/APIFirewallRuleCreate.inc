@@ -79,9 +79,9 @@ class APIFirewallRuleCreate extends APIModel {
 
                 # Check that we found the request pfSense interface ID
                 if ($if) {
-                    $this->validated_data["interface"] = $if;
+                    $this->validated_data["interface"][] = $if;
                 } else {
-                    $this->errors[] = APIResponse\get(4034);
+                    $this->errors[] = APIResponse\get(4040);
                     return;
                 }
             }
