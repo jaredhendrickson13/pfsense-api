@@ -4137,6 +4137,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Firewall rule tcpflags1 (set) items must also be present in tcpflags2 (out of)"
         ],
+        4248 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rules can only be applied to one interface unless it is a floating rule"
+        ],
 
         //5000-5999 reserved for /api/v1/user API calls
         5000 => [

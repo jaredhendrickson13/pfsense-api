@@ -139,7 +139,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Create floating firewall rule",
             "payload": {
                 "type": "block",
-                "interface": "wan",
+                "interface": "wan,lan",
                 "ipprotocol": "inet",
                 "protocol": "tcp/udp",
                 "src": "172.16.77.121",
@@ -515,7 +515,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
                 "srcport": "any",
                 "dstport": "any",
                 "floating": True,
-                "direction": "Test_Direction"
+                "direction": "INVALID"
             }
         },
         {
@@ -651,6 +651,21 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
                 "tcpflags2": ["syn"],
                 "tcpflags1": ["fin"]
             }
+        },
+        {
+            "name": "Check non-floating rules must have 1 interface constraint",
+            "status": 400,
+            "return": 4248,
+            "payload": {
+                "type": "pass",
+                "interface": ["wan", "lan"],
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any"
+            }
         }
     ]
     put_tests = [
@@ -677,7 +692,8 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Update floating firewall rule",
             "payload": {
                 "type": "block",
-                "interface": "wan",
+                "floating": True,
+                "interface": ["wan", "lan"],
                 "ipprotocol": "inet",
                 "protocol": "tcp/udp",
                 "src": "172.16.77.121",

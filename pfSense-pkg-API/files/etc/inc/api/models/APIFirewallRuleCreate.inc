@@ -58,13 +58,37 @@ class APIFirewallRuleCreate extends APIModel {
     private function __validate_interface() {
         # Check for our required 'interface' payload value
         if (isset($this->initial_data['interface'])) {
-            $this->initial_data['interface'] = APITools\get_pfsense_if_id($this->initial_data['interface'], false, true, true);
-            # Check that we found the request pfSense interface ID
-            if (is_string($this->initial_data["interface"])) {
-                $this->validated_data['interface'] = $this->initial_data['interface'];
-            } else {
-                $this->errors[] = APIResponse\get(4034);
+            # Convert value to array if it is not already and support comma separated strings.
+            if (!is_array($this->initial_data["interface"])) {
+                $this->initial_data["interface"] = explode(",", (string)$this->initial_data["interface"]);
             }
+
+            # Only allow 1 interface to be specified unless this is a floating rule
+            if (!isset($this->validated_data["floating"]) and count($this->initial_data["interface"]) > 1) {
+                $this->errors[] = APIResponse\get(4248);
+                return;
+            }
+
+            # Initialize an array to store validated interfaces
+            $this->validated_data["interface"] = [];
+
+            # Loop through each specified interface and ensure it exists
+            foreach ($this->initial_data["interface"] as $if) {
+                # Find this interface's pfSense interface ID
+                $if = APITools\get_pfsense_if_id($if, false, true, true, true);
+
+                # Check that we found the request pfSense interface ID
+                if ($if) {
+                    $this->validated_data["interface"] = $if;
+                } else {
+                    $this->errors[] = APIResponse\get(4034);
+                    return;
+                }
+            }
+
+            # Remove duplicates and convert back to pfSense expected format
+            $this->validated_data["interface"] = array_unique($this->validated_data["interface"]);
+            $this->validated_data["interface"] = implode(",", $this->validated_data["interface"]);
         } else {
             $this->errors[] = APIResponse\get(4034);
         }
@@ -485,6 +509,7 @@ class APIFirewallRuleCreate extends APIModel {
     }
 
     public function validate_payload($delay_tracker=true) {
+        $this->__validate_floating();
         $this->__validate_type();
         $this->__validate_interface();
         $this->__validate_ipprotocol();
@@ -508,7 +533,6 @@ class APIFirewallRuleCreate extends APIModel {
         $this->__validate_tcpflags1();
         $this->__validate_statetype();
         $this->__validate_top();
-        $this->__validate_floating();
         $this->__validate_direction();
         $this->__validate_quick();
 
