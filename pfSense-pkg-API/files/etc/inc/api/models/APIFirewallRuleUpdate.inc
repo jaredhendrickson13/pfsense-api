@@ -17,6 +17,7 @@ require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
 class APIFirewallRuleUpdate extends APIModel {
+    public $tcpflag_options = ["fin", "syn", "rst", "psh", "ack", "urg", "ece", "cwr"];
     private $requires_port;
     private $missing_port;
 
@@ -400,6 +401,90 @@ class APIFirewallRuleUpdate extends APIModel {
         }
     }
 
+    private function __validate_tcpflags_any() {
+        # Check for our optional 'tcpflags_any' payload value
+        if ($this->initial_data['tcpflags_any'] === true) {
+            $this->validated_data["tcpflags_any"] = true;
+            unset($this->validated_data["tcpflags1"]);
+            unset($this->validated_data["tcpflags2"]);
+        }
+        # Allow this field to be unset
+        elseif ($this->initial_data['tcpflags_any'] === false) {
+            unset($this->validated_data["tcpflags_any"]);
+        }
+    }
+
+    private function __validate_tcpflags2() {
+        # Only validate this field if 'tcpflags_any' is not set
+        if (!$this->validated_data["tcpflags_any"]) {
+            # Validate the optional 'tcpflags2' field
+            if (isset($this->initial_data["tcpflags2"])) {
+                # Initialize validated flags as empty array
+                $this->validated_data["tcpflags2"] = [];
+
+                # Ensure value is an array and support comma separated strings
+                if (!is_array($this->initial_data["tcpflags2"])) {
+                    $this->initial_data["tcpflags2"] = explode(",", (string)$this->initial_data["tcpflags2"]);
+                }
+
+                # Loop through the specified TCP flags
+                foreach ($this->initial_data["tcpflags2"] as $tcpflag) {
+                    # Ensure value is a valid tcp flag option
+                    if (in_array($tcpflag, $this->tcpflag_options)) {
+                        $this->validated_data["tcpflags2"][] = $tcpflag;
+                    }
+                    else {
+                        $this->errors[] = APIResponse\get(4246);
+                        return;
+                    }
+                }
+
+                # Remove duplicate items if present and convert to csv as expected by pfSense
+                $this->validated_data["tcpflags2"] = array_unique($this->validated_data["tcpflags2"]);
+                $this->validated_data["tcpflags2"] = implode(",", $this->validated_data["tcpflags2"]);
+            }
+        }
+    }
+
+    private function __validate_tcpflags1() {
+        # Only validate this field if 'tcpflags_any' is not set
+        if (!$this->validated_data["tcpflags_any"]) {
+            # Validate the optional 'tcpflags1' field
+            if (isset($this->initial_data["tcpflags1"])) {
+                # Initialize validated flags as empty array
+                $this->validated_data["tcpflags1"] = [];
+
+                # Ensure value is an array and support comma separated strings
+                if (!is_array($this->initial_data["tcpflags1"])) {
+                    $this->initial_data["tcpflags1"] = explode(",", (string)$this->initial_data["tcpflags1"]);
+                }
+
+                # Loop through the specified TCP flags
+                foreach ($this->initial_data["tcpflags1"] as $tcpflag) {
+                    # Ensure value is a valid tcp flag option
+                    if (in_array($tcpflag, $this->tcpflag_options)) {
+                        # Ensure this value is also present in tcpflags2 (out of)
+                        if (in_array($tcpflag, explode(",", $this->validated_data["tcpflags2"]))) {
+                            $this->validated_data["tcpflags1"][] = $tcpflag;
+                        }
+                        else {
+                            $this->errors[] = APIResponse\get(4247);
+                            return;
+                        }
+                    }
+                    else {
+                        $this->errors[] = APIResponse\get(4246);
+                        return;
+                    }
+                }
+
+                # Remove duplicate items if present and convert to csv as expected by pfSense
+                $this->validated_data["tcpflags1"] = array_unique($this->validated_data["tcpflags1"]);
+                $this->validated_data["tcpflags1"] = implode(",", $this->validated_data["tcpflags1"]);
+            }
+        }
+    }
+
     private function __validate_statetype() {
         # Variables
         $protocol = $this->validated_data["protocol"];
@@ -496,6 +581,9 @@ class APIFirewallRuleUpdate extends APIModel {
         $this->__validate_disabled();
         $this->__validate_descr();
         $this->__validate_log();
+        $this->__validate_tcpflags_any();
+        $this->__validate_tcpflags2();
+        $this->__validate_tcpflags1();
         $this->__validate_statetype();
         $this->__validate_top();
         $this->__validate_floating();

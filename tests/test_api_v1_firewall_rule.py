@@ -522,7 +522,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check statetype options constraint",
             "status": 400,
             "return": 4243,
-             "payload": {
+            "payload": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -538,7 +538,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check protocol must be 'tcp' when statetype is 'synproxy state' constraint",
             "status": 400,
             "return": 4244,
-             "payload": {
+            "payload": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -547,6 +547,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
                 "dst": "any",
                 "srcport": "any",
                 "dstport": "any",
+                "tcpflags2": ["syn"],
                 "statetype": "synproxy state"
             }
         },
@@ -554,7 +555,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check gateway must be default when statetype is 'synproxy state' constraint",
             "status": 400,
             "return": 4245,
-             "payload": {
+            "payload": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -563,8 +564,92 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
                 "dst": "any",
                 "srcport": "any",
                 "dstport": "any",
+                "tcpflags2": "syn,fin",
                 "statetype": "synproxy state",
                 "gateway": "WAN_DHCP"
+            }
+        },
+        {
+            "name": "Check tcpflags2 (out of) options constraint",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["INVALID"]
+            }
+        },
+        {
+            "name": "Check tcpflags2 (out of) options constraint (CSV)",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": "syn,INVALID"
+            }
+        },
+        {
+            "name": "Check tcpflags1 (set) options constraint",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["syn"],
+                "tcpflags1": ["INVALID"]
+            }
+        },
+        {
+            "name": "Check tcpflags1 (set) options constraint (CSV)",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["syn"],
+                "tcpflags1": ["INVALID"]
+            }
+        },
+        {
+            "name": "Check tcpflags1 (set) must be in tcpflags2 (out of) constraint",
+            "status": 400,
+            "return": 4247,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["syn"],
+                "tcpflags1": ["fin"]
             }
         }
     ]
@@ -816,6 +901,89 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
                 "dstport": "any",
                 "statetype": "synproxy state",
                 "gateway": "WAN_DHCP"
+            }
+        },
+        {
+            "name": "Check tcpflags2 (out of) options constraint",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["INVALID"]
+            }
+        },
+        {
+            "name": "Check tcpflags2 (out of) options constraint (CSV)",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": "syn,INVALID"
+            }
+        },
+        {
+            "name": "Check tcpflags1 (set) options constraint",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["syn"],
+                "tcpflags1": ["INVALID"]
+            }
+        },
+        {
+            "name": "Check tcpflags1 (set) options constraint (CSV)",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["syn"],
+                "tcpflags1": ["INVALID"]
+            }
+        },
+        {
+            "name": "Check tcpflags1 (set) must be in tcpflags2 (out of) constraint",
+            "status": 400,
+            "return": 4247,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["syn"],
+                "tcpflags1": ["fin"]
             }
         }
     ]
