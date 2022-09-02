@@ -2202,7 +2202,10 @@ paths:
                   description: Interface this rule will apply to. You may specify
                     either the interface's descriptive name, the pfSense  interface
                     ID (e.g. wan, lan, optx), or the real interface ID (e.g. igb0).
-                  type: string
+                    If `floating` is enabled, multiple interfaces may be specified.
+                  type: array
+                  items:
+                    type: string
                 ipprotocol:
                   description: IP protocol(s) this rule will apply to.
                   enum:
@@ -2270,6 +2273,23 @@ paths:
                     - keep state
                     - sloppy state
                     - synproxy state
+                tcpflags_any:
+                  description: Allow all TCP flags. This field is only relevant for TCP rules and will remove any 
+                    existing values in `tcpflags1` and `tcpflags2`.
+                  type: boolean
+                  default: false
+                tcpflags1:
+                  description: TCP flags (set). Values specified must also be specified in `tcpflags2`.
+                  type: array
+                  items:
+                    type: string
+                    enum: ["fin", "syn", "rst", "psh", "ack", "urg", "ece", "cwr"]
+                tcpflags2:
+                  description: TCP flags (out of).
+                  type: array
+                  items:
+                    type: string
+                    enum: ["fin", "syn", "rst", "psh", "ack", "urg", "ece", "cwr"]
                 top:
                   default: false
                   description: Place this firewall rule at the top of the access control
@@ -2408,7 +2428,10 @@ paths:
                   description: Interface this rule will apply to. You may specify
                     either the interface's descriptive name, the pfSense  interface
                     ID (e.g. wan, lan, optx), or the real interface ID (e.g. igb0).
-                  type: string
+                    If `floating` is enabled, multiple interfaces may be specified.
+                  type: array
+                  items:
+                    type: string
                 ipprotocol:
                   description: IP protocol(s) this rule will apply to.
                   enum:
@@ -2474,6 +2497,22 @@ paths:
                     - keep state
                     - sloppy state
                     - synproxy state
+                tcpflags_any:
+                  description: Allow all TCP flags. This field is only relevant for TCP rules and will remove any 
+                    existing values in `tcpflags1` and `tcpflags2`.
+                  type: boolean
+                tcpflags1:
+                  description: TCP flags (set). Values specified must also be specified in `tcpflags2`.
+                  type: array
+                  items:
+                    type: string
+                    enum: ["fin", "syn", "rst", "psh", "ack", "urg", "ece", "cwr"]
+                tcpflags2:
+                  description: TCP flags (out of).
+                  type: array
+                  items:
+                    type: string
+                    enum: ["fin", "syn", "rst", "psh", "ack", "urg", "ece", "cwr"]
                 top:
                   default: false
                   description: Place this firewall rule at the top of the access control
