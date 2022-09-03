@@ -4107,6 +4107,42 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Alias resolve interval must be numeric"
         ],
+        4243 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall rule state type specified"
+        ],
+        4244 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rule protocol must be 'tcp' if state type is set to synproxy"
+        ],
+        4245 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rule gateway must be default if state type is set to synproxy"
+        ],
+        4246 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unknown firewall rule TCP flag type specified"
+        ],
+        4247 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rule tcpflags1 (set) items must also be present in tcpflags2 (out of)"
+        ],
+        4248 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Firewall rules can only be applied to one interface unless it is a floating rule"
+        ],
 
         //5000-5999 reserved for /api/v1/user API calls
         5000 => [

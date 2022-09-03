@@ -359,7 +359,7 @@ function sort_nat_rules($top=false, $data=null, $field=null) {
 }
 
 # Input a physical interface ID, or a descriptive interface name, and return the pfSense interface ID (lan,wan,optx)
-function get_pfsense_if_id($interface, $include_carp=false, $include_ifgroup=false, $include_ipsec=false) {
+function get_pfsense_if_id($interface, $include_carp=false, $include_ifgroup=false, $include_ipsec=false, $include_openvpn=false) {
     # Variables
     global $config;
     # Loop through our config and check each interface for a physical ID match
@@ -400,6 +400,11 @@ function get_pfsense_if_id($interface, $include_carp=false, $include_ifgroup=fal
     
     # Only include the default IPsec interface (enc0) if explicitly requested
     if ($include_ipsec and $interface === "enc0") {
+        return $interface;
+    }
+
+    # Only include the OpenVPN interface if explicitly requested and OpenVPN is configured
+    if ($include_openvpn and $interface === "openvpn" and $config["openvpn"]) {
         return $interface;
     }
 }

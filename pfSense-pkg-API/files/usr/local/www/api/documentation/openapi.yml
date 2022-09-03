@@ -2202,7 +2202,10 @@ paths:
                   description: Interface this rule will apply to. You may specify
                     either the interface's descriptive name, the pfSense  interface
                     ID (e.g. wan, lan, optx), or the real interface ID (e.g. igb0).
-                  type: string
+                    If `floating` is enabled, multiple interfaces may be specified.
+                  type: array
+                  items:
+                    type: string
                 ipprotocol:
                   description: IP protocol(s) this rule will apply to.
                   enum:
@@ -2239,6 +2242,10 @@ paths:
                     - carp
                     - pfsync
                   type: string
+                quick:
+                  description: Apply action immediately upon match. This field is only available for `floating` rules.
+                  type: boolean
+                  default: false
                 sched:
                   description: Firewall schedule to apply to this rule. This must
                     be an existing firewall schedule name.
@@ -2259,6 +2266,30 @@ paths:
                     port. This parameter is required when `protocol` is set to `tcp`,
                     `udp`, or `tcp/udp`.
                   type: string
+                statetype:
+                  description: State type to use when this rule is matched.
+                  type: string
+                  enum:
+                    - keep state
+                    - sloppy state
+                    - synproxy state
+                tcpflags_any:
+                  description: Allow all TCP flags. This field is only relevant for TCP rules and will remove any 
+                    existing values in `tcpflags1` and `tcpflags2`.
+                  type: boolean
+                  default: false
+                tcpflags1:
+                  description: TCP flags (set). Values specified must also be specified in `tcpflags2`.
+                  type: array
+                  items:
+                    type: string
+                    enum: ["fin", "syn", "rst", "psh", "ack", "urg", "ece", "cwr"]
+                tcpflags2:
+                  description: TCP flags (out of).
+                  type: array
+                  items:
+                    type: string
+                    enum: ["fin", "syn", "rst", "psh", "ack", "urg", "ece", "cwr"]
                 top:
                   default: false
                   description: Place this firewall rule at the top of the access control
@@ -2397,7 +2428,10 @@ paths:
                   description: Interface this rule will apply to. You may specify
                     either the interface's descriptive name, the pfSense  interface
                     ID (e.g. wan, lan, optx), or the real interface ID (e.g. igb0).
-                  type: string
+                    If `floating` is enabled, multiple interfaces may be specified.
+                  type: array
+                  items:
+                    type: string
                 ipprotocol:
                   description: IP protocol(s) this rule will apply to.
                   enum:
@@ -2433,6 +2467,9 @@ paths:
                     - carp
                     - pfsync
                   type: string
+                quick:
+                  description: Apply action immediately upon match. This field is only available for `floating` rules.
+                  type: boolean
                 sched:
                   description: Firewall schedule to apply to this rule. This must
                     be an existing firewall schedule name.
@@ -2453,6 +2490,29 @@ paths:
                     port. This parameter is required when `protocol` is set to `tcp`,
                     `udp`, or `tcp/udp`.
                   type: string
+                statetype:
+                  description: State type to use when this rule is matched.
+                  type: string
+                  enum:
+                    - keep state
+                    - sloppy state
+                    - synproxy state
+                tcpflags_any:
+                  description: Allow all TCP flags. This field is only relevant for TCP rules and will remove any 
+                    existing values in `tcpflags1` and `tcpflags2`.
+                  type: boolean
+                tcpflags1:
+                  description: TCP flags (set). Values specified must also be specified in `tcpflags2`.
+                  type: array
+                  items:
+                    type: string
+                    enum: ["fin", "syn", "rst", "psh", "ack", "urg", "ece", "cwr"]
+                tcpflags2:
+                  description: TCP flags (out of).
+                  type: array
+                  items:
+                    type: string
+                    enum: ["fin", "syn", "rst", "psh", "ack", "urg", "ece", "cwr"]
                 top:
                   default: false
                   description: Place this firewall rule at the top of the access control
