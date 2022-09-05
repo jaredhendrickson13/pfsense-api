@@ -2159,6 +2159,24 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "IPsec phase 2 unique ID does not exist"
         ],
+        2259 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Service Watchdog service 'name' is required"
+        ],
+        2260 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Service Watchdog service 'name' is unknown"
+        ],
+        2261 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Duplicate Service Watchdog services are not allowed"
+        ],
 
         // 3000-3999 reserved for /api/v1/interfaces API calls
         3000 => [

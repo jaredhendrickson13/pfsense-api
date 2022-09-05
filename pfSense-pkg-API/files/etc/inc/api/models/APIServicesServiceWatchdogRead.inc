@@ -27,11 +27,10 @@ class APIServicesServiceWatchdogRead extends APIModel {
     }
 
     public function action() {
-
         return APIResponse\get(0, $this->get_watched_services());
     }
 
-    public function get_watched_services() {
+    public static function get_watched_services() {
         global $config;
         $services = ($config["installedpackages"]["servicewatchdog"]["item"]) ?: [];
 
