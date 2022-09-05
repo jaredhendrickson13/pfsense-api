@@ -10816,6 +10816,55 @@ paths:
       summary: Restart services
       tags:
         - Services
+  /api/v1/services/service_watchdog:
+    get:
+      operationId: APIServicesServiceWatchdogRead
+      description: 'Read the current Service Watchdog configuration. <br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-admin`]<br>
+        _Requires all of the following add-on packages:_ [`pfSense-pkg-Service_Watchdog`]'
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read Service Watchdog configuration
+      tags:
+        - Services > Service Watchdog
+    put:
+      operationId: APIServicesServiceWatchdogUpdate
+      description: 'Update the Service Watchdog configuration This will replace any existing Service Watchdog 
+        configuration.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-admin`]<br>
+        _Requires all of the following add-on packages:_ [`pfSense-pkg-Service_Watchdog`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                services:
+                  description: Services that Service Watchdog will monitor and automatically restart upon crash.
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        description: Name of the service that Service Watchdog will monitor.
+                        type: string
+                      notify:
+                        description: Send a notification when Service Watchdog restarts this service.
+                        type: boolean
+                    required:
+                      - name
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update Service Watchdog configuration
+      tags:
+        - Services > Service Watchdog
   /api/v1/services/sshd:
     get:
       operationId: APIServicesSSHdRead
@@ -13897,6 +13946,7 @@ tags:
   - name: Services > OpenVPN > CSC
   - name: Services > OpenVPN > Client
   - name: Services > OpenVPN > Server
+  - name: Services > Service Watchdog
   - name: Services > SSHD
   - name: Services > SYSLOGD
   - name: Services > Unbound
