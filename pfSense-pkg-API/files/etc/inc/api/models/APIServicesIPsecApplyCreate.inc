@@ -33,7 +33,14 @@ class APIServicesIPsecApplyCreate extends APIModel {
     }
 
     public function action() {
+        # Apply pending IPsec changes
         $this->apply();
+
+        # Allow clients to re-initiate tunnels with the new configuration.
+        if ($this->initial_data["initiate"] === true) {
+            $this->initiate();
+        }
+
         return APIResponse\get(0);
     }
 
@@ -46,6 +53,16 @@ class APIServicesIPsecApplyCreate extends APIModel {
         # Clear the pending changes banner if present
         if ($ipsec_dynamic_hosts >= 0 and is_subsystem_dirty('ipsec')) {
             clear_subsystem_dirty('ipsec');
+        }
+    }
+
+    public static function initiate() {
+        global $config;
+
+        # Loop through each phase1 to terminate existing IKE connections and re-initiate all tunnels
+        foreach ($config["ipsec"]["phase1"] as $p1) {
+            ipsec_terminate_by_conid("ike", ipsec_conid($p1));
+            ipsec_initiate_by_conid("all", ipsec_conid($p1));
         }
     }
 }
