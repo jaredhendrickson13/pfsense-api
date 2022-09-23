@@ -6587,6 +6587,15 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-vpn-ipsec`, `page-vpn-ipsec-editphase1`,
         `page-vpn-ipsec-editphase2`, `page-vpn-ipsec-editkeys`, `page-vpn-ipsec-mobile`, `page-vpn-ipsec-settings`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                initiate:
+                  description: Initiate all tunnels (phase 1 and 2) with the newly applied configuration.
+                  type: boolean
+                  default: false
       responses:
         "200":
           $ref: '#/components/responses/Success'
