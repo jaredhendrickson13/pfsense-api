@@ -38,7 +38,11 @@ class APIServicesIPsecApplyCreate extends APIModel {
 
         # Allow clients to re-initiate tunnels with the new configuration.
         if ($this->initial_data["initiate"] === true) {
-            $this->initiate();
+            # TODO: Remove this after support for pfSense 2.5.x is depcreated
+            # Only allow this on pfSense 2.6+/22.05+
+            if (APITools\get_pfsense_version()["program"] >= 260 or APITools\get_pfsense_version()["program"] == 2205) {
+                $this->initiate();
+            }
         }
 
         return APIResponse\get(0);
