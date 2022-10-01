@@ -646,6 +646,11 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
                 "rekey_time": 2,
                 "lifetime": 1
             }
+        },
+        {
+            "name": "Check ability to apply and initiate ipsec",
+            "uri": "/api/v1/services/ipsec/apply",
+            "payload": {"initiate": True}
         }
     ]
     put_tests = [
