@@ -33,17 +33,15 @@ class APISystemPackageRead extends APIModel {
         $pkgs = [];
 
         # Loop through each of the output lines and format it
-        foreach (get_pkg_info('all', false, true) as $pkg) {
-            # Only include this package if it is installed or 'all' packages were requested
-            if ($pkg["installed"] or $all) {
-                # Add our formatted package to our array
-                $pkgs[] = [
-                    "name" => $pkg["name"],
-                    "version" => $pkg["version"],
-                    "descr" => $pkg["desc"],
-                    "update_available" => (pkg_version_compare($pkg['installed_version'], $pkg['version']) == "<")
-                ];
-            }
+        foreach (get_pkg_info('all', false, !$all) as $pkg) {
+            # Add our formatted package to our array
+            $pkgs[] = [
+                "name" => $pkg["name"],
+                "version" => $pkg["version"],
+                "descr" => $pkg["desc"],
+                "installed" => (bool)$pkg["installed"],
+                "update_available" => (pkg_version_compare($pkg['installed_version'], $pkg['version']) == "<")
+            ];
         }
 
         return $pkgs;

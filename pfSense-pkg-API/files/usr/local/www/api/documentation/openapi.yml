@@ -13010,9 +13010,16 @@ paths:
         - System > Package
     get:
       operationId: APISystemPackageRead
-      description: 'Read all pfSense packages that are currently installed.<br><br>
+      description: 'Read all pfSense packages that are currently available and installed.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-packagemanager-installed`]'
+      parameters:
+        - description: Include all pfSense packages available, even packages that are not installed.
+          in: query
+          name: all
+          required: false
+          schema:
+            type: boolean
       responses:
         "200":
           $ref: '#/components/responses/Success'
