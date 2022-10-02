@@ -109,7 +109,7 @@ class APIE2ETest:
     # PRE/POST REQUEST METHODS. These are intended to be overwritten by a child class.
     def pre_post(self):
         """
-        Method that is run BEFORE any DELETE request is called. This method is intended to be overwritten by a subclass.
+        Method that is run BEFORE any POST request is called. This method is intended to be overwritten by a subclass.
         """
 
     def post_post(self):
@@ -119,7 +119,7 @@ class APIE2ETest:
 
     def pre_get(self):
         """
-        Method that is run BEFORE any DELETE request is called. This method is intended to be overwritten by a subclass.
+        Method that is run BEFORE any GET request is called. This method is intended to be overwritten by a subclass.
         """
 
     def post_get(self):
@@ -129,7 +129,7 @@ class APIE2ETest:
 
     def pre_put(self):
         """
-        Method that is run BEFORE any DELETE request is called. This method is intended to be overwritten by a subclass.
+        Method that is run BEFORE any PUT request is called. This method is intended to be overwritten by a subclass.
         """
 
     def post_put(self):
