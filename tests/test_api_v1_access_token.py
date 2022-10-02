@@ -44,6 +44,10 @@ class APIE2ETestAccessToken(e2e_test_framework.APIE2ETest):
         }
     ]
 
+    def __init__(self):
+        super().__init__()
+        self.test_access_token_orig_auth_mode = None
+
     def pre_post(self):
         # Save the original auth mode and change the test frameworks auth mode to local on test 1
         if len(self.post_responses) == 1:
