@@ -361,4 +361,11 @@ class APIE2ETest:
             verify=False,
             timeout=self.args.timeout
         )
+
+        # Check if the response indicates that JWT is not enabled
+        if req.json().get("return") == 9:
+            msg = "JWT IS REQUESTED BUT IS NOT ENABLED AS THE API AUTH MODE"
+            print(self.__format_msg__(req.request.method, {"name": "BUILT-IN JWT REQUEST"}, msg, mode="warning"))
+            return ""
+
         return req.json()["data"]["token"]
