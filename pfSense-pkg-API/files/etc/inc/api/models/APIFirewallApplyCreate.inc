@@ -37,12 +37,20 @@ class APIFirewallApplyCreate extends APIModel {
     }
 
     public function action() {
-        $this->apply();
+        $this->apply($this->initial_data["async"]);
         return APIResponse\get(0);
     }
 
-    public static function apply() {
-        filter_configure();
+    public static function apply($async=true) {
+        # Apply the filter changes synchronously if requested
+        if ($async === false) {
+            filter_configure_sync();
+        }
+        else {
+            filter_configure();
+        }
+
+        # Mark changes as applied
         clear_subsystem_dirty('aliases');
         clear_subsystem_dirty('natconf');
         clear_subsystem_dirty('filter');

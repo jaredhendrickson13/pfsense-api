@@ -1178,6 +1178,18 @@ paths:
         `page-firewall-rules-edit`, `page-firewall-aliases`, `page-firewall-alias-edit`,
         `page-firewall-nat-1-1`, `page-firewall-nat-1-1-edit`, `page-firewall-nat-outbound`,
         `page-firewall-nat-outbound-edit`, `page-firewall-nat-portforward`, `page-firewall-nat-portforward-edit`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                async:
+                  description: Apply firewall changes asynchronously. If set to `false`, the API will not respond
+                    until the firewall changes have been fully applied, this may cause excessive delays for large
+                    rulesets and in extreme cases cause the API request to timeout.
+                  default: true
+                  type: boolean
+              type: object
       responses:
         "200":
           $ref: '#/components/responses/Success'
