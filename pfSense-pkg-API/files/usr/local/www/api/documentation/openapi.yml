@@ -11817,7 +11817,7 @@ paths:
                   description: View logs in reverse order.
                   type: boolean
                 nentries:
-                  description: View logs in reverse order.
+                  description: Number of log entries to display in the webConfigurator.
                   type: integer
                   minimum: 5
                   maximum: 200000
