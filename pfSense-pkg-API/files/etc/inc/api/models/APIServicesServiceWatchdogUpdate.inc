@@ -29,6 +29,7 @@ class APIServicesServiceWatchdogUpdate extends APIModel {
     public function action() {
         # Write the updated configuration and reload service watchdog if changes were made
         if ($this->validated_data) {
+            $this->__init_config();
             $this->config["installedpackages"]["servicewatchdog"]["item"] = $this->validated_data;
             $this->write_config();
             servicewatchdog_cron_job();
@@ -95,5 +96,16 @@ class APIServicesServiceWatchdogUpdate extends APIModel {
             }
         }
         return false;
+    }
+
+    private function __init_config() {
+        # Initialize the configuration arrays for service watchdog if they are missing
+        if (!is_array($this->config['installedpackages']['servicewatchdog'])) {
+            $this->config['installedpackages']['servicewatchdog'] = [];
+        }
+
+        if (!is_array($this->config['installedpackages']['servicewatchdog']['item'])) {
+            $this->config['installedpackages']['servicewatchdog']['item'] = [];
+        }
     }
 }
