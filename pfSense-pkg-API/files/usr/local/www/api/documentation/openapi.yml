@@ -12073,6 +12073,9 @@ paths:
                     will be disabled and you will no longer be able to  API requests
                     until the API enabled via the webConfigurator.
                   type: boolean
+                enable_login_protection:
+                  description: Enable or disable Login Protection for API authentication requests.
+                  type: boolean
                 hasync:
                   description: Enable or disable HA sync for API configurations.
                   type: boolean

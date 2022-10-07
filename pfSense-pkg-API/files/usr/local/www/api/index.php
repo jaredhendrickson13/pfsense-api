@@ -158,6 +158,13 @@ if (isset($_POST["save"])) {
         $pkg_config["access_list"] = "";
     }
 
+    # Validate login protection settings
+    if ($_POST["enable_login_protection"]) {
+        $pkg_config["enable_login_protection"] = "";
+    } else {
+        unset($pkg_config["enable_login_protection"]);
+    }
+
     # Validate HA Sync settings if enabled
     if (!empty($_POST["hasync"])) {
         $pkg_config["hasync"] = "";
@@ -319,6 +326,16 @@ $jwt_section->addInput(new Form_Input(
 
 ### Populate the ADVANCED section of the UI form
 $advanced_section->addClass("hide-api-advanced-settings");
+$advanced_section->addInput(new Form_Checkbox(
+    'enable_login_protection',
+    'Login Protection',
+    'Enable API Login Protection',
+    isset($pkg_config["enable_login_protection"])
+))->setHelp(
+    "Include API authentication in pfSense's Login Protection feature. When enabled, all API authentication requests
+    will be logged and monitored for brute force attacks. Login Protection can be configured in 
+    <a href='/system_advanced_admin.php'>System > Advanced</a>"
+);
 $advanced_section->addInput(new Form_Checkbox(
     'hasync',
     'Sync API Configuration',
