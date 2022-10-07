@@ -178,18 +178,22 @@ class APIAuth {
 
     # Logs the authentication attempt if login protection is enabled for the API
     private function __log_authentication($authenticated) {
+        # Variables
+        $username = ($this->username) ?: "unknown";
+        $ip_address = $this->ip_address;
+
         # Log authentication attempts if enabled
         if (isset($this->api_config["enable_login_protection"])) {
             # Log successful authentication
             if ($authenticated) {
                 log_auth(
-                    gettext("Successful login for user '{$this->username}' from: {$this->ip_address} (Local Database)")
+                    gettext("Successful login for user '{$username}' from: {$ip_address} (Local Database)")
                 );
             }
             # Log failed authentication
             else {
                 log_auth(
-                    gettext("webConfigurator authentication error for user '{$this->username}' from: {$this->ip_address}")
+                    gettext("webConfigurator authentication error for user '{$username}' from: {$ip_address}")
                 );
             }
         }
