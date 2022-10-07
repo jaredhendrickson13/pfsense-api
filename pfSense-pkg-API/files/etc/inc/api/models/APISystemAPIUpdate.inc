@@ -67,6 +67,15 @@ class APISystemAPIUpdate extends APIModel {
         }
     }
 
+    private function __validate_enable_login_protection() {
+        # Check for our optional 'enable_login_protection' payload value
+        if ($this->initial_data['enable_login_protection'] === true) {
+            $this->validated_data["enable_login_protection"] = "";
+        } elseif ($this->initial_data['enable_login_protection'] === false) {
+            unset($this->validated_data["enable_login_protection"]);
+        }
+    }
+
     private function __validate_hasync() {
         # Check for our optional 'hasync' payload value
         if ($this->initial_data['hasync'] === true) {
@@ -259,6 +268,7 @@ class APISystemAPIUpdate extends APIModel {
         $this->__validate_keybytes();
         $this->__validate_custom_headers();
         $this->__validate_access_list();
+        $this->__validate_enable_login_protection();
         $this->__validate_hasync();
         $this->__validate_hasync_hosts();
         $this->__validate_hasync_username();

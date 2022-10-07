@@ -20,6 +20,7 @@
 				<keyhash>sha256</keyhash>
 				<keybytes>16</keybytes>
 				<keys></keys>
+                <enable_login_protection></enable_login_protection>
         </conf>
     </package>
 </pfsensepkgs>
