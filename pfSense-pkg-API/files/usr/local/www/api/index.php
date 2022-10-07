@@ -159,7 +159,7 @@ if (isset($_POST["save"])) {
     }
 
     # Validate login protection settings
-    if ($_POST["enable_login_protection"]) {
+    if (!empty($_POST["enable_login_protection"])) {
         $pkg_config["enable_login_protection"] = "";
     } else {
         unset($pkg_config["enable_login_protection"]);
