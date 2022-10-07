@@ -1,7 +1,7 @@
 """Script used to test the login protection API integration"""
-import e2e_test_framework
-import requests
 import sys
+import requests
+import e2e_test_framework
 
 
 class APIE2ETestLoginProtection(e2e_test_framework.APIE2ETest):
