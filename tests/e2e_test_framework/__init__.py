@@ -54,6 +54,7 @@ class APIE2ETest:
             self.get()
             self.put()
             self.delete()
+            self.custom_tests()
             sys.exit(self.exit_code)
         except KeyboardInterrupt:
             sys.exit(1)
@@ -105,6 +106,9 @@ class APIE2ETest:
             # For speed, only delay time if test is a non-200 OK test
             if test_params.get("status", 200) == 200:
                 time.sleep(self.time_delay)
+
+    def custom_tests(self):
+        """Allows child classes to specify custom tests. This is inteded to be overwritten by the child class."""
 
     # PRE/POST REQUEST METHODS. These are intended to be overwritten by a child class.
     def pre_post(self):
