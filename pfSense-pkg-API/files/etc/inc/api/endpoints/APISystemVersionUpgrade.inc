@@ -18,6 +18,7 @@ require_once("api/framework/APIEndpoint.inc");
 class APISystemVersionUpgrade extends APIEndpoint {
     public function __construct() {
         $this->url = "/api/v1/system/version/upgrade";
+        $this->query_excludes = ["use_cache"];
     }
 
     protected function get() {
