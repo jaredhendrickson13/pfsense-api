@@ -166,6 +166,7 @@ pfSense API uses the same privileges as the pfSense webConfigurator. The require
 stated within the API documentation.
 
 ### Login Protection
+
 By default, all API requests will be monitored by pfSense's Login Protection feature. This will allow API
 authentication attempts to be logged and temporarily blocked if too many failed authentication attempts are made by 
 any one client. It is strongly recommended that this feature be used at all times to prevent brute force attacks on 
