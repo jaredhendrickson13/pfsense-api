@@ -13,19 +13,14 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-require_once("api/framework/APIModel.inc");
-require_once("api/framework/APIResponse.inc");
+require_once("api/framework/APIEndpoint.inc");
 
-
-class APISystemVersionRead extends APIModel {
-    # Create our method constructor
+class APISystemVersionUpgrade extends APIEndpoint {
     public function __construct() {
-        parent::__construct();
-        $this->privileges = [
-            "page-all", "page-dashboard-widgets", "page-diagnostics-command", "page-system-update-settings"
-        ];    }
+        $this->url = "/api/v1/system/version/upgrade";
+    }
 
-    public function action() {
-        return APIResponse\get(0, APITools\get_pfsense_version());
+    protected function get() {
+        return (new APISystemVersionUpgradeRead())->call();
     }
 }

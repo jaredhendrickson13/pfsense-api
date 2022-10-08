@@ -77,7 +77,7 @@ function get($id, $data=[], $all=false) {
             "status" => "forbidden",
             "code" => 403,
             "return" => $id,
-            "message" => "Authentication mode must be set to JWT to enable access token authentication",
+            "message" => "Authentication mode must be set to JWT ot API Token to enable access token authentication",
         ],
         10 => [
             "status" => "server error",

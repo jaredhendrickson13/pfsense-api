@@ -13232,6 +13232,29 @@ paths:
       summary: Read system version
       tags:
         - System > Version
+  /api/v1/system/version/upgrade:
+    get:
+      operationId: APISystemVersionUpgradeRead
+      description: 'Checks if there is a pfSense upgrade available but does not apply upgrades.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-dashboard-widgets`, 
+        `page-diagnostics-command`, `page-system-update-settings`]'
+      parameters:
+        - description: Use cached upgrade information. This will speed up the response but may reference slightly 
+            outdated data. pfSense updates this cache automatically at scheduled intervals.
+          in: query
+          name: use_cache
+          schema:
+            type: boolean
+            default: true
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Check for system version upgrades
+      tags:
+        - System > Version
   /api/v1/user:
     delete:
       operationId: APIUserDelete
