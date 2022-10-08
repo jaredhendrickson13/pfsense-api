@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Script used to test the /api/v1/access_token endpoint."""
-import e2e_test_framework
 import sys
+import e2e_test_framework
 
 
 class APIE2ETestAccessToken(e2e_test_framework.APIE2ETest):
