@@ -65,12 +65,14 @@ info:
     <details>
         <summary>API Token</summary>
 
-    Uses standalone tokens generated via the webConfigurator. These are better suited to distribute to systems as they are
+    Uses standalone tokens generated via API or webConfigurator. These are better suited to distribute to systems as they are
     revocable and will only allow API authentication; not webConfigurator or SSH authentication (like the local database
     credentials). To generate or revoke credentials, navigate to System > API within the webConfigurator and ensure the
     Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate
     new tokens, and revoke existing tokens. After generating a new API token, the actual token will display at the top of
-    the page on the success banner. This token will only be displayed once so ensure it is stored somewhere safe.<br><br>
+    the page on the success banner. This token will only be displayed once so ensure it is stored somewhere safe.
+    Alternatively, you can generate new API tokens using the /api/v1/access_token endpoint. This endpoint will always 
+    require the use of the Local Database authentication type to receive the API token.<br><br>
 
     Once you have your API token, you may authenticate your API call by specifying your client-id and client-token within
     an `Authorization` header, these values must be separated by a space. For example:<br>
@@ -87,7 +89,15 @@ info:
 
     pfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are
     stated within the API documentation.
-
+    
+    ### Login Protection
+    
+    By default, all API requests will be monitored by pfSense's Login Protection feature. This will allow API
+    authentication attempts to be logged and temporarily blocked if too many failed authentication attempts are made by 
+    any one client. It is strongly recommended that this feature be used at all times to prevent brute force attacks on 
+    API endpoints. This feature can be disabled by within the webConfigurator system-wide under System > Advanced or 
+    only for API requests under System > API.
+    
     # Content Types
 
     pfSense API can handle a few different content types. Please note, if a `Content-Type` header is not specified in your
@@ -807,10 +817,12 @@ paths:
   /api/v1/access_token:
     post:
       operationId: APIAccessTokenCreate
-      description: Receive a temporary access token using your pfSense local database
-        credentials. Basic authentication must be used to authenticate on this endpoint
-        and this token is only applicable when the API is configured to use the JWT
-        authentication type.
+      description: Request a new API access token. If the API is configured to use JWT authentication, this endpoint
+        will generate and return the time-based JWT to use in your API calls. If the API is configured to use API Token
+        authentication, this endpoint will generate and return the client ID and token to use in your API calls. 
+        
+        Please refer to the 'Authentication & Authorization' section for more instructions on authentication your API 
+        calls with your configured authentication mode.
       responses:
         "200":
           $ref: '#/components/responses/Success'

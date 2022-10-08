@@ -333,8 +333,10 @@ $advanced_section->addInput(new Form_Checkbox(
     isset($pkg_config["enable_login_protection"])
 ))->setHelp(
     "Include API authentication in pfSense's Login Protection feature. When enabled, all API authentication requests
-    will be logged and monitored for brute force attacks. Login Protection can be configured in 
-    <a href='/system_advanced_admin.php'>System > Advanced</a>"
+    will be logged and monitored for authentication attempts. Disabling this field will not disable Login Protection 
+    system-wide, but API endpoints will not utilize Login Protection and may be more susceptible to brute force or 
+    other authentication-based attacks. Login Protection can be configured system-wide under 
+    <a href='/system_advanced_admin.php'>System > Advanced</a>."
 );
 $advanced_section->addInput(new Form_Checkbox(
     'hasync',
