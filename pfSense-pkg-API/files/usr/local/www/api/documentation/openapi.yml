@@ -13223,7 +13223,7 @@ paths:
         version, buildtime, and last commit.<br><br>
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-dashboard-widgets`,
-        `page-diagnostics-command`]'
+        `page-diagnostics-command`, `page-system-update-settings`]'
       responses:
         "200":
           $ref: '#/components/responses/Success'
