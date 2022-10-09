@@ -38,6 +38,7 @@ class APISystemPackageRead extends APIModel {
             $pkgs[] = [
                 "name" => $pkg["name"],
                 "version" => $pkg["version"],
+                "installed_version" => $pkg["installed_version"],
                 "descr" => $pkg["desc"],
                 "installed" => (bool)$pkg["installed"],
                 "update_available" => (pkg_version_compare($pkg['installed_version'], $pkg['version']) == "<")
