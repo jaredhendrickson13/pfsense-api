@@ -6617,7 +6617,8 @@ paths:
             schema:
               properties:
                 initiate:
-                  description: Initiate all tunnels (phase 1 and 2) with the newly applied configuration.
+                  description: Initiate all tunnels (phase 1 and 2) with the newly applied configuration. This field
+                    is only available on pfSense 2.6+ and pfSense Plus 22.05+.
                   type: boolean
                   default: false
       responses:
