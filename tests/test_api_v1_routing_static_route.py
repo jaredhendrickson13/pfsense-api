@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/routing/static_route endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestRoutingStaticRoute(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/routing/static_route endpoint."""
     uri = "/api/v1/routing/static_route"
     get_tests = [{"name": "Read all static routes"}]
     post_tests = [
@@ -43,5 +45,6 @@ class APIE2ETestRoutingStaticRoute(e2e_test_framework.APIE2ETest):
             "resp_time": 5    # Allow a few seconds to reload the routing table
         }
     ]
+
 
 APIE2ETestRoutingStaticRoute()

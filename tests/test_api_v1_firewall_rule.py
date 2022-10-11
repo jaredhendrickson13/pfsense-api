@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/firewall/rule endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/firewall/rule endpoint."""
     uri = "/api/v1/firewall/rule"
     get_tests = [
         {"name": "Read all firewall rules"}
@@ -137,7 +139,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Create floating firewall rule",
             "payload": {
                 "type": "block",
-                "interface": "wan",
+                "interface": "wan,lan",
                 "ipprotocol": "inet",
                 "protocol": "tcp/udp",
                 "src": "172.16.77.121",
@@ -173,7 +175,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         {
             "name": "Test interface validation",
             "status": 400,
-            "return": 4034,
+            "return": 4040,
             "payload": {
                 "type": "pass",
                 "interface": "INVALID"
@@ -513,9 +515,158 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
                 "srcport": "any",
                 "dstport": "any",
                 "floating": True,
-                "direction": "Test_Direction"
+                "direction": "INVALID"
             }
         },
+        {
+            "name": "Check statetype options constraint",
+            "status": 400,
+            "return": 4243,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "statetype": "INVALID"
+            }
+        },
+        {
+            "name": "Check protocol must be 'tcp' when statetype is 'synproxy state' constraint",
+            "status": 400,
+            "return": 4244,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["syn"],
+                "statetype": "synproxy state"
+            }
+        },
+        {
+            "name": "Check gateway must be default when statetype is 'synproxy state' constraint",
+            "status": 400,
+            "return": 4245,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": "syn,fin",
+                "statetype": "synproxy state",
+                "gateway": "WAN_DHCP"
+            }
+        },
+        {
+            "name": "Check tcpflags2 (out of) options constraint",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["INVALID"]
+            }
+        },
+        {
+            "name": "Check tcpflags2 (out of) options constraint (CSV)",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": "syn,INVALID"
+            }
+        },
+        {
+            "name": "Check tcpflags1 (set) options constraint",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["syn"],
+                "tcpflags1": ["INVALID"]
+            }
+        },
+        {
+            "name": "Check tcpflags1 (set) options constraint (CSV)",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["syn"],
+                "tcpflags1": ["INVALID"]
+            }
+        },
+        {
+            "name": "Check tcpflags1 (set) must be in tcpflags2 (out of) constraint",
+            "status": 400,
+            "return": 4247,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["syn"],
+                "tcpflags1": ["fin"]
+            }
+        },
+        {
+            "name": "Check non-floating rules must have 1 interface constraint",
+            "status": 400,
+            "return": 4248,
+            "payload": {
+                "type": "pass",
+                "interface": ["wan", "lan"],
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any"
+            }
+        }
     ]
     put_tests = [
         {
@@ -541,7 +692,8 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Update floating firewall rule",
             "payload": {
                 "type": "block",
-                "interface": "wan",
+                "floating": True,
+                "interface": ["wan", "lan"],
                 "ipprotocol": "inet",
                 "protocol": "tcp/udp",
                 "src": "172.16.77.121",
@@ -577,7 +729,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         {
             "name": "Test interface validation",
             "status": 400,
-            "return": 4034,
+            "return": 4040,
             "payload": {
                 "type": "pass",
                 "interface": "INVALID"
@@ -718,6 +870,138 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
                 "direction": "Test_Direction"
             }
         },
+        {
+            "name": "Check statetype options constraint",
+            "status": 400,
+            "return": 4243,
+             "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "statetype": "INVALID"
+            }
+        },
+        {
+            "name": "Check protocol must be 'tcp' when statetype is 'synproxy state' constraint",
+            "status": 400,
+            "return": 4244,
+             "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "statetype": "synproxy state"
+            }
+        },
+        {
+            "name": "Check gateway must be default when statetype is 'synproxy state' constraint",
+            "status": 400,
+            "return": 4245,
+             "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "statetype": "synproxy state",
+                "gateway": "WAN_DHCP"
+            }
+        },
+        {
+            "name": "Check tcpflags2 (out of) options constraint",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["INVALID"]
+            }
+        },
+        {
+            "name": "Check tcpflags2 (out of) options constraint (CSV)",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": "syn,INVALID"
+            }
+        },
+        {
+            "name": "Check tcpflags1 (set) options constraint",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["syn"],
+                "tcpflags1": ["INVALID"]
+            }
+        },
+        {
+            "name": "Check tcpflags1 (set) options constraint (CSV)",
+            "status": 400,
+            "return": 4246,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["syn"],
+                "tcpflags1": ["INVALID"]
+            }
+        },
+        {
+            "name": "Check tcpflags1 (set) must be in tcpflags2 (out of) constraint",
+            "status": 400,
+            "return": 4247,
+            "payload": {
+                "type": "pass",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "tcp/udp",
+                "src": "any",
+                "dst": "any",
+                "srcport": "any",
+                "dstport": "any",
+                "tcpflags2": ["syn"],
+                "tcpflags1": ["fin"]
+            }
+        }
     ]
     delete_tests = [
         {"name": "Delete firewall rule", "payload": {}},    # Tracker ID gets populated by post_post() method
@@ -763,10 +1047,11 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             self.delete_tests[0]["payload"]["tracker"] = self.post_responses[6]["data"]["tracker"]
             self.delete_tests[1]["payload"]["tracker"] = self.post_responses[7]["data"]["tracker"]
             key = 0
-            for value in self.put_tests:
-                if "payload" in self.put_tests[key].keys():
+            for _ in self.put_tests:
+                if "payload" in self.put_tests[key]:
                     self.put_tests[key]["payload"]["tracker"] = self.post_responses[6]["data"]["tracker"]
                     self.put_tests[key]["payload"]["tracker"] = self.post_responses[7]["data"]["tracker"]
                 key += 1
+
 
 APIE2ETestFirewallRule()

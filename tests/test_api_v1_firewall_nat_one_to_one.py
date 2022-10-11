@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/firewall/nat/one_to_one endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestFirewallNATOneToOne(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/firewall/nat/one_to_one endpoint."""
     uri = "/api/v1/firewall/nat/one_to_one"
     get_tests = [
         {"name": "Read all 1:1 NAT mappings"}
@@ -61,5 +63,6 @@ class APIE2ETestFirewallNATOneToOne(e2e_test_framework.APIE2ETest):
             "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         }
     ]
+
 
 APIE2ETestFirewallNATOneToOne()

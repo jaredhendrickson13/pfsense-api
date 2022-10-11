@@ -11,11 +11,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/services/wol/send endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestServicesWOLSend(e2e_test_framework.APIE2ETest):
-    uri = "/api/v1/services/wol/send/"
+    """Class used to test the /api/v1/services/wol/send endpoint."""
+    uri = "/api/v1/services/wol/send"
     post_tests = [
         {
             "name": "Send magic WOL packet",

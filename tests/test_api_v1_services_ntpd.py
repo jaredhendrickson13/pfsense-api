@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Class used to test the /api/v1/services/ntpd/restart endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestServicesNTPd(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/services/ntpd endpoint."""
     uri = "/api/v1/services/ntpd"
     get_tests = [{"name": "Read the NTPd configuration"}]
     put_tests = [
@@ -51,5 +53,6 @@ class APIE2ETestServicesNTPd(e2e_test_framework.APIE2ETest):
             },
         },
     ]
+
 
 APIE2ETestServicesNTPd()

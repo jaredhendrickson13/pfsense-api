@@ -1,7 +1,9 @@
+"""Script used to test the /api/v1/user/auth_server/ldap endpoint."""
 import e2e_test_framework
 
 
 class APIE2ETestUserAuthServerLDAP(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/user/auth_server/ldap endpoint."""
     uri = "/api/v1/user/auth_server/ldap"
     get_tests = [{"name": "Read LDAP auth servers"}]
     post_tests = [

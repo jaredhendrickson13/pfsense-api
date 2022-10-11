@@ -17,6 +17,7 @@ require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
 class APIFirewallRuleUpdate extends APIModel {
+    public $tcpflag_options = ["fin", "syn", "rst", "psh", "ack", "urg", "ece", "cwr"];
     private $requires_port;
     private $missing_port;
 
@@ -63,6 +64,16 @@ class APIFirewallRuleUpdate extends APIModel {
         }
     }
 
+    private function __validate_floating() {
+        # Check for floating rule
+        if ($this->initial_data["floating"] === true) {
+            $this->validated_data["floating"] = "yes";
+        } elseif ($this->initial_data["floating"] === false) {
+            unset($this->validated_data["floating"]);
+            unset($this->validated_data["direction"]);
+        }
+    }
+
     private function __validate_type() {
         # Check for our optional 'type' payload value
         if (isset($this->initial_data["type"])) {
@@ -77,15 +88,42 @@ class APIFirewallRuleUpdate extends APIModel {
     }
 
     private function __validate_interface() {
+        # Always revalidate this field in case 'floating' was changed.
+        $this->initial_data["interface"] = ($this->initial_data["interface"]) ?: $this->validated_data["interface"];
+
         # Check for our optional 'interface' payload value
         if (isset($this->initial_data['interface'])) {
-            $this->initial_data['interface'] = APITools\get_pfsense_if_id($this->initial_data['interface'], false, true);
-            # Check that we found the request pfSense interface ID
-            if (is_string($this->initial_data["interface"])) {
-                $this->validated_data['interface'] = $this->initial_data['interface'];
-            } else {
-                $this->errors[] = APIResponse\get(4034);
+            # Convert value to array if it is not already and support comma separated strings.
+            if (!is_array($this->initial_data["interface"])) {
+                $this->initial_data["interface"] = explode(",", (string)$this->initial_data["interface"]);
             }
+
+            # Only allow 1 interface to be specified unless this is a floating rule
+            if (!isset($this->validated_data["floating"]) and count($this->initial_data["interface"]) > 1) {
+                $this->errors[] = APIResponse\get(4248);
+                return;
+            }
+
+            # Initialize an array to store validated interfaces
+            $this->validated_data["interface"] = [];
+
+            # Loop through each specified interface and ensure it exists
+            foreach ($this->initial_data["interface"] as $if) {
+                # Find this interface's pfSense interface ID
+                $if = APITools\get_pfsense_if_id($if, false, true, true, true);
+
+                # Check that we found the request pfSense interface ID
+                if ($if) {
+                    $this->validated_data["interface"][] = $if;
+                } else {
+                    $this->errors[] = APIResponse\get(4040);
+                    return;
+                }
+            }
+
+            # Remove duplicates and convert back to pfSense expected format
+            $this->validated_data["interface"] = array_unique($this->validated_data["interface"]);
+            $this->validated_data["interface"] = implode(",", $this->validated_data["interface"]);
         }
     }
 
@@ -400,20 +438,125 @@ class APIFirewallRuleUpdate extends APIModel {
         }
     }
 
+    private function __validate_tcpflags_any() {
+        # Check for our optional 'tcpflags_any' payload value
+        if ($this->initial_data['tcpflags_any'] === true) {
+            $this->validated_data["tcpflags_any"] = true;
+            unset($this->validated_data["tcpflags1"]);
+            unset($this->validated_data["tcpflags2"]);
+        }
+        # Allow this field to be unset
+        elseif ($this->initial_data['tcpflags_any'] === false) {
+            unset($this->validated_data["tcpflags_any"]);
+        }
+    }
+
+    private function __validate_tcpflags2() {
+        # Only validate this field if 'tcpflags_any' is not set
+        if (!$this->validated_data["tcpflags_any"]) {
+            # Validate the optional 'tcpflags2' field
+            if (isset($this->initial_data["tcpflags2"])) {
+                # Initialize validated flags as empty array
+                $this->validated_data["tcpflags2"] = [];
+
+                # Ensure value is an array and support comma separated strings
+                if (!is_array($this->initial_data["tcpflags2"])) {
+                    $this->initial_data["tcpflags2"] = explode(",", (string)$this->initial_data["tcpflags2"]);
+                }
+
+                # Loop through the specified TCP flags
+                foreach ($this->initial_data["tcpflags2"] as $tcpflag) {
+                    # Ensure value is a valid tcp flag option
+                    if (in_array($tcpflag, $this->tcpflag_options)) {
+                        $this->validated_data["tcpflags2"][] = $tcpflag;
+                    }
+                    else {
+                        $this->errors[] = APIResponse\get(4246);
+                        return;
+                    }
+                }
+
+                # Remove duplicate items if present and convert to csv as expected by pfSense
+                $this->validated_data["tcpflags2"] = array_unique($this->validated_data["tcpflags2"]);
+                $this->validated_data["tcpflags2"] = implode(",", $this->validated_data["tcpflags2"]);
+            }
+        }
+    }
+
+    private function __validate_tcpflags1() {
+        # Only validate this field if 'tcpflags_any' is not set
+        if (!$this->validated_data["tcpflags_any"]) {
+            # Validate the optional 'tcpflags1' field
+            if (isset($this->initial_data["tcpflags1"])) {
+                # Initialize validated flags as empty array
+                $this->validated_data["tcpflags1"] = [];
+
+                # Ensure value is an array and support comma separated strings
+                if (!is_array($this->initial_data["tcpflags1"])) {
+                    $this->initial_data["tcpflags1"] = explode(",", (string)$this->initial_data["tcpflags1"]);
+                }
+
+                # Loop through the specified TCP flags
+                foreach ($this->initial_data["tcpflags1"] as $tcpflag) {
+                    # Ensure value is a valid tcp flag option
+                    if (in_array($tcpflag, $this->tcpflag_options)) {
+                        # Ensure this value is also present in tcpflags2 (out of)
+                        if (in_array($tcpflag, explode(",", $this->validated_data["tcpflags2"]))) {
+                            $this->validated_data["tcpflags1"][] = $tcpflag;
+                        }
+                        else {
+                            $this->errors[] = APIResponse\get(4247);
+                            return;
+                        }
+                    }
+                    else {
+                        $this->errors[] = APIResponse\get(4246);
+                        return;
+                    }
+                }
+
+                # Remove duplicate items if present and convert to csv as expected by pfSense
+                $this->validated_data["tcpflags1"] = array_unique($this->validated_data["tcpflags1"]);
+                $this->validated_data["tcpflags1"] = implode(",", $this->validated_data["tcpflags1"]);
+            }
+        }
+    }
+
+    private function __validate_statetype() {
+        # Variables
+        $protocol = $this->validated_data["protocol"];
+        $gateway = $this->validated_data["gateway"];
+        $statetype_options = ["keep state", "sloppy state", "synproxy state"];
+
+        # Check for the optional 'statetype' field
+        if (isset($this->initial_data["statetype"])) {
+            # Allow this value to be unset with an empty string
+            if ($this->initial_data["statetype"] === "") {
+                unset($this->validated_data["statetype"]);
+            }
+            # Otherwise, require value to be supported state type
+            elseif (!in_array($this->initial_data["statetype"], $statetype_options)) {
+                $this->errors[] = APIResponse\get(4243);
+            }
+            # Require protocol to be 'tcp' if synproxy state is specified
+            elseif ($this->initial_data["statetype"] === "synproxy state" and $protocol !== "tcp") {
+                $this->errors[] = APIResponse\get(4244);
+            }
+            # Require the default gateway to be used if synproxy state is specified
+            elseif ($this->initial_data["statetype"] === "synproxy state" and $gateway) {
+                $this->errors[] = APIResponse\get(4245);
+            }
+            # Otherwise this value is valid.
+            else {
+                $this->validated_data["statetype"] = $this->initial_data["statetype"];
+            }
+        }
+    }
+
     private function __validate_top() {
         # Check for our optional 'top' payload value
         if ($this->initial_data['top'] === true) {
             $this->initial_data['top'] = "top";
-        }
-    }
-
-    private function __validate_floating() {
-        # Check for floating rule
-        if ($this->initial_data["floating"] === true) {
-            $this->validated_data["floating"] = "yes";
-        } elseif ($this->initial_data["floating"] === false) {
-            unset($this->validated_data["floating"]);
-            unset($this->validated_data["direction"]);
         }
     }
 
@@ -433,8 +576,21 @@ class APIFirewallRuleUpdate extends APIModel {
         }
     }
 
+    private function __validate_quick() {
+        # Only validate this field if floating is enabled
+        if ($this->validated_data["floating"]) {
+            if ($this->initial_data["quick"] === true) {
+                $this->validated_data["quick"] = "yes";
+            }
+            elseif ($this->initial_data["quick"] === false) {
+                unset($this->validated_data["quick"]);
+            }
+        }
+    }
+
     public function validate_payload() {
         $this->__validate_tracker();
+        $this->__validate_floating();
         $this->__validate_type();
         $this->__validate_interface();
         $this->__validate_ipprotocol();
@@ -453,9 +609,13 @@ class APIFirewallRuleUpdate extends APIModel {
         $this->__validate_disabled();
         $this->__validate_descr();
         $this->__validate_log();
+        $this->__validate_tcpflags_any();
+        $this->__validate_tcpflags2();
+        $this->__validate_tcpflags1();
+        $this->__validate_statetype();
         $this->__validate_top();
-        $this->__validate_floating();
         $this->__validate_direction();
+        $this->__validate_quick();
 
         # Update our 'updated' value
         $this->validated_data["updated"] = [

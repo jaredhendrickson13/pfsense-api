@@ -1,0 +1,18 @@
+name: PHPlint
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Lint on PHP 7.2
+        uses: firehed/lint-php-action@v1
+        with:
+          file-extensions: 'php, inc'
+          php-version: "7.2"
+      - name: Lint on PHP 7.4
+        uses: firehed/lint-php-action@v1
+        with:
+          file-extensions: 'php, inc'
+          php-version: "7.4"

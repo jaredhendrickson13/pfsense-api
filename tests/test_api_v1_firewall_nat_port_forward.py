@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/firewall/nat/port_forward endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestFirewallNATPortForward(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/firewall/nat/port_forward endpoint."""
     uri = "/api/v1/firewall/nat/port_forward"
     get_tests = [
         {"name": "Read all NAT port forwards"}
@@ -65,5 +67,6 @@ class APIE2ETestFirewallNATPortForward(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {"name": "Delete NAT port forward", "payload": {"id": 0}}
     ]
+
 
 APIE2ETestFirewallNATPortForward()

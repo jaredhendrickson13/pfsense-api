@@ -1,0 +1,72 @@
+<?php
+//   Copyright 2022 Jared Hendrickson
+//
+//   Licensed under the Apache License, Version 2.0 (the "License");
+//   you may not use this file except in compliance with the License.
+//   You may obtain a copy of the License at
+//
+//       http://www.apache.org/licenses/LICENSE-2.0
+//
+//   Unless required by applicable law or agreed to in writing, software
+//   distributed under the License is distributed on an "AS IS" BASIS,
+//   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   See the License for the specific language governing permissions and
+//   limitations under the License.
+
+require_once("api/framework/APIModel.inc");
+require_once("api/framework/APIResponse.inc");
+
+
+class APIServicesIPsecApplyCreate extends APIModel {
+    # Create our method constructor
+    public function __construct() {
+        parent::__construct();
+        $this->privileges = [
+            "page-all",
+            "page-vpn-ipsec",
+            "page-vpn-ipsec-editphase1",
+            "page-vpn-ipsec-editphase2",
+            "page-vpn-ipsec-editkeys",
+            "page-vpn-ipsec-mobile",
+            "page-vpn-ipsec-settings"
+        ];
+    }
+
+    public function action() {
+        # Apply pending IPsec changes
+        $this->apply();
+
+        # Allow clients to re-initiate tunnels with the new configuration.
+        if ($this->initial_data["initiate"] === true) {
+            # TODO: Remove this after support for pfSense 2.5.x is depcreated
+            # Only allow this on pfSense 2.6+/22.05+
+            if (APITools\get_pfsense_version()["program"] >= 260 or APITools\get_pfsense_version()["program"] == 2205) {
+                $this->initiate();
+            }
+        }
+
+        return APIResponse\get(0);
+    }
+
+    public static function apply() {
+        # Restart IPsec and related services
+        $ipsec_dynamic_hosts = ipsec_configure();
+        ipsec_reload_package_hook();
+        filter_configure();
+
+        # Clear the pending changes banner if present
+        if ($ipsec_dynamic_hosts >= 0 and is_subsystem_dirty('ipsec')) {
+            clear_subsystem_dirty('ipsec');
+        }
+    }
+
+    public static function initiate() {
+        global $config;
+
+        # Loop through each phase1 to terminate existing IKE connections and re-initiate all tunnels
+        foreach ($config["ipsec"]["phase1"] as $p1) {
+            ipsec_terminate_by_conid("ike", ipsec_conid($p1));
+            ipsec_initiate_by_conid("all", ipsec_conid($p1));
+        }
+    }
+}

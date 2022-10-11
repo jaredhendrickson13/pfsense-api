@@ -8,7 +8,7 @@
         <category>System</category>
         <version>%%PKGVERSION%%</version>
         <configurationfile>api.xml</configurationfile>
-        <maintainer>jaredhendrickson13@gmail.com</maintainer>
+        <maintainer>github@jaredhendrickson.com</maintainer>
         <conf>
 				<enable></enable>
                 <persist></persist>
@@ -20,6 +20,7 @@
 				<keyhash>sha256</keyhash>
 				<keybytes>16</keybytes>
 				<keys></keys>
+                <enable_login_protection></enable_login_protection>
         </conf>
     </package>
 </pfsensepkgs>

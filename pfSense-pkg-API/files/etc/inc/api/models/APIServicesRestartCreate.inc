@@ -51,7 +51,7 @@ class APIServicesRestartCreate extends APIModel {
                 }
             }
             if (!$found) {
-                $this->errors[] = APIResponse\get(2999);
+                $this->errors[] = APIResponse\get(2158);
             } else {
                 $this->validated_data["service"] = $this->initial_data["service"];
             }

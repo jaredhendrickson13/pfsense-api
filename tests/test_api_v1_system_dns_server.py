@@ -1,7 +1,9 @@
+"""Script used to test the /api/v1/system/dns/server endpoint."""
 import e2e_test_framework
 
 
 class APIE2ETestSystemDNSServer(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/system/dns/server endpoint."""
     uri = "/api/v1/system/dns/server"
     post_tests = [
         {

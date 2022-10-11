@@ -11,13 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/services/dhcpd/restart endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestServicesDHCPdRestart(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/services/dhcpd/restart endpoint."""
     uri = "/api/v1/services/dhcpd/restart"
     post_tests = [
         {"name": "Restart the DHPCd service", "resp_time": 10}
     ]
+
 
 APIE2ETestServicesDHCPdRestart()

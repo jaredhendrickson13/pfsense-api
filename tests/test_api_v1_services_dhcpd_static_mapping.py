@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/services/dhcpd/static_mapping endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestServicesDHCPdStaticMapping(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/services/dhcpd/static_mapping endpoint."""
     uri = "/api/v1/services/dhcpd/static_mapping"
     get_tests = [
         {
@@ -73,5 +75,6 @@ class APIE2ETestServicesDHCPdStaticMapping(e2e_test_framework.APIE2ETest):
             "resp_time": 5    # Allow a few seconds to reload the DHCP service
         }
     ]
+
 
 APIE2ETestServicesDHCPdStaticMapping()

@@ -31,27 +31,18 @@ class APISystemPackageRead extends APIModel {
     public static function get_installed_pkgs($all=false) {
         # Local variables
         $pkgs = [];
-        exec("pkg info", $pkg_out, $pkg_rc);
 
         # Loop through each of the output lines and format it
-        foreach ($pkg_out as $pkg_line) {
-            # Only parse this package if it is a pfSense package OR all packages were requested
-            if ($all or APITools\str_starts_with("pfSense-pkg", $pkg_line)) {
-                # Remove excess whitespace and split the pkg line into an array
-                $pkg_line = preg_replace('!\s+!', ' ', $pkg_line);
-                $pkg_line = explode(" ", $pkg_line, 2);
-
-                # Extract the pkg description from the line
-                $descr = array_pop($pkg_line);
-
-                # Break apart the pkg name and version
-                $pkg_line = explode("-", $pkg_line[0]);
-                $version = array_pop($pkg_line);
-                $name = implode("-", $pkg_line);
-
-                # Add our formatted package to our array
-                $pkgs[] = ["name" => $name, "version" => $version, "descr" => $descr];
-            }
+        foreach (get_pkg_info('all', false, !$all) as $pkg) {
+            # Add our formatted package to our array
+            $pkgs[] = [
+                "name" => $pkg["name"],
+                "version" => $pkg["version"],
+                "installed_version" => $pkg["installed_version"],
+                "descr" => $pkg["desc"],
+                "installed" => (bool)$pkg["installed"],
+                "update_available" => (pkg_version_compare($pkg['installed_version'], $pkg['version']) == "<")
+            ];
         }
 
         return $pkgs;

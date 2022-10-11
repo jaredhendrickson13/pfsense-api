@@ -20,6 +20,7 @@ For example:
 `
 ### Dependencies
 - `Jinja2` package must be installed before running (`python3 -m pip install jinja2`)
+- `php80-composer2` FreeBSD package must be installed before running (`sudo pkg install php80-composer2`)
 
 ### Output
 Command will output the FreeBSD make command output. Outputs the following files:

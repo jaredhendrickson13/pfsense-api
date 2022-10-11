@@ -1,7 +1,9 @@
+"""Script used to test the /api/v1/system/hostname endpoint."""
 import e2e_test_framework
 
 
 class APIE2ETestSystemHostname(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/system/hostname endpoint."""
     uri = "/api/v1/system/hostname"
     get_tests = [{"name": "Read the system hostname"}]
     put_tests = [

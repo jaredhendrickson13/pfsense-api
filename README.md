@@ -1,4 +1,8 @@
----
+# pfSense-API
+
+[![OpenAPI](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/openapi.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/openapi.yml)
+[![PHPlint](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/phplint.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/phplint.yml)
+[![Pylint](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/pylint.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/pylint.yml)
 
 # Introduction
 
@@ -136,12 +140,14 @@ curl -H "Authorization: Bearer xxxxx.xxxxxx.xxxxxx" -X GET https://pfsense.examp
 <details>
     <summary>API Token</summary>
 
-Uses standalone tokens generated via the webConfigurator. These are better suited to distribute to systems as they are
+Uses standalone tokens generated via API or webConfigurator. These are better suited to distribute to systems as they are
 revocable and will only allow API authentication; not webConfigurator or SSH authentication (like the local database
 credentials). To generate or revoke credentials, navigate to System > API within the webConfigurator and ensure the
 Authentication Mode is set to API token. Then you should have the options to configure API Token generation, generate
 new tokens, and revoke existing tokens. After generating a new API token, the actual token will display at the top of
-the page on the success banner. This token will only be displayed once so ensure it is stored somewhere safe.<br><br>
+the page on the success banner. This token will only be displayed once so ensure it is stored somewhere safe.
+Alternatively, you can generate new API tokens using the /api/v1/access_token endpoint. This endpoint will always
+require the use of the Local Database authentication type to receive the API token.<br><br>
 
 Once you have your API token, you may authenticate your API call by specifying your client-id and client-token within
 an `Authorization` header, these values must be separated by a space. For example:<br>
@@ -158,6 +164,14 @@ functionality is still supported but is not recommended. It will be removed in a
 
 pfSense API uses the same privileges as the pfSense webConfigurator. The required privileges for each endpoint are
 stated within the API documentation.
+
+### Login Protection
+
+By default, all API requests will be monitored by pfSense's Login Protection feature. This will allow API
+authentication attempts to be logged and temporarily blocked if too many failed authentication attempts are made by 
+any one client. It is strongly recommended that this feature be used at all times to prevent brute force attacks on 
+API endpoints. This feature can be disabled by within the webConfigurator system-wide under System > Advanced or 
+only for API requests under System > API.
 
 # Content Types
 

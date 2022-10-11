@@ -11,10 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+"""Script used to test the /api/v1/services/dnsmasq/restart endpoint."""
 import e2e_test_framework
 
+
 class APIE2ETestServicesDnsmasqRestart(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/services/dnsmasq/restart endpoint."""
     uri = "/api/v1/services/dnsmasq/restart"
     post_tests = [
         {
@@ -22,5 +24,6 @@ class APIE2ETestServicesDnsmasqRestart(e2e_test_framework.APIE2ETest):
             "resp_time": 5    # Allow 5 seconds for dnsmasq to restart
         }
     ]
+
 
 APIE2ETestServicesDnsmasqRestart()
