@@ -201,11 +201,16 @@ function get_existing_tokens($username) {
     $api_config = get_api_config()[1];
     $key_user = bin2hex($username);    // Save our user's dedicated API client-ID
     $user_keys = [];
-    foreach ($api_config["keys"]["key"] as $id => $key) {
-        if ($key["client_id"] === $key_user) {
-            $user_keys[$id] = array("client_token" => $key["client_token"], "algo" => $key["algo"]);
+
+    # Only loop through if we have configured keys
+    if (is_array($api_config["keys"]["key"])) {
+        foreach ($api_config["keys"]["key"] as $id => $key) {
+            if ($key["client_id"] === $key_user) {
+                $user_keys[$id] = array("client_token" => $key["client_token"], "algo" => $key["algo"]);
+            }
         }
     }
+
     return $user_keys;
 }
 
@@ -213,8 +218,9 @@ function get_existing_tokens($username) {
 function authenticate_token($cid, $ctoken) {
     $authenticated = false;
     $hex_to_user = pack("H*", $cid);
+
     // First check if our hex decoded user exists
-    if (in_array($hex_to_user, index_users())) {
+    if (array_key_exists($hex_to_user, index_users())) {
         // Loop through each of our users API tokens and check if key matches
         foreach (get_existing_tokens($hex_to_user) as $id => $data) {
             $hash_input_key = hash($data["algo"], $ctoken);    // Hash our key using our configured algos
