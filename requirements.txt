@@ -1,4 +1,4 @@
 jinja2~=3.1.2
 requests~=2.28.1
-urllib3~=1.26.11
-pylint~=2.14.5
+pylint~=2.15.4
+urllib3~=1.26.12
