@@ -67,6 +67,17 @@ class APIFirewallAliasDelete extends APIModel {
     }
     
     public function validate_payload() {
+        $this->__init_config();
         $this->__validate_id();
+    }
+
+    private function __init_config() {
+        # Ensure the alias array is always present, even if it's empty
+        if (empty($this->config["aliases"])) {
+            $this->config["aliases"] = [];
+        }
+        if (empty($this->config["aliases"]["alias"])) {
+            $this->config["aliases"]["alias"] = [];
+        }
     }
 }

@@ -114,11 +114,12 @@ class APIFirewallAliasEntryCreate extends APIModel {
         $this->initial_data["detail"] = $this->__value_to_array($this->initial_data["detail"]);
         $this->validated_data["detail"] = ($this->validated_data["detail"]) ? explode("||", $this->validated_data["detail"]) : [];
         $this->validated_data["detail"] = $this->__value_to_array($this->validated_data["detail"]);
+        $address = ($this->validated_data["address"]) ? explode(" ", $this->validated_data["address"]) : [];
 
         # If we have less detail values than address values, add some defaults
         while(true) {
             # Check if we have the correct number of detail values
-            if (count($this->initial_data["detail"]) < count($this->initial_data["address"])) {
+            if (count($this->initial_data["detail"]) < count($address)) {
                 $this->initial_data["detail"][] = "Entry added " . date('r');
             } else {
                 break;
@@ -126,7 +127,7 @@ class APIFirewallAliasEntryCreate extends APIModel {
         }
 
         # Ensure the number of detail values is less than or equal to the number of address values
-        if (count($this->initial_data["detail"]) <= count($this->initial_data["address"])) {
+        if (count($this->initial_data["detail"]) <= count($address)) {
             # Loop through each alias detail and ensure it is a string
             foreach ($this->initial_data["detail"] as $detail) {
                 if (is_string($detail)) {
@@ -163,7 +164,7 @@ class APIFirewallAliasEntryCreate extends APIModel {
     private function __value_to_array($value) {
         # Only convert the value if it is not already array
         if (!is_array($value)) {
-            if (is_null($value)) {
+            if (empty($value)) {
                 return [];
             } else {
                 return [$value];
