@@ -64,7 +64,7 @@ class APIServicesDHCPdUpdate extends APIModel {
                 # Check that interface hosts a static network with multiple addresses
                 if (isset($this->__if_conf["enable"]) and is_ipaddrv4($this->__if_conf["ipaddr"]) and $this->__if_conf["subnet"] <= 31) {
                     $this->id = $this->initial_data["interface"];
-                    $this->init_config($this->id);
+                    $this->__init_config($this->id);
                     $this->validated_data = $this->config["dhcpd"][$this->id];
                 } else {
                     $this->errors[] = APIResponse\get(2019);
@@ -440,7 +440,7 @@ class APIServicesDHCPdUpdate extends APIModel {
         filter_configure();
     }
 
-    public function init_config($interface) {
+    private function __init_config($interface) {
         # Initialize the DHCP configuration if it does not exist
         if (empty($this->config["dhcpd"])) {
             $this->config["dhcpd"] = [];
