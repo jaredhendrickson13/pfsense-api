@@ -22,6 +22,7 @@ class APIUserAuthServerLDAPCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-authserver"];
         $this->change_note = "Added LDAP authentication server via API";
+        $this->init_config("system", "authserver");
     }
 
     public function action() {

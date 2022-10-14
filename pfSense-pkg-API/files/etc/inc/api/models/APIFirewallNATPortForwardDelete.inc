@@ -22,6 +22,7 @@ class APIFirewallNATPortForwardDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-nat-portforward-edit"];
         $this->change_note = "Deleted NAT rule via API";
+        $this->init_config('nat', 'rule');
     }
 
     public function action() {

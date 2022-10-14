@@ -21,6 +21,7 @@ class APIServicesOpenVPNClientRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-openvpn-client"];
+        $this->init_config("openvpn", "openvpn-client");
     }
 
     public function action() {

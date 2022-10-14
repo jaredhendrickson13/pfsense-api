@@ -24,6 +24,7 @@ class APIServicesOpenVPNClientSpecificOverridesUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-openvpn-server"];
         $this->change_note = "Modified OpenVPN client specific override via API";
+        $this->init_config("openvpn", "openvpn-csc");
     }
 
     public function action() {

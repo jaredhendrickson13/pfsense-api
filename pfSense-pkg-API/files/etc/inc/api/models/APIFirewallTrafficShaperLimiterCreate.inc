@@ -22,11 +22,11 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-trafficshaper-limiter"];
         $this->change_note = "Added firewall traffic shaper limiter via API";
+        $this->init_config('dnshaper', 'queue');
     }
 
     public function action() {
         # Initialize the traffic shaper configuration and save our shaper, mark the subsystem as un-applied
-        $this->__init_config();
         $this->config["dnshaper"]["queue"][] = $this->validated_data;
         $this->write_config();
         mark_subsystem_dirty('shaper');
@@ -930,17 +930,6 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
             } else {
                 $this->validated_data["param_fq_pie_max_ecnth"] = 99;
             }
-        }
-    }
-
-    private function __init_config() {
-        # Check if there is no dnshaper array in the config
-        if (empty($this->config["dnshaper"])) {
-            $this->config["dnshaper"] = [];
-        }
-        # Check if there is no dnshaper queue array in the config
-        if (empty($this->config["dnshaper"]["queue"])) {
-            $this->config["dnshaper"]["queue"] = [];
         }
     }
 

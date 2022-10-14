@@ -22,14 +22,10 @@ class APIFirewallVirtualIPCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-virtualipaddress-edit"];
         $this->change_note = "Added virtual IP via API";
+        $this->init_config('virtualip', 'vip');
     }
 
     public function action() {
-        # Ensure our config has virtual IP arrays initialized
-        if (!is_array($this->config["virtualip"]["vip"])) {
-            $this->config["virtualip"] = array("vip" => []);
-        }
-
         $this->config["virtualip"]["vip"][] = $this->validated_data;
         $this->write_config();
         APITools\apply_virtual_ip($this->validated_data);

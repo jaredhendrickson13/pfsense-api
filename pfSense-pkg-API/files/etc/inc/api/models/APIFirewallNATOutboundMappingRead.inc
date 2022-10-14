@@ -21,6 +21,7 @@ class APIFirewallNATOutboundMappingRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-nat-outbound"];
+        $this->init_config('nat', 'outbound', 'rule');
     }
 
     public function action() {

@@ -22,11 +22,11 @@ class APIFirewallAliasCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-alias-edit"];
         $this->change_note = "Added firewall alias via API";
+        $this->init_config('aliases', 'alias');
     }
 
     public function action() {
         # Add our new alias and reload configuration as requested
-        $this->config["aliases"] = !is_array($this->config["aliases"]) ? array("alias" => []) : $this->config["aliases"];
         $this->config["aliases"]["alias"][] = $this->validated_data;
         $this->write_config();
         mark_subsystem_dirty("aliases");

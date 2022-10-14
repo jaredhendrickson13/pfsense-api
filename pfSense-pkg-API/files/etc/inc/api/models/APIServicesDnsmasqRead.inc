@@ -22,6 +22,7 @@ class APIServicesDnsmasqRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsforwarder"];
+        $this->init_config("dnsmasq");
     }
 
     public function action() {

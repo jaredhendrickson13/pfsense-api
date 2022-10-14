@@ -30,12 +30,12 @@ class APIFirewallNATPortForwardCreate extends APIModel {
         $this->protocols = ["tcp", "udp", "tcp/udp", "icmp", "esp", "ah", "gre", "ipv6", "igmp", "pim", "ospf"];
         $this->nat_reflection = ["enable", "disable", "purenat"];
         $this->port_required = false;
-        $this->id = count($this->config["nat"]["rule"]);
+        $this->init_config('nat', 'rule');
     }
 
     public function action() {
         # Add our new configuration
-        $this->__init_config();
+        $this->id = count($this->config["nat"]["rule"]);
         $this->config["nat"]["rule"][$this->id] = $this->validated_data;
         APITools\sort_nat_rules($this->initial_data["top"], $this->id);
         $this->write_config();
@@ -230,15 +230,5 @@ class APIFirewallNATPortForwardCreate extends APIModel {
         $this->validated_data["associated-rule-id"] = "pass";
         $this->validated_data["created"] = array("time" => time(), "username" => $this->created_by_msg);
         $this->validated_data["updated"] = $this->validated_data["created"];
-    }
-
-    private function __init_config() {
-        # Ensure our config is formatted for NAT rules
-        if (!is_array($this->config["nat"])) {
-            $this->config["nat"] = [];
-        }
-        if (!is_array($this->config["nat"]["rule"])) {
-            $this->config["nat"]["rule"] = [];
-        }
     }
 }

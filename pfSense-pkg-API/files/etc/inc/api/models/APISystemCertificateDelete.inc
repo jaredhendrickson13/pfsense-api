@@ -25,6 +25,7 @@ class APISystemCertificateDelete extends APIModel {
         $this->privileges = ["page-all", "page-system-certmanager"];
         $this->change_note = "Deleted certificate via API";
         $this->cert_ref_id = "";
+        $this->init_config("cert");
     }
 
     public function action() {

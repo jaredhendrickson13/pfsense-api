@@ -22,6 +22,7 @@ class APIUserCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-usermanager"];
         $this->change_note = "Added user via API";
+        $this->init_config("system", "user");
     }
 
     public function action() {

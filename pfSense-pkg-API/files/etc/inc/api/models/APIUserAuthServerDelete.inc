@@ -22,6 +22,7 @@ class APIUserAuthServerDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-user-authserver"];
         $this->change_note = "Deleted authentication server via API";
+        $this->init_config("system", "authserver");
     }
 
     public function action() {

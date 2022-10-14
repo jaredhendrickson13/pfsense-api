@@ -27,6 +27,8 @@ class APIServicesNTPdTimeServerCreate extends APIModel {
         $this->change_note = "Added NTP timeserver via API";
         $this->validated_data = $this->config["ntpd"];
         $this->timeservers = explode(" ", $this->config["system"]["timeservers"]);
+        $this->init_config("ntpd");
+        $this->init_config("system");
     }
 
     public function action() {

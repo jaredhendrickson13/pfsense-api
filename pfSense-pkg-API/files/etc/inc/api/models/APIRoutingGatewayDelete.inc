@@ -22,6 +22,7 @@ class APIRoutingGatewayDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-gateways-editgateway"];
         $this->change_note = "Deleted gateway via API";
+        $this->init_config('gateways', 'gateway_item');
     }
 
     public function action() {

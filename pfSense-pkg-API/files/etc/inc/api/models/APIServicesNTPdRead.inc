@@ -22,6 +22,8 @@ class APIServicesNTPdRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-ntpd"];
+        $this->init_config("ntpd");
+        $this->init_config("system");
     }
 
     public function action() {

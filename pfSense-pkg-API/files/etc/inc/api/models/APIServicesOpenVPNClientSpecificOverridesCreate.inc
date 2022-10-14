@@ -22,12 +22,10 @@ class APIServicesOpenVPNClientSpecificOverridesCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-openvpn-server"];
         $this->change_note = "Added OpenVPN client specific override via API";
+        $this->init_config("openvpn", "openvpn-csc");
     }
 
     public function action() {
-        # Initialize expected configuration arrays
-        $this->__init_config();
-
         # Add our Client Specific Override to the configuration and resync OpenVPN to use new CSC
         $this->config['openvpn']['openvpn-csc'][] = $this->validated_data;
         openvpn_resync_csc($this->validated_data);
@@ -307,17 +305,5 @@ class APIServicesOpenVPNClientSpecificOverridesCreate extends APIModel {
         $this->__validate_wins_servers();
 
         $this->validated_data["nbdd_server1"] = "";
-    }
-
-    private function __init_config() {
-        # Ensure the OpenVPN configuration array exists
-        if (empty($this->config["openvpn"])) {
-            $this->config["openvpn"] = [];
-        }
-
-        # Ensure the OpenVPN csc configuration array exists
-        if (empty($this->config['openvpn']['openvpn-csc'])) {
-            $this->config['openvpn']['openvpn-csc'] = [];
-        }
     }
 }

@@ -21,6 +21,7 @@ class APIUserGroupRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-groupmanager"];
+        $this->init_config("system", "group");
     }
 
     public function action() {

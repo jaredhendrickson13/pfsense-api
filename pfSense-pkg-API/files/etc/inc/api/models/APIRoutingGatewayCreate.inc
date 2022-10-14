@@ -22,10 +22,10 @@ class APIRoutingGatewayCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-gateways-editgateway"];
         $this->change_note = "Added gateway via API";
+        $this->init_config('gateways', 'gateway_item');
     }
 
     public function action() {
-        $this->__init_config();
         $this->config["gateways"]["gateway_item"][] = $this->validated_data;
         $this->write_config();
         $this->apply();
@@ -353,14 +353,6 @@ class APIRoutingGatewayCreate extends APIModel {
             return true;
         } else {
             return false;
-        }
-    }
-
-    private function __init_config() {
-        # Ensure our gateway configuration is in array format
-        if (!is_array($this->config["gateways"]["gateway_item"])) {
-            $this->config["gateways"] = [];
-            $this->config["gateways"]["gateway_item"] = [];
         }
     }
 

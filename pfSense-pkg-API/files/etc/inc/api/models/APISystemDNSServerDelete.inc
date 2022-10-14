@@ -24,6 +24,7 @@ class APISystemDNSServerDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system"];
         $this->change_note = "Deleted system DNS servers via API";
+        $this->init_config("system");
     }
 
     public function action() {

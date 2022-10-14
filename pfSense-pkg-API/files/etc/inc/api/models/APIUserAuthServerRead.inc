@@ -21,6 +21,7 @@ class APIUserAuthServerRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-authservers"];
+        $this->init_config("system", "authserver");
     }
 
     public function action() {

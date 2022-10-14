@@ -24,6 +24,7 @@ class APIServicesServiceWatchdogRead extends APIModel {
         $this->privileges = ["page-all", "page-services-servicewatchdog"];
         $this->packages = ["pfSense-pkg-Service_Watchdog"];
         $this->package_includes = ["servicewatchdog.inc"];
+        $this->init_config("installedpackages", "servicewatchdog", "item");
     }
 
     public function action() {

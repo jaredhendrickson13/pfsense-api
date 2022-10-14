@@ -26,6 +26,7 @@ class APISystemCRLCreate extends APIModel {
         $this->privileges = ["page-all", "page-system-crlmanager"];
         $this->change_note = "Added certificate revocation list via API";
         $this->cert_method = null;
+        $this->init_config("crl");
     }
 
     public function action() {

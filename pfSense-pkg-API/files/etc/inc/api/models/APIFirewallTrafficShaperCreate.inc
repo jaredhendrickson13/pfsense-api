@@ -22,11 +22,11 @@ class APIFirewallTrafficShaperCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-trafficshaper"];
         $this->change_note = "Added firewall traffic shaper via API";
+        $this->init_config('shaper', 'queue');
     }
 
     public function action() {
         # Initialize the traffic shaper configuration and save our shaper, mark the subsystem as un-applied
-        $this->__init_config();
         $this->config["shaper"]["queue"][] = $this->validated_data;
         $this->write_config();
         mark_subsystem_dirty('shaper');
@@ -151,17 +151,6 @@ class APIFirewallTrafficShaperCreate extends APIModel {
             } else {
                 $this->errors[] = APIResponse\get(4121);
             }
-        }
-    }
-
-    private function __init_config() {
-        # Check if there is no shaper array in the config
-        if (empty($this->config["shaper"])) {
-            $this->config["shaper"] = [];
-        }
-        # Check if there is no shaper queue array in the config
-        if (empty($this->config["shaper"]["queue"])) {
-            $this->config["shaper"]["queue"] = [];
         }
     }
 

@@ -23,6 +23,7 @@ class APIRoutingStaticRouteDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-staticroutes-editroute"];
         $this->change_note = "Deleted static route via API";
+        $this->init_config('staticroutes', 'route');
     }
 
     public function action() {

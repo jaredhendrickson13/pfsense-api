@@ -24,6 +24,7 @@ class APIFirewallStatesSizeUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-firewall"];
         $this->change_note = "Modified firewall state table size via API";
+        $this->init_config('system');
     }
 
     public function action() {

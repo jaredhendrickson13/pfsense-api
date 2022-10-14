@@ -22,7 +22,7 @@ class APISystemConsoleUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-admin"];
         $this->change_note = "Modified system console settings";
-        $this->validated_data = $this->config["system"];
+        $this->init_config("system");
     }
 
     public function action() {
@@ -36,6 +36,7 @@ class APISystemConsoleUpdate extends APIModel {
     }
 
     public function validate_payload() {
+        $this->validated_data = $this->config["system"];
         $this->__validate_disableconsolemenu();
     }
 

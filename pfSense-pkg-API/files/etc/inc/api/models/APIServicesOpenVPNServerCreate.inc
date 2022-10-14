@@ -22,12 +22,10 @@ class APIServicesOpenVPNServerCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-openvpn-server"];
         $this->change_note = "Added OpenVPN server via API";
+        $this->init_config("openvpn", "openvpn-server");
     }
 
     public function action() {
-        # Initialize expected configuration arrays
-        $this->__init_config();
-
         # Add our Server to the configuration and resync OpenVPN to use new server
         $this->config['openvpn']['openvpn-server'][] = $this->validated_data;
         $this->write_config();
@@ -1384,17 +1382,5 @@ class APIServicesOpenVPNServerCreate extends APIModel {
         if ($this->validated_data["mode"] === "server_tls_user") {
             $this->__validate_strick_user_cn();
         }  
-    }
-
-    private function __init_config() {
-        # Ensure the OpenVPN configuration array exists
-        if (empty($this->config["openvpn"])) {
-            $this->config["openvpn"] = [];
-        }
-
-        # Ensure the OpenVPN server configuration array exists
-        if (empty($this->config['openvpn']['openvpn-server'])) {
-            $this->config['openvpn']['openvpn-server'] = [];
-        }
     }
 }

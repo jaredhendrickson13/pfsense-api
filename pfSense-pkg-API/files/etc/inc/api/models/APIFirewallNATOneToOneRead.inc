@@ -21,6 +21,7 @@ class APIFirewallNATOneToOneRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-nat-1-1"];
+        $this->init_config('nat', 'onetoone');
     }
 
     public function action() {

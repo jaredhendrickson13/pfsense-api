@@ -23,6 +23,7 @@ class APISystemTunableUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-sysctl"];
         $this->change_note = "Modified system tunable via API";
+        $this->init_config("sysctl", "item");
     }
 
     public function action() {

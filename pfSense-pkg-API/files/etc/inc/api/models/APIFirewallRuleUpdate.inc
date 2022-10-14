@@ -28,6 +28,7 @@ class APIFirewallRuleUpdate extends APIModel {
         $this->change_note = "Modified firewall rule via API";
         $this->requires_port = false;
         $this->missing_port = false;
+        $this->init_config('filter', 'rule');
     }
 
     public function action() {

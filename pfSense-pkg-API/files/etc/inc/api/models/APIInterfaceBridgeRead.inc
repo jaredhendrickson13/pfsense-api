@@ -22,7 +22,7 @@ class APIInterfaceBridgeRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-bridge", "page-interfaces-bridge-edit"];
-
+        $this->init_config('bridges', 'bridged');
     }
 
     public function action() {

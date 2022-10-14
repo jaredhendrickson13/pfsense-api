@@ -22,6 +22,7 @@ class APIServicesUnboundHostOverrideAliasCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsresolver-edithost"];
         $this->change_note = "Added DNS Resolver host override alias via API";
+        $this->init_config("unbound", "hosts");
     }
 
     public function action() {

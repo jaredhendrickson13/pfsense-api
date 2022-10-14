@@ -25,6 +25,7 @@ class APIFirewallScheduleTimeRangeDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-schedules-edit"];
         $this->change_note = "Deleted firewall schedule time range via API";
+        $this->init_config('schedules', 'schedule');
     }
 
     public function action() {

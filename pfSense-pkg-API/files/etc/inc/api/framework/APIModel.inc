@@ -63,6 +63,12 @@ class APIModel {
         return APIResponse\get(10);
     }
 
+    public static function init_config(...$config_area_path) {
+        # Initialize the configuration array of a specified path.
+        init_config_arr($config_area_path);
+
+    }
+
     protected function write_config() {
         # Start a temporary session to write the config that contains the user's username in the config history
         session_start();

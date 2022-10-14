@@ -22,6 +22,7 @@ class APIFirewallNATOneToOneDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-nat-1-1-edit"];
         $this->change_note = "Deleted 1:1 NAT mapping via API";
+        $this->init_config('nat', 'onetoone');
     }
 
     public function action() {

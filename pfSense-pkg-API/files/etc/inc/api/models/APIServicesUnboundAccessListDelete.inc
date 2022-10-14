@@ -23,6 +23,7 @@ class APIServicesUnboundAccessListDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsresolver-acls"];
         $this->change_note = "Deleted DNS Resolver access list via API";
+        $this->init_config("unbound", "acls");
     }
 
     public function action() {

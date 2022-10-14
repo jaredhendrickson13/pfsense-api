@@ -22,6 +22,7 @@ class APIFirewallTrafficShaperLimiterRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-trafficshaper-limiter"];
+        $this->init_config('dnshaper', 'queue');
     }
 
     public function action() {

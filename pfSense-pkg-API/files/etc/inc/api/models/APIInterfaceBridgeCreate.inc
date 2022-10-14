@@ -23,10 +23,10 @@ class APIInterfaceBridgeCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-bridge-edit"];
         $this->change_note = "Added bridge interface via API";
+        $this->init_config('bridges', 'bridged');
     }
 
     public function action() {
-        $this->__init_config();
         $this->config["bridges"]["bridged"][] = $this->validated_data;
         $this->write_config();
         interface_bridge_configure($this->validated_data);
@@ -179,16 +179,5 @@ class APIInterfaceBridgeCreate extends APIModel {
         }
 
         return $next_bridge;
-    }
-
-    private function __init_config() {
-        # Ensure our bridges config section is an array
-        if (!is_array($this->config["bridges"])) {
-            $this->config["bridges"] = [];
-        }
-        # Ensure our bridges bridged config section is an array
-        if (!is_array($this->config["bridges"]["bridged"])) {
-            $this->config["bridges"]["bridged"] = [];
-        }
     }
 }

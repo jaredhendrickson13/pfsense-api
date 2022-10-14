@@ -26,6 +26,7 @@ class APIFirewallAliasUpdate extends APIModel {
         $this->privileges = ["page-all", "page-firewall-alias-edit"];
         $this->change_note = "Modified firewall alias address via API";
         $this->type_changed = false;
+        $this->init_config('aliases', 'alias');
     }
 
     public function action() {

@@ -21,6 +21,7 @@ class APIFirewallAliasAdvancedRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-firewall"];
+        $this->init_config('system');
     }
 
     public function action() {

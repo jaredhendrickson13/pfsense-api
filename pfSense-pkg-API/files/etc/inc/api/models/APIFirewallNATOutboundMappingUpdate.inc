@@ -32,6 +32,7 @@ class APIFirewallNATOutboundMappingUpdate extends APIModel {
         $this->pool_options = ["", "round-robin", "round-robin sticky-address", "random", "random sticky-address", "source-hash", "bitmask"];
         $this->port_supported = false;
         $this->pool_source_hash_supported = false;
+        $this->init_config('nat', 'outbound', 'rule');
     }
 
     public function action() {

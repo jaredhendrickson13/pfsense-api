@@ -22,6 +22,7 @@ class APIFirewallRuleDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-rules-edit"];
         $this->change_note = "Deleted firewall rule via API";
+        $this->init_config('filter', 'rule');
     }
 
     public function action() {

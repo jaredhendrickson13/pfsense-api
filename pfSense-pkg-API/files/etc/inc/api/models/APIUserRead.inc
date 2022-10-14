@@ -21,6 +21,7 @@ class APIUserRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-usermanager"];
+        $this->init_config("system", "user");
     }
 
     public function action() {

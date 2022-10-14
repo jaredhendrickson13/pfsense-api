@@ -22,7 +22,7 @@ class APIServicesDHCPdStaticMappingRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"];
-
+        $this->init_config("dhcpd");
     }
 
     public function action() {

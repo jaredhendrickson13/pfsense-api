@@ -25,6 +25,7 @@ class APISystemCRLDelete extends APIModel {
         $this->privileges = ["page-all", "page-system-crlmanager"];
         $this->change_note = "Deleted Certificate Revocation List via API";
         $this->crl_ref_id = "";
+        $this->init_config("crl");
     }
 
     public function action() {

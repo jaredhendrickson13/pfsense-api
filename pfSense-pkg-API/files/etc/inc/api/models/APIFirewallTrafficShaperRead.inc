@@ -22,6 +22,7 @@ class APIFirewallTrafficShaperRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-trafficshaper"];
+        $this->init_config('shaper', 'queue');
     }
 
     public function action() {

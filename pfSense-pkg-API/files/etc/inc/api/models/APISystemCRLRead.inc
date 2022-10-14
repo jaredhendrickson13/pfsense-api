@@ -22,6 +22,7 @@ class APISystemCRLRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-crlmanager"];
+        $this->init_config("crl");
     }
 
     public function action() {

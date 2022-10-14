@@ -23,11 +23,11 @@ class APIFirewallScheduleCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-schedules-edit"];
         $this->change_note = "Added firewall schedule via API";
+        $this->init_config('schedules', 'schedule');
     }
 
     public function action() {
         # Write this schedule to the config and reload the firewall filter
-        $this->__init_config();
         $this->config["schedules"]["schedule"][] = $this->validated_data;
         $this->__sort_schedules();
         $this->write_config();
@@ -116,17 +116,6 @@ class APIFirewallScheduleCreate extends APIModel {
             }
         }
         return false;
-    }
-
-    private function __init_config() {
-        # Check if there is no schedules array in the config
-        if (empty($this->config["schedules"])) {
-            $this->config["schedules"] = [];
-        }
-        # Check if there is no schedule array in the config
-        if (empty($this->config["schedules"]["schedule"])) {
-            $this->config["schedules"]["schedule"] = [];
-        }
     }
 
     private static function __compare_schedules($a, $b) {

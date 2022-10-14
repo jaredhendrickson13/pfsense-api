@@ -22,6 +22,7 @@ class APIFirewallScheduleRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-schedules"];
+        $this->init_config('schedules', 'schedule');
     }
 
     public function action() {

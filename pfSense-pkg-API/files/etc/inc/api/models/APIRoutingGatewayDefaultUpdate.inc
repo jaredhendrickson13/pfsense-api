@@ -23,6 +23,7 @@ class APIRoutingGatewayDefaultUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-gateways"];
         $this->change_note = "Set default gateway via API";
+        $this->init_config('gateways');
     }
 
     public function action() {

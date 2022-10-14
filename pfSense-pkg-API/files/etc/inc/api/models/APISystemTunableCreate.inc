@@ -23,11 +23,10 @@ class APISystemTunableCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-sysctl"];
         $this->change_note = "Added system tunable via API";
+        $this->init_config("sysctl", "item");
     }
 
     public function action() {
-        $this->config["sysctl"] = (!is_array($this->config["sysctl"])) ? [] : $this->config["sysctl"];
-        $this->config["sysctl"]["item"] = (!is_array($this->config["sysctl"]["item"])) ? [] : $this->config["sysctl"]["item"];
         $this->config["sysctl"]["item"][] = $this->validated_data;
         $this->write_config();
         mark_subsystem_dirty('sysctl');

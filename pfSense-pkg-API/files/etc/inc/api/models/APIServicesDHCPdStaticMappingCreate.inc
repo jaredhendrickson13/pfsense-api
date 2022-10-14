@@ -23,6 +23,7 @@ class APIServicesDHCPdStaticMappingCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"];
         $this->change_note = "Added DHCP static mapping via API";
+        $this->init_config("dhcpd");
     }
 
     public function action() {

@@ -22,6 +22,7 @@ class APISystemHostnameRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system"];
+        $this->init_config("system");
     }
 
     public function action() {

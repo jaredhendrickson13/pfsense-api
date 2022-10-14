@@ -22,6 +22,8 @@ class APIServicesIPsecPhase2Delete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-vpn-ipsec-editphase2"];
         $this->change_note = "Deleted IPsec phase 2 via API";
+        $this->init_config("ipsec", "phase1");
+        $this->init_config("ipsec", "phase2");
     }
 
     public function action() {

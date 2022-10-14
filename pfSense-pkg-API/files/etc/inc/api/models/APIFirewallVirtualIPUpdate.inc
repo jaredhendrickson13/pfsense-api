@@ -24,6 +24,7 @@ class APIFirewallVirtualIPUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-virtualipaddress-edit"];
         $this->change_note = "Modified virtual IP via API";
+        $this->init_config('virtualip', 'vip');
     }
 
     public function action() {

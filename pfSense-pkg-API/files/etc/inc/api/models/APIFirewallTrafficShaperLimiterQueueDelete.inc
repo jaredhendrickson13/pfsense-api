@@ -25,6 +25,7 @@ class APIFirewallTrafficShaperLimiterQueueDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-trafficshaper-limiter"];
         $this->change_note = "Deleted firewall traffic shaper limiter queue via API";
+        $this->init_config('dnshaper', 'queue');
     }
 
     public function action() {

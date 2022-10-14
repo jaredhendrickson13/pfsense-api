@@ -30,6 +30,7 @@ class APISystemCertificateCreate extends APIModel {
         $this->cert_method = null;
         $this->cert_attr = [];
         $this->dn = [];
+        $this->init_config("cert");
     }
 
     public function action() {

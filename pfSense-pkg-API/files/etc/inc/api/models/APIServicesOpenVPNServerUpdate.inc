@@ -24,6 +24,7 @@ class APIServicesOpenVPNServerUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-openvpn-server"];
         $this->change_note = "Modified OpenVPN server via API";
+        $this->init_config("openvpn", "openvpn-server");
     }
 
     public function action() {

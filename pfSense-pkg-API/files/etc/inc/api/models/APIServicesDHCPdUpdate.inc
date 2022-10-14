@@ -25,6 +25,7 @@ class APIServicesDHCPdUpdate extends APIModel {
         $this->privileges = ["page-all", "page-services-dhcpserver"];
         $this->change_note = "Modified DHCP server via API";
         $this->__if_conf = [];
+        $this->init_config("dhcpd");
     }
 
     public function action() {

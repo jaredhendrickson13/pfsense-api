@@ -23,6 +23,7 @@ class APIFirewallScheduleUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-schedules-edit"];
         $this->change_note = "Modified firewall schedule via API";
+        $this->init_config('schedules', 'schedule');
     }
 
     public function action() {

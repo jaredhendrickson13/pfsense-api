@@ -32,6 +32,7 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
         $this->nat_reflection = ["enable", "disable", "purenat"];
         $this->port_required = false;
         $this->port_protocol = false;
+        $this->init_config('nat', 'rule');
     }
 
     public function action() {

@@ -24,6 +24,7 @@ class APIFirewallAliasAdvancedUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-firewall"];
         $this->change_note = "Modified advanced firewall alias sttings via API";
+        $this->init_config('system');
     }
 
     public function action() {

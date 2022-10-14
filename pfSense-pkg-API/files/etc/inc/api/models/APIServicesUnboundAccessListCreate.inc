@@ -23,10 +23,10 @@ class APIServicesUnboundAccessListCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsresolver-acls"];
         $this->change_note = "Added DNS Resolver access list via API";
+        $this->init_config("unbound", "acls");
     }
 
     public function action() {
-        $this->__init_array();
         $this->config["unbound"]["acls"][] = $this->validated_data;
         $this->write_config();
         mark_subsystem_dirty("unbound");
@@ -109,13 +109,6 @@ class APIServicesUnboundAccessListCreate extends APIModel {
             }
         } else {
             $this->errors[] = APIResponse\get(2073);
-        }
-    }
-
-    private function __init_array() {
-        # Check that the Unbound ACL array exists
-        if (!isset($this->config["unbound"]["acls"])) {
-            $this->config["unbound"]["acls"] = [];
         }
     }
 }

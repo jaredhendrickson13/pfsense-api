@@ -22,6 +22,7 @@ class APIFirewallNATOutboundMappingDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-nat-outbound-edit"];
         $this->change_note = "Deleted outbound NAT mapping via API";
+        $this->init_config('nat', 'outbound', 'rule');
     }
 
     public function action() {

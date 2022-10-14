@@ -22,12 +22,12 @@ class APIInterfaceGroupUpdate extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-groups-edit"];
+        $this->init_config('ifgroups', 'ifgroupentry');
     }
 
     public function action() {
         $this->config["ifgroups"]["ifgroupentry"][$this->id] = $this->validated_data;
         $this->write_config();
-        //interface_bridge_configure($this->validated_data);
         return APIResponse\get(0, $this->validated_data);
     }
     

@@ -25,6 +25,7 @@ class APIFirewallNATOneToOneCreate extends APIModel {
         $this->change_note = "Added 1:1 NAT mapping via API";
         $this->privileges = ["page-all", "page-firewall-nat-1-1-edit"];
         $this->nat_reflection = ["enable", "disable"];
+        $this->init_config('nat', 'onetoone');
     }
 
     public function action() {

@@ -24,6 +24,7 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-trafficshaper-queues"];
         $this->change_note = "Added firewall traffic shaper queue via API";
+        $this->init_config('shaper', 'queue');
     }
 
     public function action() {

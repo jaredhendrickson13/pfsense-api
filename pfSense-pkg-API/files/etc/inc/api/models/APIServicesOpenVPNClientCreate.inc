@@ -22,12 +22,10 @@ class APIServicesOpenVPNClientCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-openvpn-client"];
         $this->change_note = "Added OpenVPN client via API";
+        $this->init_config("openvpn", "openvpn-client");
     }
 
     public function action() {
-        # Initialize expected configuration arrays
-        $this->__init_config();
-
         # Add our Client to the configuration and resync OpenVPN to use new client
         $this->config['openvpn']['openvpn-client'][] = $this->validated_data;
         $this->write_config();
@@ -1079,18 +1077,6 @@ class APIServicesOpenVPNClientCreate extends APIModel {
             $this->validated_data["route_no_pull"] = "";
             $this->validated_data["inactive_seconds"] = "0";
             $this->validated_data["exit_notify"] = "1";
-        }
-    }
-
-    private function __init_config() {
-        # Ensure the OpenVPN configuration array exists
-        if (empty($this->config["openvpn"])) {
-            $this->config["openvpn"] = [];
-        }
-
-        # Ensure the OpenVPN server configuration array exists
-        if (empty($this->config['openvpn']['openvpn-client'])) {
-            $this->config['openvpn']['openvpn-client'] = [];
         }
     }
 }

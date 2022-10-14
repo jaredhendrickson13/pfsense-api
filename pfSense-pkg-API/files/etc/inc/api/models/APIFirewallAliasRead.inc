@@ -22,6 +22,7 @@ class APIFirewallAliasRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-aliases"];
+        $this->init_config('aliases', 'alias');
     }
 
     public function action() {

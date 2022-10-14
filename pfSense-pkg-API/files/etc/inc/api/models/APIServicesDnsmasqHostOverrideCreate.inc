@@ -26,10 +26,10 @@ class APIServicesDnsmasqHostOverrideCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsforwarder-edithost"];
         $this->change_note = "Added DNS Forwarder host override via API";
+        $this->init_config("dnsmasq", "hosts");
     }
 
     public function action() {
-        $this->__init_config();
         $this->config["dnsmasq"]["hosts"][] = $this->validated_data;
         usort($this->config["dnsmasq"]["hosts"], "dnsmasq_override_create_host_cmp");
         $this->write_config();
@@ -139,16 +139,6 @@ class APIServicesDnsmasqHostOverrideCreate extends APIModel {
             }
         }
         return false;
-    }
-
-    private function __init_config() {
-        # Ensure our dnsmasq and dnsmasq hosts arrays exist
-        if (empty($this->config["dnsmasq"])) {
-            $this->config["dnsmasq"] = [];
-        }
-        if (empty($this->config["dnsmasq"]["hosts"])) {
-            $this->config["dnsmasq"]["hosts"] = [];
-        }
     }
 
     public function apply() {

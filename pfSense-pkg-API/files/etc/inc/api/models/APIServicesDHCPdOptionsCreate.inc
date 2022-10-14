@@ -27,10 +27,11 @@ class APIServicesDHCPdOptionsCreate extends APIModel {
         $this->change_note = "Added DHCP options via API";
         $this->__if_conf = [];
         $this->__parent_model = new APIServicesDHCPdUpdate();
+        $this->init_config("dhcpd");
     }
 
     public function action() {
-        $this->init_config();
+        $this->__init_config();
         $this->config["dhcpd"][$this->id]["numberoptions"]["item"][] = $this->validated_data;
         $this->write_config();
         $this->__parent_model->reload_dhcpd();
@@ -170,7 +171,7 @@ class APIServicesDHCPdOptionsCreate extends APIModel {
         }
     }
 
-    public function init_config() {
+    private function __init_config() {
         # Initialize the numberoptions config if it is missing
         if (!isset($this->config["dhcpd"][$this->id]["numberoptions"])) {
             $this->config["dhcpd"][$this->id]["numberoptions"] = [];

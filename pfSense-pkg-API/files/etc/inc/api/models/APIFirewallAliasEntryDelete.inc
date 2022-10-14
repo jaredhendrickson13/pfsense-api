@@ -22,6 +22,7 @@ class APIFirewallAliasEntryDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-alias-edit"];
         $this->change_note = "Deleted firewall alias address via API";
+        $this->init_config('aliases', 'alias');
     }
 
     public function action() {

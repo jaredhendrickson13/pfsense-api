@@ -22,6 +22,7 @@ class APIInterfaceGroupRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-groups"];
+        $this->init_config('ifgroups', 'ifgroupentry');
     }
 
     public function action() {

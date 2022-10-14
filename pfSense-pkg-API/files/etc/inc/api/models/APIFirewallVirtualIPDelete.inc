@@ -22,6 +22,7 @@ class APIFirewallVirtualIPDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-virtualipaddress-edit"];
         $this->change_note = "Deleted virtual IP via API";
+        $this->init_config('virtualip', 'vip');
     }
 
     public function action() {

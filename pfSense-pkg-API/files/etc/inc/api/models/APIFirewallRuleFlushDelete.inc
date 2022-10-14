@@ -22,6 +22,7 @@ class APIFirewallRuleFlushDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-rules-edit"];
         $this->change_note = "Flushed firewall rules via API";
+        $this->init_config('filter', 'rule');
     }
 
     public function action() {

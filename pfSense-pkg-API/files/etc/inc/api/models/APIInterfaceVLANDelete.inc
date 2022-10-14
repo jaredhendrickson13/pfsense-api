@@ -23,7 +23,7 @@ class APIInterfaceVLANDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-vlan-edit"];
         $this->change_note = "Deleted interface VLAN via API";
-
+        $this->init_config('vlans', 'vlan');
     }
 
     public function action() {

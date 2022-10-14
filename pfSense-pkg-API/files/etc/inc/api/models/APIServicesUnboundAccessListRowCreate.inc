@@ -26,6 +26,7 @@ class APIServicesUnboundAccessListRowCreate extends APIModel {
         $this->privileges = ["page-all", "page-services-dnsresolver-acls"];
         $this->change_note = "Added DNS Resolver access list network via API";
         $this->ip_version = "";
+        $this->init_config("unbound", "acls");
     }
 
     public function action() {

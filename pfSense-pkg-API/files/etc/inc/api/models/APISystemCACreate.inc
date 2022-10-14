@@ -30,6 +30,7 @@ class APISystemCACreate extends APIModel {
         $this->cert_method = null;
         $this->cert_attr = [];
         $this->dn = [];
+        $this->init_config("ca");
     }
 
     public function action() {

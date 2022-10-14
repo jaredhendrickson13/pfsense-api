@@ -22,6 +22,7 @@ class APIServicesDHCPdRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dhcpserver"];
+        $this->init_config("dhcpd");
 
     }
 

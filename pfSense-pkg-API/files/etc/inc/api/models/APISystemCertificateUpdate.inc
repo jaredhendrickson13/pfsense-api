@@ -23,6 +23,7 @@ class APISystemCertificateUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-certmanager"];
         $this->change_note = "Modified system certificate via API";
+        $this->init_config("cert");
     }
 
     public function action() {

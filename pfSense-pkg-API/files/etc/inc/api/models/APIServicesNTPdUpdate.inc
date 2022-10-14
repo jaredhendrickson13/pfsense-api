@@ -23,6 +23,8 @@ class APIServicesNTPdUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-ntpd"];
         $this->change_note = "Modified NTP settings via API";
+        $this->init_config("ntpd");
+        $this->init_config("system");
     }
 
     public function action() {

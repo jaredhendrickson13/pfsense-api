@@ -21,6 +21,7 @@ class APIRoutingGatewayRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-gateways"];
+        $this->init_config('gateways', 'gateway_item');
     }
 
     public function action() {

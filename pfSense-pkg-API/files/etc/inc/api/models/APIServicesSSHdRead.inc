@@ -21,6 +21,7 @@ class APIServicesSSHdRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-admin"];
+        $this->init_config("system", "ssh");
     }
 
     public function action() {

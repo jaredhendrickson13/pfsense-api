@@ -25,6 +25,8 @@ class APIServicesIPsecPhase2Update extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-vpn-ipsec-editphase2"];
         $this->change_note = "Modified IPsec phase 2 via API";
+        $this->init_config("ipsec", "phase1");
+        $this->init_config("ipsec", "phase2");
     }
 
     public function action() {

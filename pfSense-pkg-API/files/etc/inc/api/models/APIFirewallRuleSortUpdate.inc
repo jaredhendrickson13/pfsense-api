@@ -31,6 +31,7 @@ class APIFirewallRuleSortUpdate extends APIModel {
             "numeric" => SORT_NUMERIC,
             "string" => SORT_STRING
         ];
+        $this->init_config('filter', 'rule');
     }
 
     public function action() {

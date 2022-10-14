@@ -22,6 +22,7 @@ class APIServicesDDNSRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dynamicdnsclients"];
+        $this->init_config('dyndnses', 'dyndns');
     }
 
     public function action() {

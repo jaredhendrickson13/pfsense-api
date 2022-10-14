@@ -22,6 +22,7 @@ class APIServicesUnboundRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsresolver"];
+        $this->init_config("unbound");
     }
 
     public function action() {

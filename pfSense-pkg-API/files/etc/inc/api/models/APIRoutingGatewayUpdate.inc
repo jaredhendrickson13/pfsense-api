@@ -25,6 +25,7 @@ class APIRoutingGatewayUpdate extends APIModel {
         $this->privileges = ["page-all", "page-system-gateways-editgateway"];
         $this->change_note = "Modified gateway via API";
         $this->ip_protocol_changed = false;
+        $this->init_config('gateways', 'gateway_item');
     }
 
     public function action() {

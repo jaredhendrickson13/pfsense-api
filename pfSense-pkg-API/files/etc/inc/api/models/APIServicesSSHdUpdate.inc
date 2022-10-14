@@ -22,6 +22,7 @@ class APIServicesSSHdUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-admin"];
         $this->change_note = "Modified sshd configuration via API";
+        $this->init_config("system", "ssh");
     }
 
     public function action() {

@@ -22,6 +22,7 @@ class APIFirewallRuleRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-rules"];
+        $this->init_config('filter', 'rule');
     }
 
     public function action() {

@@ -22,6 +22,7 @@ class APIServicesUnboundHostOverrideFlushDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsresolver-edithost"];
         $this->change_note = "Flushed DNS Resolver host overrides via API";
+        $this->init_config("unbound", "hosts");
     }
 
     public function action() {

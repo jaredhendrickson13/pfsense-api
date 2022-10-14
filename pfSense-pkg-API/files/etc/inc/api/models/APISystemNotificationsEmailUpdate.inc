@@ -22,11 +22,11 @@ class APISystemNotificationsEmailUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-notifications"];
         $this->change_note = "Modified system email notifications via API";
+        $this->init_config("notifications", "smtp");
     }
 
     public function action() {
         # Write our new email notification settings
-        $this->__init_config();
         $this->config["notifications"]["smtp"] = $this->validated_data;
         $this->write_config();
 
@@ -188,13 +188,6 @@ class APISystemNotificationsEmailUpdate extends APIModel {
         # Check for the optional 'password' field
         if (isset($this->initial_data["password"])) {
             $this->validated_data["password"] = strval($this->initial_data["password"]);
-        }
-    }
-
-    private function __init_config() {
-        # Check if we have a notifications config
-        if (empty($this->config["notifications"])) {
-            $this->config["notifications"] = [];
         }
     }
 

@@ -32,12 +32,12 @@ class APIFirewallNATOutboundMappingCreate extends APIModel {
         $this->pool_options = ["round-robin", "round-robin sticky-address", "random", "random sticky-address", "source-hash", "bitmask"];
         $this->port_supported = false;
         $this->pool_source_hash_supported = false;
-        $this->id = count($this->config["nat"]["outbound"]["rule"]);
+        $this->init_config('nat', 'outbound', 'rule');
     }
 
     public function action() {
         # Add our new configuration
-        $this->__init_config();
+        $this->id = count($this->config["nat"]["outbound"]["rule"]);
         $this->config["nat"]["outbound"]["rule"][$this->id] = $this->validated_data;
         APITools\sort_nat_rules($this->initial_data["top"], $this->id, "outbound");
         $this->write_config();
@@ -292,11 +292,5 @@ class APIFirewallNATOutboundMappingCreate extends APIModel {
         $this->created_by_msg = $this->client->username."@".$this->client->ip_address." (API)";
         $this->validated_data["created"] = array("time" => time(), "username" => $this->created_by_msg);
         $this->validated_data["updated"] = $this->validated_data["created"];
-    }
-
-    private function __init_config() {
-        $this->config["nat"] = (is_array($this->config["nat"])) ? $this->config["nat"] : [];
-        $this->config["nat"]["outbound"] = (is_array($this->config["nat"]["outbound"])) ? $this->config["nat"]["outbound"] : [];
-        $this->config["nat"]["outbound"]["rule"] = (is_array($this->config["nat"]["outbound"]["rule"])) ? $this->config["nat"]["outbound"]["rule"] : [];
     }
 }

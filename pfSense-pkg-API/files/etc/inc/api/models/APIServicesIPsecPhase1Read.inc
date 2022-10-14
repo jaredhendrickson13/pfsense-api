@@ -21,6 +21,8 @@ class APIServicesIPsecPhase1Read extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-vpn-ipsec-editphase1"];
+        $this->init_config("ipsec", "phase1");
+        $this->init_config("ipsec", "phase2");
     }
 
     public function action() {

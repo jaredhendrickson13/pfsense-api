@@ -22,6 +22,7 @@ class APIServicesOpenVPNClientSpecificOverridesDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-openvpn-server"];
         $this->change_note = "Deleted OpenVPN client specific override via API";
+        $this->init_config("openvpn", "openvpn-csc");
     }
 
     public function action() {

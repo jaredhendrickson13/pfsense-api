@@ -24,12 +24,10 @@ class APIServicesOpenVPNClientUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-openvpn-client"];
         $this->change_note = "Modified OpenVPN client via API";
+        $this->init_config("openvpn", "openvpn-client");
     }
 
     public function action() {
-        # Initialize expected configuration arrays
-        $this->__init_config();
-
         # Add our Client to the configuration and resync OpenVPN to use new client
         $this->config['openvpn']['openvpn-client'][$this->id] = $this->validated_data;
         $this->write_config();
@@ -994,18 +992,6 @@ class APIServicesOpenVPNClientUpdate extends APIModel {
             if (isset($this->validated_data["remote_cert_tls"])) {
                 unset($this->validated_data["remote_cert_tls"]);
             }
-        }
-    }
-
-    private function __init_config() {
-        # Ensure the OpenVPN configuration array exists
-        if (empty($this->config["openvpn"])) {
-            $this->config["openvpn"] = [];
-        }
-
-        # Ensure the OpenVPN server configuration array exists
-        if (empty($this->config['openvpn']['openvpn-client'])) {
-            $this->config['openvpn']['openvpn-client'] = [];
         }
     }
 }

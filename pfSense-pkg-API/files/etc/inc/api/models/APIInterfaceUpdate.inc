@@ -26,6 +26,7 @@ class APIInterfaceUpdate extends APIModel {
         $this->privileges = ["page-all", "page-interfaces-assignnetworkports"];
         $this->change_note = "Modified interface via API";
         $this->if_list = APITools\get_all_avail_interfaces();
+        $this->init_config('interfaces');
     }
 
     public function action() {

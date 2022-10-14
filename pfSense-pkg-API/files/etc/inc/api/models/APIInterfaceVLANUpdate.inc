@@ -29,6 +29,7 @@ class APIInterfaceVLANUpdate extends APIModel {
         $this->change_note = "Modified VLAN interface via API";
         $this->__if_changed = false;
         $this->__tag_changed = false;
+        $this->init_config('vlans', 'vlan');
     }
 
     public function action() {

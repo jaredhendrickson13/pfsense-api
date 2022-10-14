@@ -23,6 +23,7 @@ class APISystemCADelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-camanager"];
         $this->change_note = "Deleted CA certificate via API";
+        $this->init_config("ca");
     }
 
     public function action() {

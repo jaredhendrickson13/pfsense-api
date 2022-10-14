@@ -22,6 +22,7 @@ class APISystemHostnameUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system"];
         $this->change_note = "Modified system hostname via API";
+        $this->init_config("system");
     }
 
     public function action() {

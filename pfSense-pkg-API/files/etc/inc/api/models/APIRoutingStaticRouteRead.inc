@@ -22,6 +22,7 @@ class APIRoutingStaticRouteRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-staticroutes"];
+        $this->init_config('staticroutes', 'route');
     }
 
     public function action() {

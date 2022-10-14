@@ -22,6 +22,7 @@ class APIServicesDnsmasqHostOverrideDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsforwarder-edithost"];
         $this->change_note = "Deleted DNS Forwarder host override via API";
+        $this->init_config("dnsmasq", "hosts");
     }
 
     public function action() {

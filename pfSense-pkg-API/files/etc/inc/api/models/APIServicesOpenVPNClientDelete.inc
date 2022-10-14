@@ -22,6 +22,7 @@ class APIServicesOpenVPNClientDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-openvpn-client"];
         $this->change_note = "Deleted OpenVPN client via API";
+        $this->init_config("openvpn", "openvpn-client");
     }
 
     public function action() {

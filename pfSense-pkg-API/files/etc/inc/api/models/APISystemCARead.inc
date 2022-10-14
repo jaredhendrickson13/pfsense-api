@@ -22,6 +22,7 @@ class APISystemCARead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-camanager"];
+        $this->init_config("ca");
     }
 
     public function action() {

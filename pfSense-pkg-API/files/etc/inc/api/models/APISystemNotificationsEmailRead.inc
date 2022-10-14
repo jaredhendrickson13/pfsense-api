@@ -22,6 +22,7 @@ class APISystemNotificationsEmailRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-notifications"];
+        $this->init_config("notifications", "smtp");
     }
 
     public function action() {

@@ -21,6 +21,7 @@ class APIFirewallNATPortForwardRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-nat-portforward"];
+        $this->init_config('nat', 'rule');
     }
 
     public function action() {

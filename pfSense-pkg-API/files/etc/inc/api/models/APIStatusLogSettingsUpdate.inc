@@ -27,6 +27,7 @@ class APIStatusLogSettingsUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-status-logs-settings"];
         $this->change_note = "Modified log settings via API";
+        $this->init_config("syslog");
     }
 
     public function action() {
