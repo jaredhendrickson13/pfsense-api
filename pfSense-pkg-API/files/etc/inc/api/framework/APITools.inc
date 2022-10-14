@@ -1056,18 +1056,6 @@ function float_percent($value) {
     }
 }
 
-# Checks if an alias exists with a specified name, and returns the alias type. Returns null if not found
-function is_alias($name) {
-    global $config;
-    if (is_array($config['aliases']['alias'])) {
-        foreach ($config['aliases']['alias'] as $alias) {
-            if (strcasecmp($alias['name'], $name) == 0) {
-                return $alias["type"];
-            }
-        }
-    }
-}
-
 # Checks if an interface group with a specified name already exists. Returns true or false.
 function is_ifgroup($name) {
     global $config;

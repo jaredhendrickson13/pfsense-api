@@ -161,7 +161,7 @@ class APIInterfaceUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(3059);
             }
             # Ensure this interface is not named the same as an alias
-            elseif (APITools\is_alias($this->initial_data["descr"])) {
+            elseif (is_alias($this->initial_data["descr"])) {
                 $this->errors[] = APIResponse\get(3060);
             }
             # Ensure this interface is not named entirely numerical
