@@ -165,6 +165,12 @@ if (isset($_POST["save"])) {
         unset($pkg_config["enable_login_protection"]);
     }
 
+    if (!empty($_POST["log_successful_auth"])) {
+        $pkg_config["log_successful_auth"] = "";
+    } else {
+        unset($pkg_config["log_successful_auth"]);
+    }
+
     # Validate HA Sync settings if enabled
     if (!empty($_POST["hasync"])) {
         $pkg_config["hasync"] = "";
@@ -337,6 +343,16 @@ $advanced_section->addInput(new Form_Checkbox(
     system-wide, but API endpoints will not utilize Login Protection and may be more susceptible to brute force or 
     other authentication-based attacks. Login Protection can be configured system-wide under 
     <a href='/system_advanced_admin.php'>System > Advanced</a>."
+);
+$advanced_section->addInput(new Form_Checkbox(
+    'log_successful_auth',
+    'Log All Authentication',
+    'Enable Logging of All API Authentication Attempts',
+    isset($pkg_config["enable_login_protection"])
+))->setHelp(
+    "Log all API authentication attempts, even successful authentication. By default, only failed API authentication
+    attempts are logged (if API Login Protection is enabled above). This setting enforces all API authentication to
+    be logged instead. This may cause a lot of unnecessary syslog entries and is disabled by default."
 );
 $advanced_section->addInput(new Form_Checkbox(
     'hasync',

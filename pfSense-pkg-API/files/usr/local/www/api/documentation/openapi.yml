@@ -12089,6 +12089,10 @@ paths:
                 enable_login_protection:
                   description: Enable or disable Login Protection for API authentication requests.
                   type: boolean
+                log_successful_auth:
+                  description: Enable or disable logging successful API authentication requests in syslog. This
+                    field is only applicable if `enable_login_protection` is set to `true`.
+                  type: boolean
                 hasync:
                   description: Enable or disable HA sync for API configurations.
                   type: boolean
