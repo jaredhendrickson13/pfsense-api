@@ -348,7 +348,7 @@ $advanced_section->addInput(new Form_Checkbox(
     'log_successful_auth',
     'Log All Authentication',
     'Enable Logging of All API Authentication Attempts',
-    isset($pkg_config["enable_login_protection"])
+    isset($pkg_config["log_successful_auth"])
 ))->setHelp(
     "Log all API authentication attempts, even successful authentication. By default, only failed API authentication
     attempts are logged (if API Login Protection is enabled above). This setting enforces all API authentication to
