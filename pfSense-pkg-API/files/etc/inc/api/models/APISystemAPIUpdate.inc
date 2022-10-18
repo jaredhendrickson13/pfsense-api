@@ -132,7 +132,7 @@ class APISystemAPIUpdate extends APIModel {
 
     private function __validate_hasync_hosts() {
         # Only validate this field if HA sync is enabled
-        if ($this->validated_data["hasync"]) {
+        if (isset($this->validated_data["hasync"])) {
             # Validate our required 'hasync_hosts' payload value
             if (isset($this->initial_data["hasync_hosts"]) and count($this->initial_data["hasync_hosts"]) > 0) {
                 # Loop through each host and ensure it is valid
@@ -150,7 +150,7 @@ class APISystemAPIUpdate extends APIModel {
 
     private function __validate_hasync_username() {
         # Only validate this field if HA sync is enabled
-        if ($this->validated_data["hasync"]) {
+        if (isset($this->validated_data["hasync"])) {
             # Validate our required 'hasync_username' payload value
             if (isset($this->initial_data["hasync_username"])) {
                 $this->validated_data["hasync_username"] = strval($this->initial_data["hasync_username"]);
@@ -162,7 +162,7 @@ class APISystemAPIUpdate extends APIModel {
 
     private function __validate_hasync_password() {
         # Only validate this field if HA sync is enabled
-        if ($this->validated_data["hasync"]) {
+        if (isset($this->validated_data["hasync"])) {
             # Validate our required 'hasync_password' payload value
             if (isset($this->initial_data["hasync_password"])) {
                 $this->validated_data["hasync_password"] = strval($this->initial_data["hasync_password"]);
