@@ -18,6 +18,8 @@ require_once("api/framework/APIResponse.inc");
 
 
 class APISystemAPISyncUpdate extends APIModel {
+    public $pkg_index;
+    public $pkg_conf;
     # Create our method constructor
     public function __construct() {
         parent::__construct();
@@ -27,12 +29,14 @@ class APISystemAPISyncUpdate extends APIModel {
         $this->retain_read_mode = false;
         $this->ignore_enabled = true;
         $this->ignore_ifs = true;
+        $this->pkg_index = APITools\get_api_config()[0];
+        $this->pkg_conf = APITools\get_api_config()[1];
     }
 
     public function action() {
-        $pkg_index = APITools\get_api_config()[0];
-        $this->config["installedpackages"]["package"][$pkg_index]["conf"] = $this->validated_data;
+        $this->config["installedpackages"]["package"][$this->pkg_index]["conf"] = $this->validated_data;
         $this->write_config();
+        $this->backup();
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -51,6 +55,12 @@ class APISystemAPISyncUpdate extends APIModel {
             $this->validated_data = $this->initial_data;
         } else {
             $this->errors[] = APIResponse\get(1);
+        }
+    }
+
+    public function backup() {
+        if (isset($this->pkg_conf["persist"])) {
+            shell_exec("/usr/local/share/pfSense-pkg-API/manage.php backup");
         }
     }
 }

@@ -184,16 +184,17 @@ class APIAuth {
 
         # Log authentication attempts if enabled
         if (isset($this->api_config["enable_login_protection"])) {
-            # Log successful authentication
-            if ($authenticated) {
-                log_auth(
-                    gettext("Successful login for user '{$username}' from: {$ip_address} (Local Database)")
-                );
-            }
             # Log failed authentication
-            else {
+            if (!$authenticated) {
+                # This log entry is required for Login Protection to work, do not change the log text.
                 log_auth(
                     gettext("webConfigurator authentication error for user '{$username}' from: {$ip_address}")
+                );
+            }
+            # Log successful authentication if the API is configured to do so. Disabled by default to avoid log spam.
+            elseif (isset($this->api_config["log_successful_auth"])) {
+                log_auth(
+                    gettext("Successful login for user '{$username}' from: {$ip_address} (Local Database)")
                 );
             }
         }

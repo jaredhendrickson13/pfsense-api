@@ -30,8 +30,9 @@ class APISystemAPIUpdate extends APIModel {
         $this->config["installedpackages"]["package"][APITools\get_api_config()[0]]["conf"] = $this->validated_data;
         $this->write_config();
 
-        # Sync changes to HA nodes if enabled
-        $this->__sync();
+        # Backup and sync changes to HA nodes if enabled
+        $this->backup();
+        $this->sync();
 
         # Remove sensitive values
         unset($this->validated_data["server_key"]);
@@ -73,6 +74,15 @@ class APISystemAPIUpdate extends APIModel {
             $this->validated_data["enable_login_protection"] = "";
         } elseif ($this->initial_data['enable_login_protection'] === false) {
             unset($this->validated_data["enable_login_protection"]);
+        }
+    }
+
+    private function __validate_log_successful_auth() {
+        # Check for our optional 'log_successful_auth' payload value
+        if ($this->initial_data['log_successful_auth'] === true) {
+            $this->validated_data["log_successful_auth"] = "";
+        } elseif ($this->initial_data['log_successful_auth'] === false) {
+            unset($this->validated_data["log_successful_auth"]);
         }
     }
 
@@ -122,7 +132,7 @@ class APISystemAPIUpdate extends APIModel {
 
     private function __validate_hasync_hosts() {
         # Only validate this field if HA sync is enabled
-        if ($this->validated_data["hasync"]) {
+        if (isset($this->validated_data["hasync"])) {
             # Validate our required 'hasync_hosts' payload value
             if (isset($this->initial_data["hasync_hosts"]) and count($this->initial_data["hasync_hosts"]) > 0) {
                 # Loop through each host and ensure it is valid
@@ -140,7 +150,7 @@ class APISystemAPIUpdate extends APIModel {
 
     private function __validate_hasync_username() {
         # Only validate this field if HA sync is enabled
-        if ($this->validated_data["hasync"]) {
+        if (isset($this->validated_data["hasync"])) {
             # Validate our required 'hasync_username' payload value
             if (isset($this->initial_data["hasync_username"])) {
                 $this->validated_data["hasync_username"] = strval($this->initial_data["hasync_username"]);
@@ -152,7 +162,7 @@ class APISystemAPIUpdate extends APIModel {
 
     private function __validate_hasync_password() {
         # Only validate this field if HA sync is enabled
-        if ($this->validated_data["hasync"]) {
+        if (isset($this->validated_data["hasync"])) {
             # Validate our required 'hasync_password' payload value
             if (isset($this->initial_data["hasync_password"])) {
                 $this->validated_data["hasync_password"] = strval($this->initial_data["hasync_password"]);
@@ -249,7 +259,13 @@ class APISystemAPIUpdate extends APIModel {
         }
     }
 
-    private function __sync() {
+    public function backup() {
+        if (isset($this->validated_data["persist"])) {
+            shell_exec("/usr/local/share/pfSense-pkg-API/manage.php backup");
+        }
+    }
+
+    public function sync() {
         # Use ob_start()/ob_end_clean() to prevent sync() from printing output
         ob_start();
         APITools\sync();
@@ -269,6 +285,7 @@ class APISystemAPIUpdate extends APIModel {
         $this->__validate_custom_headers();
         $this->__validate_access_list();
         $this->__validate_enable_login_protection();
+        $this->__validate_log_successful_auth();
         $this->__validate_hasync();
         $this->__validate_hasync_hosts();
         $this->__validate_hasync_username();

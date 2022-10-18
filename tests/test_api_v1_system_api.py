@@ -29,7 +29,7 @@ class APIE2ETestSystemAPI(e2e_test_framework.APIE2ETest):
                 "keybytes": 64,
                 "allowed_interfaces": ["WAN"],
                 "access_list": ["0::/0", "0.0.0.0/0"]
-            },
+            }
         },
         {
             "name": "Revert API configuration to default",
@@ -90,6 +90,48 @@ class APIE2ETestSystemAPI(e2e_test_framework.APIE2ETest):
                 "access_list": ["INVALID"]
             }
         },
+        {
+            "name": "Test custom_headers type constraint",
+            "status": 400,
+            "return": 1025,
+            "payload": {"custom_headers": "INVALID"}
+        },
+        {
+            "name": "Test custom_headers key-value type constraints",
+            "status": 400,
+            "return": 1026,
+            "payload": {"custom_headers": {0: True}}
+        },
+        {
+            "name": "Test hasync_hosts minimum constraint",
+            "status": 400,
+            "return": 1027,
+            "payload": {"hasync": True, "hasync_hosts": []}
+        },
+        {
+            "name": "Test hasync_hosts IP/FQDN constraint",
+            "status": 400,
+            "return": 1028,
+            "payload": {"hasync": True, "hasync_hosts": [True]}
+        },
+        {
+            "name": "Test hasync_username required constraint",
+            "status": 400,
+            "return": 1029,
+            "payload": {"hasync": True, "hasync_hosts": ["127.0.0.1"]}
+        },
+        {
+            "name": "Test hasync_username required",
+            "status": 400,
+            "return": 1029,
+            "payload": {"hasync": True, "hasync_hosts": ["127.0.0.1"], "hasync_username": "test"}
+        },
+        {
+            "name": "Test authmode options constraint",
+            "status": 400,
+            "return": 1021,
+            "payload": {"authmode": "INVALID"}
+        }
     ]
 
 
