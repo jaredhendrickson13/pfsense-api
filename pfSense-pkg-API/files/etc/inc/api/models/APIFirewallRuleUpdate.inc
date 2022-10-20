@@ -32,9 +32,18 @@ class APIFirewallRuleUpdate extends APIModel {
     }
 
     public function action() {
-        # Update our config item, sort rule filters and apply.
-        $this->config["filter"]["rule"][$this->id] = $this->validated_data;
-        APITools\sort_firewall_rules($this->initial_data["top"], $this->id);
+        # Move rule to top of rules if requested
+        if ($this->initial_data["top"] === true) {
+            $this->config["filter"]["rule"] = [$this->validated_data] + $this->config["filter"]["rule"];
+            unset($this->config["filter"]["rule"][$this->id]);
+        }
+        # Otherwise, simply update the rule in place
+        else {
+            $this->config["filter"]["rule"][$this->id] = $this->validated_data;
+        }
+
+        # Sort the rules, write them to configuration and mark the changes as pending
+        filter_rules_sort($this->initial_data["top"], $this->id);
         $this->write_config();
         mark_subsystem_dirty('filter');
 
@@ -42,6 +51,7 @@ class APIFirewallRuleUpdate extends APIModel {
         if ($this->initial_data["apply"] === true) {
             APIFirewallApplyCreate::apply();
         }
+
         return APIResponse\get(0, $this->validated_data);
     }
 

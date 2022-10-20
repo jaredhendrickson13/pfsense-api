@@ -28,7 +28,7 @@ class APIFirewallRuleFlushUpdate extends APIModel {
     public function action() {
         $this->__randomize_tracker();
         $this->config["filter"]["rule"] = $this->validated_data;
-        APITools\sort_firewall_rules();
+        filter_rules_sort();
         $this->write_config();
         mark_subsystem_dirty('filter');
 

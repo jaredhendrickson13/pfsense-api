@@ -28,7 +28,7 @@ class APIFirewallRuleDelete extends APIModel {
     public function action() {
         # Remove rule from config, sort and apply filter if requested
         unset($this->config["filter"]["rule"][$this->id]);
-        APITools\sort_firewall_rules();
+        filter_rules_sort();
         $this->write_config();
         mark_subsystem_dirty('filter');
 

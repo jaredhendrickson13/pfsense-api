@@ -28,16 +28,25 @@ class APIFirewallRuleCreate extends APIModel {
     }
 
     public function action() {
-        $next_rule_id = count($this->config["filter"]["rule"]);    // Save our next rule ID
-        $this->config["filter"]["rule"][] = $this->validated_data;    // Write to our master config
-        APITools\sort_firewall_rules($this->initial_data["top"], $next_rule_id);    // Sort our firewall rules
-        $this->write_config();    // Apply our configuration change
+        # Add rule to top of rules if requested
+        if ($this->initial_data["top"] === true) {
+            $this->config["filter"]["rule"] = [$this->validated_data] + $this->config["filter"]["rule"];
+        }
+        # Otherwise, simply append the rule to the bottom
+        else {
+            $this->config["filter"]["rule"][] = $this->validated_data;
+        }
+
+        # Sort the rules, write them to configuration and mark the changes as pending
+        filter_rules_sort();
+        $this->write_config();
         mark_subsystem_dirty('filter');
 
         # Only reload the firewall filter if it was requested by the client
         if ($this->initial_data["apply"] === true) {
             APIFirewallApplyCreate::apply();
         }
+
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -471,13 +480,6 @@ class APIFirewallRuleCreate extends APIModel {
         }
     }
 
-    private function __validate_top() {
-        # Check for our optional 'top' payload value
-        if ($this->initial_data['top'] === true) {
-            $this->initial_data['top'] = "top";
-        }
-    }
-
     private function __validate_floating() {
         # Check for floating rule
         if ($this->initial_data["floating"] === true) {
@@ -533,7 +535,6 @@ class APIFirewallRuleCreate extends APIModel {
         $this->__validate_tcpflags2();
         $this->__validate_tcpflags1();
         $this->__validate_statetype();
-        $this->__validate_top();
         $this->__validate_direction();
         $this->__validate_quick();
 

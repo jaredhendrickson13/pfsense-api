@@ -628,33 +628,6 @@ function is_ip_in_use($ip) {
     return false;
 }
 
-// Sorts filter rules by specified criteria and reloads the filter
-function sort_firewall_rules($mode=null, $data=null) {
-    // Variables
-    global $config;
-    $sort_arr = [];
-    $master_arr = [];
-    foreach ($config["filter"]["rule"] as $idx => $fre) {
-        $curr_iface = $fre["interface"];    // Save our current entries interface
-        // Create our interface array if does not exist
-        if (!isset($sort_arr[$curr_iface])) {
-            $sort_arr[$curr_iface] = [];
-        }
-        // Check if user requested this rule to be placed at the top of array
-        if ($mode === "top" and $idx === $data) {
-            array_unshift($sort_arr[$curr_iface], $fre);
-        } else {
-            $sort_arr[$curr_iface][] = $fre;
-        }
-    }
-    foreach ($sort_arr as $if) {
-        foreach ($if as $rule) {
-            $master_arr[] = $rule;
-        }
-    }
-    $config["filter"]["rule"] = $master_arr;
-}
-
 # Checks if routing gateway exists
 function is_gateway($gw, $ret_protocol=false) {
     # Local variables
