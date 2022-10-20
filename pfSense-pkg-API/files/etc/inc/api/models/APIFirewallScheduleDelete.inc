@@ -88,7 +88,7 @@ class APIFirewallScheduleDelete extends APIModel {
 
     private function __sort_schedules() {
         if (is_array($this->config['schedules']['schedule'])) {
-            usort($this->config['schedules']['schedule'], ["APIFirewallScheduleCreate", "compare_schedules"]);
+            usort($this->config['schedules']['schedule'], ["APIFirewallScheduleDelete", "compare_schedules"]);
         }
     }
 }
