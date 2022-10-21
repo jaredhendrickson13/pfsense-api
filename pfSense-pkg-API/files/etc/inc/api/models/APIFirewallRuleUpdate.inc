@@ -34,7 +34,7 @@ class APIFirewallRuleUpdate extends APIModel {
     public function action() {
         # Move rule to top of rules if requested
         if ($this->initial_data["top"] === true) {
-            $this->config["filter"]["rule"] = [$this->validated_data] + $this->config["filter"]["rule"];
+            $this->config["filter"]["rule"] = array_merge([$this->validated_data], $this->config["filter"]["rule"]);
             unset($this->config["filter"]["rule"][$this->id]);
         }
         # Otherwise, simply update the rule in place
