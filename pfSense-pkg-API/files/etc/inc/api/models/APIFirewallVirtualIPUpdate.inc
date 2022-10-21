@@ -28,18 +28,15 @@ class APIFirewallVirtualIPUpdate extends APIModel {
     }
 
     public function action() {
-        global $g;
+        # Serialize the original entry
+        $this->__serialize_vip();
 
         # Update this virtual IP to config and mark the changes as pending
         $this->config["virtualip"]["vip"][$this->id] = $this->validated_data;
         $this->write_config();
         mark_subsystem_dirty('vip');
 
-        # Serialize the pending changes and apply them immediately
-        file_put_contents(
-            "{$g['tmp_path']}/.firewall_virtual_ip.apply",
-            serialize([$this->id => $this->validated_data])
-        );
+        # Apply the changes
         applyVIP();
 
         return APIResponse\get(0, $this->validated_data);
@@ -220,5 +217,21 @@ class APIFirewallVirtualIPUpdate extends APIModel {
             }
         }
         return false;
+    }
+
+    private function __serialize_vip() {
+        global $g;
+
+        # Retain existing serialized virtual IPs if present
+        if (file_exists("{$g['tmp_path']}/.firewall_virtual_ip.apply")) {
+            $vips_to_apply = unserialize(file_get_contents("{$g['tmp_path']}/.firewall_virtual_ip.apply"));
+            $vips_to_apply[$this->id] = $this->config["virtualip"]["vip"][$this->id];
+        }
+        else {
+            $vips_to_apply = [$this->id => $this->config["virtualip"]["vip"][$this->id]];
+        }
+
+        # Write the pending changes to file
+        file_put_contents("{$g['tmp_path']}/.firewall_virtual_ip.apply", serialize($vips_to_apply));
     }
 }
