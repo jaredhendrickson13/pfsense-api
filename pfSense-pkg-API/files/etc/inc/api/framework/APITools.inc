@@ -749,50 +749,55 @@ function unbound_reload_config() {
 // Get a complete config list of ALL interfaces. Based off interfaces_assign.php
 function get_all_avail_interfaces() {
     // Local variables
-    global $err_lib, $config;
-    $base_ifs = get_interface_list();    // Get our base interface list, this will be populated with all ifs
-    // Add wireless ifs to our array
-    if (is_array($config['wireless']['clone']) && count($config['wireless']['clone'])) {
+    global $ipsec_descrs, $config;
+    $base_ifs = get_interface_list();
+    
+    # Include wireless clone interfaces 
+    if (isset($config['wireless']['clone']) && is_array($config['wireless']['clone']) && count($config['wireless']['clone'])) {
         foreach ($config['wireless']['clone'] as $clone) {
             $base_ifs[$clone['cloneif']] = $clone;
-            $base_ifs[$clone['cloneif']]['is_wlclone'] = true;
+            $base_ifs[$clone['cloneif']]['iswlclone'] = true;
         }
     }
-    // Add VLAN ifs to our array
-    if (is_array($config['vlans']['vlan']) && count($config['vlans']['vlan'])) {
-        //$timea = microtime(true);
+
+    # Include VLAN interfaces 
+    if (isset($config['vlans']['vlan']) && is_array($config['vlans']['vlan']) && count($config['vlans']['vlan'])) {
         foreach ($config['vlans']['vlan'] as $vlan) {
             $base_ifs[$vlan['vlanif']] = $vlan;
-            $base_ifs[$vlan['vlanif']]['is_vlan'] = true;
+            $base_ifs[$vlan['vlanif']]['isvlan'] = true;
         }
     }
-    // Add bridge ifs to our array
-    if (is_array($config['bridges']['bridged']) && count($config['bridges']['bridged'])) {
+
+    # Include Bridge interfaces 
+    if (isset($config['bridges']['bridged']) && is_array($config['bridges']['bridged']) && count($config['bridges']['bridged'])) {
         foreach ($config['bridges']['bridged'] as $bridge) {
             $base_ifs[$bridge['bridgeif']] = $bridge;
-            $base_ifs[$bridge['bridgeif']]['is_bridge'] = true;
+            $base_ifs[$bridge['bridgeif']]['isbridge'] = true;
         }
     }
-    // Add GIF ifs to our array
-    if (is_array($config['gifs']['gif']) && count($config['gifs']['gif'])) {
+
+    # Include GIF interfaces 
+    if (isset($config['gifs']['gif']) && is_array($config['gifs']['gif']) && count($config['gifs']['gif'])) {
         foreach ($config['gifs']['gif'] as $gif) {
             $base_ifs[$gif['gifif']] = $gif;
-            $base_ifs[$gif['gifif']]['is_gif'] = true;
+            $base_ifs[$gif['gifif']]['isgif'] = true;
         }
     }
-    // Add GRE ifs to our array
-    if (is_array($config['gres']['gre']) && count($config['gres']['gre'])) {
+
+    # Include GRE interfaces 
+    if (isset($config['gres']['gre']) && is_array($config['gres']['gre']) && count($config['gres']['gre'])) {
         foreach ($config['gres']['gre'] as $gre) {
             $base_ifs[$gre['greif']] = $gre;
-            $base_ifs[$gre['greif']]['is_gre'] = true;
+            $base_ifs[$gre['greif']]['isgre'] = true;
         }
     }
-    // Add LAGG ifs to our array
-    if (is_array($config['laggs']['lagg']) && count($config['laggs']['lagg'])) {
+
+    # Include LAGG interfaces 
+    if (isset($config['laggs']['lagg']) && is_array($config['laggs']['lagg']) && count($config['laggs']['lagg'])) {
         foreach ($config['laggs']['lagg'] as $lagg) {
             $base_ifs[$lagg['laggif']] = $lagg;
-            $base_ifs[$lagg['laggif']]['is_lagg'] = true;
-            /* LAGG members cannot be assigned */
+            $base_ifs[$lagg['laggif']]['islagg'] = true;
+            # LAGG members cannot be assigned 
             $lagifs = explode(',', $lagg['members']);
             foreach ($lagifs as $lagif) {
                 if (isset($base_ifs[$lagif])) {
@@ -801,67 +806,74 @@ function get_all_avail_interfaces() {
             }
         }
     }
-    // Add QinQ ifs to our array
-    if (is_array($config['qinqs']['qinqentry']) && count($config['qinqs']['qinqentry'])) {
+
+    # Include QinQ interfaces 
+    if (isset($config['qinqs']['qinqentry']) && is_array($config['qinqs']['qinqentry']) && count($config['qinqs']['qinqentry'])) {
         foreach ($config['qinqs']['qinqentry'] as $qinq) {
             $base_ifs["{$qinq['vlanif']}"]['descr'] = "VLAN {$qinq['tag']} on {$qinq['if']}";
-            $base_ifs["{$qinq['vlanif']}"]['is_qinq'] = true;
-            /* QinQ members */
+            $base_ifs["{$qinq['vlanif']}"]['isqinq'] = true;
+            # QinQ members 
             $qinqifs = explode(' ', $qinq['members']);
             foreach ($qinqifs as $qinqif) {
                 $base_ifs["{$qinq['vlanif']}.{$qinqif}"]['descr'] = "QinQ {$qinqif} on VLAN {$qinq['tag']} on {$qinq['if']}";
-                $base_ifs["{$qinq['vlanif']}.{$qinqif}"]['is_qinq'] = true;
+                $base_ifs["{$qinq['vlanif']}.{$qinqif}"]['isqinq'] = true;
             }
         }
     }
-    // Add PPP ifs to our array
-    if (is_array($config['ppps']['ppp']) && count($config['ppps']['ppp'])) {
+
+    # Include PPP interfaces 
+    if (isset($config['ppps']['ppp']) && is_array($config['ppps']['ppp']) && count($config['ppps']['ppp'])) {
         foreach ($config['ppps']['ppp'] as $pppid => $ppp) {
-            $if_name = $ppp['if'];
-            $base_ifs[$if_name] = $ppp;
-            $base_ifs[$if_name]['is_ppp'] = true;
+            $portname = $ppp['if'];
+            $base_ifs[$portname] = $ppp;
+            $base_ifs[$portname]['isppp'] = true;
             $ports_base = basename($ppp['ports']);
             if (isset($ppp['descr'])) {
-                $base_ifs[$if_name]['descr'] = strtoupper($ppp['if']). "({$ports_base}) - {$ppp['descr']}";
+                $base_ifs[$portname]['descr'] = strtoupper($ppp['if']). "({$ports_base}) - {$ppp['descr']}";
             } else if (isset($ppp['username'])) {
-                $base_ifs[$if_name]['descr'] = strtoupper($ppp['if']). "({$ports_base}) - {$ppp['username']}";
+                $base_ifs[$portname]['descr'] = strtoupper($ppp['if']). "({$ports_base}) - {$ppp['username']}";
             } else {
-                $base_ifs[$if_name]['descr'] = strtoupper($ppp['if']). "({$ports_base})";
+                $base_ifs[$portname]['descr'] = strtoupper($ppp['if']). "({$ports_base})";
             }
         }
     }
-    // Add OpenVPN descriptions to our array
+
+    # Include OpenVPN interfaces
     $ovpn_descrs = array();
-    if (is_array($config['openvpn'])) {
-        if (is_array($config['openvpn']['openvpn-server'])) {
+    if (isset($config['openvpn']) && is_array($config['openvpn'])) {
+        if (isset($config['openvpn']['openvpn-server']) && is_array($config['openvpn']['openvpn-server'])) {
             foreach ($config['openvpn']['openvpn-server'] as $s) {
-                $if_name = "ovpns{$s['vpnid']}";
-                $base_ifs[$if_name] = $s;
+                $portname = "ovpns{$s['vpnid']}";
+                $base_ifs[$portname] = $s;
                 $ovpn_descrs[$s['vpnid']] = $s['description'];
             }
         }
-        if (is_array($config['openvpn']['openvpn-client'])) {
+        if (isset($config['openvpn']['openvpn-client']) && is_array($config['openvpn']['openvpn-client'])) {
             foreach ($config['openvpn']['openvpn-client'] as $c) {
-                $if_name = "ovpnc{$c['vpnid']}";
-                $base_ifs[$if_name] = $c;
+                $portname = "ovpnc{$c['vpnid']}";
+                $base_ifs[$portname] = $c;
                 $ovpn_descrs[$c['vpnid']] = $c['description'];
             }
         }
     }
-    // Add IPsec descriptions to our array
-    global $err_lib, $ipsec_descrs;
+
+    # Include IPsec interfaces
     $ipsec_descrs = interface_ipsec_vti_list_all();
     foreach ($ipsec_descrs as $ifname => $ifdescr) {
         $base_ifs[$ifname] = array('descr' => $ifdescr);
     }
-    // Loop through our array and check if interface is in use
+
+    # Loop through our array and check if interface is in use
     foreach ($base_ifs as $pid => $conf) {
-        $pf_id = get_pfsense_if_id($pid);    // Try to convert to pfSense interface ID
-        // Check if our pfSense ID was found
+        # Check if there is a configuration for this interface
+        $pf_id = get_pfsense_if_id($pid);
+
+        # Check if the pfSense interface ID was found
         if (get_pfsense_if_id($pid)) {
             $base_ifs[$pid]["in_use"] = $pf_id;
         }
     }
+
     return $base_ifs;
 }
 
