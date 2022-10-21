@@ -1087,6 +1087,7 @@ function is_ip_in_cidr($ip, $cidr) {
 # Check if a specified IP is a configured virtual IP
 function is_ip_vip($ip, $if=null) {
     global $config;
+    init_config_arr(["virtualip", "vip"]);
 
     # Loop through each configured virtual IP
     foreach ($config["virtualip"]["vip"] as $vip) {
