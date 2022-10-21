@@ -36,7 +36,10 @@ class APIFirewallVirtualIPUpdate extends APIModel {
         mark_subsystem_dirty('vip');
 
         # Serialize the pending changes and apply them immediately
-        file_put_contents("{$g['tmp_path']}/.firewall_virtual_ip.apply", serialize($this->validated_data));
+        file_put_contents(
+            "{$g['tmp_path']}/.firewall_virtual_ip.apply",
+            serialize([$this->id => $this->validated_data])
+        );
         applyVIP();
 
         return APIResponse\get(0, $this->validated_data);
