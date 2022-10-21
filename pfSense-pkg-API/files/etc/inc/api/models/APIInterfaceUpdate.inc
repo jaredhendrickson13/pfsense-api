@@ -111,7 +111,7 @@ class APIInterfaceUpdate extends APIModel {
                 return;
             }
             # Validate VLAN specific constraints
-            if ($this->if_list[$this->validated_data["if"]]["is_vlan"]) {
+            if ($this->if_list[$this->validated_data["if"]]["isvlan"]) {
                 # Fetch the parent interface configuration
                 $parent_mtu = get_interface_mtu($this->if_list[$this->validated_data["if"]]["if"]);
 
