@@ -207,7 +207,7 @@ class APISystemAPIUpdate extends APIModel {
             $this->validated_data["access_list"] = implode(" ", $this->initial_data["access_list"]);
         }
         elseif ($this->initial_data["access_list"] === []) {
-            $this->validated_data["access_list"]["access_list"] = "";
+            $this->validated_data["access_list"] = "";
         }
     }
 
