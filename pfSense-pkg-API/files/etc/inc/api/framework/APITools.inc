@@ -33,6 +33,7 @@ require_once("functions.inc");
 require_once("openvpn.inc");
 require_once("certs.inc");
 require_once("pkg-utils.inc");
+require_once("firewall_virtual_ip.inc");
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
@@ -528,59 +529,6 @@ function str_ends_with($needle, $haystack) {
 
     # Check if the end of the string matches the needle
     return substr($haystack, -$length) === $needle;
-}
-
-// Remove virtual IP and bring down virtual interface
-function bring_down_virtual_ip($vip_ent, $id, $delete=true) {
-    global $config;
-    if ($vip_ent['mode'] == "proxyarp") {
-        if ($delete) {
-            unset($config["virtualip"]["vip"][$id]);
-        }
-        $viface = $vip_ent['interface'];
-        interface_proxyarp_configure($viface);
-    } else {
-        interface_vip_bring_down($vip_ent);
-        if ($delete) {
-            unset($config["virtualip"]["vip"][$id]);
-        }
-    }
-    if ($delete and count($config['virtualip']['vip']) == 0) {
-        unset($config['virtualip']['vip']);
-    }
-}
-
-// Apply changes to virtual IPs
-function apply_virtual_ip($vip_ent) {
-    $check_carp = false;
-    if (is_array($vip_ent)) {
-        foreach ($vip_ent as $vid => $ovip) {
-            if (!empty($ovip)) {
-                interface_vip_bring_down($ovip);
-            }
-            if ($vip_ent) {
-                switch ($vip_ent['mode']) {
-                    case "ipalias":
-                        interface_ipalias_configure($vip_ent);
-                        break;
-                    case "proxyarp":
-                        interface_proxyarp_configure($vip_ent['interface']);
-                        break;
-                    case "carp":
-                        $check_carp = true;
-                        interface_carp_configure($vip_ent);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-    }
-    /* Before changing check #4633 */
-    if ($check_carp === true && !get_carp_status()) {
-        set_single_sysctl("net.inet.carp.allow", "1");
-    }
-    filter_configure();
 }
 
 // Find an available virtual IP vhid

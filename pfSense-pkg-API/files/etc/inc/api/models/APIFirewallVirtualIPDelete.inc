@@ -26,8 +26,9 @@ class APIFirewallVirtualIPDelete extends APIModel {
     }
 
     public function action() {
+        # Capture the vip to be deleted, remove it, write the changes to config, and reload the firewall filter
         $del_vip = $this->config["virtualip"]["vip"][$this->id];
-        APITools\bring_down_virtual_ip($del_vip, $this->id);
+        $this->delete_virtual_ip($del_vip, $this->id);
         $this->write_config();
         send_event("filter reload");
         return APIResponse\get(0, $del_vip);
@@ -43,6 +44,31 @@ class APIFirewallVirtualIPDelete extends APIModel {
             }
         } else {
             $this->errors[] = APIResponse\get(4017);
+        }
+    }
+
+    public static function delete_virtual_ip($vip_ent, $id, $delete=true) {
+        global $config;
+
+        # Safely remove and bring proxyarp virtual IPs
+        if ($vip_ent['mode'] == "proxyarp") {
+            if ($delete) {
+                unset($config["virtualip"]["vip"][$id]);
+            }
+            $viface = $vip_ent['interface'];
+            interface_proxyarp_configure($viface);
+        }
+        # Safely remove and bring down all other virtual IP types
+        else {
+            interface_vip_bring_down($vip_ent);
+            if ($delete) {
+                unset($config["virtualip"]["vip"][$id]);
+            }
+        }
+
+        # Remove leftover configuration arrays if there are no virtual IPs left
+        if ($delete and count($config['virtualip']['vip']) == 0) {
+            unset($config['virtualip']['vip']);
         }
     }
 }

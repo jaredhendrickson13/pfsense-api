@@ -28,10 +28,17 @@ class APIFirewallVirtualIPUpdate extends APIModel {
     }
 
     public function action() {
-        APITools\bring_down_virtual_ip($this->config["virtualip"]["vip"][$this->id], $this->id, false);
+        global $g;
+
+        # Update this virtual IP to config and mark the changes as pending
         $this->config["virtualip"]["vip"][$this->id] = $this->validated_data;
         $this->write_config();
-        APITools\apply_virtual_ip($this->validated_data);
+        mark_subsystem_dirty('vip');
+
+        # Serialize the pending changes and apply them immediately
+        file_put_contents("{$g['tmp_path']}/.firewall_virtual_ip.apply", serialize($this->validated_data));
+        applyVIP();
+
         return APIResponse\get(0, $this->validated_data);
     }
     
