@@ -30,7 +30,7 @@ class APIFirewallRuleCreate extends APIModel {
     public function action() {
         # Add rule to top of rules if requested
         if ($this->initial_data["top"] === true) {
-            $this->config["filter"]["rule"] = [$this->validated_data] + $this->config["filter"]["rule"];
+            $this->config["filter"]["rule"] = array_merge([$this->validated_data], $this->config["filter"]["rule"]);
         }
         # Otherwise, simply append the rule to the bottom
         else {
