@@ -102,11 +102,10 @@ class APIInterfaceCreate extends APIModel {
             # Validate VLAN specific constraints
             if ($this->if_list[$this->validated_data["if"]]["is_vlan"]) {
                 # Fetch the parent interface configuration
-                $parent_if_id = APITools\get_pfsense_if_id($this->if_list[$this->validated_data["if"]]["if"]);
-                $parent_if_conf = $this->config["interfaces"][$parent_if_id];
+                $parent_mtu = get_interface_mtu($this->if_list[$this->validated_data["if"]]["if"]);
 
                 # Ensure MTU is not lower than the parent interface
-                if ($this->initial_data["mtu"] > $parent_if_conf["mtu"]) {
+                if ($this->initial_data["mtu"] > $parent_mtu) {
                     $this->errors[] = APIResponse\get(3006);
                     return;
                 }
