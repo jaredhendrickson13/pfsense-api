@@ -1166,7 +1166,7 @@ function is_assoc_array($array, $strict_seq=false) {
     return false;
 }
 
-function api_request($url, $method, $data=[], $headers=[]) {
+function api_request($url, $method, $data=[], $headers=[], $username="", $password="") {
     # Format data and headers
     $data = json_encode($data);
     $headers["Content-Type"] = "application/json";
@@ -1184,6 +1184,11 @@ function api_request($url, $method, $data=[], $headers=[]) {
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($method));
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
+    # Only include basic authentication if username and password are set
+    if ($username and $password) {
+        curl_setopt($ch, CURLOPT_USERPWD, $username . ":" . $password);
+    }
+
     # Make our request and return the response
     $result = curl_exec($ch);
     curl_close($ch);
@@ -1194,21 +1199,21 @@ function sync() {
     # Local variables
     global $config;
     $pkg_conf = get_api_config()[1];
-    $protocol = ($config["system"]["webgui"]["protocol"]) ? $config["system"]["webgui"]["protocol"] : "https";
-    $port = ($config["system"]["webgui"]["port"]) ? $config["system"]["webgui"]["port"] : "443";
+    $protocol = ($config["system"]["webgui"]["protocol"]) ?: "https";
+    $port = ($config["system"]["webgui"]["port"]) ?: "443";
 
     # Only perform sync when HA Sync is enabled for the API
     if (isset($pkg_conf["hasync"])) {
         # Loop through each HA sync node and try to sync the configuration
         foreach (explode(" ", $pkg_conf["hasync_hosts"]) as $node) {
-            # Populate data
-            $auth_data = ["client-id"=> $pkg_conf["hasync_username"], "client-token"=> $pkg_conf["hasync_password"]];
             # Make the API request to sync configuration
             echo "Syncing API configuration to node ".$node."... ";
             $resp = api_request(
                 $protocol."://".$node.":".$port."/api/v1/system/api/sync",
                 "PUT",
-                $auth_data + $pkg_conf
+                $pkg_conf,
+                $pkg_conf["hasync_username"],
+                $pkg_conf["hasync_password"]
             );
 
             # Ensure the sync was successful
@@ -1221,25 +1226,20 @@ function sync() {
                     } elseif ($resp["return"] === 3) {
                         log_error("API sync failure (".$node."): Authentication failed");
                         echo "failed. Authentication failure.".PHP_EOL;
-                        continue;
                     } elseif ($resp["return"] === 4) {
                         log_error("API sync failure (".$node."): Authorization failed");
                         echo "failed. Authorization failure.".PHP_EOL;
-                        continue;
                     } else {
                         log_error("API sync failure (".$node."): Sync received return code ".strval($resp["return"]));
                         echo "failed. Received return code ".strval($resp["return"]).".".PHP_EOL;
-                        continue;
                     }
                 } else {
                     log_error("API sync failure (".$node."): Sync received unexpected response");
                     echo "failed. Received unexpected response.".PHP_EOL;
-                    continue;
                 }
             } else {
                 log_error("API sync failure (".$node."): No response received from node");
                 echo "failed. No response received from node.".PHP_EOL;
-                continue;
             }
         }
     } else {
