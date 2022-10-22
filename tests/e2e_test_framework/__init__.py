@@ -13,13 +13,13 @@
 # limitations under the License.
 """Module for the e2e test framework that is used to test pfSense-API."""
 import argparse
+import base64
 import json
 import sys
 import time
 import uuid
 import requests
 import urllib3
-import base64
 
 # Disable insecure request warnings as they cause a lot of noise in the tests.
 urllib3.disable_warnings(category=urllib3.exceptions.InsecureRequestWarning)
