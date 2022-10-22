@@ -150,6 +150,11 @@ and methods are available anywhere within your API model:
 this property or update/add new configuration by assigning the corresponding array key new values
 - `$this->write_config()` : This method writes any changes made to $this->config to pfSense's XML configuration file. 
 Any changes made to $this->config will not be applied until this method is executed. 
+- `$this->init_config()` : This method initializes empty areas of the pfSense configuration. Arguments passed to this
+method will initialize the configuration areas recursively. For example, running `$this->init_config("vip", "virtual_ip)`
+would initialize both the `vip` and `virtual_ip` configuration areas as empty arrays. This is mostly needed to prevent
+PHP errors when writing configuration to an area that currently has no configuration, such as writing an initial 
+virtual IP.
 
 #### Overriding API Model Validation ####
 By default, API models do not provide any sort of validation. You are responsible for overriding the class method to 
