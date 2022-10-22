@@ -46,8 +46,6 @@ class APISystemAPISyncUpdate extends APIModel {
         unset($this->initial_data["hasync_hosts"]);
         unset($this->initial_data["hasync_username"]);
         unset($this->initial_data["hasync_password"]);
-        unset($this->initial_data["client-id"]);
-        unset($this->initial_data["client-token"]);
 
         # Require data to include at least a server key and auth mode
         # NOTE: This model is not intended for public use, input is created by the master node and is generally trusted

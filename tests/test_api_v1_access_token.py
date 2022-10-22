@@ -45,8 +45,7 @@ class APIE2ETestAccessToken(e2e_test_framework.APIE2ETest):
 
         },
         {
-            "name": "Request new API token to authenticate with",
-            "payload": {"client-id": "admin", "client-token": "pfsense"}
+            "name": "Request new API token to authenticate with"
         },
         {
             "name": "Test API token authentication and change authentication mode back to original value",
