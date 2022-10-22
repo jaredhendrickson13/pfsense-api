@@ -157,10 +157,12 @@ class APIE2ETest:
         method = test_params.get("method", method)    # Allow custom method override
         username = test_params.get("username", self.args.username)
         password = test_params.get("password", self.args.password)
+        headers = {}
+        auth = None
 
         # Set authentication headers for local authentication
         if self.args.auth_mode == "local":
-            headers = {"Authorization": base64.b64encode(f"{username}:{password}".encode())}
+            auth = (username, password)
         # Set authentication headers for token authentication
         elif self.args.auth_mode == "token":
             headers = {"Authorization": self.args.username + " " + self.args.password}
@@ -176,7 +178,9 @@ class APIE2ETest:
                 data=json.dumps(test_params.get("payload", {})),
                 verify=False,
                 timeout=self.args.timeout,
-                headers=headers
+                headers=headers,
+                auth=auth
+
             )
         except (requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout):
             print(self.__format_msg__(method, test_params, f"Exceeded timeout of {self.args.timeout}s"))
@@ -197,16 +201,22 @@ class APIE2ETest:
             url=self.args.scheme + "://" + self.args.host + ":" + str(self.args.port) + "/api/v1/access_token",
             verify=False,
             timeout=self.args.timeout,
-            headers={"Authorization": base64.b64encode(f"{username}:{password}".encode())}
+            auth=(username, password)
         )
 
+        # Return the token if the request was successful
+        if req.json().get("return") == 0:
+            return req.json()["data"]["token"]
         # Check if the response indicates that JWT is not enabled
-        if req.json().get("return") == 9:
+        elif req.json().get("return") == 9:
             msg = "JWT IS REQUESTED BUT IS NOT ENABLED AS THE API AUTH MODE"
             print(self.__format_msg__(req.request.method, {"name": "BUILT-IN JWT REQUEST"}, msg, mode="warning"))
             return ""
-
-        return req.json()["data"]["token"]
+        # Fail on unexpected response code
+        else:
+            msg = "UNEXPECTED JWT RESPONSE"
+            print(self.__format_msg__(req.request.method, {"name": "BUILT-IN JWT REQUEST"}, msg))
+            return ""
 
     @staticmethod
     def has_json_response(req):
