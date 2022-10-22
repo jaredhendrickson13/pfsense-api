@@ -76,18 +76,11 @@ class APIUserAuthServerLDAPCreate extends APIModel {
         if (isset($this->initial_data['ldap_urltype'])) {
             // Assign default config values
             $allowed_url_types = array(
-                "standard" => "TCP - Standard",
-                "starttls" => "TCP - STARTTLS",
-                "encrypted" => "SSL - Encrypted"
+                "standard" => "Standard TCP",
+                "starttls" => "STARTTLS Encrypted",
+                "encrypted" => "SSL/TLS Encrypted"
             );
-            // Accommodate config value changes for pfSense 2.5_
-            if (APITools\get_pfsense_version()["program"] >= 250) {
-                $allowed_url_types = array(
-                    "standard" => "Standard TCP",
-                    "starttls" => "STARTTLS Encrypted",
-                    "encrypted" => "SSL/TLS Encrypted"
-                );
-            }
+
             // Check if our URL type is allowed
             if (!array_key_exists($this->initial_data["ldap_urltype"], $allowed_url_types)) {
                 $this->errors[] = APIResponse\get(5016);

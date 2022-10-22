@@ -45,7 +45,7 @@ class APIInterfaceDelete extends APIModel {
         }
     }
 
-    # Delete an interface given it's interface ID - for pfSense 2.5+!
+    # Delete an interface given it's interface ID
     private function destroy_interface($id) {
         if ($id === "wan") {
             $err_msg = 3042;

@@ -48,7 +48,6 @@ class APISystemDNSUpdate extends APIModel {
     }
 
     private function __validate_dnslocalhost() {
-        # Validate this field as needed for pfSense 2.5+
         if ($this->initial_data['dnslocalhost'] === true) {
             unset($this->config["system"]["dnslocalhost"]);
         } elseif ($this->initial_data['dnslocalhost'] === false) {
