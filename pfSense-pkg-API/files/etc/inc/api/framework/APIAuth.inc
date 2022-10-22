@@ -44,14 +44,13 @@ class APIAuth {
     # AUTHENTICATION #
     # Attempts to authenticate using local database authentication
     private function authenticate_local_database() {
-        # Attempt to pull credentials from basic auth, fallback to original request body credentials
-        # TODO: in a future release make basic authentication the only way to pass in local database credentials
-        $this->username = (!empty($_SERVER['PHP_AUTH_USER'])) ? $_SERVER['PHP_AUTH_USER'] : $this->request["client-id"];
-        $this->request["client-token"] = (!empty($_SERVER['PHP_AUTH_PW'])) ? $_SERVER['PHP_AUTH_PW'] : $this->request["client-token"];
+        # Extract the username and password from basic authentication
+        $this->username = $_SERVER['PHP_AUTH_USER'];
+        $client_token = (!empty($_SERVER['PHP_AUTH_PW'])) ? $_SERVER['PHP_AUTH_PW'] : $this->request["client-token"];
 
         # Authenticate against local database
-        if (authenticate_user($this->username, $this->request["client-token"])) {
-            // Ensure user is not disabled
+        if (authenticate_user($this->username, $client_token)) {
+            # Ensure user is not disabled
             if (APITools\is_user_disabled($this->username) === false) {
                 unset($_SESSION["Username"]);
                 $_SESSION["Username"] = $this->username;
@@ -63,6 +62,7 @@ class APIAuth {
 
     # Attempts to authenticate using JWT authentication
     private function authenticate_jwt() {
+        # Extract token type and JWT from authorization header
         $auth_header = explode(" ", $_SERVER["HTTP_AUTHORIZATION"]);
         $token_type = $auth_header[0];
         $token = $auth_header[1];
@@ -70,8 +70,10 @@ class APIAuth {
 
         # Check that the JWT from our Authorization header is valid
         if ($token_type === "Bearer" and $decoded_jwt !== false) {
+            # Extract the owner's username from the JWT's payload data
             $this->username = $decoded_jwt["data"];
-            // Ensure user is not disabled
+
+            # Ensure user is not disabled
             if (APITools\is_user_disabled($this->username) === false) {
                 unset($_SESSION["Username"]);
                 $_SESSION["Username"] = $this->username;
@@ -83,14 +85,12 @@ class APIAuth {
 
     # Attempts to authenticate using API token authentication
     private function authenticate_token() {
-        # Check if the API token was passed in via authorization header
-        # TODO: in a future release make this the only way to pass in token credentials
-        if (!empty($_SERVER["HTTP_AUTHORIZATION"])) {
-            $this->request["client-id"] = explode(" ", $_SERVER["HTTP_AUTHORIZATION"])[0];
-            $this->request["client-token"] = explode(" ", $_SERVER["HTTP_AUTHORIZATION"])[1];
-        }
+        # Extract client ID and token from the authorization header
+        $client_id = explode(" ", $_SERVER["HTTP_AUTHORIZATION"])[0];
+        $client_token = explode(" ", $_SERVER["HTTP_AUTHORIZATION"])[1];
 
-        if (APITools\authenticate_token($this->request["client-id"], $this->request["client-token"]) === true) {
+        # Check if authentication is successful with this client ID and token
+        if (APITools\authenticate_token($client_id, $client_token) === true) {
             $this->username = pack("H*", $this->request["client-id"]);
             # Ensure user is not disabled
             if (APITools\is_user_disabled($this->username) === false) {

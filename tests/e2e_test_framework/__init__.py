@@ -19,6 +19,7 @@ import time
 import uuid
 import requests
 import urllib3
+import base64
 
 # Disable insecure request warnings as they cause a lot of noise in the tests.
 urllib3.disable_warnings(category=urllib3.exceptions.InsecureRequestWarning)
@@ -156,19 +157,15 @@ class APIE2ETest:
         # Local variables
         method = test_params.get("method", method)    # Allow custom method override
 
-        # Create authentication payload for local authentication
+        # Set authentication headers for local authentication
         if self.args.auth_mode == "local":
-            test_params["payload"] = test_params.get("payload", {})
-            test_params["payload"].update(test_params.get("auth_payload", self.auth_payload))
-            headers = {}
-        # Create authentication headers for token authentication
+            headers = {"Authorization": base64.b64encode(f"{self.args.username}:{self.args.password}".encode())}
+        # Set authentication headers for token authentication
         elif self.args.auth_mode == "token":
             headers = {"Authorization": self.args.username + " " + self.args.password}
-        # Create authentication headers for JWT authentication
+        # Set authentication headers for JWT authentication
         elif self.args.auth_mode == "jwt":
-            headers = {
-                "Authorization": "Bearer " + self.__request_jwt__(test_params.get("auth_payload", self.auth_payload))
-            }
+            headers = {"Authorization": "Bearer " + self.get_jwt(test_params.get("auth_payload", self.auth_payload))}
 
         # Attempt to make the API call, if the request times out print timeout error
         try:
@@ -357,7 +354,7 @@ class APIE2ETest:
         msg = msg + f" [ {methods[method]} {self.url} ][{test_params.get('name', 'Unnamed test')}]: {result}"
         return msg
 
-    def __request_jwt__(self, auth_payload):
+    def get_jwt(self, auth_payload):
         req = requests.request(
             "POST",
             url=self.args.scheme + "://" + self.args.host + ":" + str(self.args.port) + "/api/v1/access_token",
