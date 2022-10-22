@@ -6617,8 +6617,7 @@ paths:
             schema:
               properties:
                 initiate:
-                  description: Initiate all tunnels (phase 1 and 2) with the newly applied configuration. This field
-                    is only available on pfSense 2.6+ and pfSense Plus 22.05+.
+                  description: Initiate all tunnels (phase 1 and 2) with the newly applied configuration.
                   type: boolean
                   default: false
       responses:
@@ -6869,7 +6868,6 @@ paths:
                 startaction:
                   description: Option to force specific initiation/responder behavior for child SA (P2) entries. Options 
                     for this field are set by pfSense itself. These options may vary based on your pfSense version.
-                    This field is not supported on pfSense 2.5.1 or pfSense 2.5.0.
                   type: string
                   default: ""
                   enum:
@@ -7092,7 +7090,6 @@ paths:
                 startaction:
                   description: Option to force specific initiation/responder behavior for child SA (P2) entries. Options 
                     for this field are set by pfSense itself. These options may vary based on your pfSense version.
-                    This field is not supported on pfSense 2.5.1 or pfSense 2.5.0.
                   type: string
                   enum:
                     - ""
