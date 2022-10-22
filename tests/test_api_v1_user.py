@@ -69,7 +69,8 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
         {
             "name": "Create a disabled local user using the previously created local user",
             "resp_time": 2,  # Allow a couple seconds for user database to be updated
-            "auth_payload": {"client-id": "new_user", "client-token": "changeme"},
+            "username": "new_user",
+            "password": "changeme",
             "payload": {
                 "disabled": True,
                 "username": "disabled_user",
@@ -80,7 +81,8 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "name": "Check disabled user's inability to authenticate",
             "status": 401,
             "return": 3,
-            "auth_payload": {"client-id": "disabled_user", "client-token": "changeme"},
+            "username": "disabled_user",
+            "password": "changeme"
         },
         {
             "name": "Check username requirement and login using created user",

@@ -91,7 +91,7 @@ class APIAuth {
 
         # Check if authentication is successful with this client ID and token
         if (APITools\authenticate_token($client_id, $client_token) === true) {
-            $this->username = pack("H*", $this->request["client-id"]);
+            $this->username = pack("H*", $client_id);
             # Ensure user is not disabled
             if (APITools\is_user_disabled($this->username) === false) {
                 unset($_SESSION["Username"]);

@@ -47,7 +47,6 @@ class APIE2ETest:
     def __init__(self):
         self.__start_argparse__()
         self.url = self.format_url(self.uri)
-        self.auth_payload = {"client-id": self.args.username, "client-token": self.args.password}
 
         # Run E2E tests and exit on corresponding status code
         try:
@@ -156,16 +155,18 @@ class APIE2ETest:
         """Makes an API request based on the test's parameters."""
         # Local variables
         method = test_params.get("method", method)    # Allow custom method override
+        username = test_params.get("username", self.args.username)
+        password = test_params.get("password", self.args.password)
 
         # Set authentication headers for local authentication
         if self.args.auth_mode == "local":
-            headers = {"Authorization": base64.b64encode(f"{self.args.username}:{self.args.password}".encode())}
+            headers = {"Authorization": base64.b64encode(f"{username}:{password}".encode())}
         # Set authentication headers for token authentication
         elif self.args.auth_mode == "token":
             headers = {"Authorization": self.args.username + " " + self.args.password}
         # Set authentication headers for JWT authentication
         elif self.args.auth_mode == "jwt":
-            headers = {"Authorization": "Bearer " + self.get_jwt(test_params.get("auth_payload", self.auth_payload))}
+            headers = {"Authorization": "Bearer " + self.get_jwt(username, password)}
 
         # Attempt to make the API call, if the request times out print timeout error
         try:
@@ -354,13 +355,13 @@ class APIE2ETest:
         msg = msg + f" [ {methods[method]} {self.url} ][{test_params.get('name', 'Unnamed test')}]: {result}"
         return msg
 
-    def get_jwt(self, auth_payload):
+    def get_jwt(self, username, password):
         req = requests.request(
             "POST",
             url=self.args.scheme + "://" + self.args.host + ":" + str(self.args.port) + "/api/v1/access_token",
-            data=json.dumps(auth_payload),
             verify=False,
-            timeout=self.args.timeout
+            timeout=self.args.timeout,
+            headers={"Authorization": base64.b64encode(f"{username}:{password}".encode())}
         )
 
         # Check if the response indicates that JWT is not enabled

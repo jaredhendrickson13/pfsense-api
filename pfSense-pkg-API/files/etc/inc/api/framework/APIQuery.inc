@@ -139,7 +139,7 @@ class APIQuery {
 
     # Checks if this value is excluded from queries
     private function is_excluded($value) {
-        $excluded_keys = array_merge(["client-token", "client-id"], (array)$this->excluded);
+        $excluded_keys = $this->excluded;
         return in_array($value, $excluded_keys);
     }
 
