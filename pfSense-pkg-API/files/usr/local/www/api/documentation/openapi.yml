@@ -33,9 +33,6 @@ info:
     using basic authentication. For example:<br><br>
     `curl -u admin:pfsense https://pfsense.example.com/api/v1/firewall/rule`
     <br><br>
-    _Note: in previous releases, local database authentication used the `client-id` and `client-token` fields in your
-    request body to authenticate. This functionality still exists but is not recommended. It will be removed in a future
-    release._
     </details>
 
     <details>
@@ -81,8 +78,7 @@ info:
     curl -H "Authorization: CLIENT_ID_HERE CLIENT_TOKEN_HERE" -X GET https://pfsense.example.com/api/v1/system/arp
     ```
 
-    <br><br>_Note: In previous versions of pfSense API, the client-id and client-token were provided via the request payload. This
-    functionality is still supported but is not recommended. It will be removed in a future release._
+    <br>
     </details>
 
     ### Authorization
