@@ -185,10 +185,28 @@ class APIE2ETest:
         if req_only:
             return req
         # Otherwise, check if the response is valid
-        if self.check_response(req, test_params, verbose=self.args.verbose):
+        if self.__check_resp__(req, test_params, verbose=self.args.verbose):
             return req.json()
 
         return None
+
+    def get_jwt(self, username, password):
+        """Requests a new JWT to use for JWT authentication."""
+        req = requests.request(
+            "POST",
+            url=self.args.scheme + "://" + self.args.host + ":" + str(self.args.port) + "/api/v1/access_token",
+            verify=False,
+            timeout=self.args.timeout,
+            headers={"Authorization": base64.b64encode(f"{username}:{password}".encode())}
+        )
+
+        # Check if the response indicates that JWT is not enabled
+        if req.json().get("return") == 9:
+            msg = "JWT IS REQUESTED BUT IS NOT ENABLED AS THE API AUTH MODE"
+            print(self.__format_msg__(req.request.method, {"name": "BUILT-IN JWT REQUEST"}, msg, mode="warning"))
+            return ""
+
+        return req.json()["data"]["token"]
 
     @staticmethod
     def has_json_response(req):
@@ -223,7 +241,7 @@ class APIE2ETest:
 
         return False
 
-    def check_response(self, req, test_params, verbose=False):
+    def __check_resp__(self, req, test_params, verbose=False):
         """Checks if the API response is within the test parameters."""
         # Local variables
         valid = False
@@ -354,20 +372,3 @@ class APIE2ETest:
         # Piece the message together
         msg = msg + f" [ {methods[method]} {self.url} ][{test_params.get('name', 'Unnamed test')}]: {result}"
         return msg
-
-    def get_jwt(self, username, password):
-        req = requests.request(
-            "POST",
-            url=self.args.scheme + "://" + self.args.host + ":" + str(self.args.port) + "/api/v1/access_token",
-            verify=False,
-            timeout=self.args.timeout,
-            headers={"Authorization": base64.b64encode(f"{username}:{password}".encode())}
-        )
-
-        # Check if the response indicates that JWT is not enabled
-        if req.json().get("return") == 9:
-            msg = "JWT IS REQUESTED BUT IS NOT ENABLED AS THE API AUTH MODE"
-            print(self.__format_msg__(req.request.method, {"name": "BUILT-IN JWT REQUEST"}, msg, mode="warning"))
-            return ""
-
-        return req.json()["data"]["token"]
