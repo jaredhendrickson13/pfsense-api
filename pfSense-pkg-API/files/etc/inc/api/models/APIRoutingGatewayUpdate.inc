@@ -26,6 +26,7 @@ class APIRoutingGatewayUpdate extends APIModel {
         $this->change_note = "Modified gateway via API";
         $this->ip_protocol_changed = false;
         $this->init_config('gateways', 'gateway_item');
+        $this->init_config('staticroutes', 'route');
     }
 
     public function action() {
@@ -93,6 +94,7 @@ class APIRoutingGatewayUpdate extends APIModel {
                 # Only throw an error if the updated name doesn't match the existing name
                 $this->errors[] = APIResponse\get(6026);
             } else {
+                $this->__update_route_gw_names($this->validated_data["name"], $this->initial_data["name"]);
                 $this->validated_data["name"] = $this->initial_data["name"];
             }
         }
@@ -392,6 +394,18 @@ class APIRoutingGatewayUpdate extends APIModel {
             }
         }
     }
+
+    # Updates the name of the gateway assigned to child routes
+    private function __update_route_gw_names($old_name, $new_name) {
+        # Loop through all static routes and update their gateway names
+        foreach ($this->config["staticroutes"]["route"] as $id=>$route) {
+            # If this route is using the old gateway name, update it to the new gateway name
+            if ($route["gateway"] === $old_name) {
+                $this->config["staticroutes"]["route"][$id]["gateway"] = $new_name;
+            }
+        }
+    }
+
 
     # Checks if this interface already has a saved configuration for a dynamic gateway using this IP protocol
     public function allow_dynamic_gw($interface, $ipprotocol) {
