@@ -380,7 +380,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Update IPv4 routing gateway",
             "resp_time": 5,
             "payload": {
-                "id": 0,
+                "id": "TEST_ROUTING_GATEWAY_V4",
                 "name": "UPDATED_TEST_ROUTING_GATEWAY_V4",
                 "ipprotocol": "inet",
                 "gateway": "172.16.209.2",
@@ -412,7 +412,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
         {
             "name": "Update IPv6 routing gateway",
             "payload": {
-                "id": 1,
+                "id": "TEST_ROUTING_GATEWAY_V6",
                 "name": "UPDATED_TEST_ROUTING_GATEWAY_V6",
                 "ipprotocol": "inet6",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
