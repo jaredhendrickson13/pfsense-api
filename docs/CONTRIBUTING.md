@@ -411,6 +411,12 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
     - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
     - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
     - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.
+    - `pre_test_callable` : the name of a function callable to run before this test is run.
+    - `post_test_callable` : the name of a function callable to run after this test is run.
+    - `payload_callable` : the name of a function callable to run to dynamically generate the request payload. This
+      must be a function that returns a dictionary of request payload items. This can be used to apply request payload
+      items that may by dynamic such as IDs. If this test also has a `payload` specified, this callable will simply 
+      be merged into the test's `payload`. 
     
 - `post_tests` : A list of dictionary formatted test parameters for POST requests. If this endpoint does not support 
 POST requests, you do not need to override this property. If this endpoint does support POST request, but does not require
@@ -423,7 +429,13 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
     - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
     - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
     - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.
-
+    - `pre_test_callable` : the name of a function callable to run before this test is run.
+    - `post_test_callable` : the name of a function callable to run after this test is run.
+    - `payload_callable` : the name of a function callable to run to dynamically generate the request payload. This
+      must be a function that returns a dictionary of request payload items. This can be used to apply request payload
+      items that may by dynamic such as IDs. If this test also has a `payload` specified, this callable will simply 
+      be merged into the test's `payload`. 
+  
 - `put_tests` : A list of dictionary formatted test parameters for PUT requests. If this endpoint does not support 
 PUT requests, you do not need to override this property. If this endpoint does support PUT request, but does not require
 any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
@@ -435,6 +447,12 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
     - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
     - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
     - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.
+    - `pre_test_callable` : the name of a function callable to run before this test is run.
+    - `post_test_callable` : the name of a function callable to run after this test is run.
+    - `payload_callable` : the name of a function callable to run to dynamically generate the request payload. This
+      must be a function that returns a dictionary of request payload items. This can be used to apply request payload
+      items that may by dynamic such as IDs. If this test also has a `payload` specified, this callable will simply 
+      be merged into the test's `payload`. 
 
 - `delete_tests` : A list of dictionary formatted test parameters for DELETE requests. If this endpoint does not support 
 DELETE requests, you do not need to override this property. If this endpoint does support DELETE request, but does not require
@@ -447,6 +465,12 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
     - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
     - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
     - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.
+    - `pre_test_callable` : the name of a function callable to run before this test is run.
+    - `post_test_callable` : the name of a function callable to run after this test is run.
+    - `payload_callable` : the name of a function callable to run to dynamically generate the request payload. This
+      must be a function that returns a dictionary of request payload items. This can be used to apply request payload
+      items that may by dynamic such as IDs. If this test also has a `payload` specified, this callable will simply 
+      be merged into the test's `payload`. 
 
 - `get_responses` : A list of previously executed GET requests in a dictionary format. Failing responses will not be 
 included.
