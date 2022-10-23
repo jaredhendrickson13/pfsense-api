@@ -159,13 +159,19 @@ class APIE2ETest:
         payload = test_params.get("payload", {})
         payload_callable = getattr(self, test_params.get("payload_callable", ""), None)
         pre_test_callable = getattr(self, test_params.get("pre_test_callable", ""), None)
+        pre_test_exc = None
         post_test_callable = getattr(self, test_params.get("post_test_callable", ""), None)
+        post_test_exc = None
         username = test_params.get("username", self.args.username)
         password = test_params.get("password", self.args.password)
         auth_mode = test_params.get("auth_mode", self.args.auth_mode)
+        delay = test_params.get("delay", 0)
         headers = {}
         auth = None
         req = None
+
+        # Delay this test if the 'delay' parameter is set
+        time.sleep(delay)
 
         # Set authentication headers for local authentication
         if auth_mode == "local":
@@ -183,7 +189,11 @@ class APIE2ETest:
 
         # When a pre-test callable is defined, ensure it is a callable and run the function
         if callable(pre_test_callable):
-            pre_test_callable()
+            # Try to run the callable, if an exception occurs capture it so it can be checked in __check_resp__
+            try:
+                pre_test_callable()
+            except Exception as exc:
+                pre_test_exc = exc
 
         # Attempt to make the API call, if the request times out print timeout error
         try:
@@ -203,15 +213,31 @@ class APIE2ETest:
         if req_only:
             return req
 
-        # Otherwise, check if the response is valid
-        if self.__check_resp__(req, test_params, verbose=self.args.verbose):
-            # Set the last response
+        # Try to set the last response, set an empty dict if we couldn't.
+        try:
             self.last_response = req.json()
+        except requests.exceptions.JSONDecodeError:
+            self.last_response = {}
 
-            # When a post-test callable is defined, ensure it is a callable and run the function
-            if callable(post_test_callable):
+        # When a post-test callable is defined, ensure it is a callable and run the function
+        if callable(post_test_callable):
+            # Try to run the callable, if an exception occurs capture it so it can be checked in __check_resp__
+            try:
                 post_test_callable()
+            except Exception as exc:
+                post_test_exc = exc
 
+        # Otherwise, check if the response is valid
+        response_valid = self.__check_resp__(
+            req,
+            test_params,
+            verbose=self.args.verbose,
+            pre_test_exc=pre_test_exc,
+            post_test_exc=post_test_exc
+        )
+
+        # Return the JSON response when successful
+        if response_valid:
             return req.json()
 
         return None
@@ -274,31 +300,43 @@ class APIE2ETest:
 
         return False
 
-    def __check_resp__(self, req, test_params, verbose=False):
+    def __check_resp__(self, req, test_params, verbose=False, pre_test_exc=None, post_test_exc=None):
         """Checks if the API response is within the test parameters."""
         # Local variables
         valid = False
 
-        # Run each check and print the results
+        # Ensure we received a JSON response
         if not APIE2ETest.has_json_response(req):
             msg = f"Expected JSON response, received {req.content}"
             print(self.__format_msg__(req.request.method, test_params, msg))
+        # Ensure response has the correct HTTP status code
         elif not APIE2ETest.has_correct_http_status(req, test_params):
             received_status = req.status_code
             expected_status = test_params.get("status", 200)
             msg = f"Expected status code {expected_status}, received {received_status}"
             print(self.__format_msg__(req.request.method, test_params, msg))
+        # Ensure response has the correct API return code
         elif not APIE2ETest.has_correct_return_code(req, test_params):
             received_return = req.json()["return"]
             expected_return = test_params.get("return", 0)
             msg = f"Expected return code {expected_return}, received {received_return}"
             print(self.__format_msg__(req.request.method, test_params, msg))
+        # Ensure no exceptions occurred during the pre-test callable
+        elif pre_test_exc:
+            msg = f"Encountered exception during pre-test callable, received: {pre_test_exc}"
+            print(self.__format_msg__(req.request.method, test_params, msg))
+        # Ensure no exceptions occurred during the post-test callable
+        elif post_test_exc:
+            msg = f"Encountered exception during post-test callable, received: {post_test_exc}"
+            print(self.__format_msg__(req.request.method, test_params, msg))
+        # Ensure response time was within threshold, prints a warning if the response time to was too long
         elif not APIE2ETest.has_correct_resp_time(req, test_params):
             received_resp_time = req.elapsed.total_seconds()
             expected_resp_time = test_params.get("resp_time", 1)
             msg = f"Expected response time within {expected_resp_time}s, received {received_resp_time}s"
             print(self.__format_msg__(req.request.method, test_params, msg, mode="warning"))
             valid = True
+        # Otherwise, the response is valid. Print successful test.
         else:
             print(self.__format_msg__(req.request.method, test_params, "Response is valid", mode="ok"))
             valid = True
@@ -385,12 +423,16 @@ class APIE2ETest:
         self.args = parser.parse_args()
 
     def __format_msg__(self, method, test_params, result, mode="failed"):
+        # Set ASCII color text for the method used
         methods = {
             "GET": "\33[32mGET\33[0m",
             'POST': "\33[33mPOST\33[0m",
             'PUT': "\33[34mPUT\33[0m",
             'DELETE': "\33[31mDELETE\33[0m"
         }
+
+        # Set the URL to the actual URL used in the test, respecting the 'uri' test_param
+        url = self.format_url(test_params.get("uri", ""))
 
         # Check the mode and format the message accordingly
         if mode == "failed":
@@ -403,5 +445,5 @@ class APIE2ETest:
             raise ValueError("Unknown `mode` provided to APIE2ETest.__format_msg__")
 
         # Piece the message together
-        msg = msg + f" [ {methods[method]} {self.url} ][{test_params.get('name', 'Unnamed test')}]: {result}"
+        msg = msg + f" [ {methods[method]} {url} ][{test_params.get('name', 'Unnamed test')}]: {result}"
         return msg
