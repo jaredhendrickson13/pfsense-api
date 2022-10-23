@@ -39,11 +39,17 @@ class APIRoutingGatewayUpdate extends APIModel {
     private function __validate_id() {
         # Require clients to pass in a gateway ID to locate the gateway to update
         if (isset($this->initial_data['id'])) {
-            # Check that our ID exists
+            # Check if an existing gateway's numeric ID matches this ID
             if (array_key_exists($this->initial_data['id'], $this->config["gateways"]["gateway_item"])) {
                 $this->id = $this->initial_data['id'];
                 $this->validated_data = $this->config["gateways"]["gateway_item"][$this->id];
-            } else {
+            }
+            # Check if the ID passed in is a gateway name
+            elseif (is_numeric($this->get_id_by_name($this->initial_data["id"]))) {
+                $this->id = $this->get_id_by_name($this->initial_data["id"]);
+                $this->validated_data = $this->config["gateways"]["gateway_item"][$this->id];
+            }
+            else {
                 $this->errors[] = APIResponse\get(6028);
             }
         } else {
@@ -374,6 +380,17 @@ class APIRoutingGatewayUpdate extends APIModel {
         $this->__validate_loss_interval();
         $this->__validate_time_period();
         $this->__validate_alert_interval();
+    }
+
+    # Gets the numeric ID of a gateway by it's name
+    public function get_id_by_name($name) {
+        # Loop through all existing gateways and check if this name matches
+        foreach ($this->config["gateways"]["gateway_item"] as $id=>$gw) {
+            # Check if this name matches
+            if ($name === $gw["name"]) {
+                return $id;
+            }
+        }
     }
 
     # Checks if this interface already has a saved configuration for a dynamic gateway using this IP protocol

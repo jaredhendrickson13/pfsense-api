@@ -5305,7 +5305,7 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]'
       parameters:
-        - description: ID of the gateway to delete. Refer to the 'Obtaining Object IDs'
+        - description: ID or name of the gateway to delete. Refer to the 'Obtaining Object IDs'
             section in the documentation intro for help obtaining this ID.
           in: query
           name: id
@@ -5534,7 +5534,7 @@ paths:
                     if `ipprotocol` is set to `inet6`.
                   type: string
                 id:
-                  description: ID of the gateway to update. Refer to the 'Obtaining
+                  description: ID or name of the gateway to update. Refer to the 'Obtaining
                     Object IDs' section in the documentation intro for help obtaining
                     this ID.
                   type: integer

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Script used to test the /api/v1/routing/gateway endpoint."""
+import re
+
 import e2e_test_framework
 
 
@@ -21,15 +23,42 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
     get_tests = [{"name": "Read all routing gateways"}]
     post_tests = [
         {
-            "name": "Create routing gateway",
+            "name": "Create IPv4 routing gateway",
             "payload": {
                 "interface": "wan",
-                "name": "API_e2e_test_GATEWAY",
+                "name": "TEST_ROUTING_GATEWAY_V4",
                 "ipprotocol": "inet",
                 "gateway": "172.16.209.1",
                 "monitor": "172.16.209.250",
                 "descr": "E2E test"
             }
+        },
+        {
+            "name": "Create IPv6 routing gateway",
+            "payload": {
+                "interface": "wan",
+                "name": "TEST_ROUTING_GATEWAY_V6",
+                "ipprotocol": "inet6",
+                "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7332",
+                "descr": "E2E test"
+            }
+        },
+        {
+            "name": "Create a IPv4 static route using IPv4 routing gateway",
+            "resp_time": 5,
+            "uri": "/api/v1/routing/static_route",
+            "payload": {
+                "network": "1.2.3.4/32",
+                "gateway": "TEST_ROUTING_GATEWAY_V4",
+                "apply": True
+            }
+        },
+        {
+            "name": "Check that static route with this gateway is present on system",
+            "method": "POST",
+            "post_test_callable": "check_for_static_route_created",
+            "uri": "/api/v1/diagnostics/command_prompt",
+            "payload": {"shell_cmd": "netstat -rn"}
         },
         {
             "name": "Check interface requirement",
@@ -348,10 +377,43 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
     ]
     put_tests = [
         {
-            "name": "Update routing gateway",
+            "name": "Update IPv4 routing gateway",
+            "resp_time": 5,
             "payload": {
                 "id": 0,
-                "name": "UPDATED_e2e_test_GATEWAY",
+                "name": "UPDATED_TEST_ROUTING_GATEWAY_V4",
+                "ipprotocol": "inet",
+                "gateway": "172.16.209.2",
+                "monitor": "172.16.209.100",
+                "descr": "Updated E2E Test",
+                "disabled": False,
+                "action_disable": True,
+                "monitor_disable": True,
+                "weight": 2,
+                "data_payload": 5,
+                "latencylow": 300,
+                "latencyhigh": 600,
+                "interval": 2100,
+                "loss_interval": 2500,
+                "action_interval": 1040,
+                "time_period": 66000,
+                "losslow": 5,
+                "losshigh": 10,
+                "apply": True
+            }
+        },
+        {
+            "name": "Check that static route was updated to use updated gateway IP",
+            "method": "POST",
+            "post_test_callable": "check_for_static_route_updated",
+            "uri": "/api/v1/diagnostics/command_prompt",
+            "payload": {"shell_cmd": "netstat -rn"}
+        },
+        {
+            "name": "Update IPv6 routing gateway",
+            "payload": {
+                "id": 1,
+                "name": "UPDATED_TEST_ROUTING_GATEWAY_V6",
                 "ipprotocol": "inet6",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
                 "monitor": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -491,7 +553,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6015,
             "payload": {
-                "id": 0,
+                "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
@@ -504,7 +566,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6015,
             "payload": {
-                "id": 0,
+                "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
@@ -517,7 +579,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6016,
             "payload": {
-                "id": 0,
+                "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
@@ -530,7 +592,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6017,
             "payload": {
-                "id": 0,
+                "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
@@ -543,7 +605,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6018,
             "payload": {
-                "id": 0,
+                "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
@@ -557,7 +619,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6019,
             "payload": {
-                "id": 0,
+                "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
@@ -570,7 +632,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6019,
             "payload": {
-                "id": 0,
+                "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
@@ -583,7 +645,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6020,
             "payload": {
-                "id": 0,
+                "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
@@ -597,7 +659,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6020,
             "payload": {
-                "id": 0,
+                "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
@@ -611,7 +673,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6021,
             "payload": {
-                "id": 0,
+                "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
@@ -624,7 +686,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6021,
             "payload": {
-                "id": 0,
+                "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
@@ -637,7 +699,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6022,
             "payload": {
-                "id": 0,
+                "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
@@ -650,7 +712,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6023,
             "payload": {
-                "id": 0,
+                "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
@@ -663,7 +725,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6024,
             "payload": {
-                "id": 0,
+                "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
@@ -673,6 +735,12 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
         }
     ]
     delete_tests = [
+        {
+            "name": "Delete the static route used for testing",
+            "uri": "/api/v1/routing/static_route",
+            "resp_time": 5,
+            "payload": {"id": 0, "apply": True}
+        },
         {
             "name": "Check ID requirement",
             "status": 400,
@@ -687,7 +755,14 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             }
         },
         {
-            "name": "Delete routing gateway",
+            "name": "Delete IPv4 routing gateway",
+            "payload": {
+                "id": 0
+            },
+            "resp_time": 5    # Allow a few seconds to safely remove the gateway and reload the route table
+        },
+        {
+            "name": "Delete IPv6 routing gateway",
             "payload": {
                 "id": 0
             },
@@ -709,6 +784,26 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "resp_time": 5    # Allow a few seconds to safely remove the gateway and reload the route table
         }
     ]
+
+    def check_for_static_route_created(self):
+        """Checks if the static route created by this test case is present on the remote system."""
+        # Variables
+        routing_table = self.last_response.get("data", {}).get("cmd_output", "")
+        routing_table = re.sub(' +', ' ', routing_table)
+
+        # Ensure the route we created exists and is correctly assigned the gateway we created
+        if "1.2.3.4 172.16.209.1" not in routing_table:
+            raise AssertionError("route for 1.2.3.4/32 with gateway 172.16.209.1 not in routing table")
+
+    def check_for_static_route_updated(self):
+        """Checks if the static route created by this test case had its gateway updated correctly."""
+        # Variables
+        routing_table = self.last_response.get("data", {}).get("cmd_output", "")
+        routing_table = re.sub(' +', ' ', routing_table)
+
+        # Ensure the route we created exists and is correctly assigned the gateway we updated
+        if "1.2.3.4 172.16.209.2" not in routing_table:
+            raise AssertionError("route for 1.2.3.4/32 did not get it's gateway updated to 172.16.209.2")
 
 
 APIE2ETestRoutingGateway()
