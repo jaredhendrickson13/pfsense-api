@@ -11,8 +11,3 @@ jobs:
         with:
           file-extensions: 'php, inc'
           php-version: "8.1"
-      - name: Lint on PHP 7.4
-        uses: firehed/lint-php-action@v1
-        with:
-          file-extensions: 'php, inc'
-          php-version: "7.4"
