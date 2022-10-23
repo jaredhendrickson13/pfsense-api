@@ -26,10 +26,14 @@ class APIRoutingStaticRouteCreate extends APIModel {
     }
 
     public function action() {
+        # Add this static route to config
         $this->config["staticroutes"]["route"][] = $this->validated_data;
         $this->write_config();
-        $this->validated_data["id"] = count($this->config["staticroutes"]["route"]) - 1;
+
+        # Mark the routing subsystem as changed
+        mark_subsystem_dirty("staticroutes");
         $this->apply();
+
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -103,17 +107,9 @@ class APIRoutingStaticRouteCreate extends APIModel {
     }
 
     public function apply() {
-        # Mark the routing subsystem as changed, clear if applied
-        mark_subsystem_dirty("staticroutes");
-
-        # Optionally allow clients to apply this route immediately if they passed in a true apply value
+        # Apply these changes immediately if requested
         if ($this->initial_data["apply"] === true) {
-            system_routing_configure();
-            system_resolvconf_generate();
-            filter_configure();
-            setup_gateways_monitor();
-            send_event("service reload dyndnsall");
-            clear_subsystem_dirty("staticroutes");
+            APIRoutingApplyCreate::apply();
         }
     }
 }
