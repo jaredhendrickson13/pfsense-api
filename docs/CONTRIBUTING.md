@@ -410,6 +410,7 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
     - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
     - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
+    - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.
     
 - `post_tests` : A list of dictionary formatted test parameters for POST requests. If this endpoint does not support 
 POST requests, you do not need to override this property. If this endpoint does support POST request, but does not require
@@ -421,6 +422,7 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
     - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
     - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
+    - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.
 
 - `put_tests` : A list of dictionary formatted test parameters for PUT requests. If this endpoint does not support 
 PUT requests, you do not need to override this property. If this endpoint does support PUT request, but does not require
@@ -432,6 +434,7 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
     - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
     - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
+    - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.
 
 - `delete_tests` : A list of dictionary formatted test parameters for DELETE requests. If this endpoint does not support 
 DELETE requests, you do not need to override this property. If this endpoint does support DELETE request, but does not require
@@ -443,6 +446,7 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
     - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
     - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
+    - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.
 
 - `get_responses` : A list of previously executed GET requests in a dictionary format. Failing responses will not be 
 included.
