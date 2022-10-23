@@ -27,7 +27,7 @@ class APIRoutingStaticRouteUpdate extends APIModel {
     }
 
     public function action() {
-        APITools\delete_static_route($this->id);
+        delete_static_route($this->id);
         $this->config["staticroutes"]["route"][$this->id] = $this->validated_data;
         $this->write_config();
         $this->validated_data["id"] = count($this->config["staticroutes"]["route"]) - 1;

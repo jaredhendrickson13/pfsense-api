@@ -942,41 +942,6 @@ function get_ipv6_if_list() {
     return($dyn_v6_ifs);
 }
 
-function delete_static_route($id) {
-    global $config;
-    $a_routes = &$config['staticroutes']['route'];
-    $a_gateways = return_gateways_array(true, true, true);
-
-    if (!isset($a_routes[$id])) {
-        return;
-    }
-
-    $targets = array();
-    if (is_alias($a_routes[$id]['network'])) {
-        foreach (filter_expand_alias_array($a_routes[$id]['network']) as $tgt) {
-            if (is_ipaddrv4($tgt)) {
-                $tgt .= "/32";
-            } else if (is_ipaddrv6($tgt)) {
-                $tgt .= "/128";
-            }
-            if (!is_subnet($tgt)) {
-                continue;
-            }
-            $targets[] = $tgt;
-        }
-    } else {
-        $targets[] = $a_routes[$id]['network'];
-    }
-
-    foreach ($targets as $tgt) {
-        $family = (is_subnetv6($tgt) ? "-inet6" : "-inet");
-        $gateway = $a_gateways[$a_routes[$id]['gateway']]['gateway'];
-        mwexec("/sbin/route delete {$family} " . escapeshellarg($tgt) . " " . escapeshellarg($gateway));
-    }
-
-    unset($targets);
-}
-
 # Converts an integer-of-100 percent to a decimal percentage
 function float_percent($value) {
     # Only return converted value if it is numeric
