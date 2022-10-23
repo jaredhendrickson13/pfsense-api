@@ -149,6 +149,13 @@ class APIE2ETestRoutingStaticRoute(e2e_test_framework.APIE2ETest):
             "resp_time": 5    # Allow a few seconds to reload the routing table
         },
         {
+            "name": "Check that static route is present on system",
+            "method": "POST",
+            "post_test_callable": "check_for_static_route_deleted",
+            "uri": "/api/v1/diagnostics/command_prompt",
+            "payload": {"shell_cmd": "netstat -rn"}
+        },
+        {
             "name": "Check ID required constraint",
             "status": 400,
             "return": 6005
@@ -168,13 +175,19 @@ class APIE2ETestRoutingStaticRoute(e2e_test_framework.APIE2ETest):
             raise AssertionError("1.2.3.4/32 was not found in the system table after creation via API")
 
     def check_for_static_route_updated(self):
-        """Checks if the static route created by this test case is present on the remote system."""
+        """Checks if the static route updated by this test case is present on the remote system."""
         # Ensure the route was correctly updated in the systems routing table.
         if "4.3.2.1" not in self.last_response.get("data", {}).get("cmd_output", ""):
             raise AssertionError("4.3.2.1/32 was not found in the system table after update via API")
         # Ensure the old route is no longer present
         if "1.2.3.4" in self.last_response.get("data", {}).get("cmd_output", ""):
             raise AssertionError("old route to 1.2.3.4/32 was still present in the system table after update via API")
+
+    def check_for_static_route_deleted(self):
+        """Checks if the static route deleted by this test case is no longer present on the remote system."""
+        # Check if the route we delete for 4.3.2.1/32 is no longer in the routing table.
+        if "4.3.2.1" in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError("1.2.3.4/32 was not deleted in the system table after deletion via API")
 
 
 APIE2ETestRoutingStaticRoute()
