@@ -154,6 +154,9 @@ class APIE2ETest:
 
     def make_request(self, method, test_params, req_only=False):
         """Makes an API request based on the test's parameters."""
+        # pylint: disable=broad-except    # We don't want tests to exit and prevent later tests
+        # pylint: disable=too-many-locals  # Many variables needed for customization
+
         # Local variables
         method = test_params.get("method", method)    # Allow custom method override
         payload = test_params.get("payload", {})
@@ -165,13 +168,12 @@ class APIE2ETest:
         username = test_params.get("username", self.args.username)
         password = test_params.get("password", self.args.password)
         auth_mode = test_params.get("auth_mode", self.args.auth_mode)
-        delay = test_params.get("delay", 0)
         headers = {}
         auth = None
         req = None
 
         # Delay this test if the 'delay' parameter is set
-        time.sleep(delay)
+        time.sleep(test_params.get("delay", 0))
 
         # Set authentication headers for local authentication
         if auth_mode == "local":
@@ -198,7 +200,7 @@ class APIE2ETest:
         # Attempt to make the API call, if the request times out print timeout error
         try:
             req = requests.request(
-                test_params.get("method", method),
+                method,
                 url=self.format_url(test_params.get("uri", self.uri)),
                 data=json.dumps(payload),
                 verify=False,
@@ -228,13 +230,7 @@ class APIE2ETest:
                 post_test_exc = exc
 
         # Otherwise, check if the response is valid
-        response_valid = self.__check_resp__(
-            req,
-            test_params,
-            verbose=self.args.verbose,
-            pre_test_exc=pre_test_exc,
-            post_test_exc=post_test_exc
-        )
+        response_valid = self.__check_resp__(req, test_params, pre_test_exc=pre_test_exc, post_test_exc=post_test_exc)
 
         # Return the JSON response when successful
         if response_valid:
@@ -300,7 +296,7 @@ class APIE2ETest:
 
         return False
 
-    def __check_resp__(self, req, test_params, verbose=False, pre_test_exc=None, post_test_exc=None):
+    def __check_resp__(self, req, test_params, pre_test_exc=None, post_test_exc=None):
         """Checks if the API response is within the test parameters."""
         # Local variables
         valid = False
@@ -342,7 +338,7 @@ class APIE2ETest:
             valid = True
 
         # Print detailed response information if test failed or verbose mode is enabled
-        if not valid or verbose:
+        if not valid or self.args.verbose:
             print("RESPONSE STATUS: " + str(req.status_code))
             print("RESPONSE TIME: " + str(req.elapsed.total_seconds()) + "s")
             print("RESPONSE DATA: " + req.content.decode())
