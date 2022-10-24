@@ -30,8 +30,7 @@ class APIRoutingGatewayUpdate extends APIModel {
     }
 
     public function action() {
-        $this->config["gateways"]["gateway_item"][$this->id] = $this->validated_data;
-        $this->write_config();
+        save_gateway($this->validated_data, $this->id);
         $this->apply();
 
         return APIResponse\get(0, $this->validated_data);
@@ -107,6 +106,9 @@ class APIRoutingGatewayUpdate extends APIModel {
             if (!isset($this->initial_data["gateway"])) {
                 $this->initial_data["gateway"] = $this->validated_data["gateway"];
             }
+
+            # Always set non-local gateway to reduce conditions
+            $this->validated_data["nonlocalgateway"] = "yes";
 
             # Gateway can be valid IPv4 address
             if ($this->validated_data["ipprotocol"] === "inet" and is_ipaddrv4($this->initial_data["gateway"])) {

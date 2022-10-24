@@ -26,12 +26,7 @@ class APIRoutingGatewayCreate extends APIModel {
     }
 
     public function action() {
-        # Write changes to config
-        $this->config["gateways"]["gateway_item"][] = $this->validated_data;
-        $this->write_config();
-
-        # Mark the routing subsystem as changed
-        mark_subsystem_dirty("staticroutes");
+        save_gateway($this->validated_data);
         $this->apply();
 
         return APIResponse\get(0, $this->validated_data);
@@ -86,7 +81,7 @@ class APIRoutingGatewayCreate extends APIModel {
         # Require client to pass in a gateway address
         if (isset($this->initial_data["gateway"])) {
             # Always set non-local gateway to reduce conditions
-            $this->validated_data["nonlocalgateway"] = "";
+            $this->validated_data["nonlocalgateway"] = "yes";
 
             # Gateway can be valid IPv4 address
             if ($this->validated_data["ipprotocol"] === "inet" and is_ipaddrv4($this->initial_data["gateway"])) {

@@ -1,6 +1,14 @@
 <?php
 //   Copyright 2022 Jared Hendrickson
 //
+//   Accreditation for delete_gateway_item():
+//   part of pfSense (https://www.pfsense.org)
+//   Copyright (c) 2004-2013 BSD Perimeter
+//   Copyright (c) 2013-2016 Electric Sheep Fencing
+//   Copyright (c) 2014-2022 Rubicon Communications, LLC (Netgate)
+//   Copyright (c) 2010 Seth Mos <seth.mos@dds.nl>
+//   All rights reserved.
+//
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
 //   You may obtain a copy of the License at
@@ -28,7 +36,7 @@ class APIRoutingGatewayDelete extends APIModel {
     public function action() {
         # Write these changes to config
         $this->validated_data = $this->config["gateways"]["gateway_item"][$this->id];
-        $this->delete_gateway_item();
+        $this->delete_gateway();
         $this->write_config();
 
         # Mark the routing subsystem as changed
@@ -74,61 +82,27 @@ class APIRoutingGatewayDelete extends APIModel {
         }
     }
 
-    private function delete_gateway_item() {
-        $a_gateways = return_gateways_array(true, false, true, true);
+    public function delete_gateway() {
+        # Local variables
+        $gw_data = return_gateways_array(true, false, true, true);
 
-        # Loop to obtain the backend gateways array ID
-        # TODO: There is likely a better way to do this. Revisit and refactor as needed.
-        foreach ($a_gateways as $be_gw_id=>$be_gw_item) {
-            # Check if the backend gateways attribute ID matches our client's requested object ID
-            if ($be_gw_item["attribute"] === $this->id) {
-                $backend_gw = $be_gw_item;
-                break;
-            }
-        }
+        # Loop through the gateway days until we find the gateway to delete
+        foreach ($gw_data as $gw) {
+            # Check if this gateways 'attribute' matches the ID of the gateway we're deleting
+            if ($this->id === $gw["attribute"]) {
+                # Remove the gateway and monitor IPs
+                route_del($gw["gateway"], $gw["ipprotocol"]);
+                route_del($gw["monitor"], $gw["ipprotocol"]);
 
-        if (!isset($backend_gw)) {
-            return;
-        }
-
-        # When deleting the default routing gateway, remove the default route
-        if (!empty($backend_gw) && is_ipaddr($backend_gw['gateway'])) {
-            if (!isset($backend_gw['disabled'])) {
-                if (isset($backend_gw['isdefaultgw'])) {
-                    $inet = (!is_ipaddrv4($backend_gw['gateway']) ? '-inet6' : '-inet');
-                    file_put_contents("/dev/console", "\n[" . getmypid() . "] DEL_GW, route= delete {$inet} default");
-                    mwexec("/sbin/route delete {$inet} default");
+                # Delete the default route if this gateway is the default gateway
+                if ($gw["isdefaultgw"]) {
+                    route_del("default", $gw["ipprotocol"]);
                 }
             }
         }
 
-        # Remove static routes that depend on this gateway
-        if (!empty($backend_gw) && is_ipaddr($backend_gw['gateway'])) {
-            if (isset($backend_gw["nonlocalgateway"])) {
-                $realif = get_real_interface($backend_gw['interface']);
-                $inet = (!is_ipaddrv4($backend_gw['gateway']) ? "-inet6" : "-inet");
-                file_put_contents("/dev/console", "\n[".getmypid()."] DEL_GW, route= $inet " . escapeshellarg($backend_gw['gateway']) . " -iface " . escapeshellarg($realif));
-                $cmd = "/sbin/route delete $inet " . escapeshellarg($backend_gw['gateway']) . " -iface " . escapeshellarg($realif);
-                mwexec($cmd);
-            }
-        }
-
-        # Remove static routes that were created for the monitor IP
-        if (!empty($backend_gw['monitor']) && $backend_gw['monitor'] != "dynamic") {
-            if (is_ipaddr($backend_gw['monitor']) && $backend_gw['gateway'] != $backend_gw['monitor']) {
-                if (is_ipaddrv4($backend_gw['monitor'])) {
-                    mwexec("/sbin/route delete " . escapeshellarg($backend_gw['monitor']));
-                } else {
-                    mwexec("/sbin/route delete -inet6 " . escapeshellarg($backend_gw['monitor']));
-                }
-            }
-        }
-
-        # Remove this gateway from any existing interface
-        if ($this->config['interfaces'][$backend_gw['friendlyiface']]['gateway'] == $backend_gw['name']) {
-            unset($this->config['interfaces'][$backend_gw['friendlyiface']]['gateway']);
-        }
-        unset($this->config['gateways']['gateway_item'][$backend_gw['attribute']]);
+        # Remove this gateway from config
+        unset($this->config["gateways"]["gateway_item"][$this->id]);
     }
 
     public function apply() {
