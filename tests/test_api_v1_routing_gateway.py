@@ -403,6 +403,15 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             }
         },
         {
+            "name": "Ensure gateway cannot be disabled while in use",
+            "status": 400,
+            "return": 6030,
+            "payload": {
+                "id": "UPDATED_TEST_ROUTING_GATEWAY_V4",
+                "disabled": True
+            }
+        },
+        {
             "name": "Check that static route was updated to use updated gateway IP",
             "method": "POST",
             "post_test_callable": "check_for_static_route_updated",
@@ -738,7 +747,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
         {
             "name": "Ensure gateway cannot be deleted while in use",
             "status": 400,
-            "return": 6030,
+            "return": 6031,
             "payload": {"id": "UPDATED_TEST_ROUTING_GATEWAY_V4"}
         },
         {

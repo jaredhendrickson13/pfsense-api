@@ -603,9 +603,10 @@ function is_gateway($gw, $ret_protocol=false) {
 # Checks if a specified gateway ID is in use
 function is_gateway_in_use($id) {
     global $config;
+    init_config_arr(array('gateways', 'gateway_item'));
 
     # Local variables
-    $gws = return_gateways_array(true, false, true, true);
+    $gws = $config["gateways"]["gateway_item"];
 
     # Only check if our ID is numeric
     if (is_numeric($id)) {
