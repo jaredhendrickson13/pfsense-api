@@ -139,8 +139,12 @@ class APIQuery {
 
     # Checks if this value is excluded from queries
     private function is_excluded($value) {
-        $excluded_keys = $this->excluded;
-        return in_array($value, $excluded_keys);
+        # Only exclude this field if it has an actual value set (e.g. not null)
+        if ($value and $this->excluded) {
+            return in_array($value, $this->excluded);
+        }
+
+        return false;
     }
 
     # Checks if our target data starts with a specific sub string

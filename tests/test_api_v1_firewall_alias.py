@@ -56,6 +56,24 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         },
         {
+            "name": "Create host alias using hostnames",
+            "payload": {
+                "name": "GOOGLE_DNS",
+                "type": "host",
+                "descr": "E2E Test",
+                "address": ["dns.google"]
+            },
+            "resp_time": 3    # Allow a few seconds for the firewall filter to reload
+        },
+        {
+            "name": "Check that GOOGLE_DNS actually populates a table with resolved hostnames",
+            "method": "GET",
+            "delay": 3,
+            "uri": "/api/v1/system/table",
+            "post_test_callable": "check_google_dns_table",
+            "payload": {"name": "GOOGLE_DNS"}
+        },
+        {
             "name": "Test name requirement",
             "status": 400,
             "return": 4050
@@ -243,15 +261,49 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         },
         {
+            "name": "Delete GOOGLE_DNS alias/table",
+            "payload": {
+                "id": "GOOGLE_DNS"
+            },
+            "resp_time": 3    # Allow a few seconds for the firewall filter to reload
+        },
+        {
+            "name": "Check that GOOGLE_DNS table no longer exists",
+            "method": "GET",
+            "delay": 3,
+            "uri": "/api/v1/system/table",
+            "status": 400,
+            "return": 1083,
+            "payload": {"name": "GOOGLE_DNS"}
+        },
+        {
             "name": "Test delete non-existing alias",
             "status": 400,
             "return": 4055,
             "payload": {
                 "id": "INVALID"
             }
-        },
-
+        }
     ]
+
+    def check_google_dns_table(self):
+        """Checks the the GOOGLE_DNS table is created with our dns.google hostname alias"""
+        # If the return data is a dict, convert it to a list
+        if isinstance(self.last_response["data"], dict):
+            tables = self.last_response["data"].values()
+        # If the return data is a list, just store the list in the tables var
+        elif isinstance(self.last_response["data"], list):
+            tables = self.last_response["data"]
+        # Otherwise, our table doesn't exist, fail the test
+        else:
+            raise AssertionError("expected GOOGLE_DNS table to exist")
+
+        # Ensure the alias correctly resolved 8.8.8.8 and 8.8.4.4 in the table
+        for table in tables:
+            if "8.8.8.8" not in table["entries"]:
+                raise AssertionError(f"expected '8.8.8.8' to be in GOOGLE_DNS table {self.last_response}")
+            if "8.8.4.4" not in table["entries"]:
+                raise AssertionError("expected '8.8.4.4' to be in GOOGLE_DNS table")
 
 
 APIE2ETestFirewallAlias()
