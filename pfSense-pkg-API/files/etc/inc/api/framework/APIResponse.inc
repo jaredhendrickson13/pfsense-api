@@ -4656,6 +4656,18 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Only 1 dynamic gateway per eligible interface is allowed"
         ],
+        6030 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway cannot be disabled while in use by a DNS server, static route or gateway group"
+        ],
+        6031 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway cannot be deleted while in use by a DNS server, static route or gateway group"
+        ],
 
         // 7000-7999 reserved for /api/v1/diagnostics API calls
         7000 => [

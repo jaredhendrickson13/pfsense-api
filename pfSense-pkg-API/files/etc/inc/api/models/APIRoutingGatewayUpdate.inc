@@ -162,7 +162,8 @@ class APIRoutingGatewayUpdate extends APIModel {
         # Optionally allow client to enable or disable gateway monitoring
         if ($this->initial_data['monitor_disable'] === true) {
             $this->validated_data["monitor_disable"] = "";
-        } elseif ($this->initial_data['monitor_disable'] === false) {
+        }
+        elseif ($this->initial_data['monitor_disable'] === false) {
             unset($this->validated_data["monitor_disable"]);
         }
     }
@@ -188,7 +189,13 @@ class APIRoutingGatewayUpdate extends APIModel {
     private function __validate_disabled() {
         # Optionally allow client to enable or disable gateway
         if ($this->initial_data['disabled'] === true) {
-            $this->validated_data["disabled"] = "";
+            # Ensure this gateway is not in use first
+            if (!APITools\is_gateway_in_use($this->id)) {
+                $this->validated_data["disabled"] = "";
+            }
+            else {
+                $this->errors[] = APIResponse\get(6030);
+            }
         } elseif ($this->initial_data['disabled'] === false) {
             unset($this->validated_data["disabled"]);
         }

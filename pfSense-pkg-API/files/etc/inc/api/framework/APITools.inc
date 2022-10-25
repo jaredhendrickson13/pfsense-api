@@ -600,6 +600,48 @@ function is_gateway($gw, $ret_protocol=false) {
     return false;
 }
 
+# Checks if a specified gateway ID is in use
+function is_gateway_in_use($id) {
+    global $config;
+
+    # Local variables
+    $gws = return_gateways_array(true, false, true, true);
+
+    # Only check if our ID is numeric
+    if (is_numeric($id)) {
+        # Check if gateways groups are using this gateway
+        init_config_arr(array('gateways', 'gateway_group'));
+        foreach ($config['gateways']['gateway_group'] as $group) {
+            foreach ($group['item'] as $item) {
+                $items = explode("|", $item);
+                if ($items[0] == $gws[$id]['name']) {
+                    return true;
+                }
+            }
+        }
+
+        # Check if static routes are using this gateway
+        init_config_arr(array('staticroutes', 'route'));
+        foreach ($config['staticroutes']['route'] as $route) {
+            if ($route['gateway'] == $gws[$id]['name']) {
+                return true;
+            }
+        }
+
+        # Check if system DNS servers are using this gateway
+        init_config_arr(array('system', 'dnsserver'));
+        foreach ($config['system']['dnsserver'] as $id_dnsgw => $dnsserver) {
+            if (isset($config["system"]["dns{$id_dnsgw}gw"])) {
+                if ($gws[$id]['name'] == $config["system"]["dns{$id_dnsgw}gw"]) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
 // Duplicate function from /firewall_aliases.php: accept input and check if alias exists
 function alias_find_references($section, $field, $origname, &$is_alias_referenced, &$referenced_by) {
     global $err_lib, $config;

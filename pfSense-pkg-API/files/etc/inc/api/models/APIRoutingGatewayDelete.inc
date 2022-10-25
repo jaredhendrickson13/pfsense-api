@@ -62,6 +62,12 @@ class APIRoutingGatewayDelete extends APIModel {
             else {
                 $this->errors[] = APIResponse\get(6028);
             }
+
+            # Set an error if this gateway is in use
+            if (APITools\is_gateway_in_use($this->id)) {
+                $this->errors[] = APIResponse\get(6031);
+            }
+
         } else {
             $this->errors[] = APIResponse\get(6027);
         }

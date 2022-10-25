@@ -736,6 +736,12 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
     ]
     delete_tests = [
         {
+            "name": "Ensure gateway cannot be deleted while in use",
+            "status": 400,
+            "return": 6030,
+            "payload": {"id": "UPDATED_TEST_ROUTING_GATEWAY_V4"}
+        },
+        {
             "name": "Delete the static route used for testing",
             "uri": "/api/v1/routing/static_route",
             "resp_time": 5,
