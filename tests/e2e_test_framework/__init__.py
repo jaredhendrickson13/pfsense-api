@@ -31,7 +31,6 @@ class APIE2ETest:
     uid = str(uuid.uuid4())
     url = ""
     uri = ""
-    time_delay = 0
     exit_code = 0
     last_response = {}
     get_tests = []
@@ -72,7 +71,7 @@ class APIE2ETest:
             self.post_get()
             # For speed, only delay time if test is a non-200 OK test
             if test_params.get("status", 200) == 200:
-                time.sleep(self.time_delay)
+                time.sleep(self.args.delay)
 
     def post(self):
         """Makes a POST request for every POST test found in the 'post_tests' attribute."""
@@ -83,7 +82,7 @@ class APIE2ETest:
             self.post_post()
             # For speed, only delay time if test is a non-200 OK test
             if test_params.get("status", 200) == 200:
-                time.sleep(self.time_delay)
+                time.sleep(self.args.delay)
 
     def put(self):
         """Makes a PUT request for every PUT test found in the 'put_tests' attribute."""
@@ -94,7 +93,7 @@ class APIE2ETest:
             self.post_put()
             # For speed, only delay time if test is a non-200 OK test
             if test_params.get("status", 200) == 200:
-                time.sleep(self.time_delay)
+                time.sleep(self.args.delay)
 
     def delete(self):
         """Makes a DELETE request for every DELETE test found in the 'delete_tests' attribute."""
@@ -105,7 +104,7 @@ class APIE2ETest:
             self.post_delete()
             # For speed, only delay time if test is a non-200 OK test
             if test_params.get("status", 200) == 200:
-                time.sleep(self.time_delay)
+                time.sleep(self.args.delay)
 
     def custom_tests(self):
         """Allows child classes to specify custom tests. This is inteded to be overwritten by the child class."""
@@ -407,6 +406,13 @@ class APIE2ETest:
             type=int,
             default=35,
             help="Connection timeout limit in seconds"
+        )
+        parser.add_argument(
+            '--delay',
+            dest="delay",
+            type=int,
+            default=0,
+            help="Delay between tests in seconds"
         )
         parser.add_argument(
             '--verbose',
