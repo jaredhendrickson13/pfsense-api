@@ -409,7 +409,7 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
     - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
     - `delay` : an integer that specifies how many seconds a test should wait until starting
-    - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
+    - `pause` : an integer that specifies how many seconds a test should wait after the test has finished    - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
     - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
     - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.
     - `pre_test_callable` : the name of a function callable to run before this test is run. This callable can initiate
@@ -430,7 +430,7 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
     - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
     - `delay` : an integer that specifies how many seconds a test should wait until starting
-    - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
+    - `pause` : an integer that specifies how many seconds a test should wait after the test has finished    - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
     - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
     - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.
     - `pre_test_callable` : the name of a function callable to run before this test is run. This callable can initiate
@@ -451,7 +451,7 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
     - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
     - `delay` : an integer that specifies how many seconds a test should wait until starting
-    - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
+    - `pause` : an integer that specifies how many seconds a test should wait after the test has finished    - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
     - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
     - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.
     - `pre_test_callable` : the name of a function callable to run before this test is run. This callable can initiate
@@ -472,6 +472,7 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
     - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
     - `delay` : an integer that specifies how many seconds a test should wait until starting
+    - `pause` : an integer that specifies how many seconds a test should wait after the test has finished
     - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
     - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
     - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.

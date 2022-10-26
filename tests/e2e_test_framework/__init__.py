@@ -232,6 +232,8 @@ class APIE2ETest:
 
         # Return the JSON response when successful
         if response_valid:
+            # Pause this test if the 'pause' parameter is set
+            time.sleep(test_params.get("pause", 0))
             return req.json()
 
         return None
