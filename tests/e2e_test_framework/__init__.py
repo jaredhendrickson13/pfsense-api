@@ -13,7 +13,6 @@
 # limitations under the License.
 """Module for the e2e test framework that is used to test pfSense-API."""
 import argparse
-import base64
 import json
 import sys
 import time
@@ -32,7 +31,7 @@ class APIE2ETest:
     uid = str(uuid.uuid4())
     url = ""
     uri = ""
-    time_delay = 1
+    time_delay = 0
     exit_code = 0
     last_response = {}
     get_tests = []

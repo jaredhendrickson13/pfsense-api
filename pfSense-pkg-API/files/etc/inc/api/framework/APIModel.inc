@@ -69,11 +69,29 @@ class APIModel {
     }
 
     protected function write_config() {
-        # Start a temporary session to write the config that contains the user's username in the config history
-        session_start();
-        $_SESSION["Username"] = $this->client->username;    // This is what adds the username to the change log
-        write_config(sprintf(gettext(" ".$this->change_note)));
-        unset($_SESSION);
+        # Local variables
+        $lock_file = "/tmp/.api.write_config.lock";
+
+        # Ensure there is not an API config lock, loop until the lock is released
+        foreach (range(0, 60) as $attempt) {
+            # Only write to the config if there is not an active lock
+            if (!file_exists($lock_file)) {
+                # Create a lock on API config writes while we write changes
+                file_put_contents($lock_file, microtime());
+
+                # Start a temporary session to write the config that contains the user's username in the config history
+                session_start();
+                $_SESSION["Username"] = $this->client->username;
+                write_config(sprintf(gettext(" ".$this->change_note)));
+                unset($_SESSION);
+                phpsession_destroy();
+                unlink($lock_file);
+                return;
+            }
+
+            # Delay attempts by 1 second
+            sleep(1);
+        }
     }
 
     public function validate_payload() {
