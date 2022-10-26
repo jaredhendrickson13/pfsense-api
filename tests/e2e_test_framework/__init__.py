@@ -428,7 +428,7 @@ class APIE2ETest:
         }
 
         # Set the URL to the actual URL used in the test, respecting the 'uri' test_param
-        url = self.format_url(test_params.get("uri", ""))
+        url = self.format_url(test_params.get("uri", self.uri))
 
         # Check the mode and format the message accordingly
         if mode == "failed":
