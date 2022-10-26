@@ -270,7 +270,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
         {
             "name": "Check that GOOGLE_DNS table no longer exists",
             "method": "GET",
-            "delay": 3,
+            "delay": 8,
             "uri": "/api/v1/system/table",
             "status": 400,
             "return": 1083,
