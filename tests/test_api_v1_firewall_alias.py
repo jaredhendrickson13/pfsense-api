@@ -242,21 +242,24 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
         {
             "name": "Delete network alias",
             "payload": {
-                "id": "UPDATED_RFC1918"
+                "id": "UPDATED_RFC1918",
+                "apply": False
             },
             "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         },
         {
             "name": "Delete port alias",
             "payload": {
-                "id": "UPDATED_HTTP_PORTS"
+                "id": "UPDATED_HTTP_PORTS",
+                "apply": False
             },
             "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         },
         {
             "name": "Delete host alias",
             "payload": {
-                "id": "UPDATED_DNS_SERVERS"
+                "id": "UPDATED_DNS_SERVERS",
+                "apply": False
             },
             "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         },

@@ -293,10 +293,14 @@ class APIFirewallRuleUpdate extends APIModel {
     }
 
     private function __validate_sched() {
+
         # Check for our optional 'sched' payload value
         if (isset($this->initial_data['sched'])) {
             # Only try to set the schedule if the value is not empty
             if (!empty($this->initial_data["sched"])) {
+                # In case there are no schedules, initialize the schedules config area
+                $this->init_config("schedules", "schedule");
+
                 # Loop through each configured schedule and check if it exists
                 foreach ($this->config["schedules"]["schedule"] as $schedule) {
                     # Check if the names match
