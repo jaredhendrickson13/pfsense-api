@@ -49,10 +49,5 @@ class APIFirewallApplyCreate extends APIModel {
         else {
             filter_configure();
         }
-
-        # Mark changes as applied
-        clear_subsystem_dirty('aliases');
-        clear_subsystem_dirty('natconf');
-        clear_subsystem_dirty('filter');
     }
 }
