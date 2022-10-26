@@ -263,7 +263,8 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
         {
             "name": "Delete GOOGLE_DNS alias/table",
             "payload": {
-                "id": "GOOGLE_DNS"
+                "id": "GOOGLE_DNS",
+                "apply": True
             },
             "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         },
