@@ -145,7 +145,7 @@ class APIE2ETestRoutingStaticRoute(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete static route",
-            "payload": {"id": 0},
+            "payload": {"id": 0, "apply": True},
             "resp_time": 5    # Allow a few seconds to reload the routing table
         },
         {
