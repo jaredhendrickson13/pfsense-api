@@ -126,7 +126,7 @@ class APIFirewallNATOutboundMappingUpdate extends APIModel {
             # Allow client to specify source hash, otherwise generate a random one
             if (isset($this->initial_data["source_hash_key"])) {
                 # Set an error if the hash key does not start with 0x
-                if (substr($this->initial_data["source_hash_key"]['source_hash_key'],0,2) !== "0x") {
+                if (substr($this->initial_data["source_hash_key"],0,2) !== "0x") {
                     $this->errors[] = APIResponse\get(4091);
                 }
                 # Set an error if the hash key does contain a hexadecimal value after 0x
@@ -134,7 +134,7 @@ class APIFirewallNATOutboundMappingUpdate extends APIModel {
                     $this->errors[] = APIResponse\get(4092);
                 }
                 # Set an error if the hash key is not exactly 34 characters in length include 0x
-                elseif (strlen($_POST['source_hash_key']) !== 34) {
+                elseif (strlen($this->initial_data['source_hash_key']) !== 34) {
                     $this->errors[] = APIResponse\get(4093);
                 }
                 # Otherwise, hash key appears to be valid. Save the validated value.
@@ -142,7 +142,7 @@ class APIFirewallNATOutboundMappingUpdate extends APIModel {
                     $this->validated_data["source_hash_key"] = $this->initial_data['source_hash_key'];
                 }
             } elseif(empty($this->validated_data["source_hash_key"])) {
-                $this->validated_data["source_hash_key"] = "0x".md5($_POST['source_hash_key']);
+                $this->validated_data["source_hash_key"] = "0x".md5($this->initial_data['source_hash_key']);
             }
         }
     }
