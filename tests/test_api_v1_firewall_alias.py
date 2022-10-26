@@ -272,9 +272,16 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         },
         {
+            "name": "Force reload filter",
+            "method": "POST",
+            "uri": "/api/v1/firewall/apply",
+            "payload": {
+                "async": False
+            },
+        },
+        {
             "name": "Check that GOOGLE_DNS table no longer exists",
             "method": "GET",
-            "delay": 8,
             "uri": "/api/v1/system/table",
             "status": 400,
             "return": 1083,
