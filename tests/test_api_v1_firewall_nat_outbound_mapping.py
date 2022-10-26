@@ -44,15 +44,225 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "payload": {
                 "interface": "WAN",
                 "protocol": "any",
-                "src": "any",
-                "dst": "1.1.1.1",
+                "src": "127.0.0.1/24",
+                "dst": "1.1.1.1/32",
                 "target": "192.168.1.123/24",
                 "poolopts": "round-robin",
                 "descr": "E2E Test 2",
                 "nosync": True,
                 "top": True
             }
-        }
+        },
+        {
+            "name": "Check interface required constraint",
+            "status": 400,
+            "return": 4086
+        },
+        {
+            "name": "Check interface exists constraint",
+            "status": 400,
+            "return": 4087,
+            "payload": {"interface": "INVALID"}
+        },
+        {
+            "name": "Check protocol required constraint",
+            "status": 400,
+            "return": 4088,
+            "payload": {"interface": "wan"}
+        },
+        {
+            "name": "Check protocol options constraint",
+            "status": 400,
+            "return": 4089,
+            "payload": {"interface": "wan", "protocol": "INVALID"}
+        },
+        {
+            "name": "Check poolopts options constraint",
+            "status": 400,
+            "return": 4090,
+            "payload": {"interface": "wan", "protocol": "tcp", "poolopts": "INVALID"}
+        },
+        {
+            "name": "Check source hash key begins with 0x constraint",
+            "status": 400,
+            "return": 4091,
+            "payload": {
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "source-hash",
+                "source_hash_key": "INVALID"
+            }
+        },
+        {
+            "name": "Check source hash key hex value constraint",
+            "status": 400,
+            "return": 4092,
+            "payload": {
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "source-hash",
+                "source_hash_key": "0xINVALID"
+            }
+        },
+        {
+            "name": "Check source hash key maximum length constraint",
+            "status": 400,
+            "return": 4093,
+            "payload": {
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "source-hash",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf853555"
+            }
+        },
+        {
+            "name": "Check target required constraint",
+            "status": 400,
+            "return": 4094,
+            "payload": {
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "source-hash",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535"
+            }
+        },
+        {
+            "name": "Check target is IP, subnet or alias constraint",
+            "status": 400,
+            "return": 4095,
+            "payload": {
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "source-hash",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "INVALID"
+            }
+        },
+        {
+            "name": "Create alias to use in target test",
+            "method": "POST",
+            "uri": "/api/v1/firewall/alias",
+            "payload": {
+                "name": "TEST_NAT_TARGET",
+                "type": "host",
+                "address": ["127.0.0.1", "127.0.0.2"],
+                "apply": True
+            }
+        },
+        {
+            "name": "Check allow alias target only with round-robin poolopt constraint",
+            "status": 400,
+            "return": 4096,
+            "payload": {
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "source-hash",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "TEST_NAT_TARGET"
+            }
+        },
+        {
+            "name": "Check natport is port or range constraint",
+            "status": 400,
+            "return": 4097,
+            "payload": {
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "round-robin",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "TEST_NAT_TARGET",
+                "natport": "INVALID"
+            }
+        },
+        {
+            "name": "Check src required constraint",
+            "status": 400,
+            "return": 4098,
+            "payload": {
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "round-robin",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "TEST_NAT_TARGET",
+                "natport": 62000
+            }
+        },
+        {
+            "name": "Check src is IP, subnet or any constraint",
+            "status": 400,
+            "return": 4099,
+            "payload": {
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "round-robin",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "TEST_NAT_TARGET",
+                "natport": "10000:10005",
+                "src": "INVALID"
+            }
+        },
+        {
+            "name": "Check dst required constraint",
+            "status": 400,
+            "return": 4100,
+            "payload": {
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "round-robin",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "TEST_NAT_TARGET",
+                "natport": 62000,
+                "src": "any"
+            }
+        },
+        {
+            "name": "Check dst is IP, subnet or any constraint",
+            "status": 400,
+            "return": 4101,
+            "payload": {
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "round-robin",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "TEST_NAT_TARGET",
+                "natport": "10000:10005",
+                "src": "127.0.0.1",
+                "dst": "INVALID"
+            }
+        },
+        {
+            "name": "Check srcport is port or port range constraint",
+            "status": 400,
+            "return": 4102,
+            "payload": {
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "round-robin",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "TEST_NAT_TARGET",
+                "natport": "10000:10005",
+                "src": "127.0.0.1",
+                "dst": "127.0.0.2",
+                "srcport": "INVALID"
+            }
+        },
+        {
+            "name": "Check dstport is port or port range constraint",
+            "status": 400,
+            "return": 4103,
+            "payload": {
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "round-robin",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "TEST_NAT_TARGET",
+                "natport": "10000:10005",
+                "src": "127.0.0.1",
+                "dst": "127.0.0.2",
+                "srcport": "any",
+                "dstport": "INVALID"
+            }
+        },
     ]
     put_tests = [
         {
@@ -91,11 +301,199 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
                 "nosync": True,
                 "top": True
             }
-        }
+        },
+        {
+            "name": "Check ID required constraint",
+            "status": 400,
+            "return": 4104
+        },
+        {
+            "name": "Check ID exists constraint",
+            "status": 400,
+            "return": 4105,
+            "payload": {"id": "INVALID"}
+        },
+        {
+            "name": "Check interface exists constraint",
+            "status": 400,
+            "return": 4087,
+            "payload": {"id": 0, "interface": "INVALID"}
+        },
+        {
+            "name": "Check protocol options constraint",
+            "status": 400,
+            "return": 4089,
+            "payload": {"id": 0, "interface": "wan", "protocol": "INVALID"}
+        },
+        {
+            "name": "Check poolopts options constraint",
+            "status": 400,
+            "return": 4090,
+            "payload": {"id": 0, "interface": "wan", "protocol": "tcp", "poolopts": "INVALID"}
+        },
+        {
+            "name": "Check source hash key begins with 0x constraint",
+            "status": 400,
+            "return": 4091,
+            "payload": {
+                "id": 0,
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "source-hash",
+                "source_hash_key": "INVALID"
+            }
+        },
+        {
+            "name": "Check source hash key hex value constraint",
+            "status": 400,
+            "return": 4092,
+            "payload": {
+                "id": 0,
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "source-hash",
+                "source_hash_key": "0xINVALID"
+            }
+        },
+        {
+            "name": "Check source hash key maximum length constraint",
+            "status": 400,
+            "return": 4093,
+            "payload": {
+                "id": 0,
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "source-hash",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf853555"
+            }
+        },
+        {
+            "name": "Check target is IP, subnet or alias constraint",
+            "status": 400,
+            "return": 4095,
+            "payload": {
+                "id": 0,
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "source-hash",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "INVALID"
+            }
+        },
+        {
+            "name": "Check allow alias target only with round-robin poolopt constraint",
+            "status": 400,
+            "return": 4096,
+            "payload": {
+                "id": 0,
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "source-hash",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "TEST_NAT_TARGET"
+            }
+        },
+        {
+            "name": "Check natport is port or range constraint",
+            "status": 400,
+            "return": 4097,
+            "payload": {
+                "id": 0,
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "round-robin",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "TEST_NAT_TARGET",
+                "natport": "INVALID"
+            }
+        },
+        {
+            "name": "Check src is IP, subnet or any constraint",
+            "status": 400,
+            "return": 4099,
+            "payload": {
+                "id": 0,
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "round-robin",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "TEST_NAT_TARGET",
+                "natport": "10000:10005",
+                "src": "INVALID"
+            }
+        },
+        {
+            "name": "Check dst is IP, subnet or any constraint",
+            "status": 400,
+            "return": 4101,
+            "payload": {
+                "id": 0,
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "round-robin",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "TEST_NAT_TARGET",
+                "natport": "10000:10005",
+                "src": "127.0.0.1",
+                "dst": "INVALID"
+            }
+        },
+        {
+            "name": "Check srcport is port or port range constraint",
+            "status": 400,
+            "return": 4102,
+            "payload": {
+                "id": 0,
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "round-robin",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "TEST_NAT_TARGET",
+                "natport": "10000:10005",
+                "src": "127.0.0.1",
+                "dst": "127.0.0.2",
+                "srcport": "INVALID"
+            }
+        },
+        {
+            "name": "Check dstport is port or port range constraint",
+            "status": 400,
+            "return": 4103,
+            "payload": {
+                "id": 0,
+                "interface": "wan",
+                "protocol": "tcp",
+                "poolopts": "round-robin",
+                "source_hash_key": "0x3d7f08a393ec707e50df636346bf8535",
+                "target": "TEST_NAT_TARGET",
+                "natport": "10000:10005",
+                "src": "127.0.0.1",
+                "dst": "127.0.0.2",
+                "srcport": "any",
+                "dstport": "INVALID"
+            }
+        },
     ]
     delete_tests = [
+        {
+            "name": "Check ID required constraint",
+            "status": 400,
+            "return": 4104
+        },
+        {
+            "name": "Check ID exists constraint",
+            "status": 400,
+            "return": 4105,
+            "payload": {"id": "INVALID"}
+        },
         {"name": "Delete non-port-based outbound NAT mapping", "payload": {"id": 0}},
         {"name": "Delete port-based outbound NAT mapping", "payload": {"id": 0}},
+        {
+            "name": "Delete alias used for testing",
+            "method": "DELETE",
+            "uri": "/api/v1/firewall/alias",
+            "payload": {"id": "TEST_NAT_TARGET"}
+        }
     ]
 
 
