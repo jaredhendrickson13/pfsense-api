@@ -187,7 +187,7 @@ class APIE2ETestRoutingStaticRoute(e2e_test_framework.APIE2ETest):
         """Checks if the static route deleted by this test case is no longer present on the remote system."""
         # Check if the route we delete for 4.3.2.1/32 is no longer in the routing table.
         if "4.3.2.1" in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError("1.2.3.4/32 was not deleted in the system table after deletion via API")
+            raise AssertionError("4.3.2.1/32 was not deleted in the system table after deletion via API")
 
 
 APIE2ETestRoutingStaticRoute()
