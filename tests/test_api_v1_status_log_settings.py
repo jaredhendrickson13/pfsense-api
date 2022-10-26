@@ -97,6 +97,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Check format is known validation",
+            "delay": 8,    # Wait a while before starting this one, the previous tests restarts services
             "status": 400,
             "return": 8000,
             "payload": {
