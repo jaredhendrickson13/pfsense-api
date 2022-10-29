@@ -27,7 +27,7 @@ class APIFirewallAliasCreate extends APIModel {
     public function action() {
         # Add our new alias and reload configuration as requested
         $this->id = $this->get_next_id("aliases/alias");
-        $this->set_config("aliases/alias,{$this->id}", $this->validated_data);
+        $this->set_config("aliases/alias/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty("aliases");
 
