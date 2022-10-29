@@ -21,15 +21,9 @@ class APIFirewallNATOneToOneRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-nat-1-1"];
-        $this->init_config('nat', 'onetoone');
     }
 
     public function action() {
-
-        // Check that we have a virtual IP configuration
-        if (!empty($this->config["nat"]["onetoone"])) {
-            $this->validated_data = $this->config["nat"]["onetoone"];
-        }
-        return APIResponse\get(0, $this->validated_data);
+        return APIResponse\get(0, $this->get_config("nat/onetoone", []));
     }
 }

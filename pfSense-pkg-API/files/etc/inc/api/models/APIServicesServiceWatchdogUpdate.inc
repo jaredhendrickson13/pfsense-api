@@ -24,13 +24,12 @@ class APIServicesServiceWatchdogUpdate extends APIModel {
         $this->packages = ["pfSense-pkg-Service_Watchdog"];
         $this->package_includes = ["servicewatchdog.inc"];
         $this->change_note = "Modified Service Watchdog configuration via API";
-        $this->init_config("installedpackages", "servicewatchdog", "item");
     }
 
     public function action() {
         # Write the updated configuration and reload service watchdog if changes were made
         if ($this->validated_data) {
-            $this->config["installedpackages"]["servicewatchdog"]["item"] = $this->validated_data;
+            $this->set_config("installedpackages/servicewatchdog/item", $this->validated_data);
             $this->write_config();
             servicewatchdog_cron_job();
         }

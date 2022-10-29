@@ -22,7 +22,6 @@ class APISystemHostnameRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system"];
-        $this->init_config("system");
     }
 
     public function action() {
@@ -31,12 +30,12 @@ class APISystemHostnameRead extends APIModel {
 
     public function validate_payload() {
         $this->validated_data = ["hostname" => "", "domain" => ""];
-        if (!empty($this->config["system"]["hostname"])) {
-            $this->validated_data["hostname"] = $this->config["system"]["hostname"];
+        if ($this->get_config("system/hostname", false)) {
+            $this->validated_data["hostname"] = $this->get_config("system/hostname");
         }
         // Check that we have a domain configuration
-        if (!empty($this->config["system"]["domain"])) {
-            $this->validated_data["domain"] = $this->config["system"]["domain"];
+        if (this->get_config("system/domain", false)) {
+            $this->validated_data["domain"] = $this->get_config("system/domain");
         }
     }
 }

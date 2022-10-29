@@ -24,12 +24,11 @@ class APISystemDNSServerCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system"];
         $this->change_note = "Added system DNS servers via API";
-        $this->init_config("system");
     }
 
     public function action() {
         # Write changes to config and apply backend changes
-        $this->config["system"]["dnsserver"] = $this->validated_data["dnsserver"];
+        $this->set_config("system/dnsserver", $this->validated_data["dnsserver"]);
         $this->write_config();
         $this->apply_backend_changes();
 
@@ -37,7 +36,7 @@ class APISystemDNSServerCreate extends APIModel {
     }
 
     public function validate_payload() {
-        $this->validated_data["dnsserver"] = $this->config["system"]["dnsserver"];
+        $this->validated_data["dnsserver"] = $this->get_config("system/dnsserver");
         $this->__validate_dnsserver();
     }
 
@@ -73,9 +72,9 @@ class APISystemDNSServerCreate extends APIModel {
     public function apply_backend_changes() {
         # Update a slew of backend services
         system_resolvconf_generate();
-        if (isset($this->config['dnsmasq']['enable'])) {
+        if ($this->is_config_enabled("dnsmasq")) {
             services_dnsmasq_configure();
-        } elseif (isset($this->config['unbound']['enable'])) {
+        } elseif ($this->is_config_enabled("unbound")) {
             services_unbound_configure();
         }
 

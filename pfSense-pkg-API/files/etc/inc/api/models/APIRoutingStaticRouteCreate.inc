@@ -22,12 +22,12 @@ class APIRoutingStaticRouteCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-staticroutes-editroute"];
         $this->change_note = "Added static route via API";
-        $this->init_config('staticroutes', 'route');
     }
 
     public function action() {
         # Add this static route to config
-        $this->config["staticroutes"]["route"][] = $this->validated_data;
+        $this->id = $this->get_next_id('staticroutes/route');
+        $this->set_config("staticroutes/route/{$this->id}", $this->validated_data);
         $this->write_config();
 
         # Mark the routing subsystem as changed

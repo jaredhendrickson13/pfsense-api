@@ -30,12 +30,11 @@ class APIRoutingGatewayDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-gateways-editgateway"];
         $this->change_note = "Deleted gateway via API";
-        $this->init_config('gateways', 'gateway_item');
     }
 
     public function action() {
         # Write these changes to config
-        $this->validated_data = $this->config["gateways"]["gateway_item"][$this->id];
+        $this->validated_data = $this->get_config("gateways/gateway_item/{$this->id}", []);
         $this->delete_gateway();
         $this->write_config();
 
@@ -50,14 +49,14 @@ class APIRoutingGatewayDelete extends APIModel {
         # Require clients to pass in a gateway ID to locate the gateway to update
         if (isset($this->initial_data['id'])) {
             # Check if an existing gateway's numeric ID matches this ID
-            if (array_key_exists($this->initial_data['id'], $this->config["gateways"]["gateway_item"])) {
+            if ($this->get_config("gateways/gateway_item/{$this->initial_data['id']}", false)) {
                 $this->id = $this->initial_data['id'];
-                $this->validated_data = $this->config["gateways"]["gateway_item"][$this->id];
+                $this->validated_data = $this->get_config("gateways/gateway_item/{$this->id}", []);
             }
             # Check if the ID passed in is a gateway name
             elseif (is_numeric($this->get_id_by_name($this->initial_data["id"]))) {
                 $this->id = $this->get_id_by_name($this->initial_data["id"]);
-                $this->validated_data = $this->config["gateways"]["gateway_item"][$this->id];
+                $this->validated_data = $this->get_config("gateways/gateway_item/{$this->id}", []);
             }
             else {
                 $this->errors[] = APIResponse\get(6028);
@@ -80,7 +79,7 @@ class APIRoutingGatewayDelete extends APIModel {
     # Gets the numeric ID of a gateway by it's name
     public function get_id_by_name($name) {
         # Loop through all existing gateways and check if this name matches
-        foreach ($this->config["gateways"]["gateway_item"] as $id=>$gw) {
+        foreach ($this->get_config("gateways/gateway_item", []) as $id=>$gw) {
             # Check if this name matches
             if ($name === $gw["name"]) {
                 return $id;
@@ -108,7 +107,7 @@ class APIRoutingGatewayDelete extends APIModel {
         }
 
         # Remove this gateway from config
-        unset($this->config["gateways"]["gateway_item"][$this->id]);
+        $this->del_config("gateways/gateway_item/{$this->id}");
     }
 
     public function apply() {

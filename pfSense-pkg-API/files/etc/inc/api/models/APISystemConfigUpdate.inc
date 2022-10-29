@@ -28,7 +28,7 @@ class APISystemConfigUpdate extends APIModel {
 
     public function action() {
         # Simply replace the entire configuration with the data sent in the request
-        $this->config = $this->initial_data;
+        $this->set_config("", $this->initial_data);
         $this->write_config();
         return APIResponse\get(0, $this->initial_data);
     }

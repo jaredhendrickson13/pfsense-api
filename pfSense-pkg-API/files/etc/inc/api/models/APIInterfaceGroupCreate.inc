@@ -23,11 +23,11 @@ class APIInterfaceGroupCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-groups-edit"];
         $this->change_note = "Added interface group via API";
-        $this->init_config('ifgroups', 'ifgroupentry');
     }
 
     public function action() {
-        $this->config["ifgroups"]["ifgroupentry"][] = $this->validated_data;
+        $this->id = $this->get_next_id("ifgroups/ifgroupentry");
+        $this->set_config("ifgroups/ifgroupentry/{$this->id}", $this->validated_data);
         $this->write_config();
         return APIResponse\get(0, $this->validated_data);
     }

@@ -24,17 +24,20 @@ class APIFirewallRuleCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-rules-edit"];
         $this->change_note = "Added firewall rule via API";
-        $this->init_config('filter', 'rule');
     }
 
     public function action() {
         # Add rule to top of rules if requested
         if ($this->initial_data["top"] === true) {
-            $this->config["filter"]["rule"] = array_merge([$this->validated_data], $this->config["filter"]["rule"]);
+            $this->set_config(
+                "filter/rule",
+                array_merge([$this->validated_data], $this->get_config("filter/rule"))
+            );
         }
         # Otherwise, simply append the rule to the bottom
         else {
-            $this->config["filter"]["rule"][] = $this->validated_data;
+            $this->id = $this->get_next_id("filter/rule");
+            $this->set_config("filter/rule/{$this->id}", $this->validated_data);
         }
 
         # Sort the rules, write them to configuration and mark the changes as pending
@@ -254,11 +257,8 @@ class APIFirewallRuleCreate extends APIModel {
     private function __validate_sched() {
         # Check for our optional 'sched' payload value
         if (isset($this->initial_data['sched'])) {
-            # In case there are no schedules, initialize the schedules config area
-            $this->init_config("schedules", "schedule");
-
             # Loop through each configured schedule and check if it exists
-            foreach ($this->config["schedules"]["schedule"] as $schedule) {
+            foreach ($this->get_config("schedules/schedule", []) as $schedule) {
                 # Check if the names match
                 if ($this->initial_data["sched"] === $schedule["name"]) {
                     $this->validated_data["sched"] = $this->initial_data["sched"];

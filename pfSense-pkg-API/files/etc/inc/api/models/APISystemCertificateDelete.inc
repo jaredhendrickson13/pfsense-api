@@ -25,12 +25,11 @@ class APISystemCertificateDelete extends APIModel {
         $this->privileges = ["page-all", "page-system-certmanager"];
         $this->change_note = "Deleted certificate via API";
         $this->cert_ref_id = "";
-        $this->init_config("cert");
     }
 
     public function action() {
         # Remove the certificate from configuration
-        unset($this->config["cert"][$this->id]);
+        $this->del_config("cert/{$this->id}");
         $this->write_config();
 
         return APIResponse\get(0, $this->validated_data);
@@ -46,7 +45,7 @@ class APISystemCertificateDelete extends APIModel {
         # Check for our conditional 'refid' field
         if (isset($this->initial_data['refid'])) {
             # Loop through our certificates and find a match
-            foreach ($this->config["cert"] as $i => $c) {
+            foreach ($this->get_config("cert", []) as $i => $c) {
                 if ($c["refid"] === $this->initial_data['refid']) {
                     $this->id = $i;
                     $this->cert_ref_id = $this->initial_data['refid'];
@@ -60,7 +59,7 @@ class APISystemCertificateDelete extends APIModel {
         # Check for our conditional 'descr' field. Only validate this field if the ID was not found by ref ID previously
         if (isset($this->initial_data['descr']) and !isset($this->id)) {
             # Loop through our certificates and find a match
-            foreach ($this->config["cert"] as $i => $c) {
+            foreach ($this->get_config("cert", []) as $i => $c) {
                 if ($c["descr"] === $this->initial_data['descr']) {
                     $this->id = $i;
                     $this->cert_ref_id = $c["refid"];
@@ -74,9 +73,9 @@ class APISystemCertificateDelete extends APIModel {
         # Check our conditional 'id' field.
         if (isset($this->initial_data['id'])) {
             # Check if this ID exists
-            if (array_key_exists($this->initial_data["id"], $this->config["cert"])) {
+            if ($this->get_config("cert/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data['id'];
-                $this->cert_ref_id = $this->config["cert"][$this->id]["refid"];
+                $this->cert_ref_id = $this->get_config("cert/{$this->id}/refid");
             } else {
                 $this->errors[] = APIResponse\get(1009);
             }
@@ -86,7 +85,7 @@ class APISystemCertificateDelete extends APIModel {
         if (isset($this->id) and isset($this->cert_ref_id)) {
             # Ensure certificate is not in use
             if (!cert_in_use($this->cert_ref_id)) {
-                $this->validated_data = $this->config["cert"][$this->id];
+                $this->validated_data = $this->get_config("cert/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(1005);
             }

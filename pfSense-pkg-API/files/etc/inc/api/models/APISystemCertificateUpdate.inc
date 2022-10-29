@@ -23,20 +23,19 @@ class APISystemCertificateUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-certmanager"];
         $this->change_note = "Modified system certificate via API";
-        $this->init_config("cert");
     }
 
     public function action() {
-        $this->config["cert"][$this->id] = $this->validated_data;
+        $this->set_config("cert/{$this->id}", $this->validated_data);
         $this->write_config();
-        return APIResponse\get(0, $this->config["cert"][$this->id]);
+        return APIResponse\get(0, $this->get_config("cert/{$this->id}"));
     }
 
     private function __validate_refid() {
         # Validate optional 'refid' field containing the refid of an existing certificate. If refid is not passed, find the cert through 'descr' field
         if (isset($this->initial_data["refid"])) {
             # Loop through each cert and check for a match
-            foreach ($this->config["cert"] as $id=>$cert) {
+            foreach ($this->get_config("cert", []) as $id=>$cert) {
                 # Check if the field 'refid' matches the certificate's refid
                 if ($this->initial_data["refid"] === $cert["refid"]) {
                     $this->id = $id;

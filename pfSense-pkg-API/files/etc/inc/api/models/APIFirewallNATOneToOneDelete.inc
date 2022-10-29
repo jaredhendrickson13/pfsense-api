@@ -22,13 +22,11 @@ class APIFirewallNATOneToOneDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-nat-1-1-edit"];
         $this->change_note = "Deleted 1:1 NAT mapping via API";
-        $this->init_config('nat', 'onetoone');
     }
 
     public function action() {
         # Capture the deleted item then remove it. Mark the subsystem as dirty until it is applied.
-        $del_rule = $this->config["nat"]["onetoone"][$this->id];
-        unset($this->config["nat"]["onetoone"][$this->id]);
+        $del_rule = $this->del_config("nat/onetoone/{$this->id}");
         APITools\sort_nat_rules(null, null, "onetoone");
         $this->write_config();
         $this->apply();
@@ -39,7 +37,7 @@ class APIFirewallNATOneToOneDelete extends APIModel {
         # Require clients to pass in 1:1 rule ID to locate the rule to delete
         if (isset($this->initial_data['id'])) {
             // Check that our rule ID exists
-            if (array_key_exists($this->initial_data['id'], $this->config["nat"]["onetoone"])) {
+            if ($this->get_config("nat/onetoone/{$this->initial_data['id']}", false)) {
                 $this->id = $this->initial_data['id'];
             } else {
                 $this->errors[] = APIResponse\get(4084);

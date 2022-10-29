@@ -23,11 +23,11 @@ class APIServicesUnboundAccessListCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsresolver-acls"];
         $this->change_note = "Added DNS Resolver access list via API";
-        $this->init_config("unbound", "acls");
     }
 
     public function action() {
-        $this->config["unbound"]["acls"][] = $this->validated_data;
+        $this->id = $this->get_next_id("unbound/acls");
+        $this->set_config("unbound/acls/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty("unbound");
         # If user requests immediately application

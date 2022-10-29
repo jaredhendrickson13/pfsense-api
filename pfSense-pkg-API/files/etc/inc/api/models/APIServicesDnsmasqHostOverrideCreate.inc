@@ -26,12 +26,13 @@ class APIServicesDnsmasqHostOverrideCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsforwarder-edithost"];
         $this->change_note = "Added DNS Forwarder host override via API";
-        $this->init_config("dnsmasq", "hosts");
     }
 
     public function action() {
-        $this->config["dnsmasq"]["hosts"][] = $this->validated_data;
-        usort($this->config["dnsmasq"]["hosts"], "dnsmasq_override_create_host_cmp");
+        $this->id = $this->get_next_id("dnsmasq/hosts");
+        $this->set_config("dnsmasq/hosts/{$this->id}", $this->validated_data);
+        $hosts = $this->get_config("dnsmasq/hosts");
+        usort($hosts, "dnsmasq_override_create_host_cmp");
         $this->write_config();
         mark_subsystem_dirty("hosts");
         $this->apply();
@@ -129,7 +130,7 @@ class APIServicesDnsmasqHostOverrideCreate extends APIModel {
         $IP = $this->validated_data["ip"];
 
         # Loop through each host override and check if the FQDN already exists
-        foreach ($this->config["dnsmasq"]["hosts"] as $ent) {
+        foreach ($this->get_config("dnsmasq/hosts", []) as $ent) {
             # Check the FQDN matches this entry
             if ($ent["host"] === $HOST and $ent["domain"] === $DOMAIN) {
                 # Host overrides are allowed an IPv4 and IPv6 address, check if it already has one.

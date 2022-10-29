@@ -22,12 +22,11 @@ class APIUserUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-usermanager"];
         $this->change_note = "Modified user via API";
-        $this->init_config("system", "user");
     }
 
     public function action() {
         # Update our new user in the config and set the user on the backend
-        $this->config["system"]["user"][$this->id] = $this->validated_data;
+        $this->set_config("system/user/{$this->id}", $this->validated_data);
         $this->write_config();
         local_user_set($this->validated_data);
         return APIResponse\get(0, $this->validated_data);
@@ -50,7 +49,7 @@ class APIUserUpdate extends APIModel {
         # Check for our required `username` payload value
         if (isset($this->initial_data['username'])) {
             # Loop through each configured user and check if this user exists
-            foreach ($this->config["system"]["user"] as $id=>$user) {
+            foreach ($this->get_config("system/user", []) as $id=>$user) {
                 if ($this->initial_data["username"] === $user["name"]) {
                     $this->validated_data = $user;
                     $this->id = intval($id);
@@ -179,7 +178,7 @@ class APIUserUpdate extends APIModel {
 
     public function is_user_certificate($cert_ref_id) {
         # Loop through all certificates and check for matches
-        foreach ($this->config["cert"] as $cert) {
+        foreach ($this->get_config("cert", []) as $cert) {
             # Check if this certificate matches the specified ref id
             if ($cert["refid"] === $cert_ref_id) {
                 return true;

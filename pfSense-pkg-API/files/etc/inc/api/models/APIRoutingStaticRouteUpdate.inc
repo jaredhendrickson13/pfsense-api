@@ -23,12 +23,11 @@ class APIRoutingStaticRouteUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-staticroutes-editroute"];
         $this->change_note = "Modified static route via API";
-        $this->init_config('staticroutes', 'route');
     }
 
     public function action() {
         # Write route changes to config
-        $this->config["staticroutes"]["route"][$this->id] = $this->validated_data;
+        $this->set_config("staticroutes/route/{$this->id}", $this->validated_data);
         $this->write_config();
 
         # Mark the routing subsystem as changed
@@ -44,9 +43,9 @@ class APIRoutingStaticRouteUpdate extends APIModel {
     private function __validate_id() {
         # Require clients to pass in an 'id' payload value
         if (isset($this->initial_data["id"])) {
-            if (array_key_exists($this->initial_data["id"], $this->config["staticroutes"]["route"])) {
+            if ($this->get_config("staticroutes/route/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
-                $this->validated_data = $this->config["staticroutes"]["route"][$this->id];
+                $this->validated_data = $this->get_config("staticroutes/route/{$this->id}", []);
             } else {
                 $this->errors[] = APIResponse\get(6006);
             }

@@ -23,17 +23,15 @@ class APIServicesIPsecPhase1Delete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-vpn-ipsec-editphase1"];
         $this->change_note = "Deleted IPsec phase 1 via API";
-        $this->init_config("ipsec", "phase1");
-        $this->init_config("ipsec", "phase2");
     }
 
     public function action() {
         # Capture the entry being delete before deleting it
-        $this->validated_data = $this->config["ipsec"]["phase1"][$this->id];
+        $this->validated_data = $this->get_config("ipsec/phase1/{$this->id}");
 
         # Remove child phase2 entries, this phase1 entry and mark the changes as pending
         $this->delete_child_phase2_entries();
-        unset($this->config["ipsec"]["phase1"][$this->id]);
+        $this->del_config("ipsec/phase1/{$this->id}");
         $this->write_config();
         mark_subsystem_dirty('ipsec');
 
@@ -68,10 +66,10 @@ class APIServicesIPsecPhase1Delete extends APIModel {
 
     public function delete_child_phase2_entries() {
         # Loop through all phase2 entries and remove them if they reference this phase1 entry
-        foreach ($this->config["ipsec"]["phase2"] as $index=>$p2) {
+        foreach ($this->get_config("ipsec/phase2", []) as $index=>$p2) {
             # Remove this phase2 entry if it's IKE ID matches the phase 1 we're deleting
             if ($this->ikeid === (int)$p2["ikeid"]) {
-                unset($this->config["ipsec"]["phase2"][$index]);
+                $this->del_config("ipsec/phase2/{$index}");
             }
         }
     }

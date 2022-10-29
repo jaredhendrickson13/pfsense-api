@@ -22,14 +22,9 @@ class APIServicesUnboundHostOverrideRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsresolver"];
-        $this->init_config("unbound", "hosts");
     }
 
     public function action() {
-        $unbound_array = [];
-        if (!empty($this->config["unbound"]["hosts"])) {
-            $unbound_array = $this->config["unbound"]["hosts"];
-        }
-        return APIResponse\get(0, $unbound_array);
+        return APIResponse\get(0, $this->get_config("unbound/hosts", []));
     }
 }

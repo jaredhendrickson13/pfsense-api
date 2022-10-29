@@ -22,7 +22,6 @@ class APIRoutingGatewayCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-gateways-editgateway"];
         $this->change_note = "Added gateway via API";
-        $this->init_config('gateways', 'gateway_item');
     }
 
     public function action() {
@@ -342,7 +341,7 @@ class APIRoutingGatewayCreate extends APIModel {
         }
 
         # Loop through each configured gateway and check if this interface already has a dynamic gateway set
-        foreach ($this->config["gateways"]["gateway_item"] as $gateway) {
+        foreach ($this->get_config("gateways/gateway_item", []) as $gateway) {
             if ($gateway["interface"] === $interface and $gateway["ipprotocol"] === $ipprotocol and $gateway["gateway"] === "dynamic") {
                 $dyn_gw_exists = true;
             }

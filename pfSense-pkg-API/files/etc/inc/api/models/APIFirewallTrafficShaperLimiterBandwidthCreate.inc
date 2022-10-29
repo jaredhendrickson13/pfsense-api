@@ -23,12 +23,11 @@ class APIFirewallTrafficShaperLimiterBandwidthCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-trafficshaper-limiter"];
         $this->change_note = "Added firewall traffic shaper limiter bandwidth via API";
-        $this->init_config('shaper', 'queue');
     }
 
     public function action() {
-        $this->__init_config();
-        $this->config["dnshaper"]["queue"][$this->id]["bandwidth"]["item"][] = $this->validated_data;
+        $next_id = $this->get_next_id("dnshaper/queue/{$this->id}/bandwidth/item");
+        $this->set_config("dnshaper/queue/{$this->id}/bandwidth/item/{$next_id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty('shaper');
 
@@ -111,7 +110,7 @@ class APIFirewallTrafficShaperLimiterBandwidthCreate extends APIModel {
 
     public function get_limiter_id_by_name($name, $as_bool=false) {
         # Loop through each configured limiter and see if it uses this name
-        foreach ($this->config["dnshaper"]["queue"] as $id=>$limiter) {
+        foreach ($this->get_config("dnshaper/queue", []) as $id=>$limiter) {
             # Check for matching names
             if ($name === $limiter["name"]) {
                 return ($as_bool) ? true : $id;
@@ -122,23 +121,12 @@ class APIFirewallTrafficShaperLimiterBandwidthCreate extends APIModel {
 
     public function is_firewall_schedule($name) {
         # Loop through each configured firewall schedule and check if one exists with a provided name
-        foreach ($this->config["schedules"]["schedule"] as $schedule) {
+        foreach ($this->get_config("schedules/schedule", []) as $schedule) {
             # Check if the provided name matches this schedule's name or if the name is 'none'
             if ($name === $schedule["name"] or $name == "none") {
                 return true;
             }
         }
         return false;
-    }
-
-    private function __init_config() {
-        # Check if there is no dnshaper array in the config
-        if (empty($this->config["dnshaper"]["queue"][$this->id]["queue"])) {
-            $this->config["dnshaper"]["queue"][$this->id]["queue"] = [];
-        }
-        # Check if there is no dnshaper queue array in the config
-        if (empty($this->config["dnshaper"]["queue"][$this->id]["queue"]["item"])) {
-            $this->config["dnshaper"]["queue"][$this->id]["queue"]["item"] = [];
-        }
     }
 }

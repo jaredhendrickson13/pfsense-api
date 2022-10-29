@@ -21,10 +21,9 @@ class APIServicesOpenVPNClientSpecificOverridesRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-openvpn-server"];
-        $this->init_config("openvpn", "openvpn-csc");
     }
 
     public function action() {
-        return APIResponse\get(0, $this->config["openvpn"]["openvpn-csc"]);
+        return APIResponse\get(0, $this->get_config("openvpn/openvpn-csc", []));
     }
 }

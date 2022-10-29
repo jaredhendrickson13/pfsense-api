@@ -22,10 +22,9 @@ class APIUserPrivilegeDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-usermanager-addprivs"];
         $this->change_note = "Deleted privileges for user via API";
-        $this->init_config("system", "user");
     }
     public function action() {
-        $this->config["system"]["user"][$this->id]["priv"] = $this->validated_data["priv"];
+        $this->set_config("system/user/{$this->id}/priv", $this->validated_data["priv"]);
         $this->write_config();
         local_user_set($this->validated_data);
         return APIResponse\get(0, $this->validated_data["priv"]);
@@ -40,7 +39,7 @@ class APIUserPrivilegeDelete extends APIModel {
         # Check for our required `username` payload value
         if (isset($this->initial_data['username'])) {
             # Loop through each configured user and check if this user exists
-            foreach ($this->config["system"]["user"] as $id=>$user) {
+            foreach ($this->get_config("system/user", []) as $id=>$user) {
                 if ($this->initial_data["username"] === $user["name"]) {
                     $this->validated_data = $user;
                     $this->id = intval($id);

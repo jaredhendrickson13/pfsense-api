@@ -23,11 +23,10 @@ class APISystemTunableUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-sysctl"];
         $this->change_note = "Modified system tunable via API";
-        $this->init_config("sysctl", "item");
     }
 
     public function action() {
-        $this->config["sysctl"]["item"][$this->id] = $this->validated_data;
+        $this->set_config("sysctl/item/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty('sysctl');
         system_setup_sysctl();
@@ -40,7 +39,7 @@ class APISystemTunableUpdate extends APIModel {
         if (!empty($this->initial_data["id"])) {
             $match_found = false;
             $count = 0;
-            foreach ($this->config["sysctl"]["item"] as $tunable) {
+            foreach ($this->get_config("sysctl/item", []) as $tunable) {
                 if ($tunable["tunable"] === $this->initial_data["id"]) {
                     $this->validated_data = $tunable;
                     $this->id = $count;
@@ -61,7 +60,7 @@ class APISystemTunableUpdate extends APIModel {
             # Ensure we have a tunable name, that it doesn't already exist, and that it is a string
         if (!empty($this->initial_data["tunable"])) {
             if (is_string($this->initial_data["tunable"])) {
-                foreach ($this->config["sysctl"]["item"] as $item) {
+                foreach ($this->get_config("sysctl/item", []) as $item) {
                     if ($item["tunable"] === $this->initial_data["tunable"]) {
                         $this->errors[] = APIResponse\get(1012);
                         break;

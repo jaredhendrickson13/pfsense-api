@@ -26,12 +26,13 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsresolver-edithost"];
         $this->change_note = "Added DNS Resolver host override via API";
-        $this->init_config("unbound", "hosts");
     }
 
     public function action() {
-        $this->config["unbound"]["hosts"][] = $this->validated_data;
-        usort($this->config["unbound"]["hosts"], "unbound_override_create_host_cmp");
+        $this->id = $this->get_next_id("unbound/hosts");
+        $this->set_config("unbound/hosts/{$this->id}", $this->validated_data);
+        $hosts = $this->get_config("unbound/hosts");
+        usort($hosts, "unbound_override_create_host_cmp");
         $this->write_config();
         mark_subsystem_dirty("unbound");
         # If user requests immediately application

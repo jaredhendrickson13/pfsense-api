@@ -21,14 +21,9 @@ class APIFirewallNATOutboundMappingRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-nat-outbound"];
-        $this->init_config('nat', 'outbound', 'rule');
     }
 
     public function action() {
-        # If existing outbound rules exist, populate them as our return data
-        if (!empty($this->config["nat"]["outbound"]["rule"])) {
-            $this->validated_data = $this->config["nat"]["outbound"]["rule"];
-        }
-        return APIResponse\get(0, $this->validated_data);
+        return APIResponse\get(0, $this->get_config("nat/outbound/rule", []));
     }
 }

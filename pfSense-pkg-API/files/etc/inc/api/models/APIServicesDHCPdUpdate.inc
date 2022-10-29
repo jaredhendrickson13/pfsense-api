@@ -25,11 +25,10 @@ class APIServicesDHCPdUpdate extends APIModel {
         $this->privileges = ["page-all", "page-services-dhcpserver"];
         $this->change_note = "Modified DHCP server via API";
         $this->__if_conf = [];
-        $this->init_config("dhcpd");
     }
 
     public function action() {
-        $this->config["dhcpd"][$this->id] = $this->validated_data;
+        $this->set_config("dhcpd/{$this->id}", $this->validated_data);
         $this->write_config();
         $this->reload_dhcpd();
         return APIResponse\get(0, $this->validated_data);
@@ -60,12 +59,12 @@ class APIServicesDHCPdUpdate extends APIModel {
             $this->initial_data["interface"] = APITools\get_pfsense_if_id($this->initial_data["interface"]);
             # Check that interface exists
             if (is_string($this->initial_data["interface"])) {
-                $this->__if_conf = $this->config["interfaces"][$this->initial_data["interface"]];
+                $this->__if_conf = $this->get_config("interfaces/{$this->initial_data["interface"]}", []);
                 # Check that interface hosts a static network with multiple addresses
                 if (isset($this->__if_conf["enable"]) and is_ipaddrv4($this->__if_conf["ipaddr"]) and $this->__if_conf["subnet"] <= 31) {
                     $this->id = $this->initial_data["interface"];
                     $this->__init_config($this->id);
-                    $this->validated_data = $this->config["dhcpd"][$this->id];
+                    $this->validated_data = $this->get_config("dhcpd/{$this->id}", []);
                 } else {
                     $this->errors[] = APIResponse\get(2019);
                 }
@@ -393,18 +392,19 @@ class APIServicesDHCPdUpdate extends APIModel {
         $retvaldns = 0;
         /* dnsmasq_configure calls dhcpd_configure */
         /* no need to restart dhcpd twice */
-        if (isset($this->config['dnsmasq']['enable']) && isset($this->config['dnsmasq']['regdhcpstatic']))	{
+        if ($this->is_config_enabled('dnsmasq') && $this->is_config_enabled('dnsmasq', 'regdhcpstatic')) {
             $retvaldns |= services_dnsmasq_configure();
             if ($retvaldns == 0) {
                 clear_subsystem_dirty('hosts');
                 clear_subsystem_dirty('staticmaps');
             }
-        } else if (isset($this->config['unbound']['enable']) && isset($this->config['unbound']['regdhcpstatic'])) {
-            $retvaldns |= services_unbound_configure();
-            if ($retvaldns == 0) {
-                clear_subsystem_dirty('unbound');
-                clear_subsystem_dirty('hosts');
-                clear_subsystem_dirty('staticmaps');
+            if ($this->is_config_enabled('unbound') && $this->is_config_enabled('unbound', 'regdhcpstatic')) {
+                $retvaldns |= services_unbound_configure();
+                if ($retvaldns == 0) {
+                    clear_subsystem_dirty('unbound');
+                    clear_subsystem_dirty('hosts');
+                    clear_subsystem_dirty('staticmaps');
+                }
             }
         } else {
             $retvaldhcp |= services_dhcpd_configure();
@@ -416,10 +416,10 @@ class APIServicesDHCPdUpdate extends APIModel {
         if (!function_exists('is_package_installed')) {
             require_once('pkg-utils.inc');
         }
-        if (is_package_installed('pfSense-pkg-bind') && isset($this->config['installedpackages']['bind']['config'][0]['enable_bind'])) {
+        if (is_package_installed('pfSense-pkg-bind') && $this->is_config_enabled('installedpackages/bind/config/0', 'enable_bind')) {
             $reloadbind = false;
-            if (is_array($this->config['installedpackages']['bindzone'])) {
-                $bindzone = $this->config['installedpackages']['bindzone']['config'];
+            if (is_array($this->get_config('installedpackages/bindzone'))) {
+                $bindzone = $this->get_config('installedpackages/bindzone/config');
             } else {
                 $bindzone = array();
             }
@@ -441,14 +441,9 @@ class APIServicesDHCPdUpdate extends APIModel {
     }
 
     private function __init_config($interface) {
-        # Initialize the DHCP configuration if it does not exist
-        if (empty($this->config["dhcpd"])) {
-            $this->config["dhcpd"] = [];
-        }
-
         # Initialize the default interface DHCP configuration if it does not exist
-        if (!isset($this->config["dhcpd"][$interface])) {
-            $this->config["dhcpd"][$interface] = [
+        if (!$this->is_config_enabled("dhcpd", $interface)) {
+            $this->set_config("dhcpd/{$interface}", [
                 "range" => ["from" => "", "to" => ""],
                 "failover_peerip" => "",
                 "defaultleasetime" => "",
@@ -476,7 +471,7 @@ class APIServicesDHCPdUpdate extends APIModel {
                 "filename64arm" => "",
                 "rootpath" => "",
                 "numberoptions" => ""
-            ];
+            ]);
         }
     }
 }

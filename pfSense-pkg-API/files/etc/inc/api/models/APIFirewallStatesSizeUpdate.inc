@@ -24,19 +24,19 @@ class APIFirewallStatesSizeUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-firewall"];
         $this->change_note = "Modified firewall state table size via API";
-        $this->init_config('system');
     }
 
     public function action() {
-
-        // Write our state table size
+        # Write the state table size
         if ($this->validated_data["maximumstates"] === "default") {
-            unset($this->config["system"]["maximumstates"]);
+            $this->del_config("system/maximumstates");
         } else {
-            $this->config["system"]["maximumstates"] = $this->validated_data["maximumstates"];
+            $this->set_config("system/maximumstates", $this->validated_data["maximumstates"]);
         }
-        $this->write_config();    // Apply our configuration change
-        filter_configure();    // Update our firewall filter
+
+        # Apply the configuration change
+        $this->write_config();
+        filter_configure();
         return APIResponse\get(0, (new APIFirewallStatesSizeRead())->action()["data"]);
     }
 

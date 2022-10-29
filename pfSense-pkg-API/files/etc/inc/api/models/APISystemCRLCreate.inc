@@ -26,12 +26,12 @@ class APISystemCRLCreate extends APIModel {
         $this->privileges = ["page-all", "page-system-crlmanager"];
         $this->change_note = "Added certificate revocation list via API";
         $this->cert_method = null;
-        $this->init_config("crl");
     }
 
     public function action() {
         # Add the new certificate
-        $this->config["crl"][] = $this->validated_data;
+        $this->id = $this->get_next_id("crl");
+        $this->set_config("crl/{$this->id}", $this->validated_data);
 
         # Write changes to configuration
         $this->write_config();
@@ -126,7 +126,7 @@ class APISystemCRLCreate extends APIModel {
         $ca_enties = [];
 
         # Loop through each CA and add all CAs that have a valid key
-        foreach ($this->config['ca'] as $ca) {
+        foreach ($this->get_config('ca', []) as $ca) {
             if ($ca['prv']) {
                 $ca_enties[] = $ca['refid'];
             }

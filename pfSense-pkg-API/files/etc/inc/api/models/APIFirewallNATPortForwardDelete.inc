@@ -22,13 +22,11 @@ class APIFirewallNATPortForwardDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-nat-portforward-edit"];
         $this->change_note = "Deleted NAT rule via API";
-        $this->init_config('nat', 'rule');
     }
 
     public function action() {
         # Capture the deleted item then remove it. Mark the subsystem as dirty until it is applied.
-        $del_rule = $this->config["nat"]["rule"][$this->id];
-        unset($this->config["nat"]["rule"][$this->id]);
+        $del_rule = $this->del_config("nat/rule/{$this->id}");
         APITools\sort_nat_rules();
         $this->write_config();
         mark_subsystem_dirty('natconf');
@@ -44,7 +42,7 @@ class APIFirewallNATPortForwardDelete extends APIModel {
         # Require client to pass in a port forward ID to locate the port forward to delete
         if (isset($this->initial_data['id'])) {
             // Check that our rule ID exists
-            if (array_key_exists($this->initial_data['id'], $this->config["nat"]["rule"])) {
+            if ($this->get_config("nat/rule/{$this->initial_data['id']}", false)) {
                 $this->id = $this->initial_data['id'];
             } else {
                 $this->errors[] = APIResponse\get(4016);

@@ -25,14 +25,12 @@ class APIFirewallNATOneToOneCreate extends APIModel {
         $this->change_note = "Added 1:1 NAT mapping via API";
         $this->privileges = ["page-all", "page-firewall-nat-1-1-edit"];
         $this->nat_reflection = ["enable", "disable"];
-        $this->init_config('nat', 'onetoone');
     }
 
     public function action() {
         # Add our new configuration
-        $this->__init_array();
-        $this->id = count($this->config["nat"]["onetoone"]);
-        $this->config["nat"]["onetoone"][$this->id] = $this->validated_data;
+        $this->id = $this->get_next_id("nat/onetoone");
+        $this->set_config("nat/onetoone/{$this->id}", $this->validated_data);
         APITools\sort_nat_rules($this->initial_data["top"], $this->id, "onetoone");
         $this->write_config();
         $this->apply();
@@ -129,19 +127,6 @@ class APIFirewallNATOneToOneCreate extends APIModel {
                 $this->errors[] = APIResponse\get(4008);
             }
         }
-    }
-
-    private function __init_array() {
-        # Ensure our NAT configuration is initialized as an array
-        if (!is_array($this->config["nat"])) {
-            $this->config["nat"] = [];
-        }
-
-        # Ensure our one-to-one NAT configuration is initialized as an array
-        if (!is_array($this->config["nat"]["onetoone"])) {
-            $this->config["nat"]["onetoone"] = [];
-        }
-
     }
 
     public function validate_payload() {

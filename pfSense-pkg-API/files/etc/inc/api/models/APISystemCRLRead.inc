@@ -22,7 +22,6 @@ class APISystemCRLRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-crlmanager"];
-        $this->init_config("crl");
     }
 
     public function action() {
@@ -31,8 +30,6 @@ class APISystemCRLRead extends APIModel {
     }
 
     public function validate_payload() {
-        if (!empty($this->config["crl"])) {
-            $this->validated_data["crl"] = $this->config["crl"];
-        }
+        $this->validated_data["crl"] = $this->get_config("crl", []);
     }
 }

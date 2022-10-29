@@ -22,14 +22,9 @@ class APIServicesDnsmasqRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsforwarder"];
-        $this->init_config("dnsmasq");
     }
 
     public function action() {
-        $dnsmasq_array = [];
-        if (!empty($this->config["dnsmasq"])) {
-            $dnsmasq_array = $this->config["dnsmasq"];
-        }
-        return APIResponse\get(0, $dnsmasq_array);
+        return APIResponse\get(0, $this->get_config("dnsmasq", []));
     }
 }

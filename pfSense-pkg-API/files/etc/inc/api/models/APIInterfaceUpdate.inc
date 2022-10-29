@@ -26,11 +26,10 @@ class APIInterfaceUpdate extends APIModel {
         $this->privileges = ["page-all", "page-interfaces-assignnetworkports"];
         $this->change_note = "Modified interface via API";
         $this->if_list = APITools\get_all_avail_interfaces();
-        $this->init_config('interfaces');
     }
 
     public function action() {
-        $this->config["interfaces"][$this->id] = $this->validated_data;
+        $this->set_config("interfaces/{$this->id}", $this->validated_data);
         $this->write_config();
         APIInterfaceApplyCreate::serialize_changes($this->id, $this->validated_data);
 
@@ -48,7 +47,7 @@ class APIInterfaceUpdate extends APIModel {
             $this->id = APITools\get_pfsense_if_id($this->initial_data["id"]);
             # Check that the provided ID is associated with an existing interface
             if ($this->id) {
-                $this->validated_data = $this->config["interfaces"][$this->id];
+                $this->validated_data = $this->get_config("interfaces/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(3058);
             }

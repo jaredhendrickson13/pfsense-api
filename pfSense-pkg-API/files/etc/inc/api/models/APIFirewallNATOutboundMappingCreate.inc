@@ -32,13 +32,12 @@ class APIFirewallNATOutboundMappingCreate extends APIModel {
         $this->pool_options = ["round-robin", "round-robin sticky-address", "random", "random sticky-address", "source-hash", "bitmask"];
         $this->port_supported = false;
         $this->pool_source_hash_supported = false;
-        $this->init_config('nat', 'outbound', 'rule');
     }
 
     public function action() {
         # Add our new configuration
-        $this->id = count($this->config["nat"]["outbound"]["rule"]);
-        $this->config["nat"]["outbound"]["rule"][$this->id] = $this->validated_data;
+        $this->id = count($this->get_config("nat/outbound/rule"));
+        $this->set_config("nat/outbound/rule/{$this->id}", $this->validated_data);
         APITools\sort_nat_rules($this->initial_data["top"], $this->id, "outbound");
         $this->write_config();
         mark_subsystem_dirty('natconf');

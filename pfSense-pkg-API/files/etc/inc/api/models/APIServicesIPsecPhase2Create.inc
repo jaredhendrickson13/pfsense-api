@@ -25,13 +25,12 @@ class APIServicesIPsecPhase2Create extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-vpn-ipsec-editphase2"];
         $this->change_note = "Added IPsec phase 2 via API";
-        $this->init_config("ipsec", "phase1");
-        $this->init_config("ipsec", "phase2");
     }
 
     public function action() {
         # Write this entry to configuration
-        $this->config["ipsec"]["phase2"][] = $this->validated_data;
+        $this->id = $this->get_next_id("ipsec/phase2");
+        $this->set_config("ipsec/phase2/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty('ipsec');
 

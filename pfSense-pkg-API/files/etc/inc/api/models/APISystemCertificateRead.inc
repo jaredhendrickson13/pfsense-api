@@ -22,17 +22,9 @@ class APISystemCertificateRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-certmanager"];
-        $this->init_config("cert");
     }
 
     public function action() {
-        $this->validate_payload();
-        return APIResponse\get(0, $this->validated_data);
-    }
-
-    public function validate_payload() {
-        if (!empty($this->config["cert"])) {
-            $this->validated_data["cert"] = $this->config["cert"];
-        }
+        return APIResponse\get(0, $this->get_config("cert", []));
     }
 }

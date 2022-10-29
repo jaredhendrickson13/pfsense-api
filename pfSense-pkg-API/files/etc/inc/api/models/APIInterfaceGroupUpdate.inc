@@ -22,11 +22,10 @@ class APIInterfaceGroupUpdate extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-groups-edit"];
-        $this->init_config('ifgroups', 'ifgroupentry');
     }
 
     public function action() {
-        $this->config["ifgroups"]["ifgroupentry"][$this->id] = $this->validated_data;
+        $this->set_config("ifgroups/ifgroupentry/{$this->id}", $this->validated_data);
         $this->write_config();
         return APIResponse\get(0, $this->validated_data);
     }
@@ -74,7 +73,7 @@ class APIInterfaceGroupUpdate extends APIModel {
     private function __validate_id() {
         if (isset($this->initial_data['id'])) {
             if (APITools\is_ifgroup($this->initial_data['id'])) {
-                foreach ($this->config["ifgroups"]["ifgroupentry"] as $id=>$ifgroup) {
+                foreach ($this->get_config("ifgroups/ifgroupentry", []) as $id=>$ifgroup) {
                     # Check if this group matches
                     if ($this->initial_data["id"] === $ifgroup["ifname"]) {
                         $this->validated_data = $ifgroup;

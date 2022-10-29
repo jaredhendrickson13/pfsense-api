@@ -23,12 +23,12 @@ class APIFirewallScheduleCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-schedules-edit"];
         $this->change_note = "Added firewall schedule via API";
-        $this->init_config('schedules', 'schedule');
     }
 
     public function action() {
         # Write this schedule to the config and reload the firewall filter
-        $this->config["schedules"]["schedule"][] = $this->validated_data;
+        $this->id = $this->get_next_id("schedules/schedule");
+        $this->set_config("schedules/schedule/{$this->id}", $this->validated_data);
         $this->__sort_schedules();
         $this->write_config();
         filter_configure();
@@ -109,7 +109,7 @@ class APIFirewallScheduleCreate extends APIModel {
 
     public function is_schedule_name_in_use($name) {
         # Loop through each schedule configured and check it's name
-        foreach ($this->config["schedules"]["schedule"] as $schedule) {
+        foreach ($this->get_config("schedules/schedule", []) as $schedule) {
             # Check if this $schedule's name matches our requested name
             if ($name === $schedule["name"] or $name == "wan" or $name == "lan") {
                 return true;
@@ -123,8 +123,9 @@ class APIFirewallScheduleCreate extends APIModel {
     }
 
     private function __sort_schedules() {
-        if (is_array($this->config['schedules']['schedule'])) {
-            usort($this->config['schedules']['schedule'], ["APIFirewallScheduleCreate", "compare_schedules"]);
+        if (is_array($this->get_config('schedules/schedule', []))) {
+            $schedules = $this->get_config("schedules/schedule", []);
+            usort($schedules, ["APIFirewallScheduleCreate", "compare_schedules"]);
         }
     }
 }

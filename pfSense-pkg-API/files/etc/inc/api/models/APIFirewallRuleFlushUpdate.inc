@@ -22,12 +22,11 @@ class APIFirewallRuleFlushUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-rules-edit"];
         $this->change_note = "Flushed and replaced firewall rules via API";
-        $this->init_config('filter', 'rule');
     }
 
     public function action() {
         $this->__randomize_tracker();
-        $this->config["filter"]["rule"] = $this->validated_data;
+        $this->set_config("filter/rule", $this->validated_data);
         filter_rules_sort();
         $this->write_config();
         mark_subsystem_dirty('filter');
@@ -37,7 +36,7 @@ class APIFirewallRuleFlushUpdate extends APIModel {
             APIFirewallApplyCreate::apply();
         }
 
-        return APIResponse\get(0, $this->config["filter"]["rule"]);
+        return APIResponse\get(0, $this->get_config("filter/rule", []));
     }
 
     public function validate_payload() {

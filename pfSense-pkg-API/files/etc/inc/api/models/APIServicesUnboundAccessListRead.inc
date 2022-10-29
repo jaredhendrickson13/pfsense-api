@@ -22,14 +22,9 @@ class APIServicesUnboundAccessListRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsresolver-acls"];
-        $this->init_config("unbound", "acls");
     }
 
     public function action() {
-        $unbound_acl_array = [];
-        if (!empty($this->config["unbound"]["acls"])) {
-            $unbound_acl_array = $this->config["unbound"]["acls"];
-        }
-        return APIResponse\get(0, $unbound_acl_array);
+        return APIResponse\get(0, $this->get_config("unbound/acls", []));
     }
 }

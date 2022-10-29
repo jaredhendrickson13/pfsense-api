@@ -25,16 +25,14 @@ class APIServicesNTPdTimeServerCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-ntpd"];
         $this->change_note = "Added NTP timeserver via API";
-        $this->validated_data = $this->config["ntpd"];
-        $this->timeservers = explode(" ", $this->config["system"]["timeservers"]);
-        $this->init_config("ntpd");
-        $this->init_config("system");
+        $this->validated_data = $this->get_config("ntpd");
+        $this->timeservers = explode(" ", $this->get_config("system/timeservers"));
     }
 
     public function action() {
         # Save our updated configuration. Note this updates configuration in two different places.
-        $this->config["ntpd"] = $this->validated_data;
-        $this->config["system"]["timeservers"] = implode(" ", array_filter($this->timeservers));
+        $this->set_config("ntpd", $this->validated_data);
+        $this->set_config("system/timeservers", implode(" ", array_filter($this->timeservers)));
         $this->write_config();
 
         # Reconfigure NTP to apply the changes then return the response

@@ -22,10 +22,9 @@ class APIInterfaceRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-assignnetworkports"];
-        $this->init_config('interfaces');
     }
 
     public function action() {
-        return APIResponse\get(0, $this->config["interfaces"]);
+        return APIResponse\get(0, $this->get_config("interfaces"));
     }
 }

@@ -25,12 +25,11 @@ class APISystemCRLDelete extends APIModel {
         $this->privileges = ["page-all", "page-system-crlmanager"];
         $this->change_note = "Deleted Certificate Revocation List via API";
         $this->crl_ref_id = "";
-        $this->init_config("crl");
     }
 
     public function action() {
         # Remove the certificate from configuration
-        unset($this->config["crl"][$this->id]);
+        $this->del_config("crl/{$this->id}");
         $this->write_config();
 
         return APIResponse\get(0, $this->validated_data);
@@ -46,7 +45,7 @@ class APISystemCRLDelete extends APIModel {
         # Check for our conditional 'refid' field
         if (isset($this->initial_data['refid'])) {
             # Loop through our certificates revocation list and find a match
-            foreach ($this->config["crl"] as $i => $c) {
+            foreach ($this->get_config("crl", []) as $i => $c) {
                 if ($c["refid"] === $this->initial_data['refid']) {
                     $this->id = $i;
                     $this->crl_ref_id = $this->initial_data['refid'];
@@ -60,7 +59,7 @@ class APISystemCRLDelete extends APIModel {
         # Check for our conditional 'descr' field. Only validate this field if the ID was not found by ref ID previously
         if (isset($this->initial_data['descr']) and !isset($this->id)) {
             # Loop through our certificates and find a match
-            foreach ($this->config["crl"] as $i => $c) {
+            foreach ($this->get_config("crl", []) as $i => $c) {
                 if ($c["descr"] === $this->initial_data['descr']) {
                     $this->id = $i;
                     $this->crl_ref_id = $c["refid"];
@@ -74,9 +73,9 @@ class APISystemCRLDelete extends APIModel {
         # Check our conditional 'id' field.
         if (isset($this->initial_data['id'])) {
             # Check if this ID exists
-            if (array_key_exists($this->initial_data["id"], $this->config["crl"])) {
+            if ($this->get_config("crl/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data['id'];
-                $this->crl_ref_id = $this->config["crl"][$this->id]["refid"];
+                $this->crl_ref_id = $this->get_config("crl/{$this->id}/refid");
             } else {
                 $this->errors[] = APIResponse\get(1082);
             }
@@ -86,7 +85,7 @@ class APISystemCRLDelete extends APIModel {
         if (isset($this->id) and isset($this->crl_ref_id)) {
             # Ensure certificates revocation list is not in use
             if (!crl_in_use($this->crl_ref_id)) {
-                $this->validated_data = $this->config["crl"][$this->id];
+                $this->validated_data = $this->get_config("crl/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(1081);
             }

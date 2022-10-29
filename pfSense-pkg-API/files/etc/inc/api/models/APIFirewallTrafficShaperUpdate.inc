@@ -24,12 +24,11 @@ class APIFirewallTrafficShaperUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-trafficshaper"];
         $this->change_note = "Modified firewall traffic shaper via API";
-        $this->init_config('shaper', 'queue');
     }
 
     public function action() {
         # Save the updated shaper, mark the subsystem as un-applied
-        $this->config["shaper"]["queue"][$this->id] = $this->validated_data;
+        $this->set_config("shaper/queue/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty('shaper');
 
@@ -66,7 +65,7 @@ class APIFirewallTrafficShaperUpdate extends APIModel {
                 if ($this->get_shaper_id_by_interface($this->initial_data["interface"], true)) {
                     # Fetch the traffic shaper object associated with this interface
                     $this->id = $this->get_shaper_id_by_interface($this->initial_data["interface"]);
-                    $this->validated_data = $this->config["shaper"]["queue"][$this->id];
+                    $this->validated_data = $this->get_config("shaper/queue/{$this->id}");
                 } else {
                     $this->errors[] = APIResponse\get(4122);
                 }
@@ -164,7 +163,7 @@ class APIFirewallTrafficShaperUpdate extends APIModel {
 
     public function get_shaper_id_by_interface($interface, $as_bool=false) {
         # Loop through each configured shaper
-        foreach ($this->config["shaper"]["queue"] as $id=>$shaper) {
+        foreach ($this->get_config("shaper/queue", []) as $id=>$shaper) {
             # Check if this is the shaper for our interface, if so return it's ID
             if ($interface === $shaper["interface"]) {
                 return ($as_bool) ? true : intval($id);

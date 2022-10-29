@@ -34,7 +34,7 @@ class APISystemAPISyncUpdate extends APIModel {
     }
 
     public function action() {
-        $this->config["installedpackages"]["package"][$this->pkg_index]["conf"] = $this->validated_data;
+        $this->set_config("installedpackages/package/{$this->pkg_index}/conf", $this->validated_data);
         $this->write_config();
         $this->backup();
         return APIResponse\get(0, $this->validated_data);

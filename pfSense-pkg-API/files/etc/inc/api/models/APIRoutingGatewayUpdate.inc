@@ -25,8 +25,6 @@ class APIRoutingGatewayUpdate extends APIModel {
         $this->privileges = ["page-all", "page-system-gateways-editgateway"];
         $this->change_note = "Modified gateway via API";
         $this->ip_protocol_changed = false;
-        $this->init_config('gateways', 'gateway_item');
-        $this->init_config('staticroutes', 'route');
     }
 
     public function action() {
@@ -40,14 +38,14 @@ class APIRoutingGatewayUpdate extends APIModel {
         # Require clients to pass in a gateway ID to locate the gateway to update
         if (isset($this->initial_data['id'])) {
             # Check if an existing gateway's numeric ID matches this ID
-            if (array_key_exists($this->initial_data['id'], $this->config["gateways"]["gateway_item"])) {
+            if ($this->get_config("gateways/gateway_item/{$this->initial_data['id']}", false)) {
                 $this->id = $this->initial_data['id'];
-                $this->validated_data = $this->config["gateways"]["gateway_item"][$this->id];
+                $this->validated_data = $this->get_config("gateways/gateway_item/{$this->id}", []);
             }
             # Check if the ID passed in is a gateway name
             elseif (is_numeric($this->get_id_by_name($this->initial_data["id"]))) {
                 $this->id = $this->get_id_by_name($this->initial_data["id"]);
-                $this->validated_data = $this->config["gateways"]["gateway_item"][$this->id];
+                $this->validated_data = $this->get_config("gateways/gateway_item/{$this->id}", []);
             }
             else {
                 $this->errors[] = APIResponse\get(6028);
@@ -396,7 +394,7 @@ class APIRoutingGatewayUpdate extends APIModel {
     # Gets the numeric ID of a gateway by it's name
     public function get_id_by_name($name) {
         # Loop through all existing gateways and check if this name matches
-        foreach ($this->config["gateways"]["gateway_item"] as $id=>$gw) {
+        foreach ($this->get_config("gateways/gateway_item", []) as $id=>$gw) {
             # Check if this name matches
             if ($name === $gw["name"]) {
                 return $id;
@@ -407,14 +405,13 @@ class APIRoutingGatewayUpdate extends APIModel {
     # Updates the name of the gateway assigned to child routes
     private function __update_route_gw_names($old_name, $new_name) {
         # Loop through all static routes and update their gateway names
-        foreach ($this->config["staticroutes"]["route"] as $id=>$route) {
+        foreach ($this->get_config("staticroutes/route", []) as $id=>$route) {
             # If this route is using the old gateway name, update it to the new gateway name
             if ($route["gateway"] === $old_name) {
-                $this->config["staticroutes"]["route"][$id]["gateway"] = $new_name;
+                $this->set_config("staticroutes/route/{$id}/gateway", $new_name);
             }
         }
     }
-
 
     # Checks if this interface already has a saved configuration for a dynamic gateway using this IP protocol
     public function allow_dynamic_gw($interface, $ipprotocol) {
@@ -432,7 +429,7 @@ class APIRoutingGatewayUpdate extends APIModel {
         }
 
         # Loop through each configured gateway and check if this interface already has a dynamic gateway set
-        foreach ($this->config["gateways"]["gateway_item"] as $id=>$gateway) {
+        foreach ($this->get_config("gateways/gateway_item", []) as $id=>$gateway) {
             if ($gateway["interface"] === $interface and $gateway["ipprotocol"] === $ipprotocol and $gateway["gateway"] === "dynamic") {
                 # Allow updating this entry if the ID matches
                 if ($this->id !== $id) {

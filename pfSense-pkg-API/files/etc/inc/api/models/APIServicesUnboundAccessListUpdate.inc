@@ -23,11 +23,10 @@ class APIServicesUnboundAccessListUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsresolver-acls"];
         $this->change_note = "Modified DNS Resolver access list via API";
-        $this->init_config("unbound", "acls");
     }
 
     public function action() {
-        $this->config["unbound"]["acls"][$this->id] = $this->validated_data;
+        $this->set_config("unbound/acls/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty("unbound");
         # If user requests immediately application
@@ -49,9 +48,9 @@ class APIServicesUnboundAccessListUpdate extends APIModel {
         # Check for our required 'id' payload value
         if (isset($this->initial_data["id"])) {
             # Check the Unbound ACLs array for ID
-            if (array_key_exists($this->initial_data["id"], $this->config["unbound"]["acls"])) {
+            if ($this->get_config("unbound/acls/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
-                $this->validated_data = $this->config["unbound"]["acls"][$this->id];
+                $this->validated_data = $this->get_config("unbound/acls/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(2074);
             }

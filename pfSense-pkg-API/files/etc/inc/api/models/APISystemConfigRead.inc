@@ -25,6 +25,6 @@ class APISystemConfigRead extends APIModel {
     }
 
     public function action() {
-        return APIResponse\get(0, $this->config);
+        return APIResponse\get(0, $this->get_config("/"));
     }
 }

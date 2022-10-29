@@ -23,11 +23,10 @@ class APISystemTunableDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-sysctl"];
         $this->change_note = "Deleted system tunable via API";
-        $this->init_config("sysctl", "item");
     }
 
     public function action() {
-        unset($this->config["sysctl"]["item"][$this->id]);
+        $this->del_config("sysctl/item/{$this->id}");
         $this->write_config();
         mark_subsystem_dirty('sysctl');
         system_setup_sysctl();
@@ -40,7 +39,7 @@ class APISystemTunableDelete extends APIModel {
         if (!empty($this->initial_data["id"])) {
             $match_found = false;
             $count = 0;
-            foreach ($this->config["sysctl"]["item"] as $tunable) {
+            foreach ($this->get_config("sysctl/item", []) as $tunable) {
                 if ($tunable["tunable"] === $this->initial_data["id"]) {
                     $this->validated_data = $tunable;
                     $this->id = $count;

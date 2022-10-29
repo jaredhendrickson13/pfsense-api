@@ -22,16 +22,14 @@ class APIServicesIPsecPhase2Delete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-vpn-ipsec-editphase2"];
         $this->change_note = "Deleted IPsec phase 2 via API";
-        $this->init_config("ipsec", "phase1");
-        $this->init_config("ipsec", "phase2");
     }
 
     public function action() {
         # Capture the entry being delete before deleting it
-        $this->validated_data = $this->config["ipsec"]["phase2"][$this->id];
+        $this->validated_data = $this->get_config("ipsec/phase2/{$this->id}");
 
         # Remove this phase2 entry and mark the changes as pending
-        unset($this->config["ipsec"]["phase2"][$this->id]);
+        $this->del_config("ipsec/phase2/{$this->id}");
         $this->write_config();
         mark_subsystem_dirty('ipsec');
 

@@ -22,15 +22,14 @@ class APIServicesDHCPdStaticMappingRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"];
-        $this->init_config("dhcpd");
     }
 
     public function action() {
         $mappings = [];
         # Check that we have a mappings array
-        if (is_array($this->config["dhcpd"][$this->id]["staticmap"])) {
-            # Loop through each static map and ensure it'd ID is assign to our response
-            foreach ($this->config["dhcpd"][$this->id]["staticmap"] as $id=>$mapping) {
+        if (is_array($this->get_config("dhcpd/{$this->id}/staticmap"))) {
+            # Loop through each static map and ensure its ID is assign to our response
+            foreach ($this->get_config("dhcpd/{$this->id}/staticmap", []) as $id=>$mapping) {
                 $mappings[] = array_merge(["id" => $id], $mapping);
             }
         }
@@ -42,7 +41,7 @@ class APIServicesDHCPdStaticMappingRead extends APIModel {
         if ($this->initial_data["interface"]) {
             $this->initial_data["interface"] = APITools\get_pfsense_if_id($this->initial_data["interface"]);
             # Check that this interface has a DHCPd configuration
-            if (array_key_exists($this->initial_data["interface"], $this->config["dhcpd"])) {
+            if ($this->get_config("dhcpd/{$this->initial_data["interface"]}", false)) {
                 $this->id = $this->initial_data["interface"];
             } else {
                 $this->errors[] = APIResponse\get(2018);

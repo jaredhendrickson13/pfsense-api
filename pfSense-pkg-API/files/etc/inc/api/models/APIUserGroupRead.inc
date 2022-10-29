@@ -21,11 +21,10 @@ class APIUserGroupRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-groupmanager"];
-        $this->init_config("system", "group");
     }
 
     public function action() {
-        return APIResponse\get(0, $this->to_representation($this->config["system"]["group"], true));
+        return APIResponse\get(0, $this->to_representation($this->get_config("system/group", []), true));
     }
 
     public static function to_representation($groups, $multiple=false) {

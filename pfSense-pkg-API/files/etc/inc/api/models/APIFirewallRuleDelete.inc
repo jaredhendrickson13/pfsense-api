@@ -22,12 +22,11 @@ class APIFirewallRuleDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-rules-edit"];
         $this->change_note = "Deleted firewall rule via API";
-        $this->init_config('filter', 'rule');
     }
 
     public function action() {
         # Remove rule from config, sort and apply filter if requested
-        unset($this->config["filter"]["rule"][$this->id]);
+        $this->del_config("filter/rule/{$this->id}");
         filter_rules_sort();
         $this->write_config();
         mark_subsystem_dirty('filter');
@@ -49,10 +48,10 @@ class APIFirewallRuleDelete extends APIModel {
             # Ensure the tracker provided is a numeric
             if (is_numeric($this->initial_data["tracker"])) {
                 # Loop through each rule and check if our tracker matches
-                foreach ($this->config["filter"]["rule"] as $id => $rule) {
+                foreach ($this->get_config("filter/rule", []) as $id => $rule) {
                     if (intval($rule["tracker"]) === intval($this->initial_data['tracker'])) {
                         $this->id = $id;
-                        $this->validated_data = $this->config["filter"]["rule"][$this->id];
+                        $this->validated_data = $this->get_config("filter/rule/{$this->id}");
                         break;
                     }
                 }

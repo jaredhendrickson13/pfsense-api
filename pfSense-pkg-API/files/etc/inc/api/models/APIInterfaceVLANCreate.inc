@@ -23,11 +23,11 @@ class APIInterfaceVLANCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-vlan-edit"];
         $this->change_note = "Added VLAN interface via API";
-        $this->init_config('vlans', 'vlan');
     }
 
     public function action() {
-        $this->config["vlans"]["vlan"][] = $this->validated_data;
+        $this->id = $this->get_next_id("vlans/vlan");
+        $this->set_config("vlans/vlan/{$this->id}", $this->validated_data);
         interface_vlan_configure($this->validated_data);
         $this->write_config();
         return APIResponse\get(0, $this->validated_data);
@@ -100,7 +100,7 @@ class APIInterfaceVLANCreate extends APIModel {
 
     private function __is_vlan($if, $tag) {
         # Check if our VLAN already exists
-        foreach ($this->config["vlans"]["vlan"] as $vle) {
+        foreach ($this->get_config("vlans/vlan", []) as $vle) {
             if ($if === $vle["if"] and strval($tag) === $vle["tag"]) {
                 return true;
             }

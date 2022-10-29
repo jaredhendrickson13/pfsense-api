@@ -21,17 +21,9 @@ class APIRoutingGatewayRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-gateways"];
-        $this->init_config('gateways', 'gateway_item');
     }
 
     public function action() {
-        # Local variables
-        $gateways = [];
-
-        # Populate our gateways array if it exists
-        if (isset($this->config["gateways"]["gateway_item"])) {
-            $gateways = $this->config["gateways"]["gateway_item"];
-        }
-        return APIResponse\get(0, $gateways);
+        return APIResponse\get(0, $this->get_config("gateways/gateway_item", []));
     }
 }

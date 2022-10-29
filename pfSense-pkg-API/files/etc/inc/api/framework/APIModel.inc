@@ -63,12 +63,93 @@ class APIModel {
         return APIResponse\get(10);
     }
 
-    public static function init_config(...$config_area_path) {
+    /**
+     * Initialize the configuration array of a specific config path
+     * @param $path string config path with '/' as separators
+     * @returns null
+     */
+    public static function init_config(string $path) {
         # Initialize the configuration array of a specified path.
-        init_config_arr($config_area_path);
+        global $config;
+        array_init_path($config, $path);
     }
 
-    protected function write_config() {
+    /**
+     * Read the value of specific configuration section by path.
+     * @param $path string config path with '/' as separators
+     * @param $default mixed value to return if the path is not found
+     * @returns mixed value at path or $default if the path does not exist or if the
+     *          path keys an empty string and $default is non-null
+     */
+    public static function get_config(string $path, $default=null) {
+        global $config;
+        return(array_get_path($config, $path, $default));
+    }
+
+    /**
+     * Set a value by path in the config.
+     * @param $path string path with '/' separators
+     * @param $value mixed value to set
+     * @param $default mixed value to return if the path is not found
+     * @returns mixed $val or $default if the path prefix does not exist
+     */
+    public static function set_config(string $path, $value, $default=null) {
+        global $config;
+        return (array_set_path($config, $path, $value, $default));
+    }
+
+    /**
+     * Delete a key from the configuration
+     * @param $path string path with '/' separators
+     * @returns array copy of the removed value or null
+     */
+    public static function del_config(string $path) {
+        global $config;
+        return (array_del_path($config, $path));
+    }
+
+    /**
+     * Checks if a specific config value is set. Toggle values are often set when
+     * enabled, or missing when they are not. This check is better suited for
+     * pfSense configurations than isset().
+     * @param $path string path with '/' separators
+     * @param $enable_key string an optional alternative key value for the enable key
+     * @returns bool true if $enable_key exists in the array at $path, and has a
+     * non-null value, otherwise false.
+     */
+    public static function is_config_enabled(string $path, string $enable_key="enable") {
+        global $config;
+        return (array_path_enabled($config, $path, $enable_key));
+    }
+
+    /**
+     * Finds the next available ID for a specific configuration array. This function
+     * only works for numeric-keyed arrays in the configuration.
+     * @param $path string path with '/' separators
+     * @throws Error when the path leads to a existing non-empty, non-array value
+     * @returns int the next array key (ID) for the config path specified
+     */
+    public static function get_next_id(string $path) {
+        # First, get the configuration at the specific path
+        $conf = APIModel::get_config($path);
+
+        # Ensure config is array
+        if (is_array($conf)) {
+            return count($conf);
+        }
+        # If the value is empty, start the array at ID 0
+        elseif (empty($conf)) {
+            return 0;
+        }
+        # Otherwise, this action could be dangerous, throw an error
+        else {
+            throw new Error("Next array ID was requested for existing non-array value");
+        }
+    }
+    /**
+     * Write configuration changes to the config file
+     */
+    public function write_config() {
         # Local variables
         $lock_file = "/tmp/.api.write_config.lock";
 

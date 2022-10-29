@@ -22,12 +22,12 @@ class APIServicesOpenVPNClientSpecificOverridesCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-openvpn-server"];
         $this->change_note = "Added OpenVPN client specific override via API";
-        $this->init_config("openvpn", "openvpn-csc");
     }
 
     public function action() {
         # Add our Client Specific Override to the configuration and resync OpenVPN to use new CSC
-        $this->config['openvpn']['openvpn-csc'][] = $this->validated_data;
+        $this->id = $this->get_next_id("openvpn/openvpn-csc");
+        $this->set_config("openvpn/openvpn-csc/{$this->id}", $this->validated_data);
         openvpn_resync_csc($this->validated_data);
 
         # Write the user to configuration and set the user on the backend. Return response with created user object.
@@ -37,7 +37,7 @@ class APIServicesOpenVPNClientSpecificOverridesCreate extends APIModel {
 
     private function __validate_server_list() {
         # Check if mode is one of these
-        $server_list = $this->config['openvpn']['openvpn-server'];
+        $server_list = $this->get_config('openvpn/openvpn-server', []);
         $server_ids = [];
 
         foreach ($server_list as $server) {

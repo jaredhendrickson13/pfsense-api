@@ -25,13 +25,12 @@ class APIFirewallNATOutboundUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-nat-outbound"];
         $this->modes = ["automatic", "hybrid", "advanced", "disabled"];
-        $this->init_config('nat', 'outbound');
     }
 
     public function action() {
         # Create automatic rules if required, write to config and reload the filter
         $this->create_automatic_rules();
-        $this->config["nat"]["outbound"]["mode"] = $this->validated_data["mode"];
+        $this->set_config("nat/outbound/mode", $this->validated_data["mode"]);
         $this->write_config();
         mark_subsystem_dirty('natconf');
 
@@ -47,7 +46,7 @@ class APIFirewallNATOutboundUpdate extends APIModel {
 
     private function __get_default() {
         # Default to the current configured value, if no value is configured default to automatic
-        $this->validated_data["mode"] = $this->config["nat"]["outbound"]["mode"];
+        $this->validated_data["mode"] = $this->get_config("nat/outbound/mode");
         if (empty($this->validated_data["mode"])) {
             $this->validated_data["mode"] = "automatic";
         }
@@ -91,7 +90,8 @@ class APIFirewallNATOutboundUpdate extends APIModel {
                     $nat_ent['created'] = make_config_revision_entry(null, gettext("Manual Outbound NAT Switch"));
 
                     if ($this->__is_duplicate_rule($nat_ent) === false) {
-                        $this->config["nat"]["outbound"]["rule"][] = $nat_ent;
+                        $next_nat_rule_id = $this->get_next_id("nat/outbound/rule");
+                        $this->set_config("nat/outbound/rule/{$next_nat_rule_id}", $nat_ent);
                     }
                 }
             }
@@ -101,7 +101,7 @@ class APIFirewallNATOutboundUpdate extends APIModel {
 
     # Checks if this outbound NAT entry is a duplicate. Returns true or false.
     private function __is_duplicate_rule($nat_ent) {
-        foreach ($this->config["nat"]["outbound"]["rule"] as $rule) {
+        foreach ($this->get_config("nat/outbound/rule", []) as $rule) {
             if ($rule['interface'] == $nat_ent['interface'] &&
                 $rule['source']['network'] == $nat_ent['source']['network'] &&
                 $rule['dstport'] == $nat_ent['dstport'] &&
@@ -113,15 +113,7 @@ class APIFirewallNATOutboundUpdate extends APIModel {
         return false;
     }
 
-    # Ensures we have our configuration array formatted for outbound NAT configurations
-    private function __init_config() {
-        $this->config["nat"] = (is_array($this->config["nat"])) ? $this->config["nat"] : [];
-        $this->config["nat"]["outbound"] = (is_array($this->config["nat"]["outbound"])) ? $this->config["nat"]["outbound"] : [];
-        $this->config["nat"]["outbound"]["rule"] = (is_array($this->config["nat"]["outbound"]["rule"])) ? $this->config["nat"]["outbound"]["rule"] : [];
-    }
-
     public function validate_payload() {
-        $this->__init_config();
         $this->__get_default();
         $this->__validate_mode();
     }

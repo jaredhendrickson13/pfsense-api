@@ -29,11 +29,10 @@ class APIInterfaceVLANUpdate extends APIModel {
         $this->change_note = "Modified VLAN interface via API";
         $this->__if_changed = false;
         $this->__tag_changed = false;
-        $this->init_config('vlans', 'vlan');
     }
 
     public function action() {
-        $this->config["vlans"]["vlan"][$this->id] = $this->validated_data;
+        $this->set_config("vlans/vlan/{$this->id}", $this->validated_data);
         pfSense_interface_destroy($this->__prev_vlanif);
         interface_vlan_configure($this->validated_data);
         $this->__reassign_interface();
@@ -47,12 +46,12 @@ class APIInterfaceVLANUpdate extends APIModel {
             # Allow user to locate the VLAN by vlanif
             if (!is_null($this->__get_vlan_id_from_vlanif($this->initial_data["vlanif"]))) {
                 $this->id = $this->__get_vlan_id_from_vlanif($this->initial_data["vlanif"]);
-                $this->validated_data = $this->config["vlans"]["vlan"][$this->id];
+                $this->validated_data = $this->get_config("vlans/vlan/{$this->id}");
             }
             # Try to locate our ID by configuration index ID
-            elseif (array_key_exists($this->initial_data["id"], $this->config["vlans"]["vlan"])) {
+            elseif ($this->get_config("vlans/vlan/{$this->initial_data['id']}", false)) {
                 $this->id = $this->initial_data["id"];
-                $this->validated_data = $this->config["vlans"]["vlan"][$this->id];
+                $this->validated_data = $this->get_config("vlans/vlan/{$this->id}");
             }
 
             else {
@@ -135,7 +134,7 @@ class APIInterfaceVLANUpdate extends APIModel {
 
     private function __is_vlan($if, $tag) {
         # Check if our VLAN already exists
-        foreach ($this->config["vlans"]["vlan"] as $id => $vlan) {
+        foreach ($this->get_config("vlans/vlan", []) as $id => $vlan) {
             if ($if === $vlan["if"] and strval($tag) === $vlan["tag"]) {
                 return true;
             }
@@ -145,7 +144,7 @@ class APIInterfaceVLANUpdate extends APIModel {
 
     private function __get_vlan_id_from_vlanif($vlanif) {
         # Loop through each VLAN and return it's ID if it matches
-        foreach ($this->config["vlans"]["vlan"] as $id => $vlan) {
+        foreach ($this->get_config("vlans/vlan", []) as $id => $vlan) {
             if ($vlanif === $vlan["vlanif"]) {
                 return $id;
             }
@@ -156,7 +155,7 @@ class APIInterfaceVLANUpdate extends APIModel {
         # Check if we need to reassign an interface
         $assigned_if = APITools\get_pfsense_if_id($this->initial_data["vlanif"]);
         if (!empty($assigned_if)) {
-            $this->config['interfaces'][$assigned_if]['if'] = $this->validated_data["vlanif"];
+            $this->set_config("interfaces/{$assigned_if}/if", $this->validated_data["vlanif"]);
             interface_configure($assigned_if);
         }
     }

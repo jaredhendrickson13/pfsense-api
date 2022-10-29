@@ -32,12 +32,11 @@ class APIFirewallNATOutboundMappingUpdate extends APIModel {
         $this->pool_options = ["", "round-robin", "round-robin sticky-address", "random", "random sticky-address", "source-hash", "bitmask"];
         $this->port_supported = false;
         $this->pool_source_hash_supported = false;
-        $this->init_config('nat', 'outbound', 'rule');
     }
 
     public function action() {
         # Add our new configuration
-        $this->config["nat"]["outbound"]["rule"][$this->id] = $this->validated_data;
+        $this->set_config("nat/outbound/rule/{$this->id}", $this->validated_data);
         APITools\sort_nat_rules($this->initial_data["top"], $this->id, "outbound");
         $this->write_config();
         mark_subsystem_dirty('natconf');
@@ -53,9 +52,9 @@ class APIFirewallNATOutboundMappingUpdate extends APIModel {
         # Require clients to pass in a mapping ID to locate the mapping to update
         if (isset($this->initial_data['id'])) {
             // Check that our rule ID exists
-            if (array_key_exists($this->initial_data['id'], $this->config["nat"]["outbound"]["rule"])) {
+            if ($this->get_config("nat/outbound/rule/{$this->initial_data['id']}", false)) {
                 $this->id = $this->initial_data['id'];
-                $this->validated_data = $this->config["nat"]["outbound"]["rule"][$this->id];
+                $this->validated_data = $this->get_config("nat/outbound/rule/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(4105);
             }

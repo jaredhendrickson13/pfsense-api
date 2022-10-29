@@ -25,16 +25,14 @@ class APIServicesNTPdTimeServerDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-ntpd"];
         $this->change_note = "Deleted NTP timeserver via API";
-        $this->validated_data = $this->config["ntpd"];
-        $this->timeservers = explode(" ", $this->config["system"]["timeservers"]);
-        $this->init_config("ntpd");
-        $this->init_config("system");
+        $this->validated_data = $this->get_config("ntpd");
+        $this->timeservers = explode(" ", $this->get_config("system/timeservers"));
     }
 
     public function action() {
         # Save our updated configuration. Note this updates configuration in two different places.
-        $this->config["ntpd"] = $this->validated_data;
-        $this->config["system"]["timeservers"] = implode(" ", $this->timeservers);
+        $this->set_config("ntpd", $this->validated_data);
+        $this->set_config("system/timeservers", implode(" ", $this->timeservers));
         $this->write_config();
 
         # Reconfigure NTP to apply the changes. Since values are stored in two places, simply return the initial data.

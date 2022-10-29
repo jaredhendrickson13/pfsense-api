@@ -22,21 +22,21 @@ class APIUserAuthServerLDAPCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-authserver"];
         $this->change_note = "Added LDAP authentication server via API";
-        $this->init_config("system", "authserver");
     }
 
     public function action() {
-        $this->config["system"]["authserver"][] = $this->validated_data;    // Add our new configuration
+        $this->id = $this->get_next_id("system/authserver");
+        $this->set_config("system/authserver/{$this->id}", $this->validated_data);
         // Check if clients wants to set this as default auth server
         if ($this->initial_data["active"] === true) {
-            $this->config['system']['webgui']['authmode'] = $this->validated_data["name"];    // Add default auth server
+            $this->set_config('system/webgui/authmode', $this->validated_data["name"]);    // Add default auth server
         }
         $this->write_config();
         return APIResponse\get(0, $this->validated_data);
     }
 
     public function validate_payload() {
-        $ldap_count = count($this->config["system"]["authserver"]);    // Save our total number of auth servers
+        $ldap_count = count($this->get_config("system/authserver"));    // Save our total number of auth servers
         $this->validated_data = ["refid" => uniqid(), "type" => "ldap"];    // Init our new LDAP config
         if (isset($this->initial_data['name'])) {
             $this->validated_data["name"] = APITools\sanitize_str($this->initial_data['name']);

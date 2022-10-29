@@ -23,12 +23,11 @@ class APISystemCADelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-camanager"];
         $this->change_note = "Deleted CA certificate via API";
-        $this->init_config("ca");
     }
 
     public function action() {
         # Remove the CA from configuration and reapply the truststore
-        unset($this->config["ca"][$this->id]);
+        $this->del_config("ca/{$this->id}");
         $this->write_config();
         ca_setup_trust_store();
 
@@ -54,10 +53,10 @@ class APISystemCADelete extends APIModel {
         # Check for our optional 'refid' value
         if (isset($this->initial_data['refid'])) {
             # Loop through our certificates and find a match
-            foreach ($this->config["ca"] as $i => $c) {
+            foreach ($this->get_config("ca", []) as $i => $c) {
                 if ($c["refid"] === $this->initial_data["refid"]) {
                     $this->id = $i;
-                    $this->validated_data = $this->config["ca"][$this->id];
+                    $this->validated_data = $this->get_config("ca/{$this->id}");
                     break;
                 }
             }
@@ -68,10 +67,10 @@ class APISystemCADelete extends APIModel {
         # Check for our optional 'descr' value if a refid was not specified
         if (isset($this->initial_data['descr']) and !isset($this->initial_data["refid"])) {
             # Loop through our certificates and find a match
-            foreach ($this->config["ca"] as $i => $c) {
+            foreach ($this->get_config("ca", []) as $i => $c) {
                 if ($c["descr"] === $this->initial_data["descr"]) {
                     $this->id = $i;
-                    $this->validated_data = $this->config["ca"][$this->id];
+                    $this->validated_data = $this->get_config("ca/{$this->id}");
                     break;
                 }
             }

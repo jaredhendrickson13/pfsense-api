@@ -22,7 +22,6 @@ class APIServicesSSHdUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-admin"];
         $this->change_note = "Modified sshd configuration via API";
-        $this->init_config("system", "ssh");
     }
 
     public function action() {
@@ -32,21 +31,21 @@ class APIServicesSSHdUpdate extends APIModel {
         if (!empty($this->validated_data)) {
             killbyname("sshd");    // Kill SSHD
             log_error(gettext("secure shell configuration has changed. Stopping sshd."));
-            if ($this->config['system']['ssh']['enable']) {
+            if ($this->is_config_enabled("system/ssh")) {
                 log_error(gettext("secure shell configuration has changed. Restarting sshd."));
                 send_event("service restart sshd");
             }
         }
-        return APIResponse\get(0, $this->config["system"]["ssh"]);
+        return APIResponse\get(0, $this->get_config("system/ssh", []));
     }
 
     public function validate_payload() {
         if (isset($this->initial_data['enable'])) {
             $enable = $this->initial_data['enable'];
             if ($enable === true) {
-                $this->config["system"]["ssh"]["enable"] = "enabled";
+                $this->set_config("system/ssh/enable", "enabled");
             } elseif ($enable === false) {
-                unset($this->config["system"]["ssh"]["enable"]);
+                $this->del_config("system/ssh/enable");
             } else {
                 $this->errors[] = APIResponse\get(2000);
             }
@@ -57,9 +56,9 @@ class APIServicesSSHdUpdate extends APIModel {
             // Check if our auth type is valid
             if (in_array($this->validated_data["sshdkeyonly"], $allowed_auth_types)) {
                 if ($this->validated_data["sshdkeyonly"] === "disabled") {
-                    unset($this->config["system"]["ssh"]["sshdkeyonly"]);
+                    $this->del_config("system/ssh/sshdkeyonly");
                 } else {
-                    $this->config["system"]["ssh"]["sshdkeyonly"] = $this->validated_data["sshdkeyonly"];
+                    $this->set_config("system/ssh/sshdkeyonly", $this->validated_data["sshdkeyonly"]);
                 }
             } else {
                 $this->errors[] = APIResponse\get(2001);
@@ -68,9 +67,9 @@ class APIServicesSSHdUpdate extends APIModel {
         if (isset($this->initial_data['sshdagentforwarding'])) {
             $this->validated_data["sshdagentforwarding"] = $this->initial_data['sshdagentforwarding'];
             if ($this->validated_data["sshdagentforwarding"] === true) {
-                $this->config["system"]["ssh"]["sshdagentforwarding"] = "enabled";
+                $this->set_config("system/ssh/sshdagentforwarding", "enabled");
             } elseif ($this->validated_data["sshdagentforwarding"] === false) {
-                unset($this->config["system"]["ssh"]["sshdagentforwarding"]);
+                $this->del_config("system/ssh/sshdagentforwarding");
             } else {
                 $this->errors[] = APIResponse\get(2002);
             }
@@ -79,7 +78,7 @@ class APIServicesSSHdUpdate extends APIModel {
             $this->validated_data["port"] = strval($this->initial_data['port']);
             // Convert string to array
             if (is_port($this->validated_data["port"])) {
-                $this->config["system"]["ssh"]["port"] = $this->validated_data["port"];
+                $this->set_config("system/ssh/port", $this->validated_data["port"]);
             } else {
                 $this->errors[] = APIResponse\get(2003);
             }

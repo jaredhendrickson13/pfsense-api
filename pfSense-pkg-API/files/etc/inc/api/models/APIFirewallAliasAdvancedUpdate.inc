@@ -23,13 +23,12 @@ class APIFirewallAliasAdvancedUpdate extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-firewall"];
-        $this->change_note = "Modified advanced firewall alias sttings via API";
-        $this->init_config('system');
+        $this->change_note = "Modified advanced firewall alias settings via API";
     }
 
     public function action() {
         # Write these changes to the config
-        $this->config["system"] = array_replace($this->config["system"], $this->validated_data);
+        $this->set_config("system", array_replace($this->get_config("system"), $this->validated_data));
         $this->write_config();
 
         # Restart filterdns when the alias interval changes
@@ -40,7 +39,13 @@ class APIFirewallAliasAdvancedUpdate extends APIModel {
         # Reload the filter to apply changes
         filter_configure();
 
-        return APIResponse\get(0, (new APIFirewallAliasAdvancedRead())->get_config());
+        return APIResponse\get(
+            0,
+            [
+                "aliasesresolveinterval" => intval($this->get_config("system/aliasesresolveinterval")),
+                "checkaliasesurlcert" => $this->is_config_enabled("system", "checkaliasesurlcert")
+            ]
+        );
     }
 
     public function validate_payload() {
@@ -68,7 +73,7 @@ class APIFirewallAliasAdvancedUpdate extends APIModel {
             $this->validated_data["checkaliasesurlcert"] = true;
         }
         elseif ($this->initial_data["checkaliasesurlcert"] === false) {
-            unset($this->config["system"]["checkaliasesurlcert"]);
+            $this->del_config("system/checkaliasesurlcert");
         }
     }
 

@@ -21,16 +21,13 @@ class APIUserAuthServerLDAPRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-authservers"];
-        $this->init_config("system", "authserver");
     }
 
     public function action() {
         $as_array = [];
-        if (!empty($this->config["system"]["authserver"])) {
-            foreach ($this->config["system"]["authserver"] as $a) {
-                if ($a["type"] === "ldap") {
-                    $as_array[] = $a;
-                }
+        foreach ($this->get_config("system/authserver", []) as $a) {
+            if ($a["type"] === "ldap") {
+                $as_array[] = $a;
             }
         }
         return APIResponse\get(0, $as_array);

@@ -27,12 +27,11 @@ class APIServicesDHCPdOptionsCreate extends APIModel {
         $this->change_note = "Added DHCP options via API";
         $this->__if_conf = [];
         $this->__parent_model = new APIServicesDHCPdUpdate();
-        $this->init_config("dhcpd");
     }
 
     public function action() {
-        $this->__init_config();
-        $this->config["dhcpd"][$this->id]["numberoptions"]["item"][] = $this->validated_data;
+        $next_id = $this->get_next_id("dhcpd/{$this->id}/numberoptions/item");
+        $this->set_config("dhcpd/{$this->id}/numberoptions/item/{$next_id}", $this->validated_data);
         $this->write_config();
         $this->__parent_model->reload_dhcpd();
         return APIResponse\get(0, $this->validated_data);
@@ -51,12 +50,12 @@ class APIServicesDHCPdOptionsCreate extends APIModel {
             $this->initial_data["interface"] = APITools\get_pfsense_if_id($this->initial_data["interface"]);
             # Check that interface exists
             if (is_string($this->initial_data["interface"])) {
-                $this->__if_conf = $this->config["interfaces"][$this->initial_data["interface"]];
+                $this->__if_conf = $this->get_config("interfaces/{$this->initial_data["interface"]}", []);
                 # Check that interface hosts a static network with multiple addresses
                 if (isset($this->__if_conf["enable"]) and is_ipaddrv4($this->__if_conf["ipaddr"]) and $this->__if_conf["subnet"] <= 31) {
                     $this->id = $this->initial_data["interface"];
                     $this->__parent_model->init_config($this->id);
-                    $this->validated_data = $this->config["dhcpd"][$this->id];
+                    $this->validated_data = $this->get_config("dhcpd/{$this->id}", []);
                 } else {
                     $this->errors[] = APIResponse\get(2019);
                 }
@@ -168,18 +167,6 @@ class APIServicesDHCPdOptionsCreate extends APIModel {
             }
         } else {
             $this->errors[] = APIResponse\get(2087);
-        }
-    }
-
-    private function __init_config() {
-        # Initialize the numberoptions config if it is missing
-        if (!isset($this->config["dhcpd"][$this->id]["numberoptions"])) {
-            $this->config["dhcpd"][$this->id]["numberoptions"] = [];
-        }
-
-        # Initialize the numberoptions items config if it is missing
-        if (!isset($this->config["dhcpd"][$this->id]["numberoptions"]["item"])) {
-            $this->config["dhcpd"][$this->id]["numberoptions"]["item"] = [];
         }
     }
 }

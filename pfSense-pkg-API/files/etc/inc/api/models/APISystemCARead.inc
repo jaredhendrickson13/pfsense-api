@@ -22,17 +22,9 @@ class APISystemCARead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-camanager"];
-        $this->init_config("ca");
     }
 
     public function action() {
-        $this->validate_payload();
-        return APIResponse\get(0, $this->validated_data);
-    }
-
-    public function validate_payload() {
-        if (!empty($this->config["ca"])) {
-            $this->validated_data["ca"] = $this->config["ca"];
-        }
+        return APIResponse\get(0, $this->get_config("ca", []));
     }
 }

@@ -22,16 +22,16 @@ class APIUserAuthServerRADIUSCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-authserver"];
         $this->change_note = "Added RADIUS authentication server via API";
-        $this->init_config("system", "authserver");
     }
 
     public function action() {
         # Add our new authentication server to the configuration
-        $this->config["system"]["authserver"][] = $this->validated_data;
+        $this->id = $this->get_next_id("system/authserver");
+        $this->set_config("system/authserver/{$this->id}", $this->validated_data);
 
         # Check if clients wants to set this as default auth server
         if ($this->initial_data["active"] === true) {
-            $this->config['system']['webgui']['authmode'] = $this->validated_data["name"];
+            $this->set_config('system/webgui/authmode', $this->validated_data["name"]);
         }
 
         $this->write_config();

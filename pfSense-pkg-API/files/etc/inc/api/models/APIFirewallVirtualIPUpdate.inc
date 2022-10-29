@@ -24,7 +24,6 @@ class APIFirewallVirtualIPUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-virtualipaddress-edit"];
         $this->change_note = "Modified virtual IP via API";
-        $this->init_config('virtualip', 'vip');
     }
 
     public function action() {
@@ -32,7 +31,7 @@ class APIFirewallVirtualIPUpdate extends APIModel {
         $this->__serialize_vip();
 
         # Update this virtual IP to config and mark the changes as pending
-        $this->config["virtualip"]["vip"][$this->id] = $this->validated_data;
+        $this->set_config("virtualip/vip/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty('vip');
 
@@ -59,9 +58,9 @@ class APIFirewallVirtualIPUpdate extends APIModel {
         # Validate our required 'id' payload value
         if (isset($this->initial_data['id'])) {
             # Check that our rule ID exists
-            if (array_key_exists($this->initial_data["id"], $this->config["virtualip"]["vip"])) {
+            if ($this->get_config("virtualip/vip/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data['id'];
-                $this->validated_data = $this->config["virtualip"]["vip"][$this->id];
+                $this->validated_data = $this->get_config("virtualip/vip/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(4018);
             }
@@ -211,7 +210,7 @@ class APIFirewallVirtualIPUpdate extends APIModel {
 
     private function __vhid_exists($vhid) {
         # Loop through each virtual IP and ensure it is not using the requested vhid
-        foreach ($this->config["virtualip"]["vip"] as $vip) {
+        foreach ($this->get_config("virtualip/vip", []) as $vip) {
             if (intval($vhid) === intval($vip["vhid"]) and intval($vhid) !== intval($this->validated_data["vhid"])) {
                 return true;
             }
@@ -225,10 +224,10 @@ class APIFirewallVirtualIPUpdate extends APIModel {
         # Retain existing serialized virtual IPs if present
         if (file_exists("{$g['tmp_path']}/.firewall_virtual_ip.apply")) {
             $vips_to_apply = unserialize(file_get_contents("{$g['tmp_path']}/.firewall_virtual_ip.apply"));
-            $vips_to_apply[$this->id] = $this->config["virtualip"]["vip"][$this->id];
+            $vips_to_apply[$this->id] = $this->get_config("virtualip/vip/{$this->id}");
         }
         else {
-            $vips_to_apply = [$this->id => $this->config["virtualip"]["vip"][$this->id]];
+            $vips_to_apply = [$this->id => $this->get_config("virtualip/vip/{$this->id}")];
         }
 
         # Write the pending changes to file

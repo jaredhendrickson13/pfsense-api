@@ -23,15 +23,12 @@ class APIServicesDHCPdStaticMappingCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"];
         $this->change_note = "Added DHCP static mapping via API";
-        $this->init_config("dhcpd");
     }
 
     public function action() {
         # Init the staticmap config
-        if (!is_array($this->config["dhcpd"][$this->id]["staticmap"])) {
-            $this->config["dhcpd"][$this->id]["staticmap"] = [];
-        }
-        $this->config["dhcpd"][$this->id]["staticmap"][] = $this->validated_data;
+        $next_id = $this->get_next_id("dhcpd/{$this->id}/staticmap");
+        $this->set_config("dhcpd/{$this->id}/staticmap/{$next_id}", $this->validated_data);
         $this->write_config();
         $this->reload_dhcpd();
         return APIResponse\get(0, $this->validated_data);
@@ -43,7 +40,7 @@ class APIServicesDHCPdStaticMappingCreate extends APIModel {
             $this->initial_data["interface"] = APITools\get_pfsense_if_id($this->initial_data["interface"]);
             # Check that interface exists
             if (is_string($this->initial_data["interface"])) {
-                $if_conf = $this->config["interfaces"][$this->initial_data["interface"]];
+                $if_conf = $this->get_config("interfaces/{$this->initial_data["interface"]}", []);
                 # Check that interface hosts a static network with multiple addresses
                 if (isset($if_conf["enable"]) and is_ipaddrv4($if_conf["ipaddr"]) and $if_conf["subnet"] <= 31) {
                     $this->id = $this->initial_data["interface"];
@@ -62,7 +59,7 @@ class APIServicesDHCPdStaticMappingCreate extends APIModel {
             # Ensure MAC address is valid
             if (is_macaddr($this->initial_data["mac"])) {
                 # Loop through existing mappings and ensure this MAC doesn't exist already
-                foreach ($this->config["dhcpd"][$this->id]["staticmap"] as $map) {
+                foreach ($this->get_config("dhcpd/{$this->id}/staticmap", []) as $map) {
                     if ($map["mac"] === $this->initial_data["mac"]) {
                         $this->errors[] = APIResponse\get(2036);
                     }
@@ -83,8 +80,8 @@ class APIServicesDHCPdStaticMappingCreate extends APIModel {
                 $gw_ip = ip2long($if_conf["ipaddr"]);
                 $net_ip = ip2long(gen_subnetv4($if_conf["ipaddr"], $if_conf["subnet"]));
                 $bc_ip = ip2long(gen_subnetv4_max($if_conf["ipaddr"], $if_conf["subnet"]));
-                $dhcp_start_ip = ip2long($this->config["dhcpd"][$this->id]["range"]["from"]);
-                $dhcp_end_ip = ip2long($this->config["dhcpd"][$this->id]["range"]["to"]);
+                $dhcp_start_ip = ip2long($this->get_config("dhcpd/{$this->id}/range/from"));
+                $dhcp_end_ip = ip2long($this->get_config("dhcpd/{$this->id}/range/to"));
 
                 # Check if this IP is the gateway address, if so set error
                 if ($ip === $gw_ip) {
@@ -102,7 +99,7 @@ class APIServicesDHCPdStaticMappingCreate extends APIModel {
                 }
 
                 # Loop through existing mappings and ensure this MAC doesn't exist already
-                foreach ($this->config["dhcpd"][$this->id]["staticmap"] as $map) {
+                foreach ($this->get_config("dhcpd/{$this->id}/staticmap", []) as $map) {
                     if ($map["ipaddr"] === $this->initial_data["ipaddr"]) {
                         $this->errors[] = APIResponse\get(2039);
                     }
@@ -227,13 +224,13 @@ class APIServicesDHCPdStaticMappingCreate extends APIModel {
         $retvaldns = 0;
         /* dnsmasq_configure calls dhcpd_configure */
         /* no need to restart dhcpd twice */
-        if (isset($this->config['dnsmasq']['enable']) && isset($this->config['dnsmasq']['regdhcpstatic']))	{
+        if ($this->is_config_enabled('dnsmasq') && $this->is_config_enabled('dnsmasq', 'regdhcpstatic'))	{
             $retvaldns |= services_dnsmasq_configure();
             if ($retvaldns == 0) {
                 clear_subsystem_dirty('hosts');
                 clear_subsystem_dirty('staticmaps');
             }
-        } else if (isset($this->config['unbound']['enable']) && isset($this->config['unbound']['regdhcpstatic'])) {
+        } else if ($this->is_config_enabled('unbound') && $this->is_config_enabled('unbound', 'regdhcpstatic')) {
             $retvaldns |= services_unbound_configure();
             if ($retvaldns == 0) {
                 clear_subsystem_dirty('unbound');
@@ -250,10 +247,10 @@ class APIServicesDHCPdStaticMappingCreate extends APIModel {
         if (!function_exists('is_package_installed')) {
             require_once('pkg-utils.inc');
         }
-        if (is_package_installed('pfSense-pkg-bind') && isset($this->config['installedpackages']['bind']['config'][0]['enable_bind'])) {
+        if (is_package_installed('pfSense-pkg-bind') && $this->is_config_enabled("installedpackages/bind/config/0", 'enable_bind')) {
             $reloadbind = false;
-            if (is_array($this->config['installedpackages']['bindzone'])) {
-                $bindzone = $this->config['installedpackages']['bindzone']['config'];
+            if (is_array($this->get_config('installedpackages/bindzone'))) {
+                $bindzone = $this->get_config('installedpackages/bindzone/config');
             } else {
                 $bindzone = array();
             }

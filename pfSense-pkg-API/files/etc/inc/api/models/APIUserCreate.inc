@@ -22,13 +22,13 @@ class APIUserCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-usermanager"];
         $this->change_note = "Added user via API";
-        $this->init_config("system", "user");
     }
 
     public function action() {
         # Increase the system's next UID by one and add our user to the configuration
-        $this->config["system"]["nextuid"] = strval(intval($this->validated_data["uid"]) + 1);
-        $this->config['system']['user'][] = $this->validated_data;
+        $this->set_config("system/nextuid", intval($this->validated_data["uid"])) + 1;
+        $this->id = $this->get_next_id("system/user");
+        $this->set_config("system/user/{$this->id}", $this->validated_data);
 
         # Write the user to configuration and set the user on the backend. Return response with created user object.
         $this->write_config();
@@ -170,7 +170,7 @@ class APIUserCreate extends APIModel {
 
     public function validate_payload() {
         # Set static object values
-        $this->validated_data["uid"] = $this->config["system"]["nextuid"];
+        $this->validated_data["uid"] = $this->get_config("system/nextuid");
         $this->validated_data["scope"] = "user";
 
         # Run each validation method
@@ -201,7 +201,7 @@ class APIUserCreate extends APIModel {
 
     public function is_user_certificate($cert_ref_id) {
         # Loop through all certificates and check for matches
-        foreach ($this->config["cert"] as $cert) {
+        foreach ($this->get_config("cert", []) as $cert) {
             # Check if this certificate matches the specified ref id
             if ($cert["refid"] === $cert_ref_id) {
                 return true;

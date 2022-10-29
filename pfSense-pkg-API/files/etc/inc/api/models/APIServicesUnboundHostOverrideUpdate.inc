@@ -22,12 +22,11 @@ class APIServicesUnboundHostOverrideUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsresolver-edithost"];
         $this->change_note = "Modified DNS Resolver host override via API";
-        $this->init_config("unbound", "hosts");
     }
 
     public function action() {
         // Sort and write our new configuration
-        $this->config["unbound"]["hosts"][$this->id] = $this->validated_data;
+        $this->set_config("unbound/hosts/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty("unbound");
         # If user requests immediately application
@@ -49,9 +48,9 @@ class APIServicesUnboundHostOverrideUpdate extends APIModel {
     private function __validate_id() {
         # Check for our required 'id' payload value.
         if (isset($this->initial_data["id"])) {
-            if (array_key_exists($this->initial_data["id"], $this->config["unbound"]["hosts"])) {
+            if ($this->get_config("unbound/hosts/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
-                $this->validated_data = $this->config["unbound"]["hosts"][$this->id];
+                $this->validated_data = $this->get_config("unbound/hosts/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(2016);
             }

@@ -22,15 +22,13 @@ class APIServicesNTPdRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-ntpd"];
-        $this->init_config("ntpd");
-        $this->init_config("system");
     }
 
     public function action() {
         # Return the current NTP configuration if it exists, otherwise return empty array
-        if (isset($this->config["ntpd"])) {
-            $data = $this->config["ntpd"];
-            $data["timeservers"] = explode(" ", $this->config["system"]["timeservers"]);
+        if ($this->is_config_enabled("/", "ntpd")) {
+            $data = $this->get_config("ntpd");
+            $data["timeservers"] = explode(" ", $this->get_config("system/timeservers", []));
             return APIResponse\get(0, $data);
         } else {
             return APIResponse\get(0, []);

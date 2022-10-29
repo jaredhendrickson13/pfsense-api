@@ -22,12 +22,10 @@ class APIServicesUnboundHostOverrideDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dnsresolver-edithost"];
         $this->change_note = "Deleted DNS Resolver host override via API";
-        $this->init_config("unbound", "hosts");
     }
 
     public function action() {
-        $del_data = $this->config["unbound"]["hosts"][$this->id];
-        unset($this->config["unbound"]["hosts"][$this->id]);
+        $del_data = $this->del_config("unbound/hosts/{$this->id}");
         $this->write_config();
         mark_subsystem_dirty("unbound");
         # If user requests immediately application
@@ -40,9 +38,9 @@ class APIServicesUnboundHostOverrideDelete extends APIModel {
     public function validate_payload() {
         # Check for our required 'id' payload value.
         if (isset($this->initial_data["id"])) {
-            if (array_key_exists($this->initial_data["id"], $this->config["unbound"]["hosts"])) {
+            if ($this->get_config("unbound/hosts/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
-                $this->validated_data = $this->config["unbound"]["hosts"][$this->id];
+                $this->validated_data = $this->get_config("unbound/hosts/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(2016);
             }

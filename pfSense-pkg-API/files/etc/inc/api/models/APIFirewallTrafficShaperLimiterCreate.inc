@@ -22,12 +22,12 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-trafficshaper-limiter"];
         $this->change_note = "Added firewall traffic shaper limiter via API";
-        $this->init_config('dnshaper', 'queue');
     }
 
     public function action() {
         # Initialize the traffic shaper configuration and save our shaper, mark the subsystem as un-applied
-        $this->config["dnshaper"]["queue"][] = $this->validated_data;
+        $this->id = $this->get_next_id("dnshaper/queue");
+        $this->set_config("dnshaper/queue/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty('shaper');
 
@@ -935,7 +935,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
 
     public function is_limiter_name_in_use($name) {
         # Loop through each configured limiter and see if it uses this name
-        foreach ($this->config["dnshaper"]["queue"] as $limiter) {
+        foreach ($this->get_config("dnshaper/queue", []) as $limiter) {
             # Check for matching names
             if ($name === $limiter["name"]) {
                 return true;
@@ -959,7 +959,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
             $exists = false;
 
             # Loop through each limiter and see if this number is already in use
-            foreach ($this->config["dnshaper"]["queue"] as $limiter) {
+            foreach ($this->get_config("dnshaper/queue", []) as $limiter) {
                 if (intval($limiter["number"]) === $counter) {
                     $exists = true;
                     break;

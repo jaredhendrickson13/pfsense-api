@@ -28,12 +28,11 @@ class APIInterfaceCreate extends APIModel {
         $this->change_note = "Added interface via API";
         $this->if_list = APITools\get_all_avail_interfaces();
         $this->next_if = APITools\get_next_pfsense_if_id();
-        $this->init_config('interfaces');
     }
 
     public function action() {
         # Add the new interface to our configuration and write the pending changes for application
-        $this->config["interfaces"][$this->next_if] = $this->validated_data;
+        $this->set_config("interfaces/{$this->next_if}", $this->validated_data);
         $this->write_config();
         APIInterfaceApplyCreate::serialize_changes($this->next_if, $this->validated_data);
 

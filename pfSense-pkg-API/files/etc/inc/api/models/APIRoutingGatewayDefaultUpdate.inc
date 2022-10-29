@@ -23,13 +23,12 @@ class APIRoutingGatewayDefaultUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-gateways"];
         $this->change_note = "Set default gateway via API";
-        $this->init_config('gateways');
     }
 
     public function action() {
         # Set the default gateways based on the validated input
-        $this->config["gateways"]["defaultgw4"] = $this->validated_data["defaultgw4"];
-        $this->config["gateways"]["defaultgw6"] = $this->validated_data["defaultgw6"];
+        $this->set_config("gateways/defaultgw4", $this->validated_data["defaultgw4"]);
+        $this->set_config("gateways/defaultgw6", $this->validated_data["defaultgw6"]);
 
         # Write these changes to config and apply if the client requested
         $this->write_config();
@@ -86,8 +85,8 @@ class APIRoutingGatewayDefaultUpdate extends APIModel {
     public function validate_payload() {
         # Fetch existing default gateway values
         $this->validated_data = [
-            "defaultgw4"=>$this->config["gateways"]["defaultgw4"],
-            "defaultgw6"=>$this->config["gateways"]["defaultgw6"],
+            "defaultgw4"=>$this->get_config("gateways/defaultgw4"),
+            "defaultgw6"=>$this->get_config("gateways/defaultgw6")
         ];
 
         # Validate client input

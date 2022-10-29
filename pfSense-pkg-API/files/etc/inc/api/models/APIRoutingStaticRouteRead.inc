@@ -22,17 +22,11 @@ class APIRoutingStaticRouteRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-staticroutes"];
-        $this->init_config('staticroutes', 'route');
     }
 
     public function action() {
-        // Check that we have a configuration
-        if (!empty($this->config["staticroutes"]["route"])) {
-            $routes = $this->config["staticroutes"]["route"];
-            foreach ($routes as $id=>$route) {$routes[$id]["id"] = $id;}
-        } else {
-            $routes = [];
-        }
+        $routes = $this->get_config("staticroutes/route", []);
+        foreach ($routes as $id=>$route) {$routes[$id]["id"] = $id;}
         return APIResponse\get(0, $routes);
     }
 }

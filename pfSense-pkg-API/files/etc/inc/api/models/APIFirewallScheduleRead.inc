@@ -22,16 +22,9 @@ class APIFirewallScheduleRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-schedules"];
-        $this->init_config('schedules', 'schedule');
     }
 
     public function action() {
-        # Check if our schedules array is populated. If not, return empty array.
-        if (!empty($this->config["schedules"])) {
-            $sched_array = $this->config["schedules"];
-        } else {
-            $sched_array = [];
-        }
-        return APIResponse\get(0, $sched_array);
+        return APIResponse\get(0, $this->get_config("schedules", []));
     }
 }

@@ -22,12 +22,11 @@ class APIFirewallVirtualIPDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-virtualipaddress-edit"];
         $this->change_note = "Deleted virtual IP via API";
-        $this->init_config('virtualip', 'vip');
     }
 
     public function action() {
         # Capture the vip to be deleted, remove it, write the changes to config, and reload the firewall filter
-        $del_vip = $this->config["virtualip"]["vip"][$this->id];
+        $del_vip = $this->get_config("virtualip/vip/{$this->id}");
         $this->delete_virtual_ip($del_vip, $this->id);
         $this->write_config();
         send_event("filter reload");
@@ -37,7 +36,7 @@ class APIFirewallVirtualIPDelete extends APIModel {
     public function validate_payload() {
         if (isset($this->initial_data['id'])) {
             # Check that our rule ID exists
-            if (array_key_exists($this->initial_data["id"], $this->config["virtualip"]["vip"])) {
+            if ($this->get_config("virtualip/vip/{$this->initial_data['id']}", false)) {
                 $this->id = $this->initial_data['id'];
             } else {
                 $this->errors[] = APIResponse\get(4018);
@@ -48,12 +47,10 @@ class APIFirewallVirtualIPDelete extends APIModel {
     }
 
     public static function delete_virtual_ip($vip_ent, $id, $delete=true) {
-        global $config;
-
         # Safely remove and bring proxyarp virtual IPs
         if ($vip_ent['mode'] == "proxyarp") {
             if ($delete) {
-                unset($config["virtualip"]["vip"][$id]);
+                APIModel::del_config("virtualip/vip/{$id}");
             }
             $viface = $vip_ent['interface'];
             interface_proxyarp_configure($viface);
@@ -62,13 +59,13 @@ class APIFirewallVirtualIPDelete extends APIModel {
         else {
             interface_vip_bring_down($vip_ent);
             if ($delete) {
-                unset($config["virtualip"]["vip"][$id]);
+                APIModel::del_config("virtualip/vip/{$id}");
             }
         }
 
         # Remove leftover configuration arrays if there are no virtual IPs left
-        if ($delete and count($config['virtualip']['vip']) == 0) {
-            unset($config['virtualip']['vip']);
+        if ($delete and count(APIModel::get_config('virtualip/vip')) == 0) {
+            APIModel::del_config("virtualip/vip");
         }
     }
 }

@@ -22,12 +22,11 @@ class APISystemNotificationsEmailUpdate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-advanced-notifications"];
         $this->change_note = "Modified system email notifications via API";
-        $this->init_config("notifications", "smtp");
     }
 
     public function action() {
         # Write our new email notification settings
-        $this->config["notifications"]["smtp"] = $this->validated_data;
+        $this->set_config("notifications/smtp", $this->validated_data);
         $this->write_config();
 
         return APIResponse\get(0, $this->validated_data);
@@ -35,7 +34,7 @@ class APISystemNotificationsEmailUpdate extends APIModel {
 
     public function validate_payload() {
        # Fetch our existing SMTP configuration
-        $this->__get_smtp_config();
+        $this->validated_data = $this->get_config("notifications/smtp", []);
         $this->__validate_disabled();
         $this->__validate_ipaddress();
         $this->__validate_port();
@@ -188,15 +187,6 @@ class APISystemNotificationsEmailUpdate extends APIModel {
         # Check for the optional 'password' field
         if (isset($this->initial_data["password"])) {
             $this->validated_data["password"] = strval($this->initial_data["password"]);
-        }
-    }
-
-    private function __get_smtp_config() {
-        # Check if the configuration exists
-        if (!empty($this->config["notifications"]["smtp"])) {
-            $this->validated_data = $this->config["notifications"]["smtp"];
-        } else {
-            $this->validated_data = [];
         }
     }
 }

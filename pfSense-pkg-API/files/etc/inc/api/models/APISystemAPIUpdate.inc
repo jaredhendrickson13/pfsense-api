@@ -27,7 +27,8 @@ class APISystemAPIUpdate extends APIModel {
     }
 
     public function action() {
-        $this->config["installedpackages"]["package"][APITools\get_api_config()[0]]["conf"] = $this->validated_data;
+        $api_conf_id = APITools\get_api_config()[0];
+        $this->set_config("installedpackages/package/{$api_conf_id}/conf", $this->validated_data);
         $this->write_config();
 
         # Backup and sync changes to HA nodes if enabled

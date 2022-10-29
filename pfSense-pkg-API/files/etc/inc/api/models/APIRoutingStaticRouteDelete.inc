@@ -23,14 +23,12 @@ class APIRoutingStaticRouteDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-system-staticroutes-editroute"];
         $this->change_note = "Deleted static route via API";
-        $this->init_config('staticroutes', 'route');
     }
 
     public function action() {
         # Remove this static route
-        $del_data = $this->config["staticroutes"]["route"][$this->id];
+        $del_data = $this->get_config("staticroutes/route/{$this->id}");
         delete_static_route($this->id, true);
-        unset($this->config["staticroutes"]["route"][$this->id]);
         $this->write_config();
 
         # Mark the routing subsystem as changed
@@ -43,7 +41,7 @@ class APIRoutingStaticRouteDelete extends APIModel {
     public function validate_payload() {
         # Check that this static route ID exists
         if (isset($this->initial_data["id"])) {
-            if (array_key_exists($this->initial_data["id"], $this->config["staticroutes"]["route"])) {
+            if ($this->get_config("staticroutes/route/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
             } else {
                 $this->errors[] = APIResponse\get(6006);

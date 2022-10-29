@@ -22,14 +22,14 @@ class APIFirewallVirtualIPCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-firewall-virtualipaddress-edit"];
         $this->change_note = "Added virtual IP via API";
-        $this->init_config('virtualip', 'vip');
     }
 
     public function action() {
         global $g;
 
         # Write this virtual IP to config and mark the changes as pending
-        $this->config["virtualip"]["vip"][] = $this->validated_data;
+        $this->id = $this->get_next_id("virtualip/vip");
+        $this->set_config("virtualip/vip/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty('vip');
 
@@ -45,7 +45,7 @@ class APIFirewallVirtualIPCreate extends APIModel {
 
     public function validate_payload() {
         # Find the next array ID and assign a unique ID to the virtual IP
-        $this->id = count($this->config["virtualip"]["vip"]);
+        $this->id = count($this->get_config("virtualip/vip"));
         $this->validated_data['uniqid'] = uniqid();
 
         # Validate input data
@@ -208,7 +208,7 @@ class APIFirewallVirtualIPCreate extends APIModel {
 
     private function __vhid_exists($interface, $vhid) {
         # Loop through each virtual IP and ensure it is not using the requested vhid
-        foreach ($this->config["virtualip"]["vip"] as $vip) {
+        foreach ($this->get_config("virtualip/vip", []) as $vip) {
             if ($interface === $vip["interface"] && intval($vhid) === intval($vip["vhid"])) {
                 return true;
             }

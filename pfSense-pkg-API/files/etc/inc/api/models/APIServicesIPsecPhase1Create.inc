@@ -26,13 +26,12 @@ class APIServicesIPsecPhase1Create extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-vpn-ipsec-editphase1"];
         $this->change_note = "Added IPsec phase 1 via API";
-        $this->init_config("ipsec", "phase1");
-        $this->init_config("ipsec", "phase2");
     }
 
     public function action() {
         # Write this entry to configuration
-        $this->config["ipsec"]["phase1"][] = $this->validated_data;
+        $this->id = $this->get_next_id("ipsec/phase1");
+        $this->set_config("ipsec/phase1/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty('ipsec');
 
@@ -690,7 +689,7 @@ class APIServicesIPsecPhase1Create extends APIModel {
 
     public function is_ipsec_remote_gateway_in_use($value) {
         # Loop through each IPsec phase 1 and see if the value is in use
-        foreach ($this->config['ipsec']['phase1'] as $p1) {
+        foreach ($this->get_config('ipsec/phase1', []) as $p1) {
             # Check if this phase 1 entries remote gateway matches the value
             if ($p1["remote-gateway"] === $value) {
                 # Allow this value if it is all IPv4
