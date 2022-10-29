@@ -124,9 +124,6 @@ custom API model:
 - `$this->initial_data` : The request data as it was when the object was created
 - `$this->validated_data` : An array for validators to use to populate data that has been validated
 - `$this->errors` : An array to populate any errors encountered. Should be an array of APIResponse values.
-- `$this->config` : Our pfSense configuration array. You may read current configuration values using this array or write
-changes to the configuration by updating it's values. If you do make changes to the configuration, you must use call
-`$this->write_config()` to apply them. 
 - `$this->id` : A property to track the current instances configuration ID. This is primarily helpful for updating and 
 deleting objects.
 - `$this->validate_id` : A boolean to dictate whether the model object should require validation of the configuration ID.
@@ -146,15 +143,35 @@ Included in the API framework are properties and methods to read and write to pf
 that other functions are likely required to configure pfSense's backend to use the new configuration. These properties
 and methods are available anywhere within your API model:
 
-- `$this->config` : Our pfSense XML configuration in a PHP array format. You may read the current configuration from 
-this property or update/add new configuration by assigning the corresponding array key new values
-- `$this->write_config()` : This method writes any changes made to $this->config to pfSense's XML configuration file. 
-Any changes made to $this->config will not be applied until this method is executed. 
-- `$this->init_config()` : This method initializes empty areas of the pfSense configuration. Arguments passed to this
-method will initialize the configuration areas recursively. For example, running `$this->init_config("vip", "virtual_ip)`
-would initialize both the `vip` and `virtual_ip` configuration areas as empty arrays. This is mostly needed to prevent
-PHP errors when writing configuration to an area that currently has no configuration, such as writing an initial 
-virtual IP.
+- `$this->get_next_id()` : This method returns the next array ID of a specific configuration path. This is necessary
+for most API creation tasks as the next ID must be specified in the `$this->set_config()` call in order to actually
+write the configuration correctly. In the case that target configuration path is not an array, 0 will be returned to
+initialize the array. For example, if you wanted to get the next available firewall rule ID, you could call:
+`$this->get_next_id("filter/rule")` which would return the integer of the next available array index for that
+configuration area.
+- `$this->get_config()` : This method allows you to pull the configuration of a specific configuration area by path and
+optionally allows you to return a default value if no configuration was found at this path. For example, if you wanted to 
+pull all firewall rules from the configuration and default to an empty array if none were found, you could call:
+`$this->get_config("filter/rule", [])`. This method is simply a wrapper for the pfSense built-in `config_get_path()`
+function and works exactly the same way. For more information:
+https://docs.netgate.com/pfsense/en/latest/development/php-config-arrays.html#reading-configuration-values
+- `$this->set_config()` : This method allows you to set the configuration of a specific configuration area by path and
+optionally allows you to specify a default if the configuration could not be set. For example, if you wanted to change
+the system hostname in the configuration or default the return value to `false` if the action fails, you could call:
+`$this->set_config("system/hostname", "new-hostname-value, false)`. After calling this function, the 
+`$this->write_config()` method must be called to actually write the changes to the configuration file. 
+This method is simply a wrapper for the pfSense built-in `config_set_path()` function and works exactly the same way. 
+For more information: 
+https://docs.netgate.com/pfsense/en/latest/development/php-config-arrays.html#writing-configuration-values
+- `$this->del_config()` : This method deletes the configuration at a specific configuration area by path and returns
+the deleted configuration. After calling this function, the `$this->write_config()` method must be called to actually 
+write the changes to the configuration file. This method is simply a wrapper for the built-in pfSense `config_del_path`
+function and works exactly the same way. For more information:
+https://docs.netgate.com/pfsense/en/latest/development/php-config-arrays.html#deleting-configuration-values
+- `$this->write_config()` : This method writes any changes made to the config to pfSense's XML configuration file. 
+Any changes made  $this->config will not be applied until this method is executed. This method is a wrapper for the 
+pfSense built-in `write_config()` function, that also adds additional functionality like config loggging, and a 
+configuration lock system built specifically for the API.
 
 #### Overriding API Model Validation ####
 By default, API models do not provide any sort of validation. You are responsible for overriding the class method to 
@@ -222,8 +239,9 @@ class NewAPIModel extends APIModel {
     
     # Tell our API model what to do after successfully validating the client's request
     public function action(){
-        $this->config["test"][] = $this->validated_data;          // Write a new 'test' item to our master config
-        $this->write_config();       // Apply our configuration change
+        $this->id = $this->get_next_id("test/item");    // Get the next available array index for the test item
+        $this->set_config("test/item/{$this->id}");    // Set a new 'test' item in the config
+        $this->write_config();       // Apply the configuration change
         return APIResponse\get(0, $this->validated_data);   // Return a success response containing our added data
     }
 }
