@@ -172,6 +172,14 @@ https://docs.netgate.com/pfsense/en/latest/development/php-config-arrays.html#de
 Any changes made  $this->config will not be applied until this method is executed. This method is a wrapper for the 
 pfSense built-in `write_config()` function, that also adds additional functionality like config loggging, and a 
 configuration lock system built specifically for the API.
+- `$this->is_config_enabled()` : This method checks if a specific key exists at a specific configuration path. pfSense
+identifies boolean files by whether a specific key (usually `enable`) exists or not. This method simply checks for the
+existence of that key and returns `true` if it exists or `false` if it doesn't. This works similarly to PHP's built-in
+`isset()` function but is safe for array traversal. For example, if you wanted to check if the SSH service is enabled
+in configuration, you could call `$this->is_config_enabled("system/ssh", "enable")` to check if the `enable` exists
+in the `system` > `ssh` configuration array. This method is simply a wrapper for the pfSense built-in 
+`config_path_enabled()` function and works exactly the same way. For more information:
+https://docs.netgate.com/pfsense/en/latest/development/php-config-arrays.html#testing-if-settings-are-enabled
 
 #### Overriding API Model Validation ####
 By default, API models do not provide any sort of validation. You are responsible for overriding the class method to 
