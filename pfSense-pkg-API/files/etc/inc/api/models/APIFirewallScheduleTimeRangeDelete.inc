@@ -57,8 +57,7 @@ class APIFirewallScheduleTimeRangeDelete extends APIModel {
     private function __validate_id() {
         # Check for our required `id` payload value
         if (isset($this->initial_data["id"])) {
-            # Ensure ID is numeric
-            $id = (is_numeric($this->initial_data["id"])) ? intval($this->initial_data["id"]) : null;
+            $id = $this->initial_data["id"];
 
             if ($this->get_config("schedules/schedule/{$this->parent_id}/timerange/{$id}", false)) {
                 # Don't allow client to delete the last time range

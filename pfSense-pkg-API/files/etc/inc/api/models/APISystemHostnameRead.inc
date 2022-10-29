@@ -34,7 +34,7 @@ class APISystemHostnameRead extends APIModel {
             $this->validated_data["hostname"] = $this->get_config("system/hostname");
         }
         // Check that we have a domain configuration
-        if (this->get_config("system/domain", false)) {
+        if ($this->get_config("system/domain", false)) {
             $this->validated_data["domain"] = $this->get_config("system/domain");
         }
     }

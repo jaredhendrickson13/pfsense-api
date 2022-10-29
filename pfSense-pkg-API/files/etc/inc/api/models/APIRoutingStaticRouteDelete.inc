@@ -27,8 +27,8 @@ class APIRoutingStaticRouteDelete extends APIModel {
 
     public function action() {
         # Remove this static route
-        $del_data = $this->get_config("staticroutes/route/{$this->id}");
         delete_static_route($this->id, true);
+        $del_data = $this->del_config("staticroutes/route/{$this->id}");
         $this->write_config();
 
         # Mark the routing subsystem as changed

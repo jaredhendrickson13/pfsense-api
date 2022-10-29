@@ -36,7 +36,7 @@ class APIUserAuthServerLDAPCreate extends APIModel {
     }
 
     public function validate_payload() {
-        $ldap_count = count($this->get_config("system/authserver"));    // Save our total number of auth servers
+        $ldap_count = count($this->get_config("system/authserver", []));    // Save our total number of auth servers
         $this->validated_data = ["refid" => uniqid(), "type" => "ldap"];    // Init our new LDAP config
         if (isset($this->initial_data['name'])) {
             $this->validated_data["name"] = APITools\sanitize_str($this->initial_data['name']);
