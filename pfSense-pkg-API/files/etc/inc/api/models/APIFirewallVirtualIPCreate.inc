@@ -45,7 +45,7 @@ class APIFirewallVirtualIPCreate extends APIModel {
 
     public function validate_payload() {
         # Find the next array ID and assign a unique ID to the virtual IP
-        $this->id = count($this->get_config("virtualip/vip"));
+        $this->id = $this->get_next_id("virtualip/vip");
         $this->validated_data['uniqid'] = uniqid();
 
         # Validate input data
