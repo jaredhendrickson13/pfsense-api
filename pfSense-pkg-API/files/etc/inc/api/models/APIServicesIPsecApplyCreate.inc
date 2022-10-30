@@ -57,10 +57,8 @@ class APIServicesIPsecApplyCreate extends APIModel {
     }
 
     public static function initiate() {
-        global $config;
-
         # Loop through each phase1 to terminate existing IKE connections and re-initiate all tunnels
-        foreach ($config["ipsec"]["phase1"] as $p1) {
+        foreach (APIModel::get_config("ipsec/phase1", []) as $p1) {
             ipsec_terminate_by_conid("ike", ipsec_conid($p1));
             ipsec_initiate_by_conid("all", ipsec_conid($p1));
         }

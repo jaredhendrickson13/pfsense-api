@@ -28,7 +28,6 @@ $tab_array = [[gettext("Settings"), false, "/api/"], [gettext("Documentation"), 
 display_top_tabs($tab_array, true);    # Ensure the tabs are written to the top of page
 
 # Variables
-global $config;
 $form = new Form(false);
 $pf_ver = APITools\get_pfsense_version()["version"];
 $curr_ver = APISystemAPIVersionRead::get_api_version();

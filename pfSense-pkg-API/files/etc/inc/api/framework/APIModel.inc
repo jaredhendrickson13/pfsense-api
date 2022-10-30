@@ -27,7 +27,6 @@ class APIModel {
     public $type_map;
     public $id;
     public $validate_id;
-    public $config;
     public $errors;
     public $methods;
     public $change_note;
@@ -38,9 +37,7 @@ class APIModel {
     public $ignore_enabled;
 
     public function __construct() {
-        global $config;
         error_reporting(E_ERROR);    // Prevents PHP warnings from printing to API responses
-        $this->config =& $config;
         $this->privileges = ["page-all"];
         $this->packages = [];
         $this->package_includes = [];

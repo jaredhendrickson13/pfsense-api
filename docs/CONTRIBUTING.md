@@ -169,8 +169,8 @@ write the changes to the configuration file. This method is simply a wrapper for
 function and works exactly the same way. For more information:
 https://docs.netgate.com/pfsense/en/latest/development/php-config-arrays.html#deleting-configuration-values
 - `$this->write_config()` : This method writes any changes made to the config to pfSense's XML configuration file. 
-Any changes made  $this->config will not be applied until this method is executed. This method is a wrapper for the 
-pfSense built-in `write_config()` function, that also adds additional functionality like config loggging, and a 
+Any changes made will not be applied until this method is executed. This method is a wrapper for the 
+pfSense built-in `write_config()` function, that also adds additional functionality like config logging, and a 
 configuration lock system built specifically for the API.
 - `$this->is_config_enabled()` : This method checks if a specific key exists at a specific configuration path. pfSense
 identifies boolean files by whether a specific key (usually `enable`) exists or not. This method simply checks for the

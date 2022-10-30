@@ -54,8 +54,6 @@ function backup() {
 }
 
 function restore() {
-    global $config;
-
     # Local Variables
     $api_conf = APITools\get_api_config();
 
@@ -69,7 +67,7 @@ function restore() {
     if (!empty($backup_api_conf_json)) {
         # Only restore the config if it has changed
         if ($api_conf[1] !== $backup_api_conf) {
-            $config["installedpackages"]["package"][$api_conf[0]]["conf"] = $backup_api_conf;
+            config_set_config("installedpackages/package/{$api_conf[0]}/conf", $backup_api_conf);
             write_config("Synchronized persistent API configuration");
             echo "Restoring API configuration... done.".PHP_EOL;
         } else {
@@ -118,9 +116,8 @@ function delete() {
 }
 
 function rotate_server_key() {
-    global $config;
     $pkg_index = APITools\get_api_config()[0];
-    $config["installedpackages"]["package"][$pkg_index]["conf"]["keys"] = [];
+    config_set_config("installedpackages/package/{$pkg_index}/conf/keys", []);
     echo "Rotating API server key... ";
     APITools\create_jwt_server_key(true);
     echo "done.".PHP_EOL;

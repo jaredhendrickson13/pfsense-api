@@ -31,8 +31,8 @@ class APIServicesServiceWatchdogRead extends APIModel {
     }
 
     public static function get_watched_services() {
-        global $config;
-        $services = ($config["installedpackages"]["servicewatchdog"]["item"]) ?: [];
+        # Local variables
+        $services = APIModel::get_config("installedpackages/servicewatchdog/item", []);
 
         # Loop through each configured service and ensure data is formatted correctly
         foreach ($services as &$service) {
