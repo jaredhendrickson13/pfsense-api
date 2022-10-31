@@ -24,7 +24,7 @@ class APIE2ETestFirewallAliasAdvanced(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update advanced alias settings",
-            "payload": {
+            "req_data": {
                 "aliasesresolveinterval": 300,
                 "checkaliasesurlcert": True
             },
@@ -34,7 +34,7 @@ class APIE2ETestFirewallAliasAdvanced(e2e_test_framework.APIE2ETest):
             "name": "Ensure aliasesresolveinterval is numeric",
             "status": 400,
             "return": 4242,
-            "payload": {
+            "req_data": {
                 "aliasesresolveinterval": "INVALID"
             }
         }

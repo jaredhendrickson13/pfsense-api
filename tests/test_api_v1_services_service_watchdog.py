@@ -29,7 +29,7 @@ class APIE2ETestServicesServiceWatchdog(e2e_test_framework.APIE2ETest):
             "method": "POST",
             "uri": "/api/v1/system/package",
             "resp_time": 30,
-            "payload": {
+            "req_data": {
                 "name": "pfSense-pkg-Service_Watchdog"
             }
         },
@@ -37,23 +37,23 @@ class APIE2ETestServicesServiceWatchdog(e2e_test_framework.APIE2ETest):
             "name": "Check service 'name' required constraint",
             "status": 400,
             "return": 2259,
-            "payload": {"services": [{}]}
+            "req_data": {"services": [{}]}
         },
         {
             "name": "Check service 'name' options constraint",
             "status": 400,
             "return": 2260,
-            "payload": {"services": [{"name": "INVALID"}]}
+            "req_data": {"services": [{"name": "INVALID"}]}
         },
         {
             "name": "Check service 'name' no duplicates constraint",
             "status": 400,
             "return": 2261,
-            "payload": {"services": [{"name": "unbound"}, {"name": "unbound"}]}
+            "req_data": {"services": [{"name": "unbound"}, {"name": "unbound"}]}
         },
         {
             "name": "Update watched services",
-            "payload": {"services": [{"name": "unbound", "notify": True}]}
+            "req_data": {"services": [{"name": "unbound", "notify": True}]}
         },
         {
             "name": "Read the Service Watchdog configuration",
@@ -64,7 +64,7 @@ class APIE2ETestServicesServiceWatchdog(e2e_test_framework.APIE2ETest):
             "method": "DELETE",
             "uri": "/api/v1/system/package",
             "resp_time": 30,
-            "payload": {
+            "req_data": {
                 "name": "pfSense-pkg-Service_Watchdog"
             }
         },

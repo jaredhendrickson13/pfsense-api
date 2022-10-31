@@ -22,7 +22,7 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Create IPv4 host override",
-            "payload": {
+            "req_data": {
                 "host": "pfsense-api",
                 "domain": "e2e.test",
                 "ip": "1.2.3.4",
@@ -38,7 +38,7 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create IPv6 host override",
-            "payload": {
+            "req_data": {
                 "host": "pfsense-api",
                 "domain": "e2e.test",
                 "ip": "fd00:abcd::",
@@ -56,7 +56,7 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
             "name": "Test host validation",
             "status": 400,
             "return": 2046,
-            "payload": {
+            "req_data": {
                 "host": "!@#!@#",
                 "domain": "e2e.test",
                 "ip": "1.2.3.4"
@@ -66,7 +66,7 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
             "name": "Test domain validation",
             "status": 400,
             "return": 2047,
-            "payload": {
+            "req_data": {
                 "host": "pfsense-api",
                 "domain": "!@#!@#",
                 "ip": "1.2.3.4"
@@ -76,7 +76,7 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
             "name": "Test IP validation",
             "status": 400,
             "return": 2011,
-            "payload": {
+            "req_data": {
                 "host": "invalid-ip",
                 "domain": "e2e.test",
                 "ip": "INVALID",
@@ -86,7 +86,7 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update IPv4 host override",
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "host": "updated-pfsense-api",
                 "domain": "updated-e2e.test",
@@ -103,7 +103,7 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Update IPv6 host override",
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "host": "updated-pfsense-api",
                 "domain": "updated-e2e.test",
@@ -122,7 +122,7 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
             "name": "Test host validation",
             "status": 400,
             "return": 2046,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "host": "!@#!@#",
                 "domain": "e2e.test",
@@ -133,7 +133,7 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
             "name": "Test domain validation",
             "status": 400,
             "return": 2047,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "host": "pfsense-api",
                 "domain": "!@#!@#",
@@ -144,7 +144,7 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
             "name": "Test IP validation",
             "status": 400,
             "return": 2011,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "host": "invalid-ip",
                 "domain": "e2e.test",
@@ -155,11 +155,11 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete IPv4 host override",
-            "payload": {"id": 0}
+            "req_data": {"id": 0}
         },
         {
             "name": "Delete IPv6 host override",
-            "payload": {"id": 0, "apply": True},
+            "req_data": {"id": 0, "apply": True},
             "resp_time": 10    # Allow a few seconds for Unbound to reload
         }
     ]

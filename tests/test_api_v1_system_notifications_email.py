@@ -16,43 +16,43 @@ class APIE2ETestSystemNotificationsEmail(e2e_test_framework.APIE2ETest):
             "name": "Check IP address validation",
             "status": 400,
             "return": 1062,
-            "payload": {"ipaddress": "!@#INVALID#@!"}
+            "req_data": {"ipaddress": "!@#INVALID#@!"}
         },
         {
             "name": "Check port requirement",
             "status": 400,
             "return": 1063,
-            "payload": {"ipaddress": "test.example.com"}
+            "req_data": {"ipaddress": "test.example.com"}
         },
         {
             "name": "Check port validation",
             "status": 400,
             "return": 1064,
-            "payload": {"ipaddress": "test.example.com", "port": 1000000}
+            "req_data": {"ipaddress": "test.example.com", "port": 1000000}
         },
         {
             "name": "Check timeout validation",
             "status": 400,
             "return": 1065,
-            "payload": {"ipaddress": "test.example.com", "port": 25, "timeout": 0}
+            "req_data": {"ipaddress": "test.example.com", "port": 25, "timeout": 0}
         },
         {
             "name": "Check from address requirement",
             "status": 400,
             "return": 1066,
-            "payload": {"ipaddress": "test.example.com", "port": 25, "timeout": 25}
+            "req_data": {"ipaddress": "test.example.com", "port": 25, "timeout": 25}
         },
         {
             "name": "Check from address validation",
             "status": 400,
             "return": 1067,
-            "payload": {"ipaddress": "test.example.com", "port": 25, "timeout": 25, "fromaddress": "NOT A VALID EMAIL"}
+            "req_data": {"ipaddress": "test.example.com", "port": 25, "timeout": 25, "fromaddress": "NOT A VALID EMAIL"}
         },
         {
             "name": "Check notify address requirement",
             "status": 400,
             "return": 1068,
-            "payload": {
+            "req_data": {
                 "ipaddress": "test.example.com",
                 "port": 25,
                 "timeout": 25,
@@ -63,7 +63,7 @@ class APIE2ETestSystemNotificationsEmail(e2e_test_framework.APIE2ETest):
             "name": "Check notify address validation",
             "status": 400,
             "return": 1069,
-            "payload": {
+            "req_data": {
                 "ipaddress": "test.example.com",
                 "port": 25,
                 "timeout": 25,
@@ -75,7 +75,7 @@ class APIE2ETestSystemNotificationsEmail(e2e_test_framework.APIE2ETest):
             "name": "Check authentication mechanism requirement",
             "status": 400,
             "return": 1070,
-            "payload": {
+            "req_data": {
                 "ipaddress": "test.example.com",
                 "port": 25,
                 "timeout": 25,
@@ -87,7 +87,7 @@ class APIE2ETestSystemNotificationsEmail(e2e_test_framework.APIE2ETest):
             "name": "Check authentication mechanism choices",
             "status": 400,
             "return": 1071,
-            "payload": {
+            "req_data": {
                 "ipaddress": "test.example.com",
                 "port": 25,
                 "timeout": 25,
@@ -98,7 +98,7 @@ class APIE2ETestSystemNotificationsEmail(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Update email notification settings (LOGIN)",
-            "payload": {
+            "req_data": {
     "disabled": True,
     "ipaddress": "smtp.example.com",
     "port": 25,
@@ -114,7 +114,7 @@ class APIE2ETestSystemNotificationsEmail(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Update email notification settings (PLAIN)",
-            "payload": {
+            "req_data": {
                 "disabled": False,
                 "ipaddress": "127.0.0.1",
                 "port": 25,

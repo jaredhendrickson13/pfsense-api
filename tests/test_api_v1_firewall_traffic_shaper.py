@@ -22,7 +22,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Create a traffic shaper",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "scheduler": "PRIQ",
                 "bandwidthtype": "Gb",
@@ -42,7 +42,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check interface validation",
             "status": 400,
             "return": 4111,
-            "payload": {
+            "req_data": {
                 "interface": "INVALID"
             }
         },
@@ -50,7 +50,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check interface unique constraint",
             "status": 400,
             "return": 4112,
-            "payload": {
+            "req_data": {
                 "interface": "LAN"
             }
         },
@@ -58,7 +58,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check scheduler requirement",
             "status": 400,
             "return": 4113,
-            "payload": {
+            "req_data": {
                 "interface": "wan"
             }
         },
@@ -66,7 +66,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check scheduler validation",
             "status": 400,
             "return": 4114,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "scheduler": "INVALID"
             }
@@ -75,7 +75,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check bandwidth type requirement",
             "status": 400,
             "return": 4115,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "scheduler": "HFSC"
             }
@@ -84,7 +84,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check bandwidth type validation",
             "status": 400,
             "return": 4116,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "scheduler": "HFSC",
                 "bandwidthtype": "INVALID"
@@ -94,7 +94,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check bandwidth requirement",
             "status": 400,
             "return": 4117,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "scheduler": "HFSC",
                 "bandwidthtype": "%"
@@ -104,7 +104,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check bandwidth minimum constraint",
             "status": 400,
             "return": 4118,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "scheduler": "HFSC",
                 "bandwidthtype": "%",
@@ -115,7 +115,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check bandwidth maximum constraint when percentage type is chosen",
             "status": 400,
             "return": 4119,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "scheduler": "HFSC",
                 "bandwidthtype": "%",
@@ -126,7 +126,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check queue limit minimum constraint",
             "status": 400,
             "return": 4120,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "scheduler": "HFSC",
                 "bandwidthtype": "%",
@@ -138,7 +138,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check TBR size minimum constraint",
             "status": 400,
             "return": 4121,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "scheduler": "HFSC",
                 "bandwidthtype": "%",
@@ -150,7 +150,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Create a traffic shaper",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "scheduler": "HFSC",
                 "bandwidthtype": "Mb",
@@ -170,7 +170,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check interface validation",
             "status": 400,
             "return": 4111,
-            "payload": {
+            "req_data": {
                 "interface": "INVALID"
             }
         },
@@ -178,7 +178,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check non-existing traffic shaper",
             "status": 400,
             "return": 4122,
-            "payload": {
+            "req_data": {
                 "interface": "wan"
             }
         },
@@ -186,7 +186,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check scheduler validation",
             "status": 400,
             "return": 4114,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "scheduler": "INVALID"
             }
@@ -195,7 +195,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check bandwidth requirement when changing bandwidth types",
             "status": 400,
             "return": 4117,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "bandwidthtype": "b"
             }
@@ -204,7 +204,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check bandwidth type validation",
             "status": 400,
             "return": 4116,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "bandwidthtype": "INVALID"
             }
@@ -214,7 +214,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check bandwidth minimum constraint",
             "status": 400,
             "return": 4118,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "bandwidth": 0
             }
@@ -223,7 +223,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check bandwidth maximum constraint when percentage type is chosen",
             "status": 400,
             "return": 4119,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "bandwidthtype": "%",
                 "bandwidth": 101
@@ -233,7 +233,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check queue limit minimum constraint",
             "status": 400,
             "return": 4120,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "qlimit": 0
             }
@@ -242,7 +242,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check TBR size minimum constraint",
             "status": 400,
             "return": 4121,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "tbrconfig": 0
             }
@@ -251,7 +251,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete traffic shaper for LAN interface",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "apply": True
             }
@@ -265,7 +265,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Delete non-existent traffic shaper",
             "status": 400,
             "return": 4122,
-            "payload": {
+            "req_data": {
                 "interface": "lan"
             }
         },
@@ -273,7 +273,7 @@ class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
             "name": "Check interface validation",
             "status": 400,
             "return": 4111,
-            "payload": {
+            "req_data": {
                 "interface": "INVALID"
             }
         },

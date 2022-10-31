@@ -22,7 +22,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Create CARP virtual IP",
-            "payload": {
+            "req_data": {
                 "mode": "carp",
                 "interface": "lan",
                 "subnet": "172.16.77.239/32",
@@ -34,7 +34,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create Proxy ARP virtual IP",
-            "payload": {
+            "req_data": {
                 "mode": "proxyarp",
                 "interface": "lan",
                 "subnet": "172.16.77.240/32",
@@ -44,7 +44,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create IP Alias virtual IP",
-            "payload": {
+            "req_data": {
                 "mode": "ipalias",
                 "interface": "lan",
                 "subnet": "172.16.77.241/32",
@@ -61,7 +61,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check mode validation",
             "status": 400,
             "return": 4023,
-            "payload": {
+            "req_data": {
                 "mode": "INVALID"
             }
         },
@@ -69,7 +69,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check interface requirement",
             "status": 400,
             "return": 4020,
-            "payload": {
+            "req_data": {
                 "mode": "ipalias"
             }
         },
@@ -77,7 +77,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check interface validation",
             "status": 400,
             "return": 4024,
-            "payload": {
+            "req_data": {
                 "mode": "ipalias",
                 "interface": "INVALID"
             }
@@ -86,7 +86,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check subnet requirement",
             "status": 400,
             "return": 4021,
-            "payload": {
+            "req_data": {
                 "mode": "ipalias",
                 "interface": "lan"
             }
@@ -95,7 +95,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check subnet validation",
             "status": 400,
             "return": 4025,
-            "payload": {
+            "req_data": {
                 "mode": "ipalias",
                 "interface": "lan",
                 "subnet": "INVALID"
@@ -105,7 +105,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check subnet unique constraint",
             "status": 400,
             "return": 4026,
-            "payload": {
+            "req_data": {
                 "mode": "ipalias",
                 "interface": "lan",
                 "subnet": "172.16.77.241/32"
@@ -115,7 +115,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check CARP VHID minimum constraint",
             "status": 400,
             "return": 4028,
-            "payload": {
+            "req_data": {
                 "mode": "carp",
                 "interface": "lan",
                 "subnet": "172.16.77.252/32",
@@ -126,7 +126,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check CARP VHID maximum constraint",
             "status": 400,
             "return": 4028,
-            "payload": {
+            "req_data": {
                 "mode": "carp",
                 "interface": "lan",
                 "subnet": "172.16.77.252/32",
@@ -137,7 +137,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check CARP VHID unique constraint duplicate VHID on same interface",
             "status": 400,
             "return": 4027,
-            "payload": {
+            "req_data": {
                 "mode": "carp",
                 "interface": "lan",
                 "subnet": "172.16.77.252/32",
@@ -148,7 +148,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check CARP password requirement & VHID unique constraint duplicate VHID on different interface",
             "status": 400,
             "return": 4022,
-            "payload": {
+            "req_data": {
                 "mode": "carp",
                 "interface": "wan",
                 "subnet": "172.16.77.23/32",
@@ -159,7 +159,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check CARP advertisement skew minimum constraint",
             "status": 400,
             "return": 4030,
-            "payload": {
+            "req_data": {
                 "mode": "carp",
                 "interface": "lan",
                 "subnet": "172.16.77.252/32",
@@ -170,7 +170,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check CARP advertisement skew maximum constraint",
             "status": 400,
             "return": 4030,
-            "payload": {
+            "req_data": {
                 "mode": "carp",
                 "interface": "lan",
                 "subnet": "172.16.77.252/32",
@@ -181,7 +181,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check CARP advertisement base minimum constraint",
             "status": 400,
             "return": 4029,
-            "payload": {
+            "req_data": {
                 "mode": "carp",
                 "interface": "lan",
                 "subnet": "172.16.77.252/32",
@@ -192,7 +192,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check CARP advertisement base maximum constraint",
             "status": 400,
             "return": 4029,
-            "payload": {
+            "req_data": {
                 "mode": "carp",
                 "interface": "lan",
                 "subnet": "172.16.77.252/32",
@@ -203,7 +203,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update CARP virtual IP with static VHID",
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "mode": "carp",
                 "interface": "lan",
@@ -216,7 +216,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Update Proxy ARP virtual IP",
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "mode": "proxyarp",
                 "interface": "lan",
@@ -227,7 +227,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Update IP Alias virtual IP",
-            "payload": {
+            "req_data": {
                 "id": 2,
                 "mode": "ipalias",
                 "interface": "lan",
@@ -240,7 +240,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check subnet validation",
             "status": 400,
             "return": 4025,
-            "payload": {
+            "req_data": {
                 "id": 2,
                 "mode": "ipalias",
                 "interface": "lan",
@@ -251,7 +251,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check subnet unique constraint",
             "status": 400,
             "return": 4026,
-            "payload": {
+            "req_data": {
                 "id": 2,
                 "mode": "ipalias",
                 "interface": "lan",
@@ -262,7 +262,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check CARP VHID minimum constraint",
             "status": 400,
             "return": 4028,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "mode": "carp",
                 "interface": "lan",
@@ -274,7 +274,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check CARP VHID maximum constraint",
             "status": 400,
             "return": 4028,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "mode": "carp",
                 "interface": "lan",
@@ -286,7 +286,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check CARP advertisement skew minimum constraint",
             "status": 400,
             "return": 4030,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "mode": "carp",
                 "interface": "lan",
@@ -298,7 +298,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check CARP advertisement skew maximum constraint",
             "status": 400,
             "return": 4030,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "mode": "carp",
                 "interface": "lan",
@@ -310,7 +310,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check CARP advertisement base minimum constraint",
             "status": 400,
             "return": 4029,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "mode": "carp",
                 "interface": "lan",
@@ -322,7 +322,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check CARP advertisement base maximum constraint",
             "status": 400,
             "return": 4029,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "mode": "carp",
                 "interface": "lan",
@@ -334,7 +334,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "name": "Check CARP password requirement when updating from non-CARP virtual IP",
             "status": 400,
             "return": 4022,
-            "payload": {
+            "req_data": {
                 "id": 2,
                 "mode": "carp",
                 "interface": "lan",
@@ -345,17 +345,17 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete CARP virtual IP",
-            "payload": {"id": 0},
+            "req_data": {"id": 0},
             "resp_time": 10     # Allow up to ten seconds for vips
         },
         {
             "name": "Delete Proxy ARP virtual IP",
-            "payload": {"id": 0},
+            "req_data": {"id": 0},
             "resp_time": 10     # Allow up to ten seconds for vips
         },
         {
             "name": "Delete IP Alias virtual IP",
-            "payload": {"id": 0},
+            "req_data": {"id": 0},
             "resp_time": 10  # Allow up to ten seconds for vips
         }
     ]

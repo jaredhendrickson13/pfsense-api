@@ -24,7 +24,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Create port-based outbound NAT mapping",
-            "payload": {
+            "req_data": {
                 "interface": "WAN",
                 "protocol": "tcp",
                 "src": "any",
@@ -41,7 +41,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create non-port-based outbound NAT mapping",
-            "payload": {
+            "req_data": {
                 "interface": "WAN",
                 "protocol": "any",
                 "src": "127.0.0.1/24",
@@ -62,31 +62,31 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check interface exists constraint",
             "status": 400,
             "return": 4087,
-            "payload": {"interface": "INVALID"}
+            "req_data": {"interface": "INVALID"}
         },
         {
             "name": "Check protocol required constraint",
             "status": 400,
             "return": 4088,
-            "payload": {"interface": "wan"}
+            "req_data": {"interface": "wan"}
         },
         {
             "name": "Check protocol options constraint",
             "status": 400,
             "return": 4089,
-            "payload": {"interface": "wan", "protocol": "INVALID"}
+            "req_data": {"interface": "wan", "protocol": "INVALID"}
         },
         {
             "name": "Check poolopts options constraint",
             "status": 400,
             "return": 4090,
-            "payload": {"interface": "wan", "protocol": "tcp", "poolopts": "INVALID"}
+            "req_data": {"interface": "wan", "protocol": "tcp", "poolopts": "INVALID"}
         },
         {
             "name": "Check source hash key begins with 0x constraint",
             "status": 400,
             "return": 4091,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "protocol": "tcp",
                 "poolopts": "source-hash",
@@ -97,7 +97,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check source hash key hex value constraint",
             "status": 400,
             "return": 4092,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "protocol": "tcp",
                 "poolopts": "source-hash",
@@ -108,7 +108,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check source hash key maximum length constraint",
             "status": 400,
             "return": 4093,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "protocol": "tcp",
                 "poolopts": "source-hash",
@@ -119,7 +119,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check target required constraint",
             "status": 400,
             "return": 4094,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "protocol": "tcp",
                 "poolopts": "source-hash",
@@ -130,7 +130,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check target is IP, subnet or alias constraint",
             "status": 400,
             "return": 4095,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "protocol": "tcp",
                 "poolopts": "source-hash",
@@ -142,7 +142,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Create alias to use in target test",
             "method": "POST",
             "uri": "/api/v1/firewall/alias",
-            "payload": {
+            "req_data": {
                 "name": "TEST_NAT_TARGET",
                 "type": "host",
                 "address": ["127.0.0.1", "127.0.0.2"],
@@ -153,7 +153,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check allow alias target only with round-robin poolopt constraint",
             "status": 400,
             "return": 4096,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "protocol": "tcp",
                 "poolopts": "source-hash",
@@ -165,7 +165,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check natport is port or range constraint",
             "status": 400,
             "return": 4097,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "protocol": "tcp",
                 "poolopts": "round-robin",
@@ -178,7 +178,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check src required constraint",
             "status": 400,
             "return": 4098,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "protocol": "tcp",
                 "poolopts": "round-robin",
@@ -191,7 +191,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check src is IP, subnet or any constraint",
             "status": 400,
             "return": 4099,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "protocol": "tcp",
                 "poolopts": "round-robin",
@@ -205,7 +205,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check dst required constraint",
             "status": 400,
             "return": 4100,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "protocol": "tcp",
                 "poolopts": "round-robin",
@@ -219,7 +219,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check dst is IP, subnet or any constraint",
             "status": 400,
             "return": 4101,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "protocol": "tcp",
                 "poolopts": "round-robin",
@@ -234,7 +234,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check srcport is port or port range constraint",
             "status": 400,
             "return": 4102,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "protocol": "tcp",
                 "poolopts": "round-robin",
@@ -250,7 +250,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check dstport is port or port range constraint",
             "status": 400,
             "return": 4103,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "protocol": "tcp",
                 "poolopts": "round-robin",
@@ -267,7 +267,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update port-based outbound NAT mapping to non-port-based",
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "WAN",
                 "protocol": "any",
@@ -284,7 +284,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Update non-port-based outbound NAT mapping to port-based",
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "interface": "WAN",
                 "protocol": "udp",
@@ -311,31 +311,31 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check ID exists constraint",
             "status": 400,
             "return": 4105,
-            "payload": {"id": "INVALID"}
+            "req_data": {"id": "INVALID"}
         },
         {
             "name": "Check interface exists constraint",
             "status": 400,
             "return": 4087,
-            "payload": {"id": 0, "interface": "INVALID"}
+            "req_data": {"id": 0, "interface": "INVALID"}
         },
         {
             "name": "Check protocol options constraint",
             "status": 400,
             "return": 4089,
-            "payload": {"id": 0, "interface": "wan", "protocol": "INVALID"}
+            "req_data": {"id": 0, "interface": "wan", "protocol": "INVALID"}
         },
         {
             "name": "Check poolopts options constraint",
             "status": 400,
             "return": 4090,
-            "payload": {"id": 0, "interface": "wan", "protocol": "tcp", "poolopts": "INVALID"}
+            "req_data": {"id": 0, "interface": "wan", "protocol": "tcp", "poolopts": "INVALID"}
         },
         {
             "name": "Check source hash key begins with 0x constraint",
             "status": 400,
             "return": 4091,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "protocol": "tcp",
@@ -347,7 +347,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check source hash key hex value constraint",
             "status": 400,
             "return": 4092,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "protocol": "tcp",
@@ -359,7 +359,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check source hash key maximum length constraint",
             "status": 400,
             "return": 4093,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "protocol": "tcp",
@@ -371,7 +371,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check target is IP, subnet or alias constraint",
             "status": 400,
             "return": 4095,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "protocol": "tcp",
@@ -384,7 +384,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check allow alias target only with round-robin poolopt constraint",
             "status": 400,
             "return": 4096,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "protocol": "tcp",
@@ -397,7 +397,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check natport is port or range constraint",
             "status": 400,
             "return": 4097,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "protocol": "tcp",
@@ -411,7 +411,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check src is IP, subnet or any constraint",
             "status": 400,
             "return": 4099,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "protocol": "tcp",
@@ -426,7 +426,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check dst is IP, subnet or any constraint",
             "status": 400,
             "return": 4101,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "protocol": "tcp",
@@ -442,7 +442,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check srcport is port or port range constraint",
             "status": 400,
             "return": 4102,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "protocol": "tcp",
@@ -459,7 +459,7 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check dstport is port or port range constraint",
             "status": 400,
             "return": 4103,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "protocol": "tcp",
@@ -484,15 +484,15 @@ class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
             "name": "Check ID exists constraint",
             "status": 400,
             "return": 4105,
-            "payload": {"id": "INVALID"}
+            "req_data": {"id": "INVALID"}
         },
-        {"name": "Delete non-port-based outbound NAT mapping", "payload": {"id": 0}},
-        {"name": "Delete port-based outbound NAT mapping", "payload": {"id": 0}},
+        {"name": "Delete non-port-based outbound NAT mapping", "req_data": {"id": 0}},
+        {"name": "Delete port-based outbound NAT mapping", "req_data": {"id": 0}},
         {
             "name": "Delete alias used for testing",
             "method": "DELETE",
             "uri": "/api/v1/firewall/alias",
-            "payload": {"id": "TEST_NAT_TARGET"}
+            "req_data": {"id": "TEST_NAT_TARGET"}
         }
     ]
 

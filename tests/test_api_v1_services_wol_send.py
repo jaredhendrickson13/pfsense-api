@@ -21,14 +21,14 @@ class APIE2ETestServicesWOLSend(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Send magic WOL packet",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "mac": "2C:54:91:88:C9:E3"
             }
         },
         {
             "name": "Send magic WOL packet with missing interface",
-            "payload": {
+            "req_data": {
                 "mac": "2C:54:91:88:C9:E3",
             },
             "status": 400,
@@ -36,7 +36,7 @@ class APIE2ETestServicesWOLSend(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Send magic WOL packet with invalid interface",
-            "payload": {
+            "req_data": {
                 "interface": "INVALID",
                 "mac": "2C:54:91:88:C9:E3"
             },
@@ -45,7 +45,7 @@ class APIE2ETestServicesWOLSend(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Send magic WOL packet with missing mac",
-            "payload": {
+            "req_data": {
                 "interface": "lan"
             },
             "status": 400,
@@ -53,7 +53,7 @@ class APIE2ETestServicesWOLSend(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Send magic WOL packet with invalid mac",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "mac": "INVALID"
             },

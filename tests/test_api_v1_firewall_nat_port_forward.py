@@ -24,7 +24,7 @@ class APIE2ETestFirewallNATPortForward(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Create NAT port forward",
-            "payload": {
+            "req_data": {
                 "interface": "WAN",
                 "protocol": "tcp",
                 "src": "any",
@@ -43,7 +43,7 @@ class APIE2ETestFirewallNATPortForward(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update NAT port forward and apply",
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "WAN",
                 "protocol": "tcp",
@@ -65,7 +65,7 @@ class APIE2ETestFirewallNATPortForward(e2e_test_framework.APIE2ETest):
         }
     ]
     delete_tests = [
-        {"name": "Delete NAT port forward", "payload": {"id": 0}}
+        {"name": "Delete NAT port forward", "req_data": {"id": 0}}
     ]
 
 

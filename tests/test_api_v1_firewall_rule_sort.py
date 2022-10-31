@@ -22,7 +22,7 @@ class APIE2ETestFirewallRuleSort(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Sort firewall rules alphaetically by their description in an ascending order",
-            "payload": {
+            "req_data": {
                 "field": "descr",
                 "option": "ascend",
                 "dry_run": True
@@ -32,7 +32,7 @@ class APIE2ETestFirewallRuleSort(e2e_test_framework.APIE2ETest):
             "name": "Check sort field requirement",
             "status": 400,
             "return": 4237,
-            "payload": {
+            "req_data": {
                 "option": "descend",
                 "dry_run": True
             }
@@ -41,7 +41,7 @@ class APIE2ETestFirewallRuleSort(e2e_test_framework.APIE2ETest):
             "name": "Check sort option choices constraint",
             "status": 400,
             "return": 4238,
-            "payload": {
+            "req_data": {
                 "field": "descr",
                 "option": "INVALID",
                 "dry_run": True

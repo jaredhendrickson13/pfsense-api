@@ -24,7 +24,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Create network alias",
-            "payload": {
+            "req_data": {
                 "name": "RFC1918",
                 "type": "network",
                 "descr": "E2E Test",
@@ -35,7 +35,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create port alias",
-            "payload": {
+            "req_data": {
                 "name": "HTTP_PORTS",
                 "type": "port",
                 "descr": "E2E Test",
@@ -46,7 +46,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create host alias",
-            "payload": {
+            "req_data": {
                 "name": "DNS_SERVERS",
                 "type": "host",
                 "descr": "E2E Test",
@@ -57,7 +57,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create host alias using hostnames",
-            "payload": {
+            "req_data": {
                 "name": "GOOGLE_DNS",
                 "type": "host",
                 "descr": "E2E Test",
@@ -71,7 +71,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "delay": 3,
             "uri": "/api/v1/system/table",
             "post_test_callable": "check_google_dns_table",
-            "payload": {"name": "GOOGLE_DNS"}
+            "req_data": {"name": "GOOGLE_DNS"}
         },
         {
             "name": "Test name requirement",
@@ -82,7 +82,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "name": "Test name unique constraint",
             "status": 400,
             "return": 4056,
-            "payload": {
+            "req_data": {
                 "name": "DNS_SERVERS"
             }
         },
@@ -90,7 +90,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "name": "Test name validation",
             "status": 400,
             "return": 4053,
-            "payload": {
+            "req_data": {
                 "name": "!@#"
             }
         },
@@ -98,7 +98,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "name": "Test type requirement",
             "status": 400,
             "return": 4061,
-            "payload": {
+            "req_data": {
                 "name": "TEST"
             }
         },
@@ -106,7 +106,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "name": "Test type validation",
             "status": 400,
             "return": 4057,
-            "payload": {
+            "req_data": {
                 "name": "TEST",
                 "type": "INVALID"
             }
@@ -115,7 +115,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "name": "Test network alias address validation",
             "status": 400,
             "return": 4059,
-            "payload": {
+            "req_data": {
                 "name": "TEST",
                 "type": "network",
                 "address": ["!@#!@#!@#"]
@@ -125,7 +125,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "name": "Test host alias address validation",
             "status": 400,
             "return": 4058,
-            "payload": {
+            "req_data": {
                 "name": "TEST",
                 "type": "host",
                 "address": ["!@#!@#!@#"]
@@ -135,7 +135,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "name": "Test port alias address validation",
             "status": 400,
             "return": 4060,
-            "payload": {
+            "req_data": {
                 "name": "TEST",
                 "type": "port",
                 "address": ["!@#!@#!@#"]
@@ -145,7 +145,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update network alias",
-            "payload": {
+            "req_data": {
                 "id": "RFC1918",
                 "name": "UPDATED_RFC1918",
                 "type": "network",
@@ -157,7 +157,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Update port alias",
-            "payload": {
+            "req_data": {
                 "id": "HTTP_PORTS",
                 "name": "UPDATED_HTTP_PORTS",
                 "type": "port",
@@ -169,7 +169,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Update host alias",
-            "payload": {
+            "req_data": {
                 "id": "DNS_SERVERS",
                 "name": "UPDATED_DNS_SERVERS",
                 "type": "host",
@@ -188,7 +188,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "name": "Test name unique constraint",
             "status": 400,
             "return": 4056,
-            "payload": {
+            "req_data": {
                 "id": "UPDATED_HTTP_PORTS",
                 "name": "UPDATED_DNS_SERVERS"
             }
@@ -197,7 +197,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "name": "Test name validation",
             "status": 400,
             "return": 4053,
-            "payload": {
+            "req_data": {
                 "id": "UPDATED_HTTP_PORTS",
                 "name": "!@#"
             }
@@ -206,7 +206,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "name": "Test type validation",
             "status": 400,
             "return": 4057,
-            "payload": {
+            "req_data": {
                 "id": "UPDATED_HTTP_PORTS",
                 "type": "INVALID"
             }
@@ -214,7 +214,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
         {
             "name": "Test update host to network alias address validation tolerance",
             "status": 200,
-            "payload": {
+            "req_data": {
                 "id": "UPDATED_DNS_SERVERS",
                 "type": "network"
             }
@@ -223,7 +223,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "name": "Test update network to port alias address validation",
             "status": 400,
             "return": 4060,
-            "payload": {
+            "req_data": {
                 "id": "UPDATED_RFC1918",
                 "type": "port"
             }
@@ -232,7 +232,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "name": "Test update port to host alias address validation",
             "status": 400,
             "return": 4058,
-            "payload": {
+            "req_data": {
                 "id": "UPDATED_HTTP_PORTS",
                 "type": "host"
             }
@@ -241,7 +241,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete network alias",
-            "payload": {
+            "req_data": {
                 "id": "UPDATED_RFC1918",
                 "apply": False
             },
@@ -249,7 +249,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Delete port alias",
-            "payload": {
+            "req_data": {
                 "id": "UPDATED_HTTP_PORTS",
                 "apply": False
             },
@@ -257,7 +257,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Delete host alias",
-            "payload": {
+            "req_data": {
                 "id": "UPDATED_DNS_SERVERS",
                 "apply": False
             },
@@ -265,7 +265,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Delete GOOGLE_DNS alias/table",
-            "payload": {
+            "req_data": {
                 "id": "GOOGLE_DNS",
                 "apply": True
             },
@@ -275,7 +275,7 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "name": "Force reload filter",
             "method": "POST",
             "uri": "/api/v1/firewall/apply",
-            "payload": {
+            "req_data": {
                 "async": False
             },
         },
@@ -285,13 +285,13 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
             "uri": "/api/v1/system/table",
             "status": 400,
             "return": 1083,
-            "payload": {"name": "GOOGLE_DNS"}
+            "req_data": {"name": "GOOGLE_DNS"}
         },
         {
             "name": "Test delete non-existing alias",
             "status": 400,
             "return": 4055,
-            "payload": {
+            "req_data": {
                 "id": "INVALID"
             }
         }

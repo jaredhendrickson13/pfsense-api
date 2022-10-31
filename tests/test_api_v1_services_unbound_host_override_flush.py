@@ -26,7 +26,7 @@ class APIE2ETestServicesUnboundHostOverrideFlush(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Check ability to replace all existing host overrides",
-            "payload": {
+            "req_data": {
                 "host_overrides": [
                     {
                         "host": "test1",
@@ -51,7 +51,7 @@ class APIE2ETestServicesUnboundHostOverrideFlush(e2e_test_framework.APIE2ETest):
         }
     ]
     delete_tests = [
-        {"name": "Flush all Unbound host overrides", "payload": {}},
+        {"name": "Flush all Unbound host overrides", "req_data": {}},
     ]
 
 

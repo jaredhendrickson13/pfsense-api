@@ -10,7 +10,7 @@ class APIE2ETestSystemPackage(e2e_test_framework.APIE2ETest):
         {
             "name": "Check install of pfSense repo package",
             "resp_time": 30,
-            "payload": {
+            "req_data": {
                 "name": "pfSense-pkg-nmap"
             }
         },
@@ -24,7 +24,7 @@ class APIE2ETestSystemPackage(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 1076,
             "resp_time": 30,
-            "payload": {
+            "req_data": {
                 "name": "pfSense-pkg-nmap"
             }
         },
@@ -33,7 +33,7 @@ class APIE2ETestSystemPackage(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 1075,
             "resp_time": 5,
-            "payload": {
+            "req_data": {
                 "name": "pfSense-pkg-INVALID"
             }
         },
@@ -43,7 +43,7 @@ class APIE2ETestSystemPackage(e2e_test_framework.APIE2ETest):
             {
                 "name": "Test deletion of installed package",
                 "resp_time": 30,
-                "payload": {
+                "req_data": {
                     "name": "pfSense-pkg-nmap"
                 }
             },
@@ -56,7 +56,7 @@ class APIE2ETestSystemPackage(e2e_test_framework.APIE2ETest):
                 "name": "Check inability to delete system packages, only pfSense packages",
                 "status": 400,
                 "return": 1074,
-                "payload": {
+                "req_data": {
                     "name": "sudo"
                 }
             }

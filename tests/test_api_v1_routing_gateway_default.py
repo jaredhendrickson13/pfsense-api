@@ -23,18 +23,18 @@ class APIE2ETestRoutingGatewayDefault(e2e_test_framework.APIE2ETest):
             "name": "Check IPv4 gateway exists constraint",
             "status": 400,
             "return": 6028,
-            "payload": {"defaultgw4": "INVALID"}
+            "req_data": {"defaultgw4": "INVALID"}
         },
         {
             "name": "Check IPv6 gateway exists constraint",
             "status": 400,
             "return": 6028,
-            "payload": {"defaultgw6": "INVALID"}
+            "req_data": {"defaultgw6": "INVALID"}
         },
         {
             "name": "Check updating default gateways",
             "resp_time": 10,
-            "payload": {"defaultgw4": "automatic", "defaultgw6": "automatic"}
+            "req_data": {"defaultgw4": "automatic", "defaultgw6": "automatic"}
         }
     ]
 

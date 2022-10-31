@@ -50,7 +50,7 @@ class APIE2ETestSystemCA(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Import CA without key",
-            "payload": {
+            "req_data": {
                 "method": "existing",  # Check that existing method works the same as import
                 "crt": crt,
                 "descr": "CA_NO_KEY",
@@ -59,7 +59,7 @@ class APIE2ETestSystemCA(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Import CA with key",
-            "payload": {
+            "req_data": {
                 "method": "import",  # Check that existing method works the same as import
                 "crt": crt,
                 "prv": key,
@@ -69,7 +69,7 @@ class APIE2ETestSystemCA(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create RSA internal CA",
-            "payload": {
+            "req_data": {
                 "method": "internal",
                 "descr": "INTERNAL_CA_RSA",
                 "trust": True,
@@ -87,7 +87,7 @@ class APIE2ETestSystemCA(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create ECDSA internal CA",
-            "payload": {
+            "req_data": {
                 "method": "internal",
                 "descr": "INTERNAL_CA_ECDSA",
                 "trust": True,
@@ -112,142 +112,142 @@ class APIE2ETestSystemCA(e2e_test_framework.APIE2ETest):
             "name": "Check unsupported method",
             "status": 400,
             "return": 1032,
-            "payload": {"method": "INVALID_METHOD"}
+            "req_data": {"method": "INVALID_METHOD"}
         },
         {
             "name": "Check description requirement",
             "status": 400,
             "return": 1002,
-            "payload": {"method": "internal"}
+            "req_data": {"method": "internal"}
         },
         {
             "name": "Check description character validation",
             "status": 400,
             "return": 1037,
-            "payload": {"method": "internal", "descr": "<>?&>"}
+            "req_data": {"method": "internal", "descr": "<>?&>"}
         },
         {
             "name": "Check serial numeric validation with existing method",
             "status": 400,
             "return": 1033,
-            "payload": {"method": "existing", "descr": "TEST", "crt": crt, "prv": key, "serial": "invalid"}
+            "req_data": {"method": "existing", "descr": "TEST", "crt": crt, "prv": key, "serial": "invalid"}
         },
         {
             "name": "Check certificate requirement with existing method",
             "status": 400,
             "return": 1003,
-            "payload": {"method": "existing", "descr": "TestCA"}
+            "req_data": {"method": "existing", "descr": "TestCA"}
         },
         {
             "name": "Check encrypted key rejection",
             "status": 400,
             "return": 1036,
-            "payload": {"method": "existing", "descr": "TestCA", "crt": crt, "prv": "RU5DUllQVEVECg=="}
+            "req_data": {"method": "existing", "descr": "TestCA", "crt": crt, "prv": "RU5DUllQVEVECg=="}
         },
         {
             "name": "Check certificate key matching with existing method",
             "status": 400,
             "return": 1049,
-            "payload": {"method": "existing", "descr": "TestCA", "crt": crt, "prv": "INVALID KEY"}
+            "req_data": {"method": "existing", "descr": "TestCA", "crt": crt, "prv": "INVALID KEY"}
         },
         {
             "name": "Check signing CA reference ID requirement for intermediate method",
             "status": 400,
             "return": 1047,
-            "payload": {"method": "intermediate", "descr": "TestCA"}
+            "req_data": {"method": "intermediate", "descr": "TestCA"}
         },
         {
             "name": "Check non-existing signing CA reference ID for intermediate method",
             "status": 400,
             "return": 1048,
-            "payload": {"method": "intermediate", "descr": "TestCA", "caref": "invalid"}
+            "req_data": {"method": "intermediate", "descr": "TestCA", "caref": "invalid"}
         },
         {
             "name": "Check key type requirement for internal method",
             "status": 400,
             "return": 1038,
-            "payload": {"method": "internal", "descr": "TestCA"}
+            "req_data": {"method": "internal", "descr": "TestCA"}
         },
         {
             "name": "Check unknown key type for internal method",
             "status": 400,
             "return": 1039,
-            "payload": {"method": "internal", "descr": "TestCA", "keytype": "invalid"}
+            "req_data": {"method": "internal", "descr": "TestCA", "keytype": "invalid"}
         },
         {
             "name": "Check key length requirement for internal method",
             "status": 400,
             "return": 1040,
-            "payload": {"method": "internal", "descr": "TestCA", "keytype": "RSA"}
+            "req_data": {"method": "internal", "descr": "TestCA", "keytype": "RSA"}
         },
         {
             "name": "Check unknown key length for internal method",
             "status": 400,
             "return": 1041,
-            "payload": {"method": "internal", "descr": "TestCA", "keytype": "RSA", "keylen": "invalid"}
+            "req_data": {"method": "internal", "descr": "TestCA", "keytype": "RSA", "keylen": "invalid"}
         },
         {
             "name": "Check EC name requirement for internal method",
             "status": 400,
             "return": 1042,
-            "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA"}
+            "req_data": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA"}
         },
         {
             "name": "Check unknown EC name for internal method",
             "status": 400,
             "return": 1043,
-            "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "invalid"}
+            "req_data": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "invalid"}
         },
         {
             "name": "Check digest algorithm requirement for internal method",
             "status": 400,
             "return": 1044,
-            "payload": {"method": "internal", "descr": "TestCA", "keytype": "RSA", "keylen": 2048}
+            "req_data": {"method": "internal", "descr": "TestCA", "keytype": "RSA", "keylen": 2048}
         },
         {
             "name": "Check unknown digest algorithm for internal method",
             "status": 400,
             "return": 1045,
-            "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1",
+            "req_data": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1",
                         "digest_alg": "invalid"}
         },
         {
             "name": "Check lifetime maximum constraint for internal method",
             "status": 400,
             "return": 1046,
-            "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1",
+            "req_data": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1",
                         "digest_alg": "sha256", "lifetime": 50000}
         },
         {
             "name": "Check unknown country for internal method",
             "status": 400,
             "return": 1051,
-            "payload": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1",
+            "req_data": {"method": "internal", "descr": "TestCA", "keytype": "ECDSA", "ecname": "prime256v1",
                         "digest_alg": "sha256", "lifetime": 365, "dn_country": "invalid"}
         },
     ]
     delete_tests = [
         {
             "name": "Delete CA certificate without key",
-            "payload": {"descr": "CA_NO_KEY"}
+            "req_data": {"descr": "CA_NO_KEY"}
         },
         {
             "name": "Delete CA certificate with key",
-            "payload": {"descr": "CA_WITH_KEY"}
+            "req_data": {"descr": "CA_WITH_KEY"}
         },
         {
             "name": "Delete internal CA RSA",
-            "payload": {"descr": "INTERNAL_CA_RSA"}
+            "req_data": {"descr": "INTERNAL_CA_RSA"}
         },
         {
             "name": "Delete internal CA ECDSA",
-            "payload": {"descr": "INTERNAL_CA_ECDSA"}
+            "req_data": {"descr": "INTERNAL_CA_ECDSA"}
         },
         {
             "name": "Check deletion of non-existing CA",
             "status": 400,
             "return": 1009,
-            "payload": {"descr": "INVALID"}
+            "req_data": {"descr": "INVALID"}
         }
     ]
 

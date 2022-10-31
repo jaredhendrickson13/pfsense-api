@@ -8,7 +8,7 @@ class APIE2ETestUserPrivilege(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Grant user privileges",
-            "payload": {
+            "req_data": {
                 "username": "admin",
                 "priv": ["page-all", "page-system-api"]
             }
@@ -22,7 +22,7 @@ class APIE2ETestUserPrivilege(e2e_test_framework.APIE2ETest):
             "name": "Check non-existing username",
             "status": 400,
             "return": 5001,
-            "payload": {
+            "req_data": {
                 "username": "INVALID"
             }
         },
@@ -30,7 +30,7 @@ class APIE2ETestUserPrivilege(e2e_test_framework.APIE2ETest):
             "name": "Check non-existing privileges",
             "status": 400,
             "return": 5006,
-            "payload": {
+            "req_data": {
                 "username": "admin",
                 "priv": ["INVALID"]
             }
@@ -39,7 +39,7 @@ class APIE2ETestUserPrivilege(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete user privileges",
-            "payload": {
+            "req_data": {
                 "username": "admin",
                 "priv": ["page-system-api"]
             }

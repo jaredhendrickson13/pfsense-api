@@ -22,7 +22,7 @@ class APIE2ETestDiagnosticsCommandPrompt(e2e_test_framework.APIE2ETest):
         {
             "name": "Execute shell command",
             "post_test_callable": "check_shell_cmd_response",
-            "payload": {
+            "req_data": {
                 "shell_cmd": "whoami"
             }
         },

@@ -23,7 +23,7 @@ class APIE2ETestRoutingStaticRoute(e2e_test_framework.APIE2ETest):
         {
             "name": "Create static route",
             "resp_time": 5,
-            "payload": {
+            "req_data": {
                 "network": "1.2.3.4/32",
                 "gateway": "WAN_DHCP",
                 "disabled": False,
@@ -36,7 +36,7 @@ class APIE2ETestRoutingStaticRoute(e2e_test_framework.APIE2ETest):
             "method": "POST",
             "post_test_callable": "check_for_static_route_created",
             "uri": "/api/v1/diagnostics/command_prompt",
-            "payload": {"shell_cmd": "netstat -rn"}
+            "req_data": {"shell_cmd": "netstat -rn"}
         },
         {
             "name": "Check network required constraint",
@@ -47,43 +47,43 @@ class APIE2ETestRoutingStaticRoute(e2e_test_framework.APIE2ETest):
             "name": "Check network is CIDR or alias constraint",
             "status": 400,
             "return": 6001,
-            "payload": {"network": "INVALID"}
+            "req_data": {"network": "INVALID"}
         },
         {
             "name": "Check network minimum CIDR constraint",
             "status": 400,
             "return": 6002,
-            "payload": {"network": "1.2.3.4/0"}
+            "req_data": {"network": "1.2.3.4/0"}
         },
         {
             "name": "Check network maximum IPv4 CIDR constraint",
             "status": 400,
             "return": 6002,
-            "payload": {"network": "1.2.3.4/33"}
+            "req_data": {"network": "1.2.3.4/33"}
         },
         {
             "name": "Check network maximum IPv4 CIDR constraint",
             "status": 400,
             "return": 6002,
-            "payload": {"network": "0::/129"}
+            "req_data": {"network": "0::/129"}
         },
         {
             "name": "Check gateway required constraint",
             "status": 400,
             "return": 6003,
-            "payload": {"network": "1.2.3.4/32"}
+            "req_data": {"network": "1.2.3.4/32"}
         },
         {
             "name": "Check gateway exists constraint",
             "status": 400,
             "return": 6004,
-            "payload": {"network": "1.2.3.4/32", "gateway": "INVALID"}
+            "req_data": {"network": "1.2.3.4/32", "gateway": "INVALID"}
         },
     ]
     put_tests = [
         {
             "name": "Update static route",
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "network": "4.3.2.1/32",
                 "gateway": "WAN_DHCP",
@@ -98,7 +98,7 @@ class APIE2ETestRoutingStaticRoute(e2e_test_framework.APIE2ETest):
             "method": "POST",
             "post_test_callable": "check_for_static_route_updated",
             "uri": "/api/v1/diagnostics/command_prompt",
-            "payload": {"shell_cmd": "netstat -rn"}
+            "req_data": {"shell_cmd": "netstat -rn"}
         },
         {
             "name": "Check ID required constraint",
@@ -109,43 +109,43 @@ class APIE2ETestRoutingStaticRoute(e2e_test_framework.APIE2ETest):
             "name": "Check ID exists constraint",
             "status": 400,
             "return": 6006,
-            "payload": {"id": "INVALID"}
+            "req_data": {"id": "INVALID"}
         },
         {
             "name": "Check network is CIDR or alias constraint",
             "status": 400,
             "return": 6001,
-            "payload": {"id": 0, "network": "INVALID"}
+            "req_data": {"id": 0, "network": "INVALID"}
         },
         {
             "name": "Check network minimum CIDR constraint",
             "status": 400,
             "return": 6002,
-            "payload": {"id": 0, "network": "1.2.3.4/0"}
+            "req_data": {"id": 0, "network": "1.2.3.4/0"}
         },
         {
             "name": "Check network maximum IPv4 CIDR constraint",
             "status": 400,
             "return": 6002,
-            "payload": {"id": 0, "network": "1.2.3.4/33"}
+            "req_data": {"id": 0, "network": "1.2.3.4/33"}
         },
         {
             "name": "Check network maximum IPv4 CIDR constraint",
             "status": 400,
             "return": 6002,
-            "payload": {"id": 0, "network": "0::/129"}
+            "req_data": {"id": 0, "network": "0::/129"}
         },
         {
             "name": "Check gateway exists constraint",
             "status": 400,
             "return": 6004,
-            "payload": {"id": 0, "network": "1.2.3.4/32", "gateway": "INVALID"}
+            "req_data": {"id": 0, "network": "1.2.3.4/32", "gateway": "INVALID"}
         }
     ]
     delete_tests = [
         {
             "name": "Delete static route",
-            "payload": {"id": 0, "apply": True},
+            "req_data": {"id": 0, "apply": True},
             "resp_time": 5    # Allow a few seconds to reload the routing table
         },
         {
@@ -153,7 +153,7 @@ class APIE2ETestRoutingStaticRoute(e2e_test_framework.APIE2ETest):
             "method": "POST",
             "post_test_callable": "check_for_static_route_deleted",
             "uri": "/api/v1/diagnostics/command_prompt",
-            "payload": {"shell_cmd": "netstat -rn"}
+            "req_data": {"shell_cmd": "netstat -rn"}
         },
         {
             "name": "Check ID required constraint",
@@ -164,7 +164,7 @@ class APIE2ETestRoutingStaticRoute(e2e_test_framework.APIE2ETest):
             "name": "Check ID exists constraint",
             "status": 400,
             "return": 6006,
-            "payload": {"id": "INVALID"}
+            "req_data": {"id": "INVALID"}
         }
     ]
 

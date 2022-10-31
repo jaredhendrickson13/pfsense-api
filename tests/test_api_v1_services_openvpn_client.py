@@ -30,7 +30,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "OpenVPN Server/Client No Certificate Authority found",
             "status": 400,
             "return": 2144,
-            "payload": {
+            "req_data": {
                 "server_addr": "openvpn.example.com",
             }
         },
@@ -38,7 +38,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Create RSA internal CA",
             "uri": "/api/v1/system/ca",
             "no_caref": True,  # Prevents the overriden post_post() method from auto-adding the created CA ref ID
-            "payload": {
+            "req_data": {
                 "method": "internal",
                 "descr": "INTERNAL_CA_TEST",
                 "trust": True,
@@ -52,7 +52,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "OpenVPN Server/Client No Server Certificate found",
             "status": 400,
             "return": 2135,
-            "payload": {
+            "req_data": {
                 "server_addr": "openvpn.example.com"
             }
         },
@@ -60,7 +60,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Create internal certificate with RSA key",
             "uri": "/api/v1/system/certificate",
             "no_certref": True,  # Prevents overriden post_post() method from auto-adding created Certificate ref ID
-            "payload": {
+            "req_data": {
                 "method": "internal",
                 "descr": "INTERNAL_CERT_RSA",
                 "keytype": "RSA",
@@ -80,7 +80,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Create OpenVPN Client",
             "status": 200,
             "return": 0,
-            "payload": {
+            "req_data": {
                 "protocol": "udp4",
                 "description": "TEST_Create_OpenVPN_Client",
                 "dev_mode": "tun",
@@ -114,7 +114,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "no_certref": True,
             # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
             # "resp_time": 30,
-            "payload": {
+            "req_data": {
                 "if": "ovpnc1",
                 "descr": "TEST_INTERFACE_OVPNC1",
             }
@@ -123,7 +123,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Mode",
             "status": 400,
             "return": 2104,
-            "payload": {
+            "req_data": {
                 "mode": "INVALID_MODE",
                 "server_addr": "openvpn.example.com",
             }
@@ -132,7 +132,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Protocol",
             "status": 400,
             "return": 2105,
-            "payload": {
+            "req_data": {
                 "protocol": "INVALID_PROTOCOL",
                 "server_addr": "openvpn.example.com",
             }
@@ -141,7 +141,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Device mode",
             "status": 400,
             "return": 2106,
-            "payload": {
+            "req_data": {
                 "dev_mode": "INVALID_DEV_MODE",
                 "server_addr": "openvpn.example.com",
             }
@@ -150,7 +150,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Interface",
             "status": 400,
             "return": 2107,
-            "payload": {
+            "req_data": {
                 "interface": "INVALID_INTERFACE",
                 "server_addr": "openvpn.example.com",
             }
@@ -159,7 +159,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client TLS Key Usage Mode",
             "status": 400,
             "return": 2109,
-            "payload": {
+            "req_data": {
                 "tls": tls_key_text,
                 "tls_type": "INVALID_TLS_TYPE",
                 "server_addr": "openvpn.example.com",
@@ -169,7 +169,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client TLS keydir direction",
             "status": 400,
             "return": 2110,
-            "payload": {
+            "req_data": {
                 "tls": tls_key_text,
                 "tlsauth_keydir": "INVALID_TLS_KEYDIR",
                 "server_addr": "openvpn.example.com",
@@ -179,7 +179,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Fallback Data Encryption Algorithm",
             "status": 400,
             "return": 2114,
-            "payload": {
+            "req_data": {
                 "data_ciphers_fallback": "INVALID_DATA_CIPHERS_FALLBACK",
                 "server_addr": "openvpn.example.com",
             }
@@ -188,7 +188,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Auth Digest Algorithm",
             "status": 400,
             "return": 2115,
-            "payload": {
+            "req_data": {
                 "digest": "INVALID_DIGEST",
                 "server_addr": "openvpn.example.com",
             }
@@ -197,7 +197,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Hardware Crypto Engine",
             "status": 400,
             "return": 2116,
-            "payload": {
+            "req_data": {
                 "engine": "INVALID_ENGINE",
                 "server_addr": "openvpn.example.com",
             }
@@ -206,7 +206,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown or already in use OpenVPN Server/Client Tunnel Network",
             "status": 400,
             "return": 2117,
-            "payload": {
+            "req_data": {
                 "tunnel_network": "INVALID_TUNNEL_NETWORK",
                 "server_addr": "openvpn.example.com",
             }
@@ -215,7 +215,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Remote network(s)",
             "status": 400,
             "return": 2118,
-            "payload": {
+            "req_data": {
                 "remote_network": "INVALID_REMOTE_NETWORK",
                 "server_addr": "openvpn.example.com",
             }
@@ -224,7 +224,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Allow Compression",
             "status": 400,
             "return": 2120,
-            "payload": {
+            "req_data": {
                 "allow_compression": "INVALID_ALLOW_COMPRESSION",
                 "server_addr": "openvpn.example.com",
             }
@@ -233,7 +233,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Compression",
             "status": 400,
             "return": 2121,
-            "payload": {
+            "req_data": {
                 "allow_compression": "yes",
                 "compression": "INVALID_COMPRESSION",
                 "server_addr": "openvpn.example.com",
@@ -243,7 +243,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Topology",
             "status": 400,
             "return": 2122,
-            "payload": {
+            "req_data": {
                 "dev_mode": "tun",
                 "topology": "INVALID_TOPOLOGY",
                 "server_addr": "openvpn.example.com",
@@ -253,7 +253,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Ping Method",
             "status": 400,
             "return": 2123,
-            "payload": {
+            "req_data": {
                 "ping_method": "INVALID_PING_METHOD",
                 "server_addr": "openvpn.example.com",
             }
@@ -262,7 +262,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Keepalive Interval",
             "status": 400,
             "return": 2124,
-            "payload": {
+            "req_data": {
                 "ping_method": "keepalive",
                 "keepalive_interval": "INVALID_KEEPALIVE_INTERVAL",
                 "server_addr": "openvpn.example.com",
@@ -272,7 +272,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Keepalive Timeout",
             "status": 400,
             "return": 2125,
-            "payload": {
+            "req_data": {
                 "ping_method": "keepalive",
                 "keepalive_timeout": "INVALID_KEEPALIVE_TIMEOUT",
                 "server_addr": "openvpn.example.com",
@@ -282,7 +282,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Ping Seconds",
             "status": 400,
             "return": 2126,
-            "payload": {
+            "req_data": {
                 "ping_method": "ping",
                 "ping_seconds": "INVALID_PING_SECONDS",
                 "server_addr": "openvpn.example.com",
@@ -292,7 +292,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Ping restart or exit seconds",
             "status": 400,
             "return": 2127,
-            "payload": {
+            "req_data": {
                 "ping_method": "ping",
                 "ping_action_seconds": "INVALID_PING_ACTION_SECONDS",
                 "server_addr": "openvpn.example.com",
@@ -302,7 +302,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Ping restart or exit",
             "status": 400,
             "return": 2128,
-            "payload": {
+            "req_data": {
                 "ping_method": "ping",
                 "ping_action": "INVALID_PING_ACTION",
                 "server_addr": "openvpn.example.com",
@@ -312,7 +312,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Exit Notify",
             "status": 400,
             "return": 2129,
-            "payload": {
+            "req_data": {
                 "exit_notify": "INVALID_EXIT_NOTIFY",
                 "server_addr": "openvpn.example.com",
             }
@@ -321,7 +321,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Send/Receive Buffer",
             "status": 400,
             "return": 2130,
-            "payload": {
+            "req_data": {
                 "sndrcvbuf": "INVALID_SNDRCVBUF",
                 "server_addr": "openvpn.example.com",
             }
@@ -330,7 +330,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Gateway Creation",
             "status": 400,
             "return": 2131,
-            "payload": {
+            "req_data": {
                 "create_gw": "INVALID_CREATE_GW",
                 "server_addr": "openvpn.example.com",
             }
@@ -339,7 +339,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Verbosity Level",
             "status": 400,
             "return": 2132,
-            "payload": {
+            "req_data": {
                 "verbosity_level": "INVALID_VERBOSITY_LEVEL",
                 "server_addr": "openvpn.example.com",
             }
@@ -348,7 +348,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Inactive Time",
             "status": 400,
             "return": 2134,
-            "payload": {
+            "req_data": {
                 "inactive_seconds": "INVALID_INACTIVE_TIME",
                 "server_addr": "openvpn.example.com",
             }
@@ -359,7 +359,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "return": 2135,
             "no_certref": True,
             # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
-            "payload": {
+            "req_data": {
                 "server_addr": "openvpn.example.com",
             }
         },
@@ -368,7 +368,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "status": 400,
             "return": 2136,
             "no_caref": True,  # Prevents the overriden post_post() method from auto-adding the created CA ref ID
-            "payload": {
+            "req_data": {
                 "server_addr": "openvpn.example.com"
             }
         },
@@ -376,7 +376,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Peer Certificate Revocation List",
             "status": 400,
             "return": 2137,
-            "payload": {
+            "req_data": {
                 "crlref": "INVALID_CRLREF",
                 "server_addr": "openvpn.example.com",
             }
@@ -385,7 +385,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Server/Client Data Encryption Algorithms",
             "status": 400,
             "return": 2138,
-            "payload": {
+            "req_data": {
                 "data_ciphers": "INVALID_CRLREF",
                 "server_addr": "openvpn.example.com",
             }
@@ -396,7 +396,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "return": 2141,
             "no_certref": True, # Prevents overriden post_post() method from auto-adding the created Certificate ref ID
             "no_caref": True,  # Prevents the overriden post_post() method from auto-adding the created CA ref ID
-            "payload": {
+            "req_data": {
                 "mode": "p2p_shared_key",
                 "server_addr": "openvpn.example.com",
             }
@@ -406,7 +406,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "status": 400,
             "return": 2142,
             "no_caref": True,  # Prevents the overriden post_post() method from auto-adding the created CA ref ID
-            "payload": {
+            "req_data": {
                 "caref": "INVALID_CA_REF",
                 "server_addr": "openvpn.example.com",
             }
@@ -417,7 +417,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "return": 2143,
             "no_certref": True,
             # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
-            "payload": {
+            "req_data": {
                 "certref": "INVALID_CERT_REF",
                 "server_addr": "openvpn.example.com",
             }
@@ -426,7 +426,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "OpenVPN Client the field 'Server port' must contain a valid port, ranging from 0 to 65535.",
             "status": 400,
             "return": 2154,
-            "payload": {
+            "req_data": {
                 "server_port": "99999",
                 "server_addr": "openvpn.example.com",
             }
@@ -435,7 +435,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "OpenVPN Client the field 'Local port' must contain a valid port, ranging from 0 to 65535.",
             "status": 500,
             "return": 2108,
-            "payload": {
+            "req_data": {
                 "local_port": "99999",
                 "server_addr": "openvpn.example.com",
             }
@@ -444,13 +444,13 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "OpenVPN Client the field 'Server host or address' must contain a valid IP address or domain name.",
             "status": 400,
             "return": 2153,
-            "payload": {}
+            "req_data": {}
         },
         {
             "name": "OpenVPN Client the field 'Proxy port' must contain a valid port, ranging from 0 to 65535.",
             "status": 400,
             "return": 2155,
-            "payload": {
+            "req_data": {
                 "proxy_port": "99999",
                 "server_addr": "openvpn.example.com",
             }
@@ -459,7 +459,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Unknown OpenVPN Client Proxy Authentication type.",
             "status": 400,
             "return": 2156,
-            "payload": {
+            "req_data": {
                 "proxy_authtype": "INVALID_AUTH_TYPE",
                 "server_addr": "openvpn.example.com",
             }
@@ -468,7 +468,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "OpenVPN Client the field 'User shaper' must be in valid range, ranging from 100 to 100,000,000.",
             "status": 400,
             "return": 2157,
-            "payload": {
+            "req_data": {
                 "use_shaper": "1",
                 "server_addr": "openvpn.example.com",
             }
@@ -482,7 +482,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "no_certref": True,
             # Prevents the overriden post_post() method from auto-adding the created Certificate ref ID
             "no_caref": True,  # Prevents the overriden post_post() method from auto-adding the created CA ref ID
-            "payload": {
+            "req_data": {
                 "description": "TEST_Update_OpenVPN_Client_1",
                 "mode": "p2p_shared_key",
                 "shared_key": ""
@@ -492,7 +492,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "OpenVPN Client Update 2",
             "status": 200,
             "return": 0,
-            "payload": {
+            "req_data": {
                 "description": "TEST_Update_OpenVPN_Client_2",
                 "mode": "p2p_tls",
                 "tls": "false",
@@ -517,20 +517,20 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "OpenVPN Server/Client cannot delete an OpenVPN instance while interface is assigned",
             "status": 400,
             "return": 2152,
-            "payload": {}
+            "req_data": {}
         },
         {
             "name": "Delete Interface (ovpnc1)",
             "uri": "/api/v1/interface",
             "status": 200,
             "return": 0,
-            "payload": {}
+            "req_data": {}
         },
         {
             "name": "Delete OpenVPN Client Instance",
             "status": 200,
             "return": 0,
-            "payload": {},
+            "req_data": {},
             "resp_time": 10
         },  # vpnid gets populated by post_post() method
         {
@@ -538,20 +538,20 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "uri": "/api/v1/system/certificate",
             "status": 200,
             "return": 0,
-            "payload": {"descr": "INTERNAL_CERT_RSA"}
+            "req_data": {"descr": "INTERNAL_CERT_RSA"}
         },
         {
             "name": "Delete CA certificate",
             "uri": "/api/v1/system/ca",
             "status": 200,
             "return": 0,
-            "payload": {"descr": "INTERNAL_CA_TEST"}
+            "req_data": {"descr": "INTERNAL_CA_TEST"}
         },
         {
             "name": "Unknown OpenVPN Server/Client vpnid",
             "status": 404,
             "return": 2139,
-            "payload": {
+            "req_data": {
                 "vpnid": "INVALID_VPNID"
             }
         },
@@ -559,7 +559,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "name": "Missing OpenVPN Server/Client 'vpnid', parameter is needed to identify server to modify/delete",
             "status": 400,
             "return": 2140,
-            "payload": {}
+            "req_data": {}
         },
     ]
 
@@ -569,40 +569,40 @@ a28e7bdbf1743527346bda359bc92fc9 \
             # Variables
             counter = 0
             for test in self.post_tests:
-                # Assign the required refid created in the POST request to the POST/PUT payloads
-                if "payload" in test and "no_caref" not in test:
-                    self.post_tests[counter]["payload"]["caref"] = self.post_responses[1]["data"]["refid"]
-                    self.put_tests[1]["payload"]["caref"] = self.post_responses[1]["data"]["refid"]
-                    # self.put_tests[1]["payload"]["caref"] = self.post_responses[1]["data"]["refid"]
+                # Assign the required refid created in the POST request to the POST/PUT req_datas
+                if "req_data" in test and "no_caref" not in test:
+                    self.post_tests[counter]["req_data"]["caref"] = self.post_responses[1]["data"]["refid"]
+                    self.put_tests[1]["req_data"]["caref"] = self.post_responses[1]["data"]["refid"]
+                    # self.put_tests[1]["req_data"]["caref"] = self.post_responses[1]["data"]["refid"]
                 counter = counter + 1
 
         if len(self.post_responses) == 4:
             # Variables
             counter = 0
             for test in self.post_tests:
-                # Assign the required refid created in the POST request to the POST/PUT payloads
-                if "payload" in test and "no_certref" not in test:
-                    self.post_tests[counter]["payload"]["certref"] = self.post_responses[3]["data"]["refid"]
-                    self.put_tests[1]["payload"]["certref"] = self.post_responses[3]["data"]["refid"]
+                # Assign the required refid created in the POST request to the POST/PUT req_datas
+                if "req_data" in test and "no_certref" not in test:
+                    self.post_tests[counter]["req_data"]["certref"] = self.post_responses[3]["data"]["refid"]
+                    self.put_tests[1]["req_data"]["certref"] = self.post_responses[3]["data"]["refid"]
                 counter = counter + 1
 
         if len(self.post_responses) == 5:
             # Variables
             # counter = 0
             for _ in self.post_tests:
-                # Assign the required vpnid created in the POST request to the DELETE/PUT payloads
-                self.delete_tests[0]["payload"]["vpnid"] = self.post_responses[4]["data"]["vpnid"]
-                self.delete_tests[2]["payload"]["vpnid"] = self.post_responses[4]["data"]["vpnid"]
-                self.put_tests[0]["payload"]["vpnid"] = self.post_responses[4]["data"]["vpnid"]
-                self.put_tests[1]["payload"]["vpnid"] = self.post_responses[4]["data"]["vpnid"]
+                # Assign the required vpnid created in the POST request to the DELETE/PUT req_datas
+                self.delete_tests[0]["req_data"]["vpnid"] = self.post_responses[4]["data"]["vpnid"]
+                self.delete_tests[2]["req_data"]["vpnid"] = self.post_responses[4]["data"]["vpnid"]
+                self.put_tests[0]["req_data"]["vpnid"] = self.post_responses[4]["data"]["vpnid"]
+                self.put_tests[1]["req_data"]["vpnid"] = self.post_responses[4]["data"]["vpnid"]
                 # counter = counter + 1
 
         if len(self.post_responses) == 6:
             # Variables
             # counter = 0
             for _ in self.post_tests:
-                # Assign the required vpnid created in the POST request to the DELETE payloads
-                self.delete_tests[1]["payload"]["if"] = self.post_responses[5]["data"]["if"]
+                # Assign the required vpnid created in the POST request to the DELETE req_datas
+                self.delete_tests[1]["req_data"]["if"] = self.post_responses[5]["data"]["if"]
 
 
 APIE2ETestOpenVPNClient()

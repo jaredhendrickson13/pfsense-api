@@ -22,7 +22,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
         {
             "name": "Create parent firewall schedule",
             "uri": "/api/v1/firewall/schedule",
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "descr": "E2E test",
                 "timerange": [
@@ -36,7 +36,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create month/day based time range",
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "1,2",
                 "day": "1,17",
@@ -46,7 +46,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create weekly based time range",
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "position": "1,2,3,4,5",
                 "hour": "0:00-22:59",
@@ -62,7 +62,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check non-existing schedule name",
             "status": 400,
             "return": 4150,
-            "payload": {
+            "req_data": {
                 "name": "INVALID"
             }
         },
@@ -70,7 +70,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check month requirement",
             "status": 400,
             "return": 4151,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule"
             }
         },
@@ -78,7 +78,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check month maximum constraint",
             "status": 400,
             "return": 4152,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "13"
             }
@@ -87,7 +87,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check month minimum constraint",
             "status": 400,
             "return": 4152,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "0"
             }
@@ -96,7 +96,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check day requirement",
             "status": 400,
             "return": 4153,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "1"
             }
@@ -105,7 +105,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check day and month count mismatch",
             "status": 400,
             "return": 4154,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "1,2,3",
                 "day": "21,22"
@@ -115,7 +115,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check day minimum constraint",
             "status": 400,
             "return": 4155,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "1",
                 "day": "0"
@@ -125,7 +125,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check January day maximum constraint",
             "status": 400,
             "return": 4155,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "1",
                 "day": "32"
@@ -135,7 +135,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check February day maximum constraint",
             "status": 400,
             "return": 4155,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "2",
                 "day": "30"
@@ -145,7 +145,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check March day maximum constraint",
             "status": 400,
             "return": 4155,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "3",
                 "day": "32"
@@ -155,7 +155,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check April day maximum constraint",
             "status": 400,
             "return": 4155,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "4",
                 "day": "31"
@@ -165,7 +165,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check May day maximum constraint",
             "status": 400,
             "return": 4155,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "5",
                 "day": "32"
@@ -175,7 +175,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check June day maximum constraint",
             "status": 400,
             "return": 4155,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "6",
                 "day": "31"
@@ -185,7 +185,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check July day maximum constraint",
             "status": 400,
             "return": 4155,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "7",
                 "day": "32"
@@ -195,7 +195,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check August day maximum constraint",
             "status": 400,
             "return": 4155,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "8",
                 "day": "32"
@@ -205,7 +205,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check September day maximum constraint",
             "status": 400,
             "return": 4155,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "9",
                 "day": "31"
@@ -215,7 +215,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check October day maximum constraint",
             "status": 400,
             "return": 4155,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "10",
                 "day": "32"
@@ -225,7 +225,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check November day maximum constraint",
             "status": 400,
             "return": 4155,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "11",
                 "day": "31"
@@ -235,7 +235,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check December day maximum constraint",
             "status": 400,
             "return": 4155,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "12",
                 "day": "32"
@@ -245,7 +245,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check hour requirement",
             "status": 400,
             "return": 4156,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "1",
                 "day": "1"
@@ -255,7 +255,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check hour start time validation",
             "status": 400,
             "return": 4157,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "1",
                 "day": "1",
@@ -266,7 +266,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check hour good hour bad minute start time validation",
             "status": 400,
             "return": 4157,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "1",
                 "day": "1",
@@ -277,7 +277,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check hour bad hour good minute start time validation",
             "status": 400,
             "return": 4157,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "1",
                 "day": "1",
@@ -288,7 +288,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check hour end time validation",
             "status": 400,
             "return": 4158,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "1",
                 "day": "1",
@@ -299,7 +299,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check good hour bad minute end time validation",
             "status": 400,
             "return": 4158,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "1",
                 "day": "1",
@@ -310,7 +310,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check bad hour good minute end time validation",
             "status": 400,
             "return": 4158,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "1",
                 "day": "1",
@@ -321,7 +321,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check start time greater than end time validation",
             "status": 400,
             "return": 4159,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "month": "1",
                 "day": "1",
@@ -332,7 +332,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check priority minimum constraint",
             "status": 400,
             "return": 4160,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "position": "1,2,0",
                 "hour": "23:00-22:59"
@@ -342,7 +342,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check position maximum constraint",
             "status": 400,
             "return": 4160,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "position": "1,2,8",
                 "hour": "23:00-23:59"
@@ -352,14 +352,14 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete weekly based schedule time range",
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "id": 2
             }
         },
         {
             "name": "Delete month/day based schedule time range",
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "id": 1
             }
@@ -373,7 +373,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check ID requirement",
             "status": 400,
             "return": 4163,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule"
             }
         },
@@ -381,7 +381,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check ID validation",
             "status": 400,
             "return": 4164,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "id": "INVALID"
             }
@@ -390,7 +390,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check deleting time range from non-existing schedule",
             "status": 400,
             "return": 4150,
-            "payload": {
+            "req_data": {
                 "name": "INVALID",
                 "id": 0
             }
@@ -399,7 +399,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
             "name": "Check deleting last remaining time range",
             "status": 400,
             "return": 4165,
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule",
                 "id": 0
             }
@@ -407,7 +407,7 @@ class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
         {
             "name": "Delete parent firewall schedule",
             "uri": "/api/v1/firewall/schedule",
-            "payload": {
+            "req_data": {
                 "name": "Test_Schedule"
             }
         },

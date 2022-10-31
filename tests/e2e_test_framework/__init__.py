@@ -64,7 +64,7 @@ class APIE2ETest:
 
     def get(self):
         """Makes a GET request for every GET test found in the 'get_tests' attribute."""
-        # Loop through each GET payload and check that it's response is expected
+        # Loop through each GET req_data and check that it's response is expected
         for test_params in self.get_tests:
             self.pre_get()
             self.get_responses.append(self.make_request("GET", test_params))
@@ -75,7 +75,7 @@ class APIE2ETest:
 
     def post(self):
         """Makes a POST request for every POST test found in the 'post_tests' attribute."""
-        # Loop through each POST payload and check that it's response is expected
+        # Loop through each POST req_data and check that it's response is expected
         for test_params in self.post_tests:
             self.pre_post()
             self.post_responses.append(self.make_request("POST", test_params))
@@ -86,7 +86,7 @@ class APIE2ETest:
 
     def put(self):
         """Makes a PUT request for every PUT test found in the 'put_tests' attribute."""
-        # Loop through each PUT payload and check that it's response is expected
+        # Loop through each PUT req_data and check that it's response is expected
         for test_params in self.put_tests:
             self.pre_put()
             self.put_responses.append(self.make_request("PUT", test_params))
@@ -97,7 +97,7 @@ class APIE2ETest:
 
     def delete(self):
         """Makes a DELETE request for every DELETE test found in the 'delete_tests' attribute."""
-        # Loop through each DELETE payload and check that it's response is expected
+        # Loop through each DELETE req_data and check that it's response is expected
         for test_params in self.delete_tests:
             self.pre_delete()
             self.delete_responses.append(self.make_request("DELETE", test_params))
@@ -157,8 +157,8 @@ class APIE2ETest:
 
         # Local variables
         method = test_params.get("method", method)    # Allow custom method override
-        payload = test_params.get("payload", {})
-        payload_callable = getattr(self, test_params.get("payload_callable", ""), None)
+        req_data = test_params.get("req_data", {})
+        req_data_callable = getattr(self, test_params.get("req_data_callable", ""), None)
         pre_test_callable = getattr(self, test_params.get("pre_test_callable", ""), None)
         pre_test_exc = None
         post_test_callable = getattr(self, test_params.get("post_test_callable", ""), None)
@@ -168,7 +168,7 @@ class APIE2ETest:
         auth_mode = test_params.get("auth_mode", self.args.auth_mode)
         headers = {}
         auth = None
-        req = None
+        resp = None
 
         # Delay this test if the 'delay' parameter is set
         time.sleep(test_params.get("delay", 0))
@@ -183,9 +183,9 @@ class APIE2ETest:
         if auth_mode == "jwt":
             headers = {"Authorization": "Bearer " + self.get_jwt(username, password)}
 
-        # When a callable payload is defined, ensure it is a callable and run the function
-        if callable(payload_callable):
-            payload.update(payload_callable())
+        # When a callable req_data is defined, ensure it is a callable and run the function
+        if callable(req_data_callable):
+            req_data.update(req_data_callable())
 
         # When a pre-test callable is defined, ensure it is a callable and run the function
         if callable(pre_test_callable):
@@ -197,10 +197,10 @@ class APIE2ETest:
 
         # Attempt to make the API call, if the request times out print timeout error
         try:
-            req = requests.request(
+            resp = requests.request(
                 method,
                 url=self.format_url(test_params.get("uri", self.uri)),
-                data=json.dumps(payload),
+                data=json.dumps(req_data),
                 verify=False,
                 timeout=self.args.timeout,
                 headers=headers,
@@ -211,11 +211,11 @@ class APIE2ETest:
 
         # If this is a request only execution, just return the request/response object
         if req_only:
-            return req
+            return resp
 
         # Try to set the last response, set an empty dict if we couldn't.
         try:
-            self.last_response = req.json()
+            self.last_response = resp.json()
         except requests.exceptions.JSONDecodeError:
             self.last_response = {}
 
@@ -228,19 +228,19 @@ class APIE2ETest:
                 post_test_exc = exc
 
         # Otherwise, check if the response is valid
-        response_valid = self.__check_resp__(req, test_params, pre_test_exc=pre_test_exc, post_test_exc=post_test_exc)
+        response_valid = self.__check_resp__(resp, test_params, pre_test_exc=pre_test_exc, post_test_exc=post_test_exc)
 
         # Return the JSON response when successful
         if response_valid:
             # Pause this test if the 'pause' parameter is set
             time.sleep(test_params.get("pause", 0))
-            return req.json()
+            return resp.json()
 
         return None
 
     def get_jwt(self, username, password):
         """Requests a new JWT to use for JWT authentication."""
-        req = requests.request(
+        resp = requests.request(
             "POST",
             url=self.args.scheme + "://" + self.args.host + ":" + str(self.args.port) + "/api/v1/access_token",
             verify=False,
@@ -249,99 +249,141 @@ class APIE2ETest:
         )
 
         # Check if the response indicates that JWT is not enabled
-        if req.json().get("return") == 9:
+        if resp.json().get("return") == 9:
             msg = "JWT IS REQUESTED BUT IS NOT ENABLED AS THE API AUTH MODE"
-            print(self.__format_msg__(req.request.method, {"name": "BUILT-IN JWT REQUEST"}, msg, mode="warning"))
+            print(self.__format_msg__(resp.request.method, {"name": "BUILT-IN JWT REQUEST"}, msg, mode="warning"))
             return ""
 
         # Return the token if the request was successful
-        if req.json().get("return") != 0:
+        if resp.json().get("return") != 0:
             # Fail on unexpected response code
             msg = "UNEXPECTED JWT RESPONSE"
-            print(self.__format_msg__(req.request.method, {"name": "BUILT-IN JWT REQUEST"}, msg))
+            print(self.__format_msg__(resp.request.method, {"name": "BUILT-IN JWT REQUEST"}, msg))
             return ""
 
-        return req.json()["data"]["token"]
+        return resp.json()["data"]["token"]
 
     @staticmethod
-    def has_json_response(req):
+    def has_json_response(resp):
         """Checks that our request's response is valid a JSON string."""
         try:
-            req.json()
+            resp.json()
             return True
         except json.decoder.JSONDecodeError:
             return False
 
     @staticmethod
-    def has_correct_http_status(req, test_params):
+    def has_correct_http_status(resp, test_params):
         """Checks if the HTTP status was the expected value."""
-        if req is not None and int(req.status_code) == int(test_params.get("status", 200)):
+        if resp is not None and int(resp.status_code) == int(test_params.get("status", 200)):
             return True
 
         return False
 
     @staticmethod
-    def has_correct_return_code(req, test_params):
+    def has_correct_return_code(resp, test_params):
         """Checks if the API return code was the expected value."""
-        if APIE2ETest.has_json_response(req) and req.json()["return"] == test_params.get("return", 0):
+        if APIE2ETest.has_json_response(resp) and resp.json()["return"] == test_params.get("return", 0):
             return True
 
         return False
 
     @staticmethod
-    def has_correct_resp_time(req, test_params):
+    def has_correct_resp_time(resp, test_params):
         """Checks if response time is within an acceptable threshold. Allow within 1 second variance."""
-        if req.elapsed.total_seconds() < test_params.get("resp_time", 1) + 1:
+        if resp.elapsed.total_seconds() < test_params.get("resp_time", 1) + 1:
             return True
 
         return False
 
-    def __check_resp__(self, req, test_params, pre_test_exc=None, post_test_exc=None):
+    @staticmethod
+    def has_correct_resp_data(resp, test_params):
+        """Checks if the response data matches the expected response data set in the test_params."""
+        # Check if the resp_data is specified in the test_params
+        if test_params.get("resp_data", None):
+            # Loop through each of the expected response data values and ensure they're present in the response
+            for key, val in test_params.get("resp_data").items():
+                # Ensure response data is a dict to proceed
+                if isinstance(resp.json().get("data"), dict):
+                    # Ensure key is present in the dictionary
+                    if key not in resp.json().get("data").keys():
+                        return False
+                    # Ensure value matches
+                    if val == resp.json().get("data").get(key):
+                        return False
+        # Pass this test if we did not find a mismatch in the response data vs the expected response data
+        return True
+
+    @staticmethod
+    def has_empty_resp_data(resp, test_params):
+        """Checks if a successful request resulted in an empty response data body"""
+        # Only check for this if request was successful
+        if resp.status_code == 200:
+            # Check if response data is emtpy and it was not expected
+            if not resp.json().get("data", []) and not test_params.get("resp_data_empty", False):
+                return True
+
+        return False
+
+    def __check_resp__(self, resp, test_params, pre_test_exc=None, post_test_exc=None):
         """Checks if the API response is within the test parameters."""
         # Local variables
         valid = False
 
         # Ensure we received a JSON response
-        if not APIE2ETest.has_json_response(req):
-            msg = f"Expected JSON response, received {req.content}"
-            print(self.__format_msg__(req.request.method, test_params, msg))
+        if not APIE2ETest.has_json_response(resp):
+            msg = f"Expected JSON response, received {resp.content}"
+            print(self.__format_msg__(resp.request.method, test_params, msg))
         # Ensure response has the correct HTTP status code
-        elif not APIE2ETest.has_correct_http_status(req, test_params):
-            received_status = req.status_code
+        elif not APIE2ETest.has_correct_http_status(resp, test_params):
+            received_status = resp.status_code
             expected_status = test_params.get("status", 200)
             msg = f"Expected status code {expected_status}, received {received_status}"
-            print(self.__format_msg__(req.request.method, test_params, msg))
+            print(self.__format_msg__(resp.request.method, test_params, msg))
         # Ensure response has the correct API return code
-        elif not APIE2ETest.has_correct_return_code(req, test_params):
-            received_return = req.json()["return"]
+        elif not APIE2ETest.has_correct_return_code(resp, test_params):
+            received_return = resp.json()["return"]
             expected_return = test_params.get("return", 0)
             msg = f"Expected return code {expected_return}, received {received_return}"
-            print(self.__format_msg__(req.request.method, test_params, msg))
+            print(self.__format_msg__(resp.request.method, test_params, msg))
         # Ensure no exceptions occurred during the pre-test callable
         elif pre_test_exc:
             msg = f"Encountered exception during pre-test callable, received: {pre_test_exc}"
-            print(self.__format_msg__(req.request.method, test_params, msg))
+            print(self.__format_msg__(resp.request.method, test_params, msg))
         # Ensure no exceptions occurred during the post-test callable
         elif post_test_exc:
             msg = f"Encountered exception during post-test callable, received: {post_test_exc}"
-            print(self.__format_msg__(req.request.method, test_params, msg))
+            print(self.__format_msg__(resp.request.method, test_params, msg))
+        # Ensure response data is correct type
+        elif not isinstance(resp.json().get("data"), list) and not isinstance(resp.json().get("data"), dict):
+            msg = "Expected API response data to be type list or dict"
+            print(self.__format_msg__(resp.request.method, test_params, msg))
+        # Ensure response data is expected
+        elif not APIE2ETest.has_correct_resp_data(resp, test_params):
+            msg = "API response did not contain expected response data values"
+            print(self.__format_msg__(resp.request.method, test_params, msg))
+        # Ensure response data is not empty if request is successful, warn otherwise
+        elif APIE2ETest.has_empty_resp_data(resp, test_params):
+            msg = "Request was successful but response data was empty"
+            print(self.__format_msg__(resp.request.method, test_params, msg, mode="warning"))
+            valid = True
         # Ensure response time was within threshold, prints a warning if the response time to was too long
-        elif not APIE2ETest.has_correct_resp_time(req, test_params):
-            received_resp_time = req.elapsed.total_seconds()
+        elif not APIE2ETest.has_correct_resp_time(resp, test_params):
+            received_resp_time = resp.elapsed.total_seconds()
             expected_resp_time = test_params.get("resp_time", 1)
             msg = f"Expected response time within {expected_resp_time}s, received {received_resp_time}s"
-            print(self.__format_msg__(req.request.method, test_params, msg, mode="warning"))
+            print(self.__format_msg__(resp.request.method, test_params, msg, mode="warning"))
             valid = True
         # Otherwise, the response is valid. Print successful test.
         else:
-            print(self.__format_msg__(req.request.method, test_params, "Response is valid", mode="ok"))
+            print(self.__format_msg__(resp.request.method, test_params, "Response is valid", mode="ok"))
             valid = True
 
         # Print detailed response information if test failed or verbose mode is enabled
         if not valid or self.args.verbose:
-            print("RESPONSE STATUS: " + str(req.status_code))
-            print("RESPONSE TIME: " + str(req.elapsed.total_seconds()) + "s")
-            print("RESPONSE DATA: " + req.content.decode())
+            print("RESPONSE STATUS: " + str(resp.status_code))
+            print("RESPONSE TIME: " + str(resp.elapsed.total_seconds()) + "s")
+            print("RESPONSE DATA: " + resp.content.decode())
 
         self.exit_code = 1 if not valid else self.exit_code
         return valid

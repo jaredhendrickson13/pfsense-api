@@ -23,7 +23,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
         {
             "name": "Create IPsec phase 1 for testing",
             "uri": "/api/v1/services/ipsec/phase1",
-            "payload": {
+            "req_data": {
                 "iketype": "ikev2",
                 "protocol": "inet",
                 "interface": "wan",
@@ -43,7 +43,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create valid IPsec phase 2",
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -63,37 +63,37 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check ikeid exists constraint",
             "status": 400,
             "return": 2208,
-            "payload": {"ikeid": "INVALID"}
+            "req_data": {"ikeid": "INVALID"}
         },
         {
             "name": "Check mode required constraint",
             "status": 400,
             "return": 2219,
-            "payload": {"ikeid": 1}
+            "req_data": {"ikeid": 1}
         },
         {
             "name": "Check mode options constraint",
             "status": 400,
             "return": 2220,
-            "payload": {"ikeid": 1, "mode": "INVALID"}
+            "req_data": {"ikeid": 1, "mode": "INVALID"}
         },
         {
             "name": "Check localid required constraint",
             "status": 400,
             "return": 2223,
-            "payload": {"ikeid": 1, "mode": "tunnel"}
+            "req_data": {"ikeid": 1, "mode": "tunnel"}
         },
         {
             "name": "Check localid type options constraint",
             "status": 400,
             "return": 2225,
-            "payload": {"ikeid": 1, "mode": "tunnel", "localid": {"type": "INVALID"}}
+            "req_data": {"ikeid": 1, "mode": "tunnel", "localid": {"type": "INVALID"}}
         },
         {
             "name": "Check localid address required constraint",
             "status": 400,
             "return": 2226,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "address"}
@@ -103,7 +103,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check localid address IP constraint when 'mode' is 'vti'",
             "status": 400,
             "return": 2227,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "vti",
                 "localid": {"type": "address", "address": "INVALID"}
@@ -113,7 +113,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check localid address IPv4 constraint when 'mode' is 'tunnel'",
             "status": 400,
             "return": 2228,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "address", "address": "::1"}
@@ -123,7 +123,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check localid address IPv6 constraint when 'mode' is 'tunnel6'",
             "status": 400,
             "return": 2229,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel6",
                 "localid": {"type": "address", "address": "127.0.0.1"}
@@ -133,7 +133,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check localid netbits required constraint when 'type' is 'network'",
             "status": 400,
             "return": 2230,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.0.1"}
@@ -143,7 +143,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check localid IPv4 netbits minimum constraint when 'type' is 'network'",
             "status": 400,
             "return": 2231,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.0.1", "netbits": -1}
@@ -153,7 +153,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check localid IPv4 netbits maxmimum constraint when 'type' is 'network'",
             "status": 400,
             "return": 2231,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.0.1", "netbits": 33}
@@ -163,7 +163,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check localid IPv6 netbits minimum constraint when 'type' is 'network'",
             "status": 400,
             "return": 2232,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel6",
                 "localid": {"type": "network", "address": "::1", "netbits": -1}
@@ -173,7 +173,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check localid IPv6 netbits maxmimum constraint when 'type' is 'network'",
             "status": 400,
             "return": 2232,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel6",
                 "localid": {"type": "network", "address": "::1", "netbits": 129}
@@ -183,7 +183,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check natlocalid type required constraint",
             "status": 400,
             "return": 2233,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "lan"},
@@ -194,7 +194,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check natlocalid type must match localid type constraint",
             "status": 400,
             "return": 2235,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "address", "address": "127.0.0.1"},
@@ -205,7 +205,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check natlocalid address required constraint",
             "status": 400,
             "return": 2236,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "lan"},
@@ -216,7 +216,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check natlocalid address IPv4 constraint when 'mode' is set to 'tunnel'",
             "status": 400,
             "return": 2237,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "lan"},
@@ -227,7 +227,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check natlocalid address IPv6 constraint when 'mode' is set to 'tunnel6'",
             "status": 400,
             "return": 2238,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel6",
                 "localid": {"type": "lan"},
@@ -238,7 +238,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check natlocalid netbits required constraint when 'type' is 'network'",
             "status": 400,
             "return": 2239,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "lan"},
@@ -249,7 +249,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check natlocalid netbits matches localid netbits constraint",
             "status": 400,
             "return": 2240,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.0.1", "netbits": 24},
@@ -260,7 +260,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check remoteid required constraint",
             "status": 400,
             "return": 2256,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.0.1", "netbits": 24}
@@ -270,7 +270,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check remoteid type required constraint",
             "status": 400,
             "return": 2241,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "address", "address": "127.0.0.1"},
@@ -281,7 +281,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check remoteid type options constraint",
             "status": 400,
             "return": 2242,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "address", "address": "127.0.0.1"},
@@ -292,7 +292,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check remoteid address required constraint",
             "status": 400,
             "return": 2243,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "address", "address": "127.0.0.1"},
@@ -303,7 +303,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check remoteid address IPv4 constraint when 'mode' is 'tunnel'",
             "status": 400,
             "return": 2244,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "address", "address": "127.0.0.1"},
@@ -314,7 +314,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check remoteid address IPv6 constraint when 'mode' is 'tunnel6'",
             "status": 400,
             "return": 2245,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel6",
                 "localid": {"type": "address", "address": "::1"},
@@ -325,7 +325,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check remoteid netbits required constraint when 'type' is 'network'",
             "status": 400,
             "return": 2246,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.0.1", "netbits": 24},
@@ -336,7 +336,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check remoteid netbits minimum constraint when 'mode' is 'tunnel'",
             "status": 400,
             "return": 2247,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.0.1", "netbits": 24},
@@ -347,7 +347,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check remoteid netbits maximum constraint when 'mode' is 'tunnel'",
             "status": 400,
             "return": 2247,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.0.1", "netbits": 24},
@@ -358,7 +358,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check remoteid netbits minimum constraint when 'mode' is 'tunnel6'",
             "status": 400,
             "return": 2248,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel6",
                 "localid": {"type": "network", "address": "::1", "netbits": 24},
@@ -369,7 +369,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check remoteid netbits maximum constraint when 'mode' is 'tunnel6'",
             "status": 400,
             "return": 2248,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel6",
                 "localid": {"type": "network", "address": "::1", "netbits": 24},
@@ -380,7 +380,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check protocol required constraint",
             "status": 400,
             "return": 2221,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -391,7 +391,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check protocol options constraint",
             "status": 400,
             "return": 2222,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -403,7 +403,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check encryption-algorithm-option required constraint when 'protocol' is 'esp'",
             "status": 400,
             "return": 2249,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -415,7 +415,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check encryption-algorithm-option type constraint",
             "status": 400,
             "return": 2250,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -428,7 +428,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check encryption-algorithm-option minimum length constraint",
             "status": 400,
             "return": 2250,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -441,7 +441,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check encryption-algorithm-option options constraint",
             "status": 400,
             "return": 2210,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -454,7 +454,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check hash-algorithm-option required constraint",
             "status": 400,
             "return": 2251,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -467,7 +467,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check hash-algorithm-option type constraint",
             "status": 400,
             "return": 2252,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -481,7 +481,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check hash-algorithm-option minimum length constraint",
             "status": 400,
             "return": 2252,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -495,7 +495,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check hash-algorithm-option options constraint",
             "status": 400,
             "return": 2253,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -509,7 +509,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check pfsgroup requirement constraint",
             "status": 400,
             "return": 2254,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -523,7 +523,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check pfsgroup options constraint",
             "status": 400,
             "return": 2255,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -538,7 +538,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check rekey_time numeric constraint",
             "status": 400,
             "return": 2193,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -554,7 +554,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check rekey_time minimum constraint",
             "status": 400,
             "return": 2193,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -570,7 +570,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check rand_time numeric constraint",
             "status": 400,
             "return": 2195,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -586,7 +586,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check rand_time minimum constraint",
             "status": 400,
             "return": 2195,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -602,7 +602,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check lifetime numeric constraint",
             "status": 400,
             "return": 2196,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -618,7 +618,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check lifetime minimum constraint",
             "status": 400,
             "return": 2196,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -634,7 +634,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check lifetime greater than rekey_time constraint",
             "status": 400,
             "return": 2197,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -650,14 +650,14 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
         {
             "name": "Check ability to apply and initiate ipsec",
             "uri": "/api/v1/services/ipsec/apply",
-            "payload": {"initiate": True}
+            "req_data": {"initiate": True}
         }
     ]
     put_tests = [
         {
             "name": "Update valid IPsec phase 2",
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "address", "address": "127.0.1.0"},
@@ -678,7 +678,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check uniqid exists constraint",
             "status": 400,
             "return": 2258,
-            "payload": {
+            "req_data": {
                 "uniqid": "INVALID"
             }
         },
@@ -687,28 +687,28 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2208,
             "needs_uniqid": True,
-            "payload": {"ikeid": "INVALID"}
+            "req_data": {"ikeid": "INVALID"}
         },
         {
             "name": "Check mode options constraint",
             "status": 400,
             "return": 2220,
             "needs_uniqid": True,
-            "payload": {"ikeid": 1, "mode": "INVALID"}
+            "req_data": {"ikeid": 1, "mode": "INVALID"}
         },
         {
             "name": "Check localid type options constraint",
             "status": 400,
             "return": 2225,
             "needs_uniqid": True,
-            "payload": {"ikeid": 1, "mode": "tunnel", "localid": {"type": "INVALID"}}
+            "req_data": {"ikeid": 1, "mode": "tunnel", "localid": {"type": "INVALID"}}
         },
         {
             "name": "Check localid address required constraint",
             "status": 400,
             "return": 2226,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "address"}
@@ -719,7 +719,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2227,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "vti",
                 "localid": {"type": "address", "address": "INVALID"}
@@ -730,7 +730,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2228,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "address", "address": "::1"}
@@ -741,7 +741,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2229,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel6",
                 "localid": {"type": "address", "address": "127.0.0.1"}
@@ -752,7 +752,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2230,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.0.1"}
@@ -763,7 +763,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2231,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.0.1", "netbits": -1}
@@ -774,7 +774,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2231,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.0.1", "netbits": 33}
@@ -785,7 +785,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2232,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel6",
                 "localid": {"type": "network", "address": "::1", "netbits": -1}
@@ -796,7 +796,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2232,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel6",
                 "localid": {"type": "network", "address": "::1", "netbits": 129}
@@ -807,7 +807,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2233,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "lan"},
@@ -819,7 +819,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2235,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "address", "address": "127.0.0.1"},
@@ -831,7 +831,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2236,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "lan"},
@@ -843,7 +843,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2237,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "lan"},
@@ -855,7 +855,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2238,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel6",
                 "localid": {"type": "lan"},
@@ -867,7 +867,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2239,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "lan"},
@@ -879,7 +879,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2240,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.0.1", "netbits": 24},
@@ -891,7 +891,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2241,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "address", "address": "127.0.0.1"},
@@ -903,7 +903,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2242,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "address", "address": "127.0.0.1"},
@@ -915,7 +915,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2243,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "address", "address": "127.0.0.1"},
@@ -927,7 +927,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2244,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "address", "address": "127.0.0.1"},
@@ -939,7 +939,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2245,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel6",
                 "localid": {"type": "address", "address": "::1"},
@@ -951,7 +951,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2246,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.0.1", "netbits": 24},
@@ -963,7 +963,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2247,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.0.1", "netbits": 24},
@@ -975,7 +975,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2247,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.0.1", "netbits": 24},
@@ -987,7 +987,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2248,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel6",
                 "localid": {"type": "network", "address": "::1", "netbits": 24},
@@ -999,7 +999,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2248,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel6",
                 "localid": {"type": "network", "address": "::1", "netbits": 24},
@@ -1011,7 +1011,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2222,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -1024,7 +1024,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2250,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -1038,7 +1038,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2250,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -1052,7 +1052,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2210,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -1066,7 +1066,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2252,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -1081,7 +1081,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2252,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -1096,7 +1096,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2253,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -1111,7 +1111,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2255,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -1127,7 +1127,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2193,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -1144,7 +1144,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2193,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -1161,7 +1161,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2195,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -1178,7 +1178,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2195,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -1195,7 +1195,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2196,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -1212,7 +1212,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2196,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -1229,7 +1229,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2197,
             "needs_uniqid": True,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "mode": "tunnel",
                 "localid": {"type": "network", "address": "127.0.1.0", "netbits": 24},
@@ -1253,7 +1253,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Check uniqid exists constraint",
             "status": 400,
             "return": 2258,
-            "payload": {
+            "req_data": {
                 "uniqid": "INVALID"
             }
         },
@@ -1261,7 +1261,7 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
             "name": "Delete phase 1 parent",
             "uri": "/api/v1/services/ipsec/phase1",
             "resp_time": 10,
-            "payload": {
+            "req_data": {
                 "ikeid": 1,
                 "apply": True
             }
@@ -1273,8 +1273,8 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
         if len(self.post_responses) == 2:
             for i, test in enumerate(self.put_tests):
                 # Add the unique ID of the phase 2 entry if needed
-                if "needs_uniqid" in test and "payload" in test:
-                    self.put_tests[i]["payload"]["uniqid"] = self.post_responses[1]["data"]["uniqid"]
+                if "needs_uniqid" in test and "req_data" in test:
+                    self.put_tests[i]["req_data"]["uniqid"] = self.post_responses[1]["data"]["uniqid"]
 
 
 APIE2ETestServicesIPsecPhase2()

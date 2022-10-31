@@ -22,7 +22,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
         {
             "name": "Create PRIQ parent traffic shaper",
             "uri": "/api/v1/firewall/traffic_shaper",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "scheduler": "PRIQ",
                 "bandwidthtype": "Gb",
@@ -35,7 +35,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create traffic shaper queue",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "Test_Queue",
                 "priority": 15,
@@ -52,7 +52,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check interface exists validation",
             "status": 400,
             "return": 4111,
-            "payload": {
+            "req_data": {
                 "interface": "INVALID"
             }
         },
@@ -60,7 +60,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check interface traffic shaper exists validation",
             "status": 400,
             "return": 4122,
-            "payload": {
+            "req_data": {
                 "interface": "wan"
             }
         },
@@ -68,7 +68,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check name requirement",
             "status": 400,
             "return": 4123,
-            "payload": {
+            "req_data": {
                 "interface": "lan"
             }
         },
@@ -76,7 +76,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check name character validation",
             "status": 400,
             "return": 4124,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "THIS NAME IS NOT VALID!!!"
             }
@@ -85,7 +85,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check name minimum length constraint",
             "status": 400,
             "return": 4124,    # Regex fails with an empty string, use that error code instead of 4125
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": ""
             }
@@ -94,7 +94,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check name maximum length constraint",
             "status": 400,
             "return": 4125,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "THIS_NAME_IS_TOO_LONG"
             }
@@ -103,7 +103,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check name unique constraint",
             "status": 400,
             "return": 4126,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "Test_Queue"
             }
@@ -112,7 +112,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check PRIQ priority minimum constraint",
             "status": 400,
             "return": 4128,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "priority": -1
@@ -122,7 +122,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check PRIQ priority maximum constraint",
             "status": 400,
             "return": 4128,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "priority": 16
@@ -132,7 +132,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check queue limit minimum constraint",
             "status": 400,
             "return": 4120,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "qlimit": 0
@@ -142,7 +142,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Update to FAIRQ parent traffic shaper",
             "uri": "/api/v1/firewall/traffic_shaper",
             "method": "PUT",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "scheduler": "FAIRQ",
                 "bandwidthtype": "Mb",
@@ -153,7 +153,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check FAIRQ/CBQ priority minimum constraint",
             "status": 400,
             "return": 4127,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "priority": -1
@@ -163,7 +163,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check FAIRQ/CBQ priority maximum constraint",
             "status": 400,
             "return": 4127,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "priority": 8
@@ -173,7 +173,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check bandwidth type validation",
             "status": 400,
             "return": 4116,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "bandwidthtype": "INVALID"
@@ -183,7 +183,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check bandwidth minimum constraint",
             "status": 400,
             "return": 4118,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "bandwidthtype": "Gb",
@@ -194,7 +194,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check percentage-based bandwidth maximum constraint",
             "status": 400,
             "return": 4119,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "bandwidthtype": "%",
@@ -205,7 +205,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check bandwidth parent maximum constraint",
             "status": 400,
             "return": 4129,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "bandwidthtype": "Gb",
@@ -214,7 +214,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create traffic shaper queue to increase child bandwidth",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "Mb-BW_Queue",
                 "bandwidthtype": "Gb",
@@ -226,7 +226,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Create another traffic shaper queue to push sum of child bandwidth over parent maximum",
             "status": 400,
             "return": 4129,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "bandwidthtype": "Mb",
@@ -238,7 +238,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Update to HFSC parent traffic shaper",
             "uri": "/api/v1/firewall/traffic_shaper",
             "method": "PUT",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "scheduler": "HFSC"
             }
@@ -247,7 +247,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check upperlimit3 requirement",
             "status": 400,
             "return": 4133,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "upperlimit": True
@@ -257,7 +257,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check upperlimit3 validation",
             "status": 400,
             "return": 4134,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "upperlimit": True,
@@ -268,7 +268,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check upperlimit1 validation",
             "status": 400,
             "return": 4130,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "upperlimit": True,
@@ -280,7 +280,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check upperlimit2 requirement",
             "status": 400,
             "return": 4131,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "upperlimit": True,
@@ -292,7 +292,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check upperlimit2 validation",
             "status": 400,
             "return": 4132,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "upperlimit": True,
@@ -305,7 +305,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check linkshare3 requirement",
             "status": 400,
             "return": 4138,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "linkshare": True
@@ -315,7 +315,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check linkshare3 validation",
             "status": 400,
             "return": 4139,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "linkshare": True,
@@ -326,7 +326,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check linkshare1 validation",
             "status": 400,
             "return": 4135,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "linkshare": True,
@@ -338,7 +338,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check linkshare2 requirement",
             "status": 400,
             "return": 4136,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "linkshare": True,
@@ -350,7 +350,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check linkshare2 validation",
             "status": 400,
             "return": 4137,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "linkshare": True,
@@ -363,7 +363,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check realtime3 requirement",
             "status": 400,
             "return": 4143,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "realtime": True
@@ -373,7 +373,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check realtime3 validation",
             "status": 400,
             "return": 4144,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "realtime": True,
@@ -384,7 +384,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check realtime1 validation",
             "status": 400,
             "return": 4140,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "realtime": True,
@@ -396,7 +396,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check realtime2 requirement",
             "status": 400,
             "return": 4141,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "realtime": True,
@@ -408,7 +408,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check realtime2 validation",
             "status": 400,
             "return": 4142,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "New_Queue",
                 "realtime": True,
@@ -421,7 +421,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete Test_Queue",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "Test_Queue"
             }
@@ -435,7 +435,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check interface validation",
             "status": 400,
             "return": 4111,
-            "payload": {
+            "req_data": {
                 "interface": "INVALID"
             }
         },
@@ -443,7 +443,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check interface with no traffic shaper",
             "status": 400,
             "return": 4122,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
             }
         },
@@ -451,7 +451,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check name requirement",
             "status": 400,
             "return": 4123,
-            "payload": {
+            "req_data": {
                 "interface": "lan"
             }
         },
@@ -459,7 +459,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
             "name": "Check name validation",
             "status": 400,
             "return": 4145,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "name": "INVALID"
             }
@@ -467,7 +467,7 @@ class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
         {
             "name": "Delete parent traffic shaper",
             "uri": "/api/v1/firewall/traffic_shaper",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "apply": True
             }

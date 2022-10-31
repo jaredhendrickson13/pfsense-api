@@ -8,11 +8,11 @@ class APIE2ETestSystemConsole(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Enable password protected console",
-            "payload": {"disableconsolemenu": True}
+            "req_data": {"disableconsolemenu": True}
         },
         {
             "name": "Disable password protected console",
-            "payload": {"disableconsolemenu": False}
+            "req_data": {"disableconsolemenu": False}
         }
     ]
 

@@ -9,19 +9,19 @@ class APIE2ETestTunable(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Create system tunable",
-            "payload": {"tunable": e2e_test_framework.APIE2ETest.uid, "value": 0, "descr": "E2E test"}
+            "req_data": {"tunable": e2e_test_framework.APIE2ETest.uid, "value": 0, "descr": "E2E test"}
         }
     ]
     put_tests = [
         {
             "name": "Update system tunable",
-            "payload": {"id": e2e_test_framework.APIE2ETest.uid, "value": 2, "descr": "E2E test updated"}
+            "req_data": {"id": e2e_test_framework.APIE2ETest.uid, "value": 2, "descr": "E2E test updated"}
         }
     ]
     delete_tests = [
         {
             "name": "Delete system tunable",
-            "payload": {"id": e2e_test_framework.APIE2ETest.uid}
+            "req_data": {"id": e2e_test_framework.APIE2ETest.uid}
         }
     ]
 

@@ -15,7 +15,7 @@ class APIE2ETestUserGroupMember(e2e_test_framework.APIE2ETest):
             "name": "Check username exists constraint",
             "status": 400,
             "return": 5001,
-            "payload": {
+            "req_data": {
                 "username": "new_user"
             }
         },
@@ -23,7 +23,7 @@ class APIE2ETestUserGroupMember(e2e_test_framework.APIE2ETest):
             "name": "Check group requirement",
             "status": 400,
             "return": 5007,
-            "payload": {
+            "req_data": {
                 "username": "admin"
             }
         },
@@ -31,7 +31,7 @@ class APIE2ETestUserGroupMember(e2e_test_framework.APIE2ETest):
             "name": "Check group exists constraint",
             "status": 400,
             "return": 5008,
-            "payload": {
+            "req_data": {
                 "username": "admin",
                 "group": "INVALID"
             }
@@ -39,7 +39,7 @@ class APIE2ETestUserGroupMember(e2e_test_framework.APIE2ETest):
         {
             "name": "Create group for use in tests",
             "uri": "/api/v1/user/group",
-            "payload": {
+            "req_data": {
                 "name": "TEST_GROUP",
                 "scope": "local",
                 "member": [],
@@ -48,14 +48,14 @@ class APIE2ETestUserGroupMember(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Add user to admins group",
-            "payload": {
+            "req_data": {
                 "username": "admin",
                 "group": ["TEST_GROUP"]
             }
         },
         {
             "name": "Check ability to add single group as string",
-            "payload": {
+            "req_data": {
                 "username": "admin",
                 "group": "TEST_GROUP"
             }
@@ -71,7 +71,7 @@ class APIE2ETestUserGroupMember(e2e_test_framework.APIE2ETest):
             "name": "Check username exists constraint",
             "status": 400,
             "return": 5001,
-            "payload": {
+            "req_data": {
                 "username": "new_user"
             }
         },
@@ -79,7 +79,7 @@ class APIE2ETestUserGroupMember(e2e_test_framework.APIE2ETest):
             "name": "Check group requirement",
             "status": 400,
             "return": 5007,
-            "payload": {
+            "req_data": {
                 "username": "admin"
             }
         },
@@ -87,14 +87,14 @@ class APIE2ETestUserGroupMember(e2e_test_framework.APIE2ETest):
             "name": "Check group exists constraint",
             "status": 400,
             "return": 5008,
-            "payload": {
+            "req_data": {
                 "username": "admin",
                 "group": "INVALID"
             }
         },
         {
             "name": "Remove user from admins group",
-            "payload": {
+            "req_data": {
                 "username": "admin",
                 "group": ["TEST_GROUP"]
             }
@@ -102,14 +102,14 @@ class APIE2ETestUserGroupMember(e2e_test_framework.APIE2ETest):
         {
             "name": "Re-add user to test group",
             "method": "POST",
-            "payload": {
+            "req_data": {
                 "username": "admin",
                 "group": ["TEST_GROUP"]
             }
         },
         {
             "name": "Check ability to remove single group as string",
-            "payload": {
+            "req_data": {
                 "username": "admin",
                 "group": "TEST_GROUP"
             }
@@ -117,7 +117,7 @@ class APIE2ETestUserGroupMember(e2e_test_framework.APIE2ETest):
         {
             "name": "Delete test group",
             "uri": "/api/v1/user/group",
-            "payload": {
+            "req_data": {
                 "id": "TEST_GROUP"
             }
         }

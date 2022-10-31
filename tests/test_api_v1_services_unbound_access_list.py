@@ -23,7 +23,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
         {
             "name": "Create Unbound allow access list",
             "resp_time": 10,
-            "payload": {
+            "req_data": {
                 "aclname": "Test Allow ACL",
                 "aclaction": "allow",
                 "descr": "Unbound allow ACL E2E test",
@@ -39,7 +39,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create Unbound deny access list",
-            "payload": {
+            "req_data": {
                 "aclname": "Test Deny ACL",
                 "aclaction": "deny",
                 "descr": "Unbound deny ACL E2E test",
@@ -54,7 +54,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create Unbound refuse access list",
-            "payload": {
+            "req_data": {
                 "aclname": "Test Refuse ACL",
                 "aclaction": "refuse",
                 "descr": "Unbound refuse ACL E2E test",
@@ -69,7 +69,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create Unbound allow snoop access list",
-            "payload": {
+            "req_data": {
                 "aclname": "Test Allow Snoop ACL",
                 "aclaction": "allow snoop",
                 "descr": "Unbound allow snoop ACL E2E test",
@@ -84,7 +84,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create Unbound refuse non local access list",
-            "payload": {
+            "req_data": {
                 "aclname": "Test Refuse Nonlocal ACL",
                 "aclaction": "refuse nonlocal",
                 "descr": "Unbound refuse nonlocal ACL E2E test",
@@ -99,7 +99,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create Unbound deny nonlocal access list",
-            "payload": {
+            "req_data": {
                 "aclname": "Test Deny Nonlocal ACL",
                 "aclaction": "deny nonlocal",
                 "descr": "Unbound deny nonlocal ACL E2E test",
@@ -121,7 +121,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list action choice constraint",
             "status": 400,
             "return": 2067,
-            "payload": {
+            "req_data": {
                 "aclaction": "invalid choice"
             }
         },
@@ -129,7 +129,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row requirement",
             "status": 400,
             "return": 2073,
-            "payload": {
+            "req_data": {
                 "aclaction": "allow"
             }
         },
@@ -137,7 +137,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row minimum constraint",
             "status": 400,
             "return": 2073,
-            "payload": {
+            "req_data": {
                 "aclaction": "allow",
                 "row": []
             }
@@ -146,7 +146,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row network requirement",
             "status": 400,
             "return": 2068,
-            "payload": {
+            "req_data": {
                 "aclaction": "allow",
                 "row": [{}]
             }
@@ -155,7 +155,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row network IP validation",
             "status": 400,
             "return": 2069,
-            "payload": {
+            "req_data": {
                 "aclaction": "allow",
                 "row": [
                     {
@@ -168,7 +168,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row network mask requirement",
             "status": 400,
             "return": 2071,
-            "payload": {
+            "req_data": {
                 "aclaction": "allow",
                 "row": [
                     {
@@ -181,7 +181,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row network mask IPv4 minimum constraint",
             "status": 400,
             "return": 2070,
-            "payload": {
+            "req_data": {
                 "aclaction": "allow",
                 "row": [
                     {
@@ -195,7 +195,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row network mask IPv6 minimum constraint",
             "status": 400,
             "return": 2070,
-            "payload": {
+            "req_data": {
                 "aclaction": "allow",
                 "row": [
                     {
@@ -209,7 +209,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row network mask IPv4 maximum constraint",
             "status": 400,
             "return": 2070,
-            "payload": {
+            "req_data": {
                 "aclaction": "allow",
                 "row": [
                     {
@@ -223,7 +223,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row network mask IPv6 maximum constraint",
             "status": 400,
             "return": 2070,
-            "payload": {
+            "req_data": {
                 "aclaction": "allow",
                 "row": [
                     {
@@ -237,7 +237,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update Unbound access list",
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "aclname": "Updated Test Deny ACL",
                 "aclaction": "deny",
@@ -260,7 +260,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list ID exists constraint",
             "status": 400,
             "return": 2074,
-            "payload": {
+            "req_data": {
                 "id": "invalid"
             }
         },
@@ -268,7 +268,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list action choice constraint",
             "status": 400,
             "return": 2067,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "aclaction": "invalid choice"
             }
@@ -277,7 +277,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row minimum constraint",
             "status": 400,
             "return": 2073,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "aclaction": "allow",
                 "row": []
@@ -287,7 +287,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row network requirement",
             "status": 400,
             "return": 2068,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "aclaction": "allow",
                 "row": [{}]
@@ -297,7 +297,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row network IP validation",
             "status": 400,
             "return": 2069,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "aclaction": "allow",
                 "row": [
@@ -311,7 +311,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row network mask requirement",
             "status": 400,
             "return": 2071,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "aclaction": "allow",
                 "row": [
@@ -325,7 +325,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row network mask IPv4 minimum constraint",
             "status": 400,
             "return": 2070,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "aclaction": "allow",
                 "row": [
@@ -340,7 +340,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row network mask IPv6 minimum constraint",
             "status": 400,
             "return": 2070,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "aclaction": "allow",
                 "row": [
@@ -355,7 +355,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row network mask IPv4 maximum constraint",
             "status": 400,
             "return": 2070,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "aclaction": "allow",
                 "row": [
@@ -370,7 +370,7 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list row network mask IPv6 maximum constraint",
             "status": 400,
             "return": 2070,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "aclaction": "allow",
                 "row": [
@@ -392,44 +392,44 @@ class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
             "name": "Check access list ID exists constraint",
             "status": 400,
             "return": 2074,
-            "payload": {
+            "req_data": {
                 "id": "invalid"
             }
         },
         {
             "name": "Delete Unbound access list",
-            "payload": {
+            "req_data": {
                 "id": 0
             }
         },
         {
             "name": "Delete Unbound access list",
-            "payload": {
+            "req_data": {
                 "id": 0
             }
         },
         {
             "name": "Delete Unbound access list",
-            "payload": {
+            "req_data": {
                 "id": 0
             }
         },
         {
             "name": "Delete Unbound access list",
-            "payload": {
+            "req_data": {
                 "id": 0
             }
         },
         {
             "name": "Delete Unbound access list",
-            "payload": {
+            "req_data": {
                 "id": 0
             }
         },
         {
             "name": "Delete Unbound access list",
             "resp_time": 8,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "apply": True
             }

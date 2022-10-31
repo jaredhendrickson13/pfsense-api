@@ -22,7 +22,7 @@ class APIE2ETestSystemAPI(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update API configuration",
-            "payload": {
+            "req_data": {
                 "persist": False,
                 "jwt_exp": 86400,
                 "keyhash": "sha512",
@@ -33,7 +33,7 @@ class APIE2ETestSystemAPI(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Revert API configuration to default",
-            "payload": {
+            "req_data": {
                 "persist": True,
                 "jwt_exp": 3600,
                 "keyhash": "sha256",
@@ -46,7 +46,7 @@ class APIE2ETestSystemAPI(e2e_test_framework.APIE2ETest):
             "name": "Test JWT expiration maximum threshold",
             "status": 400,
             "return": 1022,
-            "payload": {
+            "req_data": {
                 "jwt_exp": 86401
             }
         },
@@ -54,7 +54,7 @@ class APIE2ETestSystemAPI(e2e_test_framework.APIE2ETest):
             "name": "Test JWT expiration minimum threshold",
             "status": 400,
             "return": 1022,
-            "payload": {
+            "req_data": {
                 "jwt_exp": 299
             }
         },
@@ -62,7 +62,7 @@ class APIE2ETestSystemAPI(e2e_test_framework.APIE2ETest):
             "name": "Test invalid hash algorithm",
             "status": 400,
             "return": 1023,
-            "payload": {
+            "req_data": {
                 "keyhash": "INVALID"
             }
         },
@@ -70,7 +70,7 @@ class APIE2ETestSystemAPI(e2e_test_framework.APIE2ETest):
             "name": "Test invalid key bytes",
             "status": 400,
             "return": 1024,
-            "payload": {
+            "req_data": {
                 "keybytes": "INVALID"
             }
         },
@@ -78,7 +78,7 @@ class APIE2ETestSystemAPI(e2e_test_framework.APIE2ETest):
             "name": "Test invalid interface",
             "status": 400,
             "return": 1020,
-            "payload": {
+            "req_data": {
                 "allowed_interfaces": ["INVALID"]
             }
         },
@@ -86,7 +86,7 @@ class APIE2ETestSystemAPI(e2e_test_framework.APIE2ETest):
             "name": "Test invalid access list",
             "status": 400,
             "return": 1072,
-            "payload": {
+            "req_data": {
                 "access_list": ["INVALID"]
             }
         },
@@ -94,43 +94,43 @@ class APIE2ETestSystemAPI(e2e_test_framework.APIE2ETest):
             "name": "Test custom_headers type constraint",
             "status": 400,
             "return": 1025,
-            "payload": {"custom_headers": "INVALID"}
+            "req_data": {"custom_headers": "INVALID"}
         },
         {
             "name": "Test custom_headers key-value type constraints",
             "status": 400,
             "return": 1026,
-            "payload": {"custom_headers": {0: True}}
+            "req_data": {"custom_headers": {0: True}}
         },
         {
             "name": "Test hasync_hosts minimum constraint",
             "status": 400,
             "return": 1027,
-            "payload": {"hasync": True, "hasync_hosts": []}
+            "req_data": {"hasync": True, "hasync_hosts": []}
         },
         {
             "name": "Test hasync_hosts IP/FQDN constraint",
             "status": 400,
             "return": 1028,
-            "payload": {"hasync": True, "hasync_hosts": [True]}
+            "req_data": {"hasync": True, "hasync_hosts": [True]}
         },
         {
             "name": "Test hasync_username required constraint",
             "status": 400,
             "return": 1029,
-            "payload": {"hasync": True, "hasync_hosts": ["127.0.0.1"]}
+            "req_data": {"hasync": True, "hasync_hosts": ["127.0.0.1"]}
         },
         {
             "name": "Test hasync_username required",
             "status": 400,
             "return": 1029,
-            "payload": {"hasync": True, "hasync_hosts": ["127.0.0.1"], "hasync_username": "test"}
+            "req_data": {"hasync": True, "hasync_hosts": ["127.0.0.1"], "hasync_username": "test"}
         },
         {
             "name": "Test authmode options constraint",
             "status": 400,
             "return": 1021,
-            "payload": {"authmode": "INVALID"}
+            "req_data": {"authmode": "INVALID"}
         }
     ]
 

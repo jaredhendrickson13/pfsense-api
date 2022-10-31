@@ -25,7 +25,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
         {
             "name": "Create firewall alias for testing",
             "uri": "/api/v1/firewall/alias",
-            "payload": {
+            "req_data": {
                 "name": "TEST_ALIAS",
                 "type": "host",
                 "address": "1.1.1.1"
@@ -40,7 +40,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check physical interface exists constraint",
             "status": 400,
             "return": 3000,
-            "payload": {
+            "req_data": {
                 "if": "INVALID"
             }
         },
@@ -48,7 +48,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check physical interface in use constraint",
             "status": 400,
             "return": 3001,
-            "payload": {
+            "req_data": {
                 "if": "em0"
             }
         },
@@ -56,7 +56,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check IPv4 type option constraint",
             "status": 400,
             "return": 3025,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "type": "INVALID"
             }
@@ -65,7 +65,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check IPv4 type option constraint",
             "status": 400,
             "return": 3041,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "type6": "INVALID"
             }
@@ -74,7 +74,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check spoof MAC address validation",
             "status": 400,
             "return": 3003,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "spoofmac": "INVALID"
             }
@@ -83,7 +83,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check MTU minimum constraint",
             "status": 400,
             "return": 3004,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "mtu": 1279
             }
@@ -92,7 +92,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check MTU maximum constraint",
             "status": 400,
             "return": 3004,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "mtu": 8193
             }
@@ -101,7 +101,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check MSS minimum constraint",
             "status": 400,
             "return": 3005,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "mss": 575
             }
@@ -110,7 +110,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check MSS maximum constraint",
             "status": 400,
             "return": 3005,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "mss": 65536
             }
@@ -119,7 +119,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check media choices constraint",
             "status": 400,
             "return": 3007,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "media": "INVALID"
             }
@@ -128,7 +128,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check description cannot start with pkg_",
             "status": 400,
             "return": 3059,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "pkg_INVALID"
             }
@@ -137,7 +137,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check description cannot match existing alias name",
             "status": 400,
             "return": 3060,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST_ALIAS"
             }
@@ -146,7 +146,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check description cannot be numeric",
             "status": 400,
             "return": 3061,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "10051"
             }
@@ -155,7 +155,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check description cannot be in use",
             "status": 400,
             "return": 3008,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "WAN"
             }
@@ -164,7 +164,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv4 address requirement",
             "status": 400,
             "return": 3011,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "staticv4"
@@ -174,7 +174,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv4 address validation",
             "status": 400,
             "return": 3010,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "staticv4",
@@ -185,7 +185,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv4 address in use constraint",
             "status": 400,
             "return": 3009,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "staticv4",
@@ -196,7 +196,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv4 address subnet requirement",
             "status": 400,
             "return": 3013,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "staticv4",
@@ -207,7 +207,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv4 gateway exists constraint",
             "status": 400,
             "return": 3014,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "staticv4",
@@ -220,7 +220,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP IPv4 alias address validation",
             "status": 400,
             "return": 3015,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "dhcp",
@@ -231,7 +231,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP IPv4 alias subnet validation",
             "status": 400,
             "return": 3015,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "dhcp",
@@ -243,7 +243,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP reject from address validation",
             "status": 400,
             "return": 3016,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "dhcp",
@@ -254,7 +254,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP protocol timing timeout minimum constraint",
             "status": 400,
             "return": 3017,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "dhcp",
@@ -265,7 +265,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP protocol timing retry minimum constraint",
             "status": 400,
             "return": 3018,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "dhcp",
@@ -276,7 +276,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP protocol timing select timeout minimum constraint",
             "status": 400,
             "return": 3019,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "dhcp",
@@ -287,7 +287,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP protocol timing reboot minimum constraint",
             "status": 400,
             "return": 3020,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "dhcp",
@@ -298,7 +298,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP protocol timing backoff cutoff minimum constraint",
             "status": 400,
             "return": 3021,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "dhcp",
@@ -309,7 +309,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP protocol timing initial interval minimum constraint",
             "status": 400,
             "return": 3022,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "dhcp",
@@ -320,7 +320,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP config file override exists constraint",
             "status": 400,
             "return": 3023,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "dhcp",
@@ -332,7 +332,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP VLAN priority choice constraint",
             "status": 400,
             "return": 3024,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type": "dhcp",
@@ -344,7 +344,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv6 address requirement",
             "status": 400,
             "return": 3028,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type6": "staticv6"
@@ -354,7 +354,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv6 address validation",
             "status": 400,
             "return": 3026,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type6": "staticv6",
@@ -365,7 +365,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv6 address subnet requirement",
             "status": 400,
             "return": 3030,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type6": "staticv6",
@@ -376,7 +376,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv6 address subnet requirement",
             "status": 400,
             "return": 3029,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type6": "staticv6",
@@ -388,7 +388,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv6 gateway exists constraint",
             "status": 400,
             "return": 3031,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type6": "staticv6",
@@ -401,7 +401,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP IPv6 prefix delegation size choice constraint",
             "status": 400,
             "return": 3032,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type6": "dhcp6",
@@ -412,7 +412,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP IPv6 VLAN priority choice constraint",
             "status": 400,
             "return": 3033,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type6": "dhcp6",
@@ -424,7 +424,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP IPv6 VLAN priority choice constraint",
             "status": 400,
             "return": 3034,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type6": "dhcp6",
@@ -436,7 +436,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check 6RD IPv6 gateway requirement",
             "status": 400,
             "return": 3036,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type6": "6rd"
@@ -446,7 +446,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check 6RD IPv6 gateway validation",
             "status": 400,
             "return": 3035,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type6": "6rd",
@@ -457,7 +457,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check 6RD IPv6 prefix length minimum constraint",
             "status": 400,
             "return": 3037,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type6": "6rd",
@@ -469,7 +469,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check 6RD IPv6 prefix length maximum constraint",
             "status": 400,
             "return": 3037,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type6": "6rd",
@@ -481,7 +481,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check Track6 IPv6 interface requirement",
             "status": 400,
             "return": 3039,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type6": "track6"
@@ -491,7 +491,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check Track6 IPv6 interface exists constraint",
             "status": 400,
             "return": 3038,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "TEST",
                 "type6": "track6",
@@ -501,7 +501,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
         {
             "name": "Create interface bridge for testing",
             "uri": "/api/v1/interface/bridge",
-            "payload": {
+            "req_data": {
                 "members": "em1"
             }
         },
@@ -509,14 +509,14 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Create interface VLAN for testing",
             "uri": "/api/v1/interface/vlan",
             "resp_time": 5,
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "tag": 2
             }
         },
         {
             "name": "Create a staticv4/staticv6 interface",
-            "payload": {
+            "req_data": {
                 "if": "em2",
                 "descr": "e2e_test",
                 "enable": True,
@@ -531,7 +531,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create a static interface on the bridge",
-            "payload": {
+            "req_data": {
                 "if": "bridge0",
                 "descr": "BRIDGE_TEST",
                 "enable": True,
@@ -545,7 +545,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check MTU less than VLAN parent interface constraint",
             "status": 400,
             "return": 3006,
-            "payload": {
+            "req_data": {
                 "if": "em2.2",
                 "mtu": 8192
             }
@@ -555,7 +555,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update staticv4/staticv6 interface to dhcp/dhcp6 and apply",
-            "payload": {
+            "req_data": {
                 "id": "em2",
                 "descr": "e2e_test_UPDATED",
                 "enable": False,
@@ -570,7 +570,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete interface",
-            "payload": {
+            "req_data": {
                 "if": "em2"
             }
         },
@@ -579,34 +579,34 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "uri": "/api/v1/interface/bridge",
             "status": 400,
             "return": 3073,
-            "payload": {
+            "req_data": {
                 "id": "bridge0"
             }
         },
         {
             "name": "Delete bridged interface",
-            "payload": {
+            "req_data": {
                 "if": "bridge0"
             }
         },
         {
             "name": "Delete interface bridge",
             "uri": "/api/v1/interface/bridge",
-            "payload": {
+            "req_data": {
                 "id": "bridge0"
             }
         },
         {
             "name": "Delete interface VLAN",
             "uri": "/api/v1/interface/vlan",
-            "payload": {
+            "req_data": {
                 "vlanif": "em2.2"
             }
         },
         {
             "name": "Delete test firewall alias",
             "uri": "/api/v1/firewall/alias",
-            "payload": {
+            "req_data": {
                 "id": "TEST_ALIAS"
             }
         }

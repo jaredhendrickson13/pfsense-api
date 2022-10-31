@@ -430,8 +430,8 @@ The APIE2ETest class requires you to override a some properties to function corr
 GET requests, you do not need to override this property. If this endpoint does support GET request, but does not require
 any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
     - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
-    - `payload` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
-    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
+    - `req_data` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
+    - `resp_data` : a nested dictionary that contains the expected API response data.    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
     - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
     - `delay` : an integer that specifies how many seconds a test should wait until starting
@@ -442,17 +442,17 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
       a test failure by raising any exception during the function call.
     - `post_test_callable` : the name of a function callable to run after this test is run. This callable can initiate
       a test failure by raising any exception during the function call.
-    - `payload_callable` : the name of a function callable to run to dynamically generate the request payload. This
+    - `req_data_callable` : the name of a function callable to run to dynamically generate the request payload. This
       must be a function that returns a dictionary of request payload items. This can be used to apply request payload
-      items that may by dynamic such as IDs. If this test also has a `payload` specified, this callable will simply 
-      be merged into the test's `payload`. 
+      items that may by dynamic such as IDs. If this test also has a `req_data` specified, this callable will simply 
+      be merged into the test's `req_data`. 
     
 - `post_tests` : A list of dictionary formatted test parameters for POST requests. If this endpoint does not support 
 POST requests, you do not need to override this property. If this endpoint does support POST request, but does not require
 any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
     - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
-    - `payload` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
-    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
+    - `req_data` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
+    - `resp_data` : a nested dictionary that contains the expected API response data.    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
     - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
     - `delay` : an integer that specifies how many seconds a test should wait until starting
@@ -463,17 +463,17 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
       a test failure by raising any exception during the function call.
     - `post_test_callable` : the name of a function callable to run after this test is run. This callable can initiate
       a test failure by raising any exception during the function call.
-    - `payload_callable` : the name of a function callable to run to dynamically generate the request payload. This
+    - `req_data_callable` : the name of a function callable to run to dynamically generate the request payload. This
       must be a function that returns a dictionary of request payload items. This can be used to apply request payload
-      items that may by dynamic such as IDs. If this test also has a `payload` specified, this callable will simply 
-      be merged into the test's `payload`. 
+      items that may by dynamic such as IDs. If this test also has a `req_data` specified, this callable will simply 
+      be merged into the test's `req_data`. 
   
 - `put_tests` : A list of dictionary formatted test parameters for PUT requests. If this endpoint does not support 
 PUT requests, you do not need to override this property. If this endpoint does support PUT request, but does not require
 any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
     - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
-    - `payload` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
-    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
+    - `req_data` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
+    - `resp_data` : a nested dictionary that contains the expected API response data.    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
     - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
     - `delay` : an integer that specifies how many seconds a test should wait until starting
@@ -484,16 +484,17 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
       a test failure by raising any exception during the function call.
     - `post_test_callable` : the name of a function callable to run after this test is run. This callable can initiate
       a test failure by raising any exception during the function call.
-    - `payload_callable` : the name of a function callable to run to dynamically generate the request payload. This
+    - `req_data_callable` : the name of a function callable to run to dynamically generate the request payload. This
       must be a function that returns a dictionary of request payload items. This can be used to apply request payload
-      items that may by dynamic such as IDs. If this test also has a `payload` specified, this callable will simply 
-      be merged into the test's `payload`. 
+      items that may by dynamic such as IDs. If this test also has a `req_data` specified, this callable will simply 
+      be merged into the test's `req_data`. 
 
 - `delete_tests` : A list of dictionary formatted test parameters for DELETE requests. If this endpoint does not support 
 DELETE requests, you do not need to override this property. If this endpoint does support DELETE request, but does not require
 any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
     - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
-    - `payload` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
+    - `req_data` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
+    - `resp_data` : a nested dictionary that contains the expected API response data.
     - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
     - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
@@ -506,10 +507,10 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
       a test failure by raising any exception during the function call.
     - `post_test_callable` : the name of a function callable to run after this test is run. This callable can initiate
       a test failure by raising any exception during the function call.
-    - `payload_callable` : the name of a function callable to run to dynamically generate the request payload. This
+    - `req_data_callable` : the name of a function callable to run to dynamically generate the request payload. This
       must be a function that returns a dictionary of request payload items. This can be used to apply request payload
-      items that may by dynamic such as IDs. If this test also has a `payload` specified, this callable will simply 
-      be merged into the test's `payload`. 
+      items that may by dynamic such as IDs. If this test also has a `req_data` specified, this callable will simply 
+      be merged into the test's `req_data`. 
 
 - `get_responses` : A list of previously executed GET requests in a dictionary format. Failing responses will not be 
 included.
@@ -526,11 +527,11 @@ included.
 #### Other Base Model Properties
 The APIE2ETest class also contains a few properties that are not intended to be overridden:
 
-- `uid` : a unique ID that can be used for payload fields that required a unique value
+- `uid` : a unique ID that can be used for req_data fields that require a unique value
 
 #### Overriding Base Model Methods ####
 There are methods that will assist you when you need to dynamically format API request data. These are typically used 
-when you need to add payload data that is dependent on a previous API response. The following methods may 
+when you need to add request data that is dependent on a previous API response. The following methods may 
 overridden:
 
 - `pre_get()` : Runs before the GET request is made.
@@ -554,7 +555,7 @@ class NewAPIE2ETest(e2e_test_framework.APIE2ETest):
     get_requests = [{}]
     post_requests = [
         {   
-            "payload": {
+            "req_data": {
                 "some_parameter": "some value to create"
             },
             "status": 400,
@@ -562,7 +563,7 @@ class NewAPIE2ETest(e2e_test_framework.APIE2ETest):
             "resp_time": 0.5
         },
         {   
-            "payload": {
+            "req_data": {
                 "some_other parameter": "some other value to create"
             },
             "status": 200,
@@ -571,7 +572,7 @@ class NewAPIE2ETest(e2e_test_framework.APIE2ETest):
         },    ]
     put_requests = [
         {   
-            "payload": {
+            "req_data": {
                 "some_parameter": "some value to update"
             },
             "status": 400,
@@ -579,7 +580,7 @@ class NewAPIE2ETest(e2e_test_framework.APIE2ETest):
             "resp_time": 0.5
         },
         {   
-            "payload": {
+            "req_data": {
                 "some_other parameter": "some other value to update"
             },
             "status": 200,
@@ -589,7 +590,7 @@ class NewAPIE2ETest(e2e_test_framework.APIE2ETest):
     ]  
     delete_requests = [
         {   
-            "payload": {
+            "req_data": {
                 "some_parameter": "some value to delete"
             },
             "status": 200,
@@ -613,6 +614,7 @@ E2E tests will check API responses for the following:
 - API responses include the correct HTTP status code
 - API responses include the expected API return code
 - API responses are received within an acceptable time frame
+- API response data is expected
 - CRUD success. POST requests are always run first, then GET requests to check that the creation was successful, then
 PUT requests attempt to update the created object, then finally DELETE requests attempt to destroy the object. 
 

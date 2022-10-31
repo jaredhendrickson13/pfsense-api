@@ -24,7 +24,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Create IPv4 routing gateway",
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "name": "TEST_ROUTING_GATEWAY_V4",
                 "ipprotocol": "inet",
@@ -35,7 +35,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create IPv6 routing gateway",
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "name": "TEST_ROUTING_GATEWAY_V6",
                 "ipprotocol": "inet6",
@@ -47,7 +47,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Create a IPv4 static route using IPv4 routing gateway",
             "resp_time": 5,
             "uri": "/api/v1/routing/static_route",
-            "payload": {
+            "req_data": {
                 "network": "1.2.3.4/32",
                 "gateway": "TEST_ROUTING_GATEWAY_V4",
                 "apply": True
@@ -58,7 +58,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "method": "POST",
             "post_test_callable": "check_for_static_route_created",
             "uri": "/api/v1/diagnostics/command_prompt",
-            "payload": {"shell_cmd": "netstat -rn"}
+            "req_data": {"shell_cmd": "netstat -rn"}
         },
         {
             "name": "Check interface requirement",
@@ -69,7 +69,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check interface exists constraint",
             "status": 400,
             "return": 6008,
-            "payload": {
+            "req_data": {
                 "interface": "INVALID"
             }
         },
@@ -77,7 +77,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check IP protocol requirement",
             "status": 400,
             "return": 6009,
-            "payload": {
+            "req_data": {
                 "interface": "wan"
             }
         },
@@ -85,7 +85,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check IP protocol choice constraint",
             "status": 400,
             "return": 6010,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "INVALID"
             }
@@ -94,7 +94,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check name requirement",
             "status": 400,
             "return": 6011,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet"
             }
@@ -103,7 +103,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check name character constraint",
             "status": 400,
             "return": 6012,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "!@#INVALID NAME<>?^&*()"
@@ -113,7 +113,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check name unique constraint",
             "status": 400,
             "return": 6026,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "WAN_DHCP"
@@ -123,7 +123,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check gateway address requirement",
             "status": 400,
             "return": 6013,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST"
@@ -133,7 +133,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check gateway address validation",
             "status": 400,
             "return": 6014,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST",
@@ -144,7 +144,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check non-dynamic interface gateway constraint",
             "status": 400,
             "return": 6029,
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "ipprotocol": "inet",
                 "name": "TEST",
@@ -153,7 +153,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Check dynamic IPv4 gateway override",
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "DYNAMICv4",
@@ -164,7 +164,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check dynamic IPv4 gateway override maximum constraint",
             "status": 400,
             "return": 6029,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "NEWDYNAMICv4",
@@ -173,7 +173,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Check dynamic IPv6 gateway override",
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "DYNAMICv6",
@@ -184,7 +184,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check dynamic IPv6 gateway override maximum constraint",
             "status": 400,
             "return": 6029,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "NEWDYNAMICv6",
@@ -195,7 +195,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check monitor IP validation",
             "status": 400,
             "return": 6025,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
@@ -207,7 +207,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check weight minimum constraint",
             "status": 400,
             "return": 6015,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
@@ -219,7 +219,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check weight maximum constraint",
             "status": 400,
             "return": 6015,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
@@ -228,22 +228,22 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             }
         },
         {
-            "name": "Check data payload minimum constraint",
+            "name": "Check data req_data minimum constraint",
             "status": 400,
             "return": 6016,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
-                "data_payload": 0
+                "data_req_data": 0
             }
         },
         {
             "name": "Check low latency minimum constraint",
             "status": 400,
             "return": 6017,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
@@ -255,7 +255,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check high latency minimum constraint",
             "status": 400,
             "return": 6018,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
@@ -268,7 +268,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check low loss minimum constraint",
             "status": 400,
             "return": 6019,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
@@ -280,7 +280,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check low loss maximum constraint",
             "status": 400,
             "return": 6019,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
@@ -292,7 +292,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check high loss minimum constraint",
             "status": 400,
             "return": 6020,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
@@ -305,7 +305,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check high loss minimum constraint",
             "status": 400,
             "return": 6020,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
@@ -318,7 +318,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check interval minimum constraint",
             "status": 400,
             "return": 6021,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
@@ -330,7 +330,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check interval maximum constraint",
             "status": 400,
             "return": 6021,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
@@ -342,7 +342,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check loss interval minimum constraint",
             "status": 400,
             "return": 6022,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
@@ -354,7 +354,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check time period minimum constraint",
             "status": 400,
             "return": 6023,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
@@ -366,7 +366,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check alert interval minimum constraint",
             "status": 400,
             "return": 6024,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
@@ -379,7 +379,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
         {
             "name": "Update IPv4 routing gateway",
             "resp_time": 5,
-            "payload": {
+            "req_data": {
                 "id": "TEST_ROUTING_GATEWAY_V4",
                 "name": "UPDATED_TEST_ROUTING_GATEWAY_V4",
                 "ipprotocol": "inet",
@@ -390,7 +390,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
                 "action_disable": True,
                 "monitor_disable": True,
                 "weight": 2,
-                "data_payload": 5,
+                "data_req_data": 5,
                 "latencylow": 300,
                 "latencyhigh": 600,
                 "interval": 2100,
@@ -406,7 +406,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Ensure gateway cannot be disabled while in use",
             "status": 400,
             "return": 6030,
-            "payload": {
+            "req_data": {
                 "id": "UPDATED_TEST_ROUTING_GATEWAY_V4",
                 "disabled": True
             }
@@ -416,11 +416,11 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "method": "POST",
             "post_test_callable": "check_for_static_route_updated",
             "uri": "/api/v1/diagnostics/command_prompt",
-            "payload": {"shell_cmd": "netstat -rn"}
+            "req_data": {"shell_cmd": "netstat -rn"}
         },
         {
             "name": "Update IPv6 routing gateway",
-            "payload": {
+            "req_data": {
                 "id": "TEST_ROUTING_GATEWAY_V6",
                 "name": "UPDATED_TEST_ROUTING_GATEWAY_V6",
                 "ipprotocol": "inet6",
@@ -431,7 +431,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
                 "action_disable": True,
                 "monitor_disable": True,
                 "weight": 2,
-                "data_payload": 5,
+                "data_req_data": 5,
                 "latencylow": 300,
                 "latencyhigh": 600,
                 "interval": 2100,
@@ -451,7 +451,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check ID exists constraint",
             "status": 400,
             "return": 6028,
-            "payload": {
+            "req_data": {
                 "id": "INVALID"
             }
         },
@@ -459,7 +459,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check interface exists constraint",
             "status": 400,
             "return": 6008,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "INVALID"
             }
@@ -468,7 +468,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check IP protocol choice constraint",
             "status": 400,
             "return": 6010,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "ipprotocol": "INVALID"
@@ -478,7 +478,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check name character constraint",
             "status": 400,
             "return": 6012,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -489,7 +489,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check name unique constraint",
             "status": 400,
             "return": 6026,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -500,7 +500,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check gateway address validation",
             "status": 400,
             "return": 6014,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -512,7 +512,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check non-dynamic interface gateway constraint",
             "status": 400,
             "return": 6029,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "lan",
                 "ipprotocol": "inet",
@@ -524,7 +524,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check dynamic IPv4 gateway override maximum constraint",
             "status": 400,
             "return": 6029,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -536,7 +536,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check dynamic IPv6 gateway override maximum constraint",
             "status": 400,
             "return": 6029,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -548,7 +548,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check monitor IP validation",
             "status": 400,
             "return": 6025,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -561,7 +561,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check weight minimum constraint",
             "status": 400,
             "return": 6015,
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -574,7 +574,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check weight maximum constraint",
             "status": 400,
             "return": 6015,
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -584,23 +584,23 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             }
         },
         {
-            "name": "Check data payload minimum constraint",
+            "name": "Check data req_data minimum constraint",
             "status": 400,
             "return": 6016,
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
-                "data_payload": 0
+                "data_req_data": 0
             }
         },
         {
             "name": "Check low latency minimum constraint",
             "status": 400,
             "return": 6017,
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -613,7 +613,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check high latency minimum constraint",
             "status": 400,
             "return": 6018,
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -627,7 +627,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check low loss minimum constraint",
             "status": 400,
             "return": 6019,
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -640,7 +640,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check low loss maximum constraint",
             "status": 400,
             "return": 6019,
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -653,7 +653,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check high loss minimum constraint",
             "status": 400,
             "return": 6020,
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -667,7 +667,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check high loss minimum constraint",
             "status": 400,
             "return": 6020,
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -681,7 +681,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check interval minimum constraint",
             "status": 400,
             "return": 6021,
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -694,7 +694,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check interval maximum constraint",
             "status": 400,
             "return": 6021,
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -707,7 +707,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check loss interval minimum constraint",
             "status": 400,
             "return": 6022,
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -720,7 +720,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check time period minimum constraint",
             "status": 400,
             "return": 6023,
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -733,7 +733,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check alert interval minimum constraint",
             "status": 400,
             "return": 6024,
-            "payload": {
+            "req_data": {
                 "id": 1,
                 "interface": "wan",
                 "ipprotocol": "inet6",
@@ -748,13 +748,13 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Ensure gateway cannot be deleted while in use",
             "status": 400,
             "return": 6031,
-            "payload": {"id": "UPDATED_TEST_ROUTING_GATEWAY_V4"}
+            "req_data": {"id": "UPDATED_TEST_ROUTING_GATEWAY_V4"}
         },
         {
             "name": "Delete the static route used for testing",
             "uri": "/api/v1/routing/static_route",
             "resp_time": 5,
-            "payload": {"id": 0, "apply": True}
+            "req_data": {"id": 0, "apply": True}
         },
         {
             "name": "Check ID requirement",
@@ -765,34 +765,34 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Check ID exists constraint",
             "status": 400,
             "return": 6028,
-            "payload": {
+            "req_data": {
                 "id": "INVALID"
             }
         },
         {
             "name": "Delete IPv4 routing gateway",
-            "payload": {
+            "req_data": {
                 "id": 0
             },
             "resp_time": 5    # Allow a few seconds to safely remove the gateway and reload the route table
         },
         {
             "name": "Delete IPv6 routing gateway",
-            "payload": {
+            "req_data": {
                 "id": 0
             },
             "resp_time": 5    # Allow a few seconds to safely remove the gateway and reload the route table
         },
         {
             "name": "Delete dynamic IPv4 gateway override",
-            "payload": {
+            "req_data": {
                 "id": 0
             },
             "resp_time": 5    # Allow a few seconds to safely remove the gateway and reload the route table
         },
         {
             "name": "Delete dynamic IPv6 gateway override",
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "apply": True
             },

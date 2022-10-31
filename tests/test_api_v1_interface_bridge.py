@@ -22,7 +22,7 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Create bridge for LAN",
-            "payload": {
+            "req_data": {
                 "members": ["LAN"],
                 "descr": "Test bridge"
             }
@@ -36,7 +36,7 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
             "name": "Check members minimum constraint",
             "status": 400,
             "return": 3066,
-            "payload": {
+            "req_data": {
                 "members": []
             }
         },
@@ -44,7 +44,7 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
             "name": "Check non-existent member interface constraint",
             "status": 400,
             "return": 3067,
-            "payload": {
+            "req_data": {
                 "members": ["NonexistingIface"]
             }
         },
@@ -52,7 +52,7 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
             "name": "Check 1 bridge per member constraint",
             "status": 400,
             "return": 3068,
-            "payload": {
+            "req_data": {
                 "members": ["lan"]
             }
         }
@@ -60,7 +60,7 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update bridge for LAN",
-            "payload": {
+            "req_data": {
                 "id": "bridge0",
                 "members": ["lan"],
                 "descr": "Updated test bridge"
@@ -75,7 +75,7 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
             "name": "Check bridge ID exists constraint",
             "status": 400,
             "return": 3072,
-            "payload": {
+            "req_data": {
                 "id": "invalidbridgeid"
             }
         },
@@ -83,7 +83,7 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
             "name": "Check members minimum constraint",
             "status": 400,
             "return": 3066,
-            "payload": {
+            "req_data": {
                 "id": "bridge0",
                 "members": []
             }
@@ -92,7 +92,7 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
             "name": "Check non-existent member interface constraint",
             "status": 400,
             "return": 3067,
-            "payload": {
+            "req_data": {
                 "id": "bridge0",
                 "members": ["NonexistingIface"]
             }
@@ -108,13 +108,13 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
             "name": "Check bridge ID exists constraint",
             "status": 400,
             "return": 3072,
-            "payload": {
+            "req_data": {
                 "id": "invalidbridgeid"
             }
         },
         {
             "name": "Check bridge deletion",
-            "payload": {
+            "req_data": {
                 "id": "bridge0"
             }
         }

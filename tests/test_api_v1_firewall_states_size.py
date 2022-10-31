@@ -22,11 +22,11 @@ class APIE2ETestFirewallStatesSize(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update firewall states size to 20000",
-            "payload": {"maximumstates": 20000}
+            "req_data": {"maximumstates": 20000}
         },
         {
             "name": "Revert firewall states size to default",
-            "payload": {"maximumstates": "default"}
+            "req_data": {"maximumstates": "default"}
         }
     ]
 

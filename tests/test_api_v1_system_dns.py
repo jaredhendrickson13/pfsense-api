@@ -9,7 +9,7 @@ class APIE2ETestSystemDNS(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update system DNS servers",
-            "payload": {
+            "req_data": {
                 "dnsserver": ["8.8.4.4", "1.1.1.1", "8.8.8.8"],
                 "dnslocalhost": False,
                 "dnsallowoverride": False

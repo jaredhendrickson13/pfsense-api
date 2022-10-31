@@ -22,7 +22,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Create interface VLAN 10",
-            "payload": {
+            "req_data": {
                 "if": "lo0",
                 "tag": 10,
                 "pcp": 0,
@@ -31,7 +31,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create interface VLAN 11",
-            "payload": {
+            "req_data": {
                 "if": "lo0",
                 "tag": 11,
                 "pcp": 0,
@@ -42,7 +42,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
             "name": "Test non-existent parent interface",
             "status": 400,
             "return": 3051,
-            "payload": {
+            "req_data": {
                 "if": "FAKE_INTERFACE",
                 "tag": 11,
                 "pcp": 0,
@@ -53,7 +53,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
             "name": "Test VLAN tag max threshold",
             "status": 400,
             "return": 3052,
-            "payload": {
+            "req_data": {
                 "if": "lo0",
                 "tag": 4097,
             }
@@ -62,7 +62,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
             "name": "Test VLAN tag minimum threshold",
             "status": 400,
             "return": 3052,
-            "payload": {
+            "req_data": {
                 "if": "lo0",
                 "tag": 0,
             }
@@ -71,7 +71,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
             "name": "Test VLAN priority max threshold",
             "status": 400,
             "return": 3053,
-            "payload": {
+            "req_data": {
                 "if": "lo0",
                 "tag": 200,
                 "pcp": 8,
@@ -81,7 +81,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
             "name": "Test VLAN unique constraint",
             "status": 400,
             "return": 3054,
-            "payload": {
+            "req_data": {
                 "if": "lo0",
                 "tag": 10,
             }
@@ -90,7 +90,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update interface VLAN 10 to VLAN 20",
-            "payload": {
+            "req_data": {
                 "vlanif": "lo0.10",
                 "if": "lo0",
                 "tag": 20,
@@ -100,13 +100,13 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Update interface VLAN 20 with no changed values",
-            "payload": {
+            "req_data": {
                 "vlanif": "lo0.20"
             }
         },
         {
             "name": "Update interface VLAN 20 with same values",
-            "payload": {
+            "req_data": {
                 "vlanif": "lo0.20",
                 "if": "lo0",
                 "tag": 20,
@@ -118,7 +118,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
             "name": "Test VLAN tag max threshold",
             "status": 400,
             "return": 3052,
-            "payload": {
+            "req_data": {
                 "vlanif": "lo0.20",
                 "tag": 4097,
             }
@@ -127,7 +127,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
             "name": "Test VLAN tag minimum threshold",
             "status": 400,
             "return": 3052,
-            "payload": {
+            "req_data": {
                 "vlanif": "lo0.20",
                 "tag": 0,
             }
@@ -136,7 +136,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
             "name": "Test VLAN priority max threshold",
             "status": 400,
             "return": 3053,
-            "payload": {
+            "req_data": {
                 "vlanif": "lo0.20",
                 "pcp": 8,
             }
@@ -145,7 +145,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
             "name": "Test VLAN unique constraint",
             "status": 400,
             "return": 3054,
-            "payload": {
+            "req_data": {
                 "vlanif": "lo0.20",
                 "if": "lo0",
                 "tag": 11,
@@ -156,13 +156,13 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete interface VLAN 20 by ID",
-            "payload": {
+            "req_data": {
                 "id": 0
             }
         },
         {
             "name": "Delete interface VLAN 11",
-            "payload": {
+            "req_data": {
                 "vlanif": "lo0.11"
             }
         }

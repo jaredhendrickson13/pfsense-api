@@ -24,7 +24,7 @@ class APIE2ETestFirewallNATOneToOne(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Create 1:1 NAT mapping",
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "src": "any",
                 "dst": "wanip",
@@ -45,49 +45,49 @@ class APIE2ETestFirewallNATOneToOne(e2e_test_framework.APIE2ETest):
             "name": "Check interface exists constraint",
             "status": 400,
             "return": 4076,
-            "payload": {"interface": "INVALID"}
+            "req_data": {"interface": "INVALID"}
         },
         {
             "name": "Check external required constraint",
             "status": 400,
             "return": 4081,
-            "payload": {"interface": "wan"}
+            "req_data": {"interface": "wan"}
         },
         {
             "name": "Check external IP address constraint",
             "status": 400,
             "return": 4082,
-            "payload": {"interface": "wan", "external": "INVALID"}
+            "req_data": {"interface": "wan", "external": "INVALID"}
         },
         {
             "name": "Check src required constraint",
             "status": 400,
             "return": 4077,
-            "payload": {"interface": "wan", "external": "127.0.0.1"}
+            "req_data": {"interface": "wan", "external": "127.0.0.1"}
         },
         {
             "name": "Check src syntax validation",
             "status": 400,
             "return": 4079,
-            "payload": {"interface": "wan", "external": "127.0.0.1", "src": "INVALID"}
+            "req_data": {"interface": "wan", "external": "127.0.0.1", "src": "INVALID"}
         },
         {
             "name": "Check dst required constraint",
             "status": 400,
             "return": 4078,
-            "payload": {"interface": "wan", "external": "127.0.0.1", "src": "127.0.0.1/32"}
+            "req_data": {"interface": "wan", "external": "127.0.0.1", "src": "127.0.0.1/32"}
         },
         {
             "name": "Check dst syntax validation",
             "status": 400,
             "return": 4080,
-            "payload": {"interface": "wan", "external": "127.0.0.1", "src": "127.0.0.1", "dst": "INVALID"}
+            "req_data": {"interface": "wan", "external": "127.0.0.1", "src": "127.0.0.1", "dst": "INVALID"}
         },
         {
             "name": "Check nat reflection options constraint",
             "status": 400,
             "return": 4008,
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "external": "127.0.0.1",
                 "src": "127.0.0.1",
@@ -100,7 +100,7 @@ class APIE2ETestFirewallNATOneToOne(e2e_test_framework.APIE2ETest):
         {
             "name": "Update 1:1 NAT mapping and apply",
             "resp_time": 3,    # Allow a few seconds for the firewall filter to reload
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "src": "!1.1.1.1",
@@ -123,37 +123,37 @@ class APIE2ETestFirewallNATOneToOne(e2e_test_framework.APIE2ETest):
             "name": "Check ID exists constraint",
             "status": 400,
             "return": 4084,
-            "payload": {"id": "INVALID"}
+            "req_data": {"id": "INVALID"}
         },
         {
             "name": "Check interface exists constraint",
             "status": 400,
             "return": 4076,
-            "payload": {"id": 0, "interface": "INVALID"}
+            "req_data": {"id": 0, "interface": "INVALID"}
         },
         {
             "name": "Check external IP address constraint",
             "status": 400,
             "return": 4082,
-            "payload": {"id": 0, "interface": "wan", "external": "INVALID"}
+            "req_data": {"id": 0, "interface": "wan", "external": "INVALID"}
         },
         {
             "name": "Check src syntax validation",
             "status": 400,
             "return": 4079,
-            "payload": {"id": 0, "interface": "wan", "external": "127.0.0.1", "src": "INVALID"}
+            "req_data": {"id": 0, "interface": "wan", "external": "127.0.0.1", "src": "INVALID"}
         },
         {
             "name": "Check dst syntax validation",
             "status": 400,
             "return": 4080,
-            "payload": {"id": 0, "interface": "wan", "external": "127.0.0.1", "src": "127.0.0.1", "dst": "INVALID"}
+            "req_data": {"id": 0, "interface": "wan", "external": "127.0.0.1", "src": "127.0.0.1", "dst": "INVALID"}
         },
         {
             "name": "Check nat reflection options constraint",
             "status": 400,
             "return": 4008,
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "wan",
                 "external": "127.0.0.1",
@@ -166,7 +166,7 @@ class APIE2ETestFirewallNATOneToOne(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete 1:1 NAT mapping and apply",
-            "payload": {"id": 0, "apply": True},
+            "req_data": {"id": 0, "apply": True},
             "resp_time": 3    # Allow a few seconds for the firewall filter to reload
         },
         {
@@ -178,7 +178,7 @@ class APIE2ETestFirewallNATOneToOne(e2e_test_framework.APIE2ETest):
             "name": "Check ID exists constraint",
             "status": 400,
             "return": 4084,
-            "payload": {"id": "INVALID"}
+            "req_data": {"id": "INVALID"}
         }
     ]
 

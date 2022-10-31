@@ -22,10 +22,10 @@ class APIE2ETestFirewallNATOutbound(e2e_test_framework.APIE2ETest):
         {"name": "Read entire outbound NAT configuration"}
     ]
     put_tests = [
-        {"name": "Set outbound NAT mode to hybrid", "payload": {"mode": "hybrid"}},
-        {"name": "Set outbound NAT mode to advanced", "payload": {"mode": "advanced"}},
-        {"name": "Set outbound NAT mode to disabled", "payload": {"mode": "disabled"}},
-        {"name": "Set outbound NAT mode to automatic", "payload": {"mode": "automatic"}}
+        {"name": "Set outbound NAT mode to hybrid", "req_data": {"mode": "hybrid"}},
+        {"name": "Set outbound NAT mode to advanced", "req_data": {"mode": "advanced"}},
+        {"name": "Set outbound NAT mode to disabled", "req_data": {"mode": "disabled"}},
+        {"name": "Set outbound NAT mode to automatic", "req_data": {"mode": "automatic"}}
     ]
 
 

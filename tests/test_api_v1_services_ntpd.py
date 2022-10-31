@@ -23,7 +23,7 @@ class APIE2ETestServicesNTPd(e2e_test_framework.APIE2ETest):
         {
             "name": "Update the NTPd configuration to enable all options",
             "resp_time": 3,
-            "payload": {
+            "req_data": {
                 "interface": ["WAN", "em1", "lo0"],
                 "orphan": 15,
                 "timeservers": [{"timeserver": "2.pfsense.ntp.pool.org", "ispool": True}],
@@ -39,7 +39,7 @@ class APIE2ETestServicesNTPd(e2e_test_framework.APIE2ETest):
         {
             "name": "Update the NTPd configuration to disable all options",
             "resp_time": 3,
-            "payload": {
+            "req_data": {
                 "interface": ["wan", "lo0"],
                 "orphan": 12,
                 "timeservers": [{"timeserver": "ntp.pool.org", "ispool": True}],

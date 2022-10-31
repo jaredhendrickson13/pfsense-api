@@ -8,7 +8,7 @@ class APIE2ETestSystemReboot(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Test system reboot",
-            "payload": {"debug": True}
+            "req_data": {"debug": True}
         }
     ]
 

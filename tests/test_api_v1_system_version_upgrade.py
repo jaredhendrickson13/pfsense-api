@@ -11,11 +11,11 @@ class APIE2ETestSystemVersion(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Read available pfSense upgrades using cache",
-            "payload": {"use_cache": True}
+            "req_data": {"use_cache": True}
         },
         {
             "name": "Read available pfSense upgrades without cache",
-            "payload": {"use_cache": False},
+            "req_data": {"use_cache": False},
             "resp_time": 20
         }
     ]

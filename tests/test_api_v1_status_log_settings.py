@@ -21,7 +21,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update log settings",
-            "payload": {
+            "req_data": {
                 "format": "rfc3164",
                 "reverse": True,
                 "nentries": 5,
@@ -59,7 +59,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Update log settings",
-            "payload": {
+            "req_data": {
                 "format": "rfc5424",
                 "reverse": False,
                 "nentries": 200000,
@@ -100,7 +100,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
             "delay": 8,    # Wait a while before starting this one, the previous tests restarts services
             "status": 400,
             "return": 8000,
-            "payload": {
+            "req_data": {
                 "format": "INVALID"
             }
         },
@@ -108,7 +108,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
             "name": "Check nentries minimum constraint",
             "status": 400,
             "return": 8001,
-            "payload": {
+            "req_data": {
                 "nentries": 4
             }
         },
@@ -116,7 +116,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
             "name": "Check nentries maximum constraint",
             "status": 400,
             "return": 8001,
-            "payload": {
+            "req_data": {
                 "nentries": 200001
             }
         },
@@ -124,7 +124,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
             "name": "Check filterdescriptions option constraint",
             "status": 400,
             "return": 8002,
-            "payload": {
+            "req_data": {
                 "filterdescriptions": 3
             }
         },
@@ -132,7 +132,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
             "name": "Check logfilesize minimum constraint",
             "status": 400,
             "return": 8003,
-            "payload": {
+            "req_data": {
                 "logfilesize": 99999
             }
         },
@@ -140,7 +140,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
             "name": "Check logfilesize maximum constraint",
             "status": 400,
             "return": 8003,
-            "payload": {
+            "req_data": {
                 "logfilesize": 2147483649
             }
         },
@@ -148,7 +148,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
             "name": "Check rotatecount minimum constraint",
             "status": 400,
             "return": 8004,
-            "payload": {
+            "req_data": {
                 "rotatecount": -1
             }
         },
@@ -156,7 +156,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
             "name": "Check rotatecount maximum constraint",
             "status": 400,
             "return": 8004,
-            "payload": {
+            "req_data": {
                 "rotatecount": 100
             }
         },
@@ -164,7 +164,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
             "name": "Check logcompressiontype option constraint",
             "status": 400,
             "return": 8005,
-            "payload": {
+            "req_data": {
                 "logcompressiontype": "INVALID"
             }
         },
@@ -172,7 +172,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
             "name": "Check remoteserver IP or hostname constraint",
             "status": 400,
             "return": 8006,
-            "payload": {
+            "req_data": {
                 "enable": True,
                 "remoteserver": "@@@INVALID@@@"
             }
@@ -181,7 +181,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
             "name": "Check remoteserver2 IP or hostname constraint",
             "status": 400,
             "return": 8006,
-            "payload": {
+            "req_data": {
                 "enable": True,
                 "remoteserver": "127.0.0.1",
                 "remoteserver2": "@@@INVALID@@@"
@@ -191,7 +191,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
             "name": "Check remoteserver3 IP or hostname constraint",
             "status": 400,
             "return": 8006,
-            "payload": {
+            "req_data": {
                 "enable": True,
                 "remoteserver": "127.0.0.1",
                 "remoteserver2": "127.0.0.2",
@@ -202,7 +202,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
             "name": "Check sourceip option constraint",
             "status": 400,
             "return": 8007,
-            "payload": {
+            "req_data": {
                 "enable": True,
                 "sourceip": "INVALID"
             }
@@ -211,7 +211,7 @@ class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
             "name": "Check sourceip option constraint",
             "status": 400,
             "return": 8008,
-            "payload": {
+            "req_data": {
                 "enable": True,
                 "sourceip": "WAN",
                 "ipprotocol": "INVALID"

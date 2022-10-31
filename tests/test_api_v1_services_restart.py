@@ -26,7 +26,7 @@ class APIE2ETestServicesRestart(e2e_test_framework.APIE2ETest):
         {
             "name": "Restart single service",
             "resp_time": 15,    # Allow up to 15 seconds for all services to restart
-            "payload": {
+            "req_data": {
                 "service": "sshd"
             }
         }

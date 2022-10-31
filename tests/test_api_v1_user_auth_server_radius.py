@@ -9,7 +9,7 @@ class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Create RADIUS auth server",
-            "payload": {
+            "req_data": {
                 "name": "e2e_test_RADIUS",
                 "host": "123",
                 "radius_secret": "testsecret",
@@ -29,13 +29,13 @@ class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
             "name": "Test name unique constraint",
             "status": 400,
             "return": 5026,
-            "payload": {"name": "e2e_test_RADIUS"}
+            "req_data": {"name": "e2e_test_RADIUS"}
         },
         {
             "name": "Test host requirement",
             "status": 400,
             "return": 5011,
-            "payload": {
+            "req_data": {
                 "name": "e2e_test_RADIUS_2"
             }
         },
@@ -43,7 +43,7 @@ class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
             "name": "Test host validation",
             "status": 400,
             "return": 5012,
-            "payload": {
+            "req_data": {
                 "name": "e2e_test_RADIUS_2",
                 "host": "!@#$@#$$#@!"
             }
@@ -52,7 +52,7 @@ class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
             "name": "Test RADIUS secret requirement",
             "status": 400,
             "return": 5028,
-            "payload": {
+            "req_data": {
                 "name": "e2e_test_RADIUS_2",
                 "host": "example.com"
             }
@@ -61,7 +61,7 @@ class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
             "name": "Test RADIUS secret validation",
             "status": 400,
             "return": 5029,
-            "payload": {
+            "req_data": {
                 "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": ["INVALID"]
@@ -71,7 +71,7 @@ class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
             "name": "Test RADIUS auth/acct port requirement",
             "status": 400,
             "return": 5032,
-            "payload": {
+            "req_data": {
                 "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret"
@@ -81,7 +81,7 @@ class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
             "name": "Test RADIUS auth port minimum threshold",
             "status": 400,
             "return": 5030,
-            "payload": {
+            "req_data": {
                 "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret",
@@ -92,7 +92,7 @@ class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
             "name": "Test RADIUS auth port minimum threshold",
             "status": 400,
             "return": 5030,
-            "payload": {
+            "req_data": {
                 "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret",
@@ -103,7 +103,7 @@ class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
             "name": "Test RADIUS acct port minimum threshold",
             "status": 400,
             "return": 5031,
-            "payload": {
+            "req_data": {
                 "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret",
@@ -114,7 +114,7 @@ class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
             "name": "Test RADIUS acct port minimum threshold",
             "status": 400,
             "return": 5031,
-            "payload": {
+            "req_data": {
                 "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret",
@@ -125,7 +125,7 @@ class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
             "name": "Test RADIUS protocol validation",
             "status": 400,
             "return": 5027,
-            "payload": {
+            "req_data": {
                 "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret",
@@ -137,7 +137,7 @@ class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
             "name": "Test RADIUS timeout minimum threshold",
             "status": 400,
             "return": 5033,
-            "payload": {
+            "req_data": {
                 "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret",
@@ -149,7 +149,7 @@ class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
             "name": "Test RADIUS NAS IP attribute validation",
             "status": 400,
             "return": 5034,
-            "payload": {
+            "req_data": {
                 "name": "e2e_test_RADIUS_2",
                 "host": "example.com",
                 "radius_secret": "testsecret",
@@ -161,7 +161,7 @@ class APIE2ETestUserAuthServerRadius(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete LDAP auth server",
-            "payload": {"name": "e2e_test_RADIUS"}
+            "req_data": {"name": "e2e_test_RADIUS"}
         }
     ]
 

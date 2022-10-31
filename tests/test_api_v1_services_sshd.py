@@ -22,7 +22,7 @@ class APIE2ETestServicesSSHd(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update and disable SSHd",
-            "payload": {
+            "req_data": {
                 "enable": False,
                 "sshdkeyonly": "both",
                 "sshdagentforwarding": False,
@@ -31,7 +31,7 @@ class APIE2ETestServicesSSHd(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Update and enabled SSHd",
-            "payload": {
+            "req_data": {
                 "enable": True,
                 "sshdkeyonly": "disabled",
                 "sshdagentforwarding": True,

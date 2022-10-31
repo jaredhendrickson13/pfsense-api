@@ -28,13 +28,13 @@ class APIE2ETestFirewallRuleFlush(e2e_test_framework.APIE2ETest):
             "name": "Check rules array minimum items constraint",
             "status": 400,
             "return": 4241,
-            "payload": {
+            "req_data": {
                 "rules": []
             }
         },
         {
             "name": "Flush and replace all rules",
-            "payload": {
+            "req_data": {
                 "apply": "true",
                 "rules": [
                     {
@@ -58,12 +58,12 @@ class APIE2ETestFirewallRuleFlush(e2e_test_framework.APIE2ETest):
         }
     ]
     delete_tests = [
-        {"name": "Flush all firewall rules", "payload": {}},
+        {"name": "Flush all firewall rules", "req_data": {}},
         {
             "name": "Create an allow all rule on the WAN to prevent lockout",
             "uri": "/api/v1/firewall/rule",
             "method": "POST",
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "type": "pass",
                 "ipprotocol": "inet",

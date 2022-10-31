@@ -10,7 +10,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
         {
             "name": "Create RSA internal CA",
             "uri": "/api/v1/system/ca",
-            "payload": {
+            "req_data": {
                 "method": "internal",
                 "descr": "INTERNAL_CA_RSA",
                 "trust": True,
@@ -25,7 +25,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "name": "Create user certificate with RSA key",
             "uri": "/api/v1/system/certificate",
             "caref": True,    # Locator for tests that need a caref dynamically added in post_post()
-            "payload": {
+            "req_data": {
                 "method": "internal",
                 "descr": "USER_CERT",
                 "keytype": "RSA",
@@ -40,7 +40,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "name": "Create server certificate with RSA key",
             "uri": "/api/v1/system/certificate",
             "caref": True,    # Locator for tests that need a caref dynamically added in post_post()
-            "payload": {
+            "req_data": {
                 "method": "internal",
                 "descr": "SERVER_CERT",
                 "keytype": "RSA",
@@ -55,7 +55,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "name": "Create local user",
             "resp_time": 2,     # Allow a couple seconds for user database to be updated
             "user_cert": True,       # Locator for tests that need a user cert ref ID dynamically added by post_post()
-            "payload": {
+            "req_data": {
                 "disabled": False,
                 "username": "new_user",
                 "password": "changeme",
@@ -71,7 +71,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "resp_time": 2,  # Allow a couple seconds for user database to be updated
             "username": "new_user",
             "password": "changeme",
-            "payload": {
+            "req_data": {
                 "disabled": True,
                 "username": "disabled_user",
                 "password": "changeme",
@@ -93,7 +93,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "name": "Check username unique constraint",
             "status": 400,
             "return": 5002,
-            "payload": {
+            "req_data": {
                 "username": "new_user"
             }
         },
@@ -101,7 +101,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "name": "Check username character constraint",
             "status": 400,
             "return": 5036,
-            "payload": {
+            "req_data": {
                 "username": "!@#"
             }
         },
@@ -109,7 +109,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "name": "Check reserved username constraint",
             "status": 400,
             "return": 5037,
-            "payload": {
+            "req_data": {
                 "username": "root"
             }
         },
@@ -117,7 +117,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "name": "Check username length constraint",
             "status": 400,
             "return": 5038,
-            "payload": {
+            "req_data": {
                 "username": "THIS_USERNAME_IS_TOO_LONG_FOR_PFSENSE_TO_HANDLE"
             }
         },
@@ -125,7 +125,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "name": "Check password requirement",
             "status": 400,
             "return": 5003,
-            "payload": {
+            "req_data": {
                 "username": "another_user"
             }
         },
@@ -133,7 +133,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "name": "Check privilege validation",
             "status": 400,
             "return": 5006,
-            "payload": {
+            "req_data": {
                 "username": "another_user",
                 "password": "changeme",
                 "priv": ["INVALID"]
@@ -143,7 +143,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "name": "Check user expiration date validation",
             "status": 400,
             "return": 5040,
-            "payload": {
+            "req_data": {
                 "username": "another_user",
                 "password": "changeme",
                 "expires": "INVALID"
@@ -153,7 +153,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "name": "Check user certificate exists constraint",
             "status": 400,
             "return": 5041,
-            "payload": {
+            "req_data": {
                 "username": "another_user",
                 "password": "changeme",
                 "cert": "INVALID"
@@ -163,7 +163,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update local user",
-            "payload": {
+            "req_data": {
                 "disabled": False,
                 "username": "new_user",
                 "password": "changeme_again",
@@ -179,7 +179,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "name": "Check privilege validation",
             "status": 400,
             "return": 5006,
-            "payload": {
+            "req_data": {
                 "username": "new_user",
                 "password": "changeme",
                 "priv": ["INVALID"]
@@ -189,7 +189,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "name": "Check user expiration date validation",
             "status": 400,
             "return": 5040,
-            "payload": {
+            "req_data": {
                 "username": "new_user",
                 "password": "changeme",
                 "expires": "INVALID"
@@ -199,7 +199,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "name": "Check user certificate exists constraint",
             "status": 400,
             "return": 5041,
-            "payload": {
+            "req_data": {
                 "username": "new_user",
                 "password": "changeme",
                 "cert": "INVALID"
@@ -208,7 +208,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
         {
             "name": "Check ability to add server certificate as a user certificate",
             "server_cert": True,
-            "payload": {
+            "req_data": {
                 "username": "new_user",
                 "password": "changeme"
             }
@@ -216,7 +216,7 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
         {
             "name": "Update local user to re-add user certificate",
             "user_cert": True,
-            "payload": {
+            "req_data": {
                 "disabled": False,
                 "username": "new_user",
                 "password": "changeme_again",
@@ -234,42 +234,42 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             "uri": "/api/v1/system/certificate",
             "status": 400,
             "return": 1005,
-            "payload": {"descr": "USER_CERT"}
+            "req_data": {"descr": "USER_CERT"}
         },
         {
             "name": "Delete local user",
-            "payload": {"username": "new_user"}
+            "req_data": {"username": "new_user"}
         },
         {
             "name": "Delete disabled user",
-            "payload": {"username": "disabled_user"}
+            "req_data": {"username": "disabled_user"}
         },
         {
             "name": "Check deletion of non-existing user",
             "status": 400,
             "return": 5001,
-            "payload": {"username": "INVALID"}
+            "req_data": {"username": "INVALID"}
         },
         {
             "name": "Check deletion of system users",
             "status": 400,
             "return": 5005,
-            "payload": {"username": "admin"}
+            "req_data": {"username": "admin"}
         },
         {
             "name": "Check ability to delete user certificate after user was deleted",
             "uri": "/api/v1/system/certificate",
-            "payload": {"descr": "USER_CERT"}
+            "req_data": {"descr": "USER_CERT"}
         },
         {
             "name": "Delete server certificate used for testing",
             "uri": "/api/v1/system/certificate",
-            "payload": {"descr": "SERVER_CERT"}
+            "req_data": {"descr": "SERVER_CERT"}
         },
         {
             "name": "Delete CA used for testing",
             "uri": "/api/v1/system/ca",
-            "payload": {"descr": "INTERNAL_CA_RSA"}
+            "req_data": {"descr": "INTERNAL_CA_RSA"}
         }
     ]
 
@@ -281,8 +281,8 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
 
             # Loop through all tests and auto-add the caref ID to tests that have the caref key set
             for test in self.post_tests:
-                if "payload" in test and "caref" in test:
-                    self.post_tests[counter]["payload"]["caref"] = self.post_responses[0]["data"]["refid"]
+                if "req_data" in test and "caref" in test:
+                    self.post_tests[counter]["req_data"]["caref"] = self.post_responses[0]["data"]["refid"]
                 counter = counter + 1
 
         # Check the second and third POST responses for the user and server certificates
@@ -291,22 +291,22 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
             post_counter = 0
             put_counter = 0
 
-            # Loop through all tests and auto-add the refid to payloads that have the user_cert or server_cert set
+            # Loop through all tests and auto-add the refid to req_datas that have the user_cert or server_cert set
             for test in self.post_tests:
-                if "payload" in test and "user_cert" in test:
-                    self.post_tests[post_counter]["payload"]["cert"] = [self.post_responses[1]["data"]["refid"]]
+                if "req_data" in test and "user_cert" in test:
+                    self.post_tests[post_counter]["req_data"]["cert"] = [self.post_responses[1]["data"]["refid"]]
 
-                if "payload" in test and "server_cert" in test:
-                    self.post_tests[post_counter]["payload"]["cert"] = [self.post_responses[2]["data"]["refid"]]
+                if "req_data" in test and "server_cert" in test:
+                    self.post_tests[post_counter]["req_data"]["cert"] = [self.post_responses[2]["data"]["refid"]]
                 post_counter = post_counter + 1
 
             # Do the same for PUT tests
             for test in self.put_tests:
-                if "payload" in test and "user_cert" in test:
-                    self.put_tests[put_counter]["payload"]["cert"] = [self.post_responses[1]["data"]["refid"]]
+                if "req_data" in test and "user_cert" in test:
+                    self.put_tests[put_counter]["req_data"]["cert"] = [self.post_responses[1]["data"]["refid"]]
 
-                if "payload" in test and "server_cert" in test:
-                    self.put_tests[put_counter]["payload"]["cert"] = [self.post_responses[2]["data"]["refid"]]
+                if "req_data" in test and "server_cert" in test:
+                    self.put_tests[put_counter]["req_data"]["cert"] = [self.post_responses[2]["data"]["refid"]]
                 put_counter = put_counter + 1
 
 

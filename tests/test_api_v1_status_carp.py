@@ -22,7 +22,7 @@ class APIE2ETestStatusCARP(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update the CARP status",
-            "payload": {"enable": True, "maintenance_mode": False}
+            "req_data": {"enable": True, "maintenance_mode": False}
         }
     ]
 

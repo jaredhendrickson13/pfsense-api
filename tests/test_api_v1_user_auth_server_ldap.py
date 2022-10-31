@@ -9,7 +9,7 @@ class APIE2ETestUserAuthServerLDAP(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Create LDAP auth server",
-            "payload": {
+            "req_data": {
                 "name": "TEST_AUTHSERVER",
                 "host": "ldap.com",
                 "ldap_port": 636,
@@ -32,7 +32,7 @@ class APIE2ETestUserAuthServerLDAP(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete LDAP auth server",
-            "payload": {"name": "TEST_AUTHSERVER"}
+            "req_data": {"name": "TEST_AUTHSERVER"}
         }
     ]
 

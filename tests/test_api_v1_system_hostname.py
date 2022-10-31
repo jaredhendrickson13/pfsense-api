@@ -9,20 +9,20 @@ class APIE2ETestSystemHostname(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update system hostname",
-            "payload": {"hostname": "pfsense-api", "domain": "test.com"},
+            "req_data": {"hostname": "pfsense-api", "domain": "test.com"},
             "resp_time": 10    # Allow a few seconds for DNS services to reload
         },
         {
             "name": "Test hostname validation",
             "status": 400,
             "return": 1000,
-            "payload": {"hostname": "!@#$", "domain": "test.com"}
+            "req_data": {"hostname": "!@#$", "domain": "test.com"}
         },
         {
             "name": "Test domain validation",
             "status": 400,
             "return": 1001,
-            "payload": {"hostname": "pfsense-api", "domain": "!@#$"}
+            "req_data": {"hostname": "pfsense-api", "domain": "!@#$"}
         }
     ]
 

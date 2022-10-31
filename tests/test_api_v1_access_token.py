@@ -26,7 +26,7 @@ class APIE2ETestAccessToken(e2e_test_framework.APIE2ETest):
             "method": "PUT",
             "pre_test_callable": "check_for_token_auth",
             "post_test_callable": "set_auth_mode_to_local",
-            "payload": {"authmode": "local"}
+            "req_data": {"authmode": "local"}
         },
         {
             "name": "Ensure clients cannot request token when auth mode is not jwt or token",
@@ -38,14 +38,14 @@ class APIE2ETestAccessToken(e2e_test_framework.APIE2ETest):
             "uri": "/api/v1/system/api",
             "method": "PUT",
             "post_test_callable": "set_auth_mode_to_jwt",
-            "payload": {"authmode": "jwt"}
+            "req_data": {"authmode": "jwt"}
         },
         {
             "name": "Test JWT authentication and change auth mode to token to test API Token authentication",
             "uri": "/api/v1/system/api",
             "method": "PUT",
             "post_test_callable": "set_auth_mode_to_token",
-            "payload": {"authmode": "token"}
+            "req_data": {"authmode": "token"}
         },
         {
             "name": "Request new API token to authenticate with",
@@ -56,7 +56,7 @@ class APIE2ETestAccessToken(e2e_test_framework.APIE2ETest):
             "name": "Test API token authentication and change authentication mode back to original value",
             "uri": "/api/v1/system/api",
             "method": "PUT",
-            "payload_callable": "set_payload_to_initial_auth",
+            "req_data_callable": "set_req_data_to_initial_auth",
             "post_test_callable": "set_auth_mode_to_initial"
         }
     ]
@@ -108,8 +108,8 @@ class APIE2ETestAccessToken(e2e_test_framework.APIE2ETest):
         self.args.username = self.test_access_token_orig_username
         self.args.password = self.test_access_token_orig_password
 
-    def set_payload_to_initial_auth(self):
-        """Sets the payload value needed to rever the API settings back to the initial auth mode."""
+    def set_req_data_to_initial_auth(self):
+        """Sets the req_data value needed to rever the API settings back to the initial auth mode."""
         return {"authmode": self.test_access_token_orig_auth_mode}
 
 
