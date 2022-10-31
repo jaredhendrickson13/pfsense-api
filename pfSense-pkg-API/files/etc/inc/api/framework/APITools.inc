@@ -200,7 +200,7 @@ function get_existing_tokens($username) {
     $user_keys = [];
 
     # Only loop through if we have configured keys
-    if (is_array($api_config["keys"]["key"])) {
+    if (is_array($api_config["keys"]) and is_array($api_config["keys"]["key"])) {
         foreach ($api_config["keys"]["key"] as $id => $key) {
             if ($key["client_id"] === $key_user) {
                 $user_keys[$id] = array("client_token" => $key["client_token"], "algo" => $key["algo"]);
