@@ -27,7 +27,8 @@ class APISystemVersionUpgradeRead extends APIModel {
     }
 
     public function action() {
-        return APIResponse\get(0, get_system_pkg_version(false, $this->validated_data["use_cache"]));
+        $ver = get_system_pkg_version(false, $this->validated_data["use_cache"]);
+        return APIResponse\get(0, ($ver) ?: []);
     }
 
     public function validate_payload() {
