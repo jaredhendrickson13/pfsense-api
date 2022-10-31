@@ -431,8 +431,8 @@ GET requests, you do not need to override this property. If this endpoint does s
 any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
     - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
     - `req_data` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
-    - `resp_data` : a nested dictionary that contains the expected API response data.    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
-    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
+    - `resp_data` : a nested dictionary that contains the expected API response data.
+    - `resp_data_empty` : a boolean indicating whether this test should allow the response data to be empty.    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
     - `delay` : an integer that specifies how many seconds a test should wait until starting
     - `pause` : an integer that specifies how many seconds a test should wait after the test has finished    - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
@@ -452,8 +452,8 @@ POST requests, you do not need to override this property. If this endpoint does 
 any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
     - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
     - `req_data` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
-    - `resp_data` : a nested dictionary that contains the expected API response data.    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
-    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
+    - `resp_data` : a nested dictionary that contains the expected API response data.
+    - `resp_data_empty` : a boolean indicating whether this test should allow the response data to be empty.    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
     - `delay` : an integer that specifies how many seconds a test should wait until starting
     - `pause` : an integer that specifies how many seconds a test should wait after the test has finished    - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
@@ -473,8 +473,8 @@ PUT requests, you do not need to override this property. If this endpoint does s
 any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
     - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
     - `req_data` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
-    - `resp_data` : a nested dictionary that contains the expected API response data.    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
-    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
+    - `resp_data` : a nested dictionary that contains the expected API response data.
+    - `resp_data_empty` : a boolean indicating whether this test should allow the response data to be empty.    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
     - `delay` : an integer that specifies how many seconds a test should wait until starting
     - `pause` : an integer that specifies how many seconds a test should wait after the test has finished    - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
@@ -495,6 +495,7 @@ any payload data to receive a valid response you must set this value to `[{}]`. 
     - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
     - `req_data` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
     - `resp_data` : a nested dictionary that contains the expected API response data.
+    - `resp_data_empty` : a boolean indicating whether this test should allow the response data to be empty.
     - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
     - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
