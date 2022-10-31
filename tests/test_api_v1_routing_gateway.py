@@ -228,7 +228,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             }
         },
         {
-            "name": "Check data req_data minimum constraint",
+            "name": "Check data payload minimum constraint",
             "status": 400,
             "return": 6016,
             "req_data": {
@@ -236,7 +236,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
-                "data_req_data": 0
+                "data_payload": 0
             }
         },
         {
@@ -390,7 +390,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
                 "action_disable": True,
                 "monitor_disable": True,
                 "weight": 2,
-                "data_req_data": 5,
+                "data_payload": 5,
                 "latencylow": 300,
                 "latencyhigh": 600,
                 "interval": 2100,
@@ -431,7 +431,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
                 "action_disable": True,
                 "monitor_disable": True,
                 "weight": 2,
-                "data_req_data": 5,
+                "data_payload": 5,
                 "latencylow": 300,
                 "latencyhigh": 600,
                 "interval": 2100,
@@ -584,7 +584,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             }
         },
         {
-            "name": "Check data req_data minimum constraint",
+            "name": "Check data payload minimum constraint",
             "status": 400,
             "return": 6016,
             "req_data": {
@@ -593,7 +593,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
-                "data_req_data": 0
+                "data_payload": 0
             }
         },
         {
