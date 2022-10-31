@@ -26,6 +26,9 @@ urllib3.disable_warnings(category=urllib3.exceptions.InsecureRequestWarning)
 
 class APIE2ETest:
     """Base class for the e2e test framework that is used to test pfSense-API."""
+    # Many methods needed for common test cases
+    # pylint: disable=too-many-public-methods
+
     # CLASS PROPERTIES #
     args = {}
     uid = str(uuid.uuid4())
