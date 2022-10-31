@@ -29,6 +29,7 @@ class APIE2ETestServicesServiceWatchdog(e2e_test_framework.APIE2ETest):
             "method": "POST",
             "uri": "/api/v1/system/package",
             "resp_time": 30,
+            "resp_data_empty": True,
             "req_data": {
                 "name": "pfSense-pkg-Service_Watchdog"
             }
@@ -64,6 +65,7 @@ class APIE2ETestServicesServiceWatchdog(e2e_test_framework.APIE2ETest):
             "method": "DELETE",
             "uri": "/api/v1/system/package",
             "resp_time": 30,
+            "resp_data_empty": True,
             "req_data": {
                 "name": "pfSense-pkg-Service_Watchdog"
             }

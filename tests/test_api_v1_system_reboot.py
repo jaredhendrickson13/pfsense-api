@@ -8,6 +8,7 @@ class APIE2ETestSystemReboot(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Test system reboot",
+            "resp_data_empty": True,
             "req_data": {"debug": True}
         }
     ]

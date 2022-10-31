@@ -570,6 +570,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete interface",
+            "resp_time": 3,
             "req_data": {
                 "if": "em2"
             }

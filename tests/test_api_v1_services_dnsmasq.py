@@ -18,7 +18,7 @@ import e2e_test_framework
 class APIE2ETestServicesDnsmasq(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/dnsmasq endpoint."""
     uri = "/api/v1/services/dnsmasq"
-    get_tests = [{"name": "Read the dnsmasq configuration"}]
+    get_tests = [{"name": "Read the dnsmasq configuration", "resp_data_empty": True}]
 
 
 APIE2ETestServicesDnsmasq()

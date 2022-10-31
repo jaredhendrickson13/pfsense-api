@@ -650,7 +650,8 @@ class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
         {
             "name": "Check ability to apply and initiate ipsec",
             "uri": "/api/v1/services/ipsec/apply",
-            "req_data": {"initiate": True}
+            "req_data": {"initiate": True},
+            "resp_data_empty": True
         }
     ]
     put_tests = [

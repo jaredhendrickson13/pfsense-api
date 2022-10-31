@@ -18,7 +18,7 @@ import e2e_test_framework
 class APIE2ETestServicesDHCPdLease(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/dhcpd/lease endpoint."""
     uri = "/api/v1/services/dhcpd/lease"
-    get_tests = [{"name": "Read all DHCPd leases"}]
+    get_tests = [{"name": "Read all DHCPd leases", "resp_data_empty": True}]
 
 
 APIE2ETestServicesDHCPdLease()

@@ -9,7 +9,7 @@ class APIE2ETestSystemARP(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete ARP table entry",
-            "req_data": {"ip": "127.0.0.1"}
+            "req_data": {"ip": "192.168.1.1"}
         }
     ]
 

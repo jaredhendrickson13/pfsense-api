@@ -22,7 +22,8 @@ class APIE2ETestFirewallStates(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Check firewall state deletion",
-            "req_data": {"source": "1.2.3.4"}
+            "req_data": {"source": "1.2.3.4"},
+            "resp_data_empty": True
         },
         {
             "name": "Check source requirement",

@@ -10,6 +10,7 @@ class APIE2ETestSystemPackage(e2e_test_framework.APIE2ETest):
         {
             "name": "Check install of pfSense repo package",
             "resp_time": 30,
+            "resp_data_empty": True,
             "req_data": {
                 "name": "pfSense-pkg-nmap"
             }
@@ -43,6 +44,7 @@ class APIE2ETestSystemPackage(e2e_test_framework.APIE2ETest):
             {
                 "name": "Test deletion of installed package",
                 "resp_time": 30,
+                "resp_data_empty": True,
                 "req_data": {
                     "name": "pfSense-pkg-nmap"
                 }

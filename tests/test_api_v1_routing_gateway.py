@@ -420,6 +420,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Update IPv6 routing gateway",
+            "resp_time": 5,
             "req_data": {
                 "id": "TEST_ROUTING_GATEWAY_V6",
                 "name": "UPDATED_TEST_ROUTING_GATEWAY_V6",
