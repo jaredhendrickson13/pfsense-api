@@ -35,6 +35,7 @@ class APIE2ETest:
     url = ""
     uri = ""
     exit_code = 0
+    last_request = {}
     last_response = {}
     get_tests = []
     post_tests = []
@@ -229,6 +230,9 @@ class APIE2ETest:
                 post_test_callable()
             except Exception as exc:
                 post_test_exc = exc
+
+        # Capture this test's request as the last request
+        self.last_request = test_params
 
         # Otherwise, check if the response is valid
         response_valid = self.__check_resp__(resp, test_params, pre_test_exc=pre_test_exc, post_test_exc=post_test_exc)
