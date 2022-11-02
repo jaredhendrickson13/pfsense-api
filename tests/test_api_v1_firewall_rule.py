@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Script used to test the /api/v1/firewall/rule endpoint."""
+import os
+import time
+
 import e2e_test_framework
 
 
@@ -134,6 +137,22 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
                 "top": True
             },
             "resp_time": 3    # Accommodate the mandatory 1 second delay for firewall rule creations
+        },
+        {
+            "name": "Block ping and ensure block actually works",
+            "post_test_callable": "is_ping_unsuccessful",
+            "req_data": {
+                "type": "block",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "icmp",
+                "src": "any",
+                "dst": "any",
+                "descr": "E2E block ping test",
+                "top": True,
+                "apply": True
+            },
+            "resp_time": 3  # Accommodate the mandatory 1 second delay for firewall rule creations
         },
         {
             "name": "Create floating firewall rule",
@@ -906,7 +925,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check gateway must be default when statetype is 'synproxy state' constraint",
             "status": 400,
             "return": 4245,
-             "req_data": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -1005,6 +1024,13 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
     ]
     delete_tests = [
         {"name": "Delete firewall rule", "req_data": {}},    # Tracker ID gets populated by post_post() method
+        {
+            # Tracker ID gets populated by post_post() method
+            "name": "Delete ICMP test firewall rule",
+            "post_test_callable": "is_ping_successful",
+            "req_data": {"apply": True},
+            "resp_time": 3
+        },
         {"name": "Delete floating firewall rule", "req_data": {}},    # Tracker ID gets populated by post_post() method
         {
             "name": "Delete traffic shaper queue used to test",
@@ -1039,18 +1065,38 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         }
     ]
 
+    def is_ping_unsuccessful(self):
+        """Checks that we can't ping our target after a block rule is put in place"""
+        # Give the filter a moment to reload
+        time.sleep(3)
+
+        # Send a single ping and ensure the target host does not respond
+        if os.system(f"ping -c 1 -t 1 {self.args.host} > /dev/null") == 0:
+            raise AssertionError("Expected ping to be unsuccessful after block rule is applied")
+
+    def is_ping_successful(self):
+        """Checks that we can ping our target after a block rule is removed"""
+        # Give the filter a moment to reload
+        time.sleep(3)
+
+        # Send a single ping and ensure the target host does not respond
+        if os.system(f"ping -c 1 -t 1 {self.args.host} > /dev/null") != 0:
+            raise AssertionError("Expected ping to be successful after block rule is removed")
+
     # Override our PRE/POST methods
     def post_post(self):
-        # We create a firewall rule in the 7th and 8th test, ensure we have run at least 8 tests
-        if len(self.post_responses) == 8:
+        # After we've created rules in our tests, ensure the tracker is added to PUT and DELETE tests
+        if len(self.post_responses) == 9:
             # Assign the required tracker ID created in the POST request to the PUT and DELETE req_datas
             self.delete_tests[0]["req_data"]["tracker"] = self.post_responses[6]["data"]["tracker"]
             self.delete_tests[1]["req_data"]["tracker"] = self.post_responses[7]["data"]["tracker"]
+            self.delete_tests[2]["req_data"]["tracker"] = self.post_responses[8]["data"]["tracker"]
+
             key = 0
             for _ in self.put_tests:
                 if "req_data" in self.put_tests[key]:
                     self.put_tests[key]["req_data"]["tracker"] = self.post_responses[6]["data"]["tracker"]
-                    self.put_tests[key]["req_data"]["tracker"] = self.post_responses[7]["data"]["tracker"]
+                    self.put_tests[key]["req_data"]["tracker"] = self.post_responses[8]["data"]["tracker"]
                 key += 1
 
 
