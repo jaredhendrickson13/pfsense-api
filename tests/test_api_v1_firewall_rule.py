@@ -152,7 +152,8 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
                 "top": True,
                 "apply": True
             },
-            "resp_time": 3  # Accommodate the mandatory 1 second delay for firewall rule creations
+            "resp_time": 3,    # Accommodate the mandatory 1 second delay for firewall rule creations
+            "delay": 1  # Wait one second before running this request, otherwise conflicts occur with filter reload
         },
         {
             "name": "Create floating firewall rule",
@@ -1023,13 +1024,18 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         }
     ]
     delete_tests = [
-        {"name": "Delete firewall rule", "req_data": {}},    # Tracker ID gets populated by post_post() method
+        {
+            # Tracker ID gets populated by post_post() method
+            "name": "Delete firewall rule",
+            "req_data": {}
+        },
         {
             # Tracker ID gets populated by post_post() method
             "name": "Delete ICMP test firewall rule",
             "post_test_callable": "is_ping_successful",
             "req_data": {"apply": True},
-            "resp_time": 3
+            "resp_time": 3,
+            "delay": 1    # Wait one second before running this request, otherwise conflicts occur with filter reload
         },
         {"name": "Delete floating firewall rule", "req_data": {}},    # Tracker ID gets populated by post_post() method
         {
@@ -1067,7 +1073,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
 
     def is_ping_unsuccessful(self):
         """Checks that we can't ping our target after a block rule is put in place"""
-        # Give the filter a moment to reload
+        # Wait a bit for the filter to finish reloading
         time.sleep(3)
 
         # Send a single ping and ensure the target host does not respond
@@ -1076,7 +1082,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
 
     def is_ping_successful(self):
         """Checks that we can ping our target after a block rule is removed"""
-        # Give the filter a moment to reload
+        # Wait a bit for the filter to finish reloading
         time.sleep(3)
 
         # Send a single ping and ensure the target host does not respond
