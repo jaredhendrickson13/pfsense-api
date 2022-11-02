@@ -458,7 +458,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
     def check_carp_does_not_exist(self):
         """Checks if our CARP is no longer present after deleting an CARP VIP"""
         # Local variables
-        carp_ip = CARP_SUBNET_UPDATE.split("/")[0]
+        carp_ip = CARP_SUBNET_UPDATE.split("/", maxsplit=1)[0]
         carp_vhid = CARP_VHID_UPDATE
 
         if f"{carp_ip} vhid {carp_vhid}" in self.last_response.get("data", {}).get("cmd_output", ""):
@@ -467,7 +467,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
     def check_ip_alias_does_not_exist(self):
         """Checks if our IP alias is no longer present after deleting an IP alias VIP"""
         # Local varaible
-        alias_ip = IPALIAS_SUBNET_UPDATE.split("/")[0]
+        alias_ip = IPALIAS_SUBNET_UPDATE.split("/", maxsplit=1)[0]
 
         if alias_ip in self.last_response.get("data", {}).get("cmd_output", ""):
             raise AssertionError(f"Expected IP alias VIP '{alias_ip}' to be deleted")
