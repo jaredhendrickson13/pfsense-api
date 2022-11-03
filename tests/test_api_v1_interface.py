@@ -15,6 +15,25 @@
 import e2e_test_framework
 
 
+# Constants
+INTERFACE_STATICV4_IPADDR_CREATE = "172.16.100.1"
+INTERFACE_STATICV4_SUBNET_CREATE = 24
+INTERFACE_STATICV6_IPADDR_CREATE = "2001:db8:abcd:12::1"
+INTERFACE_STATICV6_SUBNET_CREATE = 64
+BRIDGE_STATICV4_IPADDR_CREATE = "172.16.200.1"
+BRIDGE_STATICV4_SUBNET_CREATE = 24
+VLAN_STATICV4_IPADDR_CREATE = "172.16.2.1"
+VLAN_STATICV4_SUBNET_CREATE = 24
+INTERFACE_STATICV4_IPADDR_UPDATE = "172.16.101.1"
+INTERFACE_STATICV4_SUBNET_UPDATE = 32
+INTERFACE_STATICV6_IPADDR_UPDATE = "2002:db8:abcd:12::1"
+INTERFACE_STATICV6_SUBNET_UPDATE = 70
+BRIDGE_STATICV4_IPADDR_UPDATE = "172.16.201.1"
+BRIDGE_STATICV4_SUBNET_UPDATE = 32
+VLAN_STATICV4_IPADDR_UPDATE = "172.16.20.1"
+VLAN_STATICV4_SUBNET_UPDATE = 32
+
+
 class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/interface endpoint."""
     uri = "/api/v1/interface"
@@ -515,17 +534,26 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             }
         },
         {
+            "name": "Check MTU less than VLAN parent interface constraint",
+            "status": 400,
+            "return": 3006,
+            "req_data": {
+                "if": "em2.2",
+                "mtu": 8192
+            }
+        },
+        {
             "name": "Create a staticv4/staticv6 interface",
             "req_data": {
                 "if": "em2",
-                "descr": "e2e_test",
+                "descr": "STATIC_TEST",
                 "enable": True,
                 "type": "staticv4",
                 "type6": "staticv6",
-                "ipaddr": "10.250.0.1",
-                "ipaddrv6": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
-                "subnet": "24",
-                "subnetv6": "120",
+                "ipaddr": INTERFACE_STATICV4_IPADDR_CREATE,
+                "ipaddrv6": INTERFACE_STATICV6_IPADDR_CREATE,
+                "subnet": INTERFACE_STATICV4_SUBNET_CREATE,
+                "subnetv6": INTERFACE_STATICV6_SUBNET_CREATE,
                 "blockbogons": True
             }
         },
@@ -536,35 +564,107 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
                 "descr": "BRIDGE_TEST",
                 "enable": True,
                 "type": "staticv4",
-                "ipaddr": "10.251.0.1",
-                "subnet": 24,
+                "ipaddr": BRIDGE_STATICV4_IPADDR_CREATE,
+                "subnet": BRIDGE_STATICV4_SUBNET_CREATE,
                 "blockbogons": True
             }
         },
         {
-            "name": "Check MTU less than VLAN parent interface constraint",
-            "status": 400,
-            "return": 3006,
+            "name": "Create a static interface on a VLAN",
             "req_data": {
                 "if": "em2.2",
-                "mtu": 8192
+                "descr": "VLAN_TEST",
+                "enable": True,
+                "type": "staticv4",
+                "ipaddr": VLAN_STATICV4_IPADDR_CREATE,
+                "subnet": VLAN_STATICV4_SUBNET_CREATE,
+                "blockbogons": True
             }
         },
-
+        {
+            "name": "Apply interfaces",
+            "method": "POST",
+            "uri": "/api/v1/interface/apply",
+            "req_data": {"aysnc": False},
+            "resp_time": 30,
+            "resp_data_empty": True
+        },
+        {
+            "name": "Check that the created interfaces are now present",
+            "method": "POST",
+            "uri": "/api/v1/diagnostics/command_prompt",
+            "req_data": {"shell_cmd": "ifconfig"},
+            "post_test_callable": "are_ifs_created"
+        }
     ]
     put_tests = [
         {
-            "name": "Update staticv4/staticv6 interface to dhcp/dhcp6 and apply",
+            "name": "Disable interface",
+            "resp_time": 5,
             "req_data": {
-                "id": "em2",
-                "descr": "e2e_test_UPDATED",
+                "id": "em2.2",
+                "descr": "IF_DISABLED_TEST",
                 "enable": False,
                 "type": "dhcp",
-                "type6": "dhcp6",
                 "blockbogons": False,
                 "apply": True
             },
-            "resp_time": 12    # Allow a few seconds to bounce the interface when applying
+        },
+        {
+            "name": "Check that the disabled interfaces is no longer up",
+            "method": "POST",
+            "uri": "/api/v1/diagnostics/command_prompt",
+            "req_data": {"shell_cmd": "ifconfig"},
+            "post_test_callable": "is_if_disabled"
+        },
+        {
+            "name": "Re-enable and update IP of VLAN interface",
+            "req_data": {
+                "id": "em2.2",
+                "enable": True,
+                "type": "staticv4",
+                "ipaddr": VLAN_STATICV4_IPADDR_UPDATE,
+                "subnet": VLAN_STATICV4_SUBNET_UPDATE,
+                "apply": False
+            },
+        },
+        {
+            "name": "Update IP of static interface",
+            "req_data": {
+                "id": "em2",
+                "type": "staticv4",
+                "type6": "staticv6",
+                "ipaddr": INTERFACE_STATICV4_IPADDR_UPDATE,
+                "ipaddrv6": INTERFACE_STATICV6_IPADDR_UPDATE,
+                "subnet": INTERFACE_STATICV4_SUBNET_UPDATE,
+                "subnetv6": INTERFACE_STATICV6_SUBNET_UPDATE,
+                "apply": False
+            },
+        },
+        {
+            "name": "Update IP of bridge interface",
+            "req_data": {
+                "id": "bridge0",
+                "type": "staticv4",
+                "ipaddr": BRIDGE_STATICV4_IPADDR_UPDATE,
+                "subnet": BRIDGE_STATICV4_SUBNET_UPDATE,
+                "apply": False
+            },
+        },
+        {
+            "name": "Apply interfaces",
+            "method": "POST",
+            "uri": "/api/v1/interface/apply",
+            "req_data": {"aysnc": False},
+            "resp_time": 30,
+            "resp_data_empty": True
+        },
+        {
+            "name": "Check that the updated interface IPs are now present and old IPs are not",
+            "method": "POST",
+            "uri": "/api/v1/diagnostics/command_prompt",
+            "req_data": {"shell_cmd": "ifconfig"},
+            "post_test_callable": "are_ifs_updated"
         }
     ]
     delete_tests = [
@@ -591,6 +691,12 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             }
         },
         {
+            "name": "Delete VLAN interface",
+            "req_data": {
+                "if": "em2.2"
+            }
+        },
+        {
             "name": "Delete interface bridge",
             "uri": "/api/v1/interface/bridge",
             "req_data": {
@@ -610,8 +716,120 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "req_data": {
                 "id": "TEST_ALIAS"
             }
+        },
+        {
+            "name": "Check that deleted interfaces no longer exist",
+            "method": "POST",
+            "uri": "/api/v1/diagnostics/command_prompt",
+            "req_data": {"shell_cmd": "ifconfig"},
+            "post_test_callable": "are_ifs_deleted"
         }
     ]
+
+    def are_ifs_created(self):
+        """Checks if the interfaces created in the POST tests are present after being applied."""
+        # Local variables
+        staticv4_line = f"inet {INTERFACE_STATICV4_IPADDR_CREATE} netmask 0xffffff00"
+        staticv6_line = f"inet6 {INTERFACE_STATICV6_IPADDR_CREATE} prefixlen {INTERFACE_STATICV6_SUBNET_CREATE}"
+        bridge_line = f"inet {BRIDGE_STATICV4_IPADDR_CREATE} netmask 0xffffff00"
+        vlan_line = f"inet {VLAN_STATICV4_IPADDR_CREATE} netmask 0xffffff00"
+
+        # Ensure static interface exists with IPv4 address
+        if staticv4_line not in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"Expected interface with static IPv4 '{INTERFACE_STATICV4_IPADDR_CREATE}'")
+
+        # Ensure static interface exists with IPv6 address
+        if staticv6_line not in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"Expected interface with static IPv6 '{INTERFACE_STATICV6_IPADDR_CREATE}'")
+
+        # Ensure bridged interface exists with IPv4 address
+        if bridge_line not in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"Expected bridge interface with static IPv4 '{BRIDGE_STATICV4_IPADDR_CREATE}'")
+
+        # Ensure VLAN interface exists with IPv4 address
+        if vlan_line not in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"Expected VLAN interface with static IPv4 '{VLAN_STATICV4_IPADDR_CREATE}'")
+
+    def are_ifs_updated(self):
+        """
+        Checks if the interfaces updated in the PUT tests are present after being applied and that the old IPs are
+        no longer used.
+        """
+        # Local variables
+        staticv4_line = f"inet {INTERFACE_STATICV4_IPADDR_UPDATE} netmask 0xffffffff"
+        staticv6_line = f"inet6 {INTERFACE_STATICV6_IPADDR_UPDATE} prefixlen {INTERFACE_STATICV6_SUBNET_UPDATE}"
+        bridge_line = f"inet {BRIDGE_STATICV4_IPADDR_UPDATE} netmask 0xffffffff"
+        vlan_line = f"inet {VLAN_STATICV4_IPADDR_UPDATE} netmask 0xffffffff"
+        staticv4_old_line = f"inet {INTERFACE_STATICV4_IPADDR_CREATE} netmask 0xffffff00"
+        staticv6_old_line = f"inet6 {INTERFACE_STATICV6_IPADDR_CREATE} prefixlen {INTERFACE_STATICV6_SUBNET_CREATE}"
+        bridge_old_line = f"inet {BRIDGE_STATICV4_IPADDR_CREATE} netmask 0xffffff00"
+        vlan_old_line = f"inet {VLAN_STATICV4_IPADDR_CREATE} netmask 0xffffff00"
+
+        # Ensure static interface exists with updated IPv4 address
+        if staticv4_line not in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"Expected interface with static IPv4 '{INTERFACE_STATICV4_IPADDR_UPDATE}'")
+
+        # Ensure old IP is no longer present
+        if staticv4_old_line in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"Interface is still using old static IPv4 '{INTERFACE_STATICV4_IPADDR_CREATE}'")
+
+        # Ensure static interface exists with updated IPv6 address
+        if staticv6_line not in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"Expected interface with static IPv6 '{INTERFACE_STATICV6_IPADDR_UPDATE}'")
+
+        # Ensure old IPv6 is no longer present
+        if staticv6_old_line in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"Interface is still using old static IPv6 '{INTERFACE_STATICV6_IPADDR_CREATE}'")
+
+        # Ensure bridged interface exists with IPv4 address
+        if bridge_line not in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"Expected bridge interface with static IPv4 '{BRIDGE_STATICV4_IPADDR_UPDATE}'")
+
+        # Ensure old bridge IP is no longer present
+        if bridge_old_line in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"Bridge is still using old static IPv4 '{BRIDGE_STATICV4_IPADDR_CREATE}'")
+
+        # Ensure VLAN interface exists with IPv4 address
+        if vlan_line not in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"Expected VLAN interface with static IPv4 '{VLAN_STATICV4_IPADDR_UPDATE}'")
+
+        # Ensure old VLAN IP is no longer present
+        if vlan_old_line in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"VLAN is still using old static IPv4 '{VLAN_STATICV4_IPADDR_CREATE}'")
+
+    def are_ifs_deleted(self):
+        """Checks if the interfaces deleted in the DELETE tests are no longer present"""
+        # Local variables
+        staticv4_line = f"inet {INTERFACE_STATICV4_IPADDR_UPDATE} netmask 0xffffffff"
+        staticv6_line = f"inet6 {INTERFACE_STATICV6_IPADDR_UPDATE} prefixlen {INTERFACE_STATICV6_SUBNET_UPDATE}"
+        bridge_line = f"inet {BRIDGE_STATICV4_IPADDR_UPDATE} netmask 0xffffffff"
+        vlan_line = f"inet {VLAN_STATICV4_IPADDR_UPDATE} netmask 0xffffffff"
+
+        # Ensure staticv4 interface no longer exists
+        if staticv4_line in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"Expected interface with IP '{INTERFACE_STATICV4_IPADDR_UPDATE}' to be deleted")
+
+        # Ensure staticv6 interface no longer exists
+        if staticv6_line in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"Expected interface with IP '{INTERFACE_STATICV6_IPADDR_UPDATE}' to be deleted")
+
+        # Ensure bridge interface no longer exists
+        if bridge_line in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"Expected bridge with IP '{BRIDGE_STATICV4_IPADDR_UPDATE}' to be deleted")
+
+        # Ensure vlan interface no longer exists
+        if vlan_line in self.last_response.get("data", {}).get("cmd_output", ""):
+            raise AssertionError(f"Expected VLAN IP '{VLAN_STATICV4_IPADDR_UPDATE}' to be deleted")
+
+    def is_if_disabled(self):
+        """Checks if the interface updated to be disabled is no longer up."""
+        # Local variables
+        ifconfig_lines = self.last_response.get("data", {}).get("cmd_output", "").split("\n")
+
+        # Loop through each line and check if em2.2 is now disabled
+        for line in ifconfig_lines:
+            if line.startswith("em2.2:") and "UP" in line:
+                raise AssertionError("Expected em2.2 to be disabled and not UP")
 
 
 APIE2ETestInterface()
