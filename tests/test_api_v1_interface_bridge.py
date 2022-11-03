@@ -13,6 +13,11 @@
 # limitations under the License.
 """Script used to test the /api/v1/interface/bridge endpoint."""
 import e2e_test_framework
+from e2e_test_framework.tools import parse_ifconfig
+
+# Constants
+BR_MEMBER_IF_CREATE = "em1"
+BR_MEMBER_IF_UPDATE = "em2"
 
 
 class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
@@ -21,11 +26,29 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
     get_tests = [{"name": "Read all interface VLANs"}]
     post_tests = [
         {
+            "name": "Assign extra interface to use in tests",
+            "method": "POST",
+            "uri": "/api/v1/interface",
+            "req_data": {
+                "if": BR_MEMBER_IF_UPDATE,
+                "enable": True,
+                "apply": True
+            },
+            "resp_time": 10
+        },
+        {
             "name": "Create bridge for LAN",
             "req_data": {
-                "members": ["LAN"],
+                "members": [BR_MEMBER_IF_CREATE],
                 "descr": "Test bridge"
             }
+        },
+        {
+            "name": "Check that bridge is actually present on the system",
+            "method": "POST",
+            "uri": "/api/v1/diagnostics/command_prompt",
+            "req_data": {"shell_cmd": "ifconfig"},
+            "post_test_callable": "is_bridge_created"
         },
         {
             "name": "Check members required constraint",
@@ -62,9 +85,16 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
             "name": "Update bridge for LAN",
             "req_data": {
                 "id": "bridge0",
-                "members": ["lan"],
+                "members": [BR_MEMBER_IF_UPDATE],
                 "descr": "Updated test bridge"
             }
+        },
+        {
+            "name": "Check that bridge is actually updated on the system",
+            "method": "POST",
+            "uri": "/api/v1/diagnostics/command_prompt",
+            "req_data": {"shell_cmd": "ifconfig"},
+            "post_test_callable": "is_bridge_updated"
         },
         {
             "name": "Check bridge ID required constraint",
@@ -117,8 +147,64 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
             "req_data": {
                 "id": "bridge0"
             }
+        },
+        {
+            "name": "Check that bridge is actually updated on the system",
+            "method": "POST",
+            "uri": "/api/v1/diagnostics/command_prompt",
+            "req_data": {"shell_cmd": "ifconfig"},
+            "post_test_callable": "is_bridge_deleted"
+        },
+        {
+            "name": "Delete interface used for testing",
+            "method": "DELETE",
+            "uri": "/api/v1/interface",
+            "req_data": {"if": BR_MEMBER_IF_UPDATE, "apply": True},
+            "resp_time": 5
         }
     ]
+
+    def is_bridge_created(self):
+        """Checks if the bridge interface is present and contains the correct members"""
+        # Local variables
+        ifconfig_out = self.last_response.get("data", {}).get("cmd_output", "")
+        ifconfig = parse_ifconfig(ifconfig_out)
+
+        # Check if the bridge interface was added to the system
+        if "bridge0" not in ifconfig:
+            raise AssertionError("Expected bridge0 interface to be present")
+
+        # Check that the bridge interface has the correct member(s)
+        if f"member: {BR_MEMBER_IF_CREATE}" not in "\n".join(ifconfig.get("bridge0")):
+            raise AssertionError(f"Expected bridge0 interface to contain member interface {BR_MEMBER_IF_CREATE}")
+
+    def is_bridge_updated(self):
+        """Checks if the bridge interface is updated and contains the correct members"""
+        # Local variables
+        ifconfig_out = self.last_response.get("data", {}).get("cmd_output", "")
+        ifconfig = parse_ifconfig(ifconfig_out)
+
+        # Check if the bridge interface was added to the system
+        if "bridge0" not in ifconfig:
+            raise AssertionError("Expected bridge0 interface to be present")
+
+        # Check that the bridge interface no longer has the old member
+        if f"member: {BR_MEMBER_IF_CREATE}" in "\n".join(ifconfig.get("bridge0")):
+            raise AssertionError(f"Bridge0 interface still using member interface {BR_MEMBER_IF_CREATE}")
+
+        # Check that the bridge interface has the correct updated member(s)
+        if f"member: {BR_MEMBER_IF_UPDATE}" not in "\n".join(ifconfig.get("bridge0")):
+            raise AssertionError(f"Expected bridge0 interface to contain member interface {BR_MEMBER_IF_UPDATE}")
+
+    def is_bridge_deleted(self):
+        """Checks if the bridge interface is deleted on the system"""
+        # Local variables
+        ifconfig_out = self.last_response.get("data", {}).get("cmd_output", "")
+        ifconfig = parse_ifconfig(ifconfig_out)
+
+        # Check if the bridge interface was added to the system
+        if "bridge0" in ifconfig:
+            raise AssertionError("Expected bridge0 interface to be deleted")
 
 
 APIE2ETestInterfaceBridge()
