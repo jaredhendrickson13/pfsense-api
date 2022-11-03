@@ -12,26 +12,107 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Script used to test the /api/v1/interface endpoint."""
+import ipaddress
+import random
+
 import e2e_test_framework
 
-
 # Constants
-INTERFACE_STATICV4_IPADDR_CREATE = "172.16.100.1"
-INTERFACE_STATICV4_SUBNET_CREATE = 24
-INTERFACE_STATICV6_IPADDR_CREATE = "2001:db8:abcd:12::1"
-INTERFACE_STATICV6_SUBNET_CREATE = 64
-BRIDGE_STATICV4_IPADDR_CREATE = "172.16.200.1"
-BRIDGE_STATICV4_SUBNET_CREATE = 24
+IF_WAN_ID = "em0"
+IF_ID = "em2"
+BR_MEMBER_ID = "em1"
+VLAN_TAG = random.randint(2, 4094)
+VLAN_IF = f"{IF_ID}.{VLAN_TAG}"
+IF_STATICV4_IPADDR_CREATE = "172.16.100.1"
+IF_STATICV4_SUBNET_CREATE = random.randint(24, 31)
+IF_STATICV6_IPADDR_CREATE = "2001:db8:abcd:12::1"
+IF_STATICV6_SUBNET_CREATE = random.randint(64, 127)
+BR_STATICV4_IPADDR_CREATE = "172.16.200.1"
+BR_STATICV4_SUBNET_CREATE = random.randint(24, 31)
 VLAN_STATICV4_IPADDR_CREATE = "172.16.2.1"
-VLAN_STATICV4_SUBNET_CREATE = 24
-INTERFACE_STATICV4_IPADDR_UPDATE = "172.16.101.1"
-INTERFACE_STATICV4_SUBNET_UPDATE = 32
-INTERFACE_STATICV6_IPADDR_UPDATE = "2002:db8:abcd:12::1"
-INTERFACE_STATICV6_SUBNET_UPDATE = 70
-BRIDGE_STATICV4_IPADDR_UPDATE = "172.16.201.1"
-BRIDGE_STATICV4_SUBNET_UPDATE = 32
+VLAN_STATICV4_SUBNET_CREATE = random.randint(24, 31)
+IF_STATICV4_IPADDR_UPDATE = "172.16.101.1"
+IF_STATICV4_SUBNET_UPDATE = random.randint(24, 31)
+IF_STATICV6_IPADDR_UPDATE = "2002:db8:abcd:12::1"
+IF_STATICV6_SUBNET_UPDATE = random.randint(64, 127)
+BR_STATICV4_IPADDR_UPDATE = "172.16.201.1"
+BR_STATICV4_SUBNET_UPDATE = random.randint(24, 31)
 VLAN_STATICV4_IPADDR_UPDATE = "172.16.20.1"
-VLAN_STATICV4_SUBNET_UPDATE = 32
+VLAN_STATICV4_SUBNET_UPDATE = random.randint(24, 31)
+
+
+# Functions
+def bits_to_hex(bits: int):
+    """
+    Converts a subnet's bit mask into a hex mask.
+    :param bits: a network bitmask
+    :return: the hex mask equivalent to the bitmask
+    """
+    # First convert to dot mask
+    dot_mask = '.'.join([str((0xffffffff << (32 - bits) >> i) & 0xff) for i in [24, 16, 8, 0]])
+
+    # Loop through each octet and append it's hex value to our mask
+    hex_mask = "0x"
+    for octet in dot_mask.split("."):
+        # Format octet into 2-digit hex value and add it to our hex mask
+        hex_octet = format(int(octet), "02x")
+        hex_mask = hex_mask + hex_octet
+
+    return hex_mask
+
+
+def parse_ifconfig(ifconfig_out: str):
+    """Parses the ifconfig output for each individual interface into it's own dict
+    :param ifconfig_out: the ifconfig output to check against
+    :return: a dictionary containing a section for each individual interface in the ifconfig output
+    """
+    # Local variables
+    ifconfig_dict = {}
+    if_name = ""
+
+    # Loop through each line of the ifconfig
+    for line in ifconfig_out.split("\n"):
+        # If the line does not start with a space, capture the interface name and start it's own dictionary
+        if not line.startswith("\t"):
+            if_name = line.split(":", maxsplit=1)[0]
+            ifconfig_dict[if_name] = []
+        # Otherwise, simply add the line to the dict for this if
+        else:
+            ifconfig_dict[if_name].append(line.replace("\t", ""))
+
+    return ifconfig_dict
+
+
+def is_if_in_ifconfig(ifconfig_out: str, iface: str, ipaddr: str, bitmask: int):
+    """
+    Checks if a specific interface configuration is present in ifconfig
+    :param iface: the interface expected to host this configuration
+    :param ifconfig_out: the ifconfig output to check against
+    :param ipaddr: the IPv4 or IPv6 (depending on the inet_type) of the network
+    :param bitmask: the bitmask of the network
+    :return: a string containing the ifconfig line expected from the network details
+    """
+    # Local variables
+    ifconfig = parse_ifconfig(ifconfig_out)
+    ipaddr = ipaddress.ip_address(f"{ipaddr}")
+    subnet = ipaddress.ip_network(f"{ipaddr}/{bitmask}", strict=False)
+
+    # Set the expected string for a IPv4 network
+    if ipaddr.version == 4:
+        ifconfig_line = f"inet {ipaddr} netmask {bits_to_hex(bitmask)} broadcast {subnet.broadcast_address}"
+    # Set the expected string for a IPv6 network
+    elif ipaddr.version == 6:
+        ifconfig_line = f"inet6 {ipaddr.compressed} prefixlen {bitmask}"
+    # Otherwise, our network details are invalid raise an error
+    else:
+        raise ValueError("Invalid IP address specified")
+
+    # Check if this line is in ifconfig
+    if ifconfig_line in ifconfig.get(iface, []):
+        return True
+
+    # Return false if not match was found
+    return False
 
 
 class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
@@ -68,7 +149,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3001,
             "req_data": {
-                "if": "em0"
+                "if": IF_WAN_ID
             }
         },
         {
@@ -76,7 +157,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3025,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "type": "INVALID"
             }
         },
@@ -85,7 +166,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3041,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "type6": "INVALID"
             }
         },
@@ -94,7 +175,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3003,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "spoofmac": "INVALID"
             }
         },
@@ -103,7 +184,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3004,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "mtu": 1279
             }
         },
@@ -112,7 +193,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3004,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "mtu": 8193
             }
         },
@@ -121,7 +202,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3005,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "mss": 575
             }
         },
@@ -130,7 +211,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3005,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "mss": 65536
             }
         },
@@ -139,7 +220,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3007,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "media": "INVALID"
             }
         },
@@ -148,7 +229,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3059,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "pkg_INVALID"
             }
         },
@@ -157,7 +238,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3060,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST_ALIAS"
             }
         },
@@ -166,7 +247,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3061,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "10051"
             }
         },
@@ -175,7 +256,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3008,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "WAN"
             }
         },
@@ -184,7 +265,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3011,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "staticv4"
             }
@@ -194,7 +275,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3010,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "staticv4",
                 "ipaddr": "INVALID"
@@ -205,7 +286,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3009,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "staticv4",
                 "ipaddr": "192.168.1.1"
@@ -216,7 +297,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3013,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "staticv4",
                 "ipaddr": "10.90.1.1"
@@ -227,7 +308,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3014,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "staticv4",
                 "ipaddr": "10.90.1.1",
@@ -240,7 +321,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3015,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "alias-address": "INVALID"
@@ -251,7 +332,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3015,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "alias-address": "192.168.54.1",
@@ -263,7 +344,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3016,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "dhcprejectfrom": ["INVALID"]
@@ -274,7 +355,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3017,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "adv_dhcp_pt_timeout": 0
@@ -285,7 +366,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3018,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "adv_dhcp_pt_retry": 0
@@ -296,7 +377,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3019,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "adv_dhcp_pt_select_timeout": -1
@@ -307,7 +388,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3020,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "adv_dhcp_pt_reboot": 0
@@ -318,7 +399,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3021,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "adv_dhcp_pt_backoff_cutoff": 0
@@ -329,7 +410,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3022,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "adv_dhcp_pt_initial_interval": 0
@@ -340,7 +421,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3023,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "adv_dhcp_config_file_override": True,
@@ -352,7 +433,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3024,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "dhcpvlanenable": True,
@@ -364,7 +445,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3028,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "staticv6"
             }
@@ -374,7 +455,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3026,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "staticv6",
                 "ipaddrv6": "INVALID"
@@ -385,7 +466,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3030,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "staticv6",
                 "ipaddrv6": "0::"
@@ -396,7 +477,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3029,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "staticv6",
                 "ipaddrv6": "0::",
@@ -408,7 +489,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3031,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "staticv6",
                 "ipaddrv6": "0::",
@@ -421,7 +502,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3032,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "dhcp6",
                 "dhcp6-ia-pd-len": "INVALID"
@@ -432,7 +513,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3033,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "dhcp6",
                 "dhcp6vlanenable": True,
@@ -444,7 +525,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3034,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "dhcp6",
                 "adv_dhcp6_config_file_override": True,
@@ -456,7 +537,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3036,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "6rd"
             }
@@ -466,7 +547,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3035,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "6rd",
                 "gateway-6rd": "INVALID"
@@ -477,7 +558,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3037,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "6rd",
                 "gateway-6rd": "1.2.3.4",
@@ -489,7 +570,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3037,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "6rd",
                 "gateway-6rd": "1.2.3.4",
@@ -501,7 +582,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3039,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "track6"
             }
@@ -511,7 +592,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3038,
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "track6",
                 "track6-interface": "INVALID"
@@ -521,7 +602,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Create interface bridge for testing",
             "uri": "/api/v1/interface/bridge",
             "req_data": {
-                "members": "em1"
+                "members": [BR_MEMBER_ID]
             }
         },
         {
@@ -529,8 +610,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "uri": "/api/v1/interface/vlan",
             "resp_time": 5,
             "req_data": {
-                "if": "em2",
-                "tag": 2
+                "if": IF_ID,
+                "tag": VLAN_TAG
             }
         },
         {
@@ -538,22 +619,22 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 3006,
             "req_data": {
-                "if": "em2.2",
+                "if": VLAN_IF,
                 "mtu": 8192
             }
         },
         {
             "name": "Create a staticv4/staticv6 interface",
             "req_data": {
-                "if": "em2",
+                "if": IF_ID,
                 "descr": "STATIC_TEST",
                 "enable": True,
                 "type": "staticv4",
                 "type6": "staticv6",
-                "ipaddr": INTERFACE_STATICV4_IPADDR_CREATE,
-                "ipaddrv6": INTERFACE_STATICV6_IPADDR_CREATE,
-                "subnet": INTERFACE_STATICV4_SUBNET_CREATE,
-                "subnetv6": INTERFACE_STATICV6_SUBNET_CREATE,
+                "ipaddr": IF_STATICV4_IPADDR_CREATE,
+                "ipaddrv6": IF_STATICV6_IPADDR_CREATE,
+                "subnet": IF_STATICV4_SUBNET_CREATE,
+                "subnetv6": IF_STATICV6_SUBNET_CREATE,
                 "blockbogons": True
             }
         },
@@ -561,18 +642,18 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Create a static interface on the bridge",
             "req_data": {
                 "if": "bridge0",
-                "descr": "BRIDGE_TEST",
+                "descr": "BR_TEST",
                 "enable": True,
                 "type": "staticv4",
-                "ipaddr": BRIDGE_STATICV4_IPADDR_CREATE,
-                "subnet": BRIDGE_STATICV4_SUBNET_CREATE,
+                "ipaddr": BR_STATICV4_IPADDR_CREATE,
+                "subnet": BR_STATICV4_SUBNET_CREATE,
                 "blockbogons": True
             }
         },
         {
             "name": "Create a static interface on a VLAN",
             "req_data": {
-                "if": "em2.2",
+                "if": VLAN_IF,
                 "descr": "VLAN_TEST",
                 "enable": True,
                 "type": "staticv4",
@@ -602,7 +683,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Disable interface",
             "resp_time": 5,
             "req_data": {
-                "id": "em2.2",
+                "id": VLAN_IF,
                 "descr": "IF_DISABLED_TEST",
                 "enable": False,
                 "type": "dhcp",
@@ -620,7 +701,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
         {
             "name": "Re-enable and update IP of VLAN interface",
             "req_data": {
-                "id": "em2.2",
+                "id": VLAN_IF,
                 "enable": True,
                 "type": "staticv4",
                 "ipaddr": VLAN_STATICV4_IPADDR_UPDATE,
@@ -631,13 +712,13 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
         {
             "name": "Update IP of static interface",
             "req_data": {
-                "id": "em2",
+                "id": IF_ID,
                 "type": "staticv4",
                 "type6": "staticv6",
-                "ipaddr": INTERFACE_STATICV4_IPADDR_UPDATE,
-                "ipaddrv6": INTERFACE_STATICV6_IPADDR_UPDATE,
-                "subnet": INTERFACE_STATICV4_SUBNET_UPDATE,
-                "subnetv6": INTERFACE_STATICV6_SUBNET_UPDATE,
+                "ipaddr": IF_STATICV4_IPADDR_UPDATE,
+                "ipaddrv6": IF_STATICV6_IPADDR_UPDATE,
+                "subnet": IF_STATICV4_SUBNET_UPDATE,
+                "subnetv6": IF_STATICV6_SUBNET_UPDATE,
                 "apply": False
             },
         },
@@ -646,8 +727,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "req_data": {
                 "id": "bridge0",
                 "type": "staticv4",
-                "ipaddr": BRIDGE_STATICV4_IPADDR_UPDATE,
-                "subnet": BRIDGE_STATICV4_SUBNET_UPDATE,
+                "ipaddr": BR_STATICV4_IPADDR_UPDATE,
+                "subnet": BR_STATICV4_SUBNET_UPDATE,
                 "apply": False
             },
         },
@@ -672,7 +753,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Delete interface",
             "resp_time": 3,
             "req_data": {
-                "if": "em2"
+                "if": IF_ID
             }
         },
         {
@@ -693,7 +774,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
         {
             "name": "Delete VLAN interface",
             "req_data": {
-                "if": "em2.2"
+                "if": VLAN_IF
             }
         },
         {
@@ -707,7 +788,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Delete interface VLAN",
             "uri": "/api/v1/interface/vlan",
             "req_data": {
-                "vlanif": "em2.2"
+                "vlanif": VLAN_IF
             }
         },
         {
@@ -729,25 +810,22 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
     def are_ifs_created(self):
         """Checks if the interfaces created in the POST tests are present after being applied."""
         # Local variables
-        staticv4_line = f"inet {INTERFACE_STATICV4_IPADDR_CREATE} netmask 0xffffff00"
-        staticv6_line = f"inet6 {INTERFACE_STATICV6_IPADDR_CREATE} prefixlen {INTERFACE_STATICV6_SUBNET_CREATE}"
-        bridge_line = f"inet {BRIDGE_STATICV4_IPADDR_CREATE} netmask 0xffffff00"
-        vlan_line = f"inet {VLAN_STATICV4_IPADDR_CREATE} netmask 0xffffff00"
+        ifconfig_out = self.last_response.get("data", {}).get("cmd_output", "")
 
         # Ensure static interface exists with IPv4 address
-        if staticv4_line not in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Expected interface with static IPv4 '{INTERFACE_STATICV4_IPADDR_CREATE}'")
+        if not is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV4_IPADDR_CREATE, IF_STATICV4_SUBNET_CREATE):
+            raise AssertionError(f"Expected interface with static IPv4 '{IF_STATICV4_IPADDR_CREATE}'")
 
         # Ensure static interface exists with IPv6 address
-        if staticv6_line not in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Expected interface with static IPv6 '{INTERFACE_STATICV6_IPADDR_CREATE}'")
+        if not is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV6_IPADDR_CREATE, IF_STATICV6_SUBNET_CREATE):
+            raise AssertionError(f"Expected interface with static IPv6 '{IF_STATICV6_IPADDR_CREATE}'")
 
         # Ensure bridged interface exists with IPv4 address
-        if bridge_line not in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Expected bridge interface with static IPv4 '{BRIDGE_STATICV4_IPADDR_CREATE}'")
+        if not is_if_in_ifconfig(ifconfig_out, "bridge0", BR_STATICV4_IPADDR_CREATE, BR_STATICV4_SUBNET_CREATE):
+            raise AssertionError(f"Expected bridge interface with static IPv4 '{BR_STATICV4_IPADDR_CREATE}'")
 
         # Ensure VLAN interface exists with IPv4 address
-        if vlan_line not in self.last_response.get("data", {}).get("cmd_output", ""):
+        if not is_if_in_ifconfig(ifconfig_out,VLAN_IF, VLAN_STATICV4_IPADDR_CREATE, VLAN_STATICV4_SUBNET_CREATE):
             raise AssertionError(f"Expected VLAN interface with static IPv4 '{VLAN_STATICV4_IPADDR_CREATE}'")
 
     def are_ifs_updated(self):
@@ -756,69 +834,59 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
         no longer used.
         """
         # Local variables
-        staticv4_line = f"inet {INTERFACE_STATICV4_IPADDR_UPDATE} netmask 0xffffffff"
-        staticv6_line = f"inet6 {INTERFACE_STATICV6_IPADDR_UPDATE} prefixlen {INTERFACE_STATICV6_SUBNET_UPDATE}"
-        bridge_line = f"inet {BRIDGE_STATICV4_IPADDR_UPDATE} netmask 0xffffffff"
-        vlan_line = f"inet {VLAN_STATICV4_IPADDR_UPDATE} netmask 0xffffffff"
-        staticv4_old_line = f"inet {INTERFACE_STATICV4_IPADDR_CREATE} netmask 0xffffff00"
-        staticv6_old_line = f"inet6 {INTERFACE_STATICV6_IPADDR_CREATE} prefixlen {INTERFACE_STATICV6_SUBNET_CREATE}"
-        bridge_old_line = f"inet {BRIDGE_STATICV4_IPADDR_CREATE} netmask 0xffffff00"
-        vlan_old_line = f"inet {VLAN_STATICV4_IPADDR_CREATE} netmask 0xffffff00"
+        ifconfig_out = self.last_response.get("data", {}).get("cmd_output", "")
 
         # Ensure static interface exists with updated IPv4 address
-        if staticv4_line not in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Expected interface with static IPv4 '{INTERFACE_STATICV4_IPADDR_UPDATE}'")
+        if not is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV4_IPADDR_UPDATE, IF_STATICV4_SUBNET_UPDATE):
+            raise AssertionError(f"Expected interface with static IPv4 '{IF_STATICV4_IPADDR_UPDATE}'")
 
         # Ensure old IP is no longer present
-        if staticv4_old_line in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Interface is still using old static IPv4 '{INTERFACE_STATICV4_IPADDR_CREATE}'")
+        if is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV4_IPADDR_CREATE, IF_STATICV4_SUBNET_CREATE):
+            raise AssertionError(f"Interface is still using old static IPv4 '{IF_STATICV4_IPADDR_CREATE}'")
 
         # Ensure static interface exists with updated IPv6 address
-        if staticv6_line not in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Expected interface with static IPv6 '{INTERFACE_STATICV6_IPADDR_UPDATE}'")
+        if not is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV6_IPADDR_UPDATE, IF_STATICV6_SUBNET_UPDATE):
+            raise AssertionError(f"Expected interface with static IPv6 '{IF_STATICV6_IPADDR_UPDATE}'")
 
         # Ensure old IPv6 is no longer present
-        if staticv6_old_line in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Interface is still using old static IPv6 '{INTERFACE_STATICV6_IPADDR_CREATE}'")
+        if is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV6_IPADDR_CREATE, IF_STATICV6_SUBNET_CREATE):
+            raise AssertionError(f"Interface is still using old static IPv6 '{IF_STATICV6_IPADDR_CREATE}'")
 
         # Ensure bridged interface exists with IPv4 address
-        if bridge_line not in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Expected bridge interface with static IPv4 '{BRIDGE_STATICV4_IPADDR_UPDATE}'")
+        if not is_if_in_ifconfig(ifconfig_out, "bridge0", BR_STATICV4_IPADDR_UPDATE, BR_STATICV4_SUBNET_UPDATE):
+            raise AssertionError(f"Expected bridge interface with static IPv4 '{BR_STATICV4_IPADDR_UPDATE}'")
 
         # Ensure old bridge IP is no longer present
-        if bridge_old_line in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Bridge is still using old static IPv4 '{BRIDGE_STATICV4_IPADDR_CREATE}'")
+        if is_if_in_ifconfig(ifconfig_out, "bridge0", BR_STATICV4_IPADDR_CREATE, BR_STATICV4_SUBNET_CREATE):
+            raise AssertionError(f"Bridge is still using old static IPv4 '{BR_STATICV4_IPADDR_CREATE}'")
 
         # Ensure VLAN interface exists with IPv4 address
-        if vlan_line not in self.last_response.get("data", {}).get("cmd_output", ""):
+        if not is_if_in_ifconfig(ifconfig_out,VLAN_IF, VLAN_STATICV4_IPADDR_UPDATE, VLAN_STATICV4_SUBNET_UPDATE):
             raise AssertionError(f"Expected VLAN interface with static IPv4 '{VLAN_STATICV4_IPADDR_UPDATE}'")
 
         # Ensure old VLAN IP is no longer present
-        if vlan_old_line in self.last_response.get("data", {}).get("cmd_output", ""):
+        if is_if_in_ifconfig(ifconfig_out,VLAN_IF, VLAN_STATICV4_IPADDR_CREATE, VLAN_STATICV4_SUBNET_CREATE):
             raise AssertionError(f"VLAN is still using old static IPv4 '{VLAN_STATICV4_IPADDR_CREATE}'")
 
     def are_ifs_deleted(self):
         """Checks if the interfaces deleted in the DELETE tests are no longer present"""
         # Local variables
-        staticv4_line = f"inet {INTERFACE_STATICV4_IPADDR_UPDATE} netmask 0xffffffff"
-        staticv6_line = f"inet6 {INTERFACE_STATICV6_IPADDR_UPDATE} prefixlen {INTERFACE_STATICV6_SUBNET_UPDATE}"
-        bridge_line = f"inet {BRIDGE_STATICV4_IPADDR_UPDATE} netmask 0xffffffff"
-        vlan_line = f"inet {VLAN_STATICV4_IPADDR_UPDATE} netmask 0xffffffff"
+        ifconfig_out = self.last_response.get("data", {}).get("cmd_output", "")
 
         # Ensure staticv4 interface no longer exists
-        if staticv4_line in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Expected interface with IP '{INTERFACE_STATICV4_IPADDR_UPDATE}' to be deleted")
+        if is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV4_IPADDR_UPDATE, IF_STATICV4_SUBNET_UPDATE):
+            raise AssertionError(f"Expected interface with IP '{IF_STATICV4_IPADDR_UPDATE}' to be deleted")
 
         # Ensure staticv6 interface no longer exists
-        if staticv6_line in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Expected interface with IP '{INTERFACE_STATICV6_IPADDR_UPDATE}' to be deleted")
+        if is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV6_IPADDR_UPDATE, IF_STATICV6_SUBNET_UPDATE):
+            raise AssertionError(f"Expected interface with IP '{IF_STATICV6_IPADDR_UPDATE}' to be deleted")
 
         # Ensure bridge interface no longer exists
-        if bridge_line in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Expected bridge with IP '{BRIDGE_STATICV4_IPADDR_UPDATE}' to be deleted")
+        if is_if_in_ifconfig(ifconfig_out, "bridge0", BR_STATICV4_IPADDR_UPDATE, BR_STATICV4_SUBNET_UPDATE):
+            raise AssertionError(f"Expected bridge with IP '{BR_STATICV4_IPADDR_UPDATE}' to be deleted")
 
         # Ensure vlan interface no longer exists
-        if vlan_line in self.last_response.get("data", {}).get("cmd_output", ""):
+        if is_if_in_ifconfig(ifconfig_out, VLAN_IF, VLAN_STATICV4_IPADDR_UPDATE, VLAN_STATICV4_SUBNET_UPDATE):
             raise AssertionError(f"Expected VLAN IP '{VLAN_STATICV4_IPADDR_UPDATE}' to be deleted")
 
     def is_if_disabled(self):
@@ -828,8 +896,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
 
         # Loop through each line and check if em2.2 is now disabled
         for line in ifconfig_lines:
-            if line.startswith("em2.2:") and "UP" in line:
-                raise AssertionError("Expected em2.2 to be disabled and not UP")
+            if line.startswith(f"{VLAN_IF}:") and "UP" in line:
+                raise AssertionError(f"Expected {VLAN_IF} to be disabled and not UP")
 
 
 APIE2ETestInterface()
