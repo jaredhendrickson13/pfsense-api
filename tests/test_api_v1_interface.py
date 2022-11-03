@@ -24,21 +24,21 @@ BR_MEMBER_ID = "em1"
 VLAN_TAG = random.randint(2, 4094)
 VLAN_IF = f"{IF_ID}.{VLAN_TAG}"
 IF_STATICV4_IPADDR_CREATE = "172.16.100.1"
-IF_STATICV4_SUBNET_CREATE = random.randint(24, 31)
+IF_STATICV4_SUBNET_CREATE = random.randint(24, 30)
 IF_STATICV6_IPADDR_CREATE = "2001:db8:abcd:12::1"
-IF_STATICV6_SUBNET_CREATE = random.randint(64, 127)
+IF_STATICV6_SUBNET_CREATE = random.randint(64, 128)
 BR_STATICV4_IPADDR_CREATE = "172.16.200.1"
-BR_STATICV4_SUBNET_CREATE = random.randint(24, 31)
+BR_STATICV4_SUBNET_CREATE = random.randint(24, 30)
 VLAN_STATICV4_IPADDR_CREATE = "172.16.2.1"
-VLAN_STATICV4_SUBNET_CREATE = random.randint(24, 31)
+VLAN_STATICV4_SUBNET_CREATE = random.randint(24, 30)
 IF_STATICV4_IPADDR_UPDATE = "172.16.101.1"
-IF_STATICV4_SUBNET_UPDATE = random.randint(24, 31)
+IF_STATICV4_SUBNET_UPDATE = random.randint(24, 30)
 IF_STATICV6_IPADDR_UPDATE = "2002:db8:abcd:12::1"
-IF_STATICV6_SUBNET_UPDATE = random.randint(64, 127)
+IF_STATICV6_SUBNET_UPDATE = random.randint(64, 128)
 BR_STATICV4_IPADDR_UPDATE = "172.16.201.1"
-BR_STATICV4_SUBNET_UPDATE = random.randint(24, 31)
+BR_STATICV4_SUBNET_UPDATE = random.randint(24, 30)
 VLAN_STATICV4_IPADDR_UPDATE = "172.16.20.1"
-VLAN_STATICV4_SUBNET_UPDATE = random.randint(24, 31)
+VLAN_STATICV4_SUBNET_UPDATE = random.randint(24, 30)
 
 
 # Functions
@@ -100,6 +100,7 @@ def is_if_in_ifconfig(ifconfig_out: str, iface: str, ipaddr: str, bitmask: int):
     # Set the expected string for a IPv4 network
     if ipaddr.version == 4:
         ifconfig_line = f"inet {ipaddr} netmask {bits_to_hex(bitmask)} broadcast {subnet.broadcast_address}"
+        print(f"{ipaddr}/{bitmask} {bits_to_hex(bitmask)} {subnet.broadcast_address}")
     # Set the expected string for a IPv6 network
     elif ipaddr.version == 6:
         ifconfig_line = f"inet6 {ipaddr.compressed} prefixlen {bitmask}"
