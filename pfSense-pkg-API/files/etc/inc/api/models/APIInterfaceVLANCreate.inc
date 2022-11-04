@@ -51,7 +51,7 @@ class APIInterfaceVLANCreate extends APIModel {
         # Require clients to specify a VLAN tag value
         if (isset($this->initial_data['tag'])) {
             # Return an error if VLAN tag is not numeric, or is not between 1 and 4096
-            if (!is_numeric($this->initial_data['tag']) or (1 > intval($this->initial_data['tag']) or intval($this->initial_data['tag']) > 4096)) {
+            if (!is_numeric($this->initial_data['tag']) or (1 > intval($this->initial_data['tag']) or intval($this->initial_data['tag']) > 4094)) {
                 $this->errors[] = APIResponse\get(3052);
             }
             # Return an error if this VLAN already exists on this interface

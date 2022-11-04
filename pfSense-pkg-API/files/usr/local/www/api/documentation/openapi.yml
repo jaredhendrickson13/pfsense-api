@@ -5218,7 +5218,7 @@ paths:
                   type: integer
                 tag:
                   description: VLAN tag to add to the parent interface.
-                  maximum: 4096
+                  maximum: 4094
                   minimum: 1
                   type: integer
               required:
@@ -5269,7 +5269,7 @@ paths:
                   type: integer
                 tag:
                   description: VLAN tag to change on the parent interface.
-                  maximum: 4096
+                  maximum: 4094
                   minimum: 1
                   type: integer
               required:
