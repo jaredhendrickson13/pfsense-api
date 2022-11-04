@@ -2665,6 +2665,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Interface group does not exist"
         ],
+        3081 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface VLAN is already used by QinQ"
+        ],
 
         // 4000-4999 reserved for /api/v1/firewall API calls
         4000 => [

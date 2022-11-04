@@ -96,6 +96,10 @@ class APIInterfaceVLANUpdate extends APIModel {
             elseif ($this->__is_vlan($this->validated_data["if"], $this->initial_data["tag"]) and ($this->__if_changed or $this->__tag_changed)) {
                 $this->errors[] = APIResponse\get(3054);
             }
+            # Return an error if this VLAN already exists as a QinQ
+            elseif ($this->__is_qinq($this->validated_data["if"], $this->initial_data["tag"])) {
+                $this->errors[] = APIResponse\get(3081);
+            }
             # Otherwise, store our tag value as validated
             else {
                 $this->validated_data["tag"] = $this->initial_data['tag'];
@@ -139,6 +143,16 @@ class APIInterfaceVLANUpdate extends APIModel {
                 return true;
             }
         }
+        return false;
+    }
+
+    private function __is_qinq($if, $tag) {
+        foreach ($this->get_config('qinqs/qinqentry', []) as $qinq) {
+            if ($qinq['tag'] == $tag && $qinq['if'] == $if) {
+                return true;
+            }
+        }
+
         return false;
     }
 
