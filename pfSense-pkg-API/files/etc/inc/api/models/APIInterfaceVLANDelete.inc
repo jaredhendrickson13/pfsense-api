@@ -34,6 +34,30 @@ class APIInterfaceVLANDelete extends APIModel {
 
     private function __validate_id() {
         # Check if the given ID exists. Also allow vlanif for backward compatibility
+        if (isset($this->initial_data["id"])) {
+            # Try to locate our ID by configuration index ID
+            if ($this->get_config("vlans/vlan/{$this->initial_data['id']}", false)) {
+                $this->id = $this->initial_data["id"];
+                $this->validated_data = $this->get_config("vlans/vlan/{$this->id}");
+            }
+            else {
+                $this->errors[] = APIResponse\get(3050);
+            }
+        }
+        elseif (isset($this->initial_data["vlanif"])) {
+            # Allow user to locate the VLAN by vlanif
+            if (!is_null($this->__get_vlan_id_from_vlanif($this->initial_data["vlanif"]))) {
+                $this->id = $this->__get_vlan_id_from_vlanif($this->initial_data["vlanif"]);
+                $this->validated_data = $this->get_config("vlans/vlan/{$this->id}");
+            }
+            else {
+                $this->errors[] = APIResponse\get(3050);
+            }
+        }
+        else {
+            $this->errors[] = APIResponse\get(3056);
+        }
+        # Check if the given ID exists. Also allow vlanif for backward compatibility
         if (isset($this->initial_data["id"]) or isset($this->initial_data["vlanif"])) {
             # Allow user to locate the VLAN by vlanif
             if (!is_null($this->__get_vlan_id_from_vlanif($this->initial_data["vlanif"]))) {
@@ -48,13 +72,13 @@ class APIInterfaceVLANDelete extends APIModel {
             else {
                 $this->errors[] = APIResponse\get(3050);
             }
-
-            # Lastly check that our interface is not in use currently
-            if (APITools\get_pfsense_if_id($this->validated_data["vlanif"])) {
-                $this->errors[] = APIResponse\get(3049);
-            }
         } else {
             $this->errors[] = APIResponse\get(3056);
+        }
+
+        # Lastly check that our interface is not in use currently
+        if (APITools\get_pfsense_if_id($this->validated_data["vlanif"])) {
+            $this->errors[] = APIResponse\get(3049);
         }
     }
 
