@@ -86,6 +86,10 @@ class APIE2ETestServicesNTPd(e2e_test_framework.APIE2ETest):
 
     def is_ntpd_updated(self):
         """Checks if the NTP configuration was updated properly"""
+        # Many levels of logic require to test various configuration values/areas
+        # pylint: disable=too-many-branches
+
+        # Local variables
         ntp_conf = self.pfsense_shell("cat /var/etc/ntpd.conf")
         leap_conf = self.pfsense_shell("cat /var/db/leap-seconds")
         req_data = self.last_request.get("req_data", {})
