@@ -226,21 +226,26 @@ class APIE2ETest:
         except requests.exceptions.JSONDecodeError:
             self.last_response = {}
 
-        # When a post-test callable is defined, ensure it is a callable and run the function
-        if callable(post_test_callable):
-            # Try to run the callable, if an exception occurs capture it so it can be checked in __check_resp__
-            try:
-                post_test_callable()
-            except Exception as exc:
-                post_test_exc = exc
+        # Pause this test if the 'pause' parameter is set
+        time.sleep(test_params.get("pause", 0))
+
+        # Check for a post test callable
+        if post_test_callable:
+            # Ensure the test is callable, otherwise raise an error
+            if callable(post_test_callable):
+                # Try to run the callable, if an exception occurs capture it so it can be checked in __check_resp__
+                try:
+                    post_test_callable()
+                except Exception as exc:
+                    post_test_exc = exc
+            else:
+                raise ValueError(f"Expected post_test_callable to be a valid callable name")
 
         # Otherwise, check if the response is valid
         response_valid = self.__check_resp__(resp, test_params, pre_test_exc=pre_test_exc, post_test_exc=post_test_exc)
 
         # Return the JSON response when successful
         if response_valid:
-            # Pause this test if the 'pause' parameter is set
-            time.sleep(test_params.get("pause", 0))
             return resp.json()
 
         return None
