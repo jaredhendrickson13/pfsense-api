@@ -359,12 +359,12 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
         if self.is_dns_resolvable(ALIAS_HOST_UPDATE, ALIAS_DOMAIN_UPDATE, any_resolve=True):
             raise AssertionError(f"Expected {ALIAS_HOST_UPDATE}.{ALIAS_DOMAIN_UPDATE} to not resolve")
 
-    def is_dns_resolvable(self, host: str, domain: str, ips=None, any_resolve=False):
+    def is_dns_resolvable(self, host: str, domain: str, ipaddrs=None, any_resolve=False):
         """
 
         :param host: string of the host portion of the DNS record
         :param domain: string of the domain portion of the DNS record
-        :param ips: a list of IPs expected to resolve
+        :param ipaddrs: a list of IPs expected to resolve
         :param any_resolve: only check if the DNS name resolves successfully, ignores `ips`.
         :return: a boolean indicating whether DNS resolution was successful
         """
@@ -372,21 +372,21 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
         dig_cmd = ["dig", f"@{self.args.host}", f"{host}.{domain}", "a", f"{host}.{domain}", "aaaa"]
         dig_out = subprocess.check_output(dig_cmd).decode()
 
-        # Ensure ips is a list
-        ips = [] if ips is None else ips
-        ips = [ips] if not isinstance(ips, list) else ips
+        # Ensure ipaddrs is a list
+        ipaddrs = [] if ipaddrs is None else ipaddrs
+        ipaddrs = [ipaddrs] if not isinstance(ipaddrs, list) else ipaddrs
 
         # Check if any successful resolution should be accepted
         if any_resolve:
             # Just ensure there was no error resolving (e.g. NXDOMAIN)
             if "status: NOERROR" in dig_out:
                 return True
-            else:
-                return False
+
+            return False
 
         # Otherwise, ensure each IP is present in the response
-        for ip in ips:
-            if ip not in dig_out:
+        for ipaddr in ipaddrs:
+            if ipaddr not in dig_out:
                 return False
 
         return True
