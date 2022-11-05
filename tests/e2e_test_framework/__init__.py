@@ -158,6 +158,7 @@ class APIE2ETest:
         """Makes an API request based on the test's parameters."""
         # pylint: disable=broad-except    # We don't want tests to exit and prevent later tests
         # pylint: disable=too-many-locals  # Many variables needed for customization
+        # pylint: disable=too-many-branches    # Many branches needed for test customization
 
         # Local variables
         method = test_params.get("method", method)    # Allow custom method override
@@ -239,7 +240,7 @@ class APIE2ETest:
                 except Exception as exc:
                     post_test_exc = exc
             else:
-                raise ValueError(f"Expected post_test_callable to be a valid callable name")
+                raise ValueError("Expected post_test_callable to be a valid callable name")
 
         # Otherwise, check if the response is valid
         response_valid = self.__check_resp__(resp, test_params, pre_test_exc=pre_test_exc, post_test_exc=post_test_exc)

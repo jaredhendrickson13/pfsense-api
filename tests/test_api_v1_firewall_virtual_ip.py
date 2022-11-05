@@ -15,7 +15,7 @@
 import random
 
 import e2e_test_framework
-from e2e_test_framework.tools import parse_ifconfig, is_if_in_ifconfig
+from e2e_test_framework.tools import is_if_in_ifconfig
 
 # Constants
 EXTRA_INTERFACE = "em2"
@@ -36,8 +36,8 @@ IPALIAS_SUBNET_CREATE = f"172.16.7.100/{random.randint(24, 29)}"
 IPALIAS_SUBNET_UPDATE = f"172.16.8.100/{random.randint(24, 29)}"
 PROXYARP_INTERFACE_CREATE = random.choice(TEST_INTERFACE_CHOICES)
 PROXYARP_INTERFACE_UPDATE = random.choice(TEST_INTERFACE_CHOICES)
-PROXYARP_SUBNET_CREATE = f"172.16.9.100/32"
-PROXYARP_SUBNET_UPDATE = f"172.16.10.100/32"
+PROXYARP_SUBNET_CREATE = "172.16.9.100/32"
+PROXYARP_SUBNET_UPDATE = "172.16.10.100/32"
 
 
 class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
@@ -477,7 +477,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             raise AssertionError(
                 f"Expected CARP VIP '{carp_ip}' with VHID {carp_vhid} to be deleted in ifconfig, got {ifconfig_out}"
             )
-        
+
     def is_ipalias_created(self):
         """Checks if our IPALIAS is present after creating an IPALIAS VIP"""
         # Local variables
