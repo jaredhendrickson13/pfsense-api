@@ -344,23 +344,30 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
     def is_host_override_deleted(self):
         """Checks if the host override was deleted and it is no longer resolvable."""
         # Check that the host override created in our POST tests is not resolvable
-        if self.is_dns_resolvable(HOST_CREATE, DOMAIN_CREATE, any=True):
+        if self.is_dns_resolvable(HOST_CREATE, DOMAIN_CREATE, any_resolve=True):
             raise AssertionError(f"Expected {HOST_CREATE}.{DOMAIN_CREATE} to not resolve")
 
         # Check that the host override alias is also not resolvable
-        if self.is_dns_resolvable(ALIAS_HOST_CREATE, ALIAS_DOMAIN_CREATE, any=True):
+        if self.is_dns_resolvable(ALIAS_HOST_CREATE, ALIAS_DOMAIN_CREATE, any_resolve=True):
             raise AssertionError(f"Expected {ALIAS_HOST_CREATE}.{ALIAS_DOMAIN_CREATE} to not resolve")
 
         # Check that the host override created in our PUT tests is not resolvable
-        if self.is_dns_resolvable(HOST_UPDATE, DOMAIN_UPDATE, any=True):
+        if self.is_dns_resolvable(HOST_UPDATE, DOMAIN_UPDATE, any_resolve=True):
             raise AssertionError(f"Expected {HOST_UPDATE}.{DOMAIN_UPDATE} to not resolve")
 
         # Check that the host override alias is also not resolvable
-        if self.is_dns_resolvable(ALIAS_HOST_UPDATE, ALIAS_DOMAIN_UPDATE, any=True):
+        if self.is_dns_resolvable(ALIAS_HOST_UPDATE, ALIAS_DOMAIN_UPDATE, any_resolve=True):
             raise AssertionError(f"Expected {ALIAS_HOST_UPDATE}.{ALIAS_DOMAIN_UPDATE} to not resolve")
 
-    def is_dns_resolvable(self, host, domain, ips=None, any=False):
-        """Checks if a specified FQDN resolves a list of IPs"""
+    def is_dns_resolvable(self, host: str, domain: str, ips=None, any_resolve=False):
+        """
+
+        :param host: string of the host portion of the DNS record
+        :param domain: string of the domain portion of the DNS record
+        :param ips: a list of IPs expected to resolve
+        :param any_resolve: only check if the DNS name resolves successfully, ignores `ips`.
+        :return: a boolean indicating whether DNS resolution was successful
+        """
         # Local variables
         dig_cmd = ["dig", f"@{self.args.host}", f"{host}.{domain}", "a", f"{host}.{domain}", "aaaa"]
         dig_out = subprocess.check_output(dig_cmd).decode()
@@ -370,7 +377,7 @@ class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
         ips = [ips] if not isinstance(ips, list) else ips
 
         # Check if any successful resolution should be accepted
-        if any:
+        if any_resolve:
             # Just ensure there was no error resolving (e.g. NXDOMAIN)
             if "status: NOERROR" in dig_out:
                 return True
