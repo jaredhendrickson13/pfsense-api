@@ -23,7 +23,7 @@ def bits_to_hex(bits: int):
     :return: the hex mask equivalent to the bitmask
     """
     # First convert to dot mask
-    dot_mask = '.'.join([str((0xffffffff << (32 - bits) >> i) & 0xff) for i in [24, 16, 8, 0]])
+    dot_mask = '.'.join([str((0xffffffff << (32 - int(bits)) >> i) & 0xff) for i in [24, 16, 8, 0]])
 
     # Loop through each octet and append it's hex value to our mask
     hex_mask = "0x"
@@ -57,13 +57,14 @@ def parse_ifconfig(ifconfig_out: str):
     return ifconfig_dict
 
 
-def is_if_in_ifconfig(ifconfig_out: str, iface: str, ipaddr: str, bitmask: int):
+def is_if_in_ifconfig(ifconfig_out: str, iface: str, ipaddr: str, bitmask: int, vhid=None):
     """
     Checks if a specific interface configuration is present in ifconfig
     :param iface: the interface expected to host this configuration
     :param ifconfig_out: the ifconfig output to check against
     :param ipaddr: the IPv4 or IPv6 (depending on the inet_type) of the network
     :param bitmask: the bitmask of the network
+    :param vhid: optionally check if the interface has a vhid, ignores otherwise
     :return: a string containing the ifconfig line expected from the network details
     """
     # Local variables
@@ -80,6 +81,10 @@ def is_if_in_ifconfig(ifconfig_out: str, iface: str, ipaddr: str, bitmask: int):
     # Otherwise, our network details are invalid raise an error
     else:
         raise ValueError("Invalid IP address specified")
+
+    # Check for the VHID if requested
+    if vhid:
+        ifconfig_line = f"{ifconfig_line} vhid {vhid}"
 
     # Check if this line is in ifconfig
     if ifconfig_line in ifconfig.get(iface, []):
