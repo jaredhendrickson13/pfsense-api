@@ -38,17 +38,11 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create bridge for LAN",
+            "post_test_callable": "is_bridge_created",
             "req_data": {
                 "members": [BR_MEMBER_IF_CREATE],
                 "descr": "Test bridge"
             }
-        },
-        {
-            "name": "Check that bridge is actually present on the system",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
-            "post_test_callable": "is_bridge_created"
         },
         {
             "name": "Check members required constraint",
@@ -83,18 +77,12 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update bridge for LAN",
+            "post_test_callable": "is_bridge_updated",
             "req_data": {
                 "id": "bridge0",
                 "members": [BR_MEMBER_IF_UPDATE],
                 "descr": "Updated test bridge"
             }
-        },
-        {
-            "name": "Check that bridge is actually updated on the system",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
-            "post_test_callable": "is_bridge_updated"
         },
         {
             "name": "Check bridge ID required constraint",
@@ -144,16 +132,10 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Check bridge deletion",
+            "post_test_callable": "is_bridge_deleted",
             "req_data": {
                 "id": "bridge0"
             }
-        },
-        {
-            "name": "Check that bridge is actually updated on the system",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
-            "post_test_callable": "is_bridge_deleted"
         },
         {
             "name": "Delete interface used for testing",
@@ -167,7 +149,7 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
     def is_bridge_created(self):
         """Checks if the bridge interface is present and contains the correct members"""
         # Local variables
-        ifconfig_out = self.last_response.get("data", {}).get("cmd_output", "")
+        ifconfig_out = self.pfsense_shell("ifconfig")
         ifconfig = parse_ifconfig(ifconfig_out)
 
         # Check if the bridge interface was added to the system
@@ -181,7 +163,7 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
     def is_bridge_updated(self):
         """Checks if the bridge interface is updated and contains the correct members"""
         # Local variables
-        ifconfig_out = self.last_response.get("data", {}).get("cmd_output", "")
+        ifconfig_out = self.pfsense_shell("ifconfig")
         ifconfig = parse_ifconfig(ifconfig_out)
 
         # Check if the bridge interface was added to the system
@@ -199,7 +181,7 @@ class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
     def is_bridge_deleted(self):
         """Checks if the bridge interface is deleted on the system"""
         # Local variables
-        ifconfig_out = self.last_response.get("data", {}).get("cmd_output", "")
+        ifconfig_out = self.pfsense_shell("ifconfig")
         ifconfig = parse_ifconfig(ifconfig_out)
 
         # Check if the bridge interface was added to the system

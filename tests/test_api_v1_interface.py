@@ -594,13 +594,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "uri": "/api/v1/interface/apply",
             "req_data": {"aysnc": False},
             "resp_time": 30,
-            "resp_data_empty": True
-        },
-        {
-            "name": "Check that the created interfaces are now present",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
+            "resp_data_empty": True,
             "post_test_callable": "are_ifs_created"
         }
     ]
@@ -608,6 +602,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
         {
             "name": "Disable interface",
             "resp_time": 5,
+            "post_test_callable": "is_if_disabled",
             "req_data": {
                 "id": VLAN_IF,
                 "descr": "IF_DISABLED_TEST",
@@ -616,13 +611,6 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
                 "blockbogons": False,
                 "apply": True
             },
-        },
-        {
-            "name": "Check that the disabled interfaces is no longer up",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
-            "post_test_callable": "is_if_disabled"
         },
         {
             "name": "Re-enable and update IP of VLAN interface",
@@ -664,13 +652,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "uri": "/api/v1/interface/apply",
             "req_data": {"aysnc": False},
             "resp_time": 30,
-            "resp_data_empty": True
-        },
-        {
-            "name": "Check that the updated interface IPs are now present and old IPs are not",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
+            "resp_data_empty": True,
             "post_test_callable": "are_ifs_updated"
         }
     ]
@@ -720,23 +702,17 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
         {
             "name": "Delete test firewall alias",
             "uri": "/api/v1/firewall/alias",
+            "post_test_callable": "are_ifs_deleted",
             "req_data": {
                 "id": "TEST_ALIAS"
             }
-        },
-        {
-            "name": "Check that deleted interfaces no longer exist",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
-            "post_test_callable": "are_ifs_deleted"
         }
     ]
 
     def are_ifs_created(self):
         """Checks if the interfaces created in the POST tests are present after being applied."""
         # Local variables
-        ifconfig_out = self.last_response.get("data", {}).get("cmd_output", "")
+        ifconfig_out = self.pfsense_shell("ifconfig")
 
         # Ensure static interface exists with IPv4 address
         if not is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV4_IPADDR_CREATE, IF_STATICV4_SUBNET_CREATE):
@@ -760,7 +736,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
         no longer used.
         """
         # Local variables
-        ifconfig_out = self.last_response.get("data", {}).get("cmd_output", "")
+        ifconfig_out = self.pfsense_shell("ifconfig")
 
         # Ensure static interface exists with updated IPv4 address
         if not is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV4_IPADDR_UPDATE, IF_STATICV4_SUBNET_UPDATE):
@@ -797,7 +773,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
     def are_ifs_deleted(self):
         """Checks if the interfaces deleted in the DELETE tests are no longer present"""
         # Local variables
-        ifconfig_out = self.last_response.get("data", {}).get("cmd_output", "")
+        ifconfig_out = self.pfsense_shell("ifconfig")
 
         # Ensure staticv4 interface no longer exists
         if is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV4_IPADDR_UPDATE, IF_STATICV4_SUBNET_UPDATE):
@@ -818,7 +794,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
     def is_if_disabled(self):
         """Checks if the interface updated to be disabled is no longer up."""
         # Local variables
-        ifconfig_lines = self.last_response.get("data", {}).get("cmd_output", "").split("\n")
+        ifconfig_lines = self.pfsense_shell("ifconfig").split("\n")
 
         # Loop through each line and check if em2.2 is now disabled
         for line in ifconfig_lines:

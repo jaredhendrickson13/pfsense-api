@@ -47,18 +47,12 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "name": "Create a IPv4 static route using IPv4 routing gateway",
             "resp_time": 5,
             "uri": "/api/v1/routing/static_route",
+            "post_test_callable": "check_for_static_route_created",
             "req_data": {
                 "network": "1.2.3.4/32",
                 "gateway": "TEST_ROUTING_GATEWAY_V4",
                 "apply": True
             }
-        },
-        {
-            "name": "Check that static route with this gateway is present on system",
-            "method": "POST",
-            "post_test_callable": "check_for_static_route_created",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "netstat -rn"}
         },
         {
             "name": "Check interface requirement",
@@ -379,6 +373,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
         {
             "name": "Update IPv4 routing gateway",
             "resp_time": 5,
+            "post_test_callable": "check_for_static_route_updated",
             "req_data": {
                 "id": "TEST_ROUTING_GATEWAY_V4",
                 "name": "UPDATED_TEST_ROUTING_GATEWAY_V4",
@@ -410,13 +405,6 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
                 "id": "UPDATED_TEST_ROUTING_GATEWAY_V4",
                 "disabled": True
             }
-        },
-        {
-            "name": "Check that static route was updated to use updated gateway IP",
-            "method": "POST",
-            "post_test_callable": "check_for_static_route_updated",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "netstat -rn"}
         },
         {
             "name": "Update IPv6 routing gateway",
@@ -804,7 +792,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
     def check_for_static_route_created(self):
         """Checks if the static route created by this test case is present on the remote system."""
         # Variables
-        routing_table = self.last_response.get("data", {}).get("cmd_output", "")
+        routing_table = self.pfsense_shell("netstat -rn")
         routing_table = re.sub(' +', ' ', routing_table)
 
         # Ensure the route we created exists and is correctly assigned the gateway we created
@@ -814,7 +802,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
     def check_for_static_route_updated(self):
         """Checks if the static route created by this test case had its gateway updated correctly."""
         # Variables
-        routing_table = self.last_response.get("data", {}).get("cmd_output", "")
+        routing_table = self.pfsense_shell("netstat -rn")
         routing_table = re.sub(' +', ' ', routing_table)
 
         # Ensure the route we created exists and is correctly assigned the gateway we updated

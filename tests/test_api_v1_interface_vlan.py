@@ -63,19 +63,13 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create interface VLAN duplicate for unique constraint tests",
+            "post_test_callable": "is_vlan_created",
             "req_data": {
                 "if": PARENT_IF_DUP,
                 "tag": VLAN_TAG_DUP,
                 "pcp": VLAN_PCP_DUP,
                 "descr": "E2E dup test"
             }
-        },
-        {
-            "name": "Check for the created VLAN in ifconfig",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
-            "post_test_callable": "is_vlan_created"
         },
         {
             "name": "Test non-existent parent interface",
@@ -129,6 +123,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update interface VLAN",
+            "post_test_callable": "is_vlan_updated",
             "req_data": {
                 "vlanif": VLAN_IF_CREATE,
                 "if": PARENT_IF_UPDATE,
@@ -136,13 +131,6 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
                 "pcp": VLAN_PCP_UPDATE,
                 "descr": "Updated E2E test 0"
             }
-        },
-        {
-            "name": "Check for the updated VLAN in ifconfig",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
-            "post_test_callable": "is_vlan_updated"
         },
         {
             "name": "Test VLAN ID or VLANIF required constraint",
@@ -243,16 +231,10 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Delete duplicate interface VLAN",
+            "post_test_callable": "is_vlan_deleted",
             "req_data": {
                 "vlanif": VLAN_IF_DUP
             }
-        },
-        {
-            "name": "Check for the deleted VLAN in ifconfig",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
-            "post_test_callable": "is_vlan_deleted"
         }
     ]
 
@@ -262,7 +244,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
         # pylint: disable=consider-using-f-string
 
         # Local variables
-        ifconfig_out = self.last_response.get("data", {}).get("cmd_output", "")
+        ifconfig_out = self.pfsense_shell("ifconfig")
         ifconfig = parse_ifconfig(ifconfig_out)
         vlan_line = "vlan: {tag} vlanproto: 802.1q vlanpcp: {pcp} parent interface: {parent}".format(
             tag=VLAN_TAG_CREATE,
@@ -284,7 +266,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
         # pylint: disable=consider-using-f-string
 
         # Local variables
-        ifconfig_out = self.last_response.get("data", {}).get("cmd_output", "")
+        ifconfig_out = self.pfsense_shell("ifconfig")
         ifconfig = parse_ifconfig(ifconfig_out)
         vlan_line = "vlan: {tag} vlanproto: 802.1q vlanpcp: {pcp} parent interface: {parent}".format(
             tag=VLAN_TAG_UPDATE,
@@ -307,7 +289,7 @@ class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
     def is_vlan_deleted(self):
         """Checks the ifconfig output for the deleted VLAN."""
         # Local variables
-        ifconfig_out = self.last_response.get("data", {}).get("cmd_output", "")
+        ifconfig_out = self.pfsense_shell("ifconfig")
         ifconfig = parse_ifconfig(ifconfig_out)
 
         # Check that the old VLAN interface is no longer present on the system

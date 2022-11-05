@@ -544,6 +544,15 @@ overridden:
 - `pre_delete()` : Runs before the DELETE request is made.
 - `post_delete()` : Runs after the DELETE request is made.
 
+#### Other Base Model Models
+There are a few methods available to tests through the testing framework, these methods are intended for use in 
+conjunction with the `pre_test_callable`, `post_test_callable`, and `payload_callable` test parameters:
+
+- `pfsense_shell()` : Runs a shell command on the targeted pfSense instance using the /api/v1/diagnostics/command_prompt
+endpoint. This function will return stdout and/or stderr of the executed command. This can be used to verify certain
+conditions, files, or configurations exist on the pfSense backend via CLI.
+  - Example usage: `self.pfsense_shell("ifconfig")`
+
 #### Running E2E Tests ####
 Once you have written your E2E test class, you must ensure you create the E2E test object at the end of the file
 you've created like so:
