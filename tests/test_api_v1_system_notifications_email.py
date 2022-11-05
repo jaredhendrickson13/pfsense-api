@@ -5,7 +5,9 @@ import e2e_test_framework
 class APIE2ETestSystemNotificationsEmail(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/system/notifications/email endpoint."""
     uri = "/api/v1/system/notifications/email"
-    get_tests = [{"name": "Read the system email notification settings"}]
+    get_tests = [
+        {"name": "Read the system email notification settings", "resp_data_empty": True}
+    ]
     put_tests = [
         {
             "name": "Check IP address requirement",
@@ -99,18 +101,18 @@ class APIE2ETestSystemNotificationsEmail(e2e_test_framework.APIE2ETest):
         {
             "name": "Update email notification settings (LOGIN)",
             "req_data": {
-    "disabled": True,
-    "ipaddress": "smtp.example.com",
-    "port": 25,
-    "timeout": 10,
-    "ssl": True,
-    "sslvalidate": True,
-    "fromaddress": "noreply@example.com",
-    "notifyemailaddress": "recipient@example.com",
-    "username": "testuser",
-    "password": "testpassword",
-    "authentication_mechanism": "LOGIN"
-}
+                "disabled": True,
+                "ipaddress": "smtp.example.com",
+                "port": 25,
+                "timeout": 10,
+                "ssl": True,
+                "sslvalidate": True,
+                "fromaddress": "noreply@example.com",
+                "notifyemailaddress": "recipient@example.com",
+                "username": "testuser",
+                "password": "testpassword",
+                "authentication_mechanism": "LOGIN"
+        }
         },
         {
             "name": "Update email notification settings (PLAIN)",
