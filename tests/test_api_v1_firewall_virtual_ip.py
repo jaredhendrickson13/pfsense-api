@@ -12,17 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Script used to test the /api/v1/firewall/virtual_ip endpoint."""
+import random
+
 import e2e_test_framework
+from e2e_test_framework.tools import parse_ifconfig, is_if_in_ifconfig
 
 # Constants
-CARP_VHID_CREATE = 10
-CARP_VHID_UPDATE = 20
-CARP_SUBNET_CREATE = "172.16.209.100/32"
-CARP_SUBNET_UPDATE = "172.16.209.200/32"
-IPALIAS_SUBNET_CREATE = "172.16.209.101/32"
-IPALIAS_SUBNET_UPDATE = "172.16.209.201/32"
-PROXYARP_SUBNET_CREATE = "172.16.209.102/32"
-PROXYARP_SUBNET_UPDATE = "172.16.209.202/32"
+EXTRA_INTERFACE = "em2"
+TEST_INTERFACE_CHOICES = ["em1", "em2"]
+CARP_INTERFACE_CREATE = random.choice(TEST_INTERFACE_CHOICES)
+CARP_INTERFACE_UPDATE = random.choice(TEST_INTERFACE_CHOICES)
+CARP_VHID_CREATE = random.randint(0, 128)
+CARP_VHID_UPDATE = random.randint(129, 255)
+CARP_ADVBASE_CREATE = random.randint(1, 254)
+CARP_ADVBASE_UPDATE = random.randint(1, 254)
+CARP_ADVSKEW_CREATE = random.randint(1, 254)
+CARP_ADVSKEW_UPDATE = random.randint(1, 254)
+CARP_SUBNET_CREATE = f"172.16.5.100/{random.randint(24, 29)}"
+CARP_SUBNET_UPDATE = f"172.16.6.100/{random.randint(24, 29)}"
+IPALIAS_INTERFACE_CREATE = random.choice(TEST_INTERFACE_CHOICES)
+IPALIAS_INTERFACE_UPDATE = random.choice(TEST_INTERFACE_CHOICES)
+IPALIAS_SUBNET_CREATE = f"172.16.7.100/{random.randint(24, 29)}"
+IPALIAS_SUBNET_UPDATE = f"172.16.8.100/{random.randint(24, 29)}"
+PROXYARP_INTERFACE_CREATE = random.choice(TEST_INTERFACE_CHOICES)
+PROXYARP_INTERFACE_UPDATE = random.choice(TEST_INTERFACE_CHOICES)
+PROXYARP_SUBNET_CREATE = f"172.16.9.100/32"
+PROXYARP_SUBNET_UPDATE = f"172.16.10.100/32"
 
 
 class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
@@ -31,54 +46,52 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
     get_tests = [{"name": "Read all virtual IPs"}]
     post_tests = [
         {
+            "name": "Create extra interface assignment for testing",
+            "method": "POST",
+            "uri": "/api/v1/interface",
+            "resp_time": 10,
+            "req_data": {
+                "if": EXTRA_INTERFACE,
+                "type": "staticv4",
+                "ipaddr": "172.16.55.1",
+                "subnet": 24,
+                "enable": True,
+                "apply": True
+            }
+        },
+        {
             "name": "Create CARP virtual IP",
+            "post_test_callable": "is_carp_created",
             "req_data": {
                 "mode": "carp",
-                "interface": "lan",
+                "interface": CARP_INTERFACE_CREATE,
                 "subnet": CARP_SUBNET_CREATE,
                 "password": "testpass",
                 "descr": "E2E Test",
-                "vhid": CARP_VHID_CREATE
+                "vhid": CARP_VHID_CREATE,
+                "advbase": CARP_ADVBASE_CREATE,
+                "advskew": CARP_ADVSKEW_CREATE
             },
-            "resp_time": 10     # Allow up to ten seconds for vips
-        },
-        {
-            "name": "Check ifconfig for CARP virtual IP",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
-            "post_test_callable": "check_carp_exists"
         },
         {
             "name": "Create Proxy ARP virtual IP",
+            "post_test_callable": "is_proxyarp_created",
             "req_data": {
                 "mode": "proxyarp",
-                "interface": "lan",
+                "interface": PROXYARP_INTERFACE_CREATE,
                 "subnet": PROXYARP_SUBNET_CREATE,
                 "descr": "E2E Test"
-            },
-            "resp_time": 10     # Allow up to ten seconds for vips
-        },
-        {
-            "name": "Check for choparp process running proxyarp virtual IP",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "/usr/bin/top -baHS 999 | grep choparp"},
-            "post_test_callable": "check_proxyarp_exists"
+            }
         },
         {
             "name": "Create IP Alias virtual IP",
+            "post_test_callable": "is_ipalias_created",
             "req_data": {
                 "mode": "ipalias",
-                "interface": "lan",
+                "interface": IPALIAS_INTERFACE_CREATE,
                 "subnet": IPALIAS_SUBNET_CREATE,
                 "descr": "E2E Test"
-            },
-            "resp_time": 10     # Allow up to ten seconds for vips
-        },
-        {
-            "name": "Check ifconfig for IP alias virtual IP",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
-            "post_test_callable": "check_ip_alias_exists"
+            }
         },
         {
             "name": "Check mode requirement",
@@ -167,7 +180,7 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
             "return": 4027,
             "req_data": {
                 "mode": "carp",
-                "interface": "lan",
+                "interface": CARP_INTERFACE_CREATE,
                 "subnet": "172.16.77.252/32",
                 "vhid": CARP_VHID_CREATE
             }
@@ -231,59 +244,40 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update CARP virtual IP with static VHID",
+            "post_test_callable": "is_carp_updated",
             "req_data": {
                 "id": 0,
                 "mode": "carp",
-                "interface": "lan",
+                "interface": CARP_INTERFACE_UPDATE,
                 "subnet": CARP_SUBNET_UPDATE,
                 "password": "newtestpass",
                 "vhid": CARP_VHID_UPDATE,
-                "descr": "Updated E2E test",
-            },
-            "resp_time": 10     # Allow up to ten seconds for vips
-        },
-        {
-            "name": "Check ifconfig for updated CARP virtual IP",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
-            "post_test_callable": "check_carp_exists"
+                "advbase": CARP_ADVBASE_UPDATE,
+                "advskew": CARP_ADVSKEW_UPDATE,
+                "descr": "Updated E2E test"
+            }
         },
         {
             "name": "Update Proxy ARP virtual IP",
+            "post_test_callable": "is_proxyarp_updated",
             "req_data": {
                 "id": 1,
                 "mode": "proxyarp",
-                "interface": "lan",
+                "interface": PROXYARP_INTERFACE_UPDATE,
                 "subnet": PROXYARP_SUBNET_UPDATE,
                 "descr": "Updated E2E test",
-            },
-            "resp_time": 10     # Allow up to ten seconds for vips
-        },
-        {
-            "name": "Check for choparp process running updated proxyarp virtual IP",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "/usr/bin/top -baHS 999 | grep choparp"},
-            "post_test_callable": "check_proxyarp_exists"
+            }
         },
         {
             "name": "Update IP Alias virtual IP",
+            "post_test_callable": "is_ipalias_updated",
             "req_data": {
                 "id": 2,
                 "mode": "ipalias",
-                "interface": "lan",
+                "interface": IPALIAS_INTERFACE_UPDATE,
                 "subnet": IPALIAS_SUBNET_UPDATE,
                 "descr": "Updated E2E test",
-            },
-            "resp_time": 10  # Allow up to ten seconds for vips
-        },
-        {
-            "name": "Check ifconfig for updated IP alias virtual IP",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
-            "post_test_callable": "check_ip_alias_exists"
+            }
         },
         {
             "name": "Check subnet validation",
@@ -394,91 +388,174 @@ class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete CARP virtual IP",
-            "req_data": {"id": 0},
-            "resp_time": 10     # Allow up to ten seconds for vips
-        },
-        {
-            "name": "Check ifconfig for deleted CARP virtual IP",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
-            "post_test_callable": "check_carp_does_not_exist"
+            "post_test_callable": "is_carp_deleted",
+            "req_data": {"id": 0}
         },
         {
             "name": "Delete Proxy ARP virtual IP",
-            "req_data": {"id": 0},
-            "resp_time": 10     # Allow up to ten seconds for vips
-        },
-        {
-            "name": "Check for choparp process running deleted proxyarp virtual IP",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "/usr/bin/top -baHS 999 | grep choparp"},
-            "post_test_callable": "check_proxyarp_does_not_exist"
+            "post_test_callable": "is_proxyarp_deleted",
+            "req_data": {"id": 0}
         },
         {
             "name": "Delete IP Alias virtual IP",
-            "req_data": {"id": 0},
-            "resp_time": 10  # Allow up to ten seconds for vips
+            "post_test_callable": "is_ipalias_deleted",
+            "req_data": {"id": 0}
         },
         {
-            "name": "Check ifconfig for deleted IP alias virtual IP",
-            "method": "POST",
-            "uri": "/api/v1/diagnostics/command_prompt",
-            "req_data": {"shell_cmd": "ifconfig"},
-            "post_test_callable": "check_ip_alias_does_not_exist"
-        },
+            "name": "Delete the extra interface we created for testing",
+            "method": "DELETE",
+            "uri": "/api/v1/interface",
+            "req_data": {"if": EXTRA_INTERFACE}
+        }
     ]
 
-    def check_carp_exists(self):
-        """Checks if our CARP is present after creating/updating an CARP VIP"""
+    def is_carp_created(self):
+        """Checks if our CARP is present after creating a CARP VIP"""
         # Local variables
-        carp_ip = self.last_request.get("req_data").get("subnet").split("/")[0]
-        carp_vhid = self.last_request.get("req_data").get("vhid")
+        carp_subnet = CARP_SUBNET_CREATE
+        carp_ip = carp_subnet.split("/")[0]
+        carp_bitmask = int(carp_subnet.split("/")[1])
+        carp_interface = CARP_INTERFACE_CREATE
+        carp_vhid = CARP_VHID_CREATE
+        carp_advbase = CARP_ADVBASE_CREATE
+        carp_advskew = CARP_ADVSKEW_CREATE
+        ifconfig_carp_line = f"vhid {carp_vhid} advbase {carp_advbase} advskew {carp_advskew}"
+        ifconfig_out = self.pfsense_shell("ifconfig")
 
-        if f"{carp_ip} vhid {carp_vhid}" not in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Expected IP alias VIP '{carp_ip}' with VHID {carp_vhid} to be present")
+        # Check that the CARP VIP created in the test is correctly represented in ifconfig
+        if not is_if_in_ifconfig(ifconfig_out, carp_interface, carp_ip, carp_bitmask, carp_vhid):
+            raise AssertionError(
+                f"Expected CARP VIP '{carp_subnet}' with VHID {carp_vhid} to exist, got: {ifconfig_out}"
+            )
 
-    def check_ip_alias_exists(self):
-        """Checks if our IP alias is present after creating/updating an IP alias VIP"""
-        # Local varaible
-        alias_ip = self.last_request.get("req_data").get("subnet").split("/")[0]
+        # Check that the CARP advbase and advskew are correctly represented in ifconfig
+        if ifconfig_carp_line not in ifconfig_out:
+            raise AssertionError(
+                f"Expected '{ifconfig_carp_line}' in ifconfig for interface {carp_interface}, got {ifconfig_out}"
+            )
 
-        if alias_ip not in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Expected IP alias VIP '{alias_ip}' to be present")
-
-    def check_proxyarp_exists(self):
-        """Checks if our proxyarp IP is present after creating/updating a proxyarp VIP"""
+    def is_carp_updated(self):
+        """Checks if our CARP is present after creating a CARP VIP"""
         # Local variables
-        proxyarp_ip = self.last_request.get("req_data").get("subnet")
+        carp_subnet = CARP_SUBNET_UPDATE
+        carp_ip = carp_subnet.split("/")[0]
+        carp_ip_prev = CARP_SUBNET_CREATE.split("/")[0]
+        carp_bitmask = int(carp_subnet.split("/")[1])
+        carp_interface = CARP_INTERFACE_UPDATE
+        carp_vhid = CARP_VHID_UPDATE
+        carp_advbase = CARP_ADVBASE_UPDATE
+        carp_advskew = CARP_ADVSKEW_UPDATE
+        ifconfig_carp_line = f"vhid {carp_vhid} advbase {carp_advbase} advskew {carp_advskew}"
+        ifconfig_out = self.pfsense_shell("ifconfig")
 
-        if f"{proxyarp_ip}" not in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Expected proxyarp VIP '{proxyarp_ip}' to be present")
+        # Check that the CARP VIP created in the test is correctly represented in ifconfig
+        if not is_if_in_ifconfig(ifconfig_out, carp_interface, carp_ip, carp_bitmask, carp_vhid):
+            raise AssertionError(
+                f"Expected CARP VIP '{carp_subnet}' with VHID {carp_vhid} to exist, got {ifconfig_out}"
+            )
 
-    def check_carp_does_not_exist(self):
+        # Check that the CARP advbase and advskew are correctly represented in ifconfig
+        if ifconfig_carp_line not in ifconfig_out:
+            raise AssertionError(
+                f"Expected '{ifconfig_carp_line}' in ifconfig for interface {carp_interface}, got {ifconfig_out}"
+            )
+
+        # Check that the previous CARP IP is no longer present
+        if carp_ip_prev in ifconfig_out:
+            raise AssertionError(
+                f"Expected previous CARP IP '{carp_ip_prev}' to no longer exist in ifconfig, got {ifconfig_out}"
+            )
+
+    def is_carp_deleted(self):
         """Checks if our CARP is no longer present after deleting an CARP VIP"""
         # Local variables
         carp_ip = CARP_SUBNET_UPDATE.split("/", maxsplit=1)[0]
         carp_vhid = CARP_VHID_UPDATE
+        ifconfig_out = self.pfsense_shell("ifconfig")
 
-        if f"{carp_ip} vhid {carp_vhid}" in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Expected IP alias VIP '{carp_ip}' with VHID {carp_vhid} to be deleted")
+        if carp_ip in ifconfig_out or f"vhid {carp_vhid}" in ifconfig_out:
+            raise AssertionError(
+                f"Expected CARP VIP '{carp_ip}' with VHID {carp_vhid} to be deleted in ifconfig, got {ifconfig_out}"
+            )
+        
+    def is_ipalias_created(self):
+        """Checks if our IPALIAS is present after creating an IPALIAS VIP"""
+        # Local variables
+        ipalias_subnet = IPALIAS_SUBNET_CREATE
+        ipalias_ip = ipalias_subnet.split("/")[0]
+        ipalias_bitmask = int(ipalias_subnet.split("/")[1])
+        ipalias_interface = IPALIAS_INTERFACE_CREATE
+        ifconfig_out = self.pfsense_shell("ifconfig")
 
-    def check_ip_alias_does_not_exist(self):
-        """Checks if our IP alias is no longer present after deleting an IP alias VIP"""
-        # Local varaible
-        alias_ip = IPALIAS_SUBNET_UPDATE.split("/", maxsplit=1)[0]
+        # Check that the IPALIAS VIP created in the test is correctly represented in ifconfig
+        if not is_if_in_ifconfig(ifconfig_out, ipalias_interface, ipalias_ip, ipalias_bitmask):
+            raise AssertionError(f"Expected IPALIAS VIP '{ipalias_subnet}' to exist, got {ifconfig_out}")
 
-        if alias_ip in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Expected IP alias VIP '{alias_ip}' to be deleted")
+    def is_ipalias_updated(self):
+        """Checks if our IPALIAS is present after creating an IPALIAS VIP"""
+        # Local variables
+        ipalias_subnet = IPALIAS_SUBNET_UPDATE
+        ipalias_ip = ipalias_subnet.split("/")[0]
+        ipalias_ip_prev = IPALIAS_SUBNET_CREATE.split("/")[0]
+        ipalias_bitmask = int(ipalias_subnet.split("/")[1])
+        ipalias_interface = IPALIAS_INTERFACE_UPDATE
+        ifconfig_out = self.pfsense_shell("ifconfig")
 
-    def check_proxyarp_does_not_exist(self):
-        """Checks if our proxyarp IP is no longer present after deleting a proxyarp VIP"""
+        # Check that the IPALIAS VIP created in the test is correctly represented in ifconfig
+        if not is_if_in_ifconfig(ifconfig_out, ipalias_interface, ipalias_ip, ipalias_bitmask):
+            raise AssertionError(f"Expected IPALIAS VIP '{ipalias_subnet}' to exist, got {ifconfig_out}")
+
+        # Check that the previous IPALIAS IP is no longer present
+        if ipalias_ip_prev in ifconfig_out:
+            raise AssertionError(
+                f"Expected previous IPALIAS IP '{ipalias_ip_prev}' to no longer exist in ifconfig, got {ifconfig_out}"
+            )
+
+    def is_ipalias_deleted(self):
+        """Checks if our IPALIAS is no longer present after deleting an IPALIAS VIP"""
+        # Local variables
+        ipalias_ip = IPALIAS_SUBNET_UPDATE.split("/", maxsplit=1)[0]
+        ifconfig_out = self.pfsense_shell("ifconfig")
+
+        if ipalias_ip in ifconfig_out:
+            raise AssertionError(f"Expected IPALIAS VIP '{ipalias_ip}' to be deleted in ifconfig, got {ifconfig_out}")
+
+    def is_proxyarp_created(self):
+        """Checks if our proxyarp IP is present after creating a proxyarp VIP"""
+        # Local variables
+        proxyarp_ip = PROXYARP_SUBNET_CREATE
+        choparp_processes = self.pfsense_shell("/usr/bin/top -baHS 999 | grep choparp")
+
+        # Ensure there is an active choparp process advertising this subnet
+        if proxyarp_ip not in choparp_processes:
+            raise AssertionError(f"Expected proxyarp VIP '{proxyarp_ip}' to be present, got {choparp_processes}")
+
+    def is_proxyarp_updated(self):
+        """Checks if our proxyarp IP is present after updating a proxyarp VIP"""
         # Local variables
         proxyarp_ip = PROXYARP_SUBNET_UPDATE
+        proxyarp_ip_prev = PROXYARP_SUBNET_CREATE
+        choparp_processes = self.pfsense_shell("/usr/bin/top -baHS 999 | grep choparp")
 
-        if f"{proxyarp_ip}" in self.last_response.get("data", {}).get("cmd_output", ""):
-            raise AssertionError(f"Expected proxyarp VIP '{proxyarp_ip}' to be deleted")
+        # Ensure there is an active choparp process advertising this subnet
+        if proxyarp_ip not in choparp_processes:
+            raise AssertionError(f"Expected proxyarp VIP '{proxyarp_ip}' to be present, got {choparp_processes}")
+
+        # Ensure the choparp process advertising the previous subnet is no longer present
+        if proxyarp_ip_prev in choparp_processes:
+            raise AssertionError(
+                f"Expected previous proxyarp VIP '{proxyarp_ip_prev}' to no longer be present, got {choparp_processes}"
+            )
+
+    def is_proxyarp_deleted(self):
+        """Checks if our proxyarp IP is not present after deleting a proxyarp VIP"""
+        # Local variables
+        proxyarp_ip =  PROXYARP_SUBNET_UPDATE
+        choparp_processes = self.pfsense_shell("/usr/bin/top -baHS 999 | grep choparp")
+
+        # Ensure there is an active choparp process advertising this subnet
+        if proxyarp_ip in choparp_processes:
+            raise AssertionError(f"Expected proxyarp VIP '{proxyarp_ip}' to be deleted, got {choparp_processes}")
 
 
 APIE2ETestFirewallVirtualIP()
