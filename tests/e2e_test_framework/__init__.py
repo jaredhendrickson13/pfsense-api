@@ -270,6 +270,29 @@ class APIE2ETest:
 
         return resp.json()["data"]["token"]
 
+    def pfsense_shell(self, cmd: str):
+        """
+        Runs a specified shell command on the target pfSense using the /api/v1/diagnostics/command_prompt endpoint
+        and returns it's output.
+        :param cmd: the shell command to run
+        :return: the stdout from the shell command
+        """
+        # Local variables
+        test_params = {
+            "uri": "/api/v1/diagnostics/command_prompt",
+            "req_data": {"shell_cmd": cmd}
+        }
+
+        # Run the API request
+        resp = self.make_request("POST", test_params, req_only=True)
+
+        # Only return the response if it was successful
+        if self.has_json_response(resp) and resp.status_code == 200:
+            return resp.json().get("data").get("cmd_output")
+
+        # Otherwise, raise an error
+        raise ConnectionError(f"Failed to run '{cmd}' at '{self.format_url(test_params['uri'])}'")
+
     @staticmethod
     def has_json_response(resp):
         """Checks that our request's response is valid a JSON string."""
