@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Class used to test the /api/v1/services/service_watchdog endpoint."""
+import time
+
 import e2e_test_framework
 
 
@@ -53,8 +55,9 @@ class APIE2ETestServicesServiceWatchdog(e2e_test_framework.APIE2ETest):
             "req_data": {"services": [{"name": "unbound"}, {"name": "unbound"}]}
         },
         {
-            "name": "Update watched services",
-            "req_data": {"services": [{"name": "unbound", "notify": True}]}
+            "name": "Update watched services and ensure services get restarted when stopped",
+            "req_data": {"services": [{"name": "unbound", "notify": True}]},
+            "post_test_callable": "is_unbound_restarted"
         },
         {
             "name": "Read the Service Watchdog configuration",
@@ -71,6 +74,31 @@ class APIE2ETestServicesServiceWatchdog(e2e_test_framework.APIE2ETest):
             }
         },
     ]
+
+    def is_unbound_restarted(self):
+        """Checks if the unbound service was restarted by service watchdog"""
+        # Local variables
+        unbound_running = False
+
+        # First, kill the unbound process
+        self.pfsense_shell("pkill unbound")
+
+        # Check up to 90 times, service watchdog only runs every minute by default
+        for attempt in range(0, 90):
+            # Check active processes
+            unbound_processes = self.pfsense_shell("ps aux | grep /usr/local/sbin/unbound")
+
+            # Check if the main unbound process is running
+            if "/usr/local/sbin/unbound -c /var/unbound/unbound.conf" in unbound_processes:
+                unbound_running = True
+                break
+
+            # Wait 1 second before retrying
+            time.sleep(1)
+
+        # Raise an error if unbound wasn't running by the end of the loop
+        if not unbound_running:
+            raise AssertionError("Expected Service Watchdog to restart Unbound service")
 
 
 APIE2ETestServicesServiceWatchdog()
