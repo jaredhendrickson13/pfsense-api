@@ -88,6 +88,9 @@ class APIE2ETestServicesSSHd(e2e_test_framework.APIE2ETest):
 
     def is_sshd_set_test_1(self):
         """Checks if the first SSH update we do correctly configures sshd and it is reachable"""
+        # Many sshd_config fields need to be checked
+        # pylint: disable=too-many-branches
+
         # Local variables
         sshd_config = self.pfsense_shell("cat /etc/ssh/sshd_config")
 
@@ -128,9 +131,12 @@ class APIE2ETestServicesSSHd(e2e_test_framework.APIE2ETest):
             raise AssertionError(f"Expected 'AllowAgentForwarding yes' in sshd_config, got: {sshd_config}")
         if not SSH_AGENTFORWARDING_TEST_1 and "AllowAgentForwarding no" not in sshd_config:
             raise AssertionError(f"Expected 'AllowAgentForwarding no' in sshd_config, got: {sshd_config}")
-        
+
     def is_sshd_set_test_2(self):
         """Checks if the second SSH update we do correctly configures sshd and it is reachable"""
+        # Many sshd_config fields need to be checked
+        # pylint: disable=too-many-branches
+
         # Local variables
         sshd_config = self.pfsense_shell("cat /etc/ssh/sshd_config")
 
