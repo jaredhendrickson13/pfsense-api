@@ -192,7 +192,7 @@ class APIE2ETest:
         # When a callable req_data is defined, ensure it is a callable and run the function
         if test_params.get("req_data_callable", ""):
             # Ensure the test is callable, otherwise raise an error
-            if callable(pre_test_callable):
+            if callable(req_data_callable):
                 # Try to run the callable, if an exception occurs capture it so it can be checked in __check_resp__
                 req_data.update(req_data_callable())
             else:
