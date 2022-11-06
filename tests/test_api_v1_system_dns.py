@@ -44,13 +44,13 @@ class APIE2ETestSystemDNS(e2e_test_framework.APIE2ETest):
         if DNSLOCALHOST_TEST_1 and "nameserver 127.0.0.1" not in resolvconf_out:
             raise AssertionError(f"Expected nameserver 127.0.0.1 in /etc/resolv.conf, got: {resolvconf_out}")
         # Ensure localhost is not present if dnslocalhost is not enabled
-        elif not DNSLOCALHOST_TEST_1 and "nameserver 127.0.0.1" in resolvconf_out:
+        if not DNSLOCALHOST_TEST_1 and "nameserver 127.0.0.1" in resolvconf_out:
             raise AssertionError(f"Unexpected nameserver 127.0.0.1 in /etc/resolv.conf, got: {resolvconf_out}")
 
         # Loop through each requested nameserver and ensure it is present in resolv.conf
-        for ns in DNSSERVER_TEST_1:
-            if f"nameserver {ns}" not in resolvconf_out:
-                raise AssertionError(f"Expected nameserver {ns} in /etc/resolv.conf, got: {resolvconf_out}")
+        for ns_ip in DNSSERVER_TEST_1:
+            if f"nameserver {ns_ip}" not in resolvconf_out:
+                raise AssertionError(f"Expected nameserver {ns_ip} in /etc/resolv.conf, got: {resolvconf_out}")
 
     def is_dns_set_test_2(self):
         """Checks if the second DNS update is applied correctly in resolv.conf"""
@@ -60,11 +60,14 @@ class APIE2ETestSystemDNS(e2e_test_framework.APIE2ETest):
         # Ensure localhost is present as nameserver if dnslocalhost is enabled
         if DNSLOCALHOST_TEST_2 and "nameserver 127.0.0.1" not in resolvconf_out:
             raise AssertionError(f"Expected nameserver 127.0.0.1 in /etc/resolv.conf, got: {resolvconf_out}")
+        # Ensure localhost is not present if dnslocalhost is not enabled
+        if not DNSLOCALHOST_TEST_2 and "nameserver 127.0.0.1" in resolvconf_out:
+            raise AssertionError(f"Unexpected nameserver 127.0.0.1 in /etc/resolv.conf, got: {resolvconf_out}")
 
         # Loop through each requested nameserver and ensure it is present in resolv.conf
-        for ns in DNSSERVER_TEST_2:
-            if f"nameserver {ns}" not in resolvconf_out:
-                raise AssertionError(f"Expected nameserver {ns} in /etc/resolv.conf, but got: {resolvconf_out}")
+        for ns_ip in DNSSERVER_TEST_2:
+            if f"nameserver {ns_ip}" not in resolvconf_out:
+                raise AssertionError(f"Expected nameserver {ns_ip} in /etc/resolv.conf, but got: {resolvconf_out}")
 
 
 APIE2ETestSystemDNS()
