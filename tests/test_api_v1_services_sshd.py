@@ -192,7 +192,7 @@ class APIE2ETestServicesSSHd(e2e_test_framework.APIE2ETest):
             sock.connect((self.args.host, int(port)))
             sock.shutdown(2)
             return True
-        except (TimeoutError, ConnectionError):
+        except (socket.timeout, TimeoutError, ConnectionError):
             return False
 
 
