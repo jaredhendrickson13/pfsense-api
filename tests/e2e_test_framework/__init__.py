@@ -157,8 +157,9 @@ class APIE2ETest:
     def make_request(self, method, test_params, req_only=False):
         """Makes an API request based on the test's parameters."""
         # pylint: disable=broad-except    # We don't want tests to exit and prevent later tests
-        # pylint: disable=too-many-locals  # Many variables needed for customization
+        # pylint: disable=too-many-locals  # Many variables needed for test customization
         # pylint: disable=too-many-branches    # Many branches needed for test customization
+        # pylint: disable=too-many-statements    # Many statements needed for test customization
 
         # Local variables
         method = test_params.get("method", method)    # Allow custom method override
@@ -189,16 +190,25 @@ class APIE2ETest:
             headers = {"Authorization": "Bearer " + self.get_jwt(username, password)}
 
         # When a callable req_data is defined, ensure it is a callable and run the function
-        if callable(req_data_callable):
-            req_data.update(req_data_callable())
+        if test_params.get("req_data_callable", ""):
+            # Ensure the test is callable, otherwise raise an error
+            if callable(pre_test_callable):
+                # Try to run the callable, if an exception occurs capture it so it can be checked in __check_resp__
+                req_data.update(req_data_callable())
+            else:
+                raise ValueError("Expected req_data_callable to be a valid callable name")
 
         # When a pre-test callable is defined, ensure it is a callable and run the function
-        if callable(pre_test_callable):
-            # Try to run the callable, if an exception occurs capture it so it can be checked in __check_resp__
-            try:
-                pre_test_callable()
-            except Exception as exc:
-                pre_test_exc = exc
+        if test_params.get("pre_test_callable", ""):
+            # Ensure the test is callable, otherwise raise an error
+            if callable(pre_test_callable):
+                # Try to run the callable, if an exception occurs capture it so it can be checked in __check_resp__
+                try:
+                    pre_test_callable()
+                except Exception as exc:
+                    pre_test_exc = exc
+            else:
+                raise ValueError("Expected pre_test_callable to be a valid callable name")
 
         # Attempt to make the API call, if the request times out print timeout error
         try:
@@ -231,7 +241,7 @@ class APIE2ETest:
         time.sleep(test_params.get("pause", 0))
 
         # Check for a post test callable
-        if post_test_callable:
+        if test_params.get("post_test_callable", ""):
             # Ensure the test is callable, otherwise raise an error
             if callable(post_test_callable):
                 # Try to run the callable, if an exception occurs capture it so it can be checked in __check_resp__

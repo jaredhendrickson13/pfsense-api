@@ -84,7 +84,7 @@ class APIE2ETestServicesServiceWatchdog(e2e_test_framework.APIE2ETest):
         self.pfsense_shell("pkill unbound")
 
         # Check up to 90 times, service watchdog only runs every minute by default
-        for attempt in range(0, 90):
+        for _ in range(0, 90):
             # Check active processes
             unbound_processes = self.pfsense_shell("ps aux | grep /usr/local/sbin/unbound")
 
