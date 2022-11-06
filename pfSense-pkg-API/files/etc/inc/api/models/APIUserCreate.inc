@@ -26,7 +26,7 @@ class APIUserCreate extends APIModel {
 
     public function action() {
         # Increase the system's next UID by one and add our user to the configuration
-        $this->set_config("system/nextuid", intval($this->validated_data["uid"])) + 1;
+        $this->set_config("system/nextuid", intval($this->validated_data["uid"]) + 1);
         $this->id = $this->get_next_id("system/user");
         $this->set_config("system/user/{$this->id}", $this->validated_data);
 

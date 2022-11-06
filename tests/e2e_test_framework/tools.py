@@ -12,8 +12,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Tool functions for E2E testing."""
-
+import datetime
 import ipaddress
+import random
+
+
+def generate_random_future_date():
+    """
+    Generates a random future date in MM/DD/YYYY format. This date will always be the next year or greater, and does
+    not generate days beyond 28 since not every month has more than 28 days.
+    :return: date string in MM/DD/YYYY
+    """
+    # Local variables
+    current_year = datetime.datetime.now().year
+    random_day = random.randint(1, 28)
+    random_month = random.randint(1, 12)
+    random_year = random.randint(current_year + 1, current_year + 10)
+
+    # Ensure single digit date values have leading zero
+    random_day = f"0{random_day}" if random_day < 10 else str(random_day)
+    random_month = f"0{random_month}" if random_month < 10 else str(random_month)
+
+    # Return the date string
+    return f"{random_month}/{random_day}/{random_year}"
 
 
 def bits_to_hex(bits: int):
