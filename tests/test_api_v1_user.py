@@ -415,7 +415,4 @@ class APIE2ETestUser(e2e_test_framework.APIE2ETest):
         return ""
 
 
-
-
-
 APIE2ETestUser()
