@@ -182,7 +182,6 @@ class APIModel {
         # Checks API status and requirements
         $this->check_enable();
         $this->check_server_ip();
-        $this->check_packages();
 
         # Checks request data
         $this->check_request_data();
@@ -192,6 +191,9 @@ class APIModel {
             $this->check_authentication();
             $this->check_authorization();
         }
+
+        # Check for required packages
+        $this->check_packages();
 
         # Attempt to validate the request
         $this->validate_payload();
@@ -207,7 +209,12 @@ class APIModel {
     public function call() {
         # If the API call was valid, execute the action. Otherwise, return the first error encountered.
         if ($this->validate()) {
-            return $this->action();
+            # Bypass the action if requested
+            if ($this->initial_data["_action_bypass"] === true) {
+                return APIResponse\get(15);
+            } else {
+                return $this->action();
+            }
         } else {
             return $this->errors[0];
         }

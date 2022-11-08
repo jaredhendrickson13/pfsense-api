@@ -109,6 +109,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Request was successful and is processing in the background",
         ],
+        15 => [
+            "status" => "accepted",
+            "code" => 200,
+            "return" => $id,
+            "message" => "Request was successful but actions were bypassed so nothing was changed",
+        ],
 
         // 1000-1999 reserved for /api/v1/system API calls
         1000 => [
