@@ -20,6 +20,10 @@ import e2e_test_framework
 class APIE2ETestServicesServiceWatchdog(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/service_watchdog endpoint."""
     uri = "/api/v1/services/service_watchdog"
+
+    get_privileges = ["page-all", "api-services-servicewatchdog"]
+    put_privileges = ["page-all", "api-services-servicewatchdog"]
+
     put_tests = [
         {
             "name": "Check pfSense-pkg-Service_Watchdog installed constraint",

@@ -1,11 +1,8 @@
 """Script used to test the /api/v1/services/openvpn/client endpoint."""
 import e2e_test_framework
 
-
-class APIE2ETestOpenVPNClient(e2e_test_framework.APIE2ETest):
-    """Class used to test the /api/v1/services/openvpn/client endpoint."""
-    uri = "/api/v1/services/openvpn/client"
-    tls_key_text = "-----BEGIN OpenVPN Static key V1----- \
+# Constants
+TLS_KEY_TEXT = "-----BEGIN OpenVPN Static key V1----- \
 db8701afd882d746be67f084bae68470 \
 54a99ef3b61864cfe1864c6c02584335 \
 fe706df150250bf7e294b8c35911817c \
@@ -22,8 +19,19 @@ a9a7510d2d167033edfd3580a824f3e1 \
 1af57da6eee89e6318ec29c67da8a19d \
 7c9d74c7afac6ee0f813a0278a6261d7 \
 a28e7bdbf1743527346bda359bc92fc9 \
------END OpenVPN Static key V1----- \
+-----END OpenVPN Static Key V1----- \
 "
+
+
+class APIE2ETestOpenVPNClient(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/services/openvpn/client endpoint."""
+    uri = "/api/v1/services/openvpn/client"
+
+    get_privileges = ["page-all", "page-openvpn-client"]
+    post_privileges = ["page-all", "page-openvpn-client"]
+    put_privileges = ["page-all", "page-openvpn-client"]
+    delete_privileges = ["page-all", "page-openvpn-client"]
+
     get_tests = [{"name": "Read all OpenVPN Client instances"}]
     post_tests = [
         {
@@ -160,7 +168,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "status": 400,
             "return": 2109,
             "req_data": {
-                "tls": tls_key_text,
+                "tls": TLS_KEY_TEXT,
                 "tls_type": "INVALID_TLS_TYPE",
                 "server_addr": "openvpn.example.com",
             }
@@ -170,7 +178,7 @@ a28e7bdbf1743527346bda359bc92fc9 \
             "status": 400,
             "return": 2110,
             "req_data": {
-                "tls": tls_key_text,
+                "tls": TLS_KEY_TEXT,
                 "tlsauth_keydir": "INVALID_TLS_KEYDIR",
                 "server_addr": "openvpn.example.com",
             }

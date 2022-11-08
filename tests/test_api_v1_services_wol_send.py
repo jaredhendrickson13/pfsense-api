@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestServicesWOLSend(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/wol/send endpoint."""
     uri = "/api/v1/services/wol/send"
+    post_privileges = ["page-all", "page-services-wakeonlan"]
     post_tests = [
         {
             "name": "Send magic WOL packet",
@@ -61,5 +62,6 @@ class APIE2ETestServicesWOLSend(e2e_test_framework.APIE2ETest):
             "return": 2102
         },
     ]
+
 
 APIE2ETestServicesWOLSend()

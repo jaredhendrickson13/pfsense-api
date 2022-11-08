@@ -18,6 +18,10 @@ import e2e_test_framework
 class APIE2ETestStatusCARP(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/status/carp endpoint."""
     uri = "/api/v1/status/carp"
+
+    get_privileges = ["page-all", "page-status-carp"]
+    put_privileges = ["page-all", "page-status-carp"]
+
     get_tests = [{"name": "Read the CARP status"}]
     put_tests = [
         {

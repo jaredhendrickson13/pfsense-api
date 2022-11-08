@@ -5,6 +5,10 @@ import e2e_test_framework
 class APIE2ETestUserPrivilege(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/user/privilege endpoint."""
     uri = "/api/v1/user/privilege"
+
+    post_privileges = ["page-all", "page-system-usermanager-addprivs"]
+    delete_privileges = ["page-all", "page-system-usermanager-addprivs"]
+
     post_tests = [
         {
             "name": "Grant user privileges",

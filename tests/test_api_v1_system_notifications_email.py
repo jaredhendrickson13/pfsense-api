@@ -5,6 +5,10 @@ import e2e_test_framework
 class APIE2ETestSystemNotificationsEmail(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/system/notifications/email endpoint."""
     uri = "/api/v1/system/notifications/email"
+
+    get_privileges = ["page-all", "page-system-advanced-notifications"]
+    put_privileges = ["page-all", "page-system-advanced-notifications"]
+
     get_tests = [
         {"name": "Read the system email notification settings", "resp_data_empty": True}
     ]

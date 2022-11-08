@@ -18,6 +18,10 @@ import e2e_test_framework
 class APIE2ETestFirewallNATOutbound(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/nat/outbound endpoint."""
     uri = "/api/v1/firewall/nat/outbound"
+
+    get_privileges = ["page-all", "page-firewall-nat-outbound"]
+    put_privileges = ["page-all", "page-firewall-nat-outbound"]
+
     get_tests = [
         {"name": "Read entire outbound NAT configuration"}
     ]

@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestStatusLogSystem(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/status/log/system endpoint."""
     uri = "/api/v1/status/log/system"
+    get_privileges = ["page-all", "page-diagnostics-logs-system"]
     get_tests = [{"name": "Read the system log"}]
 
 

@@ -18,6 +18,10 @@ import e2e_test_framework
 class APIE2ETestServicesNTPd(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/ntpd endpoint."""
     uri = "/api/v1/services/ntpd"
+
+    get_privileges = ["page-all", "page-services-ntpd"]
+    put_privileges = ["page-all", "page-services-ntpd"]
+
     get_tests = [{"name": "Read the NTPd configuration"}]
     put_tests = [
         {

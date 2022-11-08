@@ -18,7 +18,7 @@ import e2e_test_framework
 class APIE2ETestFirewallRuleSort(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/rule/sort endpoint."""
     uri = "/api/v1/firewall/rule/sort"
-
+    put_privileges = ["page-all", "page-firewall-rules"]
     put_tests = [
         {
             "name": "Set firewall rules in a random order",

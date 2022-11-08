@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestStatusLogDHCP(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/status/log/dhcp endpoint."""
     uri = "/api/v1/status/log/dhcp"
+    get_privileges = ["page-all", "page-diagnostics-logs-dhcp"]
     get_tests = [{"name": "Read the DHCP log"}]
 
 

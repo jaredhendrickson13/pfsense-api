@@ -18,6 +18,12 @@ import e2e_test_framework
 class APIE2ETestFirewallNATOneToOne(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/nat/one_to_one endpoint."""
     uri = "/api/v1/firewall/nat/one_to_one"
+
+    get_privileges = ["page-all", "page-firewall-nat-1-1"]
+    post_privileges = ["page-all", "page-firewall-nat-1-1-edit"]
+    put_privileges = ["page-all", "page-firewall-nat-1-1-edit"]
+    delete_privileges = ["page-all", "page-firewall-nat-1-1-edit"]
+
     get_tests = [
         {"name": "Read all 1:1 NAT mappings"}
     ]

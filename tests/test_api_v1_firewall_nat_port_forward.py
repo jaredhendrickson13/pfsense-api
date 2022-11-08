@@ -18,6 +18,12 @@ import e2e_test_framework
 class APIE2ETestFirewallNATPortForward(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/nat/port_forward endpoint."""
     uri = "/api/v1/firewall/nat/port_forward"
+
+    get_privileges = ["page-all", "page-firewall-nat-portforward"]
+    post_privileges = ["page-all", "page-firewall-nat-portforward-edit"]
+    put_privileges = ["page-all", "page-firewall-nat-portforward-edit"]
+    delete_privileges = ["page-all", "page-firewall-nat-portforward-edit"]
+
     get_tests = [
         {"name": "Read all NAT port forwards"}
     ]

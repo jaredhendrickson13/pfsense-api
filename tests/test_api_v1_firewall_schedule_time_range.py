@@ -18,6 +18,10 @@ import e2e_test_framework
 class APIE2ETestFirewallScheduleTimeRange(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/schedule/time_range endpoint."""
     uri = "/api/v1/firewall/schedule/time_range"
+
+    post_privileges = ["page-all", "page-firewall-schedules-edit"]
+    delete_privileges = ["page-all", "page-firewall-schedules-edit"]
+
     post_tests = [
         {
             "name": "Create parent firewall schedule",

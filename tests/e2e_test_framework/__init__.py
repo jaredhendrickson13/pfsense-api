@@ -14,6 +14,7 @@
 """Module for the e2e test framework that is used to test pfSense-API."""
 import argparse
 import json
+import secrets
 import sys
 import time
 import uuid
@@ -37,9 +38,13 @@ class APIE2ETest:
     exit_code = 0
     last_request = {}
     last_response = {}
+    get_privileges = []
     get_tests = []
+    post_privileges = []
     post_tests = []
+    put_privileges = []
     put_tests = []
+    delete_privileges = []
     delete_tests = []
     get_responses = []
     post_responses = []
@@ -53,6 +58,7 @@ class APIE2ETest:
 
         # Run E2E tests and exit on corresponding status code
         try:
+            self.test_privs()
             self.post()
             self.get()
             self.put()
@@ -286,12 +292,54 @@ class APIE2ETest:
 
         return resp.json()["data"]["token"]
 
+    def create_or_update_user(self, username, passwd, privs):
+        """
+        Creates or updates a user that can be used for testing.
+        :param username: the username of the user to create/update
+        :param passwd: (string) the password to assign the user to create/update
+        :param privs: (list) a list of privileges to assign the user
+        :return: true if the user was was created/updated, false if something went wrong
+        """
+        # First try to create (POST) the user, then update (PUT) if the creation was not successful
+        for method in ["POST", "PUT"]:
+            # Try to create/update this user
+            resp = self.make_request(
+                method,
+                req_only=True,
+                test_params={
+                    "uri": "/api/v1/user",
+                    "req_data": {"username": username, "password": passwd, "priv": privs, "_test": True}
+                }
+            )
+
+            # If the creation was successful, return true.
+            if resp.status_code == 200:
+                return True
+
+        # Return False if the user was not created or updated
+        return False
+
+    def delete_user(self, username):
+        """
+        Deletes a user off pfSense. Intended to delete users used for testing.
+        :param username: (string) the username of the user to delete
+        :return: None
+        """
+        self.make_request(
+            "DELETE",
+            req_only=True,
+            test_params={
+                "uri": "/api/v1/user",
+                "req_data": {"username": username}
+            }
+        )
+
     def pfsense_shell(self, cmd: str):
         """
         Runs a specified shell command on the target pfSense using the /api/v1/diagnostics/command_prompt endpoint
         and returns it's output.
-        :param cmd: the shell command to run
-        :return: the stdout from the shell command
+        :param cmd: (string) the shell command to run
+        :return: (string) the stdout from the shell command
         """
         # Local variables
         test_params = {
@@ -308,6 +356,69 @@ class APIE2ETest:
 
         # Otherwise, raise an error
         raise ConnectionError(f"Failed to run '{cmd}' at '{self.format_url(test_params['uri'])}'")
+
+    def is_priv_allowed(self, method, username, password, priv):
+        """
+        Makes a test API call to check if a specified privilege authorizes the API call
+        :param method: (string) the method to use when testing
+        :param username: (string) the username to create/update and use for tests
+        :param password: (string) the password to create/update and use for tests
+        :param priv: (string) the priv to assign the user and test
+        :return: (boolean) returns true if the privilege authorized the request
+        """
+        # Create/update the test user with no privileges to start and make a request
+        self.create_or_update_user(username, password, [])
+        no_priv_resp = self.make_request(
+            method,
+            test_params={"username": username, "password": password},
+            req_only=True
+        )
+
+        # Create the test user with no privileges to start and make a request
+        self.create_or_update_user(username, password, [priv])
+        priv_resp = self.make_request(
+            method,
+            test_params={"username": username, "password": password, "req_data": {"_action_bypass": True}},
+            req_only=True
+        )
+
+        # Delete the test user
+        self.delete_user(username)
+
+        # Ensure unprivileged reqeust returned a 403 and the privileged request didn't
+        if no_priv_resp.status_code == 403 and priv_resp.status_code != 403:
+            return True
+
+        return False
+
+    def test_privs(self):
+        """
+        Check that each privilege specified in the 'privileges' attributes of tests work as expected. This method
+        essentially calls is_priv_allowed() for each expected privilege.
+        """
+        # Local variables
+        username = str(uuid.uuid4())[:8]    # Username of user to create and use for this test
+        password = secrets.token_urlsafe(12)    # Password of the user to create and use for this test
+
+        # Test privs for each request type
+        for method in ["get", "post", "put", "delete"]:
+            # Get the method privileges attribute for this method. (e.g. self.get_privileges, etc)
+            privileges = getattr(self, f"{method}_privileges", [])
+
+            # Only test privileges if we have them
+            if privileges:
+                # Loop through each privilege and ensure it authorizes correctly
+                for privilege in privileges:
+                    # Set test_pararms so the test name shows correctly
+                    test_params = {"name": f"Checking privilege '{privilege}' acceptance"}
+
+                    # Check if the privilege was allowed
+                    if self.is_priv_allowed(method.upper(), username, password, privilege):
+                        print(self.__format_msg__(method.upper(), test_params, "Response is valid", mode="ok"))
+                    else:
+                        msg = f"Expected API to authorize call with privilege '{privilege}'"
+                        print(self.__format_msg__(method.upper(), test_params, msg))
+                        self.exit_code = 1
 
     @staticmethod
     def has_json_response(resp):

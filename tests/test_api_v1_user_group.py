@@ -5,6 +5,12 @@ import e2e_test_framework
 class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/user/group endpoint."""
     uri = "/api/v1/user/group"
+
+    post_privileges = ["page-all", "page-system-groupmanager"]
+    put_privileges = ["page-all", "page-system-groupmanager"]
+    delete_privileges = ["page-all", "page-system-groupmanager"]
+    get_privileges = ["page-all", "page-system-groupmanager"]
+
     get_tests = [
         {
             "name": "Read groups"

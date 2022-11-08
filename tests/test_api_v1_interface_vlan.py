@@ -36,6 +36,12 @@ VLAN_IF_DUP = f"{PARENT_IF_DUP}.{VLAN_TAG_DUP}"
 class APIE2ETestInterfaceVLAN(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/interface/vlan endpoint."""
     uri = "/api/v1/interface/vlan"
+
+    get_privileges = ["page-all", "page-interfaces-vlan", "page-interfaces-vlan-edit"]
+    post_privileges = ["page-all", "page-interfaces-vlan-edit"]
+    put_privileges = ["page-all", "page-interfaces-vlan-edit"]
+    delete_privileges = ["page-all", "page-interfaces-vlan-edit"]
+
     get_tests = [{"name": "Read all interface VLANs"}]
     post_tests = [
         {

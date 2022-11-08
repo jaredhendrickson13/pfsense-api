@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestStatusIPsec(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/status/ipsec endpoint."""
     uri = "/api/v1/status/ipsec"
+    get_privileges = ["page-all", "page-status-ipsec"]
     get_tests = [{"name": "Read the IPsec status", "resp_data_empty": True}]
 
 

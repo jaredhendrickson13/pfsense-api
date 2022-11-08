@@ -18,6 +18,8 @@ import e2e_test_framework
 class APIE2ETestFirewallRuleFlush(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/rule/flush endpoint."""
     uri = "/api/v1/firewall/rule/flush"
+    put_privileges = ["page-all", "page-firewall-rules-edit"]
+    delete_privileges = ["page-all", "page-firewall-rules-edit"]
     put_tests = [
         {
             "name": "Check rules array type constraint",

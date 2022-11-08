@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestServicesSyslogdStart(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/syslogd/start endpoint."""
     uri = "/api/v1/services/syslogd/start"
+    post_privileges = ["page-all", "page-status-services"]
     post_tests = [{"name": "Start the syslogd service"}]
 
 

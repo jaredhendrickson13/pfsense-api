@@ -18,6 +18,10 @@ import e2e_test_framework
 class APIE2ETestFirewallStates(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/states endpoint."""
     uri = "/api/v1/firewall/states"
+
+    get_privileges = ["page-all", "page-diagnostics-showstates"]
+    delete_privileges = ["page-all", "page-diagnostics-showstates"]
+
     get_tests = [{"name": "Read all firewalls states"}]
     delete_tests = [
         {

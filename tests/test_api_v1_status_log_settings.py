@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestStatusLogSettings(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/status/log/settings endpoint."""
     uri = "/api/v1/status/log/settings"
+    put_privileges = ["page-all", "page-diagnostics-logs-settings"]
     put_tests = [
         {
             "name": "Update log settings",

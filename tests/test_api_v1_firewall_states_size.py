@@ -18,6 +18,10 @@ import e2e_test_framework
 class APIE2ETestFirewallStatesSize(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/states/size endpoint."""
     uri = "/api/v1/firewall/states/size"
+
+    get_privileges = ["page-all", "page-system-advanced-firewall"]
+    put_privileges = ["page-all", "page-system-advanced-firewall"]
+
     get_tests = [{"name": "Read firewall states size"}]
     put_tests = [
         {

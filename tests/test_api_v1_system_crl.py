@@ -1,11 +1,8 @@
 """Script used to test the /api/v1/system/crl endpoint."""
 import e2e_test_framework
 
-
-class APIE2ETestSystemCRL(e2e_test_framework.APIE2ETest):
-    """Class used to test the /api/v1/system/crl endpoint."""
-    uri = "/api/v1/system/crl"
-    crl_text = "-----BEGIN X509 CRL----- \
+# Constants
+CRL_TEXT = "-----BEGIN X509 CRL----- \
 MIICnzCCAYcCAQEwDQYJKoZIhvcNAQEFBQAwgYUxKjAoBgNVBAMTIWludGVybmFs \
 LWNhLXVuaXQtdGVzdC5leGFtcGxlLmNvbTELMAkGA1UEBhMCVVMxDTALBgNVBAgT \
 BFV0YWgxFzAVBgNVBAcTDlNhbHQgTGFrZSBDaXR5MRUwEwYDVQQKEwxUZXN0IENv \
@@ -23,6 +20,16 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
 4bV6 \
 -----END X509 CRL----- \
 "
+
+
+class APIE2ETestSystemCRL(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/system/crl endpoint."""
+    uri = "/api/v1/system/crl"
+
+    get_privileges = ["page-all", "page-system-crlmanager"]
+    post_privileges = ["page-all", "page-system-crlmanager"]
+    delete_privileges = ["page-all", "page-system-crlmanager"]
+
     get_tests = [{"name": "Read system CRLs"}]
     post_tests = [
         {
@@ -69,7 +76,7 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
                 "method": "existing",
                 "descr": "EXISTING_CRL_TEST",
                 "lifetime": 3650,
-                "crl_data": crl_text
+                "crl_data": CRL_TEXT
             },
             "resp_time": 10
         },

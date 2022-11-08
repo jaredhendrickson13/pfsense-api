@@ -18,6 +18,10 @@ import e2e_test_framework
 class APIE2ETestFirewallTrafficShaperQueue(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/traffic_shaper/queue endpoint."""
     uri = "/api/v1/firewall/traffic_shaper/queue"
+
+    post_privileges = ["page-all", "page-firewall-trafficshaper-queues"]
+    delete_privileges = ["page-all", "page-firewall-trafficshaper-queues"]
+
     post_tests = [
         {
             "name": "Create PRIQ parent traffic shaper",

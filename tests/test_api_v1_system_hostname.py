@@ -11,6 +11,10 @@ DOMAIN_UPDATE = "example.com"
 class APIE2ETestSystemHostname(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/system/hostname endpoint."""
     uri = "/api/v1/system/hostname"
+
+    get_privileges = ["page-all", "page-system-generalsetup"]
+    put_privileges = ["page-all", "page-system-generalsetup"]
+
     get_tests = [{"name": "Read the system hostname"}]
     put_tests = [
         {

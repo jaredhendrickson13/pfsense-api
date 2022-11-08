@@ -18,6 +18,12 @@ import e2e_test_framework
 class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/schedule endpoint."""
     uri = "/api/v1/firewall/schedule"
+
+    get_privileges = ["page-all", "page-firewall-schedules"]
+    post_privileges = ["page-all", "page-firewall-schedules-edit"]
+    put_privileges = ["page-all", "page-firewall-schedules-edit"]
+    delete_privileges = ["page-all", "page-firewall-schedules-edit"]
+
     get_tests = [
             {"name": "Read all firewall schedules"}
         ]

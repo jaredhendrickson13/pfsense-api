@@ -18,6 +18,12 @@ import e2e_test_framework
 class APIE2ETestFirewallTrafficShaper(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/traffic_shaper endpoint."""
     uri = "/api/v1/firewall/traffic_shaper"
+
+    get_privileges = ["page-all", "page-firewall-trafficshaper"]
+    post_privileges = ["page-all", "page-firewall-trafficshaper"]
+    put_privileges = ["page-all", "page-firewall-trafficshaper"]
+    delete_privileges = ["page-all", "page-firewall-trafficshaper"]
+
     get_tests = [{"name": "Read all traffic shapers"}]
     post_tests = [
         {

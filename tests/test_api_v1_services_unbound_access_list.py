@@ -18,6 +18,12 @@ import e2e_test_framework
 class APIE2ETestServicesUnboundAccessList(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/unbound/access_list endpoint."""
     uri = "/api/v1/services/unbound/access_list"
+
+    get_privileges = ["page-all", "page-services-dnsresolver-acls"]
+    post_privileges = ["page-all", "page-services-dnsresolver-acls"]
+    put_privileges = ["page-all", "page-services-dnsresolver-acls"]
+    delete_privileges = ["page-all", "page-services-dnsresolver-acls"]
+
     get_tests = [{"name": "Read Unbound access lists"}]
     post_tests = [
         {

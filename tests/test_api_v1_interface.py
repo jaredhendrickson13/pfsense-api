@@ -44,6 +44,12 @@ VLAN_STATICV4_SUBNET_UPDATE = random.randint(24, 30)
 class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/interface endpoint."""
     uri = "/api/v1/interface"
+
+    get_privileges = ["page-all", "page-interfaces-assignnetworkports"]
+    post_privileges = ["page-all", "page-interfaces-assignnetworkports"]
+    put_privileges = ["page-all", "page-interfaces-assignnetworkports"]
+    delete_privileges = ["page-all", "page-interfaces-assignnetworkports"]
+
     get_tests = [
         {"name": "Read all configured interfaces"}
     ]

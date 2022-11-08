@@ -18,6 +18,12 @@ import e2e_test_framework
 class APIE2ETestServicesDnsmasqHostOverride(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/dnsmasq/host_override endpoint."""
     uri = "/api/v1/services/dnsmasq/host_override"
+
+    get_privileges = ["page-all", "page-services-dnsforwarder"]
+    post_privileges = ["page-all", "page-services-dnsforwarder-edithost"]
+    put_privileges = ["page-all", "page-services-dnsforwarder-edithost"]
+    delete_privileges = ["page-all", "page-services-dnsforwarder-edithost"]
+
     get_tests = [{"name": "Read all host overrides"}]
     post_tests = [
         {

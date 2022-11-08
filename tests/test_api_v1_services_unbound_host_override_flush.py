@@ -18,6 +18,8 @@ import e2e_test_framework
 class APIE2ETestServicesUnboundHostOverrideFlush(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/unbound/host_override/flush endpoint."""
     uri = "/api/v1/services/unbound/host_override/flush"
+    put_privileges = ["page-all", "page-services-dnsresolver-edithost"]
+    delete_privileges = ["page-all", "page-services-dnsresolver-edithost"]
     put_tests = [
         {
             "name": "Check host_overrides field array requirement",

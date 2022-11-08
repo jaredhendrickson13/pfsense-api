@@ -18,6 +18,12 @@ import e2e_test_framework
 class APIE2ETestRoutingStaticRoute(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/routing/static_route endpoint."""
     uri = "/api/v1/routing/static_route"
+
+    get_privileges = ["page-all", "page-system-staticroutes"]
+    post_privileges = ["page-all", "page-system-staticroutes-editroute"]
+    put_privileges = ["page-all", "page-system-staticroutes-editroute"]
+    delete_privileges = ["page-all", "page-system-staticroutes-editroute"]
+
     get_tests = [{"name": "Read all static routes"}]
     post_tests = [
         {

@@ -21,6 +21,12 @@ import e2e_test_framework
 class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/rule endpoint."""
     uri = "/api/v1/firewall/rule"
+
+    get_privileges = ["page-all", "page-firewall-rules"]
+    post_privileges = ["page-all", "page-firewall-rules-edit"]
+    put_privileges = ["page-all", "page-firewall-rules-edit"]
+    delete_privileges = ["page-all", "page-firewall-rules-edit"]
+
     get_tests = [
         {"name": "Read all firewall rules"}
     ]

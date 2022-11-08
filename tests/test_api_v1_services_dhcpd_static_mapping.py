@@ -18,6 +18,12 @@ import e2e_test_framework
 class APIE2ETestServicesDHCPdStaticMapping(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/dhcpd/static_mapping endpoint."""
     uri = "/api/v1/services/dhcpd/static_mapping"
+
+    get_privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"]
+    post_privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"]
+    put_privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"]
+    delete_privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"]
+
     get_tests = [
         {
             "name": "Read all DHCPd static mappings on the LAN interface",

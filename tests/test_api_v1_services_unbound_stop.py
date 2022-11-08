@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestServicesUnboundStop(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/unbound/stop endpoint."""
     uri = "/api/v1/services/unbound/stop"
+    post_privileges = ["page-all", "page-status-services"]
     post_tests = [{"name": "Stop the Unbound service"}]
 
 

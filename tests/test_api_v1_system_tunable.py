@@ -12,6 +12,12 @@ TUNABLE_VALUE_UPDATE = random.randint(1, 9)
 class APIE2ETestTunable(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/system/tunable endpoint."""
     uri = "/api/v1/system/tunable"
+
+    get_privileges = ["page-all", "page-system-advanced-sysctl"]
+    post_privileges = ["page-all", "page-system-advanced-sysctl"]
+    put_privileges = ["page-all", "page-system-advanced-sysctl"]
+    delete_privileges = ["page-all", "page-system-advanced-sysctl"]
+
     get_tests = [{"name": "Read system tunables"}]
     post_tests = [
         {

@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestDiagnosticsCommandPrompt(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/diagnostics/command_prompt endpoint."""
     uri = "/api/v1/diagnostics/command_prompt"
+    post_privileges = ["page-all", "page-diagnostics-command"]
     post_tests = [
         {
             "name": "Execute shell command",

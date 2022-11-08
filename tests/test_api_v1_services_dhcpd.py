@@ -18,6 +18,10 @@ import e2e_test_framework
 class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/dhcpd endpoint."""
     uri = "/api/v1/services/dhcpd"
+
+    get_privileges = ["page-all", "page-services-dhcpserver"]
+    put_privileges = ["page-all", "page-services-dhcpserver"]
+
     get_tests = [{"name": "Read all DHCPd configurations"}]
     put_tests = [
         {

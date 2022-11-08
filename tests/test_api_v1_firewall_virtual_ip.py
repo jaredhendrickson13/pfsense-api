@@ -43,6 +43,12 @@ PROXYARP_SUBNET_UPDATE = "172.16.10.100/32"
 class APIE2ETestFirewallVirtualIP(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/virtual_ip endpoint."""
     uri = "/api/v1/firewall/virtual_ip"
+
+    get_privileges = ["page-all", "page-firewall-virtualipaddresses"]
+    post_privileges = ["page-all", "page-firewall-virtualipaddress-edit"]
+    put_privileges = ["page-all", "page-firewall-virtualipaddress-edit"]
+    delete_privileges = ["page-all", "page-firewall-virtualipaddress-edit"]
+
     get_tests = [{"name": "Read all virtual IPs"}]
     post_tests = [
         {

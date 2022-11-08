@@ -18,6 +18,12 @@ import e2e_test_framework
 class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/alias endpoint."""
     uri = "/api/v1/firewall/alias"
+
+    get_privileges = ["page-all", "page-firewall-aliases"]
+    post_privileges = ["page-all", "page-firewall-alias-edit"]
+    put_privileges = ["page-all", "page-firewall-alias-edit"]
+    delete_privileges = ["page-all", "page-firewall-alias-edit"]
+
     get_tests = [
         {"name": "Read all aliases"}
     ]

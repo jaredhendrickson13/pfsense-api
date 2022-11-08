@@ -18,6 +18,12 @@ import e2e_test_framework
 class APIE2ETestOpenVPNClientSpecificOverrides(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/openvpn/csc endpoint."""
     uri = "/api/v1/services/openvpn/csc"
+
+    get_privileges = ["page-all", "page-openvpn-server"]
+    post_privileges = ["page-all", "page-openvpn-server"]
+    put_privileges = ["page-all", "page-openvpn-server"]
+    delete_privileges = ["page-all", "page-openvpn-server"]
+
     get_tests = [
         {"name": "Read all OpenVPN client specific overrides"}
     ]

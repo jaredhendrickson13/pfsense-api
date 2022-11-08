@@ -18,6 +18,12 @@ import e2e_test_framework
 class APIE2ETestServicesIPsecPhase2(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/ipsec/phase2 endpoint."""
     uri = "/api/v1/services/ipsec/phase2"
+
+    get_privileges = ["page-all", "page-vpn-ipsec-editphase2"]
+    post_privileges = ["page-all", "page-vpn-ipsec-editphase2"]
+    put_privileges = ["page-all", "page-vpn-ipsec-editphase2"]
+    delete_privileges = ["page-all", "page-vpn-ipsec-editphase2"]
+
     get_tests = [{"name": "Read IPsec phase2 entries"}]
     post_tests = [
         {

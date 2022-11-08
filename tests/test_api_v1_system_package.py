@@ -8,6 +8,11 @@ INSTALL_PKG_NAME = "pfSense-pkg-nmap"
 class APIE2ETestSystemPackage(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/system/package endpoint."""
     uri = "/api/v1/system/package"
+
+    get_privileges = ["page-all", "page-system-packagemanager-installed"]
+    post_privileges = ["page-all", "page-system-packagemanager-installpackage"]
+    delete_privileges = ["page-all", "page-system-packagemanager-installed"]
+
     get_tests = [{"name": "Read installed packages"}]
     post_tests = [
         {

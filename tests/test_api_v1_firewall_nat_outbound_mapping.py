@@ -18,6 +18,12 @@ import e2e_test_framework
 class APIE2ETestFirewallNATOutboundMapping(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/nat/outbound/mapping endpoint."""
     uri = "/api/v1/firewall/nat/outbound/mapping"
+
+    get_privileges = ["page-all", "page-firewall-nat-outbound"]
+    post_privileges = ["page-all", "page-firewall-nat-outbound-edit"]
+    put_privileges = ["page-all", "page-firewall-nat-outbound-edit"]
+    delete_privileges = ["page-all", "page-firewall-nat-outbound-edit"]
+
     get_tests = [
         {"name": "Read all outbound NAT mappings"}
     ]

@@ -20,6 +20,12 @@ import e2e_test_framework
 class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/routing/gateway endpoint."""
     uri = "/api/v1/routing/gateway"
+
+    get_privileges = ["page-all", "page-system-gateways"]
+    post_privileges = ["page-all", "page-system-gateways-editgateway"]
+    put_privileges = ["page-all", "page-system-gateways-editgateway"]
+    delete_privileges = ["page-all", "page-system-gateways-editgateway"]
+
     get_tests = [{"name": "Read all routing gateways"}]
     post_tests = [
         {

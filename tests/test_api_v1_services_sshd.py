@@ -28,6 +28,10 @@ SSH_AGENTFORWARDING_TEST_2 = False
 class APIE2ETestServicesSSHd(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/sshd endpoint."""
     uri = "/api/v1/services/sshd"
+
+    get_privileges = ["page-all", "page-system-advanced-admin"]
+    put_privileges = ["page-all", "page-system-advanced-admin"]
+
     get_tests = [{"name": "Read SSHd configuration"}]
     put_tests = [
         {

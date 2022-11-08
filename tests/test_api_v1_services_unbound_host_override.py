@@ -37,6 +37,12 @@ ALIAS_DOMAIN_UPDATE = "update.alias.example.com"
 class APIE2ETestServicesUnboundHostOverride(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/unbound/host_override endpoint."""
     uri = "/api/v1/services/unbound/host_override"
+
+    get_privileges = ["page-all", "page-services-dnsresolver"]
+    post_privileges = ["page-all", "page-services-dnsresolver-edithost"]
+    put_privileges = ["page-all", "page-services-dnsresolver-edithost"]
+    delete_privileges = ["page-all", "page-services-dnsresolver-edithost"]
+
     get_tests = [{"name": "Read all host overrides"}]
     post_tests = [
         {

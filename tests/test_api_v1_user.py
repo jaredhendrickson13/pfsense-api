@@ -25,6 +25,12 @@ DISABED_USER_PASSWD = secrets.token_urlsafe(12)
 class APIE2ETestUser(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/user endpoint."""
     uri = "/api/v1/user"
+
+    get_privileges = ["page-all", "page-system-usermanager"]
+    post_privileges = ["page-all", "page-system-usermanager"]
+    put_privileges = ["page-all", "page-system-usermanager"]
+    delete_privileges = ["page-all", "page-system-usermanager"]
+
     get_tests = [{"name": "Read local users"}]
     post_tests = [
         {

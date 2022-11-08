@@ -23,6 +23,12 @@ BR_MEMBER_IF_UPDATE = "em2"
 class APIE2ETestInterfaceBridge(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/interface/bridge endpoint."""
     uri = "/api/v1/interface/bridge"
+
+    get_privileges = ["page-all", "page-interfaces-bridge", "page-interfaces-bridge-edit"]
+    post_privileges = ["page-all", "page-interfaces-bridge-edit"]
+    put_privileges = ["page-all", "page-interfaces-bridge-edit"]
+    delete_privileges = ["page-all", "page-interfaces-bridge-edit"]
+
     get_tests = [{"name": "Read all interface VLANs"}]
     post_tests = [
         {

@@ -22,6 +22,11 @@ import e2e_test_framework
 class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/traffic_shaper/limiter endpoint."""
     uri = "/api/v1/firewall/traffic_shaper/limiter"
+
+    get_privileges = ["page-all", "page-firewall-trafficshaper-limiter"]
+    post_privileges = ["page-all", "page-firewall-trafficshaper-limiter"]
+    delete_privileges = ["page-all", "page-firewall-trafficshaper-limiter"]
+
     get_tests = [{"name": "Read all traffic shaper limiters"}]
     post_tests = [
         {
