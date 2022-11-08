@@ -20,7 +20,7 @@ require_once("api/framework/APIResponse.inc");
 class APIServicesServiceWatchdogUpdate extends APIModel {
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-services-servicewatchdog"];
+        $this->privileges = ["page-all", "api-services-servicewatchdog"];
         $this->packages = ["pfSense-pkg-Service_Watchdog"];
         $this->package_includes = ["servicewatchdog.inc"];
         $this->change_note = "Modified Service Watchdog configuration via API";
