@@ -76,7 +76,7 @@ class APIUserUpdate extends APIModel {
         global $priv_list;
 
         # Check for our optional `priv` payload value
-        if ($this->initial_data["priv"]) {
+        if (isset($this->initial_data["priv"])) {
             # Revert priv array to default
             $this->validated_data["priv"] = [];
 

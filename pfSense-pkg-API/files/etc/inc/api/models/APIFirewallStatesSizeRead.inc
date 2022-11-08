@@ -22,7 +22,7 @@ class APIFirewallStatesSizeRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-diagnostics-statessummary"];
+        $this->privileges = ["page-all", "page-system-advanced-firewall"];
     }
 
     public function action() {

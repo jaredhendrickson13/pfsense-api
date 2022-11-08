@@ -2980,7 +2980,7 @@ paths:
       description: 'Read information about the firewall state table''s current, default
         and maximum sizes.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-statessummary`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-firewall`]'
       responses:
         "200":
           $ref: '#/components/responses/Success'
@@ -12781,7 +12781,7 @@ paths:
       operationId: APISystemDNSRead
       description: 'Read current system DNS settings.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       responses:
         "200":
           $ref: '#/components/responses/Success'
@@ -12794,7 +12794,7 @@ paths:
       operationId: APISystemDNSUpdate
       description: 'Modify the existing system DNS settings.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       requestBody:
         content:
           application/json:
@@ -12828,7 +12828,7 @@ paths:
       operationId: APISystemDNSServerDelete
       description: 'Remove existing system DNS servers.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       parameters:
         - description: IP of the system DNS servers to remove.
           in: query
@@ -12848,7 +12848,7 @@ paths:
       operationId: APISystemDNSServerCreate
       description: 'Add new DNS servers to the system DNS servers.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       requestBody:
         content:
           application/json:
@@ -12887,7 +12887,7 @@ paths:
       operationId: APISystemHostnameRead
       description: 'Read the system''s hostname.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       responses:
         "200":
           $ref: '#/components/responses/Success'
@@ -12900,7 +12900,7 @@ paths:
       operationId: APISystemHostnameUpdate
       description: 'Modify the system hostname.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       requestBody:
         content:
           application/json:
