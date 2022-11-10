@@ -39,29 +39,27 @@ class APISystemAPIVersionRead extends APIModel {
 
         # Loop through each line and check the version
         foreach ($pkg_info as $pkg_line) {
-            if (APITools\str_starts_with("Version", $pkg_line)) {
+            if (str_starts_with($pkg_line, "Version")) {
                 # Locate the version and format it to a standard semantic version format (x.x.x)
                 $version = str_replace(" ", "", $pkg_line);
                 $version = explode(":", $version)[1];
                 $version = (strlen($version) === 3) ? $version.".0" : $version;
                 $version = str_replace("_", ".", $version);
-                return $version;
+                return "v{$version}";
             }
         }
     }
 
     public static function get_latest_api_version() {
         # Fetch our latest version and format it semantically (x.x.x)
-        $latest_version = array_key_first(self::get_all_available_versions());
-        $latest_version = str_replace("v", "", $latest_version);
-        return $latest_version;
+        return array_key_first(self::get_all_available_versions());
     }
 
     public static function get_latest_api_release_date() {
         # Loop through each release and locate the latest available releases creation date
         foreach (self::get_github_releases()["releases"] as $release) {
             # Check if this releases is latest available for our platform
-            if ($release["tag_name"] === "v".self::get_latest_api_version()) {
+            if ($release["tag_name"] === self::get_latest_api_version()) {
                 return $release["created_at"];
             }
         }
@@ -94,21 +92,25 @@ class APISystemAPIVersionRead extends APIModel {
     public static function get_all_available_versions() {
         # Variables
         $pf_version = APITools\get_pfsense_version()["base"];
+        $pkg_config = APITools\get_api_config()[1];
         $versions = [];
         $count = 0;
         $releases = self::get_github_releases()["releases"];
 
         # Loop through each version and populate our version data
         foreach ($releases as $release) {
-            # Loop through the assets of each release and check if our version of pfSense is supported
-            foreach ($release["assets"] as $asset) {
-                if ($asset["name"] === "pfSense-".$pf_version."-pkg-API.txz") {
-                    # The first item of our list is the latest release, mark it as such.
-                    if ($count === 0) {
-                        $versions[$release["tag_name"]] = $release["name"]." - Latest";
-                        $count++;
-                    } else {
-                        $versions[$release["tag_name"]] = $release["name"];
+            # Check if this release is a pre-release, if so, only include it if allow_pre_release is enabled
+            if ($release["prerelease"] === false or isset($pkg_config["allow_pre_release"])) {
+                # Loop through the assets of each release and check if our version of pfSense is supported
+                foreach ($release["assets"] as $asset) {
+                    if (str_starts_with($asset["name"], "pfSense-" . $pf_version)) {
+                        # The first item of our list is the latest release, mark it as such.
+                        if ($count === 0) {
+                            $versions[$release["tag_name"]] = $release["name"] . " - Latest";
+                            $count++;
+                        } else {
+                            $versions[$release["tag_name"]] = $release["name"];
+                        }
                     }
                 }
             }

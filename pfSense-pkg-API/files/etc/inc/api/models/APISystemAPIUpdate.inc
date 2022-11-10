@@ -105,6 +105,15 @@ class APISystemAPIUpdate extends APIModel {
         }
     }
 
+    private function __validate_allow_pre_release() {
+        # Check for our optional 'allow_pre_release' payload value
+        if ($this->initial_data['allow_pre_release'] === true) {
+            $this->validated_data["allow_pre_release"] = "";
+        } elseif ($this->initial_data['allow_pre_release'] === false) {
+            unset($this->validated_data["allow_pre_release"]);
+        }
+    }
+
     private function __validate_allowed_interfaces() {
         # Local variables
         $non_config_ifs = array("any" => "Any", "localhost" => "Link-local");
@@ -278,6 +287,7 @@ class APISystemAPIUpdate extends APIModel {
         $this->__validate_persist();
         $this->__validate_readonly();
         $this->__validate_allow_options();
+        $this->__validate_allow_pre_release();
         $this->__validate_allowed_interfaces();
         $this->__validate_authmode();
         $this->__validate_jwt_exp();
