@@ -56,7 +56,7 @@ class APIQuery {
                     }
                     # If this query matched, add it to our new response
                     if ($match) {
-                        $q_response[$id] = $entry;
+                        $q_response[] = $entry;
                     }
                 }
             }
