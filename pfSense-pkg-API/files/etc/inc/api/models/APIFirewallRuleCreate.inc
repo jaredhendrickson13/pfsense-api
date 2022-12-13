@@ -89,6 +89,9 @@ class APIFirewallRuleCreate extends APIModel {
             # Remove duplicates and convert back to pfSense expected format
             $this->validated_data["interface"] = array_unique($this->validated_data["interface"]);
             $this->validated_data["interface"] = implode(",", $this->validated_data["interface"]);
+        } else if ($this->initial_data["floating"] === true) {
+            # Add a floating rule without interface
+            ; // no op
         } else {
             $this->errors[] = APIResponse\get(4034);
         }
