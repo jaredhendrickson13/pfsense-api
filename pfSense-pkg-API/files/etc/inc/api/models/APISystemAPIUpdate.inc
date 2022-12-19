@@ -249,7 +249,7 @@ class APISystemAPIUpdate extends APIModel {
         # Check for our option 'keyhash' payload value
         if (isset($this->initial_data["keyhash"])) {
             # Ensure it is an available option
-            if (in_array($this->initial_data["keyhash"], ["sha256", "sha384", "sha512", "md5"])) {
+            if (in_array($this->initial_data["keyhash"], ["sha256", "sha384", "sha512"])) {
                 $this->validated_data["keyhash"] = $this->initial_data["keyhash"];
             } else {
                 $this->errors[] = APIResponse\get(1023);

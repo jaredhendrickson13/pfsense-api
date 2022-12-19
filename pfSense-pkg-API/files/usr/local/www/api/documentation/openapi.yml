@@ -6661,7 +6661,6 @@ paths:
                     vary based on your version of pfSense.
                   type: string
                   enum:
-                    - md5
                     - sha1
                     - sha256
                     - sha384
@@ -6678,7 +6677,6 @@ paths:
                     has `prfselect_enable` enabled.
                   type: string
                   enum:
-                    - md5
                     - sha1
                     - sha256
                     - sha384
@@ -7298,7 +7296,6 @@ paths:
                   items:
                     type: string
                     enum:
-                      - hmac_md5
                       - hmac_sha1
                       - hmac_sha256
                       - hmac_sha384
@@ -12124,7 +12121,6 @@ paths:
                     - sha256
                     - sha384
                     - sha512
-                    - md5
                   type: string
                 persist:
                   description: Enable or disable persistent API configuration. If

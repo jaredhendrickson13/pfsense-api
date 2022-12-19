@@ -303,7 +303,7 @@ $token_section->addInput(new Form_Select(
     'keyhash',
     'Token Hash Algorithm',
     $pkg_config["keyhash"],
-    ["sha256" => "SHA256", "sha384" => "SHA384", "sha512" => "SHA512", "md5" => "MD5"]
+    ["sha256" => "SHA256", "sha384" => "SHA384", "sha512" => "SHA512"]
 ))->setHelp(
     "Hashing algorithm used when generating API tokens."
 );
