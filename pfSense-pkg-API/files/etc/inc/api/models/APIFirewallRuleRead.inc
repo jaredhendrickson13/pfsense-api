@@ -25,6 +25,15 @@ class APIFirewallRuleRead extends APIModel {
     }
 
     public function action() {
-        return APIResponse\get(0, $this->get_config("filter/rule", []));
+        $rule_array = $this->get_config("filter/rule", []);
+
+        // Convert some fields to booleans, to better convenience
+        foreach ($rule_array as $i=>$rule) {
+            $rule_array[$i]["floating"] = $rule["floating"] === "yes";
+            $rule_array[$i]["disabled"] = $rule["disabled"] === "";
+            $rule_array[$i]["log"] = $rule["log"] === "";
+        }
+
+        return APIResponse\get(0, $rule_array);
     }
 }
