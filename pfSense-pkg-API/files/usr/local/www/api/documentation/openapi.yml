@@ -6655,11 +6655,6 @@ paths:
                     `{ "name": "aes256gcm","keylen": 64 }`,
                     `{ "name": "aes256gcm","keylen": 96 }`,
                     `{ "name": "aes256gcm","keylen": 128 }`,
-                    `{ "name": "blowfish","keylen": 128 }`,
-                    `{ "name": "blowfish","keylen": 192 }`,
-                    `{ "name": "blowfish","keylen": 256 }`,
-                    `{ "name": "3des" }`,
-                    `{ "name": "cast128" }`
                   type: object
                 hash-algorithm:
                   description: Hashing algorithm to use. Options for this field are set by pfSense itself and may

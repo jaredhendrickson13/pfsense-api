@@ -1194,7 +1194,7 @@ class APIE2ETestServicesIPsecPhase1(e2e_test_framework.APIE2ETest):
                 "peerid_type": "peeraddress",
                 "encryption": [
                     {
-                        "encryption-algorithm": {"name": "3des"},
+                        "encryption-algorithm": {"name": "aes", "keylen": 128},
                         "hash-algorithm": "sha384",
                         "dhgroup": 15
                     }
@@ -1217,7 +1217,7 @@ class APIE2ETestServicesIPsecPhase1(e2e_test_framework.APIE2ETest):
                 "peerid_type": "peeraddress",
                 "encryption": [
                     {
-                        "encryption-algorithm": {"name": "3des"},
+                        "encryption-algorithm": {"name": "aes", "keylen": 128},
                         "hash-algorithm": "sha384",
                         "dhgroup": 15
                     }
