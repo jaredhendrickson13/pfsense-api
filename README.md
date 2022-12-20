@@ -17,8 +17,8 @@ are made preventing the need for a reboot. All this results in the fastest, safe
 <details>
     <summary>Supported pfSense Versions</summary>
 
-  - pfSense Plus 22.11 (AMD64)
   - pfSense CE 2.7.0 (AMD64)
+  - pfSense Plus 23.01 (AMD64)
   ---
   
 </details>
