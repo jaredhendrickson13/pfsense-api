@@ -408,8 +408,8 @@ class APIRoutingGatewayUpdate extends APIModel {
     public function validate_payload() {
         $this->__validate_id();
         $this->__validate_disabled();
-        $this->__validate_interface();
         $this->__validate_ipprotocol();
+        $this->__validate_interface();
         $this->__validate_name();
         $this->__validate_gateway();
         $this->__validate_monitor_disable();
