@@ -4680,6 +4680,18 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Gateway cannot be deleted while in use by a DNS server, static route or gateway group"
         ],
+        6032 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPv4 gateway address cannot be used because no IPv4 address is configured on the interface"
+        ],
+        6033 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPv6 gateway address cannot be used because no IPv6 address is configured on the interface"
+        ],
 
         // 7000-7999 reserved for /api/v1/diagnostics API calls
         7000 => [

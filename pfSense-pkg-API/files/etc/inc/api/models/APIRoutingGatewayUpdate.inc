@@ -55,19 +55,6 @@ class APIRoutingGatewayUpdate extends APIModel {
         }
     }
 
-    private function __validate_interface() {
-        # Optionally allow clients to update the gateway interface
-        if (isset($this->initial_data['interface'])) {
-            $interface = APITools\get_pfsense_if_id($this->initial_data['interface']);
-            # Require interface to exist
-            if ($interface) {
-                $this->validated_data["interface"] = $interface;
-            } else {
-                $this->errors[] = APIResponse\get(6008);
-            }
-        }
-    }
-
     private function __validate_ipprotocol() {
         # Optionally allow clients to update the IP protocol
         if (isset($this->initial_data["ipprotocol"])) {
@@ -77,6 +64,57 @@ class APIRoutingGatewayUpdate extends APIModel {
                 $this->ip_protocol_changed = true;
             } else {
                 $this->errors[] = APIResponse\get(6010);
+            }
+        }
+    }
+
+    private function __validate_interface() {
+        # Revalidate the existing interface if the ipprotocol was changed but no interface was specified
+        if (isset($this->initial_data["ipprotocol"]) and !isset($this->initial_data['interface'])) {
+            $this->initial_data["interface"] = $this->validated_data["interface"];
+        }
+
+        # Optionally allow clients to pass in an interface
+        if (isset($this->initial_data['interface'])) {
+            $interface = APITools\get_pfsense_if_id($this->initial_data['interface']);
+            # Require interface to exist
+            if ($interface) {
+                # Ensure interface is valid for IPv4 gateway
+                if ($this->validated_data["ipprotocol"] === "inet") {
+                    # Get the interface's IPv4 address/subnet
+                    $int_ip = get_interface_ip($interface);
+                    $int_subnet = get_interface_subnet($interface);
+
+                    # Ensure this interface has a valid IPv4 assigned
+                    if ($int_ip and $int_subnet) {
+                        $this->validated_data["interface"] = $interface;
+                    }
+                    else {
+                        $this->errors[] = APIResponse\get(6032);
+                    }
+                }
+                # Ensure interface is valid for IPv6 gateway
+                elseif ($this->validated_data["ipprotocol"] === "inet6") {
+                    # Get the interface's IPv6 address/subnet
+                    $int_ipv6 = get_interface_ipv6($interface);
+                    $int_subnetv6 = get_interface_subnetv6($interface);
+
+                    # Ensure this interface has a valid IPv6 assigned
+                    if ($int_ipv6 and $int_subnetv6) {
+                        $this->validated_data["interface"] = $interface;
+                    }
+                    else {
+                        $this->errors[] = APIResponse\get(6033);
+                    }
+                }
+                # Return unexpected error if we somehow end up here
+                else {
+                    $this->errors[] = APIResponse\get(1);
+                }
+            }
+            # Return interface not found error if the interface does not exist
+            else {
+                $this->errors[] = APIResponse\get(6008);
             }
         }
     }
