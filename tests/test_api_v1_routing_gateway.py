@@ -16,6 +16,12 @@ import re
 
 import e2e_test_framework
 
+# Constants
+EXTRA_IF = "em2"
+EXTRA_IF_IPADDR = "172.16.209.100"
+EXTRA_IF_SUBNET = 24
+EXTRA_IF_IPADDRV6 = "2001:0db8:85a3:0000:0000:8a2e:0370:0000"
+EXTRA_IF_SUBNETV6 = 64
 
 class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/routing/gateway endpoint."""
@@ -29,24 +35,75 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
     get_tests = [{"name": "Read all routing gateways"}]
     post_tests = [
         {
-            "name": "Create IPv4 routing gateway",
+            "name": "Creating extra interface for gateway testing",
+            "uri": "/api/v1/interface",
+            "method": "POST",
+            "resp_time": 10,
             "req_data": {
-                "interface": "wan",
+                "if": EXTRA_IF,
+                "enable": True,
+                "descr": "GW_TEST_IF",
+                "apply": True
+            }
+        },
+        {
+            "name": "Ensure IPv4 gateways cannot be created without IPv4 interface address",
+            "status": 400,
+            "return": 6032,
+            "req_data": {
+                "ipprotocol": "inet",
+                "interface": EXTRA_IF
+            }
+        },
+        {
+            "name": "Ensure IPv6 gateways cannot be created without IPv6 interface address",
+            "status": 400,
+            "return": 6033,
+            "req_data": {
+                "ipprotocol": "inet6",
+                "interface": EXTRA_IF
+            }
+        },
+        {
+            "name": "Adding IPv4 & IPv6 address to extra interface for gateway testing",
+            "uri": "/api/v1/interface",
+            "method": "PUT",
+            "resp_time": 10,
+            "req_data": {
+                "id": EXTRA_IF,
+                "descr": "GW_TEST_IF",
+                "type": "staticv4",
+                "ipaddr": EXTRA_IF_IPADDR,
+                "subnet": EXTRA_IF_SUBNET,
+                "type6": "staticv6",
+                "ipaddrv6": EXTRA_IF_IPADDRV6,
+                "subnetv6": EXTRA_IF_SUBNETV6,
+                "apply": True
+            }
+        },
+        {
+            "name": "Create IPv4 routing gateway",
+            "resp_time": 10,
+            "req_data": {
+                "interface": EXTRA_IF,
                 "name": "TEST_ROUTING_GATEWAY_V4",
                 "ipprotocol": "inet",
                 "gateway": "172.16.209.1",
                 "monitor": "172.16.209.250",
-                "descr": "E2E test"
+                "descr": "E2E test",
+                "apply": True
             }
         },
         {
             "name": "Create IPv6 routing gateway",
+            "resp_time": 10,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "name": "TEST_ROUTING_GATEWAY_V6",
                 "ipprotocol": "inet6",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7332",
-                "descr": "E2E test"
+                "descr": "E2E test",
+                "apply": True
             }
         },
         {
@@ -61,33 +118,33 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             }
         },
         {
-            "name": "Check interface requirement",
-            "status": 400,
-            "return": 6007
-        },
-        {
-            "name": "Check interface exists constraint",
-            "status": 400,
-            "return": 6008,
-            "req_data": {
-                "interface": "INVALID"
-            }
-        },
-        {
             "name": "Check IP protocol requirement",
             "status": 400,
             "return": 6009,
-            "req_data": {
-                "interface": "wan"
-            }
         },
         {
             "name": "Check IP protocol choice constraint",
             "status": 400,
             "return": 6010,
             "req_data": {
-                "interface": "wan",
                 "ipprotocol": "INVALID"
+            }
+        },
+        {
+            "name": "Check interface requirement",
+            "status": 400,
+            "return": 6007,
+            "req_data": {
+                "ipprotocol": "inet"
+            }
+        },
+        {
+            "name": "Check interface exists constraint",
+            "status": 400,
+            "return": 6008,
+            "req_data": {
+                "ipprotocol": "inet",
+                "interface": "INVALID"
             }
         },
         {
@@ -95,7 +152,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6011,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet"
             }
         },
@@ -104,7 +161,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6012,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "!@#INVALID NAME<>?^&*()"
             }
@@ -114,7 +171,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6026,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "WAN_DHCP"
             }
@@ -124,7 +181,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6013,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST"
             }
@@ -134,7 +191,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6014,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST",
                 "gateway": "INVALID GATEWAY ADDRESS"
@@ -196,7 +253,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6025,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
@@ -208,7 +265,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6015,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
@@ -220,7 +277,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6015,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
@@ -232,7 +289,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6016,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
@@ -244,7 +301,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6017,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
@@ -256,7 +313,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6018,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
@@ -269,7 +326,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6019,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
@@ -281,7 +338,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6019,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
@@ -293,7 +350,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6020,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
@@ -306,7 +363,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6020,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
@@ -319,7 +376,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6021,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
@@ -331,7 +388,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6021,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
@@ -343,7 +400,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6022,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
@@ -355,7 +412,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6023,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
@@ -367,7 +424,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 6024,
             "req_data": {
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "TEST_MONITOR",
                 "gateway": "172.16.77.200",
@@ -378,7 +435,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update IPv4 routing gateway",
-            "resp_time": 5,
+            "resp_time": 10,
             "post_test_callable": "check_for_static_route_updated",
             "req_data": {
                 "id": "TEST_ROUTING_GATEWAY_V4",
@@ -465,7 +522,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6010,
             "req_data": {
                 "id": 0,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "INVALID"
             }
         },
@@ -475,7 +532,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6012,
             "req_data": {
                 "id": 0,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "!@#INVALID NAME<>?^&*()"
             }
@@ -486,7 +543,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6026,
             "req_data": {
                 "id": 0,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "DYNAMICv6"
             }
@@ -497,7 +554,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6014,
             "req_data": {
                 "id": 0,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST",
                 "gateway": "INVALID GATEWAY ADDRESS"
@@ -521,7 +578,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6029,
             "req_data": {
                 "id": 0,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet",
                 "name": "NEWDYNAMICv4",
                 "gateway": "dynamic"
@@ -533,7 +590,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6029,
             "req_data": {
                 "id": 0,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "NEWDYNAMICv6",
                 "gateway": "dynamic"
@@ -545,7 +602,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6025,
             "req_data": {
                 "id": 0,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -558,7 +615,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6015,
             "req_data": {
                 "id": 1,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -571,7 +628,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6015,
             "req_data": {
                 "id": 1,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -584,7 +641,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6016,
             "req_data": {
                 "id": 1,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -597,7 +654,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6017,
             "req_data": {
                 "id": 1,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -610,7 +667,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6018,
             "req_data": {
                 "id": 1,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -624,7 +681,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6019,
             "req_data": {
                 "id": 1,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -637,7 +694,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6019,
             "req_data": {
                 "id": 1,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -650,7 +707,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6020,
             "req_data": {
                 "id": 1,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -664,7 +721,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6020,
             "req_data": {
                 "id": 1,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -678,7 +735,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6021,
             "req_data": {
                 "id": 1,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -691,7 +748,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6021,
             "req_data": {
                 "id": 1,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -704,7 +761,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6022,
             "req_data": {
                 "id": 1,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -717,7 +774,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6023,
             "req_data": {
                 "id": 1,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -730,7 +787,7 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
             "return": 6024,
             "req_data": {
                 "id": 1,
-                "interface": "wan",
+                "interface": EXTRA_IF,
                 "ipprotocol": "inet6",
                 "name": "TEST_MONITOR",
                 "gateway": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
@@ -767,21 +824,24 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
         {
             "name": "Delete IPv4 routing gateway",
             "req_data": {
-                "id": 0
+                "id": 0,
+                "apply": True
             },
             "resp_time": 5    # Allow a few seconds to safely remove the gateway and reload the route table
         },
         {
             "name": "Delete IPv6 routing gateway",
             "req_data": {
-                "id": 0
+                "id": 0,
+                "apply": True
             },
             "resp_time": 5    # Allow a few seconds to safely remove the gateway and reload the route table
         },
         {
             "name": "Delete dynamic IPv4 gateway override",
             "req_data": {
-                "id": 0
+                "id": 0,
+                "apply": True
             },
             "resp_time": 5    # Allow a few seconds to safely remove the gateway and reload the route table
         },
@@ -791,7 +851,16 @@ class APIE2ETestRoutingGateway(e2e_test_framework.APIE2ETest):
                 "id": 0,
                 "apply": True
             },
-            "resp_time": 5    # Allow a few seconds to safely remove the gateway and reload the route table
+            "resp_time": 5
+        },
+        {
+            "name": "Delete interface used for gateway testing",
+            "uri": "/api/v1/interface",
+            "method": "DELETE",
+            "req_data": {
+                "if": EXTRA_IF,
+                "apply": True
+            }
         }
     ]
 
