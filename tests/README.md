@@ -56,6 +56,7 @@ on specific environment configurations, there are some environment requirements 
 by default for most virtual network adapters.
 - pfSense must use the default DHCP enabled WAN interface. Testing routing and gateways requires the default DHCP dynamic
 gateway to be present. Do not manually add any gateways or static routes before running tests.
+- pfSense must be able to obtain an IPv4 and IPv6 address on the WAN interface. 
 - The default pfSense LAN interface must be up. In some virtualization software you will need to ensure the network adapter
 is connected and the interface is up.
 - pfSense must have public internet access and ability to resolve DNS. Some API calls make subsequent calls to upstream resources.
