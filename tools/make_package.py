@@ -28,8 +28,8 @@ class MakePackage:
     """Class that groups together variables and methods required to build the pfSense-pkg-API FreeBSD package."""
     def __init__(self):
         self.__start_argparse__()
-        self.port_version = ".".join(self.args.tag.split(".")[0:2])
-        self.port_revision = self.args.tag.split(".")[2]
+        self.port_version = self.args.tag.split("_")[0]
+        self.port_version = self.args.tag.split("_")[1]
 
         # Run tasks for build mode
         if self.args.host:
@@ -128,8 +128,15 @@ class MakePackage:
         self.run_scp_cmd(src, ".")
 
     def __start_argparse__(self):
+        # Custom tag type for argparse
+        def tag(value_string):
+            if "." in value_string and "_" in value_string:
+                return value_string
+
+            raise argparse.ArgumentTypeError(f"{value_string} is not a semantic version tag")
+
         parser = argparse.ArgumentParser(
-            description="Build pfSense-API on FreeBSD"
+            description="Build the pfSense API on FreeBSD"
         )
         parser.add_argument(
             '--host', '-i',
@@ -155,7 +162,7 @@ class MakePackage:
         parser.add_argument(
             '--tag', '-t',
             dest="tag",
-            type=str,
+            type=tag,
             required=True,
             help="The version tag to use when building."
         )
