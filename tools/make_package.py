@@ -29,7 +29,7 @@ class MakePackage:
     def __init__(self):
         self.__start_argparse__()
         self.port_version = self.args.tag.split("_")[0]
-        self.port_version = self.args.tag.split("_")[1]
+        self.port_revision = self.args.tag.split("_")[1]
 
         # Run tasks for build mode
         if self.args.host:
