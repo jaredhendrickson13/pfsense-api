@@ -128,28 +128,8 @@ class MakePackage:
         self.run_scp_cmd(src, ".")
 
     def __start_argparse__(self):
-        # Custom port type for argparse
-        def tag(value_string):
-            value = str(value_string).split(".")
-            valid = True
-
-            # Require 3 items (M.m.p)
-            if len(value) == 3:
-                for i in value:
-                    # Value cannot be blank
-                    if i == "":
-                        valid = False
-            else:
-                valid = False
-
-            # Return value if valid, otherwise throw error
-            if valid:
-                return value_string
-
-            raise argparse.ArgumentTypeError(f"{value_string} is not a semantic version tag")
-
         parser = argparse.ArgumentParser(
-            description="Build the pfSense API on FreeBSD"
+            description="Build pfSense-API on FreeBSD"
         )
         parser.add_argument(
             '--host', '-i',
@@ -175,7 +155,7 @@ class MakePackage:
         parser.add_argument(
             '--tag', '-t',
             dest="tag",
-            type=tag,
+            type=str,
             required=True,
             help="The version tag to use when building."
         )
