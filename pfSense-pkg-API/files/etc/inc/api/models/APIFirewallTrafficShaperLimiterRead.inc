@@ -25,12 +25,6 @@ class APIFirewallTrafficShaperLimiterRead extends APIModel {
     }
 
     public function action() {
-        # Check that we have a configuration
-        if (!empty($this->config["dnshaper"]["queue"])) {
-            $limiter_array = $this->config["dnshaper"]["queue"];
-        } else {
-            $limiter_array = [];
-        }
-        return APIResponse\get(0, $limiter_array);
+        return APIResponse\get(0, $this->get_config("dnshaper/queue", []));
     }
 }

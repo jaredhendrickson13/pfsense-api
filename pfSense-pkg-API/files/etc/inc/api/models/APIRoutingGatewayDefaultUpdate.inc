@@ -27,12 +27,16 @@ class APIRoutingGatewayDefaultUpdate extends APIModel {
 
     public function action() {
         # Set the default gateways based on the validated input
-        $this->config["gateways"]["defaultgw4"] = $this->validated_data["defaultgw4"];
-        $this->config["gateways"]["defaultgw6"] = $this->validated_data["defaultgw6"];
+        $this->set_config("gateways/defaultgw4", $this->validated_data["defaultgw4"]);
+        $this->set_config("gateways/defaultgw6", $this->validated_data["defaultgw6"]);
 
         # Write these changes to config and apply if the client requested
         $this->write_config();
+
+        # Mark the routing subsystem as changed
+        mark_subsystem_dirty("staticroutes");
         $this->apply();
+
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -81,8 +85,8 @@ class APIRoutingGatewayDefaultUpdate extends APIModel {
     public function validate_payload() {
         # Fetch existing default gateway values
         $this->validated_data = [
-            "defaultgw4"=>$this->config["gateways"]["defaultgw4"],
-            "defaultgw6"=>$this->config["gateways"]["defaultgw6"],
+            "defaultgw4"=>$this->get_config("gateways/defaultgw4"),
+            "defaultgw6"=>$this->get_config("gateways/defaultgw6")
         ];
 
         # Validate client input
@@ -91,18 +95,9 @@ class APIRoutingGatewayDefaultUpdate extends APIModel {
     }
 
     public function apply() {
-        # Mark the routing subsystem as changed, clear if applied
-        mark_subsystem_dirty("staticroutes");
-
-        # Optionally allow clients to apply this route immediately if they passed in a true apply value
-        # Note: this is a one-off case where this was better to default to true instead of false.
-        if ($this->initial_data["apply"] !== false) {
-            system_routing_configure();
-            system_resolvconf_generate();
-            filter_configure();
-            setup_gateways_monitor();
-            send_event("service reload dyndnsall");
-            clear_subsystem_dirty("staticroutes");
+        # Apply these changes immediately if requested
+        if ($this->initial_data["apply"] === true) {
+            APIRoutingApplyCreate::apply();
         }
     }
 }

@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestStatusInterface(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/status/interface endpoint."""
     uri = "/api/v1/status/interface"
+    get_privileges = ["page-all", "page-status-interfaces"]
     get_tests = [{"name": "Read interface statuses"}]
 
 

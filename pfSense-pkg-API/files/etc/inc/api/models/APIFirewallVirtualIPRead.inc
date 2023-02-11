@@ -25,18 +25,8 @@ class APIFirewallVirtualIPRead extends APIModel {
     }
 
     public function action() {
-
-        // Check that we have a virtual IP configuration
-        if (!empty($this->config["virtualip"]["vip"])) {
-            $vip_array = [];
-            # Loop through each virtual IP to include it's config ID
-            foreach ($this->config["virtualip"]["vip"] as $id=>$vip) {
-                $vip["id"] = $id;
-                $vip_array[] = $vip;
-            }
-        } else {
-            $vip_array = [];
-        }
-        return APIResponse\get(0, $vip_array);
+        $vips = $this->get_config("virtualip/vip", []);
+        foreach ($vips as $id=>$vip) {$vips[$id]["id"] = $id;}
+        return APIResponse\get(0, $vips);
     }
 }

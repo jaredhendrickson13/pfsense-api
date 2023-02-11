@@ -24,6 +24,6 @@ class APIUserRead extends APIModel {
     }
 
     public function action() {
-        return APIResponse\get(0, $this->config["system"]["user"]);
+        return APIResponse\get(0, $this->get_config("system/user", []));
     }
 }

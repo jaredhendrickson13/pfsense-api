@@ -5,6 +5,7 @@ import e2e_test_framework
 class APIE2ETestSystemTable(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/system/table endpoint."""
     uri = "/api/v1/system/table"
+    get_privileges = ["page-all", "page-diagnostics-tables"]
     get_tests = [{"name": "Read system tables"}]
 
 

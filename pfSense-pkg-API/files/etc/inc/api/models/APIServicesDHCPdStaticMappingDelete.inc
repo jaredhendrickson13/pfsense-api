@@ -26,8 +26,7 @@ class APIServicesDHCPdStaticMappingDelete extends APIModel {
     }
 
     public function action() {
-        $del_data = $this->config["dhcpd"][$this->initial_data["interface"]]["staticmap"][$this->id];
-        unset($this->config["dhcpd"][$this->initial_data["interface"]]["staticmap"][$this->id]);
+        $del_data = $this->del_config("dhcpd/{$this->initial_data["interface"]}/staticmap/{$this->id}");
         $this->write_config();
         $this->reload_dhcpd();
         return APIResponse\get(0, $del_data);
@@ -39,7 +38,7 @@ class APIServicesDHCPdStaticMappingDelete extends APIModel {
             $this->initial_data["interface"] = APITools\get_pfsense_if_id($this->initial_data["interface"]);
             # Check that interface exists
             if (is_string($this->initial_data["interface"])) {
-                $if_conf = $this->config["interfaces"][$this->initial_data["interface"]];
+                $if_conf = $this->get_config("interfaces/{$this->initial_data["interface"]}", []);
                 # Check that interface hosts a static network with multiple addresses
                 if (isset($if_conf["enable"]) and is_ipaddrv4($if_conf["ipaddr"]) and $if_conf["subnet"] <= 31) {
 
@@ -56,8 +55,7 @@ class APIServicesDHCPdStaticMappingDelete extends APIModel {
         # Check for our required 'id' payload value
         if (isset($this->initial_data["id"])) {
             # Ensure this ID exists
-            $dhcp_maps = $this->config["dhcpd"][$this->initial_data["interface"]]["staticmap"];
-            if (array_key_exists($this->initial_data["id"], $dhcp_maps)) {
+            if ($this->get_config("dhcpd/{$this->initial_data["interface"]}/staticmap", false)) {
                 $this->id = $this->initial_data["id"];
             } else {
                 $this->errors[] = APIResponse\get(2045);
@@ -73,13 +71,13 @@ class APIServicesDHCPdStaticMappingDelete extends APIModel {
         $retvaldns = 0;
         /* dnsmasq_configure calls dhcpd_configure */
         /* no need to restart dhcpd twice */
-        if (isset($this->config['dnsmasq']['enable']) && isset($this->config['dnsmasq']['regdhcpstatic']))	{
+        if ($this->is_config_enabled('dnsmasq') && $this->is_config_enabled('dnsmasq', 'regdhcpstatic'))	{
             $retvaldns |= services_dnsmasq_configure();
             if ($retvaldns == 0) {
                 clear_subsystem_dirty('hosts');
                 clear_subsystem_dirty('staticmaps');
             }
-        } else if (isset($this->config['unbound']['enable']) && isset($this->config['unbound']['regdhcpstatic'])) {
+        } else if ($this->is_config_enabled('unbound') && $this->is_config_enabled('unbound', 'regdhcpstatic')) {
             $retvaldns |= services_unbound_configure();
             if ($retvaldns == 0) {
                 clear_subsystem_dirty('unbound');
@@ -96,10 +94,10 @@ class APIServicesDHCPdStaticMappingDelete extends APIModel {
         if (!function_exists('is_package_installed')) {
             require_once('pkg-utils.inc');
         }
-        if (is_package_installed('pfSense-pkg-bind') && isset($this->config['installedpackages']['bind']['config'][0]['enable_bind'])) {
+        if (is_package_installed('pfSense-pkg-bind') && isset($this->ge['installedpackages']['bind']['config'][0]['enable_bind'])) {
             $reloadbind = false;
-            if (is_array($this->config['installedpackages']['bindzone'])) {
-                $bindzone = $this->config['installedpackages']['bindzone']['config'];
+            if (is_array($this->get_config('installedpackages/bindzone'))) {
+                $bindzone = $this->get_config('installedpackages/bindzone/config');
             } else {
                 $bindzone = array();
             }

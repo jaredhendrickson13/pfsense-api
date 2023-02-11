@@ -26,8 +26,8 @@ class APIInterfaceVLANCreate extends APIModel {
     }
 
     public function action() {
-        $this->__init_config();
-        $this->config["vlans"]["vlan"][] = $this->validated_data;
+        $this->id = $this->get_next_id("vlans/vlan");
+        $this->set_config("vlans/vlan/{$this->id}", $this->validated_data);
         interface_vlan_configure($this->validated_data);
         $this->write_config();
         return APIResponse\get(0, $this->validated_data);
@@ -51,12 +51,16 @@ class APIInterfaceVLANCreate extends APIModel {
         # Require clients to specify a VLAN tag value
         if (isset($this->initial_data['tag'])) {
             # Return an error if VLAN tag is not numeric, or is not between 1 and 4096
-            if (!is_numeric($this->initial_data['tag']) or (1 > intval($this->initial_data['tag']) or intval($this->initial_data['tag']) > 4096)) {
+            if (!is_numeric($this->initial_data['tag']) or (1 > intval($this->initial_data['tag']) or intval($this->initial_data['tag']) > 4094)) {
                 $this->errors[] = APIResponse\get(3052);
             }
             # Return an error if this VLAN already exists on this interface
             elseif ($this->__is_vlan($this->validated_data["if"], $this->initial_data["tag"])) {
                 $this->errors[] = APIResponse\get(3054);
+            }
+            # Return an error if this VLAN already exists as a QinQ
+            elseif ($this->__is_qinq($this->validated_data["if"], $this->initial_data["tag"])) {
+                $this->errors[] = APIResponse\get(3081);
             }
             # Otherwise, store our tag value as validated
             else {
@@ -100,7 +104,7 @@ class APIInterfaceVLANCreate extends APIModel {
 
     private function __is_vlan($if, $tag) {
         # Check if our VLAN already exists
-        foreach ($this->config["vlans"]["vlan"] as $vle) {
+        foreach ($this->get_config("vlans/vlan", []) as $vle) {
             if ($if === $vle["if"] and strval($tag) === $vle["tag"]) {
                 return true;
             }
@@ -108,14 +112,13 @@ class APIInterfaceVLANCreate extends APIModel {
         return false;
     }
 
-    private function __init_config() {
-        # Ensure our VLANs config section is an array
-        if (!is_array($this->config["vlans"])) {
-            $this->config["vlans"] = [];
+    private function __is_qinq($if, $tag) {
+        foreach ($this->get_config('qinqs/qinqentry', []) as $qinq) {
+            if ($qinq['tag'] == $tag && $qinq['if'] == $if) {
+                return true;
+            }
         }
-        # Ensure our VLAN config section is an array
-        if (!is_array($this->config["vlans"]["vlan"])) {
-            $this->config["vlan"] = [];
-        }
+
+        return false;
     }
 }

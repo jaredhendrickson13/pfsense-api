@@ -25,8 +25,7 @@ class APIServicesDnsmasqHostOverrideDelete extends APIModel {
     }
 
     public function action() {
-        $del_data = $this->config["dnsmasq"]["hosts"][$this->id];
-        unset($this->config["dnsmasq"]["hosts"][$this->id]);
+        $del_data = $this->del_config("dnsmasq/hosts/{$this->id}");
         $this->write_config();
         mark_subsystem_dirty("hosts");
         $this->apply();
@@ -36,9 +35,9 @@ class APIServicesDnsmasqHostOverrideDelete extends APIModel {
     public function validate_payload() {
         # Check for our required 'id' payload value.
         if (isset($this->initial_data["id"])) {
-            if (array_key_exists($this->initial_data["id"], $this->config["dnsmasq"]["hosts"])) {
+            if ($this->get_config("dnsmasq/hosts/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
-                $this->validated_data = $this->config["dnsmasq"]["hosts"][$this->id];
+                $this->validated_data = $this->get_config("dnsmasq/hosts/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(2062);
             }

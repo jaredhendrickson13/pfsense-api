@@ -28,7 +28,7 @@ class APIFirewallTrafficShaperLimiterQueueDelete extends APIModel {
     }
 
     public function action() {
-        unset($this->config["dnshaper"]["queue"][$this->parent_id]["queue"][$this->id]);
+        $this->del_config("dnshaper/queue/{$this->parent_id}/queue/{$this->id}");
         $this->write_config();
         mark_subsystem_dirty('shaper');
 
@@ -54,7 +54,7 @@ class APIFirewallTrafficShaperLimiterQueueDelete extends APIModel {
         if (isset($this->initial_data["limiter"])) {
             if ($this->get_limiter_id_by_name($this->initial_data["limiter"], true)) {
                 $this->parent_id = $this->get_limiter_id_by_name($this->initial_data["limiter"]);
-                $this->validated_data["number"] = $this->config["dnshaper"]["queue"][$this->id]["number"];
+                $this->validated_data["number"] = $this->get_config("dnshaper/queue/{$this->id}/number");
             } else {
                 $this->errors[] = APIResponse\get(4219);
             }
@@ -70,7 +70,7 @@ class APIFirewallTrafficShaperLimiterQueueDelete extends APIModel {
                 # Ensure limiter queue is not in use
                 if (!$this->is_limiter_queue_in_use($this->initial_data["name"])) {
                     $this->id = $this->get_limiter_queue_id_by_name($this->initial_data["name"], $this->parent_id);
-                    $this->validated_data = $this->config["dnshaper"]["queue"][$this->parent_id]["queue"][$this->id];
+                    $this->validated_data = $this->get_config("dnshaper/queue/{$this->parent_id}/queue/{$this->id}");
                 } else {
                     $this->errors[] = APIResponse\get(4214);
                 }
@@ -84,7 +84,7 @@ class APIFirewallTrafficShaperLimiterQueueDelete extends APIModel {
 
     public function get_limiter_id_by_name($name, $as_bool=false) {
         # Loop through each configured limiter and see if it uses this name
-        foreach ($this->config["dnshaper"]["queue"] as $id=>$limiter) {
+        foreach ($this->get_config("dnshaper/queue", []) as $id=>$limiter) {
             # Check for matching names
             if ($name === $limiter["name"]) {
                 return ($as_bool) ? true : $id;
@@ -95,7 +95,7 @@ class APIFirewallTrafficShaperLimiterQueueDelete extends APIModel {
 
     public function get_limiter_queue_id_by_name($name, $limiter_id, $as_bool=false) {
         # Loop through each configured limiter queue and see if it uses this name
-        foreach ($this->config["dnshaper"]["queue"][$limiter_id]["queue"] as $id=>$queue) {
+        foreach ($this->get_config("dnshaper/queue/{$limiter_id}/queue", []) as $id=>$queue) {
             # Check for matching names
             if ($name === $queue["name"]) {
                 return ($as_bool) ? true : $id;
@@ -106,7 +106,7 @@ class APIFirewallTrafficShaperLimiterQueueDelete extends APIModel {
 
     public function is_limiter_queue_in_use($name) {
         # Loop through each configured firewall rule and check if it's using this limiter
-        foreach ($this->config["filter"]["rule"] as $rule) {
+        foreach ($this->get_config("filter/rule", []) as $rule) {
             # Check for matches
             if ($rule["dnpipe"] === $name or $rule["pdnpipe"] === $name) {
                 return true;

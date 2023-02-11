@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestServicesUnbound(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/unbound endpoint."""
     uri = "/api/v1/services/unbound"
+    get_privileges = ["page-all", "page-services-dnsresolver"]
     get_tests = [{"name": "Read the Unbound configuration"}]
 
 

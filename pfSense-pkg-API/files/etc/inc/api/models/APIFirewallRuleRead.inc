@@ -25,13 +25,6 @@ class APIFirewallRuleRead extends APIModel {
     }
 
     public function action() {
-
-        // Check that we have a configuration
-        if (!empty($this->config["filter"]["rule"])) {
-            $rule_array = $this->config["filter"]["rule"];
-        } else {
-            $rule_array = [];
-        }
-        return APIResponse\get(0, $rule_array);
+        return APIResponse\get(0, $this->get_config("filter/rule", []));
     }
 }

@@ -5,6 +5,7 @@ import e2e_test_framework
 class APIE2ETestSystemAPIVersion(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/system/api/version endpoint."""
     uri = "/api/v1/system/api/version"
+    get_privileges = ["page-all", "page-system-api"]
     get_tests = [{"name": "Read API version"}]
 
 

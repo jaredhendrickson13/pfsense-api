@@ -28,7 +28,6 @@ $tab_array = [[gettext("Settings"), true, "/api/"], [gettext("Documentation"), f
 display_top_tabs($tab_array, true);    # Ensure the tabs are written to the top of page
 
 # Variables
-global $config;
 $form = new Form(false);
 $general_section = new Form_Section('General Settings');
 $token_section = new Form_Section('API Token Settings');
@@ -46,7 +45,7 @@ if ($_POST["gen"] === "1") {
 
 # Rotate JWT server key if requested
 if ($_POST["rotate_server_key"]) {
-    $config["installedpackages"]["package"][$pkg_index]["conf"]["keys"] = [];
+    config_set_path("installedpackages/package/{$pkg_index}/conf/keys", []);
     APITools\create_jwt_server_key(true);
     print_apply_result_box(0, "\nRotated server key.\n");
 }
@@ -54,7 +53,7 @@ if ($_POST["rotate_server_key"]) {
 # Remove the corresponding API token if a token deletion was requested
 if (isset($_POST["del"]) and is_numeric($_POST["del"])) {
     $del_key = $_POST["del"];
-    unset($config["installedpackages"]["package"][$pkg_index]["conf"]["keys"]["key"][$del_key]);
+    config_del_path("installedpackages/package/{$pkg_index}/conf/keys/key/{$del_key}");
     $change_note = " Deleted API key";
     write_config(sprintf(gettext($change_note)));
     print_apply_result_box(0);
@@ -222,7 +221,7 @@ if (isset($_POST["save"])) {
     # Only write changes if no errors occurred
     if (!$has_errors) {
         # Write and apply our changes, leave a session variable indicating save, then reload the page
-        $config["installedpackages"]["package"][$pkg_index]["conf"] = $pkg_config;
+        config_set_path("installedpackages/package/{$pkg_index}/conf", $pkg_config);
         $change_note = " Updated API settings";
         write_config(sprintf(gettext($change_note)));
         APITools\create_jwt_server_key();
@@ -304,7 +303,7 @@ $token_section->addInput(new Form_Select(
     'keyhash',
     'Token Hash Algorithm',
     $pkg_config["keyhash"],
-    ["sha256" => "SHA256", "sha384" => "SHA384", "sha512" => "SHA512", "md5" => "MD5"]
+    ["sha256" => "SHA256", "sha384" => "SHA384", "sha512" => "SHA512"]
 ))->setHelp(
     "Hashing algorithm used when generating API tokens."
 );

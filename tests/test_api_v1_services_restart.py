@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestServicesRestart(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/restart endpoint."""
     uri = "/api/v1/services/restart"
+    post_privileges = ["page-all", "page-status-services"]
     post_tests = [
         {
             "name": "Restart all services",
@@ -25,9 +26,9 @@ class APIE2ETestServicesRestart(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Restart single service",
-            "resp_time": 15,    # Allow up to 15 seconds for all services to restart
-            "payload": {
-                "service": "sshd"
+            "resp_time": 5,
+            "req_data": {
+                "service": "unbound"
             }
         }
     ]

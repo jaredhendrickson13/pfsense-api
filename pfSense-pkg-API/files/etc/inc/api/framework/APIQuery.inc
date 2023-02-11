@@ -92,13 +92,13 @@ class APIQuery {
         # Only proceed if key is not excluded from queries
         if (!$this->is_excluded($q_key)) {
             # Always prefer exact matches first
-            if ($entry[$key] === $value) {
+            if (is_array($entry) and $entry[$key] === $value) {
                 return true;
             }
 
             # Loop through each query parameter and ensure it exists/matches the end value
             foreach ($q_params as $q) {
-                if (array_key_exists($q, $entry)) {
+                if (is_array($entry) and array_key_exists($q, $entry)) {
                     # Check if we've reach the last entry
                     if ($q_count === $q_params_count) {
                         # Determine our corresponding query action and return it's result
@@ -139,8 +139,12 @@ class APIQuery {
 
     # Checks if this value is excluded from queries
     private function is_excluded($value) {
-        $excluded_keys = array_merge(["client-token", "client-id"], (array)$this->excluded);
-        return in_array($value, $excluded_keys);
+        # Only exclude this field if it has an actual value set (e.g. not null)
+        if ($value and $this->excluded) {
+            return in_array($value, $this->excluded);
+        }
+
+        return false;
     }
 
     # Checks if our target data starts with a specific sub string

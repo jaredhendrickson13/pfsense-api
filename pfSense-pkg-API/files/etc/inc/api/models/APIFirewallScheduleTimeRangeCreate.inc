@@ -31,7 +31,8 @@ class APIFirewallScheduleTimeRangeCreate extends APIModel {
 
     public function action() {
         # Write this schedule time range to the config and reload the firewall filter
-        $this->config["schedules"]["schedule"][$this->id]["timerange"][] = $this->validated_data;
+        $next_id = $this->get_next_id("schedules/schedule/{$this->id}/timerange");
+        $this->set_config("schedules/schedule/{$this->id}/timerange/{$next_id}", $this->validated_data);
         $this->write_config();
         filter_configure();
 
@@ -163,7 +164,7 @@ class APIFirewallScheduleTimeRangeCreate extends APIModel {
 
     public function get_schedule_id_by_name($name, $as_bool=false) {
         # Loop through each schedule configured and check it's name
-        foreach ($this->config["schedules"]["schedule"] as $id=>$schedule) {
+        foreach ($this->get_config("schedules/schedule", []) as $id=>$schedule) {
             # Check if this $schedule's name matches our requested name
             if ($name === $schedule["name"]) {
                 return ($as_bool) ? true : $id;

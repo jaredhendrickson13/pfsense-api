@@ -18,11 +18,13 @@ import e2e_test_framework
 class APIE2ETestDiagnosticsCommandPrompt(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/diagnostics/command_prompt endpoint."""
     uri = "/api/v1/diagnostics/command_prompt"
+    post_privileges = ["page-all", "page-diagnostics-command"]
     post_tests = [
         {
             "name": "Execute shell command",
-            "payload": {
-                "shell_cmd": "curl -s http://ipinfo.io/ip"
+            "post_test_callable": "check_shell_cmd_response",
+            "req_data": {
+                "shell_cmd": "whoami"
             }
         },
         {
@@ -31,6 +33,12 @@ class APIE2ETestDiagnosticsCommandPrompt(e2e_test_framework.APIE2ETest):
             "return": 7000
         }
     ]
+
+    def check_shell_cmd_response(self):
+        """Checks that the shell command we run responds with the expected output."""
+        # Ensure the 'whoami' we run responds with 'root'
+        if self.last_response.get("data", {}).get("cmd_output") != "root":
+            raise AssertionError("expected shell_cmd 'whoami' to respond with 'root'")
 
 
 APIE2ETestDiagnosticsCommandPrompt()

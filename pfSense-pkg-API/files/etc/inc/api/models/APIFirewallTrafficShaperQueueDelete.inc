@@ -27,7 +27,7 @@ class APIFirewallTrafficShaperQueueDelete extends APIModel {
     }
 
     public function action() {
-        unset($this->config["shaper"]["queue"][$this->parent_id]["queue"][$this->id]);
+        $this->del_config("shaper/queue/{$this->parent_id}/queue/{$this->id}");
         $this->write_config();
         mark_subsystem_dirty('shaper');
 
@@ -74,13 +74,13 @@ class APIFirewallTrafficShaperQueueDelete extends APIModel {
         # Check for our required `name` payload value
         if (isset($this->initial_data["name"])) {
             # Loop through each queue within the interface's shaper and search for a match
-            foreach ($this->config["shaper"]["queue"][$this->parent_id]["queue"] as $id=>$queue) {
+            foreach ($this->get_config("shaper/queue/{$this->parent_id}/queue", []) as $id=>$queue) {
                 # Check if this queue matches the requested queue to delete
                 if ($this->initial_data["name"] === $queue["name"]) {
                     # Ensure this queue is not in use
                     if (!$this->is_queue_in_use($this->initial_data["name"])) {
                         $this->id = intval($id);
-                        $this->validated_data = $this->config["shaper"]["queue"][$this->parent_id]["queue"][$this->id];
+                        $this->validated_data = $this->get_config("shaper/queue/{$this->parent_id}/queue/{$this->id}");
                     } else {
                         $this->errors[] = APIResponse\get(4230);
                     }
@@ -97,7 +97,7 @@ class APIFirewallTrafficShaperQueueDelete extends APIModel {
 
     public function get_shaper_id_by_interface($interface, $as_bool=false) {
         # Loop through each configured shaper
-        foreach ($this->config["shaper"]["queue"] as $id=>$shaper) {
+        foreach ($this->get_config("shaper/queue", []) as $id=>$shaper) {
             # Check if this is the shaper for our interface, if so return it's ID
             if ($interface === $shaper["interface"]) {
                 return ($as_bool) ? true : intval($id);
@@ -108,7 +108,7 @@ class APIFirewallTrafficShaperQueueDelete extends APIModel {
 
     public function is_queue_in_use($name) {
         # Loop through each firewall rule and check if it uses this queue
-        foreach ($this->config["filter"]["rule"] as $rule) {
+        foreach ($this->get_config("filter/rule", []) as $rule) {
             # It is in use if the defaultqueue or ackqueue use this queue
             if ($name === $rule["defaultqueue"] or $name === $rule["ackqueue"]) {
                 return true;

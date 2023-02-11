@@ -25,12 +25,6 @@ class APIFirewallAliasRead extends APIModel {
     }
 
     public function action() {
-        // Check that we have a configuration
-        if (!empty($this->config["aliases"]["alias"])) {
-            $alias_array = $this->config["aliases"]["alias"];
-        } else {
-            $alias_array = [];
-        }
-        return APIResponse\get(0, $alias_array);
+        return APIResponse\get(0, $this->get_config("aliases/alias", []));
     }
 }

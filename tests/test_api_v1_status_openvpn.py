@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestStatusOpenVPN(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/status/openvpn endpoint."""
     uri = "/api/v1/status/openvpn"
+    get_privileges = ["page-all", "page-status-openvpn"]
     get_tests = [
         {
             "name": "Read the OpenVPN status",

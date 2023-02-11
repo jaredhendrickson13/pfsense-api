@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestStatusLogConfigHistory(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/status/log/config_history endpoint."""
     uri = "/api/v1/status/log/config_history"
+    get_privileges = ["page-all", "page-diagnostics-configurationhistory"]
     get_tests = [{"name": "Read configuration history"}]
 
 

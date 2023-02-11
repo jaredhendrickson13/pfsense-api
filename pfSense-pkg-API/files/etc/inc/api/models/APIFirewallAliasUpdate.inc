@@ -29,7 +29,7 @@ class APIFirewallAliasUpdate extends APIModel {
     }
 
     public function action() {
-        $this->config["aliases"]["alias"][$this->id] = $this->validated_data;
+        $this->set_config("aliases/alias/{$this->id}", $this->validated_data);
         $this->__rename_alias_references__();
         $this->write_config();
         mark_subsystem_dirty("aliases");
@@ -40,14 +40,14 @@ class APIFirewallAliasUpdate extends APIModel {
         if ($this->initial_data["apply"] !== false) {
             APIFirewallApplyCreate::apply();
         }
-        return APIResponse\get(0, $this->config["aliases"]["alias"][$this->id]);
+        return APIResponse\get(0, $this->get_config("aliases/alias/{$this->id}"));
     }
 
     private function __validate_id() {
         # Require clients to pass in an ID field containing the alias name or index value
         if (isset($this->initial_data["id"])) {
             # Loop through each alias and check for a match
-            foreach ($this->config["aliases"]["alias"] as $id=>$alias) {
+            foreach ($this->get_config("aliases/alias", []) as $id=>$alias) {
                 # First check if the ID matches the index value or the alias name
                 if ($this->initial_data["id"] === $id or $this->initial_data["id"] === $alias["name"]) {
                     $this->id = $id;

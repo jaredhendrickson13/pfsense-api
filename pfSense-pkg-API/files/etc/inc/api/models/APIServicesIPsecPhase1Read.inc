@@ -24,6 +24,6 @@ class APIServicesIPsecPhase1Read extends APIModel {
     }
 
     public function action() {
-        return APIResponse\get(0, ($this->config["ipsec"]["phase1"]) ?: []);
+        return APIResponse\get(0, $this->get_config("ipsec/phase1", []));
     }
 }

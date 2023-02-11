@@ -25,12 +25,6 @@ class APIInterfaceGroupRead extends APIModel {
     }
 
     public function action() {
-        // Check that we have a configuration
-        if (!empty($this->config['ifgroups']['ifgroupentry'])) {
-            $group_array = $this->config['ifgroups']['ifgroupentry'];
-        } else {
-            $group_array = [];
-        }
-        return APIResponse\get(0, $group_array);
+        return APIResponse\get(0, $this->get_config("ifgroups/ifgroupentry", []));
     }
 }

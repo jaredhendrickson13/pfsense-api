@@ -37,7 +37,8 @@ class APISystemCACreate extends APIModel {
         ca_setup_trust_store();
 
         # Add our new CA to the config
-        $this->config["ca"][] = $this->validated_data;
+        $this->id = $this->get_next_id("ca");
+        $this->set_config("ca/{$this->id}", $this->validated_data);
         $this->write_config();
 
         // Print our JSON response
@@ -343,7 +344,7 @@ class APISystemCACreate extends APIModel {
         $ca_enties = [];
 
         # Loop through each CA and add all CAs that have a valid key
-        foreach ($this->config['ca'] as $ca) {
+        foreach ($this->get_config('ca', []) as $ca) {
             if ($ca['prv']) {
                 $ca_enties[] = $ca['refid'];
             }

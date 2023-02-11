@@ -16,21 +16,23 @@ OK [POST /api/v1/access_token]: Response is valid
 ```
 
 ```commandline
-$ python3 tests/test_api_v1_system_api.py --help
-usage: test_api_v1_system_api.py [-h] --host HOST [--port {1-65535}] [--scheme {http,https}] [--username USERNAME] [--password PASSWORD] [--timeout TIMEOUT] [--verbose]
+$ python3 tests/test_api_*.py --help
+usage: test_api_*.py  [-h] --host HOST [--port {1-65535}] [--scheme {http,https}] [--auth_mode {local,token,jwt}] [--username USERNAME] [--password PASSWORD] [--timeout TIMEOUT] [--delay DELAY] [--verbose]
 
-Check pfSense API's '/api/v1/system/api' endpoint for correct functionality.
-
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --host HOST           The host to connect to
   --port {1-65535}      The port to use when connecting
   --scheme {http,https}
                         The URL scheme to use when connecting
+  --auth_mode {local,token,jwt}
+                        The API authentication mode to use.
   --username USERNAME   Username to authenticate as.
   --password PASSWORD   Password to authenticate with
   --timeout TIMEOUT     Connection timeout limit in seconds
+  --delay DELAY         Delay between tests in seconds
   --verbose             Display verbose output
+
 
 ```
 
@@ -54,9 +56,10 @@ on specific environment configurations, there are some environment requirements 
 by default for most virtual network adapters.
 - pfSense must use the default DHCP enabled WAN interface. Testing routing and gateways requires the default DHCP dynamic
 gateway to be present. Do not manually add any gateways or static routes before running tests.
+- pfSense must be able to obtain an IPv4 and IPv6 address on the WAN interface. 
 - The default pfSense LAN interface must be up. In some virtualization software you will need to ensure the network adapter
 is connected and the interface is up.
-- pfSense must have public internet access and ability to resolver DNS. Some API calls make subsequent calls to upstream resources.
+- pfSense must have public internet access and ability to resolve DNS. Some API calls make subsequent calls to upstream resources.
 These tests will require public internet access and DNS resolution to work properly.
 
 ### Example

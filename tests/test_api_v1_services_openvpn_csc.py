@@ -18,13 +18,19 @@ import e2e_test_framework
 class APIE2ETestOpenVPNClientSpecificOverrides(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/openvpn/csc endpoint."""
     uri = "/api/v1/services/openvpn/csc"
+
+    get_privileges = ["page-all", "page-openvpn-server"]
+    post_privileges = ["page-all", "page-openvpn-server"]
+    put_privileges = ["page-all", "page-openvpn-server"]
+    delete_privileges = ["page-all", "page-openvpn-server"]
+
     get_tests = [
         {"name": "Read all OpenVPN client specific overrides"}
     ]
     post_tests = [
         {
             "name": "Create a client specific override",
-            "payload": {
+            "req_data": {
                 "custom_options": "ifconfig-push xxx.xxx.xxx.xxx 255.255.255.0;",
                 "common_name": "commonname",
                 "description": "An override, that is specific..."
@@ -32,7 +38,7 @@ class APIE2ETestOpenVPNClientSpecificOverrides(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Missing Common Name",
-            "payload": {
+            "req_data": {
                 "custom_options": "ifconfig-push xxx.xxx.xxx.xxx 255.255.255.0;",
                 "description": "An override, that is specific..."
             },
@@ -41,7 +47,7 @@ class APIE2ETestOpenVPNClientSpecificOverrides(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Unknown NetBIOS Node Type",
-            "payload": {
+            "req_data": {
                 "custom_options": "ifconfig-push xxx.xxx.xxx.xxx 255.255.255.0;",
                 "common_name": "commonname",
                 "description": "An override, that is specific...",
@@ -52,7 +58,7 @@ class APIE2ETestOpenVPNClientSpecificOverrides(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "All options",
-            "payload": {
+            "req_data": {
                 "server_list": "1, 2, 3",
                 "custom_options": "ifconfig-push xxx.xxx.xxx.xxx 255.255.255.0;",
                 "disable": True,
@@ -81,14 +87,14 @@ class APIE2ETestOpenVPNClientSpecificOverrides(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update a client specific override",
-            "payload": {
+            "req_data": {
                 "refid": 0,
                 "common_name": "commonname2",
             }
         },
         {
             "name": "Missing Reference ID",
-            "payload": {
+            "req_data": {
                 "description": "An override, that is pretty specific..."
             },
             "return": 2079,
@@ -96,7 +102,7 @@ class APIE2ETestOpenVPNClientSpecificOverrides(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Unknown Reference ID",
-            "payload": {
+            "req_data": {
                 "refid": 1000,
                 "description": "An override, that is pretty specific..."
             },
@@ -105,7 +111,7 @@ class APIE2ETestOpenVPNClientSpecificOverrides(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Unknown NetBIOS Node Type",
-            "payload": {
+            "req_data": {
                 "refid": 0,
                 "netbios_node_type": "q"
             },
@@ -114,7 +120,7 @@ class APIE2ETestOpenVPNClientSpecificOverrides(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "All options",
-            "payload": {
+            "req_data": {
                 "refid": 1,
                 "server_list": "1, 2",
                 "custom_options": "ifconfig-push 10.10.10.1 255.255.255.0;",
@@ -144,18 +150,18 @@ class APIE2ETestOpenVPNClientSpecificOverrides(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete client specific override",
-            "payload": {"refid": 0}
+            "req_data": {"refid": 0}
         },
         {
             "name": "Missing Reference ID",
-            "payload": {
+            "req_data": {
             },
             "return": 2077,
             "status": 400
         },
         {
             "name": "Unknown Reference ID",
-            "payload": {
+            "req_data": {
                 "refid": 1000,
             },
             "return": 2078,

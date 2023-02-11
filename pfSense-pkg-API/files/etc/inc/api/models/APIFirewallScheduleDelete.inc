@@ -27,7 +27,7 @@ class APIFirewallScheduleDelete extends APIModel {
 
     public function action() {
         # Delete this schedule from the config and reload the firewall filter
-        unset($this->config["schedules"]["schedule"][$this->id]);
+        $this->del_config("schedules/schedule/{$this->id}");
         $this->__sort_schedules();
         $this->write_config();
         filter_configure();
@@ -46,7 +46,7 @@ class APIFirewallScheduleDelete extends APIModel {
                 # Do not allow this schedule to be deleted if it is in use
                 if (!$this->is_schedule_in_use($this->initial_data["name"])) {
                     $this->id = $this->get_schedule_id_by_name($this->initial_data["name"]);
-                    $this->validated_data = $this->config["schedules"]["schedule"][$this->id];
+                    $this->validated_data = $this->get_config("schedules/schedule/{$this->id}");
                 } else {
                     $this->errors[] = APIResponse\get(4166);
                 }
@@ -60,8 +60,8 @@ class APIFirewallScheduleDelete extends APIModel {
 
     public function is_schedule_in_use($name) {
         # Loop through each firewall rule and check if it uses this schedule
-        if (is_array($this->config['filter']['rule'])) {
-            foreach ($this->config['filter']['rule'] as $rule) {
+        if (is_array($this->get_config('filter/rule', []))) {
+            foreach ($this->get_config('filter/rule', []) as $rule) {
                 if ($rule['sched'] === $name) {
                     return true;
                 }
@@ -72,7 +72,7 @@ class APIFirewallScheduleDelete extends APIModel {
 
     public function get_schedule_id_by_name($name, $as_bool=false) {
         # Loop through each schedule configured and check it's name
-        foreach ($this->config["schedules"]["schedule"] as $id=>$schedule) {
+        foreach ($this->get_config("schedules/schedule", []) as $id=>$schedule) {
             # Check if this $schedule's name matches our requested name
             if ($name === $schedule["name"]) {
                 return ($as_bool) ? true : $id;
@@ -81,13 +81,14 @@ class APIFirewallScheduleDelete extends APIModel {
         return ($as_bool) ? false : null;
     }
 
-    private static function __compare_schedules($a, $b) {
+    public static function compare_schedules($a, $b) {
         return strcmp($a['name'], $b['name']);
     }
 
     private function __sort_schedules() {
-        if (is_array($this->config['schedules']['schedule'])) {
-            usort($this->config['schedules']['schedule'], ["APIFirewallScheduleCreate", "__compare_schedules"]);
+        if (is_array($this->get_config('schedules/schedule'))) {
+            $schedules = $this->get_config('schedules/schedule');
+            usort($schedules, ["APIFirewallScheduleDelete", "compare_schedules"]);
         }
     }
 }

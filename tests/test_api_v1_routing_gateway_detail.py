@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestRoutingGatewayDetail(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/routing/gateway/detail endpoint."""
     uri = "/api/v1/routing/gateway/detail"
+    get_privileges = ["page-all", "page-system-gateways"]
     get_tests = [{"name": "Read routing gateway details"}]
 
 

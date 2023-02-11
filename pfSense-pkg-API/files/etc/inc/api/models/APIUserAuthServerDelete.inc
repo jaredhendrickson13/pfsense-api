@@ -20,15 +20,14 @@ class APIUserAuthServerDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-user-authserver"];
+        $this->privileges = ["page-all", "page-system-authservers"];
         $this->change_note = "Deleted authentication server via API";
     }
 
     public function action() {
-        $del_server = $this->config["system"]["authserver"][$this->validated_data["id"]];
-        unset($this->config["system"]["authserver"][$this->validated_data["id"]]);
+        $del_server = $this->del_config("system/authserver/{$this->validated_data["id"]}");
         if ($this->validated_data["revert"] === true) {
-            unset($this->config["system"]["webgui"]["authmode"]);
+            $this->del_config("system/webgui/authmode");
         }
         $this->write_config();
         return APIResponse\get(0, $del_server);
@@ -42,11 +41,11 @@ class APIUserAuthServerDelete extends APIModel {
         }
 
         // Loop through our servers and check that this server exists
-        foreach ($this->config["system"]["authserver"] as $asid => $asc) {
+        foreach ($this->get_config("system/authserver", []) as $asid => $asc) {
             if ($this->validated_data["name"] === $asc["name"]) {
                 $this->validated_data["id"] = $asid;    // Save our config before deleting
                 // Check if this auth server is our default, if so revert to local database
-                if ($this->validated_data["name"] === $this->config["system"]["webgui"]["authmode"]) {
+                if ($this->validated_data["name"] === $this->get_config("system/webgui/authmode")) {
                     $this->validated_data["revert"] = True;
                 }
             }

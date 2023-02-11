@@ -25,13 +25,6 @@ class APISystemCertificateRead extends APIModel {
     }
 
     public function action() {
-        $this->validate_payload();
-        return APIResponse\get(0, $this->validated_data);
-    }
-
-    public function validate_payload() {
-        if (!empty($this->config["cert"])) {
-            $this->validated_data["cert"] = $this->config["cert"];
-        }
+        return APIResponse\get(0, $this->get_config("cert", []));
     }
 }

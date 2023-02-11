@@ -18,23 +18,24 @@ import e2e_test_framework
 class APIE2ETestRoutingGatewayDefault(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/routing/gateway/default endpoint."""
     uri = "/api/v1/routing/gateway/default"
+    put_privileges = ["page-all", "page-system-gateways"]
     put_tests = [
         {
             "name": "Check IPv4 gateway exists constraint",
             "status": 400,
             "return": 6028,
-            "payload": {"defaultgw4": "INVALID"}
+            "req_data": {"defaultgw4": "INVALID"}
         },
         {
             "name": "Check IPv6 gateway exists constraint",
             "status": 400,
             "return": 6028,
-            "payload": {"defaultgw6": "INVALID"}
+            "req_data": {"defaultgw6": "INVALID"}
         },
         {
             "name": "Check updating default gateways",
             "resp_time": 10,
-            "payload": {"defaultgw4": "automatic", "defaultgw6": "automatic"}
+            "req_data": {"defaultgw4": "automatic", "defaultgw6": "automatic"}
         }
     ]
 

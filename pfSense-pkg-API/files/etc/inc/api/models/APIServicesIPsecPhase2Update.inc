@@ -29,7 +29,7 @@ class APIServicesIPsecPhase2Update extends APIModel {
 
     public function action() {
         # Write this entry to configuration
-        $this->config["ipsec"]["phase2"][$this->id] = $this->validated_data;
+        $this->set_config("ipsec/phase2/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty('ipsec');
 
@@ -72,7 +72,7 @@ class APIServicesIPsecPhase2Update extends APIModel {
         if (isset($this->initial_data["uniqid"])) {
             # Attempt to get the config ID from this phase 2 unique ID
             $this->id = APITools\get_phase2_config_id_from_uniqid($this->initial_data["uniqid"]);
-            $this->validated_data = $this->config["ipsec"]["phase2"][$this->id];
+            $this->validated_data = $this->get_config("ipsec/phase2/{$this->id}");
 
             # Return an error if this phase 2 unique was not found in any existing IPsec entry
             if ($this->id === false) {
