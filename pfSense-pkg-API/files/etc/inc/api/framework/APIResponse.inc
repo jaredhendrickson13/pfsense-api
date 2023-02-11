@@ -109,6 +109,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Request was successful and is processing in the background",
         ],
+        15 => [
+            "status" => "accepted",
+            "code" => 200,
+            "return" => $id,
+            "message" => "Request was successful but actions were bypassed so nothing was changed",
+        ],
 
         // 1000-1999 reserved for /api/v1/system API calls
         1000 => [
@@ -2665,6 +2671,12 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Interface group does not exist"
         ],
+        3081 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Interface VLAN is already used by QinQ"
+        ],
 
         // 4000-4999 reserved for /api/v1/firewall API calls
         4000 => [
@@ -4655,6 +4667,30 @@ function get($id, $data=[], $all=false) {
             "code" => 400,
             "return" => $id,
             "message" => "Only 1 dynamic gateway per eligible interface is allowed"
+        ],
+        6030 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway cannot be disabled while in use by a DNS server, static route or gateway group"
+        ],
+        6031 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Gateway cannot be deleted while in use by a DNS server, static route or gateway group"
+        ],
+        6032 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPv4 gateway address cannot be used because no IPv4 address is configured on the interface"
+        ],
+        6033 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "IPv6 gateway address cannot be used because no IPv6 address is configured on the interface"
         ],
 
         // 7000-7999 reserved for /api/v1/diagnostics API calls

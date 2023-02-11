@@ -22,15 +22,14 @@ class APIServicesDHCPdRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-services-dhcpserver"];
-
     }
 
     public function action() {
         # Ensure we have a DHCP configuration
-        if (is_array($this->config["dhcpd"])) {
+        if (is_array($this->get_config("dhcpd"))) {
             $dhcp = [];
             # Loop through each DHCP config and format it's entry
-            foreach ($this->config["dhcpd"] as $id=>$dhcp_ent) {
+            foreach ($this->get_config("dhcpd", []) as $id=>$dhcp_ent) {
                 $dhcp[] = array_merge(["interface"=>$id], $dhcp_ent);
             }
         } else {

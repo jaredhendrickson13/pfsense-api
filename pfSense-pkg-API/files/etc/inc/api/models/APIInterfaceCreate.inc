@@ -32,7 +32,7 @@ class APIInterfaceCreate extends APIModel {
 
     public function action() {
         # Add the new interface to our configuration and write the pending changes for application
-        $this->config["interfaces"][$this->next_if] = $this->validated_data;
+        $this->set_config("interfaces/{$this->next_if}", $this->validated_data);
         $this->write_config();
         APIInterfaceApplyCreate::serialize_changes($this->next_if, $this->validated_data);
 
@@ -88,21 +88,29 @@ class APIInterfaceCreate extends APIModel {
     }
 
     private function __validate_mtu() {
-        // Check for our MTU value
+        # Check for our MTU value
         if (isset($this->initial_data["mtu"])) {
+            # Ensure value is an integer
             $this->initial_data["mtu"] = intval($this->initial_data["mtu"]);
-            // Check if MTU is within range
+
+            # Check if MTU is within range
             if (1280 > $this->initial_data["mtu"] or $this->initial_data["mtu"] > 8192) {
                 $this->errors[] = APIResponse\get(3004);
-            } elseif ($this->if_list[$this->validated_data["if"]]["is_vlan"]) {
-                // Check if interface is VLAN and that it's MTU is lower than it's parent interface
-                $parent_if = $this->if_list[$this->validated_data["if"]]["if"];
-                if ($this->initial_data["mtu"] > $parent_if["mtu"]) {
-                    $this->errors[] = APIResponse\get(3006);
-                }
-            } else {
-                $this->validated_data["mtu"] = $this->initial_data["mtu"];
+                return;
             }
+            # Validate VLAN specific constraints
+            if ($this->if_list[$this->validated_data["if"]]["isvlan"]) {
+                # Fetch the parent interface configuration
+                $parent_mtu = get_interface_mtu($this->if_list[$this->validated_data["if"]]["if"]);
+
+                # Ensure MTU is not lower than the parent interface
+                if ($this->initial_data["mtu"] > $parent_mtu) {
+                    $this->errors[] = APIResponse\get(3006);
+                    return;
+                }
+            }
+
+            $this->validated_data["mtu"] = $this->initial_data["mtu"];
         }
     }
 
@@ -151,7 +159,7 @@ class APIInterfaceCreate extends APIModel {
                 $this->errors[] = APIResponse\get(3059);
             }
             # Ensure this interface is not named the same as an alias
-            elseif (APITools\is_alias($this->initial_data["descr"])) {
+            elseif (is_alias($this->initial_data["descr"])) {
                 $this->errors[] = APIResponse\get(3060);
             }
             # Ensure this interface is name named entirely numerical

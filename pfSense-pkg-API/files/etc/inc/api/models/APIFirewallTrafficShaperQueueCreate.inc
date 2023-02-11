@@ -28,8 +28,8 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
 
     public function action() {
         # Initialize the traffic shaper configuration and save our shaper, mark the subsystem as un-applied
-        $this->__init_config();
-        $this->config["shaper"]["queue"][$this->id]["queue"][] = $this->validated_data;
+        $next_id = $this->get_next_id("shaper/queue/{$this->id}/queue");
+        $this->set_config("shaper/queue/{$this->id}/queue/{$next_id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty('shaper');
 
@@ -88,7 +88,7 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
                     # Set the interface this queue will be applied to
                     $this->validated_data["interface"] = $this->initial_data["interface"];
                     $this->id = $this->get_shaper_id_by_interface($this->validated_data["interface"]);
-                    $this->parent = $this->config["shaper"]["queue"][$this->id];
+                    $this->parent = $this->get_config("shaper/queue/{$this->id}");
                 } else {
                     $this->errors[] = APIResponse\get(4122);
                 }
@@ -493,16 +493,9 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
         return false;
     }
 
-    private function __init_config() {
-        # Check if there is no shaper queue array in the config
-        if (!isset($this->config["shaper"]["queue"][$this->id]["queue"])) {
-            $this->config["shaper"]["queue"][$this->id]["queue"] = [];
-        }
-    }
-
     public function get_shaper_id_by_interface($interface, $as_bool=false) {
         # Loop through each configured shaper
-        foreach ($this->config["shaper"]["queue"] as $id=>$shaper) {
+        foreach ($this->get_config("shaper/queue", []) as $id=>$shaper) {
             # Check if this is the shaper for our interface, if so return it's ID
             if ($interface === $shaper["interface"]) {
                 return ($as_bool) ? true : intval($id);
@@ -518,7 +511,7 @@ class APIFirewallTrafficShaperQueueCreate extends APIModel {
             $id = $this->get_shaper_id_by_interface($interface);
 
             # Loop through each queue configured for this shaper
-            foreach ($this->config["shaper"]["queue"][$id]["queue"] as $queue) {
+            foreach ($this->get_config("shaper/queue/{$id}/queue", []) as $queue) {
                 # Check if this queue's name matches our requested name
                 if ($name === $queue["name"]) {
                     return true;

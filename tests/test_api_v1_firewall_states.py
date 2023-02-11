@@ -18,11 +18,16 @@ import e2e_test_framework
 class APIE2ETestFirewallStates(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/states endpoint."""
     uri = "/api/v1/firewall/states"
+
+    get_privileges = ["page-all", "page-diagnostics-showstates"]
+    delete_privileges = ["page-all", "page-diagnostics-showstates"]
+
     get_tests = [{"name": "Read all firewalls states"}]
     delete_tests = [
         {
             "name": "Check firewall state deletion",
-            "payload": {"source": "1.2.3.4"}
+            "req_data": {"source": "1.2.3.4"},
+            "resp_data_empty": True
         },
         {
             "name": "Check source requirement",
@@ -33,25 +38,25 @@ class APIE2ETestFirewallStates(e2e_test_framework.APIE2ETest):
             "name": "Check source IP/CIDR constraint",
             "status": 400,
             "return": 4232,
-            "payload": {"source": "INVALID"}
+            "req_data": {"source": "INVALID"}
         },
         {
             "name": "Check destination IP/CIDR constraint",
             "status": 400,
             "return": 4233,
-            "payload": {"source": "1.2.3.4", "destination": "INVALID"}
+            "req_data": {"source": "1.2.3.4", "destination": "INVALID"}
         },
         {
             "name": "Check sleep minimum constraint",
             "status": 400,
             "return": 4236,
-            "payload": {"source": "1.2.3.4", "sleep": -1}
+            "req_data": {"source": "1.2.3.4", "sleep": -1}
         },
         {
             "name": "Check sleep maximum constraint",
             "status": 400,
             "return": 4236,
-            "payload": {"source": "1.2.3.4", "sleep": 301}
+            "req_data": {"source": "1.2.3.4", "sleep": 301}
         }
     ]
 

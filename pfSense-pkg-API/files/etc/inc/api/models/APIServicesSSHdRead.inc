@@ -24,10 +24,6 @@ class APIServicesSSHdRead extends APIModel {
     }
 
     public function action() {
-        $ssh_array = [];
-        if (!empty($this->config["system"]["ssh"])) {
-            $ssh_array = $this->config["system"]["ssh"];
-        }
-        return APIResponse\get(0, $ssh_array);
+        return APIResponse\get(0, $this->get_config("system/ssh", []));
     }
 }

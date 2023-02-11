@@ -26,8 +26,7 @@ class APIFirewallRuleFlushDelete extends APIModel {
 
     public function action() {
         # Capture the rules data then flush all firewall rules
-        $del_rules = $this->config["filter"]["rule"];
-        $this->config["filter"]["rule"] = "";
+        $del_rules = $this->del_config("filter/rule");
 
         # Mark the firewall subsystem as changed, this will be cleared if applied
         mark_subsystem_dirty('filter');

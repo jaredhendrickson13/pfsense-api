@@ -24,11 +24,6 @@ class APIUserAuthServerRead extends APIModel {
     }
 
     public function action() {
-        if (!empty($this->config["system"]["authserver"])) {
-            $as_array = $this->config["system"]["authserver"];
-        } else {
-            $as_array = [];
-        }
-        return APIResponse\get(0, $as_array);
+        return APIResponse\get(0, $this->get_config("system/authserver", []));
     }
 }

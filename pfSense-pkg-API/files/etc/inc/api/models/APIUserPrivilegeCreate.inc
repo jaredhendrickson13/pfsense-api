@@ -25,7 +25,7 @@ class APIUserPrivilegeCreate extends APIModel {
     }
 
     public function action() {
-        $this->config["system"]["user"][$this->id]["priv"] = $this->validated_data["priv"];
+        $this->set_config("system/user/{$this->id}/priv", $this->validated_data["priv"]);
         $this->write_config();
         local_user_set($this->validated_data);
         return APIResponse\get(0, $this->validated_data["priv"]);
@@ -40,7 +40,7 @@ class APIUserPrivilegeCreate extends APIModel {
         # Check for our required `username` payload value
         if (isset($this->initial_data['username'])) {
             # Loop through each configured user and check if this user exists
-            foreach ($this->config["system"]["user"] as $id=>$user) {
+            foreach ($this->get_config("system/user", []) as $id=>$user) {
                 if ($this->initial_data["username"] === $user["name"]) {
                     $this->validated_data = $user;
                     $this->id = intval($id);

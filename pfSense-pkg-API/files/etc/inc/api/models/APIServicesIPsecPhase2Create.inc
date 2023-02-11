@@ -29,8 +29,8 @@ class APIServicesIPsecPhase2Create extends APIModel {
 
     public function action() {
         # Write this entry to configuration
-        $this->__init_config();
-        $this->config["ipsec"]["phase2"][] = $this->validated_data;
+        $this->id = $this->get_next_id("ipsec/phase2");
+        $this->set_config("ipsec/phase2/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty('ipsec');
 
@@ -576,11 +576,5 @@ class APIServicesIPsecPhase2Create extends APIModel {
         else {
             $this->validated_data["keepalive"] = "disabled";
         }
-    }
-
-    private function __init_config() {
-        # Initialize the config with the ipsec phase1 and phase2 sections
-        init_config_arr(array('ipsec', 'phase1'));
-        init_config_arr(array('ipsec', 'phase2'));
     }
 }

@@ -18,11 +18,15 @@ import e2e_test_framework
 class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/dhcpd endpoint."""
     uri = "/api/v1/services/dhcpd"
+
+    get_privileges = ["page-all", "page-services-dhcpserver"]
+    put_privileges = ["page-all", "page-services-dhcpserver"]
+
     get_tests = [{"name": "Read all DHCPd configurations"}]
     put_tests = [
         {
             "name": "Update LAN interface's DHCP configuration",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "enable": True,
                 "ignorebootp": False,
@@ -57,7 +61,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2018,
             "name": "Check interface exists constraint",
-            "payload": {
+            "req_data": {
                 "interface": "INVALID"
             }
         },
@@ -65,7 +69,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2021,
             "name": "Check range_from IPv4 constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "range_from": "INVALID"
             }
@@ -74,7 +78,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2022,
             "name": "Check range_from available IPv4 constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "range_from": "172.16.1.1"
             }
@@ -83,7 +87,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2024,
             "name": "Check range_to IPv4 constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "range_to": "INVALID"
             }
@@ -92,7 +96,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2025,
             "name": "Check range_to available IPv4 constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "range_to": "172.16.1.1"
             }
@@ -101,7 +105,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2030,
             "name": "Check domain valid hostname constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "domain": False
             }
@@ -110,7 +114,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2032,
             "name": "Check mac_allow valid MAC constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "mac_allow": "INVALID"
             }
@@ -119,7 +123,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2033,
             "name": "Check mac_deny valid MAC constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "mac_deny": "INVALID"
             }
@@ -128,7 +132,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2031,
             "name": "Check domainsearchlist valid hostname constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "domainsearchlist": False
             }
@@ -137,7 +141,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2080,
             "name": "Check defaultleasetime minimum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "defaultleasetime": 59
             }
@@ -146,7 +150,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2081,
             "name": "Check defaultleasetime less than maxleasetime constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "defaultleasetime": 61,
                 "maxleasetime": 60
@@ -156,7 +160,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2082,
             "name": "Check maxleasetime minimum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "maxleasetime": 59
             }
@@ -165,7 +169,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2028,
             "name": "Check gateway IPv4 constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "gateway": "INVALID"
             }
@@ -174,7 +178,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2029,
             "name": "Check gateway in subnet constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "gateway": "172.16.1.1"
             }
@@ -183,7 +187,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2026,
             "name": "Check dnsserver maximum items constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "dnsserver": ["127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1", "127.0.0.1"]
             }
@@ -192,7 +196,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2027,
             "name": "Check dnsserver IPv4 constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "dnsserver": ["INVALID"]
             }
@@ -201,7 +205,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2083,
             "name": "Check numberoptions number requirement",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {}
@@ -212,7 +216,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2084,
             "name": "Check numberoptions number minimum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -225,7 +229,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2084,
             "name": "Check numberoptions number maximum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -238,7 +242,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2085,
             "name": "Check numberoptions type requirement",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -251,7 +255,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2086,
             "name": "Check numberoptions type choice constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -265,7 +269,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2087,
             "name": "Check numberoptions value requirement",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -279,7 +283,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2088,
             "name": "Check numberoptions text value quotation constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -294,7 +298,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2089,
             "name": "Check numberoptions string value quotation required constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -309,7 +313,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2090,
             "name": "Check numberoptions boolean value choice constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -324,7 +328,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2091,
             "name": "Check numberoptions unsigned integer 8 value minimum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -339,7 +343,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2091,
             "name": "Check numberoptions unsigned integer 8 value maximum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -354,7 +358,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2092,
             "name": "Check numberoptions unsigned integer 16 value minimum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -369,7 +373,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2092,
             "name": "Check numberoptions unsigned integer 16 value maximum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -384,7 +388,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2093,
             "name": "Check numberoptions unsigned integer 32 value minimum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -399,7 +403,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2093,
             "name": "Check numberoptions unsigned integer 32 value maximum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -414,7 +418,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2094,
             "name": "Check numberoptions signed integer 8 value minimum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -429,7 +433,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2094,
             "name": "Check numberoptions signed integer 8 value maximum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -444,7 +448,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2095,
             "name": "Check numberoptions signed integer 16 value minimum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -459,7 +463,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2095,
             "name": "Check numberoptions signed integer 16 value maximum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -474,7 +478,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2096,
             "name": "Check numberoptions signed integer 32 value minimum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -489,7 +493,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2096,
             "name": "Check numberoptions signed integer 32 value maximum constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {
@@ -504,7 +508,7 @@ class APIE2ETestServicesDHCPd(e2e_test_framework.APIE2ETest):
             "status": 400,
             "return": 2097,
             "name": "Check numberoptions ip-address value IPv4/hostname constraint",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "numberoptions": [
                     {

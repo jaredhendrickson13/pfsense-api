@@ -26,7 +26,8 @@ class APIUserGroupCreate extends APIModel {
 
     public function action() {
         # Add this group to configuration and apply OS changes.
-        $this->config["system"]["group"][] = $this->validated_data;
+        $this->id = $this->get_next_id("system/group");
+        $this->set_config("system/group/{$this->id}", $this->validated_data);
         $this->__apply();
         $this->write_config();
         return APIResponse\get(0, APIUserGroupRead::to_representation($this->validated_data));
@@ -41,7 +42,7 @@ class APIUserGroupCreate extends APIModel {
         $this->__validate_priv();
 
         # Set static values
-        $this->validated_data["gid"] = $this->config["system"]["nextgid"]++;
+        $this->validated_data["gid"] = $this->get_config("system/nextgid") + 1;
     }
 
     private function __validate_name() {
@@ -147,7 +148,8 @@ class APIUserGroupCreate extends APIModel {
     # Applies this user/group configuration to the OS user
     private function __apply() {
         # Sort groups alphabetically
-        usort($this->config['system']['group'], function($a, $b) {
+        $groups = $this->get_config('system/group', []);
+        usort($groups, function($a, $b) {
             return strcasecmp($a['name'], $b['name']);
         });
 
@@ -156,9 +158,8 @@ class APIUserGroupCreate extends APIModel {
 
         # Sync group member's OS users
         if (is_array($this->validated_data['member'])) {
-            init_config_arr(array('system', 'user'));
 
-            foreach ($this->config["system"]["user"] as $user) {
+            foreach ($this->get_config("system/user", []) as $user) {
                 if (in_array($user['uid'], $this->validated_data['member'])) {
                     local_user_set($user);
                 }
@@ -168,7 +169,7 @@ class APIUserGroupCreate extends APIModel {
 
     public function is_existing_uid($uid) {
         # Loop through each existing user and change if the UID matches
-        foreach ($this->config["system"]["user"] as $user) {
+        foreach ($this->get_config("system/user", []) as $user) {
             if ($user["uid"] == $uid) {
                 return true;
             }
@@ -178,7 +179,7 @@ class APIUserGroupCreate extends APIModel {
 
     public function is_existing_group($name) {
         # Loop through each existing group and ensure this group name is not already used
-        foreach ($this->config["system"]["group"] as $group) {
+        foreach ($this->get_config("system/group", []) as $group) {
             if ($name === $group["name"]) {
                 return true;
             }

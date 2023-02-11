@@ -26,7 +26,7 @@ class APIFirewallTrafficShaperLimiterDelete extends APIModel {
     }
 
     public function action() {
-        unset($this->config["dnshaper"]["queue"][$this->id]);
+        $this->del_config("dnshaper/queue/{$this->id}");
         $this->write_config();
         mark_subsystem_dirty('shaper');
 
@@ -53,7 +53,7 @@ class APIFirewallTrafficShaperLimiterDelete extends APIModel {
                 # Ensure limiter is not in use
                 if (!$this->is_limiter_in_use($this->initial_data["name"])) {
                     $this->id = $this->get_limiter_id_by_name($this->initial_data["name"]);
-                    $this->validated_data = $this->config["dnshaper"]["queue"][$this->id];
+                    $this->validated_data = $this->get_config("dnshaper/queue/{$this->id}");
                 } else {
                     $this->errors[] = APIResponse\get(4214);
                 }
@@ -67,7 +67,7 @@ class APIFirewallTrafficShaperLimiterDelete extends APIModel {
 
     public function get_limiter_id_by_name($name, $as_bool=false) {
         # Loop through each configured limiter and see if it uses this name
-        foreach ($this->config["dnshaper"]["queue"] as $id=>$limiter) {
+        foreach ($this->get_config("dnshaper/queue", []) as $id=>$limiter) {
             # Check for matching names
             if ($name === $limiter["name"]) {
                 return ($as_bool) ? true : $id;
@@ -79,10 +79,10 @@ class APIFirewallTrafficShaperLimiterDelete extends APIModel {
     public function is_limiter_in_use($name) {
         # Get our limiters ID and config
         $id = $this->get_limiter_id_by_name($name);
-        $limiter = $this->config["dnshaper"]["queue"][$id];
+        $limiter = $this->get_config("dnshaper/queue/{$id}");
 
         # Loop through each configured firewall rule and check if it's using this limiter
-        foreach ($this->config["filter"]["rule"] as $rule) {
+        foreach ($this->get_config("filter/rule", []) as $rule) {
                 # Check for matches
                 if ($rule["dnpipe"] === $limiter["name"] or $rule["pdnpipe"] === $limiter["name"]) {
                     return true;

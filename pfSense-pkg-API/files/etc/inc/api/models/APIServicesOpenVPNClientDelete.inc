@@ -26,8 +26,8 @@ class APIServicesOpenVPNClientDelete extends APIModel {
 
     public function action() {
         # Remove user from backend and remove from config
-        openvpn_delete("client",$this->config["openvpn"]["openvpn-client"][$this->id]);
-        unset($this->config["openvpn"]["openvpn-client"][$this->id]);
+        openvpn_delete("client",$this->get_config("openvpn/openvpn-client/{$this->id}"));
+        $this->del_config("openvpn/openvpn-client/{$this->id}");
         $this->write_config();
         return APIResponse\get(0, $this->validated_data);
     }
@@ -35,7 +35,7 @@ class APIServicesOpenVPNClientDelete extends APIModel {
     private function __validate_vpnid() {
         if (isset($this->initial_data['vpnid'])) {
             $counter = 0;
-            foreach ($this->config["openvpn"]["openvpn-client"] as $client) {
+            foreach ($this->get_config("openvpn/openvpn-client", []) as $client) {
                 if ((string) $this->initial_data['vpnid'] === (string) $client["vpnid"]) {
                     $this->id = $counter;
                     $this->validated_data['vpnid'] = (string) $this->initial_data['vpnid'];
@@ -53,7 +53,7 @@ class APIServicesOpenVPNClientDelete extends APIModel {
     }
 
     public function __validate_ovpnc() {
-        foreach ($this->config["interfaces"] as $interface) {
+        foreach ($this->get_config("interfaces", []) as $interface) {
             if (isset($interface["if"]) and ($interface["if"] == "ovpnc" . $this->validated_data['vpnid'])) {
                 $this->errors[] = APIResponse\get(2152);
             }

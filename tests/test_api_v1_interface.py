@@ -12,12 +12,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Script used to test the /api/v1/interface endpoint."""
+import random
+
 import e2e_test_framework
+from e2e_test_framework.tools import is_if_in_ifconfig
+
+# Constants
+IF_WAN_ID = "em0"
+IF_ID = "em2"
+BR_MEMBER_ID = "em1"
+VLAN_TAG = random.randint(2, 4094)
+VLAN_IF = f"{IF_ID}.{VLAN_TAG}"
+IF_STATICV4_IPADDR_CREATE = "172.16.100.1"
+IF_STATICV4_SUBNET_CREATE = random.randint(24, 30)
+IF_STATICV6_IPADDR_CREATE = "2001:db8:abcd:12::1"
+IF_STATICV6_SUBNET_CREATE = random.randint(64, 128)
+BR_STATICV4_IPADDR_CREATE = "172.16.200.1"
+BR_STATICV4_SUBNET_CREATE = random.randint(24, 30)
+VLAN_STATICV4_IPADDR_CREATE = "172.16.2.1"
+VLAN_STATICV4_SUBNET_CREATE = random.randint(24, 30)
+IF_STATICV4_IPADDR_UPDATE = "172.16.101.1"
+IF_STATICV4_SUBNET_UPDATE = random.randint(24, 30)
+IF_STATICV6_IPADDR_UPDATE = "2002:db8:abcd:12::1"
+IF_STATICV6_SUBNET_UPDATE = random.randint(64, 128)
+BR_STATICV4_IPADDR_UPDATE = "172.16.201.1"
+BR_STATICV4_SUBNET_UPDATE = random.randint(24, 30)
+VLAN_STATICV4_IPADDR_UPDATE = "172.16.20.1"
+VLAN_STATICV4_SUBNET_UPDATE = random.randint(24, 30)
 
 
 class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/interface endpoint."""
     uri = "/api/v1/interface"
+
+    get_privileges = ["page-all", "page-interfaces-assignnetworkports"]
+    post_privileges = ["page-all", "page-interfaces-assignnetworkports"]
+    put_privileges = ["page-all", "page-interfaces-assignnetworkports"]
+    delete_privileges = ["page-all", "page-interfaces-assignnetworkports"]
+
     get_tests = [
         {"name": "Read all configured interfaces"}
     ]
@@ -25,7 +57,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
         {
             "name": "Create firewall alias for testing",
             "uri": "/api/v1/firewall/alias",
-            "payload": {
+            "req_data": {
                 "name": "TEST_ALIAS",
                 "type": "host",
                 "address": "1.1.1.1"
@@ -40,7 +72,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check physical interface exists constraint",
             "status": 400,
             "return": 3000,
-            "payload": {
+            "req_data": {
                 "if": "INVALID"
             }
         },
@@ -48,16 +80,16 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check physical interface in use constraint",
             "status": 400,
             "return": 3001,
-            "payload": {
-                "if": "em0"
+            "req_data": {
+                "if": IF_WAN_ID
             }
         },
         {
             "name": "Check IPv4 type option constraint",
             "status": 400,
             "return": 3025,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "type": "INVALID"
             }
         },
@@ -65,8 +97,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check IPv4 type option constraint",
             "status": 400,
             "return": 3041,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "type6": "INVALID"
             }
         },
@@ -74,8 +106,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check spoof MAC address validation",
             "status": 400,
             "return": 3003,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "spoofmac": "INVALID"
             }
         },
@@ -83,8 +115,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check MTU minimum constraint",
             "status": 400,
             "return": 3004,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "mtu": 1279
             }
         },
@@ -92,8 +124,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check MTU maximum constraint",
             "status": 400,
             "return": 3004,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "mtu": 8193
             }
         },
@@ -101,8 +133,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check MSS minimum constraint",
             "status": 400,
             "return": 3005,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "mss": 575
             }
         },
@@ -110,8 +142,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check MSS maximum constraint",
             "status": 400,
             "return": 3005,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "mss": 65536
             }
         },
@@ -119,8 +151,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check media choices constraint",
             "status": 400,
             "return": 3007,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "media": "INVALID"
             }
         },
@@ -128,8 +160,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check description cannot start with pkg_",
             "status": 400,
             "return": 3059,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "pkg_INVALID"
             }
         },
@@ -137,8 +169,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check description cannot match existing alias name",
             "status": 400,
             "return": 3060,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST_ALIAS"
             }
         },
@@ -146,8 +178,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check description cannot be numeric",
             "status": 400,
             "return": 3061,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "10051"
             }
         },
@@ -155,8 +187,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check description cannot be in use",
             "status": 400,
             "return": 3008,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "WAN"
             }
         },
@@ -164,8 +196,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv4 address requirement",
             "status": 400,
             "return": 3011,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "staticv4"
             }
@@ -174,8 +206,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv4 address validation",
             "status": 400,
             "return": 3010,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "staticv4",
                 "ipaddr": "INVALID"
@@ -185,8 +217,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv4 address in use constraint",
             "status": 400,
             "return": 3009,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "staticv4",
                 "ipaddr": "192.168.1.1"
@@ -196,8 +228,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv4 address subnet requirement",
             "status": 400,
             "return": 3013,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "staticv4",
                 "ipaddr": "10.90.1.1"
@@ -207,8 +239,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv4 gateway exists constraint",
             "status": 400,
             "return": 3014,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "staticv4",
                 "ipaddr": "10.90.1.1",
@@ -220,8 +252,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP IPv4 alias address validation",
             "status": 400,
             "return": 3015,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "alias-address": "INVALID"
@@ -231,8 +263,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP IPv4 alias subnet validation",
             "status": 400,
             "return": 3015,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "alias-address": "192.168.54.1",
@@ -243,8 +275,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP reject from address validation",
             "status": 400,
             "return": 3016,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "dhcprejectfrom": ["INVALID"]
@@ -254,8 +286,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP protocol timing timeout minimum constraint",
             "status": 400,
             "return": 3017,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "adv_dhcp_pt_timeout": 0
@@ -265,8 +297,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP protocol timing retry minimum constraint",
             "status": 400,
             "return": 3018,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "adv_dhcp_pt_retry": 0
@@ -276,8 +308,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP protocol timing select timeout minimum constraint",
             "status": 400,
             "return": 3019,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "adv_dhcp_pt_select_timeout": -1
@@ -287,8 +319,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP protocol timing reboot minimum constraint",
             "status": 400,
             "return": 3020,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "adv_dhcp_pt_reboot": 0
@@ -298,8 +330,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP protocol timing backoff cutoff minimum constraint",
             "status": 400,
             "return": 3021,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "adv_dhcp_pt_backoff_cutoff": 0
@@ -309,8 +341,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP protocol timing initial interval minimum constraint",
             "status": 400,
             "return": 3022,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "adv_dhcp_pt_initial_interval": 0
@@ -320,8 +352,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP config file override exists constraint",
             "status": 400,
             "return": 3023,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "adv_dhcp_config_file_override": True,
@@ -332,8 +364,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP VLAN priority choice constraint",
             "status": 400,
             "return": 3024,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type": "dhcp",
                 "dhcpvlanenable": True,
@@ -344,8 +376,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv6 address requirement",
             "status": 400,
             "return": 3028,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "staticv6"
             }
@@ -354,8 +386,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv6 address validation",
             "status": 400,
             "return": 3026,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "staticv6",
                 "ipaddrv6": "INVALID"
@@ -365,8 +397,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv6 address subnet requirement",
             "status": 400,
             "return": 3030,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "staticv6",
                 "ipaddrv6": "0::"
@@ -376,8 +408,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv6 address subnet requirement",
             "status": 400,
             "return": 3029,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "staticv6",
                 "ipaddrv6": "0::",
@@ -388,8 +420,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check static IPv6 gateway exists constraint",
             "status": 400,
             "return": 3031,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "staticv6",
                 "ipaddrv6": "0::",
@@ -401,8 +433,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP IPv6 prefix delegation size choice constraint",
             "status": 400,
             "return": 3032,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "dhcp6",
                 "dhcp6-ia-pd-len": "INVALID"
@@ -412,8 +444,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP IPv6 VLAN priority choice constraint",
             "status": 400,
             "return": 3033,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "dhcp6",
                 "dhcp6vlanenable": True,
@@ -424,8 +456,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check DHCP IPv6 VLAN priority choice constraint",
             "status": 400,
             "return": 3034,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "dhcp6",
                 "adv_dhcp6_config_file_override": True,
@@ -436,8 +468,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check 6RD IPv6 gateway requirement",
             "status": 400,
             "return": 3036,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "6rd"
             }
@@ -446,8 +478,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check 6RD IPv6 gateway validation",
             "status": 400,
             "return": 3035,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "6rd",
                 "gateway-6rd": "INVALID"
@@ -457,8 +489,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check 6RD IPv6 prefix length minimum constraint",
             "status": 400,
             "return": 3037,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "6rd",
                 "gateway-6rd": "1.2.3.4",
@@ -469,8 +501,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check 6RD IPv6 prefix length maximum constraint",
             "status": 400,
             "return": 3037,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "6rd",
                 "gateway-6rd": "1.2.3.4",
@@ -481,8 +513,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check Track6 IPv6 interface requirement",
             "status": 400,
             "return": 3039,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "track6"
             }
@@ -491,8 +523,8 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "name": "Check Track6 IPv6 interface exists constraint",
             "status": 400,
             "return": 3038,
-            "payload": {
-                "if": "em2",
+            "req_data": {
+                "if": IF_ID,
                 "descr": "TEST",
                 "type6": "track6",
                 "track6-interface": "INVALID"
@@ -501,77 +533,141 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
         {
             "name": "Create interface bridge for testing",
             "uri": "/api/v1/interface/bridge",
-            "payload": {
-                "members": "em1"
+            "req_data": {
+                "members": [BR_MEMBER_ID]
             }
         },
         {
             "name": "Create interface VLAN for testing",
             "uri": "/api/v1/interface/vlan",
             "resp_time": 5,
-            "payload": {
-                "if": "em2",
-                "tag": 2
-            }
-        },
-        {
-            "name": "Create a staticv4/staticv6 interface",
-            "payload": {
-                "if": "em2",
-                "descr": "e2e_test",
-                "enable": True,
-                "type": "staticv4",
-                "type6": "staticv6",
-                "ipaddr": "10.250.0.1",
-                "ipaddrv6": "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
-                "subnet": "24",
-                "subnetv6": "120",
-                "blockbogons": True
-            }
-        },
-        {
-            "name": "Create a static interface on the bridge",
-            "payload": {
-                "if": "bridge0",
-                "descr": "BRIDGE_TEST",
-                "enable": True,
-                "type": "staticv4",
-                "ipaddr": "10.251.0.1",
-                "subnet": 24,
-                "blockbogons": True
+            "req_data": {
+                "if": IF_ID,
+                "tag": VLAN_TAG
             }
         },
         {
             "name": "Check MTU less than VLAN parent interface constraint",
             "status": 400,
             "return": 3006,
-            "payload": {
-                "if": "em2.2",
+            "req_data": {
+                "if": VLAN_IF,
                 "mtu": 8192
             }
         },
-
+        {
+            "name": "Create a staticv4/staticv6 interface",
+            "req_data": {
+                "if": IF_ID,
+                "descr": "STATIC_TEST",
+                "enable": True,
+                "type": "staticv4",
+                "type6": "staticv6",
+                "ipaddr": IF_STATICV4_IPADDR_CREATE,
+                "ipaddrv6": IF_STATICV6_IPADDR_CREATE,
+                "subnet": IF_STATICV4_SUBNET_CREATE,
+                "subnetv6": IF_STATICV6_SUBNET_CREATE,
+                "blockbogons": True
+            }
+        },
+        {
+            "name": "Create a static interface on the bridge",
+            "req_data": {
+                "if": "bridge0",
+                "descr": "BR_TEST",
+                "enable": True,
+                "type": "staticv4",
+                "ipaddr": BR_STATICV4_IPADDR_CREATE,
+                "subnet": BR_STATICV4_SUBNET_CREATE,
+                "blockbogons": True
+            }
+        },
+        {
+            "name": "Create a static interface on a VLAN",
+            "req_data": {
+                "if": VLAN_IF,
+                "descr": "VLAN_TEST",
+                "enable": True,
+                "type": "staticv4",
+                "ipaddr": VLAN_STATICV4_IPADDR_CREATE,
+                "subnet": VLAN_STATICV4_SUBNET_CREATE,
+                "blockbogons": True
+            }
+        },
+        {
+            "name": "Apply interfaces",
+            "method": "POST",
+            "uri": "/api/v1/interface/apply",
+            "req_data": {"aysnc": False},
+            "resp_time": 30,
+            "resp_data_empty": True,
+            "post_test_callable": "are_ifs_created"
+        }
     ]
     put_tests = [
         {
-            "name": "Update staticv4/staticv6 interface to dhcp/dhcp6 and apply",
-            "payload": {
-                "id": "em2",
-                "descr": "e2e_test_UPDATED",
+            "name": "Disable interface",
+            "resp_time": 5,
+            "post_test_callable": "is_if_disabled",
+            "req_data": {
+                "id": VLAN_IF,
+                "descr": "IF_DISABLED_TEST",
                 "enable": False,
                 "type": "dhcp",
-                "type6": "dhcp6",
                 "blockbogons": False,
                 "apply": True
             },
-            "resp_time": 12    # Allow a few seconds to bounce the interface when applying
+        },
+        {
+            "name": "Re-enable and update IP of VLAN interface",
+            "req_data": {
+                "id": VLAN_IF,
+                "enable": True,
+                "type": "staticv4",
+                "ipaddr": VLAN_STATICV4_IPADDR_UPDATE,
+                "subnet": VLAN_STATICV4_SUBNET_UPDATE,
+                "apply": False
+            },
+        },
+        {
+            "name": "Update IP of static interface",
+            "req_data": {
+                "id": IF_ID,
+                "type": "staticv4",
+                "type6": "staticv6",
+                "ipaddr": IF_STATICV4_IPADDR_UPDATE,
+                "ipaddrv6": IF_STATICV6_IPADDR_UPDATE,
+                "subnet": IF_STATICV4_SUBNET_UPDATE,
+                "subnetv6": IF_STATICV6_SUBNET_UPDATE,
+                "apply": False
+            },
+        },
+        {
+            "name": "Update IP of bridge interface",
+            "req_data": {
+                "id": "bridge0",
+                "type": "staticv4",
+                "ipaddr": BR_STATICV4_IPADDR_UPDATE,
+                "subnet": BR_STATICV4_SUBNET_UPDATE,
+                "apply": False
+            },
+        },
+        {
+            "name": "Apply interfaces",
+            "method": "POST",
+            "uri": "/api/v1/interface/apply",
+            "req_data": {"aysnc": False},
+            "resp_time": 30,
+            "resp_data_empty": True,
+            "post_test_callable": "are_ifs_updated"
         }
     ]
     delete_tests = [
         {
             "name": "Delete interface",
-            "payload": {
-                "if": "em2"
+            "resp_time": 3,
+            "req_data": {
+                "if": IF_ID
             }
         },
         {
@@ -579,38 +675,137 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
             "uri": "/api/v1/interface/bridge",
             "status": 400,
             "return": 3073,
-            "payload": {
+            "req_data": {
                 "id": "bridge0"
             }
         },
         {
             "name": "Delete bridged interface",
-            "payload": {
+            "req_data": {
                 "if": "bridge0"
+            }
+        },
+        {
+            "name": "Delete VLAN interface",
+            "req_data": {
+                "if": VLAN_IF
             }
         },
         {
             "name": "Delete interface bridge",
             "uri": "/api/v1/interface/bridge",
-            "payload": {
+            "req_data": {
                 "id": "bridge0"
             }
         },
         {
             "name": "Delete interface VLAN",
             "uri": "/api/v1/interface/vlan",
-            "payload": {
-                "vlanif": "em2.2"
+            "req_data": {
+                "vlanif": VLAN_IF
             }
         },
         {
             "name": "Delete test firewall alias",
             "uri": "/api/v1/firewall/alias",
-            "payload": {
+            "post_test_callable": "are_ifs_deleted",
+            "req_data": {
                 "id": "TEST_ALIAS"
             }
         }
     ]
+
+    def are_ifs_created(self):
+        """Checks if the interfaces created in the POST tests are present after being applied."""
+        # Local variables
+        ifconfig_out = self.pfsense_shell("ifconfig")
+
+        # Ensure static interface exists with IPv4 address
+        if not is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV4_IPADDR_CREATE, IF_STATICV4_SUBNET_CREATE):
+            raise AssertionError(f"Expected interface with static IPv4 '{IF_STATICV4_IPADDR_CREATE}'")
+
+        # Ensure static interface exists with IPv6 address
+        if not is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV6_IPADDR_CREATE, IF_STATICV6_SUBNET_CREATE):
+            raise AssertionError(f"Expected interface with static IPv6 '{IF_STATICV6_IPADDR_CREATE}'")
+
+        # Ensure bridged interface exists with IPv4 address
+        if not is_if_in_ifconfig(ifconfig_out, "bridge0", BR_STATICV4_IPADDR_CREATE, BR_STATICV4_SUBNET_CREATE):
+            raise AssertionError(f"Expected bridge interface with static IPv4 '{BR_STATICV4_IPADDR_CREATE}'")
+
+        # Ensure VLAN interface exists with IPv4 address
+        if not is_if_in_ifconfig(ifconfig_out, VLAN_IF, VLAN_STATICV4_IPADDR_CREATE, VLAN_STATICV4_SUBNET_CREATE):
+            raise AssertionError(f"Expected VLAN interface with static IPv4 '{VLAN_STATICV4_IPADDR_CREATE}'")
+
+    def are_ifs_updated(self):
+        """
+        Checks if the interfaces updated in the PUT tests are present after being applied and that the old IPs are
+        no longer used.
+        """
+        # Local variables
+        ifconfig_out = self.pfsense_shell("ifconfig")
+
+        # Ensure static interface exists with updated IPv4 address
+        if not is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV4_IPADDR_UPDATE, IF_STATICV4_SUBNET_UPDATE):
+            raise AssertionError(f"Expected interface with static IPv4 '{IF_STATICV4_IPADDR_UPDATE}'")
+
+        # Ensure old IP is no longer present
+        if is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV4_IPADDR_CREATE, IF_STATICV4_SUBNET_CREATE):
+            raise AssertionError(f"Interface is still using old static IPv4 '{IF_STATICV4_IPADDR_CREATE}'")
+
+        # Ensure static interface exists with updated IPv6 address
+        if not is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV6_IPADDR_UPDATE, IF_STATICV6_SUBNET_UPDATE):
+            raise AssertionError(f"Expected interface with static IPv6 '{IF_STATICV6_IPADDR_UPDATE}'")
+
+        # Ensure old IPv6 is no longer present
+        if is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV6_IPADDR_CREATE, IF_STATICV6_SUBNET_CREATE):
+            raise AssertionError(f"Interface is still using old static IPv6 '{IF_STATICV6_IPADDR_CREATE}'")
+
+        # Ensure bridged interface exists with IPv4 address
+        if not is_if_in_ifconfig(ifconfig_out, "bridge0", BR_STATICV4_IPADDR_UPDATE, BR_STATICV4_SUBNET_UPDATE):
+            raise AssertionError(f"Expected bridge interface with static IPv4 '{BR_STATICV4_IPADDR_UPDATE}'")
+
+        # Ensure old bridge IP is no longer present
+        if is_if_in_ifconfig(ifconfig_out, "bridge0", BR_STATICV4_IPADDR_CREATE, BR_STATICV4_SUBNET_CREATE):
+            raise AssertionError(f"Bridge is still using old static IPv4 '{BR_STATICV4_IPADDR_CREATE}'")
+
+        # Ensure VLAN interface exists with IPv4 address
+        if not is_if_in_ifconfig(ifconfig_out, VLAN_IF, VLAN_STATICV4_IPADDR_UPDATE, VLAN_STATICV4_SUBNET_UPDATE):
+            raise AssertionError(f"Expected VLAN interface with static IPv4 '{VLAN_STATICV4_IPADDR_UPDATE}'")
+
+        # Ensure old VLAN IP is no longer present
+        if is_if_in_ifconfig(ifconfig_out, VLAN_IF, VLAN_STATICV4_IPADDR_CREATE, VLAN_STATICV4_SUBNET_CREATE):
+            raise AssertionError(f"VLAN is still using old static IPv4 '{VLAN_STATICV4_IPADDR_CREATE}'")
+
+    def are_ifs_deleted(self):
+        """Checks if the interfaces deleted in the DELETE tests are no longer present"""
+        # Local variables
+        ifconfig_out = self.pfsense_shell("ifconfig")
+
+        # Ensure staticv4 interface no longer exists
+        if is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV4_IPADDR_UPDATE, IF_STATICV4_SUBNET_UPDATE):
+            raise AssertionError(f"Expected interface with IP '{IF_STATICV4_IPADDR_UPDATE}' to be deleted")
+
+        # Ensure staticv6 interface no longer exists
+        if is_if_in_ifconfig(ifconfig_out, IF_ID, IF_STATICV6_IPADDR_UPDATE, IF_STATICV6_SUBNET_UPDATE):
+            raise AssertionError(f"Expected interface with IP '{IF_STATICV6_IPADDR_UPDATE}' to be deleted")
+
+        # Ensure bridge interface no longer exists
+        if is_if_in_ifconfig(ifconfig_out, "bridge0", BR_STATICV4_IPADDR_UPDATE, BR_STATICV4_SUBNET_UPDATE):
+            raise AssertionError(f"Expected bridge with IP '{BR_STATICV4_IPADDR_UPDATE}' to be deleted")
+
+        # Ensure vlan interface no longer exists
+        if is_if_in_ifconfig(ifconfig_out, VLAN_IF, VLAN_STATICV4_IPADDR_UPDATE, VLAN_STATICV4_SUBNET_UPDATE):
+            raise AssertionError(f"Expected VLAN IP '{VLAN_STATICV4_IPADDR_UPDATE}' to be deleted")
+
+    def is_if_disabled(self):
+        """Checks if the interface updated to be disabled is no longer up."""
+        # Local variables
+        ifconfig_lines = self.pfsense_shell("ifconfig").split("\n")
+
+        # Loop through each line and check if em2.2 is now disabled
+        for line in ifconfig_lines:
+            if line.startswith(f"{VLAN_IF}:") and "UP" in line:
+                raise AssertionError(f"Expected {VLAN_IF} to be disabled and not UP")
 
 
 APIE2ETestInterface()

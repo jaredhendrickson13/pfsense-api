@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestStatusLogFirewall(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/status/log/firewall endpoint."""
     uri = "/api/v1/status/log/firewall"
+    get_privileges = ["page-all", "page-diagnostics-logs-firewall"]
     get_tests = [{"name": "Read the firewall log"}]
 
 

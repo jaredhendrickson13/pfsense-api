@@ -23,11 +23,10 @@ class APIInterfaceDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-assignnetworkports"];
         $this->change_note = "Deleted interface via API";
-
     }
 
     public function action() {
-        $curr_config = [$this->validated_data["if"] => $this->config["interfaces"][$this->validated_data["if"]]];
+        $curr_config = $this->get_config("interfaces/{$this->validated_data["if"]}");
         $del_stat = $this->destroy_interface($this->validated_data["if"]);
         $this->write_config();
         return APIResponse\get($del_stat, ($del_stat === 0) ? $curr_config : []);
@@ -45,57 +44,69 @@ class APIInterfaceDelete extends APIModel {
         }
     }
 
-    # Delete an interface given it's interface ID - for pfSense 2.5+!
+    # Delete an interface given it's interface ID
     private function destroy_interface($id) {
+        # Do not allow deletion of WAN interface
         if ($id === "wan") {
             $err_msg = 3042;
-        } elseif (link_interface_to_group($id)) {
+        }
+        # Do not allow deletion if interface is in group
+        elseif (link_interface_to_group($id)) {
             $err_msg = 3043;
-        } elseif (link_interface_to_bridge($id)) {
+        }
+        # Do not allow deletion if interface is in bridge
+        elseif (link_interface_to_bridge($id)) {
             $err_msg = 3044;
-        } elseif (link_interface_to_tunnelif($id, 'gre')) {
+        }
+        # Do not allow interface to be deleted if it is assigned GRE interface
+        elseif (link_interface_to_tunnelif($id, 'gre')) {
             $err_msg = 3045;
-        } elseif (link_interface_to_tunnelif($id, 'gif')) {
+        }
+        # Do not allow interface to be deleted if it is assigned GIF interface
+        elseif (link_interface_to_tunnelif($id, 'gif')) {
             $err_msg = 3046;
-        } elseif (interface_has_queue($id)) {
+        }
+        # Do not allow interface to be deleted if it has a traffic queue assigned
+        elseif (interface_has_queue($id)) {
             $err_msg = 3047;
-        } else {
-            unset($this->config['interfaces'][$id]['enable']);
+        }
+        # Otherwise, run through the steps to delete the interface
+        else {
+            # Remove the 'enable' value first, then bring down the interface and delete it from config
+            $this->del_config("interfaces/{$id}/enable");
             $realid = get_real_interface($id);
-            interface_bring_down($id);   // Bring down interface
-            unset($this->config['interfaces'][$id]);	// Delete our interface from configuration
-            // Remove DHCP config for interface
-            if (is_array($this->config['dhcpd']) && is_array($this->config['dhcpd'][$id])) {
-                unset($this->config['dhcpd'][$id]);
+            interface_bring_down($id);
+            $this->del_config("interfaces/{$id}");
+
+            # Remove DHCP config for interface
+            if (is_array($this->get_config("dhcpd/{$id}"))) {
+                $this->del_config("dhcpd/{$id}");
                 services_dhcpd_configure('inet');
             }
-            // Removed interface config for dhcp6
-            if (is_array($this->config['dhcpdv6']) && is_array($this->config['dhcpdv6'][$id])) {
-                unset($this->config['dhcpdv6'][$id]);
+            # Remove interface config for dhcp6
+            if (is_array($this->get_config("dhcpdv6/{$id}"))) {
+                $this->del_config("dhcpdv6/{$id}");
                 services_dhcpd_configure('inet6');
             }
-            // Remove ACL for interface
-            if (count($this->config['filter']['rule']) > 0) {
-                foreach ($this->config['filter']['rule'] as $x => $rule) {
-                    if ($rule['interface'] == $id) {
-                        unset($this->config['filter']['rule'][$x]);
-                    }
+            # Remove ACL for interface
+            foreach ($this->get_config('filter/rule', []) as $x => $rule) {
+                if ($rule['interface'] == $id) {
+                    $this->del_config("filter/rule/{$x}");
                 }
             }
-            // Remove NAT config for interface
-            if (is_array($this->config['nat']['rule']) && count($this->config['nat']['rule']) > 0) {
-                foreach ($this->config['nat']['rule'] as $x => $rule) {
-                    if ($rule['interface'] == $id) {
-                        unset($this->config['nat']['rule'][$x]['interface']);
-                    }
+            # Remove NAT config for interface
+            foreach ($this->get_config('nat/rule', []) as $x => $rule) {
+                if ($rule['interface'] == $id) {
+                    $this->del_config("nat/rule/{$x}");
                 }
             }
 
-            // Disable DHCP if last interface
-            if ($this->config['interfaces']['lan'] && $this->config['dhcpd']['wan']) {
-                unset($this->config['dhcpd']['wan']);
+            # Disable DHCP if last interface
+            if (count($this->get_config('interfaces', [])) <= 1 && $this->get_config('dhcpd/wan')) {
+                $this->del_config('dhcpd/wan');
             }
-            // Update VLAN assignments
+
+            # Update VLAN assignments
             link_interface_to_vlans($realid, "update");
             $err_msg = 0;
         }

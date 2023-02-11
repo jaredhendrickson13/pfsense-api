@@ -25,10 +25,6 @@ class APIServicesUnboundHostOverrideRead extends APIModel {
     }
 
     public function action() {
-        $unbound_array = [];
-        if (!empty($this->config["unbound"]["hosts"])) {
-            $unbound_array = $this->config["unbound"]["hosts"];
-        }
-        return APIResponse\get(0, $unbound_array);
+        return APIResponse\get(0, $this->get_config("unbound/hosts", []));
     }
 }

@@ -25,62 +25,100 @@ class APIServicesSSHdUpdate extends APIModel {
     }
 
     public function action() {
+        # Write the changes to configuration
+        $this->set_config("system/ssh", $this->validated_data);
         $this->write_config();
-        send_event("filter reload");
-        // Check that something was changed before altering service
-        if (!empty($this->validated_data)) {
-            killbyname("sshd");    // Kill SSHD
-            log_error(gettext("secure shell configuration has changed. Stopping sshd."));
-            if ($this->config['system']['ssh']['enable']) {
-                log_error(gettext("secure shell configuration has changed. Restarting sshd."));
-                send_event("service restart sshd");
-            }
+
+        # Stop SSHD and log that action
+        killbyname("sshd");
+        log_error(gettext("secure shell configuration has changed. Stopping sshd."));
+
+        # Restart SSHD if it is still enabled
+        if ($this->is_config_enabled("system/ssh")) {
+            log_error(gettext("secure shell configuration has changed. Restarting sshd."));
+            send_event("service restart sshd");
         }
-        return APIResponse\get(0, $this->config["system"]["ssh"]);
+
+        return APIResponse\get(0, $this->get_config("system/ssh", []));
     }
 
     public function validate_payload() {
+        # Obtain the current ssh value
+        $this->validated_data = $this->get_config("system/ssh", []);
+
+        # Validate fields
+        $this->__validate_enable();
+        $this->__validate_port();
+        $this->__validate_sshdkeyonly();
+        $this->__validate_sshdagentforwarding();
+    }
+
+    private function __validate_enable() {
+        # Check for the optional 'enable' field
         if (isset($this->initial_data['enable'])) {
-            $enable = $this->initial_data['enable'];
-            if ($enable === true) {
-                $this->config["system"]["ssh"]["enable"] = "enabled";
-            } elseif ($enable === false) {
-                unset($this->config["system"]["ssh"]["enable"]);
-            } else {
+            if ($this->initial_data['enable'] === true) {
+                $this->validated_data["enable"] ="enabled";
+            }
+            elseif ($this->initial_data['enable'] === false) {
+                unset($this->validated_data["enable"]);
+            }
+            else {
                 $this->errors[] = APIResponse\get(2000);
             }
         }
+    }
+
+    private function __validate_port() {
+        # Check for the optional 'port' field
+        if (isset($this->initial_data['port'])) {
+            # Ensure port is a valid TCP port
+            if (is_port((string)$this->initial_data["port"])) {
+                $this->validated_data["port"] = (int)$this->initial_data["port"];
+            }
+            else {
+                $this->errors[] = APIResponse\get(2003);
+            }
+        }
+
+        # Assume a default if this is not set
+        if (!isset($this->validated_data["port"])) {
+            $this->validated_data["port"] = 22;
+        }
+    }
+
+    private function __validate_sshdkeyonly() {
+        # Check for the optional 'sshdkeyonly' field
         if (isset($this->initial_data["sshdkeyonly"])) {
-            $this->validated_data["sshdkeyonly"] = $this->initial_data["sshdkeyonly"];
-            $allowed_auth_types = array("disabled", "enabled", "both");    // Array of allowed auth types
-            // Check if our auth type is valid
-            if (in_array($this->validated_data["sshdkeyonly"], $allowed_auth_types)) {
-                if ($this->validated_data["sshdkeyonly"] === "disabled") {
-                    unset($this->config["system"]["ssh"]["sshdkeyonly"]);
-                } else {
-                    $this->config["system"]["ssh"]["sshdkeyonly"] = $this->validated_data["sshdkeyonly"];
+            # Ensure it is a valid option
+            if (in_array($this->initial_data["sshdkeyonly"], ["disabled", "enabled", "both"])) {
+                # If disabled, just remove it from the data
+                if ($this->initial_data["sshdkeyonly"] === "disabled") {
+                    unset($this->validated_data["sshdkeyonly"]);
                 }
-            } else {
+                # Otherwise, save the data as valid
+                else {
+                    $this->validated_data["sshdkeyonly"] = $this->initial_data["sshdkeyonly"];
+                }
+            }
+            else {
                 $this->errors[] = APIResponse\get(2001);
             }
         }
+    }
+
+    private function __validate_sshdagentforwarding() {
+        # Check for the optional 'sshdagentforwarding' field
         if (isset($this->initial_data['sshdagentforwarding'])) {
-            $this->validated_data["sshdagentforwarding"] = $this->initial_data['sshdagentforwarding'];
-            if ($this->validated_data["sshdagentforwarding"] === true) {
-                $this->config["system"]["ssh"]["sshdagentforwarding"] = "enabled";
-            } elseif ($this->validated_data["sshdagentforwarding"] === false) {
-                unset($this->config["system"]["ssh"]["sshdagentforwarding"]);
-            } else {
-                $this->errors[] = APIResponse\get(2002);
+            # Enable the field if set to true
+            if ($this->initial_data["sshdagentforwarding"] === true) {
+                $this->validated_data["sshdagentforwarding"] = "enabled";
             }
-        }
-        if (isset($this->initial_data['port'])) {
-            $this->validated_data["port"] = strval($this->initial_data['port']);
-            // Convert string to array
-            if (is_port($this->validated_data["port"])) {
-                $this->config["system"]["ssh"]["port"] = $this->validated_data["port"];
-            } else {
-                $this->errors[] = APIResponse\get(2003);
+            # Remove the field if set to false
+            elseif ($this->initial_data["sshdagentforwarding"] === false) {
+                unset($this->validated_data["sshdagentforwarding"]);
+            }
+            else {
+                $this->errors[] = APIResponse\get(2002);
             }
         }
     }

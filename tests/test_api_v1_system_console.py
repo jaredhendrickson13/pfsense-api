@@ -5,14 +5,15 @@ import e2e_test_framework
 class APIE2ETestSystemConsole(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/system/console endpoint."""
     uri = "/api/v1/system/console"
+    put_privileges = ["page-all", "page-system-advanced-admin"]
     put_tests = [
         {
             "name": "Enable password protected console",
-            "payload": {"disableconsolemenu": True}
+            "req_data": {"disableconsolemenu": True}
         },
         {
             "name": "Disable password protected console",
-            "payload": {"disableconsolemenu": False}
+            "req_data": {"disableconsolemenu": False}
         }
     ]
 

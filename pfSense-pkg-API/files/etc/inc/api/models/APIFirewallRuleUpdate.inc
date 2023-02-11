@@ -31,9 +31,21 @@ class APIFirewallRuleUpdate extends APIModel {
     }
 
     public function action() {
-        # Update our config item, sort rule filters and apply.
-        $this->config["filter"]["rule"][$this->id] = $this->validated_data;
-        APITools\sort_firewall_rules($this->initial_data["top"], $this->id);
+        # Move rule to top of rules if requested
+        if ($this->initial_data["top"] === true) {
+            $this->set_config(
+                "filter/rule",
+                array_merge([$this->validated_data], $this->get_config("filter/rule"))
+            );
+            $this->del_config("filter/rule/{$this->id}");
+        }
+        # Otherwise, simply update the rule in place
+        else {
+            $this->set_config("filter/rule/{$this->id}", $this->validated_data);
+        }
+
+        # Sort the rules, write them to configuration and mark the changes as pending
+        filter_rules_sort();
         $this->write_config();
         mark_subsystem_dirty('filter');
 
@@ -41,6 +53,7 @@ class APIFirewallRuleUpdate extends APIModel {
         if ($this->initial_data["apply"] === true) {
             APIFirewallApplyCreate::apply();
         }
+
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -48,7 +61,7 @@ class APIFirewallRuleUpdate extends APIModel {
         # Check for our required 'tracker' payload value
         if (isset($this->initial_data['tracker'])) {
             # Loop through each rule and check if our tracker matches
-            foreach ($this->config["filter"]["rule"] as $id=>$rule) {
+            foreach ($this->get_config("filter/rule", []) as $id=>$rule) {
                 if (intval($rule["tracker"]) === intval($this->initial_data['tracker'])) {
                     $this->validated_data = $rule;
                     $this->id = $id;
@@ -282,12 +295,13 @@ class APIFirewallRuleUpdate extends APIModel {
     }
 
     private function __validate_sched() {
+
         # Check for our optional 'sched' payload value
         if (isset($this->initial_data['sched'])) {
             # Only try to set the schedule if the value is not empty
             if (!empty($this->initial_data["sched"])) {
                 # Loop through each configured schedule and check if it exists
-                foreach ($this->config["schedules"]["schedule"] as $schedule) {
+                foreach ($this->get_config("schedules/schedule", []) as $schedule) {
                     # Check if the names match
                     if ($this->initial_data["sched"] === $schedule["name"]) {
                         $this->validated_data["sched"] = $this->initial_data["sched"];

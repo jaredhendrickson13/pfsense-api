@@ -22,16 +22,17 @@ class APIFirewallStatesSizeRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-diagnostics-statessummary"];
+        $this->privileges = ["page-all", "page-system-advanced-firewall"];
     }
 
     public function action() {
         # Check our default state table size
         $size_array["defaultmaximumstates"] = intval(pfsense_default_state_size());
+        $maximum_states = $this->get_config("system/maximumstates");
 
         # Check our maximum state table size if configured, Otherwise, use default.
-        if (!empty($this->config["system"]["maximumstates"])) {
-            $size_array["maximumstates"] = intval($this->config["system"]["maximumstates"]);
+        if (!empty($maximum_states)) {
+            $size_array["maximumstates"] = intval($maximum_states);
         } else {
             $size_array["maximumstates"] = $size_array["defaultmaximumstates"];
         }

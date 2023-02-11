@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestServicesStart(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/start endpoint."""
     uri = "/api/v1/services/start"
+    post_privileges = ["page-all", "page-status-services"]
     post_tests = [
         {
             "name": "Start all services",

@@ -33,9 +33,6 @@ info:
     using basic authentication. For example:<br><br>
     `curl -u admin:pfsense https://pfsense.example.com/api/v1/firewall/rule`
     <br><br>
-    _Note: in previous releases, local database authentication used the `client-id` and `client-token` fields in your
-    request body to authenticate. This functionality still exists but is not recommended. It will be removed in a future
-    release._
     </details>
 
     <details>
@@ -81,8 +78,7 @@ info:
     curl -H "Authorization: CLIENT_ID_HERE CLIENT_TOKEN_HERE" -X GET https://pfsense.example.com/api/v1/system/arp
     ```
 
-    <br><br>_Note: In previous versions of pfSense API, the client-id and client-token were provided via the request payload. This
-    functionality is still supported but is not recommended. It will be removed in a future release._
+    <br>
     </details>
 
     ### Authorization
@@ -2984,7 +2980,7 @@ paths:
       description: 'Read information about the firewall state table''s current, default
         and maximum sizes.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-statessummary`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-firewall`]'
       responses:
         "200":
           $ref: '#/components/responses/Success'
@@ -5222,7 +5218,7 @@ paths:
                   type: integer
                 tag:
                   description: VLAN tag to add to the parent interface.
-                  maximum: 4096
+                  maximum: 4094
                   minimum: 1
                   type: integer
               required:
@@ -5273,7 +5269,7 @@ paths:
                   type: integer
                 tag:
                   description: VLAN tag to change on the parent interface.
-                  maximum: 4096
+                  maximum: 4094
                   minimum: 1
                   type: integer
               required:
@@ -5309,7 +5305,7 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]'
       parameters:
-        - description: ID of the gateway to delete. Refer to the 'Obtaining Object IDs'
+        - description: ID or name of the gateway to delete. Refer to the 'Obtaining Object IDs'
             section in the documentation intro for help obtaining this ID.
           in: query
           name: id
@@ -5538,7 +5534,7 @@ paths:
                     if `ipprotocol` is set to `inet6`.
                   type: string
                 id:
-                  description: ID of the gateway to update. Refer to the 'Obtaining
+                  description: ID or name of the gateway to update. Refer to the 'Obtaining
                     Object IDs' section in the documentation intro for help obtaining
                     this ID.
                   type: integer
@@ -6617,8 +6613,7 @@ paths:
             schema:
               properties:
                 initiate:
-                  description: Initiate all tunnels (phase 1 and 2) with the newly applied configuration. This field
-                    is only available on pfSense 2.6+ and pfSense Plus 22.05+.
+                  description: Initiate all tunnels (phase 1 and 2) with the newly applied configuration.
                   type: boolean
                   default: false
       responses:
@@ -6660,18 +6655,12 @@ paths:
                     `{ "name": "aes256gcm","keylen": 64 }`,
                     `{ "name": "aes256gcm","keylen": 96 }`,
                     `{ "name": "aes256gcm","keylen": 128 }`,
-                    `{ "name": "blowfish","keylen": 128 }`,
-                    `{ "name": "blowfish","keylen": 192 }`,
-                    `{ "name": "blowfish","keylen": 256 }`,
-                    `{ "name": "3des" }`,
-                    `{ "name": "cast128" }`
                   type: object
                 hash-algorithm:
                   description: Hashing algorithm to use. Options for this field are set by pfSense itself and may
                     vary based on your version of pfSense.
                   type: string
                   enum:
-                    - md5
                     - sha1
                     - sha256
                     - sha384
@@ -6688,7 +6677,6 @@ paths:
                     has `prfselect_enable` enabled.
                   type: string
                   enum:
-                    - md5
                     - sha1
                     - sha256
                     - sha384
@@ -6869,7 +6857,6 @@ paths:
                 startaction:
                   description: Option to force specific initiation/responder behavior for child SA (P2) entries. Options 
                     for this field are set by pfSense itself. These options may vary based on your pfSense version.
-                    This field is not supported on pfSense 2.5.1 or pfSense 2.5.0.
                   type: string
                   default: ""
                   enum:
@@ -7092,7 +7079,6 @@ paths:
                 startaction:
                   description: Option to force specific initiation/responder behavior for child SA (P2) entries. Options 
                     for this field are set by pfSense itself. These options may vary based on your pfSense version.
-                    This field is not supported on pfSense 2.5.1 or pfSense 2.5.0.
                   type: string
                   enum:
                     - ""
@@ -7310,7 +7296,6 @@ paths:
                   items:
                     type: string
                     enum:
-                      - hmac_md5
                       - hmac_sha1
                       - hmac_sha256
                       - hmac_sha384
@@ -12136,7 +12121,6 @@ paths:
                     - sha256
                     - sha384
                     - sha512
-                    - md5
                   type: string
                 persist:
                   description: Enable or disable persistent API configuration. If
@@ -12788,7 +12772,7 @@ paths:
       operationId: APISystemDNSRead
       description: 'Read current system DNS settings.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       responses:
         "200":
           $ref: '#/components/responses/Success'
@@ -12801,7 +12785,7 @@ paths:
       operationId: APISystemDNSUpdate
       description: 'Modify the existing system DNS settings.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       requestBody:
         content:
           application/json:
@@ -12835,7 +12819,7 @@ paths:
       operationId: APISystemDNSServerDelete
       description: 'Remove existing system DNS servers.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       parameters:
         - description: IP of the system DNS servers to remove.
           in: query
@@ -12855,7 +12839,7 @@ paths:
       operationId: APISystemDNSServerCreate
       description: 'Add new DNS servers to the system DNS servers.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       requestBody:
         content:
           application/json:
@@ -12894,7 +12878,7 @@ paths:
       operationId: APISystemHostnameRead
       description: 'Read the system''s hostname.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       responses:
         "200":
           $ref: '#/components/responses/Success'
@@ -12907,7 +12891,7 @@ paths:
       operationId: APISystemHostnameUpdate
       description: 'Modify the system hostname.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       requestBody:
         content:
           application/json:

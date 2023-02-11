@@ -24,11 +24,6 @@ class APIFirewallNATPortForwardRead extends APIModel {
     }
 
     public function action() {
-
-        // Check that we have a virtual IP configuration
-        if (!empty($this->config["nat"]["rule"])) {
-            $this->validated_data = $this->config["nat"]["rule"];
-        }
-        return APIResponse\get(0, $this->validated_data);
+        return APIResponse\get(0, $this->get_config("nat/rule", []));
     }
 }

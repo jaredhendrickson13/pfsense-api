@@ -29,7 +29,7 @@ class APIFirewallScheduleTimeRangeDelete extends APIModel {
 
     public function action() {
         # Remove this schedule time range to the config and reload the firewall filter
-        unset($this->config["schedules"]["schedule"][$this->parent_id]["timerange"][$this->id]);
+        $this->del_config("schedules/schedule/{$this->parent_id}/timerange/{$this->id}");
         $this->write_config();
         filter_configure();
 
@@ -57,12 +57,13 @@ class APIFirewallScheduleTimeRangeDelete extends APIModel {
     private function __validate_id() {
         # Check for our required `id` payload value
         if (isset($this->initial_data["id"])) {
-            $id = (is_numeric($this->initial_data["id"])) ? intval($this->initial_data["id"]) : null;
-            if (array_key_exists($id, $this->config["schedules"]["schedule"][$this->parent_id]["timerange"])) {
+            $id = $this->initial_data["id"];
+
+            if ($this->get_config("schedules/schedule/{$this->parent_id}/timerange/{$id}", false)) {
                 # Don't allow client to delete the last time range
-                if (count($this->config["schedules"]["schedule"][$this->parent_id]["timerange"]) !== 1) {
+                if (count($this->get_config("schedules/schedule/{$this->parent_id}/timerange")) !== 1) {
                     $this->id = intval($id);
-                    $this->validated_data = $this->config["schedules"]["schedule"][$this->parent_id]["timerange"][$this->id];
+                    $this->validated_data = $this->get_config("schedules/schedule/{$this->parent_id}/timerange/{$id}");
                 } else {
                     $this->errors[] = APIResponse\get(4165);
                 }
@@ -76,7 +77,7 @@ class APIFirewallScheduleTimeRangeDelete extends APIModel {
 
     public function get_schedule_id_by_name($name, $as_bool=false) {
         # Loop through each schedule configured and check it's name
-        foreach ($this->config["schedules"]["schedule"] as $id=>$schedule) {
+        foreach ($this->get_config("schedules/schedule", []) as $id=>$schedule) {
             # Check if this $schedule's name matches our requested name
             if ($name === $schedule["name"]) {
                 return ($as_bool) ? true : $id;

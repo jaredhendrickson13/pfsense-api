@@ -30,8 +30,6 @@ class APISystemCRLRead extends APIModel {
     }
 
     public function validate_payload() {
-        if (!empty($this->config["crl"])) {
-            $this->validated_data["crl"] = $this->config["crl"];
-        }
+        $this->validated_data["crl"] = $this->get_config("crl", []);
     }
 }

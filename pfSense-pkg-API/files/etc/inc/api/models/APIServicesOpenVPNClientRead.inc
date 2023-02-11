@@ -24,6 +24,6 @@ class APIServicesOpenVPNClientRead extends APIModel {
     }
 
     public function action() {
-        return APIResponse\get(0, $this->config["openvpn"]["openvpn-client"]);
+        return APIResponse\get(0, $this->get_config("openvpn/openvpn-client", []));
     }
 }

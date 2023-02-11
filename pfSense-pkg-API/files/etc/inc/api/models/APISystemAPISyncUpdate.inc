@@ -34,7 +34,7 @@ class APISystemAPISyncUpdate extends APIModel {
     }
 
     public function action() {
-        $this->config["installedpackages"]["package"][$this->pkg_index]["conf"] = $this->validated_data;
+        $this->set_config("installedpackages/package/{$this->pkg_index}/conf", $this->validated_data);
         $this->write_config();
         $this->backup();
         return APIResponse\get(0, $this->validated_data);
@@ -46,8 +46,6 @@ class APISystemAPISyncUpdate extends APIModel {
         unset($this->initial_data["hasync_hosts"]);
         unset($this->initial_data["hasync_username"]);
         unset($this->initial_data["hasync_password"]);
-        unset($this->initial_data["client-id"]);
-        unset($this->initial_data["client-token"]);
 
         # Require data to include at least a server key and auth mode
         # NOTE: This model is not intended for public use, input is created by the master node and is generally trusted

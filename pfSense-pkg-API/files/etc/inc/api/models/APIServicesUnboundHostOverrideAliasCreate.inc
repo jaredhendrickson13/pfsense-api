@@ -25,12 +25,8 @@ class APIServicesUnboundHostOverrideAliasCreate extends APIModel {
     }
 
     public function action() {
-        # Convert aliases config value to array if not already
-        if (!is_array($this->config["unbound"]["hosts"][$this->id]["aliases"])) {
-            $this->config["unbound"]["hosts"][$this->id]["aliases"] = ["item"=>[]];
-        }
-
-        $this->config["unbound"]["hosts"][$this->id]["aliases"]["item"][] = $this->validated_data;
+        $next_id = $this->get_next_id("unbound/hosts/{$this->id}/aliases/item");
+        $this->set_config("unbound/hosts/{$this->id}/aliases/item/{$next_id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty("unbound");
         # If user requests immediately application
@@ -51,7 +47,7 @@ class APIServicesUnboundHostOverrideAliasCreate extends APIModel {
         # Check for our required 'id' payload value. Allow this to be bypassed internally for nested calls
         if ($this->validate_id === false) {
         } elseif (isset($this->initial_data["id"])) {
-            if (array_key_exists($this->initial_data["id"], $this->config["unbound"]["hosts"])) {
+            if ($this->get_config("unbound/hosts/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
             } else {
                 $this->errors[] = APIResponse\get(2016);

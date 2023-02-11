@@ -18,7 +18,8 @@ import e2e_test_framework
 class APIE2ETestServicesDDNS(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/ddns endpoint."""
     uri = "/api/v1/services/ddns"
-    get_tests = [{"name": "Read DDNS service configuration"}]
+    get_privileges = ["page-all", "page-services-dynamicdnsclients"]
+    get_tests = [{"name": "Read DDNS service configuration", "resp_data_empty": True}]
 
 
 APIE2ETestServicesDDNS()

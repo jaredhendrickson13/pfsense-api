@@ -25,12 +25,6 @@ class APIFirewallTrafficShaperRead extends APIModel {
     }
 
     public function action() {
-        # Check that we have a configuration
-        if (!empty($this->config["shaper"]["queue"])) {
-            $shaper_array = $this->config["shaper"]["queue"];
-        } else {
-            $shaper_array = [];
-        }
-        return APIResponse\get(0, $shaper_array);
+        return APIResponse\get(0, $this->get_config("shaper/queue", []));
     }
 }

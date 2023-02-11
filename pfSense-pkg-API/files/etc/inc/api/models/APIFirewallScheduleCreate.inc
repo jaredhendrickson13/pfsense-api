@@ -27,8 +27,8 @@ class APIFirewallScheduleCreate extends APIModel {
 
     public function action() {
         # Write this schedule to the config and reload the firewall filter
-        $this->__init_config();
-        $this->config["schedules"]["schedule"][] = $this->validated_data;
+        $this->id = $this->get_next_id("schedules/schedule");
+        $this->set_config("schedules/schedule/{$this->id}", $this->validated_data);
         $this->__sort_schedules();
         $this->write_config();
         filter_configure();
@@ -109,7 +109,7 @@ class APIFirewallScheduleCreate extends APIModel {
 
     public function is_schedule_name_in_use($name) {
         # Loop through each schedule configured and check it's name
-        foreach ($this->config["schedules"]["schedule"] as $schedule) {
+        foreach ($this->get_config("schedules/schedule", []) as $schedule) {
             # Check if this $schedule's name matches our requested name
             if ($name === $schedule["name"] or $name == "wan" or $name == "lan") {
                 return true;
@@ -118,24 +118,14 @@ class APIFirewallScheduleCreate extends APIModel {
         return false;
     }
 
-    private function __init_config() {
-        # Check if there is no schedules array in the config
-        if (empty($this->config["schedules"])) {
-            $this->config["schedules"] = [];
-        }
-        # Check if there is no schedule array in the config
-        if (empty($this->config["schedules"]["schedule"])) {
-            $this->config["schedules"]["schedule"] = [];
-        }
-    }
-
-    private static function __compare_schedules($a, $b) {
+    public static function compare_schedules($a, $b) {
         return strcmp($a['name'], $b['name']);
     }
 
     private function __sort_schedules() {
-        if (is_array($this->config['schedules']['schedule'])) {
-            usort($this->config['schedules']['schedule'], ["APIFirewallScheduleCreate", "__compare_schedules"]);
+        if (is_array($this->get_config('schedules/schedule', []))) {
+            $schedules = $this->get_config("schedules/schedule", []);
+            usort($schedules, ["APIFirewallScheduleCreate", "compare_schedules"]);
         }
     }
 }

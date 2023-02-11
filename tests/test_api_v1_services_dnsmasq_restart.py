@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestServicesDnsmasqRestart(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/dnsmasq/restart endpoint."""
     uri = "/api/v1/services/dnsmasq/restart"
+    post_privileges = ["page-all", "page-status-services"]
     post_tests = [
         {
             "name": "Restart the dnsmasq service",

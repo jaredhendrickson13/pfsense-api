@@ -25,18 +25,16 @@ class APIServicesDDNSRead extends APIModel {
     }
 
     public function action() {
-        # Check that we have at least 1 DDNS configuration, otherwise return empty array
-        if (!empty($this->config['dyndnses']['dyndns'])) {
-            $this->validated_data = $this->config['dyndnses']['dyndns'];
-            # Loop through each entry and check if it's address is current
-            foreach ($this->validated_data as $id=>$ddns_ent) {
-                $this->validated_data[$id]["cached_ip"] = $this->__get_cached_ip($ddns_ent);
-                $this->validated_data[$id]["cached_ipv6"] = $this->__get_cached_ip($ddns_ent, true);
-                $this->validated_data[$id]["current"] = $this->__is_dyndns_current($ddns_ent);
-            }
-        } else {
-            $this->validated_data = [];
+        # Get currently configured DDNS
+        $this->validated_data = $this->get_config('dyndnses/dyndns', []);
+
+        # Loop through each entry and check if it's address is current
+        foreach ($this->validated_data as $id=>$ddns_ent) {
+            $this->validated_data[$id]["cached_ip"] = $this->__get_cached_ip($ddns_ent);
+            $this->validated_data[$id]["cached_ipv6"] = $this->__get_cached_ip($ddns_ent, true);
+            $this->validated_data[$id]["current"] = $this->__is_dyndns_current($ddns_ent);
         }
+
         return APIResponse\get(0, $this->validated_data);
     }
 

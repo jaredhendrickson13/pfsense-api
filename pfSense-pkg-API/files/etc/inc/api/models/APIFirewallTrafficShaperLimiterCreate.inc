@@ -26,8 +26,8 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
 
     public function action() {
         # Initialize the traffic shaper configuration and save our shaper, mark the subsystem as un-applied
-        $this->__init_config();
-        $this->config["dnshaper"]["queue"][] = $this->validated_data;
+        $this->id = $this->get_next_id("dnshaper/queue");
+        $this->set_config("dnshaper/queue/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty('shaper');
 
@@ -933,20 +933,9 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
         }
     }
 
-    private function __init_config() {
-        # Check if there is no dnshaper array in the config
-        if (empty($this->config["dnshaper"])) {
-            $this->config["dnshaper"] = [];
-        }
-        # Check if there is no dnshaper queue array in the config
-        if (empty($this->config["dnshaper"]["queue"])) {
-            $this->config["dnshaper"]["queue"] = [];
-        }
-    }
-
     public function is_limiter_name_in_use($name) {
         # Loop through each configured limiter and see if it uses this name
-        foreach ($this->config["dnshaper"]["queue"] as $limiter) {
+        foreach ($this->get_config("dnshaper/queue", []) as $limiter) {
             # Check for matching names
             if ($name === $limiter["name"]) {
                 return true;
@@ -970,7 +959,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
             $exists = false;
 
             # Loop through each limiter and see if this number is already in use
-            foreach ($this->config["dnshaper"]["queue"] as $limiter) {
+            foreach ($this->get_config("dnshaper/queue", []) as $limiter) {
                 if (intval($limiter["number"]) === $counter) {
                     $exists = true;
                     break;

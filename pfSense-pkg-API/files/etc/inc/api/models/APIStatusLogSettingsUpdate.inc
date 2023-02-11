@@ -25,7 +25,7 @@ class APIStatusLogSettingsUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-status-logs-settings"];
+        $this->privileges = ["page-all", "page-diagnostics-logs-settings"];
         $this->change_note = "Modified log settings via API";
     }
 
@@ -40,7 +40,7 @@ class APIStatusLogSettingsUpdate extends APIModel {
         }
 
         # Write the config changes are restart syslogd
-        $this->config["syslog"] = $this->validated_data;
+        $this->set_config("syslog", $this->validated_data);
         $this->write_config();
         system_syslogd_start();
 

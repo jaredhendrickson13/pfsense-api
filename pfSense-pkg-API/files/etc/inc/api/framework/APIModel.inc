@@ -27,7 +27,6 @@ class APIModel {
     public $type_map;
     public $id;
     public $validate_id;
-    public $config;
     public $errors;
     public $methods;
     public $change_note;
@@ -38,9 +37,7 @@ class APIModel {
     public $ignore_enabled;
 
     public function __construct() {
-        global $config;
         error_reporting(E_ERROR);    // Prevents PHP warnings from printing to API responses
-        $this->config =& $config;
         $this->privileges = ["page-all"];
         $this->packages = [];
         $this->package_includes = [];
@@ -63,12 +60,116 @@ class APIModel {
         return APIResponse\get(10);
     }
 
-    protected function write_config() {
-        # Start a temporary session to write the config that contains the user's username in the config history
-        session_start();
-        $_SESSION["Username"] = $this->client->username;    // This is what adds the username to the change log
-        write_config(sprintf(gettext(" ".$this->change_note)));
-        unset($_SESSION);
+    /**
+     * Initialize the configuration array of a specific config path
+     * @param $path string config path with '/' as separators
+     * @returns null
+     */
+    public static function init_config(string $path) {
+        # Initialize the configuration array of a specified path.
+        global $config;
+        array_init_path($config, $path);
+    }
+
+    /**
+     * Read the value of specific configuration section by path.
+     * @param $path string config path with '/' as separators
+     * @param $default mixed value to return if the path is not found
+     * @returns mixed value at path or $default if the path does not exist or if the
+     *          path keys an empty string and $default is non-null
+     */
+    public static function get_config(string $path, $default=null) {
+        global $config;
+        return(array_get_path($config, $path, $default));
+    }
+
+    /**
+     * Set a value by path in the config.
+     * @param $path string path with '/' separators
+     * @param $value mixed value to set
+     * @param $default mixed value to return if the path is not found
+     * @returns mixed $val or $default if the path prefix does not exist
+     */
+    public static function set_config(string $path, $value, $default=null) {
+        global $config;
+        return (array_set_path($config, $path, $value, $default));
+    }
+
+    /**
+     * Delete a key from the configuration
+     * @param $path string path with '/' separators
+     * @returns array copy of the removed value or null
+     */
+    public static function del_config(string $path) {
+        global $config;
+        return (array_del_path($config, $path));
+    }
+
+    /**
+     * Checks if a specific config value is set. Toggle values are often set when
+     * enabled, or missing when they are not. This check is better suited for
+     * pfSense configurations than isset().
+     * @param $path string path with '/' separators
+     * @param $enable_key string an optional alternative key value for the enable key
+     * @returns bool true if $enable_key exists in the array at $path, and has a
+     * non-null value, otherwise false.
+     */
+    public static function is_config_enabled(string $path, string $enable_key="enable") {
+        global $config;
+        return (array_path_enabled($config, $path, $enable_key));
+    }
+
+    /**
+     * Finds the next available ID for a specific configuration array. This function
+     * only works for numeric-keyed arrays in the configuration.
+     * @param $path string path with '/' separators
+     * @throws Error when the path leads to a existing non-empty, non-array value
+     * @returns int the next array key (ID) for the config path specified
+     */
+    public static function get_next_id(string $path) {
+        # First, get the configuration at the specific path
+        $conf = APIModel::get_config($path);
+
+        # Ensure config is array
+        if (is_array($conf)) {
+            return count($conf);
+        }
+        # If the value is empty, start the array at ID 0
+        elseif (empty($conf)) {
+            return 0;
+        }
+        # Otherwise, this action could be dangerous, throw an error
+        else {
+            throw new Error("Next array ID was requested for existing non-array value");
+        }
+    }
+    /**
+     * Write configuration changes to the config file
+     */
+    public function write_config() {
+        # Local variables
+        $lock_file = "/tmp/.api.write_config.lock";
+
+        # Ensure there is not an API config lock, loop until the lock is released
+        foreach (range(0, 60) as $attempt) {
+            # Only write to the config if there is not an active lock
+            if (!file_exists($lock_file)) {
+                # Create a lock on API config writes while we write changes
+                file_put_contents($lock_file, microtime());
+
+                # Start a temporary session to write the config that contains the user's username in the config history
+                session_start();
+                $_SESSION["Username"] = $this->client->username;
+                write_config(sprintf(gettext(" ".$this->change_note)));
+                unset($_SESSION);
+                phpsession_destroy();
+                unlink($lock_file);
+                return;
+            }
+
+            # Delay attempts by 1 second
+            sleep(1);
+        }
     }
 
     public function validate_payload() {
@@ -81,7 +182,6 @@ class APIModel {
         # Checks API status and requirements
         $this->check_enable();
         $this->check_server_ip();
-        $this->check_packages();
 
         # Checks request data
         $this->check_request_data();
@@ -91,6 +191,9 @@ class APIModel {
             $this->check_authentication();
             $this->check_authorization();
         }
+
+        # Check for required packages
+        $this->check_packages();
 
         # Attempt to validate the request
         $this->validate_payload();
@@ -106,7 +209,12 @@ class APIModel {
     public function call() {
         # If the API call was valid, execute the action. Otherwise, return the first error encountered.
         if ($this->validate()) {
-            return $this->action();
+            # Bypass the action if requested
+            if ($this->initial_data["_action_bypass"] === true) {
+                return APIResponse\get(15);
+            } else {
+                return $this->action();
+            }
         } else {
             return $this->errors[0];
         }

@@ -24,13 +24,12 @@ class APIFirewallAliasAdvancedRead extends APIModel {
     }
 
     public function action() {
-        return APIResponse\get(0, $this->get_config());
-    }
-
-    public function get_config() {
-         return [
-            "aliasesresolveinterval" => intval($this->config["system"]["aliasesresolveinterval"]),
-            "checkaliasesurlcert" => isset($this->config["system"]["checkaliasesurlcert"])
-        ];
+        return APIResponse\get(
+            0,
+            [
+                "aliasesresolveinterval" => intval($this->get_config("system/aliasesresolveinterval")),
+                "checkaliasesurlcert" => $this->is_config_enabled("system", "checkaliasesurlcert")
+            ]
+        );
     }
 }

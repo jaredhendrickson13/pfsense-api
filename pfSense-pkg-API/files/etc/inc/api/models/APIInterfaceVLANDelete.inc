@@ -23,39 +23,44 @@ class APIInterfaceVLANDelete extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-vlan-edit"];
         $this->change_note = "Deleted interface VLAN via API";
-
     }
 
     public function action() {
-        pfSense_interface_destroy($this->validated_data["vlanif"]);    // delete our VLAN on the backend
-        unset($this->config["vlans"]["vlan"][$this->id]);    // Remove our VLAN configuration
+        pfSense_interface_destroy($this->validated_data["vlanif"]);
+        $this->del_config("vlans/vlan/{$this->id}");
         $this->write_config();
         return APIResponse\get(0, $this->validated_data);
     }
 
     private function __validate_id() {
         # Check if the given ID exists. Also allow vlanif for backward compatibility
-        if (isset($this->initial_data["id"]) or isset($this->initial_data["vlanif"])) {
-            # Allow user to locate the VLAN by vlanif
-            if (!is_null($this->__get_vlan_id_from_vlanif($this->initial_data["vlanif"]))) {
-                $this->id = $this->__get_vlan_id_from_vlanif($this->initial_data["vlanif"]);
-                $this->validated_data = $this->config["vlans"]["vlan"][$this->id];
-            }
+        if (isset($this->initial_data["id"])) {
             # Try to locate our ID by configuration index ID
-            elseif (array_key_exists($this->initial_data["id"], $this->config["vlans"]["vlan"])) {
+            if ($this->get_config("vlans/vlan/{$this->initial_data['id']}", false)) {
                 $this->id = $this->initial_data["id"];
-                $this->validated_data = $this->config["vlans"]["vlan"][$this->id];
+                $this->validated_data = $this->get_config("vlans/vlan/{$this->id}");
             }
             else {
                 $this->errors[] = APIResponse\get(3050);
             }
-
-            # Lastly check that our interface is not in use currently
-            if (APITools\get_pfsense_if_id($this->validated_data["vlanif"])) {
-                $this->errors[] = APIResponse\get(3049);
+        }
+        elseif (isset($this->initial_data["vlanif"])) {
+            # Allow user to locate the VLAN by vlanif
+            if (!is_null($this->__get_vlan_id_from_vlanif($this->initial_data["vlanif"]))) {
+                $this->id = $this->__get_vlan_id_from_vlanif($this->initial_data["vlanif"]);
+                $this->validated_data = $this->get_config("vlans/vlan/{$this->id}");
             }
-        } else {
+            else {
+                $this->errors[] = APIResponse\get(3050);
+            }
+        }
+        else {
             $this->errors[] = APIResponse\get(3056);
+        }
+
+        # Lastly check that our interface is not in use currently
+        if (APITools\get_pfsense_if_id($this->validated_data["vlanif"])) {
+            $this->errors[] = APIResponse\get(3049);
         }
     }
 
@@ -65,7 +70,7 @@ class APIInterfaceVLANDelete extends APIModel {
 
     private function __get_vlan_id_from_vlanif($vlanif) {
         # Loop through each VLAN and return it's ID if it matches
-        foreach ($this->config["vlans"]["vlan"] as $id => $vlan) {
+        foreach ($this->get_config("vlans/vlan", []) as $id => $vlan) {
             if ($vlanif === $vlan["vlanif"]) {
                 return $id;
             }

@@ -26,8 +26,8 @@ class APIUserDelete extends APIModel {
 
     public function action() {
         # Remove user from backend and remove from config
-        local_user_del($this->config["system"]["user"][$this->id]);
-        unset($this->config["system"]["user"][$this->id]);
+        local_user_del($this->get_config("system/user/{$this->id}"));
+        $this->del_config("system/user/{$this->id}");
         $this->write_config();
         return APIResponse\get(0, $this->validated_data);
     }
@@ -36,7 +36,7 @@ class APIUserDelete extends APIModel {
         # Check for our required `username` payload value
         if (isset($this->initial_data['username'])) {
             # Loop through each configured user and check if this user exists
-            foreach ($this->config["system"]["user"] as $id=>$user) {
+            foreach ($this->get_config("system/user", []) as $id=>$user) {
                 if ($this->initial_data["username"] === $user["name"]) {
                     $this->validated_data = $user;
                     $this->id = intval($id);

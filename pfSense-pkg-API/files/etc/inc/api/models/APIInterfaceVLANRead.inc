@@ -22,14 +22,9 @@ class APIInterfaceVLANRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-vlan", "page-interfaces-vlan-edit"];
-
     }
 
     public function action() {
-        $vlan_array = [];
-        if (!empty($this->config["vlans"]["vlan"])) {
-            $vlan_array = $this->config["vlans"]["vlan"];
-        }
-        return APIResponse\get(0, $vlan_array);
+        return APIResponse\get(0, $this->get_config("vlans/vlan", []));
     }
 }

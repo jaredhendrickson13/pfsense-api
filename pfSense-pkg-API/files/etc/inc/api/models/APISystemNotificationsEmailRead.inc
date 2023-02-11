@@ -25,10 +25,6 @@ class APISystemNotificationsEmailRead extends APIModel {
     }
 
     public function action() {
-        # Populate the config if it exists
-        if (!empty($this->config["notifications"]["smtp"])) {
-            $this->validated_data = $this->config["notifications"]["smtp"];
-        }
-        return APIResponse\get(0, $this->validated_data);
+        return APIResponse\get(0, $this->get_config("notifications/smtp", []));
     }
 }

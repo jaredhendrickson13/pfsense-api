@@ -39,7 +39,7 @@ class APIFirewallRuleSortUpdate extends APIModel {
 
         # Only write and apply changes if a dry run was not requested
         if ($this->initial_data["dry_run"] !== true) {
-            $this->config["filter"]["rule"] = $rules;
+            $this->set_config("filter/rule", $rules);
             $this->write_config();
             mark_subsystem_dirty('filter');
 
@@ -84,7 +84,7 @@ class APIFirewallRuleSortUpdate extends APIModel {
 
     public function sort_firewall_rules($field, $option="ascend") {
         # Local variables
-        $rules = $this->config["filter"]["rule"];
+        $rules = $this->get_config("filter/rule", []);
         $criteria = [];
 
         # Loop through each rule and map it's sort field to our sort criteria

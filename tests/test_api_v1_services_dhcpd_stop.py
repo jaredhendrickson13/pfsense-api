@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestServicesDHCPdStop(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/dhcpd/stop endpoint."""
     uri = "/api/v1/services/dhcpd/stop"
+    post_privileges = ["page-all", "page-status-services"]
     post_tests = [{"name": "Stop the DHCPd service"}]
 
 

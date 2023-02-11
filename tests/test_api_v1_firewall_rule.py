@@ -12,12 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """Script used to test the /api/v1/firewall/rule endpoint."""
+import os
+import time
+
 import e2e_test_framework
 
 
 class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/rule endpoint."""
     uri = "/api/v1/firewall/rule"
+
+    get_privileges = ["page-all", "page-firewall-rules"]
+    post_privileges = ["page-all", "page-firewall-rules-edit"]
+    put_privileges = ["page-all", "page-firewall-rules-edit"]
+    delete_privileges = ["page-all", "page-firewall-rules-edit"]
+
     get_tests = [
         {"name": "Read all firewall rules"}
     ]
@@ -25,7 +34,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         {
             "name": "Create a parent traffic shaper (altq) to use in rule",
             "uri": "/api/v1/firewall/traffic_shaper",
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "scheduler": "PRIQ",
                 "bandwidthtype": "Gb",
@@ -39,7 +48,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         {
             "name": "Create another traffic shaper queue (altq) to use in the rule",
             "uri": "/api/v1/firewall/traffic_shaper/queue",
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "name": "Test_Altq",
                 "priority": 14,
@@ -50,7 +59,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         {
             "name": "Create traffic shaper queue (altq) to use in the rule",
             "uri": "/api/v1/firewall/traffic_shaper/queue",
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "name": "Test_Altq2",
                 "priority": 15,
@@ -61,7 +70,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         {
             "name": "Create parent firewall traffic shaper limiter (dummynet) to use in rule",
             "uri": "/api/v1/firewall/traffic_shaper/limiter",
-            "payload": {
+            "req_data": {
                 "name": "Test_Limiter",
                 "bandwidth": [{"bw": 100, "bwscale": "Mb"}],
                 "mask": "srcaddress",
@@ -80,7 +89,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         {
             "name": "Create firewall traffic shaper limiter queue (dummynet) to use in rule",
             "uri": "/api/v1/firewall/traffic_shaper/limiter/queue",
-            "payload": {
+            "req_data": {
                 "limiter": "Test_Limiter",
                 "name": "Test_DNQueue",
                 "mask": "srcaddress",
@@ -98,7 +107,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         {
             "name": "Create another firewall traffic shaper limiter queue (dummynet) to use in rule",
             "uri": "/api/v1/firewall/traffic_shaper/limiter/queue",
-            "payload": {
+            "req_data": {
                 "limiter": "Test_Limiter",
                 "name": "Test_DNQueue2",
                 "mask": "srcaddress",
@@ -115,7 +124,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create firewall rule",
-            "payload": {
+            "req_data": {
                 "type": "block",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -136,8 +145,25 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "resp_time": 3    # Accommodate the mandatory 1 second delay for firewall rule creations
         },
         {
+            "name": "Block ping and ensure block actually works",
+            "post_test_callable": "is_ping_unsuccessful",
+            "req_data": {
+                "type": "block",
+                "interface": "wan",
+                "ipprotocol": "inet",
+                "protocol": "icmp",
+                "src": "any",
+                "dst": "any",
+                "descr": "E2E block ping test",
+                "top": True,
+                "apply": True
+            },
+            "resp_time": 3,    # Accommodate the mandatory 1 second delay for firewall rule creations
+            "delay": 1  # Wait one second before running this request, otherwise conflicts occur with filter reload
+        },
+        {
             "name": "Create floating firewall rule",
-            "payload": {
+            "req_data": {
                 "type": "block",
                 "interface": "wan,lan",
                 "ipprotocol": "inet",
@@ -160,7 +186,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test type validation",
             "status": 400,
             "return": 4039,
-            "payload": {
+            "req_data": {
                 "type": "INVALID"
             }
         },
@@ -168,7 +194,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test interface requirement",
             "status": 400,
             "return": 4034,
-            "payload": {
+            "req_data": {
                 "type": "pass"
             }
         },
@@ -176,7 +202,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test interface validation",
             "status": 400,
             "return": 4040,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "INVALID"
             }
@@ -185,7 +211,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test IP protocol requirement",
             "status": 400,
             "return": 4035,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan"
             }
@@ -194,7 +220,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test IP protocol validation",
             "status": 400,
             "return": 4041,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "INVALID"
@@ -204,7 +230,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test protocol requirement",
             "status": 400,
             "return": 4036,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet"
@@ -214,7 +240,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test protocol validation",
             "status": 400,
             "return": 4042,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -225,7 +251,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test ICMP type validation",
             "status": 400,
             "return": 4046,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -237,7 +263,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test source requirement",
             "status": 400,
             "return": 4037,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -248,7 +274,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test source validation",
             "status": 400,
             "return": 4044,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -260,7 +286,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test destination requirement",
             "status": 400,
             "return": 4038,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -272,7 +298,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test destination validation",
             "status": 400,
             "return": 4045,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -285,7 +311,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test source port requirement",
             "status": 400,
             "return": 4047,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -298,7 +324,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test source port validation",
             "status": 400,
             "return": 4048,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -312,7 +338,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test destination port requirement",
             "status": 400,
             "return": 4047,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -326,7 +352,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test destination port validation",
             "status": 400,
             "return": 4049,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -341,7 +367,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test gateway validation",
             "status": 400,
             "return": 4043,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -357,7 +383,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test schedule validation",
             "status": 400,
             "return": 4150,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -373,7 +399,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test dnpipe validation",
             "status": 400,
             "return": 4222,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -389,7 +415,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test dnpipe requirement when pdnpipe provided",
             "status": 400,
             "return": 4223,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -405,7 +431,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test dnpipe and pdnpipe cannot match",
             "status": 400,
             "return": 4224,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -422,7 +448,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test dnpipe and pdnpipe type requirements",
             "status": 400,
             "return": 4225,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -439,7 +465,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test unknown default queue",
             "status": 400,
             "return": 4226,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -455,7 +481,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test default queue requirement when ackqueue is provided",
             "status": 400,
             "return": 4227,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -471,7 +497,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test unknown ackqueue",
             "status": 400,
             "return": 4228,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -488,7 +514,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test default queue and ackqueue cannot match",
             "status": 400,
             "return": 4229,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -505,7 +531,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test unknown floating direction",
             "status": 400,
             "return": 4239,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -522,7 +548,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check statetype options constraint",
             "status": 400,
             "return": 4243,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -538,7 +564,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check protocol must be 'tcp' when statetype is 'synproxy state' constraint",
             "status": 400,
             "return": 4244,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -555,7 +581,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check gateway must be default when statetype is 'synproxy state' constraint",
             "status": 400,
             "return": 4245,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -573,7 +599,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check tcpflags2 (out of) options constraint",
             "status": 400,
             "return": 4246,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -589,7 +615,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check tcpflags2 (out of) options constraint (CSV)",
             "status": 400,
             "return": 4246,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -605,7 +631,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check tcpflags1 (set) options constraint",
             "status": 400,
             "return": 4246,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -622,7 +648,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check tcpflags1 (set) options constraint (CSV)",
             "status": 400,
             "return": 4246,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -639,7 +665,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check tcpflags1 (set) must be in tcpflags2 (out of) constraint",
             "status": 400,
             "return": 4247,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -656,7 +682,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check non-floating rules must have 1 interface constraint",
             "status": 400,
             "return": 4248,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": ["wan", "lan"],
                 "ipprotocol": "inet",
@@ -671,7 +697,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update firewall rule",
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -690,7 +716,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Update floating firewall rule",
-            "payload": {
+            "req_data": {
                 "type": "block",
                 "floating": True,
                 "interface": ["wan", "lan"],
@@ -707,7 +733,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Test ability to revert the gateway field to default",
-            "payload": {
+            "req_data": {
                 "gateway": "default",
                 "apply": True
             },
@@ -722,7 +748,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test type validation",
             "status": 400,
             "return": 4039,
-            "payload": {
+            "req_data": {
                 "type": "INVALID"
             }
         },
@@ -730,7 +756,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test interface validation",
             "status": 400,
             "return": 4040,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "INVALID"
             }
@@ -739,7 +765,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test IP protocol validation",
             "status": 400,
             "return": 4041,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "INVALID"
@@ -749,7 +775,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test protocol validation",
             "status": 400,
             "return": 4042,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -760,7 +786,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test ICMP type validation",
             "status": 400,
             "return": 4046,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -772,7 +798,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test source validation",
             "status": 400,
             "return": 4044,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -784,7 +810,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test destination validation",
             "status": 400,
             "return": 4045,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -797,7 +823,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test source port validation",
             "status": 400,
             "return": 4048,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -811,7 +837,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test destination port validation",
             "status": 400,
             "return": 4049,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -826,7 +852,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test gateway validation",
             "status": 400,
             "return": 4043,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -842,7 +868,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test schedule validation",
             "status": 400,
             "return": 4150,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -858,7 +884,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test unknown floating direction",
             "status": 400,
             "return": 4239,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -874,7 +900,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check statetype options constraint",
             "status": 400,
             "return": 4243,
-             "payload": {
+             "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -890,7 +916,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check protocol must be 'tcp' when statetype is 'synproxy state' constraint",
             "status": 400,
             "return": 4244,
-             "payload": {
+             "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -906,7 +932,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check gateway must be default when statetype is 'synproxy state' constraint",
             "status": 400,
             "return": 4245,
-             "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -923,7 +949,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check tcpflags2 (out of) options constraint",
             "status": 400,
             "return": 4246,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -939,7 +965,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check tcpflags2 (out of) options constraint (CSV)",
             "status": 400,
             "return": 4246,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -955,7 +981,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check tcpflags1 (set) options constraint",
             "status": 400,
             "return": 4246,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -972,7 +998,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check tcpflags1 (set) options constraint (CSV)",
             "status": 400,
             "return": 4246,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -989,7 +1015,7 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Check tcpflags1 (set) must be in tcpflags2 (out of) constraint",
             "status": 400,
             "return": 4247,
-            "payload": {
+            "req_data": {
                 "type": "pass",
                 "interface": "wan",
                 "ipprotocol": "inet",
@@ -1004,27 +1030,39 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
         }
     ]
     delete_tests = [
-        {"name": "Delete firewall rule", "payload": {}},    # Tracker ID gets populated by post_post() method
-        {"name": "Delete floating firewall rule", "payload": {}},    # Tracker ID gets populated by post_post() method
+        {
+            # Tracker ID gets populated by post_post() method
+            "name": "Delete firewall rule",
+            "req_data": {}
+        },
+        {
+            # Tracker ID gets populated by post_post() method
+            "name": "Delete ICMP test firewall rule",
+            "post_test_callable": "is_ping_successful",
+            "req_data": {"apply": True},
+            "resp_time": 3,
+            "delay": 1    # Wait one second before running this request, otherwise conflicts occur with filter reload
+        },
+        {"name": "Delete floating firewall rule", "req_data": {}},    # Tracker ID gets populated by post_post() method
         {
             "name": "Delete traffic shaper queue used to test",
             "uri": "/api/v1/firewall/traffic_shaper/queue",
-            "payload": {"interface": "wan", "name": "Test_Altq"}
+            "req_data": {"interface": "wan", "name": "Test_Altq"}
         },
         {
             "name": "Delete traffic shaper used to test",
             "uri": "/api/v1/firewall/traffic_shaper",
-            "payload": {"interface": "wan"}
+            "req_data": {"interface": "wan"}
         },
         {
             "name": "Delete limiter queue used to test",
             "uri": "/api/v1/firewall/traffic_shaper/limiter/queue",
-            "payload": {"limiter": "Test_Limiter", "name": "Test_DNQueue"}
+            "req_data": {"limiter": "Test_Limiter", "name": "Test_DNQueue"}
         },
         {
             "name": "Delete limiter used to test",
             "uri": "/api/v1/firewall/traffic_shaper/limiter",
-            "payload": {"name": "Test_Limiter"}
+            "req_data": {"name": "Test_Limiter"}
         },
         {
             "name": "Test tracker requirement",
@@ -1035,22 +1073,42 @@ class APIE2ETestFirewallRule(e2e_test_framework.APIE2ETest):
             "name": "Test delete non-existing rule",
             "status": 400,
             "return": 4032,
-            "payload": {"tracker": "INVALID"}
+            "req_data": {"tracker": "INVALID"}
         }
     ]
 
+    def is_ping_unsuccessful(self):
+        """Checks that we can't ping our target after a block rule is put in place"""
+        # Wait a bit for the filter to finish reloading
+        time.sleep(3)
+
+        # Send a single ping and ensure the target host does not respond
+        if os.system(f"ping -c 1 -t 1 {self.args.host} > /dev/null") == 0:
+            raise AssertionError("Expected ping to be unsuccessful after block rule is applied")
+
+    def is_ping_successful(self):
+        """Checks that we can ping our target after a block rule is removed"""
+        # Wait a bit for the filter to finish reloading
+        time.sleep(3)
+
+        # Send a single ping and ensure the target host does not respond
+        if os.system(f"ping -c 1 -t 1 {self.args.host} > /dev/null") != 0:
+            raise AssertionError("Expected ping to be successful after block rule is removed")
+
     # Override our PRE/POST methods
     def post_post(self):
-        # We create a firewall rule in the 7th and 8th test, ensure we have run at least 8 tests
-        if len(self.post_responses) == 8:
-            # Assign the required tracker ID created in the POST request to the PUT and DELETE payloads
-            self.delete_tests[0]["payload"]["tracker"] = self.post_responses[6]["data"]["tracker"]
-            self.delete_tests[1]["payload"]["tracker"] = self.post_responses[7]["data"]["tracker"]
+        # After we've created rules in our tests, ensure the tracker is added to PUT and DELETE tests
+        if len(self.post_responses) == 9:
+            # Assign the required tracker ID created in the POST request to the PUT and DELETE req_datas
+            self.delete_tests[0]["req_data"]["tracker"] = self.post_responses[6]["data"]["tracker"]
+            self.delete_tests[1]["req_data"]["tracker"] = self.post_responses[7]["data"]["tracker"]
+            self.delete_tests[2]["req_data"]["tracker"] = self.post_responses[8]["data"]["tracker"]
+
             key = 0
             for _ in self.put_tests:
-                if "payload" in self.put_tests[key]:
-                    self.put_tests[key]["payload"]["tracker"] = self.post_responses[6]["data"]["tracker"]
-                    self.put_tests[key]["payload"]["tracker"] = self.post_responses[7]["data"]["tracker"]
+                if "req_data" in self.put_tests[key]:
+                    self.put_tests[key]["req_data"]["tracker"] = self.post_responses[6]["data"]["tracker"]
+                    self.put_tests[key]["req_data"]["tracker"] = self.post_responses[8]["data"]["tracker"]
                 key += 1
 
 

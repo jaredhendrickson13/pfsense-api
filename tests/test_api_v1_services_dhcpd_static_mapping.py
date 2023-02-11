@@ -18,10 +18,16 @@ import e2e_test_framework
 class APIE2ETestServicesDHCPdStaticMapping(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/dhcpd/static_mapping endpoint."""
     uri = "/api/v1/services/dhcpd/static_mapping"
+
+    get_privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"]
+    post_privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"]
+    put_privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"]
+    delete_privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"]
+
     get_tests = [
         {
             "name": "Read all DHCPd static mappings on the LAN interface",
-            "payload": {
+            "req_data": {
                 "interface": "lan"
             }
         }
@@ -29,7 +35,7 @@ class APIE2ETestServicesDHCPdStaticMapping(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Create DHCPd static mapping on the LAN interface",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "mac": "ac:de:48:00:11:22",
                 "ipaddr": "192.168.1.254",
@@ -48,7 +54,7 @@ class APIE2ETestServicesDHCPdStaticMapping(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update DHCPd static mapping on the LAN interface",
-            "payload": {
+            "req_data": {
                 "id": 0,
                 "interface": "lan",
                 "mac": "ac:de:48:00:11:22",
@@ -68,7 +74,7 @@ class APIE2ETestServicesDHCPdStaticMapping(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete DHCPd static mapping on the LAN interface",
-            "payload": {
+            "req_data": {
                 "interface": "lan",
                 "id": 0
             },

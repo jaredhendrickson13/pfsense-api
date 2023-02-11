@@ -38,11 +38,7 @@ class APIServicesIPsecApplyCreate extends APIModel {
 
         # Allow clients to re-initiate tunnels with the new configuration.
         if ($this->initial_data["initiate"] === true) {
-            # TODO: Remove this after support for pfSense 2.5.x is depcreated
-            # Only allow this on pfSense 2.6+/22.05+
-            if (APITools\get_pfsense_version()["program"] >= 260 or APITools\get_pfsense_version()["program"] == 2205) {
-                $this->initiate();
-            }
+            $this->initiate();
         }
 
         return APIResponse\get(0);
@@ -61,10 +57,8 @@ class APIServicesIPsecApplyCreate extends APIModel {
     }
 
     public static function initiate() {
-        global $config;
-
         # Loop through each phase1 to terminate existing IKE connections and re-initiate all tunnels
-        foreach ($config["ipsec"]["phase1"] as $p1) {
+        foreach (APIModel::get_config("ipsec/phase1", []) as $p1) {
             ipsec_terminate_by_conid("ike", ipsec_conid($p1));
             ipsec_initiate_by_conid("all", ipsec_conid($p1));
         }

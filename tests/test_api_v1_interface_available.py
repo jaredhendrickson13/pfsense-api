@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestInterfaceAvailable(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/interface/available endpoint."""
     uri = "/api/v1/interface/available"
+    get_privileges = ["page-all", "page-interfaces-assignnetworkports"]
     get_tests = [{"name": "Read all available interface"}]
 
 
