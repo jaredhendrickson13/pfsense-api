@@ -45,6 +45,7 @@ class APIStatusSystemRead extends APIModel {
             "temp_c" => $this->__get_temp(),
             "temp_f" => $this->__get_temp(false),
             "load_avg" => $this->__get_load_avg(),
+            "cpu_count" => (int)get_single_sysctl("hw.ncpu"),
             "mbuf_usage" => $this->__get_mbuf_usage(),
             "mem_usage" => (!is_null(mem_usage())) ? APITools\float_percent(mem_usage()) : null,
             "swap_usage" => (!is_null(swap_usage())) ? APITools\float_percent(swap_usage()) : null,
