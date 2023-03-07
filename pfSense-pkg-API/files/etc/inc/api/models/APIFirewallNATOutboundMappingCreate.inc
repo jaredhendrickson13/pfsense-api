@@ -223,7 +223,7 @@ class APIFirewallNATOutboundMappingCreate extends APIModel {
             }
             # If our value is not any, replace the port range character with a - and save the value
             elseif ($this->initial_data['srcport'] !== "any") {
-                $this->validated_data["sourceport"] = str_replace(":", "-", $this->initial_data['srcport']);
+                $this->validated_data["sourceport"] = str_replace("-", ":", $this->initial_data['srcport']);
             }
         }
     }
@@ -238,7 +238,7 @@ class APIFirewallNATOutboundMappingCreate extends APIModel {
             }
             # If our value is not any, replace the port range character with a - and save the value
             elseif ($this->initial_data['dstport'] !== "any") {
-                $this->validated_data["dstport"] = str_replace(":", "-", $this->initial_data['dstport']);
+                $this->validated_data["dstport"] = str_replace("-", ":", $this->initial_data['dstport']);
             }
         }
     }
