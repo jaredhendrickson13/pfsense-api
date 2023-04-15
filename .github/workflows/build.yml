@@ -10,27 +10,25 @@ jobs:
     runs-on: self-hosted
     strategy:
       matrix:
-        include:
-          - freebsd_version: FreeBSD-14.0-CURRENT
-            freebsd_ip: 192.168.55.14
+        freebsd_version: [FreeBSD-14.0-CURRENT]
     steps:
       - uses: actions/checkout@v3
       - name: Setup FreeBSD build VM
         run: |
-          /usr/local/bin/vboxmanage controlvm ${matrix.freebsd_version} poweroff || true
-          /usr/local/bin/vboxmanage snapshot ${matrix.freebsd_version} restore initial
-          /usr/local/bin/vboxmanage startvm ${matrix.freebsd_version} --type headless
+          "/usr/local/bin/vboxmanage controlvm ${matrix.freebsd_version} poweroff || true"
+          "/usr/local/bin/vboxmanage snapshot ${matrix.freebsd_version} restore initial"
+          "/usr/local/bin/vboxmanage startvm ${matrix.freebsd_version} --type headless"
           sleep 5
 
       - name: Build pfSense-pkg-API on FreeBSD
         run: |
-          /usr/bin/ssh ${matrix.freebsd_ip} 'sudo pkill ntpd || true && sudo ntpdate pool.ntp.org || true'
-          /usr/local/bin/python3 tools/make_package.py --host ${matrix.freebsd_ip} --branch ${GITHUB_SHA} --tag ${env.build_version}
+          "/usr/bin/ssh ${matrix.freebsd_ip} 'sudo pkill ntpd || true && sudo ntpdate pool.ntp.org || true'"
+          "/usr/local/bin/python3 tools/make_package.py --host ${matrix.freebsd_version}.jaredhendrickson.com --branch ${GITHUB_SHA} --tag ${env.build_version}"
 
       - name: Teardown FreeBSD build VM
         run: |
-          /usr/local/bin/vboxmanage controlvm ${matrix.freebsd_version} poweroff || true
-          /usr/local/bin/vboxmanage snapshot ${matrix.freebsd_version} restore initial
+          "/usr/local/bin/vboxmanage controlvm ${matrix.freebsd_version} poweroff || true"
+          "/usr/local/bin/vboxmanage snapshot ${matrix.freebsd_version} restore initial"
 
       - uses: actions/upload-artifact@v3
         with:
