@@ -52,6 +52,12 @@ jobs:
         
     steps:
       - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}}.pkg
+          path: pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}}.pkg
+
       - name: Setup pfSense VM
         run: |
           /usr/local/bin/VBoxManage controlvm ${{matrix.pfsense_version}} poweroff || true
@@ -59,7 +65,7 @@ jobs:
           /usr/local/bin/VBoxManage startvm ${{matrix.pfsense_version}} --type headless
           sleep 5
 
-      # This is only necessary until GitHub Actions allows an easier way to download an uploaded artifact
+      # This is only necessary until GitHub Actions allows an easier way to get a URL to download the artifact within pfSense
       - name: Copy pfSense-pkg-API build to pfSense
         run: |
           pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com -u admin -p pfsense -c 'pfSsh.php playback enablesshd' -k
