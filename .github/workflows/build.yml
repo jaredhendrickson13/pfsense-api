@@ -64,11 +64,11 @@ jobs:
         run: |
           pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com -u admin -p pfsense -c 'pfSsh.php playback enablesshd' -k
           pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com -u admin -p pfsense -c "mkdir /root/.ssh/ && echo $(cat ~/.ssh/id_rsa.pub) > /root/.ssh/authorized_keys" -k
-          scp -o StrictHostKeyChecking=no pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}} admin@${{matrix.pfsense_version}}.jaredhendrickson.com:/tmp/
+          scp -o StrictHostKeyChecking=no pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}}.pkg admin@${{matrix.pfsense_version}}.jaredhendrickson.com:/tmp/
 
       - name: Install pfSense-pkg-API on pfSense
         run: |
-          /usr/local/bin/pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com --no_verify -c "pkg add /tmp/pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}}" -u admin -p pfsense
+          /usr/local/bin/pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com --no_verify -c "pkg add /tmp/pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}}.pkg" -u admin -p pfsense
           /usr/local/bin/pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com --no_verify -c '/etc/rc.restart_webgui' -u admin -p pfsense || true
           sleep 10
 
