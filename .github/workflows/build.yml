@@ -70,7 +70,7 @@ jobs:
         run: |
           pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com -u admin -p pfsense -c 'pfSsh.php playback enablesshd' -k
           pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com -u admin -p pfsense -c "mkdir /root/.ssh/ && echo $(cat ~/.ssh/id_rsa.pub) > /root/.ssh/authorized_keys" -k
-          scp -o StrictHostKeyChecking=no pfSense-pkg-API-${{env.build_version}}_${{matrix.freebsd_version}}.pkg admin@${{matrix.pfsense_version}}.jaredhendrickson.com:/tmp/
+          scp -o StrictHostKeyChecking=no pfSense-pkg-API-${{env.build_version}}_${{matrix.freebsd_version}}.pkg/pfSense-pkg-API-${{env.build_version}}_${{matrix.freebsd_version}}.pkg admin@${{matrix.pfsense_version}}.jaredhendrickson.com:/tmp/
 
       - name: Install pfSense-pkg-API on pfSense
         run: |
