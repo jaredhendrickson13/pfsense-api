@@ -8,9 +8,15 @@ env:
 jobs:
   build:
     runs-on: self-hosted
+
+    defaults:
+      run:
+        shell: bash
+
     strategy:
       matrix:
         freebsd_version: [FreeBSD-14.0-CURRENT]
+        
     steps:
       - uses: actions/checkout@v3
       - name: Setup FreeBSD build VM
