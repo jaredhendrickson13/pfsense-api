@@ -26,7 +26,7 @@ jobs:
       - name: Build pfSense-pkg-API on FreeBSD
         run: |
           /usr/bin/ssh -o StrictHostKeyChecking=no ${{matrix.freebsd_version}}.jaredhendrickson.com 'sudo pkill ntpd || true && sudo ntpdate pool.ntp.org || true'
-          /usr/local/bin/python3 tools/make_package.py --host ${{matrix.freebsd_version}}.jaredhendrickson.com --branch ${{github.sha}} --tag ${{env.build_version}}
+          /usr/local/bin/python3 tools/make_package.py --host ${{matrix.freebsd_version}}.jaredhendrickson.com --branch ${{github.sha}} --tag ${{env.build_version}}_${{matrix.freebsd_version}}
 
       - name: Teardown FreeBSD build VM
         run: |
@@ -35,8 +35,8 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}}.pkg
-          path: pfSense-pkg-API-${{env.build_version}}.pkg
+          name: pfSense-pkg-API-${{env.build_version}}_${{matrix.freebsd_version}}.pkg
+          path: pfSense-pkg-API-${{env.build_version}}_${{matrix.freebsd_version}}.pkg
 
   e2e_tests:
     runs-on: self-hosted
@@ -55,8 +55,8 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}}.pkg
-          path: pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}}.pkg
+          name: pfSense-pkg-API-${{env.build_version}}_${{matrix.freebsd_version}}.pkg
+          path: pfSense-pkg-API-${{env.build_version}}_${{matrix.freebsd_version}}.pkg
 
       - name: Setup pfSense VM
         run: |
@@ -70,11 +70,11 @@ jobs:
         run: |
           pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com -u admin -p pfsense -c 'pfSsh.php playback enablesshd' -k
           pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com -u admin -p pfsense -c "mkdir /root/.ssh/ && echo $(cat ~/.ssh/id_rsa.pub) > /root/.ssh/authorized_keys" -k
-          scp -o StrictHostKeyChecking=no pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}}.pkg admin@${{matrix.pfsense_version}}.jaredhendrickson.com:/tmp/
+          scp -o StrictHostKeyChecking=no pfSense-pkg-API-${{env.build_version}}_${{matrix.freebsd_version}}.pkg admin@${{matrix.pfsense_version}}.jaredhendrickson.com:/tmp/
 
       - name: Install pfSense-pkg-API on pfSense
         run: |
-          /usr/local/bin/pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com --no_verify -c "pkg add /tmp/pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}}.pkg" -u admin -p pfsense
+          /usr/local/bin/pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com --no_verify -c "pkg add /tmp/pfSense-pkg-API-${{env.build_version}}_${{matrix.freebsd_version}}.pkg" -u admin -p pfsense
           /usr/local/bin/pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com --no_verify -c '/etc/rc.restart_webgui' -u admin -p pfsense || true
           sleep 10
 
