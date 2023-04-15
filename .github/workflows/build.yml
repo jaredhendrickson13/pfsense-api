@@ -9,13 +9,10 @@ jobs:
   build:
     runs-on: self-hosted
 
-    defaults:
-      run:
-        shell: bash
-
     strategy:
       matrix:
-        freebsd_version: [FreeBSD-14.0-CURRENT]
+        freebsd_version: 
+          - FreeBSD-14.0-CURRENT
         
     steps:
       - uses: actions/checkout@v3
@@ -28,13 +25,61 @@ jobs:
 
       - name: Build pfSense-pkg-API on FreeBSD
         run: |
-          /usr/bin/ssh ${{matrix.freebsd_version}}.jaredhendrickson.com 'sudo pkill ntpd || true && sudo ntpdate pool.ntp.org || true'
+          /usr/bin/ssh -o StrictHostKeyChecking=no ${{matrix.freebsd_version}}.jaredhendrickson.com 'sudo pkill ntpd || true && sudo ntpdate pool.ntp.org || true'
           /usr/local/bin/python3 tools/make_package.py --host ${{matrix.freebsd_version}}.jaredhendrickson.com --branch ${{github.sha}} --tag ${{env.build_version}}
 
       - name: Teardown FreeBSD build VM
         run: |
           /usr/local/bin/VBoxManage controlvm ${{matrix.freebsd_version}} poweroff || true
           /usr/local/bin/VBoxManage snapshot ${{matrix.freebsd_version}} restore initial
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}}.pkg
+          path: pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}}.pkg
+
+  e2e_tests:
+    runs-on: self-hosted
+    needs: [build]
+
+    strategy:
+      matrix:
+        include:
+          - pfsense_version: pfSense-2.7.0-DEVELOPMENT
+            freebsd_version: FreeBSD-14.0-CURRENT
+          - pfsense_version: pfSense-23.01-RELEASE
+            freebsd_version: FreeBSD-14.0-CURRENT
+        
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup pfSense VM
+        run: |
+          /usr/local/bin/VBoxManage controlvm ${{matrix.pfsense_version}} poweroff || true
+          /usr/local/bin/VBoxManage snapshot ${{matrix.pfsense_version}} restore initial
+          /usr/local/bin/VBoxManage startvm ${{matrix.pfsense_version}} --type headless
+          sleep 5
+
+      # This is only necessary until GitHub Actions allows an easier way to download an uploaded artifact
+      - name: Copy pfSense-pkg-API build to pfSense
+        run: |
+          pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com -u admin -p pfsense -c 'pfSsh.php playback enablesshd' -k
+          pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com -u admin -p pfsense -c "mkdir /root/.ssh/ && echo $(cat ~/.ssh/id_rsa.pub) > /root/.ssh/authorized_keys" -k
+          scp -o StrictHostKeyChecking=no pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}} admin@${{matrix.pfsense_version}}.jaredhendrickson.com:/tmp/
+
+      - name: Install pfSense-pkg-API on pfSense
+        run: |
+          /usr/local/bin/pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com --no_verify -c "pkg add /tmp/pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}}" -u admin -p pfsense
+          /usr/local/bin/pfsense-vshell --host ${{matrix.pfsense_version}}.jaredhendrickson.com --no_verify -c '/etc/rc.restart_webgui' -u admin -p pfsense || true
+          sleep 10
+
+      - name: Run pfSense-pkg-API E2E tests
+        run: |
+          python3 tests/run_all_tests.py --host ${{matrix.pfsense_version}}.jaredhendrickson.com
+
+      - name: Teardown pfSense VM
+        run: |
+          /usr/local/bin/VBoxManage controlvm ${{matrix.pfsense_version}} poweroff || true
+          /usr/local/bin/VBoxManage snapshot ${{matrix.pfsense_version}} restore initial
 
       - uses: actions/upload-artifact@v3
         with:
