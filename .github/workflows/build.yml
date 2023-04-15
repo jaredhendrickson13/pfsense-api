@@ -36,7 +36,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}}.pkg
-          path: pfSense-pkg-API-${{env.build_version}}.${{matrix.freebsd_version}}.pkg
+          path: pfSense-pkg-API-${{env.build_version}}.pkg
 
   e2e_tests:
     runs-on: self-hosted
