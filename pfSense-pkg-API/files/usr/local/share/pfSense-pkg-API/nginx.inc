@@ -11,9 +11,9 @@ function api_plugin_nginx($pluginparams) {
 
     switch ($pluginparams['section']) {
         case 'location':
-            $result = "        # custom block for pfsense-api package 
-		# this block is required to allow URI's without trailing slash or .php extension
-		# this block also enables PHP to handle PUT and DELETE requests for API functionality
+            $result = "
+		# This block is required to allow URI's without trailing slash or .php extension.
+		# This block also enables PHP to handle PUT and DELETE requests for API functionality.
 		location /api/v1/ {
 			index index.php index.html index.htm;
 			try_files \$uri/index.php =404; #  This line closes a potential security hole
