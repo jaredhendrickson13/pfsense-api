@@ -33,4 +33,10 @@
             <active/>
         </tab>
     </tabs>
+    <include_file>/usr/local/share/pfSense-pkg-API/nginx.inc</include_file>
+    <plugins>
+        <item>
+            <type>plugin_nginx</type>
+        </item>
+    </plugins>
 </packagegui>
