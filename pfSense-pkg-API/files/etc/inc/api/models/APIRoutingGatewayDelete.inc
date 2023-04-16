@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Accreditation for delete_gateway_item():
 //   part of pfSense (https://www.pfsense.org)
