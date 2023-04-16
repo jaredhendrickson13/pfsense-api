@@ -11,7 +11,7 @@ PFSENSE_VERSION=$(/bin/cat /etc/version)
 echo "Checking pfSense version... done."
 
 # pfSense 2.7.0+ support custom nginx configurations for package. Only override files on previous versions.
-if ["${PFSENSE_VERSION}" != "pfSense-2.7.0-DEVELOPMENT"]
+if [ "${PFSENSE_VERSION}" != "pfSense-2.7.0-DEVELOPMENT" ]
 then
   # Backup original files before overriding
   echo "Creating backups of files to override... done."
