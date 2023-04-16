@@ -1,6 +1,10 @@
 name: Build
 
-on: push
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - 'master'
 
 env:
   build_version: "0.0_0dev_${{github.sha}}"
