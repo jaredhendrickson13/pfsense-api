@@ -91,8 +91,8 @@ class APIQuery {
 
         # Only proceed if key is not excluded from queries
         if (!$this->is_excluded($q_key)) {
-            # Always prefer exact matches first
-            if (is_array($entry) and $entry[$key] === $value) {
+            # Always prefer exact matches first. Don't strict type match since the pfSense config won't store types.
+            if ($entry[$key] == $value) {
                 return true;
             }
 
