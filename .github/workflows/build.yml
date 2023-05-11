@@ -55,6 +55,8 @@ jobs:
             freebsd_version: FreeBSD-14.0-CURRENT
           - pfsense_version: pfSense-23.01-RELEASE
             freebsd_version: FreeBSD-14.0-CURRENT
+          - pfsense_version: pfSense-23.05-RC
+              freebsd_version: FreeBSD-14.0-CURRENT
         
     steps:
       - uses: actions/checkout@v3
