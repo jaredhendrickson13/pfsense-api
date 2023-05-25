@@ -33,15 +33,6 @@ class APIServicesDHCPdLeaseRead extends APIModel {
         # Loop through each array item and change the online/offline keywords to True/False accordingly
         # Also change the 'act' key to 'state'
         foreach ($leases as $id=>$lease) {
-            # Change the 'online' keyword to true
-            if ($lease["online"] === "online") {
-                $leases[$id]["online"] = true;
-            }
-            # Otherwise change the 'offline' keyword to false
-            else {
-                $leases[$id]["online"] = false;
-            }
-
             # Change the 'act' key to 'state'
             $leases[$id]["state"] = $leases[$id]["act"];
             unset($leases[$id]["act"]);
