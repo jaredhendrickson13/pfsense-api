@@ -1,4 +1,4 @@
-# Copyright 2022 Jared Hendrickson
+# Copyright 2023 Jared Hendrickson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,11 +22,16 @@ import e2e_test_framework
 class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/traffic_shaper/limiter endpoint."""
     uri = "/api/v1/firewall/traffic_shaper/limiter"
+
+    get_privileges = ["page-all", "page-firewall-trafficshaper-limiter"]
+    post_privileges = ["page-all", "page-firewall-trafficshaper-limiter"]
+    delete_privileges = ["page-all", "page-firewall-trafficshaper-limiter"]
+
     get_tests = [{"name": "Read all traffic shaper limiters"}]
     post_tests = [
         {
             "name": "Create firewall traffic shaper limiter",
-            "payload": {
+            "req_data": {
                 "name": "Test_Limiter",
                 "bandwidth": [{"bw": 100, "bwscale": "Mb"}],
                 "mask": "srcaddress",
@@ -54,7 +59,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check name character validation",
             "status": 400,
             "return": 4168,
-            "payload": {
+            "req_data": {
                 "name": "THIS NAME IS INVALID!"
             }
         },
@@ -62,7 +67,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check name character length minimum constraint",
             "status": 400,
             "return": 4168,
-            "payload": {
+            "req_data": {
                 "name": ""
             }
         },
@@ -70,7 +75,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check name character length maximum constraint",
             "status": 400,
             "return": 4169,
-            "payload": {
+            "req_data": {
                 "name": "This_name_is_too-long_for-the_system_to_handle"
             }
         },
@@ -78,7 +83,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check name unique constraint",
             "status": 400,
             "return": 4170,
-            "payload": {
+            "req_data": {
                 "name": "Test_Limiter"
             }
         },
@@ -86,7 +91,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check bandwidth requirement",
             "status": 400,
             "return": 4207,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter"
             }
         },
@@ -94,7 +99,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check bandwidth minimum constraint",
             "status": 400,
             "return": 4208,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": []
             }
@@ -103,7 +108,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check bandwidth type constraint",
             "status": 400,
             "return": 4208,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": ""
             }
@@ -112,7 +117,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check mask with invalid option",
             "status": 400,
             "return": 4171,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "mask": "INVALID"
@@ -122,7 +127,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check bit mask minimum constraint",
             "status": 400,
             "return": 4172,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "mask": "dstaddress",
@@ -133,7 +138,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check bit mask maximum constraint",
             "status": 400,
             "return": 4172,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "mask": "dstaddress",
@@ -144,7 +149,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check bit mask type constraint",
             "status": 400,
             "return": 4172,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "mask": "dstaddress",
@@ -155,7 +160,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check IPV6 bit mask minimum constraint",
             "status": 400,
             "return": 4173,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "mask": "dstaddress",
@@ -166,7 +171,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check IPV6 bit mask maximum constraint",
             "status": 400,
             "return": 4173,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "mask": "dstaddress",
@@ -177,7 +182,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check IPV6 bit mask type constraint",
             "status": 400,
             "return": 4173,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "mask": "dstaddress",
@@ -188,7 +193,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check AQM requirement",
             "status": 400,
             "return": 4174,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}]
             }
@@ -197,7 +202,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check AQM with invalid choice",
             "status": 400,
             "return": 4114,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "INVALID"
@@ -207,7 +212,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check scheduler requirement",
             "status": 400,
             "return": 4113,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "droptail"
@@ -217,7 +222,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check scheduler with invalid choice",
             "status": 400,
             "return": 4114,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "droptail",
@@ -228,7 +233,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check ECN with invalid AQM or scheduler",
             "status": 400,
             "return": 4176,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "droptail",
@@ -240,7 +245,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check queue limit minimum constraint",
             "status": 400,
             "return": 4120,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "droptail",
@@ -252,7 +257,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check queue limit type constraint",
             "status": 400,
             "return": 4120,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "droptail",
@@ -264,7 +269,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check delay minimum constraint",
             "status": 400,
             "return": 4177,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "droptail",
@@ -276,7 +281,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check delay maximum constraint",
             "status": 400,
             "return": 4177,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "droptail",
@@ -288,7 +293,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check delay type constraint",
             "status": 400,
             "return": 4177,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "droptail",
@@ -300,7 +305,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check packet loss rate minimum constraint",
             "status": 400,
             "return": 4178,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "droptail",
@@ -312,7 +317,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check packet loss maximum constraint",
             "status": 400,
             "return": 4178,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "droptail",
@@ -324,7 +329,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check packet loss type constraint",
             "status": 400,
             "return": 4178,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "droptail",
@@ -336,7 +341,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check buckets minimum constraint",
             "status": 400,
             "return": 4179,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "droptail",
@@ -348,7 +353,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check buckets maximum constraint",
             "status": 400,
             "return": 4179,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "droptail",
@@ -360,7 +365,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check buckets type constraint",
             "status": 400,
             "return": 4179,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "droptail",
@@ -372,7 +377,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check CoDel target parameter minimum constraint",
             "status": 400,
             "return": 4180,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "codel",
@@ -384,7 +389,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check CoDel target parameter type constraint",
             "status": 400,
             "return": 4180,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "codel",
@@ -396,7 +401,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check CoDel interval parameter minimum constraint",
             "status": 400,
             "return": 4181,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "codel",
@@ -408,7 +413,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check CoDel interval parameter type constraint",
             "status": 400,
             "return": 4181,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "codel",
@@ -420,7 +425,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check PIE target parameter minimum constraint",
             "status": 400,
             "return": 4182,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "pie",
@@ -432,7 +437,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check PIE target parameter type constraint",
             "status": 400,
             "return": 4182,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "pie",
@@ -444,7 +449,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check PIE tupdate parameter minimum constraint",
             "status": 400,
             "return": 4183,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "pie",
@@ -456,7 +461,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check PIE tupdate parameter type constraint",
             "status": 400,
             "return": 4183,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "pie",
@@ -468,7 +473,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check PIE alpha parameter minimum constraint",
             "status": 400,
             "return": 4184,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "pie",
@@ -480,7 +485,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check PIE alpha parameter type constraint",
             "status": 400,
             "return": 4184,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "pie",
@@ -492,7 +497,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check PIE beta parameter minimum constraint",
             "status": 400,
             "return": 4185,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "pie",
@@ -504,7 +509,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check PIE beta parameter type constraint",
             "status": 400,
             "return": 4185,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "pie",
@@ -516,7 +521,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check PIE max_burst parameter minimum constraint",
             "status": 400,
             "return": 4186,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "pie",
@@ -528,7 +533,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check PIE max_burst parameter type constraint",
             "status": 400,
             "return": 4186,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "pie",
@@ -540,7 +545,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check PIE max_ecnth parameter minimum constraint",
             "status": 400,
             "return": 4187,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "pie",
@@ -552,7 +557,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check PIE max_ecnth parameter type constraint",
             "status": 400,
             "return": 4187,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "pie",
@@ -564,7 +569,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check RED w_g parameter minimum constraint",
             "status": 400,
             "return": 4188,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "red",
@@ -576,7 +581,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check RED w_g parameter type constraint",
             "status": 400,
             "return": 4188,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "red",
@@ -588,7 +593,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check RED min_th parameter minimum constraint",
             "status": 400,
             "return": 4189,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "red",
@@ -600,7 +605,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check RED min_th parameter type constraint",
             "status": 400,
             "return": 4189,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "red",
@@ -612,7 +617,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check RED max_th parameter minimum constraint",
             "status": 400,
             "return": 4190,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "red",
@@ -624,7 +629,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check RED max_th parameter type constraint",
             "status": 400,
             "return": 4190,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "red",
@@ -636,7 +641,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check RED max_p parameter minimum constraint",
             "status": 400,
             "return": 4191,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "red",
@@ -648,7 +653,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check RED max_p parameter type constraint",
             "status": 400,
             "return": 4191,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "red",
@@ -660,7 +665,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check GRED w_q parameter minimum constraint",
             "status": 400,
             "return": 4192,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -672,7 +677,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check GRED w_q parameter type constraint",
             "status": 400,
             "return": 4192,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -684,7 +689,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check GRED min_th parameter minimum constraint",
             "status": 400,
             "return": 4193,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -696,7 +701,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check GRED min_th parameter type constraint",
             "status": 400,
             "return": 4193,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -708,7 +713,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check GRED max_th parameter minimum constraint",
             "status": 400,
             "return": 4194,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -720,7 +725,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check GRED max_th parameter type constraint",
             "status": 400,
             "return": 4194,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -732,7 +737,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check GRED max_p parameter minimum constraint",
             "status": 400,
             "return": 4195,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -744,7 +749,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check GRED max_p parameter type constraint",
             "status": 400,
             "return": 4195,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -756,7 +761,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_CoDel target parameter minimum constraint",
             "status": 400,
             "return": 4196,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -768,7 +773,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_CoDel target parameter type constraint",
             "status": 400,
             "return": 4196,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -780,7 +785,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_CoDel interval parameter minimum constraint",
             "status": 400,
             "return": 4197,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -792,7 +797,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_CoDel interval parameter type constraint",
             "status": 400,
             "return": 4197,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -804,7 +809,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_CoDel quantum parameter minimum constraint",
             "status": 400,
             "return": 4198,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -816,7 +821,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_CoDel quantum parameter type constraint",
             "status": 400,
             "return": 4198,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -828,7 +833,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_CoDel limit parameter minimum constraint",
             "status": 400,
             "return": 4199,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -840,7 +845,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_CoDel limit parameter type constraint",
             "status": 400,
             "return": 4199,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -852,7 +857,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_CoDel flows parameter minimum constraint",
             "status": 400,
             "return": 4200,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -864,7 +869,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_CoDel flows parameter type constraint",
             "status": 400,
             "return": 4200,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -876,7 +881,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_PIE target parameter minimum constraint",
             "status": 400,
             "return": 4201,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -888,7 +893,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_PIE target parameter type constraint",
             "status": 400,
             "return": 4201,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -900,7 +905,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_PIE tupdate parameter minimum constraint",
             "status": 400,
             "return": 4202,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -912,7 +917,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_PIE tupdate parameter type constraint",
             "status": 400,
             "return": 4202,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -924,7 +929,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_PIE alpha parameter minimum constraint",
             "status": 400,
             "return": 4203,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -936,7 +941,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_PIE alpha parameter type constraint",
             "status": 400,
             "return": 4203,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -948,7 +953,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_PIE beta parameter minimum constraint",
             "status": 400,
             "return": 4204,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -960,7 +965,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_PIE beta parameter type constraint",
             "status": 400,
             "return": 4204,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -972,7 +977,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_PIE max_burst parameter minimum constraint",
             "status": 400,
             "return": 4205,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -984,7 +989,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_PIE max_burst parameter type constraint",
             "status": 400,
             "return": 4205,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -996,7 +1001,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_PIE max_ecnth parameter minimum constraint",
             "status": 400,
             "return": 4206,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -1008,7 +1013,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check FQ_PIE max_ecnth parameter type constraint",
             "status": 400,
             "return": 4206,
-            "payload": {
+            "req_data": {
                 "name": "New_Limiter",
                 "bandwidth": [{"bw": 10000, "bwscale": "Kb"}],
                 "aqm": "gred",
@@ -1020,7 +1025,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete limiter",
-            "payload": {
+            "req_data": {
                 "name": "Test_Limiter"
             }
         },
@@ -1033,7 +1038,7 @@ class APIE2ETestFirewallTrafficShaperLimiter(e2e_test_framework.APIE2ETest):
             "name": "Check deleting non-existing limiter",
             "status": 400,
             "return": 4209,
-            "payload": {
+            "req_data": {
                 "name": "Test_Limiter"
             }
         }

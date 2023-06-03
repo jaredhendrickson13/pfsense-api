@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -24,10 +24,6 @@ class APIFirewallNATOutboundMappingRead extends APIModel {
     }
 
     public function action() {
-        # If existing outbound rules exist, populate them as our return data
-        if (!empty($this->config["nat"]["outbound"]["rule"])) {
-            $this->validated_data = $this->config["nat"]["outbound"]["rule"];
-        }
-        return APIResponse\get(0, $this->validated_data);
+        return APIResponse\get(0, $this->get_config("nat/outbound/rule", []));
     }
 }

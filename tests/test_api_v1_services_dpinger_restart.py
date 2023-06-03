@@ -1,4 +1,4 @@
-# Copyright 2022 Jared Hendrickson
+# Copyright 2023 Jared Hendrickson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestServicesDpingerRestart(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/dpinger/restart endpoint."""
     uri = "/api/v1/services/dpinger/restart"
+    post_privileges = ["page-all", "page-status-services"]
     post_tests = [{"name": "Restart the dpinger service"}]
 
 

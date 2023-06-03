@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ class APISystemDNSUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system"];
+        $this->privileges = ["page-all", "page-system-generalsetup"];
         $this->change_note = "Modified system DNS servers via API";
     }
 
@@ -40,18 +40,17 @@ class APISystemDNSUpdate extends APIModel {
 
     private function __validate_dnsallowoverride() {
         if ($this->initial_data['dnsallowoverride'] === true) {
-            $this->config["system"]["dnsallowoverride"] = "";
+            $this->set_config("system/dnsallowoverride", "");
         } elseif ($this->initial_data['dnsallowoverride'] === false) {
-            unset($this->config["system"]["dnsallowoverride"]);
+            $this->del_config("system/dnsallowoverride");
         }
     }
 
     private function __validate_dnslocalhost() {
-        # Validate this field as needed for pfSense 2.5+
         if ($this->initial_data['dnslocalhost'] === true) {
-            unset($this->config["system"]["dnslocalhost"]);
+            $this->del_config("system/dnslocalhost");
         } elseif ($this->initial_data['dnslocalhost'] === false) {
-            $this->config["system"]["dnslocalhost"] = "remote";
+            $this->set_config("system/dnslocalhost", "remote");
         }
     }
 
@@ -62,16 +61,16 @@ class APISystemDNSUpdate extends APIModel {
             $dns_server_c->initial_data["dnsserver"] = $this->initial_data["dnsserver"];
             $dns_server_c->__validate_dnsserver();
             $this->errors = $this->errors + $dns_server_c->errors;
-            $this->config["system"]["dnsserver"] = $dns_server_c->validated_data["dnsserver"];
+            $this->set_config("system/dnsserver",  $dns_server_c->validated_data["dnsserver"]);
         }
     }
 
     public function apply_backend_changes() {
         # Update a slew of backend services
         system_resolvconf_generate();
-        if (isset($this->config['dnsmasq']['enable'])) {
+        if ($this->is_config_enabled('dnsmasq')) {
             services_dnsmasq_configure();
-        } elseif (isset($this->config['unbound']['enable'])) {
+        } elseif ($this->is_config_enabled('unbound')) {
             services_unbound_configure();
         }
 

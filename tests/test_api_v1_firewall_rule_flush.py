@@ -1,4 +1,4 @@
-# Copyright 2022 Jared Hendrickson
+# Copyright 2023 Jared Hendrickson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ import e2e_test_framework
 class APIE2ETestFirewallRuleFlush(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/rule/flush endpoint."""
     uri = "/api/v1/firewall/rule/flush"
+    put_privileges = ["page-all", "page-firewall-rules-edit"]
+    delete_privileges = ["page-all", "page-firewall-rules-edit"]
     put_tests = [
         {
             "name": "Check rules array type constraint",
@@ -28,13 +30,13 @@ class APIE2ETestFirewallRuleFlush(e2e_test_framework.APIE2ETest):
             "name": "Check rules array minimum items constraint",
             "status": 400,
             "return": 4241,
-            "payload": {
+            "req_data": {
                 "rules": []
             }
         },
         {
             "name": "Flush and replace all rules",
-            "payload": {
+            "req_data": {
                 "apply": "true",
                 "rules": [
                     {
@@ -58,12 +60,19 @@ class APIE2ETestFirewallRuleFlush(e2e_test_framework.APIE2ETest):
         }
     ]
     delete_tests = [
-        {"name": "Flush all firewall rules", "payload": {}},
+        {"name": "Flush all firewall rules"},
+        {
+            "name": "Read all firewall rules and ensure it is now empty",
+            "uri": "/api/v1/firewall/rule",
+            "method": "GET",
+            "resp_data_empty": True,
+            "post_test_callable": "is_acl_empty"
+        },
         {
             "name": "Create an allow all rule on the WAN to prevent lockout",
             "uri": "/api/v1/firewall/rule",
             "method": "POST",
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "type": "pass",
                 "ipprotocol": "inet",
@@ -74,6 +83,11 @@ class APIE2ETestFirewallRuleFlush(e2e_test_framework.APIE2ETest):
             }
         },
     ]
+
+    def is_acl_empty(self):
+        """Checks if the response data from a GET firewall rules call is empty after flush"""
+        if self.last_response.get("data"):
+            raise AssertionError("Expected no firewall rules to be present")
 
 
 APIE2ETestFirewallRuleFlush()

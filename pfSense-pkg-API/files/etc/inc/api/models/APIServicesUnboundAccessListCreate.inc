@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ class APIServicesUnboundAccessListCreate extends APIModel {
     }
 
     public function action() {
-        $this->__init_array();
-        $this->config["unbound"]["acls"][] = $this->validated_data;
+        $this->id = $this->get_next_id("unbound/acls");
+        $this->set_config("unbound/acls/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty("unbound");
         # If user requests immediately application
@@ -109,13 +109,6 @@ class APIServicesUnboundAccessListCreate extends APIModel {
             }
         } else {
             $this->errors[] = APIResponse\get(2073);
-        }
-    }
-
-    private function __init_array() {
-        # Check that the Unbound ACL array exists
-        if (!isset($this->config["unbound"]["acls"])) {
-            $this->config["unbound"]["acls"] = [];
         }
     }
 }

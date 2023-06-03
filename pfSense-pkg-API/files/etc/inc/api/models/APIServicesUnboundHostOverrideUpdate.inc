@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ class APIServicesUnboundHostOverrideUpdate extends APIModel {
 
     public function action() {
         // Sort and write our new configuration
-        $this->config["unbound"]["hosts"][$this->id] = $this->validated_data;
+        $this->set_config("unbound/hosts/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty("unbound");
         # If user requests immediately application
@@ -48,9 +48,9 @@ class APIServicesUnboundHostOverrideUpdate extends APIModel {
     private function __validate_id() {
         # Check for our required 'id' payload value.
         if (isset($this->initial_data["id"])) {
-            if (array_key_exists($this->initial_data["id"], $this->config["unbound"]["hosts"])) {
+            if ($this->get_config("unbound/hosts/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
-                $this->validated_data = $this->config["unbound"]["hosts"][$this->id];
+                $this->validated_data = $this->get_config("unbound/hosts/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(2016);
             }
@@ -121,7 +121,7 @@ class APIServicesUnboundHostOverrideUpdate extends APIModel {
                 $this->initial_data['aliases'] = $this->initial_data['aliases']["item"];
             }
 
-            $this->validated_data["aliases"]["item"] = [];
+            $this->validated_data["aliases"] = ["item"=>[]];
             foreach ($this->initial_data['aliases'] as $alias) {
                 $alias_create = new APIServicesUnboundHostOverrideAliasCreate();
                 $alias_create->initial_data = $alias;

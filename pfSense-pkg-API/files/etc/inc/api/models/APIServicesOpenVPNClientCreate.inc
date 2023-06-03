@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -25,11 +25,9 @@ class APIServicesOpenVPNClientCreate extends APIModel {
     }
 
     public function action() {
-        # Initialize expected configuration arrays
-        $this->__init_config();
-
         # Add our Client to the configuration and resync OpenVPN to use new client
-        $this->config['openvpn']['openvpn-client'][] = $this->validated_data;
+        $this->id = $this->get_next_id("openvpn/openvpn-client");
+        $this->set_config("openvpn/openvpn-client/{$this->id}", $this->validated_data);
         $this->write_config();
         openvpn_resync('client', $this->validated_data);
         return APIResponse\get(0, $this->validated_data);
@@ -102,8 +100,10 @@ class APIServicesOpenVPNClientCreate extends APIModel {
 
             // Validate Interface
             if (!empty(APITools\get_pfsense_if_id($interface))) {
-                if (isset($this->config["interfaces"][APITools\get_pfsense_if_id($interface)]["enable"])) {
-                    $this->validated_data["interface"] = APITools\get_pfsense_if_id($interface);
+                $interface = APITools\get_pfsense_if_id($interface);
+
+                if ($this->is_config_enabled("interfaces/{$interface}")) {
+                    $this->validated_data["interface"] = $interface;
                     $this->validated_data["ipaddr"] = "";
                     $match = true;
                 }
@@ -111,7 +111,7 @@ class APIServicesOpenVPNClientCreate extends APIModel {
 
             // Validate Virtual Interface
             if (!$match) {
-                foreach ($this->config["virtualip"]["vip"] as $vip) {
+                foreach ($this->get_config("virtualip/vip", []) as $vip) {
                     if (($vip["mode"] === "ipalias") or ($vip["mode"] === "carp") ) {
                         if (strtolower($this->initial_data["interface"]) === strtolower($vip["descr"])) {
                             $this->validated_data["interface"] = "_vip" . $vip["uniqid"];
@@ -135,7 +135,7 @@ class APIServicesOpenVPNClientCreate extends APIModel {
 
             // Validate Gateway Group Interface
             if (!$match) {
-                foreach ($this->config["gateways"]["gateway_group"] as $gateway_group) {
+                foreach ($this->get_config("gateways/gateway_group", []) as $gateway_group) {
                     if (strtolower($this->initial_data["interface"]) === strtolower($gateway_group['name'])) {
                         $this->validated_data["interface"] = $gateway_group['name'];
                         $this->validated_data["ipaddr"] = "";
@@ -413,9 +413,9 @@ class APIServicesOpenVPNClientCreate extends APIModel {
     }
 
     private function __validate_caref() {
-        if (!empty($this->config["ca"])) {
+        if ($this->get_config("ca", false)) {
             if (isset($this->initial_data["caref"])) {
-                foreach ($this->config["ca"] as $ca) {
+                foreach ($this->get_config("ca", []) as $ca) {
                     if ($this->initial_data["caref"] === $ca["refid"]) {
                         $this->validated_data["caref"] = $ca["refid"];
                         break;
@@ -435,7 +435,7 @@ class APIServicesOpenVPNClientCreate extends APIModel {
 
     private function __validate_crlref() {
         if (isset($this->initial_data["crlref"])) {
-            foreach ($this->config["crl"] as $crl) {
+            foreach ($this->get_config("crl", []) as $crl) {
                 if (($this->validated_data["caref"] === $crl["caref"]) and ($this->initial_data["crlref"] === $crl["refid"])) {
                     $this->validated_data["crlref"] = $this->initial_data["refid"];
                     break;
@@ -456,9 +456,9 @@ class APIServicesOpenVPNClientCreate extends APIModel {
     }
 
     private function __validate_certref() {
-        if (!empty($this->config["cert"])) {
+        if ($this->get_config("cert", false)) {
             if (isset($this->initial_data["certref"])) {
-                foreach ($this->config["cert"] as $cert) {
+                foreach ($this->get_config("cert", []) as $cert) {
                     if ($this->initial_data["certref"] === $cert["refid"]) {
                         $this->validated_data["certref"] = $cert["refid"];
                         break;
@@ -1079,18 +1079,6 @@ class APIServicesOpenVPNClientCreate extends APIModel {
             $this->validated_data["route_no_pull"] = "";
             $this->validated_data["inactive_seconds"] = "0";
             $this->validated_data["exit_notify"] = "1";
-        }
-    }
-
-    private function __init_config() {
-        # Ensure the OpenVPN configuration array exists
-        if (empty($this->config["openvpn"])) {
-            $this->config["openvpn"] = [];
-        }
-
-        # Ensure the OpenVPN server configuration array exists
-        if (empty($this->config['openvpn']['openvpn-client'])) {
-            $this->config['openvpn']['openvpn-client'] = [];
         }
     }
 }

@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@ class APIServicesIPsecPhase1EncryptionCreate extends APIModel {
 
     public function action() {
         # Add this encryption item to the parent P1 entry
-        $this->config["ipsec"]["phase1"]["encryption"]["item"][] = $this->validated_data;
+        $next_id = $this->get_next_id("ipsec/phase1/{$this->id}/encryption/item");
+        $this->set_config("ipsec/phase1/{$this->id}/encryption/item/{$next_id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty('ipsec');
 
@@ -147,7 +148,7 @@ class APIServicesIPsecPhase1EncryptionCreate extends APIModel {
     }
 
     public function is_parent_prf_enabled() {
-        return isset($this->config["ipsec"]["phase1"][$this->id]["prfselect_enable"]);
+        return $this->is_config_enabled("ipsec/phase1/{$this->id}", "prfselect_enable");
     }
 
     # Determines every possible encryption algorithm combination

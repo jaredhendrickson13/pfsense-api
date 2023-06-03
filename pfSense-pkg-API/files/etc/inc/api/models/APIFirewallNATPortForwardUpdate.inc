@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
 
     public function action() {
         # Update our new configuration
-        $this->config["nat"]["rule"][$this->id] = $this->validated_data;
+        $this->set_config("nat/rule/{$this->id}", $this->validated_data);
         APITools\sort_nat_rules($this->initial_data["top"], $this->id);
         $this->write_config();
         mark_subsystem_dirty('natconf');
@@ -52,9 +52,9 @@ class APIFirewallNATPortForwardUpdate extends APIModel {
         # Require clients to specify a port forward ID to modify
         if (isset($this->initial_data["id"])) {
             # Require the port forward ID specified to exist
-            if (array_key_exists($this->initial_data["id"], $this->config["nat"]["rule"])) {
+            if ($this->get_config("nat/rule/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
-                $this->validated_data = $this->config["nat"]["rule"][$this->id];
+                $this->validated_data = $this->get_config("nat/rule/{$this->id}");
 
                 # Check if current protocol is a port based protocol
                 if (in_array($this->validated_data["protocol"], ["tcp", "udp", "tcp/udp"])) {

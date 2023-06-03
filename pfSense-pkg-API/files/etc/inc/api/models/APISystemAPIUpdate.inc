@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@ class APISystemAPIUpdate extends APIModel {
     }
 
     public function action() {
-        $this->config["installedpackages"]["package"][APITools\get_api_config()[0]]["conf"] = $this->validated_data;
+        $api_conf_id = APITools\get_api_config()[0];
+        $this->set_config("installedpackages/package/{$api_conf_id}/conf", $this->validated_data);
         $this->write_config();
 
         # Backup and sync changes to HA nodes if enabled
@@ -101,6 +102,15 @@ class APISystemAPIUpdate extends APIModel {
             $this->validated_data["allow_options"] = "";
         } elseif ($this->initial_data['allow_options'] === false) {
             unset($this->validated_data["allow_options"]);
+        }
+    }
+
+    private function __validate_allow_pre_release() {
+        # Check for our optional 'allow_pre_release' payload value
+        if ($this->initial_data['allow_pre_release'] === true) {
+            $this->validated_data["allow_pre_release"] = "";
+        } elseif ($this->initial_data['allow_pre_release'] === false) {
+            unset($this->validated_data["allow_pre_release"]);
         }
     }
 
@@ -207,7 +217,7 @@ class APISystemAPIUpdate extends APIModel {
             $this->validated_data["access_list"] = implode(" ", $this->initial_data["access_list"]);
         }
         elseif ($this->initial_data["access_list"] === []) {
-            $this->validated_data["access_list"]["access_list"] = "";
+            $this->validated_data["access_list"] = "";
         }
     }
 
@@ -239,7 +249,7 @@ class APISystemAPIUpdate extends APIModel {
         # Check for our option 'keyhash' payload value
         if (isset($this->initial_data["keyhash"])) {
             # Ensure it is an available option
-            if (in_array($this->initial_data["keyhash"], ["sha256", "sha384", "sha512", "md5"])) {
+            if (in_array($this->initial_data["keyhash"], ["sha256", "sha384", "sha512"])) {
                 $this->validated_data["keyhash"] = $this->initial_data["keyhash"];
             } else {
                 $this->errors[] = APIResponse\get(1023);
@@ -277,6 +287,7 @@ class APISystemAPIUpdate extends APIModel {
         $this->__validate_persist();
         $this->__validate_readonly();
         $this->__validate_allow_options();
+        $this->__validate_allow_pre_release();
         $this->__validate_allowed_interfaces();
         $this->__validate_authmode();
         $this->__validate_jwt_exp();

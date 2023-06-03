@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -22,14 +22,9 @@ class APIInterfaceVLANRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-vlan", "page-interfaces-vlan-edit"];
-
     }
 
     public function action() {
-        $vlan_array = [];
-        if (!empty($this->config["vlans"]["vlan"])) {
-            $vlan_array = $this->config["vlans"]["vlan"];
-        }
-        return APIResponse\get(0, $vlan_array);
+        return APIResponse\get(0, $this->get_config("vlans/vlan", []));
     }
 }

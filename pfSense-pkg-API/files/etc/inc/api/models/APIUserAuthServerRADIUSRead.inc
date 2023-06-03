@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -25,11 +25,10 @@ class APIUserAuthServerRADIUSRead extends APIModel {
 
     public function action() {
         $as_array = [];
-        if (!empty($this->config["system"]["authserver"])) {
-            foreach ($this->config["system"]["authserver"] as $a) {
-                if ($a["type"] === "radius") {
-                    $as_array[] = $a;
-                }
+
+        foreach ($this->get_config("system/authserver", []) as $a) {
+            if ($a["type"] === "radius") {
+                $as_array[] = $a;
             }
         }
         return APIResponse\get(0, $as_array);

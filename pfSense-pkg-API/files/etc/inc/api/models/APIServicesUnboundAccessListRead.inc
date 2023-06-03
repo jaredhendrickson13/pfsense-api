@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -25,10 +25,6 @@ class APIServicesUnboundAccessListRead extends APIModel {
     }
 
     public function action() {
-        $unbound_acl_array = [];
-        if (!empty($this->config["unbound"]["acls"])) {
-            $unbound_acl_array = $this->config["unbound"]["acls"];
-        }
-        return APIResponse\get(0, $unbound_acl_array);
+        return APIResponse\get(0, $this->get_config("unbound/acls", []));
     }
 }

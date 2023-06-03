@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ class APIFirewallRuleDelete extends APIModel {
 
     public function action() {
         # Remove rule from config, sort and apply filter if requested
-        unset($this->config["filter"]["rule"][$this->id]);
-        APITools\sort_firewall_rules();
+        $this->del_config("filter/rule/{$this->id}");
+        filter_rules_sort();
         $this->write_config();
         mark_subsystem_dirty('filter');
 
@@ -48,10 +48,10 @@ class APIFirewallRuleDelete extends APIModel {
             # Ensure the tracker provided is a numeric
             if (is_numeric($this->initial_data["tracker"])) {
                 # Loop through each rule and check if our tracker matches
-                foreach ($this->config["filter"]["rule"] as $id => $rule) {
+                foreach ($this->get_config("filter/rule", []) as $id => $rule) {
                     if (intval($rule["tracker"]) === intval($this->initial_data['tracker'])) {
                         $this->id = $id;
-                        $this->validated_data = $this->config["filter"]["rule"][$this->id];
+                        $this->validated_data = $this->get_config("filter/rule/{$this->id}");
                         break;
                     }
                 }

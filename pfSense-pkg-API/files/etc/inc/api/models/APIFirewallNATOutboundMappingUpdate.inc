@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ class APIFirewallNATOutboundMappingUpdate extends APIModel {
 
     public function action() {
         # Add our new configuration
-        $this->config["nat"]["outbound"]["rule"][$this->id] = $this->validated_data;
+        $this->set_config("nat/outbound/rule/{$this->id}", $this->validated_data);
         APITools\sort_nat_rules($this->initial_data["top"], $this->id, "outbound");
         $this->write_config();
         mark_subsystem_dirty('natconf');
@@ -52,9 +52,9 @@ class APIFirewallNATOutboundMappingUpdate extends APIModel {
         # Require clients to pass in a mapping ID to locate the mapping to update
         if (isset($this->initial_data['id'])) {
             // Check that our rule ID exists
-            if (array_key_exists($this->initial_data['id'], $this->config["nat"]["outbound"]["rule"])) {
+            if ($this->get_config("nat/outbound/rule/{$this->initial_data['id']}", false)) {
                 $this->id = $this->initial_data['id'];
-                $this->validated_data = $this->config["nat"]["outbound"]["rule"][$this->id];
+                $this->validated_data = $this->get_config("nat/outbound/rule/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(4105);
             }
@@ -125,7 +125,7 @@ class APIFirewallNATOutboundMappingUpdate extends APIModel {
             # Allow client to specify source hash, otherwise generate a random one
             if (isset($this->initial_data["source_hash_key"])) {
                 # Set an error if the hash key does not start with 0x
-                if (substr($this->initial_data["source_hash_key"]['source_hash_key'],0,2) !== "0x") {
+                if (substr($this->initial_data["source_hash_key"],0,2) !== "0x") {
                     $this->errors[] = APIResponse\get(4091);
                 }
                 # Set an error if the hash key does contain a hexadecimal value after 0x
@@ -133,7 +133,7 @@ class APIFirewallNATOutboundMappingUpdate extends APIModel {
                     $this->errors[] = APIResponse\get(4092);
                 }
                 # Set an error if the hash key is not exactly 34 characters in length include 0x
-                elseif (strlen($_POST['source_hash_key']) !== 34) {
+                elseif (strlen($this->initial_data['source_hash_key']) !== 34) {
                     $this->errors[] = APIResponse\get(4093);
                 }
                 # Otherwise, hash key appears to be valid. Save the validated value.
@@ -141,7 +141,7 @@ class APIFirewallNATOutboundMappingUpdate extends APIModel {
                     $this->validated_data["source_hash_key"] = $this->initial_data['source_hash_key'];
                 }
             } elseif(empty($this->validated_data["source_hash_key"])) {
-                $this->validated_data["source_hash_key"] = "0x".md5($_POST['source_hash_key']);
+                $this->validated_data["source_hash_key"] = "0x".md5($this->initial_data['source_hash_key']);
             }
         }
     }

@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -30,7 +30,8 @@ class APISystemCRLCreate extends APIModel {
 
     public function action() {
         # Add the new certificate
-        $this->config["crl"][] = $this->validated_data;
+        $this->id = $this->get_next_id("crl");
+        $this->set_config("crl/{$this->id}", $this->validated_data);
 
         # Write changes to configuration
         $this->write_config();
@@ -125,7 +126,7 @@ class APISystemCRLCreate extends APIModel {
         $ca_enties = [];
 
         # Loop through each CA and add all CAs that have a valid key
-        foreach ($this->config['ca'] as $ca) {
+        foreach ($this->get_config('ca', []) as $ca) {
             if ($ca['prv']) {
                 $ca_enties[] = $ca['refid'];
             }

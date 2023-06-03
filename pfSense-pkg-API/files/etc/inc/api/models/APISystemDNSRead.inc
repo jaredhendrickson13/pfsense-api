@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ class APISystemDNSRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system"];
+        $this->privileges = ["page-all", "page-system-generalsetup"];
     }
 
     public function action() {
@@ -36,22 +36,20 @@ class APISystemDNSRead extends APIModel {
         $this->validated_data["dnslocalhost"] = false;
 
         # Populate our system DNS servers if they exist
-        if (!empty($this->config["system"]["dnsserver"])) {
-            $this->validated_data["dnsserver"] = $this->config["system"]["dnsserver"];
+        if (!empty($this->get_config("system/dnsserver"))) {
+            $this->validated_data["dnsserver"] = $this->get_config("system/dnsserver");
         }
 
         # Format our DNS allow override on WAN
-        if (array_key_exists("dnsallowoverride", $this->config["system"])) {
+        if ($this->is_config_enabled("system","dnsallowoverride")) {
             $this->validated_data["dnsallowoverride"] = true;
         }
 
         # Format our DNS local host value
-        if ($this->config["system"]["dnslocalhost"] === "remote") {
+        if ($this->get_config("system/dnslocalhost") === "remote") {
             $this->validated_data["dnslocalhost"] = false;
         } else {
             $this->validated_data["dnslocalhost"] = true;
         }
-
-
     }
 }

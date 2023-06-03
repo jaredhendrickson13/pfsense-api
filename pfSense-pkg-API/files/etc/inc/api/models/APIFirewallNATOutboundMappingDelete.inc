@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -20,14 +20,13 @@ class APIFirewallNATOutboundMappingDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-nat-outbound-edit"];
+        $this->privileges = ["page-all", "page-firewall-nat-outbound-edit"];
         $this->change_note = "Deleted outbound NAT mapping via API";
     }
 
     public function action() {
         # Capture the deleted item then remove it. Mark the subsystem as dirty until it is applied.
-        $del_rule = $this->config["nat"]["outbound"]["rule"][$this->id];
-        unset($this->config["nat"]["outbound"]["rule"][$this->id]);
+        $del_rule = $this->del_config("nat/outbound/rule/{$this->id}");
         APITools\sort_nat_rules(null, null, "outbound");
         $this->write_config();
         mark_subsystem_dirty('natconf');
@@ -43,7 +42,7 @@ class APIFirewallNATOutboundMappingDelete extends APIModel {
         # Require clients to pass in a outbound rule ID to locate the rule to delete
         if (isset($this->initial_data['id'])) {
             // Check that our rule ID exists
-            if (array_key_exists($this->initial_data['id'], $this->config["nat"]["outbound"]["rule"])) {
+            if ($this->get_config("nat/outbound/rule/{$this->initial_data['id']}", false)) {
                 $this->id = $this->initial_data['id'];
             } else {
                 $this->errors[] = APIResponse\get(4105);

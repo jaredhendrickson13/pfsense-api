@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ class APIServicesIPsecPhase2Read extends APIModel {
     }
 
     public function action() {
-        return APIResponse\get(0, ($this->config["ipsec"]["phase2"]) ?: []);
+
+        return APIResponse\get(0, $this->get_config("ipsec/phase2", []));
     }
 }

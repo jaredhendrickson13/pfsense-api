@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ class APIUserGroupDelete extends APIModel {
 
     public function action() {
         # Add this group to configuration and apply OS changes.
-        unset($this->config["system"]["group"][$this->id]);
+        $this->del_config("system/group/{$this->id}");
         $this->__apply();
         $this->write_config();
         return APIResponse\get(0, APIUserGroupRead::to_representation($this->validated_data));
@@ -45,7 +45,7 @@ class APIUserGroupDelete extends APIModel {
             # Check if a group with this name (ID) exists
             if ($id !== false) {
                 $this->id = $id;
-                $this->validated_data = $this->config["system"]["group"][$this->id];
+                $this->validated_data = $this->get_config("system/group/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(5051);
             }
@@ -57,10 +57,11 @@ class APIUserGroupDelete extends APIModel {
     # Applies this user/group configuration to the OS user
     private function __apply() {
         # Resort groups to correct IDs
-        $this->config["system"]["group"] = array_values($this->config["system"]["group"]);
+        $this->set_config("system/group", array_values($this->get_config("system/group")));
 
         # Sort groups alphabetically
-        usort($this->config['system']['group'], function($a, $b) {
+        $groups = $this->get_config("system/group");
+        usort($groups, function($a, $b) {
             return strcasecmp($a['name'], $b['name']);
         });
 
@@ -69,7 +70,7 @@ class APIUserGroupDelete extends APIModel {
 
     public function is_existing_group($name, $ret_id=false) {
         # Loop through each existing group and ensure this group name is not already used
-        foreach ($this->config["system"]["group"] as $id=>$group) {
+        foreach ($this->get_config("system/group", []) as $id=>$group) {
             # Check if names match. Allow names to match if the name matches this object's current name.
             if ($name === $group["name"] and $name !== $this->validated_data["name"]) {
                 return ($ret_id) ? $id : true;

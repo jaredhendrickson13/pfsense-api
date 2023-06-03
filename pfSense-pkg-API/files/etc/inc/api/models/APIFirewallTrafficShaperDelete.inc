@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ class APIFirewallTrafficShaperDelete extends APIModel {
 
     public function action() {
         # Save the updated shaper, mark the subsystem as un-applied
-        unset($this->config["shaper"]["queue"][$this->id]);
+        $this->del_config("shaper/queue/{$this->id}");
         $this->write_config();
         mark_subsystem_dirty('shaper');
 
@@ -61,7 +61,7 @@ class APIFirewallTrafficShaperDelete extends APIModel {
                     if (!$this->is_child_queue_in_use($this->initial_data["interface"])) {
                         # Fetch the traffic shaper object associated with this interface
                         $this->id = $this->get_shaper_id_by_interface($this->initial_data["interface"]);
-                        $this->validated_data = $this->config["shaper"]["queue"][$this->id];
+                        $this->validated_data = $this->get_config("shaper/queue/{$this->id}");
                     } else {
                         $this->errors[] = APIResponse\get(4230);
                     }
@@ -78,7 +78,7 @@ class APIFirewallTrafficShaperDelete extends APIModel {
 
     public function get_shaper_id_by_interface($interface, $as_bool=false) {
         # Loop through each configured shaper
-        foreach ($this->config["shaper"]["queue"] as $id=>$shaper) {
+        foreach ($this->get_config("shaper/queue", []) as $id=>$shaper) {
             # Check if this is the shaper for our interface, if so return it's ID
             if ($interface === $shaper["interface"]) {
                 return ($as_bool) ? true : intval($id);
@@ -92,9 +92,9 @@ class APIFirewallTrafficShaperDelete extends APIModel {
         $id = $this->get_shaper_id_by_interface($interface);
 
         # Loop through each child queue to check if it is in use
-        foreach ($this->config["shaper"]["queue"][$id]["queue"] as $child) {
+        foreach ($this->get_config("shaper/queue/{$id}/queue", []) as $child) {
             # Loop through each firewall rule to check if the child queue is configured in the rule
-            foreach ($this->config["filter"]["rule"] as $rule) {
+            foreach ($this->get_config("filter/rule", []) as $rule) {
                 # It is in use if the defaultqueue or ackqueue use this queue
                 if ($child["name"] === $rule["defaultqueue"] or $child["name"] === $rule["ackqueue"]) {
                     return true;

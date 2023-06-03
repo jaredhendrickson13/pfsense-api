@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ class APIInterfaceBridgeCreate extends APIModel {
     }
 
     public function action() {
-        $this->__init_config();
-        $this->config["bridges"]["bridged"][] = $this->validated_data;
+        $this->id = $this->get_next_id("bridges/bridged");
+        $this->set_config("bridges/bridged/{$this->id}", $this->validated_data);
         $this->write_config();
         interface_bridge_configure($this->validated_data);
         return APIResponse\get(0, $this->validated_data);
@@ -117,7 +117,7 @@ class APIInterfaceBridgeCreate extends APIModel {
         $member = APITools\get_pfsense_if_id($member);
 
         # Check if our request bridge member already exists in another bridge
-        foreach ($this->config["bridges"]["bridged"] as $bridge) {
+        foreach ($this->get_config("bridges/bridged", []) as $bridge) {
             $bridge_members = explode(",", $bridge["members"]);
             if (in_array($member, $bridge_members)) {
                 return true;
@@ -128,7 +128,7 @@ class APIInterfaceBridgeCreate extends APIModel {
 
     private function __is_member_wireless($member) {
         # Check if a wireless configuration exists for this interface
-        if (is_array($this->config['interfaces'][$member]['wireless'])) {
+        if (is_array($this->get_config("interfaces/{$member}/wireless"))) {
             return true;
         } else {
             return false;
@@ -138,7 +138,7 @@ class APIInterfaceBridgeCreate extends APIModel {
     private function __is_wireless_member_hostap($member) {
         # Only proceed if this member is a wireless interfaee
             # Check if this wireless interface is not in host AP mode
-            if ($this->config['interfaces'][$member]['wireless']['mode'] == "hostap") {
+            if ($this->get_config("interfaces/{$member}/wireless/mode") == "hostap") {
                 return true;
             } else {
                 return false;
@@ -147,7 +147,7 @@ class APIInterfaceBridgeCreate extends APIModel {
 
     private function __is_member_captive_portal($member) {
         # Check if this member interface has a captive portal configured
-        foreach ($this->config['captiveportal'] as $cp) {
+        foreach ($this->get_config('captiveportal', []) as $cp) {
             if (in_array($member, explode(',', $cp['interface']))) {
                 return true;
             }
@@ -167,7 +167,7 @@ class APIInterfaceBridgeCreate extends APIModel {
             $in_use = false;
 
             # Loop through all existing bridges and see if this bridgeif is in use
-            foreach ($this->config["bridges"]["bridged"] as $bridge) {
+            foreach ($this->get_config("bridges/bridged", []) as $bridge) {
                 # Check if this value matches our potential next bridge
                 if ($bridge["bridgeif"] === $next_bridge) {
                     $in_use = true;
@@ -179,16 +179,5 @@ class APIInterfaceBridgeCreate extends APIModel {
         }
 
         return $next_bridge;
-    }
-
-    private function __init_config() {
-        # Ensure our bridges config section is an array
-        if (!is_array($this->config["bridges"])) {
-            $this->config["bridges"] = [];
-        }
-        # Ensure our bridges bridged config section is an array
-        if (!is_array($this->config["bridges"]["bridged"])) {
-            $this->config["bridges"]["bridged"] = [];
-        }
     }
 }

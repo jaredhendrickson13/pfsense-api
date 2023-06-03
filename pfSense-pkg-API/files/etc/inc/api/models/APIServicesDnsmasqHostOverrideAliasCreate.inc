@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ class APIServicesDnsmasqHostOverrideAliasCreate extends APIModel {
     }
 
     public function action() {
-        $this->__init_config();
-        $this->config["dnsmasq"]["hosts"][$this->id]["aliases"]["item"][] = $this->validated_data;
+        $next_id = $this->get_next_id("dnsmasq/hosts/{$this->id}/aliases/item");
+        $this->set_config("dnsmasq/hosts/{$this->id}/aliases/item/{$next_id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty("hosts");
         $this->apply();
@@ -46,9 +46,9 @@ class APIServicesDnsmasqHostOverrideAliasCreate extends APIModel {
         # Check for our required 'id' payload value. Allow this to be bypassed internally for nested calls
         if ($this->validate_id === false) {
         } elseif (isset($this->initial_data["id"])) {
-            if (array_key_exists($this->initial_data["id"], $this->config["dnsmasq"]["hosts"])) {
+            if ($this->get_config("dnsmasq/hosts/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
-                $this->parent = $this->config["dnsmasq"]["hosts"][$this->id];
+                $this->parent = $this->get_config("dnsmasq/hosts/{$this->id}", []);
             } else {
                 $this->errors[] = APIResponse\get(2062);
             }
@@ -101,13 +101,6 @@ class APIServicesDnsmasqHostOverrideAliasCreate extends APIModel {
             system_resolvconf_generate();
             system_dhcpleases_configure();
             clear_subsystem_dirty('hosts');
-        }
-    }
-
-    private function __init_config() {
-        # Convert aliases config value to array if not already
-        if (!is_array($this->config["dnsmasq"]["hosts"][$this->id]["aliases"])) {
-            $this->config["dnsmasq"]["hosts"][$this->id]["aliases"] = ["item"=>[]];
         }
     }
 }

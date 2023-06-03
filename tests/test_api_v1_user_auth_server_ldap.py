@@ -5,11 +5,16 @@ import e2e_test_framework
 class APIE2ETestUserAuthServerLDAP(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/user/auth_server/ldap endpoint."""
     uri = "/api/v1/user/auth_server/ldap"
+
+    get_privileges = ["page-all", "page-system-authservers"]
+    post_privileges = ["page-all", "page-system-authservers"]
+    delete_privileges = ["page-all", "page-system-authservers"]
+
     get_tests = [{"name": "Read LDAP auth servers"}]
     post_tests = [
         {
             "name": "Create LDAP auth server",
-            "payload": {
+            "req_data": {
                 "name": "TEST_AUTHSERVER",
                 "host": "ldap.com",
                 "ldap_port": 636,
@@ -32,7 +37,7 @@ class APIE2ETestUserAuthServerLDAP(e2e_test_framework.APIE2ETest):
     delete_tests = [
         {
             "name": "Delete LDAP auth server",
-            "payload": {"name": "TEST_AUTHSERVER"}
+            "req_data": {"name": "TEST_AUTHSERVER"}
         }
     ]
 

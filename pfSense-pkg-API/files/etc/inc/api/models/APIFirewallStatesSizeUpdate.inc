@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -27,15 +27,16 @@ class APIFirewallStatesSizeUpdate extends APIModel {
     }
 
     public function action() {
-
-        // Write our state table size
+        # Write the state table size
         if ($this->validated_data["maximumstates"] === "default") {
-            unset($this->config["system"]["maximumstates"]);
+            $this->del_config("system/maximumstates");
         } else {
-            $this->config["system"]["maximumstates"] = $this->validated_data["maximumstates"];
+            $this->set_config("system/maximumstates", $this->validated_data["maximumstates"]);
         }
-        $this->write_config();    // Apply our configuration change
-        filter_configure();    // Update our firewall filter
+
+        # Apply the configuration change
+        $this->write_config();
+        filter_configure();
         return APIResponse\get(0, (new APIFirewallStatesSizeRead())->action()["data"]);
     }
 

@@ -5,6 +5,12 @@ import e2e_test_framework
 class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/user/group endpoint."""
     uri = "/api/v1/user/group"
+
+    post_privileges = ["page-all", "page-system-groupmanager"]
+    put_privileges = ["page-all", "page-system-groupmanager"]
+    delete_privileges = ["page-all", "page-system-groupmanager"]
+    get_privileges = ["page-all", "page-system-groupmanager"]
+
     get_tests = [
         {
             "name": "Read groups"
@@ -20,7 +26,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check name minimum length constraint",
             "status": 400,
             "return": 5044,
-            "payload": {
+            "req_data": {
                 "name": ""
             }
         },
@@ -28,7 +34,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check local group name maximum length constraint",
             "status": 400,
             "return": 5044,
-            "payload": {
+            "req_data": {
                 "name": "THISNAMEISTOOLONGFORAGROUP",
                 "scope": "local"
             }
@@ -37,7 +43,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check remote group name maximum length constraint",
             "status": 400,
             "return": 5044,
-            "payload": {
+            "req_data": {
                 "name": "SDPUMWFf76c1NuDFmCgt28htYERm8SUOZJldH2VPzZXj446X9T0ijTXC935KcSax2"
             }
         },
@@ -45,7 +51,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check name exists constraint",
             "status": 400,
             "return": 5049,
-            "payload": {
+            "req_data": {
                 "name": "admins"
             }
         },
@@ -53,7 +59,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check name charset constraint",
             "status": 400,
             "return": 5045,
-            "payload": {
+            "req_data": {
                 "name": "!!!INVALID@@@"
             }
         },
@@ -61,7 +67,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check scope options constraint",
             "status": 400,
             "return": 5046,
-            "payload": {
+            "req_data": {
                 "name": "TEST_GROUP",
                 "scope": "INVALID_CHOICE"
             }
@@ -70,7 +76,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check member exists constraint",
             "status": 400,
             "return": 5047,
-            "payload": {
+            "req_data": {
                 "name": "TEST_GROUP",
                 "scope": "local",
                 "member": ["NOT_A_VALID_UID"]
@@ -80,7 +86,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check privilege exists constraint",
             "status": 400,
             "return": 5048,
-            "payload": {
+            "req_data": {
                 "name": "TEST_GROUP",
                 "scope": "remote",
                 "member": [],
@@ -89,7 +95,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Create group",
-            "payload": {
+            "req_data": {
                 "name": "TEST_GROUP",
                 "scope": "local",
                 "member": [0],
@@ -107,7 +113,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check ID exists constraint",
             "status": 400,
             "return": 5051,
-            "payload": {
+            "req_data": {
                 "id": "THIS_GROUP_DOES_NOT_EXIST"
             }
         },
@@ -115,7 +121,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check name minimum length constraint",
             "status": 400,
             "return": 5044,
-            "payload": {
+            "req_data": {
                 "id": "TEST_GROUP",
                 "name": ""
             }
@@ -124,7 +130,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check name maximum length constraint",
             "status": 400,
             "return": 5044,
-            "payload": {
+            "req_data": {
                 "id": "TEST_GROUP",
                 "name": "THISNAMEISTOOLONGFORAGROUP"
             }
@@ -133,7 +139,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check name maximum length constraint",
             "status": 400,
             "return": 5044,
-            "payload": {
+            "req_data": {
                 "id": "TEST_GROUP",
                 "name": "THISNAMEISTOOLONGFORAGROUP"
             }
@@ -142,7 +148,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check name exists constraint",
             "status": 400,
             "return": 5049,
-            "payload": {
+            "req_data": {
                 "id": "TEST_GROUP",
                 "name": "admins"
             }
@@ -151,7 +157,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check name charset constraint",
             "status": 400,
             "return": 5045,
-            "payload": {
+            "req_data": {
                 "id": "TEST_GROUP",
                 "name": "!!!INVALID@@@"
             }
@@ -160,7 +166,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check scope options constraint",
             "status": 400,
             "return": 5046,
-            "payload": {
+            "req_data": {
                 "id": "TEST_GROUP",
                 "name": "TEST_GROUP",
                 "scope": "INVALID_CHOICE"
@@ -170,7 +176,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check member exists constraint",
             "status": 400,
             "return": 5047,
-            "payload": {
+            "req_data": {
                 "id": "TEST_GROUP",
                 "name": "TEST_GROUP",
                 "scope": "local",
@@ -181,7 +187,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check privilege exists constraint",
             "status": 400,
             "return": 5048,
-            "payload": {
+            "req_data": {
                 "id": "TEST_GROUP",
                 "name": "TEST_GROUP",
                 "scope": "remote",
@@ -191,7 +197,7 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Update group",
-            "payload": {
+            "req_data": {
                 "id": "TEST_GROUP",
                 "name": "TEST_GROUP",
                 "scope": "remote",
@@ -210,13 +216,13 @@ class APIE2ETestUserGroup(e2e_test_framework.APIE2ETest):
             "name": "Check ID exists constraint",
             "status": 400,
             "return": 5051,
-            "payload": {
+            "req_data": {
                 "id": "THIS_GROUP_DOES_NOT_EXIST"
             }
         },
         {
             "name": "Delete group",
-            "payload": {
+            "req_data": {
                 "id": "TEST_GROUP"
             }
         }

@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -27,10 +27,17 @@ class APIFirewallVirtualIPUpdate extends APIModel {
     }
 
     public function action() {
-        APITools\bring_down_virtual_ip($this->config["virtualip"]["vip"][$this->id], $this->id, false);
-        $this->config["virtualip"]["vip"][$this->id] = $this->validated_data;
+        # Serialize the original entry
+        $this->__serialize_vip();
+
+        # Update this virtual IP to config and mark the changes as pending
+        $this->set_config("virtualip/vip/{$this->id}", $this->validated_data);
         $this->write_config();
-        APITools\apply_virtual_ip($this->validated_data);
+        mark_subsystem_dirty('vip');
+
+        # Apply the changes
+        applyVIP();
+
         return APIResponse\get(0, $this->validated_data);
     }
     
@@ -51,9 +58,9 @@ class APIFirewallVirtualIPUpdate extends APIModel {
         # Validate our required 'id' payload value
         if (isset($this->initial_data['id'])) {
             # Check that our rule ID exists
-            if (array_key_exists($this->initial_data["id"], $this->config["virtualip"]["vip"])) {
+            if ($this->get_config("virtualip/vip/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data['id'];
-                $this->validated_data = $this->config["virtualip"]["vip"][$this->id];
+                $this->validated_data = $this->get_config("virtualip/vip/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(4018);
             }
@@ -203,11 +210,27 @@ class APIFirewallVirtualIPUpdate extends APIModel {
 
     private function __vhid_exists($vhid) {
         # Loop through each virtual IP and ensure it is not using the requested vhid
-        foreach ($this->config["virtualip"]["vip"] as $vip) {
+        foreach ($this->get_config("virtualip/vip", []) as $vip) {
             if (intval($vhid) === intval($vip["vhid"]) and intval($vhid) !== intval($this->validated_data["vhid"])) {
                 return true;
             }
         }
         return false;
+    }
+
+    private function __serialize_vip() {
+        global $g;
+
+        # Retain existing serialized virtual IPs if present
+        if (file_exists("{$g['tmp_path']}/.firewall_virtual_ip.apply")) {
+            $vips_to_apply = unserialize(file_get_contents("{$g['tmp_path']}/.firewall_virtual_ip.apply"));
+            $vips_to_apply[$this->id] = $this->get_config("virtualip/vip/{$this->id}");
+        }
+        else {
+            $vips_to_apply = [$this->id => $this->get_config("virtualip/vip/{$this->id}")];
+        }
+
+        # Write the pending changes to file
+        file_put_contents("{$g['tmp_path']}/.firewall_virtual_ip.apply", serialize($vips_to_apply));
     }
 }

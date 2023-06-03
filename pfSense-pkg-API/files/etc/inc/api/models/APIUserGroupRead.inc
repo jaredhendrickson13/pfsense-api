@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ class APIUserGroupRead extends APIModel {
     }
 
     public function action() {
-        return APIResponse\get(0, $this->to_representation($this->config["system"]["group"], true));
+        return APIResponse\get(0, $this->to_representation($this->get_config("system/group", []), true));
     }
 
     public static function to_representation($groups, $multiple=false) {

@@ -1,11 +1,8 @@
 """Script used to test the /api/v1/system/crl endpoint."""
 import e2e_test_framework
 
-
-class APIE2ETestSystemCRL(e2e_test_framework.APIE2ETest):
-    """Class used to test the /api/v1/system/crl endpoint."""
-    uri = "/api/v1/system/crl"
-    crl_text = "-----BEGIN X509 CRL----- \
+# Constants
+CRL_TEXT = "-----BEGIN X509 CRL----- \
 MIICnzCCAYcCAQEwDQYJKoZIhvcNAQEFBQAwgYUxKjAoBgNVBAMTIWludGVybmFs \
 LWNhLXVuaXQtdGVzdC5leGFtcGxlLmNvbTELMAkGA1UEBhMCVVMxDTALBgNVBAgT \
 BFV0YWgxFzAVBgNVBAcTDlNhbHQgTGFrZSBDaXR5MRUwEwYDVQQKEwxUZXN0IENv \
@@ -23,13 +20,23 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
 4bV6 \
 -----END X509 CRL----- \
 "
+
+
+class APIE2ETestSystemCRL(e2e_test_framework.APIE2ETest):
+    """Class used to test the /api/v1/system/crl endpoint."""
+    uri = "/api/v1/system/crl"
+
+    get_privileges = ["page-all", "page-system-crlmanager"]
+    post_privileges = ["page-all", "page-system-crlmanager"]
+    delete_privileges = ["page-all", "page-system-crlmanager"]
+
     get_tests = [{"name": "Read system CRLs"}]
     post_tests = [
         {
             "name": "Create RSA internal CA",
             "uri": "/api/v1/system/ca",
             "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
-            "payload": {
+            "req_data": {
                 "method": "internal",
                 "descr": "INTERNAL_CA_TEST",
                 "trust": True,
@@ -44,18 +51,18 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
             "status": 400,
             "return": 1047,
             "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
-            "payload": {"method": "internal", "descr": "TestCRL"}
+            "req_data": {"method": "internal", "descr": "TestCRL"}
         },
         {
             "name": "Check non-existing signing CA reference ID for intermediate method",
             "status": 400,
             "return": 1048,
             "no_caref": True,    # Prevents the overriden post_post() method from auto-adding the created CA ref ID
-            "payload": {"method": "internal", "descr": "TestCRL", "caref": "INVALID"}
+            "req_data": {"method": "internal", "descr": "TestCRL", "caref": "INVALID"}
         },
         {
             "name": "Create internal CRL",
-            "payload": {
+            "req_data": {
                 "method": "internal",
                 "descr": "INTERNAL_CRL_TEST",
                 "lifetime": 3650,
@@ -65,11 +72,11 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
         },
         {
             "name": "Create existing CRL",
-            "payload": {
+            "req_data": {
                 "method": "existing",
                 "descr": "EXISTING_CRL_TEST",
                 "lifetime": 3650,
-                "crl_data": crl_text
+                "crl_data": CRL_TEXT
             },
             "resp_time": 10
         },
@@ -77,63 +84,63 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
             "name": "Check method requirement",
             "status": 400,
             "return": 1031,
-            "payload": {"descr": "TestCRL"}
+            "req_data": {"descr": "TestCRL"}
         },
         {
             "name": "Check unsupported method",
             "status": 400,
             "return": 1032,
-            "payload": {"method": "INVALID_METHOD", "descr": "TestCRL"}
+            "req_data": {"method": "INVALID_METHOD", "descr": "TestCRL"}
         },
         {
             "name": "Check description character validation",
             "status": 400,
             "return": 1037,
-            "payload": {"method": "internal", "descr": "<>?&>"}
+            "req_data": {"method": "internal", "descr": "<>?&>"}
         },
         {
             "name": "Check description requirement",
             "status": 400,
             "return": 1002,
-            "payload": {"method": "internal"}
+            "req_data": {"method": "internal"}
         },
         {
             "name": "Check description requirement",
             "status": 400,
             "return": 1080,
-            "payload": {"method": "existing", "descr": "TestCRL"}
+            "req_data": {"method": "existing", "descr": "TestCRL"}
         },
         {
             "name": "Check lifetime maximum constraint for internal method",
             "status": 400,
             "return": 1046,
-            "payload": {"method": "internal", "descr": "TestCRL", "lifetime": 50000}
+            "req_data": {"method": "internal", "descr": "TestCRL", "lifetime": 50000}
         },
         {
             "name": "Check serial numeric validation with existing method",
             "status": 400,
             "return": 1033,
-            "payload": {"method": "internal", "descr": "TestCRL", "serial": "invalid"}
+            "req_data": {"method": "internal", "descr": "TestCRL", "serial": "invalid"}
         },
     ]
     delete_tests = [
         # refid gets populated by post_post() method
-        {"name": "Delete CRL certificate with refid", "payload": {}, "resp_time": 10},
+        {"name": "Delete CRL certificate with refid", "req_data": {}, "resp_time": 10},
         {
             "name": "Delete CRL certificate with descr",
-            "payload": {"descr": "EXISTING_CRL_TEST"},
+            "req_data": {"descr": "EXISTING_CRL_TEST"},
             "resp_time": 10
         },
         {
             "name": "Delete CA certificate",
             "uri": "/api/v1/system/ca",
-            "payload": {"descr": "INTERNAL_CA_TEST"}
+            "req_data": {"descr": "INTERNAL_CA_TEST"}
         },
         {
             "name": "Check deletion of non-existing CRL",
             "status": 400,
             "return": 1082,
-            "payload": {"refid": "INVALID"}
+            "req_data": {"refid": "INVALID"}
         }
     ]
 
@@ -143,15 +150,15 @@ BEswL+tABUNMaIVoGkVPSzlnSzHqEIVwC23S4w34o2pQUP0DRdhFaA+v21cAsBNa \
             # Variables
             counter = 0
             for test in self.post_tests:
-                # Assign the required refid created in the POST request to the DELETE payloads]
-                if "payload" in test and "no_caref" not in test:
-                    self.post_tests[counter]["payload"]["caref"] = self.post_responses[0]["data"]["refid"]
+                # Assign the required refid created in the POST request to the DELETE req_datas]
+                if "req_data" in test and "no_caref" not in test:
+                    self.post_tests[counter]["req_data"]["caref"] = self.post_responses[0]["data"]["refid"]
                 counter = counter + 1
 
         if len(self.post_responses) == 4:
             for test in self.post_tests:
-                # Assign the required refid created in the POST request to the DELETE payloads
-                self.delete_tests[0]["payload"]["refid"] = self.post_responses[3]["data"]["refid"]
+                # Assign the required refid created in the POST request to the DELETE req_datas
+                self.delete_tests[0]["req_data"]["refid"] = self.post_responses[3]["data"]["refid"]
 
 
 APIE2ETestSystemCRL()

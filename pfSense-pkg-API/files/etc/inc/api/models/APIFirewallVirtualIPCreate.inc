@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -25,19 +25,27 @@ class APIFirewallVirtualIPCreate extends APIModel {
     }
 
     public function action() {
-        # Ensure our config has virtual IP arrays initialized
-        if (!is_array($this->config["virtualip"]["vip"])) {
-            $this->config["virtualip"] = array("vip" => []);
-        }
+        global $g;
 
-        $this->config["virtualip"]["vip"][] = $this->validated_data;
+        # Write this virtual IP to config and mark the changes as pending
+        $this->id = $this->get_next_id("virtualip/vip");
+        $this->set_config("virtualip/vip/{$this->id}", $this->validated_data);
         $this->write_config();
-        APITools\apply_virtual_ip($this->validated_data);
+        mark_subsystem_dirty('vip');
+
+        # Serialize the pending changes and apply them immediately
+        file_put_contents(
+            "{$g['tmp_path']}/.firewall_virtual_ip.apply",
+            serialize([$this->id => $this->validated_data])
+        );
+        applyVIP();
+
         return APIResponse\get(0, $this->validated_data);
     }
 
     public function validate_payload() {
-        # Assign a unique ID to the virtual IP
+        # Find the next array ID and assign a unique ID to the virtual IP
+        $this->id = $this->get_next_id("virtualip/vip");
         $this->validated_data['uniqid'] = uniqid();
 
         # Validate input data
@@ -200,7 +208,7 @@ class APIFirewallVirtualIPCreate extends APIModel {
 
     private function __vhid_exists($interface, $vhid) {
         # Loop through each virtual IP and ensure it is not using the requested vhid
-        foreach ($this->config["virtualip"]["vip"] as $vip) {
+        foreach ($this->get_config("virtualip/vip", []) as $vip) {
             if ($interface === $vip["interface"] && intval($vhid) === intval($vip["vhid"])) {
                 return true;
             }

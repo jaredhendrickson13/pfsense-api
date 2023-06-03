@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,8 +26,7 @@ class APIFirewallRuleFlushDelete extends APIModel {
 
     public function action() {
         # Capture the rules data then flush all firewall rules
-        $del_rules = $this->config["filter"]["rule"];
-        $this->config["filter"]["rule"] = "";
+        $del_rules = $this->del_config("filter/rule");
 
         # Mark the firewall subsystem as changed, this will be cleared if applied
         mark_subsystem_dirty('filter');

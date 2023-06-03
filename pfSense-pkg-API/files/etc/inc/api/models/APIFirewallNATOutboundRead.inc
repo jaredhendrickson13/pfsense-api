@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -24,12 +24,6 @@ class APIFirewallNATOutboundRead extends APIModel {
     }
 
     public function action() {
-        # If default outbound NAT mode (auto) is configured, set a representation of this value since none is shown
-        if (empty($this->config["nat"]["outbound"]["mode"])) {
-            $this->validated_data = ["mode" => "automatic"];
-        } else {
-            $this->validated_data = ["mode" => $this->config["nat"]["outbound"]["mode"]];
-        }
-        return APIResponse\get(0, $this->validated_data);
+        return APIResponse\get(0, ["mode" => $this->get_config("nat/outbound/mode", "automatic")]);
     }
 }

@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -34,11 +34,12 @@ class APISystemCertificateCreate extends APIModel {
 
     public function action() {
         # Add the new certificate
-        $this->config["cert"][] = $this->validated_data;
+        $this->id = $this->get_next_id("cert");
+        $this->set_config("cert/{$this->id}",  $this->validated_data);
 
         # If user requests this cert to be active, configure it as the wc cert
         if ($this->initial_data["active"] === true and $this->validated_data["type"] === "server") {
-            $this->config["system"]["webgui"]["ssl-certref"] = $this->validated_data["refid"];
+            $this->set_config("system/webgui/ssl-certref", $this->validated_data["refid"]);
         }
 
         # Write changes to configuration
@@ -401,7 +402,7 @@ class APISystemCertificateCreate extends APIModel {
         $ca_enties = [];
 
         # Loop through each CA and add all CAs that have a valid key
-        foreach ($this->config['ca'] as $ca) {
+        foreach ($this->get_config('ca', []) as $ca) {
             if ($ca['prv']) {
                 $ca_enties[] = $ca['refid'];
             }

@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -22,14 +22,9 @@ class APIInterfaceBridgeRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-bridge", "page-interfaces-bridge-edit"];
-
     }
 
     public function action() {
-        $bridge_array = [];
-        if (!empty($this->config["bridges"]["bridged"])) {
-            $bridge_array = $this->config["bridges"]["bridged"];
-        }
-        return APIResponse\get(0, $bridge_array);
+        return APIResponse\get(0, $this->get_config("bridges/bridged", []));
     }
 }

@@ -1,4 +1,4 @@
-# Copyright 2022 Jared Hendrickson
+# Copyright 2023 Jared Hendrickson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,13 +18,19 @@ import e2e_test_framework
 class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/firewall/schedule endpoint."""
     uri = "/api/v1/firewall/schedule"
+
+    get_privileges = ["page-all", "page-firewall-schedules"]
+    post_privileges = ["page-all", "page-firewall-schedules-edit"]
+    put_privileges = ["page-all", "page-firewall-schedules-edit"]
+    delete_privileges = ["page-all", "page-firewall-schedules-edit"]
+
     get_tests = [
             {"name": "Read all firewall schedules"}
         ]
     post_tests = [
         {
             "name": "Create firewall schedule",
-            "payload": {
+            "req_data": {
                 "name": "Test_Create_Schedule",
                 "descr": "E2E test",
                 "timerange": [
@@ -51,7 +57,7 @@ class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
             "name": "Check name character validation",
             "status": 400,
             "return": 4147,
-            "payload": {
+            "req_data": {
                 "name": "THIS NAME IS INVALID!"
             }
         },
@@ -59,7 +65,7 @@ class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
             "name": "Check name minimum length constraint",
             "status": 400,
             "return": 4147,    # This triggers the regex validation to fail, use that error code
-            "payload": {
+            "req_data": {
                 "name": ""
             }
         },
@@ -67,7 +73,7 @@ class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
             "name": "Check name maximum length constraint",
             "status": 400,
             "return": 4148,
-            "payload": {
+            "req_data": {
                 "name": "THIS_NAME_IS_TOO_LONG_FOR_PFSENSE_TO_HANDLE"
             }
         },
@@ -75,7 +81,7 @@ class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
             "name": "Check name unique constraint",
             "status": 400,
             "return": 4149,
-            "payload": {
+            "req_data": {
                 "name": "Test_Create_Schedule"
             }
         },
@@ -83,7 +89,7 @@ class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
             "name": "Check time range requirement",
             "status": 400,
             "return": 4161,
-            "payload": {
+            "req_data": {
                 "name": "New_Schedule"
             }
         },
@@ -91,7 +97,7 @@ class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
             "name": "Check time range minimum length constraint",
             "status": 400,
             "return": 4162,
-            "payload": {
+            "req_data": {
                 "name": "New_Schedule",
                 "timerange": []
             }
@@ -99,7 +105,7 @@ class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
         {
             "name": "Create firewall rule using created schedule",
             "uri": "/api/v1/firewall/rule",
-            "payload": {
+            "req_data": {
                 "interface": "wan",
                 "ipprotocol": "inet",
                 "protocol": "any",
@@ -113,7 +119,7 @@ class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
     put_tests = [
         {
             "name": "Update firewall schedule",
-            "payload": {
+            "req_data": {
                 "name": "Test_Create_Schedule",
                 "descr": "Updated E2E test",
                 "timerange": [
@@ -140,19 +146,19 @@ class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
             "name": "Check updating non-existent firewall schedule",
             "status": 400,
             "return": 4150,
-            "payload": {
+            "req_data": {
                 "name": "INVALID"
             }
         },
         {
             "name": "Check update with no changes",
-            "payload": {
+            "req_data": {
                 "name": "Test_Create_Schedule"
             }
         },
         {
             "name": "Check update with changed description only",
-            "payload": {
+            "req_data": {
                 "name": "Test_Create_Schedule",
                 "descr": "Update E2E test description only"
             }
@@ -161,7 +167,7 @@ class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
             "name": "Check time range minimum length constraint",
             "status": 400,
             "return": 4162,
-            "payload": {
+            "req_data": {
                 "name": "Test_Create_Schedule",
                 "timerange": []
             }
@@ -172,18 +178,18 @@ class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
             "name": "Check deleting schedule in use",
             "status": 400,
             "return": 4166,
-            "payload": {
+            "req_data": {
                 "name": "Test_Create_Schedule"
             }
         },
         {
             "name": "Delete firewall rule using schedule",
             "uri": "/api/v1/firewall/rule",
-            "payload": {}
+            "req_data": {}
         },
         {
             "name": "Delete firewall schedule",
-            "payload": {
+            "req_data": {
                 "name": "Test_Create_Schedule"
             }
         },
@@ -196,7 +202,7 @@ class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
             "name": "Check delete non-existing schedule name",
             "status": 400,
             "return": 4150,
-            "payload": {
+            "req_data": {
                 "name": "INVALID"
             }
         }
@@ -207,9 +213,9 @@ class APIE2ETestFirewallSchedule(e2e_test_framework.APIE2ETest):
         if self.post_responses:
             # Check if the last request was a successful firewall rule creation
             if self.post_responses[-1] and isinstance(self.post_responses[-1]["data"], dict):
-                # Add the tracker to delete payload that deletes the firewall rule using the schedule
+                # Add the tracker to delete req_data that deletes the firewall rule using the schedule
                 if self.post_responses[-1]["data"].get("tracker", None):
-                    self.delete_tests[1]["payload"]["tracker"] = self.post_responses[-1]["data"]["tracker"]
+                    self.delete_tests[1]["req_data"]["tracker"] = self.post_responses[-1]["data"]["tracker"]
 
 
 APIE2ETestFirewallSchedule()

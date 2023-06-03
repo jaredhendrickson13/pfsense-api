@@ -8,7 +8,7 @@
  * API
  *  - The missing REST API package for pfSense
  *
- * Copyright 2022 Jared Hendrickson
+ * Copyright 2023 Jared Hendrickson
  */
 	]]>
     </copyright>
@@ -33,4 +33,10 @@
             <active/>
         </tab>
     </tabs>
+    <include_file>/usr/local/share/pfSense-pkg-API/nginx.inc</include_file>
+    <plugins>
+        <item>
+            <type>plugin_nginx</type>
+        </item>
+    </plugins>
 </packagegui>

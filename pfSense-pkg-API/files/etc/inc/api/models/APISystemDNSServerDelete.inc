@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -22,19 +22,19 @@ class APISystemDNSServerDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system"];
+        $this->privileges = ["page-all", "page-system-generalsetup"];
         $this->change_note = "Deleted system DNS servers via API";
     }
 
     public function action() {
-        $this->config["system"]["dnsserver"] = $this->validated_data["dnsserver"];
+        $this->set_config("system/dnsserver", $this->validated_data["dnsserver"]);
         $this->write_config();
         $this->apply_backend_changes();
         return APIResponse\get(0, $this->validated_data);
     }
 
     public function validate_payload() {
-        $this->validated_data["dnsserver"] = $this->config["system"]["dnsserver"];
+        $this->validated_data["dnsserver"] = $this->get_config("system/dnsserver");
         $this->__validate_dnsserver();
     }
 
@@ -69,9 +69,9 @@ class APISystemDNSServerDelete extends APIModel {
     public function apply_backend_changes() {
         # Update a slew of backend services
         system_resolvconf_generate();
-        if (isset($this->config['dnsmasq']['enable'])) {
+        if ($this->is_config_enabled('dnsmasq')) {
             services_dnsmasq_configure();
-        } elseif (isset($this->config['unbound']['enable'])) {
+        } elseif ($this->is_config_enabled('unbound')) {
             services_unbound_configure();
         }
 

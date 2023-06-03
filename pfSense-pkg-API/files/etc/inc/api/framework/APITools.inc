@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ require_once("functions.inc");
 require_once("openvpn.inc");
 require_once("certs.inc");
 require_once("pkg-utils.inc");
+require_once("firewall_virtual_ip.inc");
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
@@ -127,9 +128,8 @@ function get_pfsense_version() {
 
 # Locates our API configuration from pfSense's XML configuration. Returns
 function get_api_config() {
-    global $config;
     $api_pkg_name = "API";
-    $pkg_conf = $config["installedpackages"]["package"];
+    $pkg_conf = config_get_path("installedpackages/package");
     // Check that our configuration is an array
     if (is_array($pkg_conf)) {
         // Loop through our packages and find our API package config
@@ -143,9 +143,9 @@ function get_api_config() {
 
 # Checks if a specified user is disabled
 function is_user_disabled($username) {
-    global $config;
     $users = index_users();
-    if (array_key_exists("disabled", $config["system"]["user"][$users[$username]])) {
+    $user = $users[$username];
+    if (config_path_enabled("system/user/{$user}", "disabled")) {
         return true;
     }
     return false;
@@ -153,27 +153,24 @@ function is_user_disabled($username) {
 
 # Creates JWT server key if one does not exist, or optionally allows rotation of the JWT server key
 function create_jwt_server_key($rotate=false) {
-    global $config;
     $pkg_index = get_api_config()[0];    // Save our current API configs pkg index
     $api_config = get_api_config()[1];    // Save our current API config
     # Create a new server key if one is not set
     if (empty($api_config["server_key"]) or $rotate === true) {
-        $config["installedpackages"]["package"][$pkg_index]["conf"]["server_key"] = bin2hex(random_bytes(32));
+        config_set_path("installedpackages/package/{$pkg_index}/conf/server_key", bin2hex(random_bytes(32)));
         write_config("API server key created");
     }
 }
 
 # Creates a JWT to use for JWT authentication
 function create_jwt($data) {
-    global $config;
-
     # Pull the API configuration and extract the jwt expiration value, then ensure a server key and payload exists.
     $api_config = get_api_config()[1];
     $token_exp = $api_config["jwt_exp"];
     create_jwt_server_key();
     $payload = array(
-        "iss" => $config["system"]["hostname"],
-        "aud" => $config["system"]["hostname"],
+        "iss" => config_get_path("system/hostname"),
+        "aud" => config_get_path("system/hostname"),
         "exp" => time() + $token_exp,
         "nbf" => time(),
         "data" => $data
@@ -201,11 +198,16 @@ function get_existing_tokens($username) {
     $api_config = get_api_config()[1];
     $key_user = bin2hex($username);    // Save our user's dedicated API client-ID
     $user_keys = [];
-    foreach ($api_config["keys"]["key"] as $id => $key) {
-        if ($key["client_id"] === $key_user) {
-            $user_keys[$id] = array("client_token" => $key["client_token"], "algo" => $key["algo"]);
+
+    # Only loop through if we have configured keys
+    if (is_array($api_config["keys"]) and is_array($api_config["keys"]["key"])) {
+        foreach ($api_config["keys"]["key"] as $id => $key) {
+            if ($key["client_id"] === $key_user) {
+                $user_keys[$id] = array("client_token" => $key["client_token"], "algo" => $key["algo"]);
+            }
         }
     }
+
     return $user_keys;
 }
 
@@ -213,8 +215,9 @@ function get_existing_tokens($username) {
 function authenticate_token($cid, $ctoken) {
     $authenticated = false;
     $hex_to_user = pack("H*", $cid);
+
     // First check if our hex decoded user exists
-    if (in_array($hex_to_user, index_users())) {
+    if (array_key_exists($hex_to_user, index_users())) {
         // Loop through each of our users API tokens and check if key matches
         foreach (get_existing_tokens($hex_to_user) as $id => $data) {
             $hash_input_key = hash($data["algo"], $ctoken);    // Hash our key using our configured algos
@@ -230,7 +233,6 @@ function authenticate_token($cid, $ctoken) {
 // Generate new API tokens for token auth mode
 function generate_token($username) {
     // Local variables
-    global $config;
     $pkg_index = get_api_config()[0];    // Save our current API configs pkg index
     $api_config = get_api_config()[1];    // Save our current API config
     $key_hash_algo = $api_config["keyhash"];    // Pull our configured key hash algorithm
@@ -244,9 +246,8 @@ function generate_token($username) {
     $api_config["keys"]["key"][] = array("client_id" => $key_user, "client_token" => $key_hash, "algo" => $key_hash_algo);
 
     // Write our changes
-    $config["installedpackages"]["package"][$pkg_index]["conf"] = $api_config;    // Write change to config
-    $change_note = " Generated API key";    // Add a change note
-    write_config(sprintf(gettext($change_note)));    // Apply our configuration change
+    config_set_path("installedpackages/package/{$pkg_index}/conf", $api_config);
+    write_config(sprintf(gettext(" Generated API key")));    // Apply our configuration change
     return $key_new;
 }
 
@@ -261,10 +262,9 @@ function is_carp_enabled() {
 // Check each CARP interface's status
 function get_carp_if_status() {
     // Local variables
-    global $err_lib, $config;
     $carp_if_stats = [];
     $carp_enabled = is_carp_enabled();
-    foreach ($config['virtualip']['vip'] as $carp) {
+    foreach (config_get_path('virtualip/vip', []) as $carp) {
         if ($carp['mode'] == "carp") {
             $carp_if_ent = [];
             $carp_if_ent["interface"] = $carp["interface"];
@@ -294,8 +294,7 @@ function get_carp_if_status() {
 // Enables CARP interfaces
 function enable_carp($enable) {
     // Local variables
-    global $config;
-    $vip_arr = $config['virtualip']['vip'];
+    $vip_arr = config_get_path('virtualip/vip');
     $no_action = (is_carp_enabled() === $enable) ? true : false;    // Check if a change is even requried
     // Disable if $enable is false, enable if $enable is true
     if (!$no_action and $enable === false) {
@@ -328,19 +327,18 @@ function enable_carp($enable) {
 # Sorts NAT rules by specified criteria
 function sort_nat_rules($top=false, $data=null, $field=null) {
     // Variables
-    global $config;
     $sort_arr = [];
 
     # Set appropriate config location depending on specified field
     switch($field) {
         case "onetoone":
-            $acl =& $config["nat"]["onetoone"];
+            $acl =& config_get_path("nat/onetoone", []);
             break;
         case "outbound":
-            $acl =& $config["nat"]["outbound"]["rule"];
+            $acl =& config_get_path("nat/outbound/rule", []);
             break;
         default:
-            $acl =& $config["nat"]["rule"];
+            $acl =& config_get_path("nat/rule", []);
     }
 
     foreach ($acl as $idx => $fre) {
@@ -361,9 +359,8 @@ function sort_nat_rules($top=false, $data=null, $field=null) {
 # Input a physical interface ID, or a descriptive interface name, and return the pfSense interface ID (lan,wan,optx)
 function get_pfsense_if_id($interface, $include_carp=false, $include_ifgroup=false, $include_ipsec=false, $include_openvpn=false) {
     # Variables
-    global $config;
     # Loop through our config and check each interface for a physical ID match
-    foreach ($config["interfaces"] as $if_id => $if_ent) {
+    foreach (config_get_path("interfaces", []) as $if_id => $if_ent) {
         # First check if the requested interface matches this physical interface ID
         if (array_key_exists("if", $if_ent)) {
             // Check if the interface id matches
@@ -404,17 +401,15 @@ function get_pfsense_if_id($interface, $include_carp=false, $include_ifgroup=fal
     }
 
     # Only include the OpenVPN interface if explicitly requested and OpenVPN is configured
-    if ($include_openvpn and $interface === "openvpn" and $config["openvpn"]) {
+    if ($include_openvpn and $interface === "openvpn" and config_get_path("openvpn", false)) {
         return $interface;
     }
 }
 
 # Check if a string is a virtual IPs unique ID
 function is_vip($value, $vip_type="all") {
-    global $config;
-
     # Loop through each configured virtual IP
-    foreach ($config['virtualip']['vip'] as $vip) {
+    foreach (config_get_path('virtualip/vip', []) as $vip) {
         if ($vip['mode'] == $vip_type or $vip_type === "all") {
             if ($value === '_vip'.$vip['uniqid']) {
                 return $value;
@@ -425,10 +420,8 @@ function is_vip($value, $vip_type="all") {
 
 # Checks if a string is an existing certificate's ref ID
 function is_certificate($refid) {
-    global $config;
-
     # Loop through each configured certificate and check if this value matches its refid
-    foreach ($config["cert"] as $cert) {
+    foreach (config_get_path("cert", []) as $cert) {
         if ($cert["refid"] === $refid) {
             return true;
         }
@@ -438,10 +431,8 @@ function is_certificate($refid) {
 
 # Checks if a string is an existing ca's ref ID
 function is_ca($refid) {
-    global $config;
-
     # Loop through each configured ca and check if this value matches its refid
-    foreach ($config["ca"] as $ca) {
+    foreach (config_get_path("ca", []) as $ca) {
         if ($ca["refid"] === $refid) {
             return true;
         }
@@ -524,63 +515,9 @@ function str_ends_with($needle, $haystack) {
     return substr($haystack, -$length) === $needle;
 }
 
-// Remove virtual IP and bring down virtual interface
-function bring_down_virtual_ip($vip_ent, $id, $delete=true) {
-    global $config;
-    if ($vip_ent['mode'] == "proxyarp") {
-        if ($delete) {
-            unset($config["virtualip"]["vip"][$id]);
-        }
-        $viface = $vip_ent['interface'];
-        interface_proxyarp_configure($viface);
-    } else {
-        interface_vip_bring_down($vip_ent);
-        if ($delete) {
-            unset($config["virtualip"]["vip"][$id]);
-        }
-    }
-    if ($delete and count($config['virtualip']['vip']) == 0) {
-        unset($config['virtualip']['vip']);
-    }
-}
-
-// Apply changes to virtual IPs
-function apply_virtual_ip($vip_ent) {
-    $check_carp = false;
-    if (is_array($vip_ent)) {
-        foreach ($vip_ent as $vid => $ovip) {
-            if (!empty($ovip)) {
-                interface_vip_bring_down($ovip);
-            }
-            if ($vip_ent) {
-                switch ($vip_ent['mode']) {
-                    case "ipalias":
-                        interface_ipalias_configure($vip_ent);
-                        break;
-                    case "proxyarp":
-                        interface_proxyarp_configure($vip_ent['interface']);
-                        break;
-                    case "carp":
-                        $check_carp = true;
-                        interface_carp_configure($vip_ent);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-    }
-    /* Before changing check #4633 */
-    if ($check_carp === true && !get_carp_status()) {
-        set_single_sysctl("net.inet.carp.allow", "1");
-    }
-    filter_configure();
-}
-
 // Find an available virtual IP vhid
 function next_vhid() {
-    global $err_lib, $config;
-    $vhid_config = $config["virtualip"]["vip"];
+    $vhid_config = config_get_path("virtualip/vip", []);
     $ret_vhid = null;
     # Loop through our range of valid VHID ids
     foreach (range(1, 255) as $idx) {
@@ -602,9 +539,8 @@ function next_vhid() {
 
 // Checks if an IP is in use elsewhere in our configuration
 function is_ip_in_use($ip) {
-    global $err_lib, $config;
-    $vip_conf = $config["virtualip"]["vip"];
-    $if_conf = $config["interfaces"];
+    $vip_conf = config_get_path("virtualip/vip", []);
+    $if_conf = config_get_path("interfaces", []);
     // Check if IP is used in our virtual IP configuration
     foreach ($vip_conf as $vip) {
         if ($ip === $vip["subnet"]) {
@@ -620,33 +556,6 @@ function is_ip_in_use($ip) {
         }
     }
     return false;
-}
-
-// Sorts filter rules by specified criteria and reloads the filter
-function sort_firewall_rules($mode=null, $data=null) {
-    // Variables
-    global $config;
-    $sort_arr = [];
-    $master_arr = [];
-    foreach ($config["filter"]["rule"] as $idx => $fre) {
-        $curr_iface = $fre["interface"];    // Save our current entries interface
-        // Create our interface array if does not exist
-        if (!isset($sort_arr[$curr_iface])) {
-            $sort_arr[$curr_iface] = [];
-        }
-        // Check if user requested this rule to be placed at the top of array
-        if ($mode === "top" and $idx === $data) {
-            array_unshift($sort_arr[$curr_iface], $fre);
-        } else {
-            $sort_arr[$curr_iface][] = $fre;
-        }
-    }
-    foreach ($sort_arr as $if) {
-        foreach ($if as $rule) {
-            $master_arr[] = $rule;
-        }
-    }
-    $config["filter"]["rule"] = $master_arr;
 }
 
 # Checks if routing gateway exists
@@ -673,13 +582,49 @@ function is_gateway($gw, $ret_protocol=false) {
     return false;
 }
 
+# Checks if a specified gateway ID is in use
+function is_gateway_in_use($id) {
+    # Local variables
+    $gws = config_get_path("gateways/gateway_item", []);
+
+    # Only check if our ID is numeric
+    if (is_numeric($id)) {
+        # Check if gateways groups are using this gateway
+        foreach (config_get_path('gateways/gateway_group', []) as $group) {
+            foreach ($group['item'] as $item) {
+                $items = explode("|", $item);
+                if ($items[0] == $gws[$id]['name']) {
+                    return true;
+                }
+            }
+        }
+
+        # Check if static routes are using this gateway
+        foreach (config_get_path('staticroutes/route', []) as $route) {
+            if ($route['gateway'] == $gws[$id]['name']) {
+                return true;
+            }
+        }
+
+        # Check if system DNS servers are using this gateway
+        foreach (config_get_path('system/dnsserver', []) as $id_dnsgw => $dnsserver) {
+            if (config_path_enabled("system", "dns{$id_dnsgw}gw")) {
+                if ($gws[$id]['name'] == config_get_path("system/dns{$id_dnsgw}gw")) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
 // Duplicate function from /firewall_aliases.php: accept input and check if alias exists
 function alias_find_references($section, $field, $origname, &$is_alias_referenced, &$referenced_by) {
-    global $err_lib, $config;
     if (!$origname || $is_alias_referenced) {
         return;
     }
-    $sectionref = &$config;
+    $sectionref = config_get_path("/");
     foreach ($section as $sectionname) {
         if (is_array($sectionref) && isset($sectionref[$sectionname])) {
             $sectionref = &$sectionref[$sectionname];
@@ -795,8 +740,7 @@ function get_arp_entry($search, $value) {
 
 // Checks if an authentication server exists by name
 function is_authentication_server($name) {
-    global $err_lib, $config;
-    foreach ($config["system"]["authserver"] as $as) {
+    foreach (config_get_path("system/authserver", []) as $as) {
         $reserved_names = [$as["name"], "Local_Database", "local", "LOCAL", "Local"];
         if (in_array($name, $reserved_names)) {
             return true;
@@ -822,50 +766,55 @@ function unbound_reload_config() {
 // Get a complete config list of ALL interfaces. Based off interfaces_assign.php
 function get_all_avail_interfaces() {
     // Local variables
-    global $err_lib, $config;
-    $base_ifs = get_interface_list();    // Get our base interface list, this will be populated with all ifs
-    // Add wireless ifs to our array
-    if (is_array($config['wireless']['clone']) && count($config['wireless']['clone'])) {
-        foreach ($config['wireless']['clone'] as $clone) {
+    global $ipsec_descrs;
+    $base_ifs = get_interface_list();
+    
+    # Include wireless clone interfaces 
+    if (config_get_path('wireless/clone') && is_array(config_get_path('wireless/clone')) && count(config_get_path('wireless/clone'))) {
+        foreach (config_get_path('wireless/clone', []) as $clone) {
             $base_ifs[$clone['cloneif']] = $clone;
-            $base_ifs[$clone['cloneif']]['is_wlclone'] = true;
+            $base_ifs[$clone['cloneif']]['iswlclone'] = true;
         }
     }
-    // Add VLAN ifs to our array
-    if (is_array($config['vlans']['vlan']) && count($config['vlans']['vlan'])) {
-        //$timea = microtime(true);
-        foreach ($config['vlans']['vlan'] as $vlan) {
+
+    # Include VLAN interfaces 
+    if (config_get_path('vlans/vlan') && is_array(config_get_path('vlans/vlan')) && count(config_get_path('vlans/vlan'))) {
+        foreach (config_get_path('vlans/vlan', []) as $vlan) {
             $base_ifs[$vlan['vlanif']] = $vlan;
-            $base_ifs[$vlan['vlanif']]['is_vlan'] = true;
+            $base_ifs[$vlan['vlanif']]['isvlan'] = true;
         }
     }
-    // Add bridge ifs to our array
-    if (is_array($config['bridges']['bridged']) && count($config['bridges']['bridged'])) {
-        foreach ($config['bridges']['bridged'] as $bridge) {
+
+    # Include Bridge interfaces 
+    if (config_get_path('bridges/bridged') && is_array(config_get_path('bridges/bridged')) && count(config_get_path('bridges/bridged'))) {
+        foreach (config_get_path('bridges/bridged', []) as $bridge) {
             $base_ifs[$bridge['bridgeif']] = $bridge;
-            $base_ifs[$bridge['bridgeif']]['is_bridge'] = true;
+            $base_ifs[$bridge['bridgeif']]['isbridge'] = true;
         }
     }
-    // Add GIF ifs to our array
-    if (is_array($config['gifs']['gif']) && count($config['gifs']['gif'])) {
-        foreach ($config['gifs']['gif'] as $gif) {
+
+    # Include GIF interfaces 
+    if (config_get_path('gifs/gif') && is_array(config_get_path('gifs/gif')) && count(config_get_path('gifs/gif'))) {
+        foreach (config_get_path('gifs/gif', []) as $gif) {
             $base_ifs[$gif['gifif']] = $gif;
-            $base_ifs[$gif['gifif']]['is_gif'] = true;
+            $base_ifs[$gif['gifif']]['isgif'] = true;
         }
     }
-    // Add GRE ifs to our array
-    if (is_array($config['gres']['gre']) && count($config['gres']['gre'])) {
-        foreach ($config['gres']['gre'] as $gre) {
+
+    # Include GRE interfaces 
+    if (config_get_path('gres/gre') && is_array(config_get_path('gres/gre')) && count(config_get_path('gres/gre'))) {
+        foreach (config_get_path('gres/gre', []) as $gre) {
             $base_ifs[$gre['greif']] = $gre;
-            $base_ifs[$gre['greif']]['is_gre'] = true;
+            $base_ifs[$gre['greif']]['isgre'] = true;
         }
     }
-    // Add LAGG ifs to our array
-    if (is_array($config['laggs']['lagg']) && count($config['laggs']['lagg'])) {
-        foreach ($config['laggs']['lagg'] as $lagg) {
+
+    # Include LAGG interfaces 
+    if (config_get_path('laggs/lagg') && is_array(config_get_path('laggs/lagg')) && count(config_get_path('laggs/lagg'))) {
+        foreach (config_get_path('laggs/lagg', []) as $lagg) {
             $base_ifs[$lagg['laggif']] = $lagg;
-            $base_ifs[$lagg['laggif']]['is_lagg'] = true;
-            /* LAGG members cannot be assigned */
+            $base_ifs[$lagg['laggif']]['islagg'] = true;
+            # LAGG members cannot be assigned 
             $lagifs = explode(',', $lagg['members']);
             foreach ($lagifs as $lagif) {
                 if (isset($base_ifs[$lagif])) {
@@ -874,76 +823,82 @@ function get_all_avail_interfaces() {
             }
         }
     }
-    // Add QinQ ifs to our array
-    if (is_array($config['qinqs']['qinqentry']) && count($config['qinqs']['qinqentry'])) {
-        foreach ($config['qinqs']['qinqentry'] as $qinq) {
+
+    # Include QinQ interfaces 
+    if (config_get_path('qinqs/qinqentry') && is_array(config_get_path('qinqs/qinqentry')) && count(config_get_path('qinqs/qinqentry'))) {
+        foreach (config_get_path('qinqs/qinqentry', []) as $qinq) {
             $base_ifs["{$qinq['vlanif']}"]['descr'] = "VLAN {$qinq['tag']} on {$qinq['if']}";
-            $base_ifs["{$qinq['vlanif']}"]['is_qinq'] = true;
-            /* QinQ members */
+            $base_ifs["{$qinq['vlanif']}"]['isqinq'] = true;
+            # QinQ members 
             $qinqifs = explode(' ', $qinq['members']);
             foreach ($qinqifs as $qinqif) {
                 $base_ifs["{$qinq['vlanif']}.{$qinqif}"]['descr'] = "QinQ {$qinqif} on VLAN {$qinq['tag']} on {$qinq['if']}";
-                $base_ifs["{$qinq['vlanif']}.{$qinqif}"]['is_qinq'] = true;
+                $base_ifs["{$qinq['vlanif']}.{$qinqif}"]['isqinq'] = true;
             }
         }
     }
-    // Add PPP ifs to our array
-    if (is_array($config['ppps']['ppp']) && count($config['ppps']['ppp'])) {
-        foreach ($config['ppps']['ppp'] as $pppid => $ppp) {
-            $if_name = $ppp['if'];
-            $base_ifs[$if_name] = $ppp;
-            $base_ifs[$if_name]['is_ppp'] = true;
+
+    # Include PPP interfaces 
+    if (config_get_path('ppps/ppp') && is_array(config_get_path('ppps/ppp')) && count(config_get_path('ppps/ppp'))) {
+        foreach (config_get_path('ppps/ppp', []) as $pppid => $ppp) {
+            $portname = $ppp['if'];
+            $base_ifs[$portname] = $ppp;
+            $base_ifs[$portname]['isppp'] = true;
             $ports_base = basename($ppp['ports']);
             if (isset($ppp['descr'])) {
-                $base_ifs[$if_name]['descr'] = strtoupper($ppp['if']). "({$ports_base}) - {$ppp['descr']}";
+                $base_ifs[$portname]['descr'] = strtoupper($ppp['if']). "({$ports_base}) - {$ppp['descr']}";
             } else if (isset($ppp['username'])) {
-                $base_ifs[$if_name]['descr'] = strtoupper($ppp['if']). "({$ports_base}) - {$ppp['username']}";
+                $base_ifs[$portname]['descr'] = strtoupper($ppp['if']). "({$ports_base}) - {$ppp['username']}";
             } else {
-                $base_ifs[$if_name]['descr'] = strtoupper($ppp['if']). "({$ports_base})";
+                $base_ifs[$portname]['descr'] = strtoupper($ppp['if']). "({$ports_base})";
             }
         }
     }
-    // Add OpenVPN descriptions to our array
+
+    # Include OpenVPN interfaces
     $ovpn_descrs = array();
-    if (is_array($config['openvpn'])) {
-        if (is_array($config['openvpn']['openvpn-server'])) {
-            foreach ($config['openvpn']['openvpn-server'] as $s) {
-                $if_name = "ovpns{$s['vpnid']}";
-                $base_ifs[$if_name] = $s;
+    if (config_get_path('openvpn') && is_array(config_get_path('openvpn'))) {
+        if (config_get_path('openvpn/openvpn-server') && is_array(config_get_path('openvpn/openvpn-server'))) {
+            foreach (config_get_path('openvpn/openvpn-server', []) as $s) {
+                $portname = "ovpns{$s['vpnid']}";
+                $base_ifs[$portname] = $s;
                 $ovpn_descrs[$s['vpnid']] = $s['description'];
             }
         }
-        if (is_array($config['openvpn']['openvpn-client'])) {
-            foreach ($config['openvpn']['openvpn-client'] as $c) {
-                $if_name = "ovpnc{$c['vpnid']}";
-                $base_ifs[$if_name] = $c;
+        if (config_get_path('openvpn/openvpn-client') && is_array(config_get_path('openvpn/openvpn-client'))) {
+            foreach (config_get_path('openvpn/openvpn-client', []) as $c) {
+                $portname = "ovpnc{$c['vpnid']}";
+                $base_ifs[$portname] = $c;
                 $ovpn_descrs[$c['vpnid']] = $c['description'];
             }
         }
     }
-    // Add IPsec descriptions to our array
-    global $err_lib, $ipsec_descrs;
+
+    # Include IPsec interfaces
     $ipsec_descrs = interface_ipsec_vti_list_all();
     foreach ($ipsec_descrs as $ifname => $ifdescr) {
         $base_ifs[$ifname] = array('descr' => $ifdescr);
     }
-    // Loop through our array and check if interface is in use
+
+    # Loop through our array and check if interface is in use
     foreach ($base_ifs as $pid => $conf) {
-        $pf_id = get_pfsense_if_id($pid);    // Try to convert to pfSense interface ID
-        // Check if our pfSense ID was found
+        # Check if there is a configuration for this interface
+        $pf_id = get_pfsense_if_id($pid);
+
+        # Check if the pfSense interface ID was found
         if (get_pfsense_if_id($pid)) {
             $base_ifs[$pid]["in_use"] = $pf_id;
         }
     }
+
     return $base_ifs;
 }
 
 // Get available media options for a given interface. Modified from interfaces.php
 function get_if_media_options($interface, $physical_if=false) {
     // Local variables
-    global $err_lib, $config;
     $interface = ($physical_if !== true) ? get_pfsense_if_id($interface) : $interface;
-    $interface = ($physical_if !== true) ? $config['interfaces'][$interface]['if'] : $interface;
+    $interface = ($physical_if !== true) ? config_get_path("interfaces/{$interface}/if") : $interface;
     $mediaopts_list = array();
     exec("/sbin/ifconfig -m $interface | grep \"media \"", $mediaopts);
     foreach ($mediaopts as $mediaopt) {
@@ -962,8 +917,7 @@ function get_if_media_options($interface, $physical_if=false) {
 // Get our next available pfSense interface ID
 function get_next_pfsense_if_id() {
     // Local variables
-    global $err_lib, $config;
-    $curr_ifs = $config["interfaces"];
+    $curr_ifs = config_get_path("interfaces", []);
     // Check if we have our `wan` or `lan` pf IDs in use, if so, find the next OPTx id
     if (!array_key_exists("wan", $curr_ifs)) {
         return "wan";
@@ -983,12 +937,10 @@ function get_next_pfsense_if_id() {
 
 // Returns a list of dynamically configured IPv6 interfaces. Modified from interfaces.php function.
 function get_ipv6_if_list() {
-    global $err_lib, $config, $section;
-    $list = array('' => '');
     $interfaces = get_configured_interface_with_descr(true);
     $dyn_v6_ifs = array();
     foreach ($interfaces as $iface => $ifacename) {
-        switch ($config['interfaces'][$iface]['ipaddrv6']) {
+        switch (config_get_path("interfaces/{$iface}/ipaddrv6")) {
             case "6to4":
             case "6rd":
             case "dhcp6":
@@ -1003,41 +955,6 @@ function get_ipv6_if_list() {
     return($dyn_v6_ifs);
 }
 
-function delete_static_route($id) {
-    global $config;
-    $a_routes = &$config['staticroutes']['route'];
-    $a_gateways = return_gateways_array(true, true, true);
-
-    if (!isset($a_routes[$id])) {
-        return;
-    }
-
-    $targets = array();
-    if (is_alias($a_routes[$id]['network'])) {
-        foreach (filter_expand_alias_array($a_routes[$id]['network']) as $tgt) {
-            if (is_ipaddrv4($tgt)) {
-                $tgt .= "/32";
-            } else if (is_ipaddrv6($tgt)) {
-                $tgt .= "/128";
-            }
-            if (!is_subnet($tgt)) {
-                continue;
-            }
-            $targets[] = $tgt;
-        }
-    } else {
-        $targets[] = $a_routes[$id]['network'];
-    }
-
-    foreach ($targets as $tgt) {
-        $family = (is_subnetv6($tgt) ? "-inet6" : "-inet");
-        $gateway = $a_gateways[$a_routes[$id]['gateway']]['gateway'];
-        mwexec("/sbin/route delete {$family} " . escapeshellarg($tgt) . " " . escapeshellarg($gateway));
-    }
-
-    unset($targets);
-}
-
 # Converts an integer-of-100 percent to a decimal percentage
 function float_percent($value) {
     # Only return converted value if it is numeric
@@ -1050,26 +967,11 @@ function float_percent($value) {
     }
 }
 
-# Checks if an alias exists with a specified name, and returns the alias type. Returns null if not found
-function is_alias($name) {
-    global $config;
-    if (is_array($config['aliases']['alias'])) {
-        foreach ($config['aliases']['alias'] as $alias) {
-            if (strcasecmp($alias['name'], $name) == 0) {
-                return $alias["type"];
-            }
-        }
-    }
-}
-
 # Checks if an interface group with a specified name already exists. Returns true or false.
 function is_ifgroup($name) {
-    global $config;
-    if (is_array($config['ifgroups']['ifgroupentry'])) {
-        foreach ($config['ifgroups']['ifgroupentry'] as $if_group_ent) {
-            if ($if_group_ent["ifname"] === $name) {
-                return true;
-            }
+    foreach (config_get_path('ifgroups/ifgroupentry', []) as $if_group_ent) {
+        if ($if_group_ent["ifname"] === $name) {
+            return true;
         }
     }
     return false;
@@ -1077,13 +979,11 @@ function is_ifgroup($name) {
 
 # Checks if an interface has DHCPD enabled. Returns true or false.
 function is_dhcpd_enabled($if) {
-    global $config;
-
     # Ensure our interface is in it's pfSense ID format
     $if = get_pfsense_if_id($if);
 
     # Check if this interface is enabled
-    if (isset($config['dhcpd'][$if]['enable'])) {
+    if (config_path_enabled("dhcpd/{$if}")) {
         return true;
     }
 
@@ -1092,13 +992,11 @@ function is_dhcpd_enabled($if) {
 
 # Checks if an interface has DHCPDv6 enabled. Returns true or false.
 function is_dhcpdv6_enabled($if) {
-    global $config;
-
     # Ensure our interface is in it's pfSense ID format
     $if = get_pfsense_if_id($if);
 
     # Check if this interface is enabled
-    if (isset($config['dhcpdv6'][$if]['enable'])) {
+    if (config_path_enabled("dhcpdv6/{$if}")) {
         return true;
     }
 
@@ -1171,10 +1069,8 @@ function is_ip_in_cidr($ip, $cidr) {
 
 # Check if a specified IP is a configured virtual IP
 function is_ip_vip($ip, $if=null) {
-    global $config;
-
     # Loop through each configured virtual IP
-    foreach ($config["virtualip"]["vip"] as $vip) {
+    foreach (config_get_path("virtualip/vip", []) as $vip) {
         # Check if this VIPs interface matches the requested interface, or any if none was specified
         if ($vip["interface"] === $if or $if === null) {
             # Check if the specified IP is contained in this VIP
@@ -1188,10 +1084,8 @@ function is_ip_vip($ip, $if=null) {
 
 # Gets the config ID of a IPsec phase 1 entry
 function get_phase1_config_id_from_ikeid($ikeid) {
-    global $config;
-
     # Loop through each IPsec phase1 entry and check for a match
-    foreach ($config["ipsec"]["phase1"] as $index=>$p1) {
+    foreach (config_get_path("ipsec/phase1", []) as $index=>$p1) {
         # Check if this IKE ID matches
         if ((int)$ikeid === (int)$p1["ikeid"]) {
             return $index;
@@ -1203,10 +1097,8 @@ function get_phase1_config_id_from_ikeid($ikeid) {
 
 # Gets the config ID of IPsec phase2 entry by it's uniqid
 function get_phase2_config_id_from_uniqid($uniqid) {
-    global $config;
-
     # Loop through each IPsec phase2 entry and check for a match
-    foreach ($config["ipsec"]["phase2"] as $index=>$p2) {
+    foreach (config_get_path("ipsec/phase2", []) as $index=>$p2) {
         # Check if this IKE ID matches
         if ($uniqid === $p2["uniqid"]) {
             return $index;
@@ -1238,7 +1130,7 @@ function is_assoc_array($array, $strict_seq=false) {
     return false;
 }
 
-function api_request($url, $method, $data=[], $headers=[]) {
+function api_request($url, $method, $data=[], $headers=[], $username="", $password="") {
     # Format data and headers
     $data = json_encode($data);
     $headers["Content-Type"] = "application/json";
@@ -1256,6 +1148,11 @@ function api_request($url, $method, $data=[], $headers=[]) {
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, strtoupper($method));
     curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
 
+    # Only include basic authentication if username and password are set
+    if ($username and $password) {
+        curl_setopt($ch, CURLOPT_USERPWD, $username . ":" . $password);
+    }
+
     # Make our request and return the response
     $result = curl_exec($ch);
     curl_close($ch);
@@ -1264,23 +1161,22 @@ function api_request($url, $method, $data=[], $headers=[]) {
 
 function sync() {
     # Local variables
-    global $config;
     $pkg_conf = get_api_config()[1];
-    $protocol = ($config["system"]["webgui"]["protocol"]) ? $config["system"]["webgui"]["protocol"] : "https";
-    $port = ($config["system"]["webgui"]["port"]) ? $config["system"]["webgui"]["port"] : "443";
+    $protocol = config_get_path("system/webgui/protocol", "https");
+    $port = config_get_path("system/webgui/port", "443");
 
     # Only perform sync when HA Sync is enabled for the API
     if (isset($pkg_conf["hasync"])) {
         # Loop through each HA sync node and try to sync the configuration
         foreach (explode(" ", $pkg_conf["hasync_hosts"]) as $node) {
-            # Populate data
-            $auth_data = ["client-id"=> $pkg_conf["hasync_username"], "client-token"=> $pkg_conf["hasync_password"]];
             # Make the API request to sync configuration
             echo "Syncing API configuration to node ".$node."... ";
             $resp = api_request(
                 $protocol."://".$node.":".$port."/api/v1/system/api/sync",
                 "PUT",
-                $auth_data + $pkg_conf
+                $pkg_conf,
+                $pkg_conf["hasync_username"],
+                $pkg_conf["hasync_password"]
             );
 
             # Ensure the sync was successful
@@ -1293,25 +1189,20 @@ function sync() {
                     } elseif ($resp["return"] === 3) {
                         log_error("API sync failure (".$node."): Authentication failed");
                         echo "failed. Authentication failure.".PHP_EOL;
-                        continue;
                     } elseif ($resp["return"] === 4) {
                         log_error("API sync failure (".$node."): Authorization failed");
                         echo "failed. Authorization failure.".PHP_EOL;
-                        continue;
                     } else {
                         log_error("API sync failure (".$node."): Sync received return code ".strval($resp["return"]));
                         echo "failed. Received return code ".strval($resp["return"]).".".PHP_EOL;
-                        continue;
                     }
                 } else {
                     log_error("API sync failure (".$node."): Sync received unexpected response");
                     echo "failed. Received unexpected response.".PHP_EOL;
-                    continue;
                 }
             } else {
                 log_error("API sync failure (".$node."): No response received from node");
                 echo "failed. No response received from node.".PHP_EOL;
-                continue;
             }
         }
     } else {

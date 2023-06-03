@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -22,10 +22,9 @@ class APIInterfaceRead extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->privileges = ["page-all", "page-interfaces-assignnetworkports"];
-
     }
 
     public function action() {
-        return APIResponse\get(0, $this->config["interfaces"]);
+        return APIResponse\get(0, $this->get_config("interfaces"));
     }
 }

@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ class APIInterfaceBridgeDelete extends APIModel {
     }
 
     public function action() {
-        unset($this->config["bridges"]["bridged"][$this->id]);
+        $this->del_config("bridges/bridged/{$this->id}");
         $this->write_config();
         pfSense_interface_destroy($this->validated_data["bridgeif"]);
         return APIResponse\get(0, $this->validated_data);
@@ -36,7 +36,7 @@ class APIInterfaceBridgeDelete extends APIModel {
         # Check our required 'id' field
         if (isset($this->initial_data["id"])) {
             # Loop through each bridge and check if the ID matches the bridgeif value
-            foreach ($this->config["bridges"]["bridged"] as $id=>$bridge) {
+            foreach ($this->get_config("bridges/bridged", []) as $id=>$bridge) {
                 # Check if this bridge matches
                 if (strtolower($this->initial_data["id"]) === $bridge["bridgeif"]) {
                     $this->validated_data = $bridge;
@@ -64,7 +64,7 @@ class APIInterfaceBridgeDelete extends APIModel {
 
     private function __is_bridge_in_use() {
         # Loop through each configured interface and see if this bridge is assigned
-        foreach ($this->config["interfaces"] as $id=>$interface) {
+        foreach ($this->get_config("interfaces", []) as $id=>$interface) {
             # Check if this interface matches the bridgeif to be deleted
             if ($interface["if"] === $this->validated_data["bridgeif"]) {
                 return true;

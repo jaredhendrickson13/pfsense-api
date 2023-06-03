@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ class APIFirewallRuleFlushUpdate extends APIModel {
 
     public function action() {
         $this->__randomize_tracker();
-        $this->config["filter"]["rule"] = $this->validated_data;
-        APITools\sort_firewall_rules();
+        $this->set_config("filter/rule", $this->validated_data);
+        filter_rules_sort();
         $this->write_config();
         mark_subsystem_dirty('filter');
 
@@ -36,7 +36,7 @@ class APIFirewallRuleFlushUpdate extends APIModel {
             APIFirewallApplyCreate::apply();
         }
 
-        return APIResponse\get(0, $this->config["filter"]["rule"]);
+        return APIResponse\get(0, $this->get_config("filter/rule", []));
     }
 
     public function validate_payload() {

@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -25,9 +25,8 @@ class APIInterfaceGroupUpdate extends APIModel {
     }
 
     public function action() {
-        $this->config["ifgroups"]["ifgroupentry"][$this->id] = $this->validated_data;
+        $this->set_config("ifgroups/ifgroupentry/{$this->id}", $this->validated_data);
         $this->write_config();
-        //interface_bridge_configure($this->validated_data);
         return APIResponse\get(0, $this->validated_data);
     }
     
@@ -74,7 +73,7 @@ class APIInterfaceGroupUpdate extends APIModel {
     private function __validate_id() {
         if (isset($this->initial_data['id'])) {
             if (APITools\is_ifgroup($this->initial_data['id'])) {
-                foreach ($this->config["ifgroups"]["ifgroupentry"] as $id=>$ifgroup) {
+                foreach ($this->get_config("ifgroups/ifgroupentry", []) as $id=>$ifgroup) {
                     # Check if this group matches
                     if ($this->initial_data["id"] === $ifgroup["ifname"]) {
                         $this->validated_data = $ifgroup;

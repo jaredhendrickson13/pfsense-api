@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -20,3 +20,9 @@ $priv_list['page-system-api']['name'] = "WebCfg - System: API package";
 $priv_list['page-system-api']['descr'] = "Allow access to API package UI";
 $priv_list['page-system-api']['match'] = array();
 $priv_list['page-system-api']['match'][] = "api*";
+
+# Since Service Watchdog doesn't have it's own privilege, create one for it. This will only apply to the API.
+$priv_list['api-services-servicewatchdog'] = array();
+$priv_list['api-services-servicewatchdog']['name'] = "API - Services: Service Watchdog";
+$priv_list['api-services-servicewatchdog']['descr'] = "Allow access to Service Watchdog API";
+$priv_list['api-services-servicewatchdog']['match'] = array();

@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ require_once("api/framework/APIResponse.inc");
 class APIServicesServiceWatchdogUpdate extends APIModel {
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-services-servicewatchdog"];
+        $this->privileges = ["page-all", "api-services-servicewatchdog"];
         $this->packages = ["pfSense-pkg-Service_Watchdog"];
         $this->package_includes = ["servicewatchdog.inc"];
         $this->change_note = "Modified Service Watchdog configuration via API";
@@ -29,8 +29,7 @@ class APIServicesServiceWatchdogUpdate extends APIModel {
     public function action() {
         # Write the updated configuration and reload service watchdog if changes were made
         if ($this->validated_data) {
-            $this->__init_config();
-            $this->config["installedpackages"]["servicewatchdog"]["item"] = $this->validated_data;
+            $this->set_config("installedpackages/servicewatchdog/item", $this->validated_data);
             $this->write_config();
             servicewatchdog_cron_job();
         }
@@ -96,16 +95,5 @@ class APIServicesServiceWatchdogUpdate extends APIModel {
             }
         }
         return false;
-    }
-
-    private function __init_config() {
-        # Initialize the configuration arrays for service watchdog if they are missing
-        if (!is_array($this->config['installedpackages']['servicewatchdog'])) {
-            $this->config['installedpackages']['servicewatchdog'] = [];
-        }
-
-        if (!is_array($this->config['installedpackages']['servicewatchdog']['item'])) {
-            $this->config['installedpackages']['servicewatchdog']['item'] = [];
-        }
     }
 }

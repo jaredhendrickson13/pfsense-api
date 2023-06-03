@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,10 +26,9 @@ class APIInterfaceGroupCreate extends APIModel {
     }
 
     public function action() {
-        $this->__init_config();
-        $this->config["ifgroups"]["ifgroupentry"][] = $this->validated_data;
+        $this->id = $this->get_next_id("ifgroups/ifgroupentry");
+        $this->set_config("ifgroups/ifgroupentry/{$this->id}", $this->validated_data);
         $this->write_config();
-        //interface_bridge_configure($this->validated_data);
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -104,17 +103,6 @@ class APIInterfaceGroupCreate extends APIModel {
         $this->__validate_ifname();
         $this->__validate_members();
         $this->__validate_descr();
-    }
-
-    private function __init_config() {
-        # Ensure our groups config section is an array
-        if (!is_array($this->config["ifgroups"])) {
-            $this->config["ifgroups"] = [];
-        }
-        # Ensure our groups groupd config section is an array
-        if (!is_array($this->config["ifgroups"]["ifgroupentry"])) {
-            $this->config["ifgroups"]["ifgroupentry"] = [];
-        }
     }
     
 }

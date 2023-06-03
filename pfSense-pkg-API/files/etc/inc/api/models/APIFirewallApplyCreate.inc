@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -49,10 +49,5 @@ class APIFirewallApplyCreate extends APIModel {
         else {
             filter_configure();
         }
-
-        # Mark changes as applied
-        clear_subsystem_dirty('aliases');
-        clear_subsystem_dirty('natconf');
-        clear_subsystem_dirty('filter');
     }
 }

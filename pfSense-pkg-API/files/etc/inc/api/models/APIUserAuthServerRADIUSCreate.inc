@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -20,17 +20,18 @@ class APIUserAuthServerRADIUSCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-authserver"];
+        $this->privileges = ["page-all", "page-system-authservers"];
         $this->change_note = "Added RADIUS authentication server via API";
     }
 
     public function action() {
         # Add our new authentication server to the configuration
-        $this->config["system"]["authserver"][] = $this->validated_data;
+        $this->id = $this->get_next_id("system/authserver");
+        $this->set_config("system/authserver/{$this->id}", $this->validated_data);
 
         # Check if clients wants to set this as default auth server
         if ($this->initial_data["active"] === true) {
-            $this->config['system']['webgui']['authmode'] = $this->validated_data["name"];
+            $this->set_config('system/webgui/authmode', $this->validated_data["name"]);
         }
 
         $this->write_config();

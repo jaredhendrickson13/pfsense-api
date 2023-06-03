@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ class APIFirewallAliasEntryCreate extends APIModel {
 
     public function action() {
         # Update our alias with the new entries
-        $this->config["aliases"]["alias"][$this->id] = $this->validated_data;
+        $this->set_config("aliases/alias/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty("aliases");
 
@@ -37,7 +37,7 @@ class APIFirewallAliasEntryCreate extends APIModel {
             APIFirewallApplyCreate::apply();
         }
 
-        return APIResponse\get(0, $this->config["aliases"]["alias"][$this->id]);
+        return APIResponse\get(0, $this->get_config("aliases/alias/{$this->id}"));
     }
 
     private function __validate_name() {
@@ -48,7 +48,7 @@ class APIFirewallAliasEntryCreate extends APIModel {
                 # Ensure this alias exists
                 $this->id = $this->__get_alias_id($this->initial_data["name"]);
                 if (isset($this->id)) {
-                    $this->validated_data = $this->config["aliases"]["alias"][$this->id];
+                    $this->validated_data = $this->get_config("aliases/alias/{$this->id}");
                 } else {
                     $this->errors[] = APIResponse\get(4055);
                 }
@@ -114,11 +114,12 @@ class APIFirewallAliasEntryCreate extends APIModel {
         $this->initial_data["detail"] = $this->__value_to_array($this->initial_data["detail"]);
         $this->validated_data["detail"] = ($this->validated_data["detail"]) ? explode("||", $this->validated_data["detail"]) : [];
         $this->validated_data["detail"] = $this->__value_to_array($this->validated_data["detail"]);
+        $address = ($this->validated_data["address"]) ? explode(" ", $this->validated_data["address"]) : [];
 
         # If we have less detail values than address values, add some defaults
         while(true) {
             # Check if we have the correct number of detail values
-            if (count($this->initial_data["detail"]) < count($this->initial_data["address"])) {
+            if (count($this->initial_data["detail"]) < count($address)) {
                 $this->initial_data["detail"][] = "Entry added " . date('r');
             } else {
                 break;
@@ -126,7 +127,7 @@ class APIFirewallAliasEntryCreate extends APIModel {
         }
 
         # Ensure the number of detail values is less than or equal to the number of address values
-        if (count($this->initial_data["detail"]) <= count($this->initial_data["address"])) {
+        if (count($this->initial_data["detail"]) <= count($address)) {
             # Loop through each alias detail and ensure it is a string
             foreach ($this->initial_data["detail"] as $detail) {
                 if (is_string($detail)) {
@@ -151,7 +152,7 @@ class APIFirewallAliasEntryCreate extends APIModel {
 
     private function __get_alias_id($name) {
         # Loop through each alias until we find one that matches
-        foreach ($this->config["aliases"]["alias"] as $id => $alias) {
+        foreach ($this->get_config("aliases/alias", []) as $id => $alias) {
             # Check if the name matches
             if ($name === $alias["name"]) {
                 return intval($id);
@@ -163,7 +164,7 @@ class APIFirewallAliasEntryCreate extends APIModel {
     private function __value_to_array($value) {
         # Only convert the value if it is not already array
         if (!is_array($value)) {
-            if (is_null($value)) {
+            if (empty($value)) {
                 return [];
             } else {
                 return [$value];
