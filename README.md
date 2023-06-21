@@ -19,7 +19,9 @@ are made preventing the need for a reboot. All this results in the fastest, safe
 
   - pfSense CE 2.7.0 (AMD64)
   - pfSense Plus 23.01 (AMD64)
-  ---
+  - pfSense Plus 23.05 (AMD64)
+
+    ---
   
 </details>
 
@@ -33,7 +35,7 @@ are made preventing the need for a reboot. All this results in the fastest, safe
 To install pfSense API, simply run the following command from the pfSense shell:<br>
 
 ```
-pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.6-pkg-API.txz && /etc/rc.restart_webgui
+pkg -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.7-pkg-API.pkg && /etc/rc.restart_webgui
 ```
 
 <br>
