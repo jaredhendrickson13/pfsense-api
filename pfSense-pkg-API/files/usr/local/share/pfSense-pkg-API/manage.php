@@ -85,7 +85,7 @@ function sync() {
 function update() {
     $pf_version = APITools\get_pfsense_version()["base"];
     echo shell_exec("/usr/sbin/pkg delete -y pfSense-pkg-API");
-    echo shell_exec("/usr/sbin/pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-".$pf_version."-pkg-API.pkg");
+    echo shell_exec("/usr/sbin/pkg -C /dev/null https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-".$pf_version."-pkg-API.pkg");
     echo shell_exec("/etc/rc.restart_webgui");
 }
 
@@ -102,7 +102,7 @@ function revert($version) {
     if($headers && strpos($headers[0], '302')) {
         echo "done.".PHP_EOL;
         echo shell_exec("/usr/sbin/pkg delete -y pfSense-pkg-API");
-        echo shell_exec("/usr/sbin/pkg add ".$url);
+        echo shell_exec("/usr/sbin/pkg -C /dev/null ".$url);
         echo shell_exec("/etc/rc.restart_webgui");
     } else {
         echo "no package found.".PHP_EOL;
