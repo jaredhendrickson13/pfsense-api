@@ -30,8 +30,7 @@ class APIServicesDHCPdLeaseRead extends APIModel {
 
     # Formats the leases array to be more REST like
     private function __to_representation($leases) {
-        # Loop through each array item and change the online/offline keywords to True/False accordingly
-        # Also change the 'act' key to 'state'
+        # Change the 'act' key to 'state'
         foreach ($leases as $id=>$lease) {
             # Change the 'act' key to 'state'
             $leases[$id]["state"] = $leases[$id]["act"];
