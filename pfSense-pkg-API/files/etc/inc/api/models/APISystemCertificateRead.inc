@@ -31,7 +31,7 @@ class APISystemCertificateRead extends APIModel {
 
     public function validate_payload() {
         if (!empty($this->config["cert"])) {
-            $this->validated_data["cert"] = $this->config["cert"];
+            $this->validated_data = $this->config["cert"];
         }
     }
 }

@@ -31,7 +31,7 @@ class APISystemCARead extends APIModel {
 
     public function validate_payload() {
         if (!empty($this->config["ca"])) {
-            $this->validated_data["ca"] = $this->config["ca"];
+            $this->validated_data = $this->config["ca"];
         }
     }
 }
