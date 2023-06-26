@@ -83,7 +83,7 @@ jobs:
 
       - name: Install pfSense-pkg-API on pfSense
         run: |
-          /usr/local/bin/pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com --no_verify -c "pkg -C /dev/null /tmp/pfSense-pkg-API-${{ env.build_version }}_${{ matrix.freebsd_version }}.pkg" -u admin -p pfsense
+          /usr/local/bin/pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com --no_verify -c "pkg -C /dev/null add /tmp/pfSense-pkg-API-${{ env.build_version }}_${{ matrix.freebsd_version }}.pkg" -u admin -p pfsense
           /usr/local/bin/pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com --no_verify -c '/etc/rc.restart_webgui' -u admin -p pfsense || true
           sleep 10
 
