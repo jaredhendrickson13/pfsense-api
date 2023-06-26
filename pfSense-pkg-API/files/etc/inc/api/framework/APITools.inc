@@ -343,7 +343,7 @@ function sort_nat_rules($top=false, $data=null, $field=null) {
 
     foreach ($acl as $idx => $fre) {
         # Check if top mode is enabled, if so add this item to the start of the array
-        if ($top === true and $idx === $data) {
+        if ($top == true and $idx === $data) {
             array_unshift($sort_arr, $fre);
         } else {
             $sort_arr[] = $fre;

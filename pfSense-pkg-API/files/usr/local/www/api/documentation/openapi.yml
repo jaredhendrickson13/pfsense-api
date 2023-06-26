@@ -9309,6 +9309,9 @@ paths:
 
                     _Note: If you are using a failover group, the failover group must be configured to use the same_.'
                   type: string
+                server_addr:
+                  description: Sets the server IP or hostname of the OpenVPN server this client will connect to.
+                  type: string
                 local_port:
                   description: For clients, the local port should be blank in nearly every case so that OpenVPN
                     will use a randomized local port. This behavior is more secure, but some server configurations
@@ -9775,6 +9778,9 @@ paths:
                     Failover group can be provided as group name.
 
                     _Note: If you are using a failover group, the failover group must be configured to use the same_.'
+                  type: string
+                server_addr:
+                  description: Sets the server IP or hostname of the OpenVPN server this client will connect to.
                   type: string
                 local_port:
                   description: The port number upon which OpenVPN will listen for incoming connections from peers.
