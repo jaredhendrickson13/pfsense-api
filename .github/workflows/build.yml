@@ -52,7 +52,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - pfsense_version: pfSense-2.7.0-BETA
+          - pfsense_version: pfSense-2.7.0-RC
             freebsd_version: FreeBSD-14.0-CURRENT
           - pfsense_version: pfSense-23.01-RELEASE
             freebsd_version: FreeBSD-14.0-CURRENT
