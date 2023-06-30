@@ -164,6 +164,8 @@ class APIRoutingGatewayCreate extends APIModel {
     private function __validate_monitor_disable() {
         # Optionally allow client to disable gateway monitoring
         if ($this->initial_data['monitor_disable'] === true) {
+            # When monitoring is disabled, remove the `monitor` IP.
+            unset($this->validated_data["monitor"]);
             $this->validated_data["monitor_disable"] = "";
         }
     }
@@ -343,9 +345,9 @@ class APIRoutingGatewayCreate extends APIModel {
         $this->__validate_interface();
         $this->__validate_name();
         $this->__validate_gateway();
+        $this->__validate_monitor();    # must be validated before `monitor_disable`.
         $this->__validate_monitor_disable();
         $this->__validate_action_disable();
-        $this->__validate_monitor();
         $this->__validate_force_down();
         $this->__validate_descr();
         $this->__validate_weight();
