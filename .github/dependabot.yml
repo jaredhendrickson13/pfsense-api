@@ -7,11 +7,11 @@ version: 2
 updates:
   - package-ecosystem: "composer"
     directory: "/"
-    target-branch: "next_patch"
+    target-branch: "master"
     schedule:
       interval: "weekly"
   - package-ecosystem: "pip"
     directory: "/"
-    target-branch: "next_patch"
+    target-branch: "master"
     schedule:
       interval: "weekly"
