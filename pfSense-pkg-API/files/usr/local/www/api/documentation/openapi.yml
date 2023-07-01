@@ -9621,16 +9621,18 @@ paths:
                     improving CPU efficiency by 5% to 10%. Experimental.
                   type: boolean
                 exit_notify:
-                  default: 'none'
+                  default: x1
                   description: Controls whether or not OpenVPN will send an explicit exit notification to
                     connected UDP clients or peers when restarting or shutting down. This notification
                     allows peers to immediately disconnect rather than wait for a timeout.
                     This is only relevant to UDP modes as TCP natively supports closing connections.
                   enum:
-                    - once
-                    - twice
-                    - none
-                    - ''
+                    - x1
+                    - x2
+                    - x3
+                    - x4
+                    - x5
+                    - disable
                   type: string
                 sndrcvbuf:
                   default: 'default'
@@ -10321,16 +10323,18 @@ paths:
                     improving CPU efficiency by 5% to 10%. Experimental.
                   type: boolean
                 exit_notify:
-                  default: 'none'
+                  default: x1
                   description: Controls whether or not OpenVPN will send an explicit exit notification to
                     connected UDP clients or peers when restarting or shutting down. This notification
                     allows peers to immediately disconnect rather than wait for a timeout.
                     This is only relevant to UDP modes as TCP natively supports closing connections.
                   enum:
-                    - once
-                    - twice
-                    - none
-                    - ''
+                    - x1
+                    - x2
+                    - x3
+                    - x4
+                    - x5
+                    - disable
                   type: string
                 sndrcvbuf:
                   default: 'default'
