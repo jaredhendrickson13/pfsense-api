@@ -50,7 +50,7 @@ class APIFirewallNATPortForwardCreate extends APIModel {
     private function __validate_interface() {
         # Require clients to pass in an interface
         if (isset($this->initial_data['interface'])) {
-            $interface = APITools\get_pfsense_if_id($this->initial_data['interface']);
+            $interface = APITools\get_pfsense_if_id($this->initial_data['interface'], false, true, true, true);
             # Require interface to exist
             if ($interface) {
                 $this->validated_data["interface"] = $interface;

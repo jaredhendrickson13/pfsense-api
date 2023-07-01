@@ -1858,7 +1858,9 @@ paths:
                 interface:
                   description: Interface the rule will apply to. You may specify either
                     the interface's descriptive name, the pfSense ID (wan, lan, optx),
-                    or the real interface ID (e.g. igb0).
+                    or the real interface ID (e.g. igb0). Alternatively, you can specify
+                    an interface group name, `enc0` for IPsec interfaces, or `openvpn`
+                    for OpenVPN interfaces.
                   type: string
                 local-port:
                   description: TCP and/or UDP port, port range, or port alias to forward
@@ -1987,7 +1989,9 @@ paths:
                 interface:
                   description: Interface the rule will apply to. You may specify either
                     the interface's descriptive name, the pfSense ID (wan, lan, optx),
-                    or the real interface ID (e.g. igb0).
+                    or the real interface ID (e.g. igb0). Alternatively, you can specify
+                    an interface group name, `enc0` for IPsec interfaces, or `openvpn`
+                    for OpenVPN interfaces.
                   type: string
                 local-port:
                   description: TCP and/or UDP port, port range, or port alias to forward
