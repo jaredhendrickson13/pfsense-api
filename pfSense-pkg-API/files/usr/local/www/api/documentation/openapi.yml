@@ -11084,6 +11084,58 @@ paths:
       summary: Read DNS Resolver (Unbound) configuration
       tags:
         - Services > Unbound
+    put:
+      operationId: APIServicesUnboundUpdate
+      description: 'Modify general DNS Resolver (unbound) options.<br><br>
+
+            _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                enable:
+                  description: Enable or disable the DNS Resolver (unbound) services.
+                  type: boolean
+                dnssec:
+                  description: Enable or disable DNSSEC.
+                  type: boolean
+                description:
+                  default: ''
+                  description: Assign custom options to the DNS Resolver. Do not Base64 encode this value as the API 
+                    will automatically Base64 encoded the specified string.
+                  type: string
+                apply:
+                  default: false
+                  description: Specify whether or not the DNS Resolver (Unbound) configuration
+                    should be reloaded immediately after. `true` to apply immediately,
+                    `false` to keep the changes pending. If `false`, the DNS Resolver
+                    (Unbound) configuration must be reloaded manually by calling the
+                    /api/v1/services/unbound/apply endpoint.
+                  type: boolean
+                id:
+                  description: ID of the access list to update. Refer to the 'Obtaining
+                    Object IDs' section in the documentation intro for help obtaining
+                    this ID.
+                  type: integer
+                row:
+                  description: Set networks to match for this access list. This must
+                    be an array of access list row objects and must contain at least
+                    one object. For more information on access list object fields,
+                    see documentation for /api/v1/services/unbound/access_list/row.
+                    Existing values will be overwritten.
+                  items:
+                    type: object
+                  type: array
+              type: object
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update DNS Resolver (Unbound) settings
+      tags:
+        - Services > Unbound
   /api/v1/services/unbound/access_list:
     delete:
       operationId: APIServicesUnboundAccessListDelete
