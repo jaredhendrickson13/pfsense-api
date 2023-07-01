@@ -36,6 +36,7 @@ class APIE2ETestServicesUnbound(e2e_test_framework.APIE2ETest):
     ]
 
     def is_custom_options_updated(self):
+        """Checks the 'custom_options' are actually present in /var/unbound/unbound.conf after update."""
         # Read the unbound.conf file
         unbound_conf = self.pfsense_shell("cat /var/unbound/unbound.conf")
 
