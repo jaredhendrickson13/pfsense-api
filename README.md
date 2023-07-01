@@ -1,5 +1,6 @@
 # pfSense-API
 
+[![Build](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml)
 [![OpenAPI](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/openapi.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/openapi.yml)
 [![PHPlint](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/phplint.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/phplint.yml)
 [![Pylint](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/pylint.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/pylint.yml)
