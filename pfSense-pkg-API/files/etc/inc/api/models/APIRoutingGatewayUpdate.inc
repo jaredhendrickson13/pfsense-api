@@ -199,7 +199,7 @@ class APIRoutingGatewayUpdate extends APIModel {
         if ($this->initial_data['monitor_disable'] === true) {
             # When monitoring is disabled, remove the `monitor` IP as well.
             unset($this->validated_data["monitor"]);
-            $this->validated_data["monitor_disable"] = "";
+            $this->validated_data["monitor_disable"] = "yes";
         }
         elseif ($this->initial_data['monitor_disable'] === false) {
             unset($this->validated_data["monitor_disable"]);
@@ -209,7 +209,7 @@ class APIRoutingGatewayUpdate extends APIModel {
     private function __validate_action_disable() {
         # Optionally allow client to disable gateway actions
         if ($this->initial_data['action_disable'] === true) {
-            $this->validated_data["action_disable"] = "";
+            $this->validated_data["action_disable"] = "yes";
         } elseif ($this->initial_data['action_disable'] === false) {
             unset($this->validated_data["action_disable"]);
         }
@@ -218,7 +218,7 @@ class APIRoutingGatewayUpdate extends APIModel {
     private function __validate_force_down() {
         # Optionally allow client to enable or disable forcing this gateway to be considered down
         if ($this->initial_data['force_down'] === true) {
-            $this->validated_data["force_down"] = "";
+            $this->validated_data["force_down"] = "yes";
         } elseif ($this->initial_data['force_down'] === false) {
             unset($this->validated_data["force_down"]);
         }
@@ -229,7 +229,7 @@ class APIRoutingGatewayUpdate extends APIModel {
         if ($this->initial_data['disabled'] === true) {
             # Ensure this gateway is not in use first
             if (!APITools\is_gateway_in_use($this->id)) {
-                $this->validated_data["disabled"] = "";
+                $this->validated_data["disabled"] = "yes";
             }
             else {
                 $this->errors[] = APIResponse\get(6030);

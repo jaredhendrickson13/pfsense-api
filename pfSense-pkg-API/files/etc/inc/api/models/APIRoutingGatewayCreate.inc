@@ -166,28 +166,28 @@ class APIRoutingGatewayCreate extends APIModel {
         if ($this->initial_data['monitor_disable'] === true) {
             # When monitoring is disabled, remove the `monitor` IP.
             unset($this->validated_data["monitor"]);
-            $this->validated_data["monitor_disable"] = "";
+            $this->validated_data["monitor_disable"] = "yes";
         }
     }
 
     private function __validate_action_disable() {
         # Optionally allow client to disable gateway actions
         if ($this->initial_data['action_disable'] === true) {
-            $this->validated_data["action_disable"] = "";
+            $this->validated_data["action_disable"] = "yes";
         }
     }
 
     private function __validate_force_down() {
         # Optionally allow client to force this gateway to be considered down
         if ($this->initial_data['force_down'] === true) {
-            $this->validated_data["force_down"] = "";
+            $this->validated_data["force_down"] = "yes";
         }
     }
 
     private function __validate_disabled() {
         # Optionally allow client to disable gateway upon entry
         if ($this->initial_data['disabled'] === true) {
-            $this->validated_data["disabled"] = "";
+            $this->validated_data["disabled"] = "yes";
         }
     }
 
