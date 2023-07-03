@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -25,26 +25,10 @@ class APIRoutingGatewayCreate extends APIModel {
     }
 
     public function action() {
-        $this->__init_config();
-        $this->config["gateways"]["gateway_item"][] = $this->validated_data;
-        $this->write_config();
+        save_gateway($this->validated_data);
         $this->apply();
-        return APIResponse\get(0, $this->validated_data);
-    }
 
-    private function __validate_interface() {
-        # Require clients to pass in an interface
-        if (isset($this->initial_data['interface'])) {
-            $interface = APITools\get_pfsense_if_id($this->initial_data['interface']);
-            # Require interface to exist
-            if ($interface) {
-                $this->validated_data["interface"] = $interface;
-            } else {
-                $this->errors[] = APIResponse\get(6008);
-            }
-        } else {
-            $this->errors[] = APIResponse\get(6007);
-        }
+        return APIResponse\get(0, $this->validated_data);
     }
 
     private function __validate_ipprotocol() {
@@ -58,6 +42,56 @@ class APIRoutingGatewayCreate extends APIModel {
             }
         } else {
             $this->errors[] = APIResponse\get(6009);
+        }
+    }
+
+    private function __validate_interface() {
+        # Require clients to pass in an interface
+        if (isset($this->initial_data['interface'])) {
+            $interface = APITools\get_pfsense_if_id($this->initial_data['interface']);
+            # Require interface to exist
+            if ($interface) {
+                # Ensure interface is valid for IPv4 gateway
+                if ($this->validated_data["ipprotocol"] === "inet") {
+                    # Get the interface's IPv4 address/subnet
+                    $int_ip = get_interface_ip($interface);
+                    $int_subnet = get_interface_subnet($interface);
+
+                    # Ensure this interface has a valid IPv4 assigned
+                    if ($int_ip and $int_subnet) {
+                        $this->validated_data["interface"] = $interface;
+                    }
+                    else {
+                        $this->errors[] = APIResponse\get(6032);
+                    }
+                }
+                # Ensure interface is valid for IPv6 gateway
+                elseif ($this->validated_data["ipprotocol"] === "inet6") {
+                    # Get the interface's IPv6 address/subnet
+                    $int_ipv6 = get_interface_ipv6($interface);
+                    $int_subnetv6 = get_interface_subnetv6($interface);
+
+                    # Ensure this interface has a valid IPv6 assigned
+                    if ($int_ipv6 and $int_subnetv6) {
+                        $this->validated_data["interface"] = $interface;
+                    }
+                    else {
+                        $this->errors[] = APIResponse\get(6033);
+                    }
+                }
+                # Return unexpected error if we somehow end up here
+                else {
+                    $this->errors[] = APIResponse\get(1);
+                }
+            }
+            # Return interface not found error if the interface does not exist
+            else {
+                $this->errors[] = APIResponse\get(6008);
+            }
+        }
+        # Return ipprotocol required error if ipprotocol was not specified
+        else {
+            $this->errors[] = APIResponse\get(6007);
         }
     }
 
@@ -81,7 +115,7 @@ class APIRoutingGatewayCreate extends APIModel {
         # Require client to pass in a gateway address
         if (isset($this->initial_data["gateway"])) {
             # Always set non-local gateway to reduce conditions
-            $this->validated_data["nonlocalgateway"] = "";
+            $this->validated_data["nonlocalgateway"] = "yes";
 
             # Gateway can be valid IPv4 address
             if ($this->validated_data["ipprotocol"] === "inet" and is_ipaddrv4($this->initial_data["gateway"])) {
@@ -130,28 +164,30 @@ class APIRoutingGatewayCreate extends APIModel {
     private function __validate_monitor_disable() {
         # Optionally allow client to disable gateway monitoring
         if ($this->initial_data['monitor_disable'] === true) {
-            $this->validated_data["monitor_disable"] = "";
+            # When monitoring is disabled, remove the `monitor` IP.
+            unset($this->validated_data["monitor"]);
+            $this->validated_data["monitor_disable"] = "yes";
         }
     }
 
     private function __validate_action_disable() {
         # Optionally allow client to disable gateway actions
         if ($this->initial_data['action_disable'] === true) {
-            $this->validated_data["action_disable"] = "";
+            $this->validated_data["action_disable"] = "yes";
         }
     }
 
     private function __validate_force_down() {
         # Optionally allow client to force this gateway to be considered down
         if ($this->initial_data['force_down'] === true) {
-            $this->validated_data["force_down"] = "";
+            $this->validated_data["force_down"] = "yes";
         }
     }
 
     private function __validate_disabled() {
         # Optionally allow client to disable gateway upon entry
         if ($this->initial_data['disabled'] === true) {
-            $this->validated_data["disabled"] = "";
+            $this->validated_data["disabled"] = "yes";
         }
     }
 
@@ -305,13 +341,13 @@ class APIRoutingGatewayCreate extends APIModel {
 
     public function validate_payload() {
         $this->__validate_disabled();
-        $this->__validate_interface();
         $this->__validate_ipprotocol();
+        $this->__validate_interface();
         $this->__validate_name();
         $this->__validate_gateway();
+        $this->__validate_monitor();    # must be validated before `monitor_disable`.
         $this->__validate_monitor_disable();
         $this->__validate_action_disable();
-        $this->__validate_monitor();
         $this->__validate_force_down();
         $this->__validate_descr();
         $this->__validate_weight();
@@ -342,7 +378,7 @@ class APIRoutingGatewayCreate extends APIModel {
         }
 
         # Loop through each configured gateway and check if this interface already has a dynamic gateway set
-        foreach ($this->config["gateways"]["gateway_item"] as $gateway) {
+        foreach ($this->get_config("gateways/gateway_item", []) as $gateway) {
             if ($gateway["interface"] === $interface and $gateway["ipprotocol"] === $ipprotocol and $gateway["gateway"] === "dynamic") {
                 $dyn_gw_exists = true;
             }
@@ -356,26 +392,10 @@ class APIRoutingGatewayCreate extends APIModel {
         }
     }
 
-    private function __init_config() {
-        # Ensure our gateway configuration is in array format
-        if (!is_array($this->config["gateways"]["gateway_item"])) {
-            $this->config["gateways"] = [];
-            $this->config["gateways"]["gateway_item"] = [];
-        }
-    }
-
     public function apply() {
-        # Mark the routing subsystem as changed, clear if applied
-        mark_subsystem_dirty("staticroutes");
-
-        # Optionally allow clients to apply this gateway immediately if they passed in a true apply value
+        # Apply these changes immediately if requested
         if ($this->initial_data["apply"] === true) {
-            system_routing_configure();
-            system_resolvconf_generate();
-            filter_configure();
-            setup_gateways_monitor();
-            send_event("service reload dyndnsall");
-            clear_subsystem_dirty("staticroutes");
+            APIRoutingApplyCreate::apply();
         }
     }
 }

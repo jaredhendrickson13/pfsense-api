@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -30,8 +30,9 @@ class APIServicesUnboundHostOverrideFlushUpdate extends APIModel {
 
     public function action() {
         # Replace any existing host overrides with the host overrides validated in this request
-        $this->config["unbound"]["hosts"] = $this->validated_data;
-        usort($this->config["unbound"]["hosts"], "unbound_override_flush_host_cmp");
+        $this->set_config('unbound/hosts', $this->validated_data);
+        $hosts = $this->get_config("unbound/hosts", []);
+        usort($hosts, "unbound_override_flush_host_cmp");
         $this->write_config();
 
         # Mark the Unbound subsystem as changed.
@@ -42,7 +43,7 @@ class APIServicesUnboundHostOverrideFlushUpdate extends APIModel {
             (new APIServicesUnboundApplyCreate)->action();
         }
 
-        return APIResponse\get(0, $this->config["unbound"]["hosts"]);
+        return APIResponse\get(0, $hosts);
     }
 
     public function validate_payload() {

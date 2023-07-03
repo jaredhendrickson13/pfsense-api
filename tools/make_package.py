@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-# Copyright 2022 Jared Hendrickson
+# Copyright 2023 Jared Hendrickson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ class MakePackage:
     """Class that groups together variables and methods required to build the pfSense-pkg-API FreeBSD package."""
     def __init__(self):
         self.__start_argparse__()
-        self.port_version = ".".join(self.args.tag.split(".")[0:2])
-        self.port_revision = self.args.tag.split(".")[2]
+        self.port_version = self.args.tag.split("_")[0]
+        self.port_revision = self.args.tag.split("_", maxsplit=1)[1]
 
         # Run tasks for build mode
         if self.args.host:
@@ -128,22 +128,9 @@ class MakePackage:
         self.run_scp_cmd(src, ".")
 
     def __start_argparse__(self):
-        # Custom port type for argparse
+        # Custom tag type for argparse
         def tag(value_string):
-            value = str(value_string).split(".")
-            valid = True
-
-            # Require 3 items (M.m.p)
-            if len(value) == 3:
-                for i in value:
-                    # Value cannot be blank
-                    if i == "":
-                        valid = False
-            else:
-                valid = False
-
-            # Return value if valid, otherwise throw error
-            if valid:
+            if "." in value_string and "_" in value_string:
                 return value_string
 
             raise argparse.ArgumentTypeError(f"{value_string} is not a semantic version tag")

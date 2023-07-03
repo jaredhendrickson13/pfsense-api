@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -30,8 +30,8 @@ class APIServicesIPsecPhase1Create extends APIModel {
 
     public function action() {
         # Write this entry to configuration
-        $this->__init_config();
-        $this->config["ipsec"]["phase1"][] = $this->validated_data;
+        $this->id = $this->get_next_id("ipsec/phase1");
+        $this->set_config("ipsec/phase1/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty('ipsec');
 
@@ -481,8 +481,6 @@ class APIServicesIPsecPhase1Create extends APIModel {
     private function __validate_startaction() {
         global $ipsec_startactions;
         $remotegw = $this->validated_data["remote-gateway"];
-
-        # This field doesn't exist on pfSense 2.5.0-2.5.1, still allow these versions to set this field for tests.
         $ipsec_startactions = ($ipsec_startactions) ?: [""=>0, "none"=>0, "start"=>0, "trap"=>0];
 
         # Set default value if not specified. Even the default value needs to be validated for this field.
@@ -691,7 +689,7 @@ class APIServicesIPsecPhase1Create extends APIModel {
 
     public function is_ipsec_remote_gateway_in_use($value) {
         # Loop through each IPsec phase 1 and see if the value is in use
-        foreach ($this->config['ipsec']['phase1'] as $p1) {
+        foreach ($this->get_config('ipsec/phase1', []) as $p1) {
             # Check if this phase 1 entries remote gateway matches the value
             if ($p1["remote-gateway"] === $value) {
                 # Allow this value if it is all IPv4
@@ -718,11 +716,5 @@ class APIServicesIPsecPhase1Create extends APIModel {
         }
 
         return false;
-    }
-
-    private function __init_config() {
-        # Initialize the config with the ipsec phase1 and phase2 sections
-        init_config_arr(array('ipsec', 'phase1'));
-        init_config_arr(array('ipsec', 'phase2'));
     }
 }

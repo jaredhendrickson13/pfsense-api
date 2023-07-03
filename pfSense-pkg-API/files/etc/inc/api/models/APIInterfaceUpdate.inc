@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ class APIInterfaceUpdate extends APIModel {
     }
 
     public function action() {
-        $this->config["interfaces"][$this->id] = $this->validated_data;
+        $this->set_config("interfaces/{$this->id}", $this->validated_data);
         $this->write_config();
         APIInterfaceApplyCreate::serialize_changes($this->id, $this->validated_data);
 
@@ -47,7 +47,7 @@ class APIInterfaceUpdate extends APIModel {
             $this->id = APITools\get_pfsense_if_id($this->initial_data["id"]);
             # Check that the provided ID is associated with an existing interface
             if ($this->id) {
-                $this->validated_data = $this->config["interfaces"][$this->id];
+                $this->validated_data = $this->get_config("interfaces/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(3058);
             }
@@ -99,21 +99,29 @@ class APIInterfaceUpdate extends APIModel {
     }
 
     private function __validate_mtu() {
-        // Check for our MTU value
+        # Check for our MTU value
         if (isset($this->initial_data["mtu"])) {
+            # Ensure value is an integer
             $this->initial_data["mtu"] = intval($this->initial_data["mtu"]);
-            // Check if MTU is within range
+
+            # Check if MTU is within range
             if (1280 > $this->initial_data["mtu"] or $this->initial_data["mtu"] > 8192) {
                 $this->errors[] = APIResponse\get(3004);
-            } elseif ($this->if_list[$this->validated_data["if"]]["is_vlan"]) {
-                // Check if interface is VLAN and that it's MTU is lower than it's parent interface
-                $parent_if = $this->if_list[$this->validated_data["if"]]["if"];
-                if ($this->initial_data["mtu"] > $parent_if["mtu"]) {
-                    $this->errors[] = APIResponse\get(3006);
-                }
-            } else {
-                $this->validated_data["mtu"] = $this->initial_data["mtu"];
+                return;
             }
+            # Validate VLAN specific constraints
+            if ($this->if_list[$this->validated_data["if"]]["isvlan"]) {
+                # Fetch the parent interface configuration
+                $parent_mtu = get_interface_mtu($this->if_list[$this->validated_data["if"]]["if"]);
+
+                # Ensure MTU is not lower than the parent interface
+                if ($this->initial_data["mtu"] > $parent_mtu) {
+                    $this->errors[] = APIResponse\get(3006);
+                    return;
+                }
+            }
+
+            $this->validated_data["mtu"] = $this->initial_data["mtu"];
         }
     }
 
@@ -161,7 +169,7 @@ class APIInterfaceUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(3059);
             }
             # Ensure this interface is not named the same as an alias
-            elseif (APITools\is_alias($this->initial_data["descr"])) {
+            elseif (is_alias($this->initial_data["descr"])) {
                 $this->errors[] = APIResponse\get(3060);
             }
             # Ensure this interface is not named entirely numerical

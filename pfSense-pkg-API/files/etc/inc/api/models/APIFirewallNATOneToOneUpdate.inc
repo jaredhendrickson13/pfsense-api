@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ class APIFirewallNATOneToOneUpdate extends APIModel {
 
     public function action() {
         # Add our new configuration
-        $this->config["nat"]["onetoone"][$this->id] = $this->validated_data;
+        $this->set_config("nat/onetoone/{$this->id}", $this->validated_data);
         APITools\sort_nat_rules($this->initial_data["top"], $this->id, "onetoone");
         $this->write_config();
         $this->apply();
@@ -40,9 +40,9 @@ class APIFirewallNATOneToOneUpdate extends APIModel {
         # Require clients to specify a 1:1 NAT ID to modify
         if (isset($this->initial_data["id"])) {
             # Require the 1:1 NAT ID specified to exist
-            if (array_key_exists($this->initial_data["id"], $this->config["nat"]["onetoone"])) {
+            if ($this->get_config("nat/onetoone/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
-                $this->validated_data = $this->config["nat"]["onetoone"][$this->id];
+                $this->validated_data = $this->get_config("nat/onetoone/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(4084);
             }

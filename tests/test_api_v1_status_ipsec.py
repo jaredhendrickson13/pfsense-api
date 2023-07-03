@@ -1,4 +1,4 @@
-# Copyright 2022 Jared Hendrickson
+# Copyright 2023 Jared Hendrickson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ import e2e_test_framework
 class APIE2ETestStatusIPsec(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/status/ipsec endpoint."""
     uri = "/api/v1/status/ipsec"
-    get_tests = [{"name": "Read the IPsec status"}]
+    get_privileges = ["page-all", "page-status-ipsec"]
+    get_tests = [{"name": "Read the IPsec status", "resp_data_empty": True}]
 
 
 APIE2ETestStatusIPsec()

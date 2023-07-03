@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ class APIServicesServiceWatchdogRead extends APIModel {
 
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-services-servicewatchdog"];
+        $this->privileges = ["page-all", "api-services-servicewatchdog"];
         $this->packages = ["pfSense-pkg-Service_Watchdog"];
         $this->package_includes = ["servicewatchdog.inc"];
     }
@@ -31,8 +31,8 @@ class APIServicesServiceWatchdogRead extends APIModel {
     }
 
     public static function get_watched_services() {
-        global $config;
-        $services = ($config["installedpackages"]["servicewatchdog"]["item"]) ?: [];
+        # Local variables
+        $services = APIModel::get_config("installedpackages/servicewatchdog/item", []);
 
         # Loop through each configured service and ensure data is formatted correctly
         foreach ($services as &$service) {

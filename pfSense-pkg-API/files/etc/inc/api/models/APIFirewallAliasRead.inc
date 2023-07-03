@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -25,12 +25,6 @@ class APIFirewallAliasRead extends APIModel {
     }
 
     public function action() {
-        // Check that we have a configuration
-        if (!empty($this->config["aliases"]["alias"])) {
-            $alias_array = $this->config["aliases"]["alias"];
-        } else {
-            $alias_array = [];
-        }
-        return APIResponse\get(0, $alias_array);
+        return APIResponse\get(0, $this->get_config("aliases/alias", []));
     }
 }

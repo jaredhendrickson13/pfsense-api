@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,8 +26,8 @@ class APIFirewallAliasDelete extends APIModel {
 
     public function action() {
         # Remove this alias from configuration and apply changes as requested
-        unset($this->config["aliases"]["alias"][$this->id]);
-        $this->config["aliases"]["alias"] = array_values($this->config["aliases"]["alias"]);
+        $this->del_config("aliases/alias/{$this->id}");
+        $this->set_config("aliases/alias", array_values($this->get_config("aliases/alias")));
         $this->write_config();
         mark_subsystem_dirty("aliases");
 
@@ -44,7 +44,7 @@ class APIFirewallAliasDelete extends APIModel {
         # Require clients to pass in an ID field containing the alias name or index value
         if (isset($this->initial_data["id"])) {
             # Loop through each alias and check for a match
-            foreach ($this->config["aliases"]["alias"] as $id=>$alias) {
+            foreach ($this->get_config("aliases/alias", []) as $id=>$alias) {
                 # First check if the ID matches the index value or the alias name
                 if ($this->initial_data["id"] === $id or $this->initial_data["id"] === $alias["name"]) {
                     # Only allow deletion if the firewall alias is not in use.

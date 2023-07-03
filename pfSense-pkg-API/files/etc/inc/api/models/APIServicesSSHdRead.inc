@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -24,10 +24,6 @@ class APIServicesSSHdRead extends APIModel {
     }
 
     public function action() {
-        $ssh_array = [];
-        if (!empty($this->config["system"]["ssh"])) {
-            $ssh_array = $this->config["system"]["ssh"];
-        }
-        return APIResponse\get(0, $ssh_array);
+        return APIResponse\get(0, $this->get_config("system/ssh", []));
     }
 }

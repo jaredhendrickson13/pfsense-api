@@ -33,9 +33,6 @@ info:
     using basic authentication. For example:<br><br>
     `curl -u admin:pfsense https://pfsense.example.com/api/v1/firewall/rule`
     <br><br>
-    _Note: in previous releases, local database authentication used the `client-id` and `client-token` fields in your
-    request body to authenticate. This functionality still exists but is not recommended. It will be removed in a future
-    release._
     </details>
 
     <details>
@@ -81,8 +78,7 @@ info:
     curl -H "Authorization: CLIENT_ID_HERE CLIENT_TOKEN_HERE" -X GET https://pfsense.example.com/api/v1/system/arp
     ```
 
-    <br><br>_Note: In previous versions of pfSense API, the client-id and client-token were provided via the request payload. This
-    functionality is still supported but is not recommended. It will be removed in a future release._
+    <br>
     </details>
 
     ### Authorization
@@ -1862,7 +1858,9 @@ paths:
                 interface:
                   description: Interface the rule will apply to. You may specify either
                     the interface's descriptive name, the pfSense ID (wan, lan, optx),
-                    or the real interface ID (e.g. igb0).
+                    or the real interface ID (e.g. igb0). Alternatively, you can specify
+                    an interface group name, `enc0` for IPsec interfaces, or `openvpn`
+                    for OpenVPN interfaces.
                   type: string
                 local-port:
                   description: TCP and/or UDP port, port range, or port alias to forward
@@ -1991,7 +1989,9 @@ paths:
                 interface:
                   description: Interface the rule will apply to. You may specify either
                     the interface's descriptive name, the pfSense ID (wan, lan, optx),
-                    or the real interface ID (e.g. igb0).
+                    or the real interface ID (e.g. igb0). Alternatively, you can specify
+                    an interface group name, `enc0` for IPsec interfaces, or `openvpn`
+                    for OpenVPN interfaces.
                   type: string
                 local-port:
                   description: TCP and/or UDP port, port range, or port alias to forward
@@ -2984,7 +2984,7 @@ paths:
       description: 'Read information about the firewall state table''s current, default
         and maximum sizes.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-diagnostics-statessummary`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-advanced-firewall`]'
       responses:
         "200":
           $ref: '#/components/responses/Success'
@@ -5222,7 +5222,7 @@ paths:
                   type: integer
                 tag:
                   description: VLAN tag to add to the parent interface.
-                  maximum: 4096
+                  maximum: 4094
                   minimum: 1
                   type: integer
               required:
@@ -5273,7 +5273,7 @@ paths:
                   type: integer
                 tag:
                   description: VLAN tag to change on the parent interface.
-                  maximum: 4096
+                  maximum: 4094
                   minimum: 1
                   type: integer
               required:
@@ -5309,7 +5309,7 @@ paths:
 
         _Requires at least one of the following privileges:_ [`page-all`, `page-system-gateways-editgateway`]'
       parameters:
-        - description: ID of the gateway to delete. Refer to the 'Obtaining Object IDs'
+        - description: ID or name of the gateway to delete. Refer to the 'Obtaining Object IDs'
             section in the documentation intro for help obtaining this ID.
           in: query
           name: id
@@ -5538,7 +5538,7 @@ paths:
                     if `ipprotocol` is set to `inet6`.
                   type: string
                 id:
-                  description: ID of the gateway to update. Refer to the 'Obtaining
+                  description: ID or name of the gateway to update. Refer to the 'Obtaining
                     Object IDs' section in the documentation intro for help obtaining
                     this ID.
                   type: integer
@@ -6617,8 +6617,7 @@ paths:
             schema:
               properties:
                 initiate:
-                  description: Initiate all tunnels (phase 1 and 2) with the newly applied configuration. This field
-                    is only available on pfSense 2.6+ and pfSense Plus 22.05+.
+                  description: Initiate all tunnels (phase 1 and 2) with the newly applied configuration.
                   type: boolean
                   default: false
       responses:
@@ -6660,18 +6659,12 @@ paths:
                     `{ "name": "aes256gcm","keylen": 64 }`,
                     `{ "name": "aes256gcm","keylen": 96 }`,
                     `{ "name": "aes256gcm","keylen": 128 }`,
-                    `{ "name": "blowfish","keylen": 128 }`,
-                    `{ "name": "blowfish","keylen": 192 }`,
-                    `{ "name": "blowfish","keylen": 256 }`,
-                    `{ "name": "3des" }`,
-                    `{ "name": "cast128" }`
                   type: object
                 hash-algorithm:
                   description: Hashing algorithm to use. Options for this field are set by pfSense itself and may
                     vary based on your version of pfSense.
                   type: string
                   enum:
-                    - md5
                     - sha1
                     - sha256
                     - sha384
@@ -6688,7 +6681,6 @@ paths:
                     has `prfselect_enable` enabled.
                   type: string
                   enum:
-                    - md5
                     - sha1
                     - sha256
                     - sha384
@@ -6869,7 +6861,6 @@ paths:
                 startaction:
                   description: Option to force specific initiation/responder behavior for child SA (P2) entries. Options 
                     for this field are set by pfSense itself. These options may vary based on your pfSense version.
-                    This field is not supported on pfSense 2.5.1 or pfSense 2.5.0.
                   type: string
                   default: ""
                   enum:
@@ -7092,7 +7083,6 @@ paths:
                 startaction:
                   description: Option to force specific initiation/responder behavior for child SA (P2) entries. Options 
                     for this field are set by pfSense itself. These options may vary based on your pfSense version.
-                    This field is not supported on pfSense 2.5.1 or pfSense 2.5.0.
                   type: string
                   enum:
                     - ""
@@ -7310,7 +7300,6 @@ paths:
                   items:
                     type: string
                     enum:
-                      - hmac_md5
                       - hmac_sha1
                       - hmac_sha256
                       - hmac_sha384
@@ -9636,16 +9625,18 @@ paths:
                     improving CPU efficiency by 5% to 10%. Experimental.
                   type: boolean
                 exit_notify:
-                  default: 'none'
+                  default: x1
                   description: Controls whether or not OpenVPN will send an explicit exit notification to
                     connected UDP clients or peers when restarting or shutting down. This notification
                     allows peers to immediately disconnect rather than wait for a timeout.
                     This is only relevant to UDP modes as TCP natively supports closing connections.
                   enum:
-                    - once
-                    - twice
-                    - none
-                    - ''
+                    - x1
+                    - x2
+                    - x3
+                    - x4
+                    - x5
+                    - disable
                   type: string
                 sndrcvbuf:
                   default: 'default'
@@ -10336,16 +10327,18 @@ paths:
                     improving CPU efficiency by 5% to 10%. Experimental.
                   type: boolean
                 exit_notify:
-                  default: 'none'
+                  default: x1
                   description: Controls whether or not OpenVPN will send an explicit exit notification to
                     connected UDP clients or peers when restarting or shutting down. This notification
                     allows peers to immediately disconnect rather than wait for a timeout.
                     This is only relevant to UDP modes as TCP natively supports closing connections.
                   enum:
-                    - once
-                    - twice
-                    - none
-                    - ''
+                    - x1
+                    - x2
+                    - x3
+                    - x4
+                    - x5
+                    - disable
                   type: string
                 sndrcvbuf:
                   default: 'default'
@@ -11089,6 +11082,58 @@ paths:
         "401":
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Read DNS Resolver (Unbound) configuration
+      tags:
+        - Services > Unbound
+    put:
+      operationId: APIServicesUnboundUpdate
+      description: 'Modify general DNS Resolver (unbound) options.<br><br>
+
+            _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsresolver`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                enable:
+                  description: Enable or disable the DNS Resolver (unbound) services.
+                  type: boolean
+                dnssec:
+                  description: Enable or disable DNSSEC.
+                  type: boolean
+                description:
+                  default: ''
+                  description: Assign custom options to the DNS Resolver. Do not Base64 encode this value as the API 
+                    will automatically Base64 encoded the specified string.
+                  type: string
+                apply:
+                  default: false
+                  description: Specify whether or not the DNS Resolver (Unbound) configuration
+                    should be reloaded immediately after. `true` to apply immediately,
+                    `false` to keep the changes pending. If `false`, the DNS Resolver
+                    (Unbound) configuration must be reloaded manually by calling the
+                    /api/v1/services/unbound/apply endpoint.
+                  type: boolean
+                id:
+                  description: ID of the access list to update. Refer to the 'Obtaining
+                    Object IDs' section in the documentation intro for help obtaining
+                    this ID.
+                  type: integer
+                row:
+                  description: Set networks to match for this access list. This must
+                    be an array of access list row objects and must contain at least
+                    one object. For more information on access list object fields,
+                    see documentation for /api/v1/services/unbound/access_list/row.
+                    Existing values will be overwritten.
+                  items:
+                    type: object
+                  type: array
+              type: object
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update DNS Resolver (Unbound) settings
       tags:
         - Services > Unbound
   /api/v1/services/unbound/access_list:
@@ -12142,7 +12187,6 @@ paths:
                     - sha256
                     - sha384
                     - sha512
-                    - md5
                   type: string
                 persist:
                   description: Enable or disable persistent API configuration. If
@@ -12794,7 +12838,7 @@ paths:
       operationId: APISystemDNSRead
       description: 'Read current system DNS settings.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       responses:
         "200":
           $ref: '#/components/responses/Success'
@@ -12807,7 +12851,7 @@ paths:
       operationId: APISystemDNSUpdate
       description: 'Modify the existing system DNS settings.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       requestBody:
         content:
           application/json:
@@ -12841,7 +12885,7 @@ paths:
       operationId: APISystemDNSServerDelete
       description: 'Remove existing system DNS servers.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       parameters:
         - description: IP of the system DNS servers to remove.
           in: query
@@ -12861,7 +12905,7 @@ paths:
       operationId: APISystemDNSServerCreate
       description: 'Add new DNS servers to the system DNS servers.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       requestBody:
         content:
           application/json:
@@ -12900,7 +12944,7 @@ paths:
       operationId: APISystemHostnameRead
       description: 'Read the system''s hostname.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       responses:
         "200":
           $ref: '#/components/responses/Success'
@@ -12913,7 +12957,7 @@ paths:
       operationId: APISystemHostnameUpdate
       description: 'Modify the system hostname.<br><br>
 
-        _Requires at least one of the following privileges:_ [`page-all`, `page-system`]'
+        _Requires at least one of the following privileges:_ [`page-all`, `page-system-generalsetup`]'
       requestBody:
         content:
           application/json:

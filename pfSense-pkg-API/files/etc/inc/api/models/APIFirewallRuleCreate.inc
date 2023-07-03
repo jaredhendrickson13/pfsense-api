@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -27,16 +27,29 @@ class APIFirewallRuleCreate extends APIModel {
     }
 
     public function action() {
-        $next_rule_id = count($this->config["filter"]["rule"]);    // Save our next rule ID
-        $this->config["filter"]["rule"][] = $this->validated_data;    // Write to our master config
-        APITools\sort_firewall_rules($this->initial_data["top"], $next_rule_id);    // Sort our firewall rules
-        $this->write_config();    // Apply our configuration change
+        # Add rule to top of rules if requested
+        if ($this->initial_data["top"] === true) {
+            $this->set_config(
+                "filter/rule",
+                array_merge([$this->validated_data], $this->get_config("filter/rule"))
+            );
+        }
+        # Otherwise, simply append the rule to the bottom
+        else {
+            $this->id = $this->get_next_id("filter/rule");
+            $this->set_config("filter/rule/{$this->id}", $this->validated_data);
+        }
+
+        # Sort the rules, write them to configuration and mark the changes as pending
+        filter_rules_sort();
+        $this->write_config();
         mark_subsystem_dirty('filter');
 
         # Only reload the firewall filter if it was requested by the client
         if ($this->initial_data["apply"] === true) {
             APIFirewallApplyCreate::apply();
         }
+
         return APIResponse\get(0, $this->validated_data);
     }
 
@@ -89,6 +102,9 @@ class APIFirewallRuleCreate extends APIModel {
             # Remove duplicates and convert back to pfSense expected format
             $this->validated_data["interface"] = array_unique($this->validated_data["interface"]);
             $this->validated_data["interface"] = implode(",", $this->validated_data["interface"]);
+        } else if ($this->initial_data["floating"] === true) {
+            # Add a floating rule without interface
+            ; // no op
         } else {
             $this->errors[] = APIResponse\get(4034);
         }
@@ -245,7 +261,7 @@ class APIFirewallRuleCreate extends APIModel {
         # Check for our optional 'sched' payload value
         if (isset($this->initial_data['sched'])) {
             # Loop through each configured schedule and check if it exists
-            foreach ($this->config["schedules"]["schedule"] as $schedule) {
+            foreach ($this->get_config("schedules/schedule", []) as $schedule) {
                 # Check if the names match
                 if ($this->initial_data["sched"] === $schedule["name"]) {
                     $this->validated_data["sched"] = $this->initial_data["sched"];
@@ -470,13 +486,6 @@ class APIFirewallRuleCreate extends APIModel {
         }
     }
 
-    private function __validate_top() {
-        # Check for our optional 'top' payload value
-        if ($this->initial_data['top'] === true) {
-            $this->initial_data['top'] = "top";
-        }
-    }
-
     private function __validate_floating() {
         # Check for floating rule
         if ($this->initial_data["floating"] === true) {
@@ -532,7 +541,6 @@ class APIFirewallRuleCreate extends APIModel {
         $this->__validate_tcpflags2();
         $this->__validate_tcpflags1();
         $this->__validate_statetype();
-        $this->__validate_top();
         $this->__validate_direction();
         $this->__validate_quick();
 

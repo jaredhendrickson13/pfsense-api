@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ class APIFirewallAliasEntryDelete extends APIModel {
 
     public function action() {
         # Write our new alias entry
-        $this->config["aliases"]["alias"][$this->id] = $this->validated_data;
+        $this->set_config("aliases/alias/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty("aliases");
 
@@ -45,7 +45,7 @@ class APIFirewallAliasEntryDelete extends APIModel {
             # Ensure this alias exists
             $this->id = $this->__get_alias_id($this->initial_data["name"]);
             if (isset($this->id)) {
-                $this->validated_data = $this->config["aliases"]["alias"][$this->id];
+                $this->validated_data = $this->get_config("aliases/alias/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(4055);
             }
@@ -81,7 +81,7 @@ class APIFirewallAliasEntryDelete extends APIModel {
 
     private function __get_alias_id($name) {
         # Loop through each alias until we find one that matches
-        foreach ($this->config["aliases"]["alias"] as $id => $alias) {
+        foreach ($this->get_config("aliases/alias", []) as $id => $alias) {
             # Check if the name matches
             if ($name === $alias["name"]) {
                 return intval($id);

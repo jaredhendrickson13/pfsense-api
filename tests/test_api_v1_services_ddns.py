@@ -1,4 +1,4 @@
-# Copyright 2022 Jared Hendrickson
+# Copyright 2023 Jared Hendrickson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ import e2e_test_framework
 class APIE2ETestServicesDDNS(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/ddns endpoint."""
     uri = "/api/v1/services/ddns"
-    get_tests = [{"name": "Read DDNS service configuration"}]
+    get_privileges = ["page-all", "page-services-dynamicdnsclients"]
+    get_tests = [{"name": "Read DDNS service configuration", "resp_data_empty": True}]
 
 
 APIE2ETestServicesDDNS()

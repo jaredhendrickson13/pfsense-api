@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ class APIFirewallTrafficShaperLimiterBandwidthDelete extends APIModel {
     }
 
     public function action() {
-        unset($this->config["dnshaper"]["queue"][$this->parent_id]["bandwidth"]["item"][$this->id]);
+        $this->del_config("dnshaper/queue/{$this->parent_id}/bandwidth/item/{$this->id}");
         $this->write_config();
         mark_subsystem_dirty('shaper');
 
@@ -68,9 +68,9 @@ class APIFirewallTrafficShaperLimiterBandwidthDelete extends APIModel {
             $id = intval($this->initial_data["id"]);
 
             # Ensure a bandwidth object with this ID exists
-            if (array_key_exists($id, $this->config["dnshaper"]["queue"][$this->parent_id]["bandwidth"]["item"])) {
+            if ($this->get_config("dnshaper/queue/{$this->parent_id}/bandwidth/item/{$id}", false)) {
                 $this->id = $id;
-                $this->validated_data = $this->config["dnshaper"]["queue"][$this->parent_id]["bandwidth"]["item"][$id];
+                $this->validated_data = $this->get_config("dnshaper/queue/{$this->parent_id}/bandwidth/item/{$id}");
             } else {
                 $this->errors[] = APIResponse\get(4216);
             }
@@ -81,7 +81,7 @@ class APIFirewallTrafficShaperLimiterBandwidthDelete extends APIModel {
 
     public function get_limiter_id_by_name($name, $as_bool=false) {
         # Loop through each configured limiter and see if it uses this name
-        foreach ($this->config["dnshaper"]["queue"] as $id=>$limiter) {
+        foreach ($this->get_config("dnshaper/queue", []) as $id=>$limiter) {
             # Check for matching names
             if ($name === $limiter["name"]) {
                 return ($as_bool) ? true : $id;

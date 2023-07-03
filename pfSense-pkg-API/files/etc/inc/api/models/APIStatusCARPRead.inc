@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ class APIStatusCARPRead extends APIModel {
         ;
         $carp_status = [];
         $carp_status["enable"] = APITools\is_carp_enabled();
-        $carp_status["maintenance_mode"] = isset($this->config["virtualip_carp_maintenancemode"]);
+        $carp_status["maintenance_mode"] = $this->is_config_enabled("/", "virtualip_carp_maintenancemode");
         $carp_status["interfaces"] = APITools\get_carp_if_status();
         return APIResponse\get(0, $carp_status);
     }

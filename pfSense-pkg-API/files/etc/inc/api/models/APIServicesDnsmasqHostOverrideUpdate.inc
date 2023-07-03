@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ class APIServicesDnsmasqHostOverrideUpdate extends APIModel {
 
     public function action() {
         # Update the host override and apply changes
-        $this->config["dnsmasq"]["hosts"][$this->id] = $this->validated_data;
+        $this->set_config("dnsmasq/hosts/{$this->id}", $this->validated_data);
         $this->write_config();
         mark_subsystem_dirty("hosts");
         $this->apply();
@@ -53,9 +53,9 @@ class APIServicesDnsmasqHostOverrideUpdate extends APIModel {
     private function __validate_id() {
         # Check for our required 'id' payload value.
         if (isset($this->initial_data["id"])) {
-            if (array_key_exists($this->initial_data["id"], $this->config["dnsmasq"]["hosts"])) {
+            if ($this->get_config("dnsmasq/hosts/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
-                $this->validated_data = $this->config["dnsmasq"]["hosts"][$this->id];
+                $this->validated_data = $this->get_config("dnsmasq/hosts/{$this->id}");
             } else {
                 $this->errors[] = APIResponse\get(2062);
             }
@@ -133,7 +133,7 @@ class APIServicesDnsmasqHostOverrideUpdate extends APIModel {
         $IP = $this->validated_data["ip"];
 
         # Loop through each host override and check if the FQDN already exists
-        foreach ($this->config["dnsmasq"]["hosts"] as $index=>$ent) {
+        foreach ($this->get_config("dnsmasq/hosts", []) as $index=>$ent) {
             # Check the FQDN matches this entry
             if ($ent["host"] === $HOST and $ent["domain"] === $DOMAIN) {
                 # Host overrides are allowed an IPv4 and IPv6 address, check if it already has one.

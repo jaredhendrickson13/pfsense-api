@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,18 +26,22 @@ class APIRoutingStaticRouteDelete extends APIModel {
     }
 
     public function action() {
-        $del_data = $this->config["staticroutes"]["route"][$this->id];
-        APITools\delete_static_route($this->id);
-        unset($this->config["staticroutes"]["route"][$this->id]);
+        # Remove this static route
+        delete_static_route($this->id, true);
+        $del_data = $this->del_config("staticroutes/route/{$this->id}");
         $this->write_config();
+
+        # Mark the routing subsystem as changed
+        mark_subsystem_dirty("staticroutes");
         $this->apply();
+
         return APIResponse\get(0, $del_data);
     }
 
     public function validate_payload() {
         # Check that this static route ID exists
         if (isset($this->initial_data["id"])) {
-            if (array_key_exists($this->initial_data["id"], $this->config["staticroutes"]["route"])) {
+            if ($this->get_config("staticroutes/route/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
             } else {
                 $this->errors[] = APIResponse\get(6006);
@@ -48,13 +52,9 @@ class APIRoutingStaticRouteDelete extends APIModel {
     }
 
     public function apply() {
-        # Mark the routing subsystem as changed, clear if applied
-        mark_subsystem_dirty("staticroutes");
-        system_routing_configure();
-        system_resolvconf_generate();
-        filter_configure();
-        setup_gateways_monitor();
-        send_event("service reload dyndnsall");
-        clear_subsystem_dirty("staticroutes");
+        # Apply these changes immediately if requested
+        if ($this->initial_data["apply"] === true) {
+            APIRoutingApplyCreate::apply();
+        }
     }
 }

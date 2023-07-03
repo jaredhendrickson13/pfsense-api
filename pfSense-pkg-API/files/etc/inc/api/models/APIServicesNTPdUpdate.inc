@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ class APIServicesNTPdUpdate extends APIModel {
 
     public function action() {
         # Save our updated configuration
-        $this->config["ntpd"] = $this->validated_data;
+        $this->set_config("ntpd", $this->validated_data);
         $this->write_config();
         $this->__validate_timeservers(true);    // Revalidate timeservers. This time create if valid.
 
@@ -36,18 +36,18 @@ class APIServicesNTPdUpdate extends APIModel {
 
         # Update our return values and return the response. Get the updated NTPd configuration and add the timeservers
         # from system > timeservers to provide full context of the NTP configuration.
-        $this->validated_data = $this->config["ntpd"];
-        $this->validated_data["timeservers"] = explode(" ", $this->config["system"]["timeservers"]);;
+        $this->validated_data = $this->get_config("ntpd", []);
+        $this->validated_data["timeservers"] = explode(" ", $this->get_config("system/timeservers", []));
         return APIResponse\get(0, $this->validated_data);
     }
 
     public function validate_payload() {
         # Pull the existing NTP configuration or default if it's empty
-        if (!empty($this->config["ntpd"])) {
-            $this->validated_data = $this->config["ntpd"];
+        if (!empty($this->get_config("ntpd", []))) {
+            $this->validated_data = $this->get_config("ntpd");
         } else {
             $this->validated_data = [];
-            $this->config["ntpd"] = [];
+            $this->set_config("ntpd", []);
         }
 
         # Validate each NTP field
@@ -97,10 +97,10 @@ class APIServicesNTPdUpdate extends APIModel {
                 }
 
                 # Unset all existing timeservers.
-                unset($this->config["system"]["timeservers"]);
-                unset($this->config["ntpd"]["ispool"]);
-                unset($this->config["ntpd"]["noselect"]);
-                unset($this->config["ntpd"]["prefer"]);
+                $this->del_config("system/timeservers");
+                $this->del_config("ntpd/ispool");
+                $this->del_config("ntpd/noselect");
+                $this->del_config("ntpd/prefer");
 
                 # Loop through each requested timeserver and ensure it is valid
                 foreach ($this->initial_data["timeservers"] as $timeserver) {

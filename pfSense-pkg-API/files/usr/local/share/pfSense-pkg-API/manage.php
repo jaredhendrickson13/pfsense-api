@@ -1,6 +1,6 @@
 #!/usr/local/bin/php -f
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -54,8 +54,6 @@ function backup() {
 }
 
 function restore() {
-    global $config;
-
     # Local Variables
     $api_conf = APITools\get_api_config();
 
@@ -69,7 +67,7 @@ function restore() {
     if (!empty($backup_api_conf_json)) {
         # Only restore the config if it has changed
         if ($api_conf[1] !== $backup_api_conf) {
-            $config["installedpackages"]["package"][$api_conf[0]]["conf"] = $backup_api_conf;
+            config_set_path("installedpackages/package/{$api_conf[0]}/conf", $backup_api_conf);
             write_config("Synchronized persistent API configuration");
             echo "Restoring API configuration... done.".PHP_EOL;
         } else {
@@ -87,14 +85,14 @@ function sync() {
 function update() {
     $pf_version = APITools\get_pfsense_version()["base"];
     echo shell_exec("/usr/sbin/pkg delete -y pfSense-pkg-API");
-    echo shell_exec("/usr/sbin/pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-".$pf_version."-pkg-API.txz");
+    echo shell_exec("/usr/sbin/pkg -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-".$pf_version."-pkg-API.pkg");
     echo shell_exec("/etc/rc.restart_webgui");
 }
 
 function revert($version) {
     # Local variables
     $pf_version = APITools\get_pfsense_version()["base"];
-    $url = "https://github.com/jaredhendrickson13/pfsense-api/releases/download/".urlencode($version)."/pfSense-".$pf_version."-pkg-API.txz";
+    $url = "https://github.com/jaredhendrickson13/pfsense-api/releases/download/".urlencode($version)."/pfSense-".$pf_version."-pkg-API.pkg";
     echo "Locating pfSense-pkg-API-".$version." at ".$url."... ";
 
     # Check our URL for the existence of this version
@@ -104,7 +102,7 @@ function revert($version) {
     if($headers && strpos($headers[0], '302')) {
         echo "done.".PHP_EOL;
         echo shell_exec("/usr/sbin/pkg delete -y pfSense-pkg-API");
-        echo shell_exec("/usr/sbin/pkg add ".$url);
+        echo shell_exec("/usr/sbin/pkg -C /dev/null add ".$url);
         echo shell_exec("/etc/rc.restart_webgui");
     } else {
         echo "no package found.".PHP_EOL;
@@ -118,9 +116,8 @@ function delete() {
 }
 
 function rotate_server_key() {
-    global $config;
     $pkg_index = APITools\get_api_config()[0];
-    $config["installedpackages"]["package"][$pkg_index]["conf"]["keys"] = [];
+    config_set_path("installedpackages/package/{$pkg_index}/conf/keys", []);
     echo "Rotating API server key... ";
     APITools\create_jwt_server_key(true);
     echo "done.".PHP_EOL;

@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ class APISystemHostnameUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system"];
+        $this->privileges = ["page-all", "page-system-generalsetup"];
         $this->change_note = "Modified system hostname via API";
     }
 
@@ -29,7 +29,7 @@ class APISystemHostnameUpdate extends APIModel {
         $this->write_config();
         $this->apply_backend_changes();
 
-        $data = ["hostname" => $this->config["system"]["hostname"], "domain" => $this->config["system"]["domain"]];
+        $data = ["hostname" => $this->get_config("system/hostname"), "domain" => $this->get_config("system/domain")];
         return APIResponse\get(0, $data);
     }
 
@@ -39,7 +39,7 @@ class APISystemHostnameUpdate extends APIModel {
             if (!is_hostname($this->initial_data['hostname']) or !is_unqualified_hostname($this->initial_data['hostname'])) {
                 $this->errors[] = APIResponse\get(1000);
             } else {
-                $this->config["system"]["hostname"] = $this->initial_data['hostname'];
+                $this->set_config("system/hostname", $this->initial_data['hostname']);
             }
         }
         if (isset($this->initial_data['domain'])) {
@@ -47,7 +47,7 @@ class APISystemHostnameUpdate extends APIModel {
             if (!is_domain($this->initial_data['domain'])) {
                 $this->errors[] = APIResponse\get(1001);
             } else {
-                $this->config["system"]["domain"] = $this->initial_data['domain'];
+                $this->set_config("system/domain", $this->initial_data['domain']);
             }
         }
     }
@@ -57,9 +57,9 @@ class APISystemHostnameUpdate extends APIModel {
         system_hostname_configure();
         system_hosts_generate();
         system_resolvconf_generate();
-        if (isset($this->config['dnsmasq']['enable'])) {
+        if ($this->is_config_enabled('dnsmasq')) {
             services_dnsmasq_configure();
-        } elseif (isset($this->config['unbound']['enable'])) {
+        } elseif ($this->is_config_enabled('unbound')) {
             services_unbound_configure();
         }
         filter_configure();

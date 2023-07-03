@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ class APIInterfaceGroupDelete extends APIModel {
     }
 
     public function action() {
-        unset($this->config["ifgroups"]["ifgroupentry"][$this->id]);
+        $this->del_config("ifgroups/ifgroupentry/{$this->id}");
         $this->write_config();
         pfSense_interface_destroy($this->validated_data["ifname"]);
         return APIResponse\get(0, $this->validated_data);
@@ -34,7 +34,7 @@ class APIInterfaceGroupDelete extends APIModel {
     private function __validate_id() {
         if (isset($this->initial_data['id'])) {
             if (APITools\is_ifgroup($this->initial_data['id'])) {
-                foreach ($this->config["ifgroups"]["ifgroupentry"] as $id=>$ifgroup) {
+                foreach ($this->get_config("ifgroups/ifgroupentry", []) as $id=>$ifgroup) {
                     # Check if this group matches
                     if ($this->initial_data["id"] === $ifgroup["ifname"]) {
                         $this->validated_data = $ifgroup;

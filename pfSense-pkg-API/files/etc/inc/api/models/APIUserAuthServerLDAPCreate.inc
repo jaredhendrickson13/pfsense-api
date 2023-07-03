@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -20,22 +20,23 @@ class APIUserAuthServerLDAPCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-authserver"];
+        $this->privileges = ["page-all", "page-system-authservers"];
         $this->change_note = "Added LDAP authentication server via API";
     }
 
     public function action() {
-        $this->config["system"]["authserver"][] = $this->validated_data;    // Add our new configuration
+        $this->id = $this->get_next_id("system/authserver");
+        $this->set_config("system/authserver/{$this->id}", $this->validated_data);
         // Check if clients wants to set this as default auth server
         if ($this->initial_data["active"] === true) {
-            $this->config['system']['webgui']['authmode'] = $this->validated_data["name"];    // Add default auth server
+            $this->set_config('system/webgui/authmode', $this->validated_data["name"]);    // Add default auth server
         }
         $this->write_config();
         return APIResponse\get(0, $this->validated_data);
     }
 
     public function validate_payload() {
-        $ldap_count = count($this->config["system"]["authserver"]);    // Save our total number of auth servers
+        $ldap_count = count($this->get_config("system/authserver", []));    // Save our total number of auth servers
         $this->validated_data = ["refid" => uniqid(), "type" => "ldap"];    // Init our new LDAP config
         if (isset($this->initial_data['name'])) {
             $this->validated_data["name"] = APITools\sanitize_str($this->initial_data['name']);
@@ -75,18 +76,11 @@ class APIUserAuthServerLDAPCreate extends APIModel {
         if (isset($this->initial_data['ldap_urltype'])) {
             // Assign default config values
             $allowed_url_types = array(
-                "standard" => "TCP - Standard",
-                "starttls" => "TCP - STARTTLS",
-                "encrypted" => "SSL - Encrypted"
+                "standard" => "Standard TCP",
+                "starttls" => "STARTTLS Encrypted",
+                "encrypted" => "SSL/TLS Encrypted"
             );
-            // Accommodate config value changes for pfSense 2.5_
-            if (APITools\get_pfsense_version()["program"] >= 250) {
-                $allowed_url_types = array(
-                    "standard" => "Standard TCP",
-                    "starttls" => "STARTTLS Encrypted",
-                    "encrypted" => "SSL/TLS Encrypted"
-                );
-            }
+
             // Check if our URL type is allowed
             if (!array_key_exists($this->initial_data["ldap_urltype"], $allowed_url_types)) {
                 $this->errors[] = APIResponse\get(5016);

@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ class APIUserGroupMemberDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-usermanager-addprivs", "page-system-groupmanager-addprivs"];
+        $this->privileges = ["page-all", "page-system-groupmanager"];
         $this->change_note = "Deleted group membership for user via API";
     }
 

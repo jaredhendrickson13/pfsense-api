@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -25,13 +25,8 @@ class APIRoutingStaticRouteRead extends APIModel {
     }
 
     public function action() {
-        // Check that we have a configuration
-        if (!empty($this->config["staticroutes"]["route"])) {
-            $routes = $this->config["staticroutes"]["route"];
-            foreach ($routes as $id=>$route) {$routes[$id]["id"] = $id;}
-        } else {
-            $routes = [];
-        }
+        $routes = $this->get_config("staticroutes/route", []);
+        foreach ($routes as $id=>$route) {$routes[$id]["id"] = $id;}
         return APIResponse\get(0, $routes);
     }
 }

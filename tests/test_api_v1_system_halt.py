@@ -5,10 +5,12 @@ import e2e_test_framework
 class APIE2ETestSystemHalt(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/system/halt endpoint."""
     uri = "/api/v1/system/halt"
+    post_privileges = ["page-all", "page-diagnostics-haltsystem"]
     post_tests = [
         {
             "name": "Test system halt",
-            "payload": {"debug": True}}
+            "resp_data_empty": True,
+            "req_data": {"debug": True}}
 
     ]
 

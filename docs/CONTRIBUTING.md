@@ -124,9 +124,6 @@ custom API model:
 - `$this->initial_data` : The request data as it was when the object was created
 - `$this->validated_data` : An array for validators to use to populate data that has been validated
 - `$this->errors` : An array to populate any errors encountered. Should be an array of APIResponse values.
-- `$this->config` : Our pfSense configuration array. You may read current configuration values using this array or write
-changes to the configuration by updating it's values. If you do make changes to the configuration, you must use call
-`$this->write_config()` to apply them. 
 - `$this->id` : A property to track the current instances configuration ID. This is primarily helpful for updating and 
 deleting objects.
 - `$this->validate_id` : A boolean to dictate whether the model object should require validation of the configuration ID.
@@ -146,10 +143,43 @@ Included in the API framework are properties and methods to read and write to pf
 that other functions are likely required to configure pfSense's backend to use the new configuration. These properties
 and methods are available anywhere within your API model:
 
-- `$this->config` : Our pfSense XML configuration in a PHP array format. You may read the current configuration from 
-this property or update/add new configuration by assigning the corresponding array key new values
-- `$this->write_config()` : This method writes any changes made to $this->config to pfSense's XML configuration file. 
-Any changes made to $this->config will not be applied until this method is executed. 
+- `$this->get_next_id()` : This method returns the next array ID of a specific configuration path. This is necessary
+for most API creation tasks as the next ID must be specified in the `$this->set_config()` call in order to actually
+write the configuration correctly. In the case that target configuration path is not an array, 0 will be returned to
+initialize the array. For example, if you wanted to get the next available firewall rule ID, you could call:
+`$this->get_next_id("filter/rule")` which would return the integer of the next available array index for that
+configuration area.
+- `$this->get_config()` : This method allows you to pull the configuration of a specific configuration area by path and
+optionally allows you to return a default value if no configuration was found at this path. For example, if you wanted to 
+pull all firewall rules from the configuration and default to an empty array if none were found, you could call:
+`$this->get_config("filter/rule", [])`. This method is simply a wrapper for the pfSense built-in `config_get_path()`
+function and works exactly the same way. For more information:
+https://docs.netgate.com/pfsense/en/latest/development/php-config-arrays.html#reading-configuration-values
+- `$this->set_config()` : This method allows you to set the configuration of a specific configuration area by path and
+optionally allows you to specify a default if the configuration could not be set. For example, if you wanted to change
+the system hostname in the configuration or default the return value to `false` if the action fails, you could call:
+`$this->set_config("system/hostname", "new-hostname-value, false)`. After calling this function, the 
+`$this->write_config()` method must be called to actually write the changes to the configuration file. 
+This method is simply a wrapper for the pfSense built-in `config_set_path()` function and works exactly the same way. 
+For more information: 
+https://docs.netgate.com/pfsense/en/latest/development/php-config-arrays.html#writing-configuration-values
+- `$this->del_config()` : This method deletes the configuration at a specific configuration area by path and returns
+the deleted configuration. After calling this function, the `$this->write_config()` method must be called to actually 
+write the changes to the configuration file. This method is simply a wrapper for the built-in pfSense `config_del_path`
+function and works exactly the same way. For more information:
+https://docs.netgate.com/pfsense/en/latest/development/php-config-arrays.html#deleting-configuration-values
+- `$this->write_config()` : This method writes any changes made to the config to pfSense's XML configuration file. 
+Any changes made will not be applied until this method is executed. This method is a wrapper for the 
+pfSense built-in `write_config()` function, that also adds additional functionality like config logging, and a 
+configuration lock system built specifically for the API.
+- `$this->is_config_enabled()` : This method checks if a specific key exists at a specific configuration path. pfSense
+identifies boolean files by whether a specific key (usually `enable`) exists or not. This method simply checks for the
+existence of that key and returns `true` if it exists or `false` if it doesn't. This works similarly to PHP's built-in
+`isset()` function but is safe for array traversal. For example, if you wanted to check if the SSH service is enabled
+in configuration, you could call `$this->is_config_enabled("system/ssh", "enable")` to check if the `enable` exists
+in the `system` > `ssh` configuration array. This method is simply a wrapper for the pfSense built-in 
+`config_path_enabled()` function and works exactly the same way. For more information:
+https://docs.netgate.com/pfsense/en/latest/development/php-config-arrays.html#testing-if-settings-are-enabled
 
 #### Overriding API Model Validation ####
 By default, API models do not provide any sort of validation. You are responsible for overriding the class method to 
@@ -217,8 +247,9 @@ class NewAPIModel extends APIModel {
     
     # Tell our API model what to do after successfully validating the client's request
     public function action(){
-        $this->config["test"][] = $this->validated_data;          // Write a new 'test' item to our master config
-        $this->write_config();       // Apply our configuration change
+        $this->id = $this->get_next_id("test/item");    // Get the next available array index for the test item
+        $this->set_config("test/item/{$this->id}");    // Set a new 'test' item in the config
+        $this->write_config();       // Apply the configuration change
         return APIResponse\get(0, $this->validated_data);   // Return a success response containing our added data
     }
 }
@@ -399,46 +430,89 @@ The APIE2ETest class requires you to override a some properties to function corr
 GET requests, you do not need to override this property. If this endpoint does support GET request, but does not require
 any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
     - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
-    - `payload` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
-    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
-    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
+    - `req_data` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
+    - `resp_data` : a nested dictionary that contains the expected API response data.
+    - `resp_data_empty` : a boolean indicating whether this test should allow the response data to be empty.    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
-    - `auth_payload` : a dictionary containing authentication payload values (typically `client-id` and `client-token`) 
-    to use with the corresponding request (defaults the username and password passed into the command)
+    - `delay` : an integer that specifies how many seconds a test should wait until starting
+    - `pause` : an integer that specifies how many seconds a test should wait after the test has finished    - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
+    - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
+    - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.
+    - `pre_test_callable` : the name of a function callable to run before this test is run. This callable can initiate
+      a test failure by raising any exception during the function call.
+    - `post_test_callable` : the name of a function callable to run after this test is run. This callable can initiate
+      a test failure by raising any exception during the function call.
+    - `req_data_callable` : the name of a function callable to run to dynamically generate the request payload. This
+      must be a function that returns a dictionary of request payload items. This can be used to apply request payload
+      items that may by dynamic such as IDs. If this test also has a `req_data` specified, this callable will simply 
+      be merged into the test's `req_data`. 
     
 - `post_tests` : A list of dictionary formatted test parameters for POST requests. If this endpoint does not support 
 POST requests, you do not need to override this property. If this endpoint does support POST request, but does not require
 any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
     - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
-    - `payload` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
-    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
-    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
+    - `req_data` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
+    - `resp_data` : a nested dictionary that contains the expected API response data.
+    - `resp_data_empty` : a boolean indicating whether this test should allow the response data to be empty.    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
-    - `auth_payload` : a dictionary containing authentication payload values (typically `client-id` and `client-token`) 
-    to use with the corresponding request (defaults the username and password passed into the command)
-    
+    - `delay` : an integer that specifies how many seconds a test should wait until starting
+    - `pause` : an integer that specifies how many seconds a test should wait after the test has finished    - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
+    - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
+    - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.
+    - `pre_test_callable` : the name of a function callable to run before this test is run. This callable can initiate
+      a test failure by raising any exception during the function call.
+    - `post_test_callable` : the name of a function callable to run after this test is run. This callable can initiate
+      a test failure by raising any exception during the function call.
+    - `req_data_callable` : the name of a function callable to run to dynamically generate the request payload. This
+      must be a function that returns a dictionary of request payload items. This can be used to apply request payload
+      items that may by dynamic such as IDs. If this test also has a `req_data` specified, this callable will simply 
+      be merged into the test's `req_data`. 
+  
 - `put_tests` : A list of dictionary formatted test parameters for PUT requests. If this endpoint does not support 
 PUT requests, you do not need to override this property. If this endpoint does support PUT request, but does not require
 any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
     - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
-    - `payload` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
-    - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
-    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
+    - `req_data` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
+    - `resp_data` : a nested dictionary that contains the expected API response data.
+    - `resp_data_empty` : a boolean indicating whether this test should allow the response data to be empty.    - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
-    - `auth_payload` : a dictionary containing authentication payload values (typically `client-id` and `client-token`) 
-    to use with the corresponding request (defaults the username and password passed into the command)
+    - `delay` : an integer that specifies how many seconds a test should wait until starting
+    - `pause` : an integer that specifies how many seconds a test should wait after the test has finished    - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
+    - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
+    - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.
+    - `pre_test_callable` : the name of a function callable to run before this test is run. This callable can initiate
+      a test failure by raising any exception during the function call.
+    - `post_test_callable` : the name of a function callable to run after this test is run. This callable can initiate
+      a test failure by raising any exception during the function call.
+    - `req_data_callable` : the name of a function callable to run to dynamically generate the request payload. This
+      must be a function that returns a dictionary of request payload items. This can be used to apply request payload
+      items that may by dynamic such as IDs. If this test also has a `req_data` specified, this callable will simply 
+      be merged into the test's `req_data`. 
 
 - `delete_tests` : A list of dictionary formatted test parameters for DELETE requests. If this endpoint does not support 
 DELETE requests, you do not need to override this property. If this endpoint does support DELETE request, but does not require
 any payload data to receive a valid response you must set this value to `[{}]`. Each dictionary can contain:
     - `name` : set a descriptive name to be printed alongside test results (defaults to `unnamed test`)
-    - `payload` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
+    - `req_data` : a nested dictionary that contains the request payload to use when running the test (defaults to `{}`)
+    - `resp_data` : a nested dictionary that contains the expected API response data.
+    - `resp_data_empty` : a boolean indicating whether this test should allow the response data to be empty.
     - `status` : an integer that specifies the tests expected HTTPS status code (defaults to `200`) 
     - `return` : an integer that specifies the tests expected API return code (defaults to `0`)
     - `resp_time` : a float that specifies the tests maximum response time expected from the API endpoint
-    - `auth_payload` : a dictionary containing authentication payload values (typically `client-id` and `client-token`) 
-    to use with the corresponding request (defaults the username and password passed into the command)
-    
+    - `delay` : an integer that specifies how many seconds a test should wait until starting
+    - `pause` : an integer that specifies how many seconds a test should wait after the test has finished
+    - `username` : the client's username or client-id to authenticate with. Defaults to `username` argument value.
+    - `password` : the client's password or client-token to authenticate with. Defaults to `password` argument value.
+    - `auth_mode` : hard set the authentication mode for this test. Defaults to `auth_mode` argument value.
+    - `pre_test_callable` : the name of a function callable to run before this test is run. This callable can initiate
+      a test failure by raising any exception during the function call.
+    - `post_test_callable` : the name of a function callable to run after this test is run. This callable can initiate
+      a test failure by raising any exception during the function call.
+    - `req_data_callable` : the name of a function callable to run to dynamically generate the request payload. This
+      must be a function that returns a dictionary of request payload items. This can be used to apply request payload
+      items that may by dynamic such as IDs. If this test also has a `req_data` specified, this callable will simply 
+      be merged into the test's `req_data`. 
+
 - `get_responses` : A list of previously executed GET requests in a dictionary format. Failing responses will not be 
 included.
 
@@ -451,14 +525,26 @@ included.
 - `delete_responses` : A list of previously executed DELETE requests in a dictionary format. Failing responses will not be 
 included.
 
+- `get_privileges` : A list of pfSense privileges required to authorize GET API calls to this test's endpoint. Any 
+privilege specified here will automatically be tested by the E2E test framework. 
+
+- `post_privileges` : A list of pfSense privileges required to authorize POST API calls to this test's endpoint. Any
+privilege specified here will automatically be tested by the E2E test framework.
+
+- `put_privileges` : A list of pfSense privileges required to authorize PUT API calls to this test's endpoint. Any
+privilege specified here will automatically be tested by the E2E test framework.
+
+- `delete_privileges` : A list of pfSense privileges required to authorize DELETE API calls to this test's endpoint. Any
+privilege specified here will automatically be tested by the E2E test framework.
+
 #### Other Base Model Properties
 The APIE2ETest class also contains a few properties that are not intended to be overridden:
 
-- `uid` : a unique ID that can be used for payload fields that required a unique value
+- `uid` : a unique ID that can be used for req_data fields that require a unique value
 
 #### Overriding Base Model Methods ####
 There are methods that will assist you when you need to dynamically format API request data. These are typically used 
-when you need to add payload data that is dependent on a previous API response. The following methods may 
+when you need to add request data that is dependent on a previous API response. The following methods may 
 overridden:
 
 - `pre_get()` : Runs before the GET request is made.
@@ -470,6 +556,32 @@ overridden:
 - `pre_delete()` : Runs before the DELETE request is made.
 - `post_delete()` : Runs after the DELETE request is made.
 
+#### Other Base Model Models
+There are a few methods available to tests through the testing framework, these methods are intended for use in 
+conjunction with the `pre_test_callable`, `post_test_callable`, and `payload_callable` test parameters:
+
+- `pfsense_shell()` : Runs a shell command on the targeted pfSense instance using the /api/v1/diagnostics/command_prompt
+endpoint. This function will return stdout and/or stderr of the executed command. This can be used to verify certain
+conditions, files, or configurations exist on the pfSense backend via CLI.
+  - Example usage: `self.pfsense_shell("ifconfig")`
+
+#### Best Practices
+When writing E2E tests, it is best to follow these guidelines to prevent unexpected test failures:
+
+- Any configuration added by a test should be fully removed by the end of the test, this will prevent issues with
+other tests that expect the configuration to be a blank slate. Each test should be able to run repeatedly without 
+failure, both individually and using `run_all_tests.py`.
+- For tests that utilize `pre_test_callable` or `post_test_callable` to verify the changes made are expected, it is 
+strongly recommended you make use of constants for any values that are being set and evaluated. This ensures the 
+value only needs to be updated in one place to update the context of the test, or change test values.
+- When possible, you may want to consider integrating randomized values where applicable. For example, if a field
+accepts a numeric value that must be within a set range, you may want tests to use a random value for this field to
+better simulate variance of client options. This both ensures validation constraints work, as well as point out 
+problematic values that would otherwise be missed by a static field value.
+- As much as possible, tests should not bypass any functionality available to an API endpoint. One exception to this
+rule is if the API endpoint inherently severs access to the target pfSense instance (e.g. system reboot). In these 
+situations, you can add `_action_bypass` to the test's `req_data` to bypass the `action()` method of the API model.
+
 #### Running E2E Tests ####
 Once you have written your E2E test class, you must ensure you create the E2E test object at the end of the file
 you've created like so:
@@ -479,10 +591,16 @@ import e2e_test_framework
 
 class NewAPIE2ETest(e2e_test_framework.APIE2ETest):
     url = "/api/v1/your_endpoint"
+    
+    get_privileges = ["page-all", "page-some-other-priv"]
+    post_privileges = ["page-all", "page-some-other-priv"]
+    put_privileges = ["page-all", "page-some-other-priv"]
+    delete_privileges = ["page-all", "page-some-other-priv"]
+
     get_requests = [{}]
     post_requests = [
         {   
-            "payload": {
+            "req_data": {
                 "some_parameter": "some value to create"
             },
             "status": 400,
@@ -490,7 +608,7 @@ class NewAPIE2ETest(e2e_test_framework.APIE2ETest):
             "resp_time": 0.5
         },
         {   
-            "payload": {
+            "req_data": {
                 "some_other parameter": "some other value to create"
             },
             "status": 200,
@@ -499,7 +617,7 @@ class NewAPIE2ETest(e2e_test_framework.APIE2ETest):
         },    ]
     put_requests = [
         {   
-            "payload": {
+            "req_data": {
                 "some_parameter": "some value to update"
             },
             "status": 400,
@@ -507,7 +625,7 @@ class NewAPIE2ETest(e2e_test_framework.APIE2ETest):
             "resp_time": 0.5
         },
         {   
-            "payload": {
+            "req_data": {
                 "some_other parameter": "some other value to update"
             },
             "status": 200,
@@ -517,7 +635,7 @@ class NewAPIE2ETest(e2e_test_framework.APIE2ETest):
     ]  
     delete_requests = [
         {   
-            "payload": {
+            "req_data": {
                 "some_parameter": "some value to delete"
             },
             "status": 200,
@@ -541,8 +659,9 @@ E2E tests will check API responses for the following:
 - API responses include the correct HTTP status code
 - API responses include the expected API return code
 - API responses are received within an acceptable time frame
+- API response data is expected
 - CRUD success. POST requests are always run first, then GET requests to check that the creation was successful, then
-PUT requests attempt to update the created object, then finally DELETE requests attempt to destroy the object. 
+PUT requests attempt to update the created object, then finally DELETE requests attempt to destroy the object.
 
 ## Making the pfSense API package ##
 The package Makefile and pkg-plist files are auto generated by `tools/make_package.py`. This simply pulls the files and

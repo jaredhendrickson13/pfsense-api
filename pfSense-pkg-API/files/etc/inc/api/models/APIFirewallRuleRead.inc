@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -25,13 +25,6 @@ class APIFirewallRuleRead extends APIModel {
     }
 
     public function action() {
-
-        // Check that we have a configuration
-        if (!empty($this->config["filter"]["rule"])) {
-            $rule_array = $this->config["filter"]["rule"];
-        } else {
-            $rule_array = [];
-        }
-        return APIResponse\get(0, $rule_array);
+        return APIResponse\get(0, $this->get_config("filter/rule", []));
     }
 }

@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -25,13 +25,6 @@ class APISystemCertificateRead extends APIModel {
     }
 
     public function action() {
-        $this->validate_payload();
-        return APIResponse\get(0, $this->validated_data);
-    }
-
-    public function validate_payload() {
-        if (!empty($this->config["cert"])) {
-            $this->validated_data = $this->config["cert"];
-        }
+        return APIResponse\get(0, $this->get_config("cert", []));
     }
 }

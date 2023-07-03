@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -27,7 +27,8 @@ class APISystemVersionUpgradeRead extends APIModel {
     }
 
     public function action() {
-        return APIResponse\get(0, get_system_pkg_version(false, $this->validated_data["use_cache"]));
+        $ver = get_system_pkg_version(false, $this->validated_data["use_cache"]);
+        return APIResponse\get(0, ($ver) ?: []);
     }
 
     public function validate_payload() {

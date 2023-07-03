@@ -1,4 +1,4 @@
-# Copyright 2022 Jared Hendrickson
+# Copyright 2023 Jared Hendrickson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ import e2e_test_framework
 class APIE2ETestServicesUnboundHostOverrideFlush(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/services/unbound/host_override/flush endpoint."""
     uri = "/api/v1/services/unbound/host_override/flush"
+    put_privileges = ["page-all", "page-services-dnsresolver-edithost"]
+    delete_privileges = ["page-all", "page-services-dnsresolver-edithost"]
     put_tests = [
         {
             "name": "Check host_overrides field array requirement",
@@ -26,7 +28,7 @@ class APIE2ETestServicesUnboundHostOverrideFlush(e2e_test_framework.APIE2ETest):
         },
         {
             "name": "Check ability to replace all existing host overrides",
-            "payload": {
+            "req_data": {
                 "host_overrides": [
                     {
                         "host": "test1",
@@ -51,7 +53,7 @@ class APIE2ETestServicesUnboundHostOverrideFlush(e2e_test_framework.APIE2ETest):
         }
     ]
     delete_tests = [
-        {"name": "Flush all Unbound host overrides", "payload": {}},
+        {"name": "Flush all Unbound host overrides", "req_data": {}},
     ]
 
 

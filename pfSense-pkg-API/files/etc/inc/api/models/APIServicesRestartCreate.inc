@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@ class APIServicesRestartCreate extends APIModel {
     public function action() {
         if (isset($this->validated_data["service"])) {
             service_control_restart($this->validated_data["service"], []);
-            return APIResponse\get(0, $this->validated_data["service"]);
+            $services = ["service"=>$this->validated_data["service"], "status"=>"restarted"];
+            return APIResponse\get(0, $services);
         } else {
             $services = get_services();
             // Loop through our service list and add our service status

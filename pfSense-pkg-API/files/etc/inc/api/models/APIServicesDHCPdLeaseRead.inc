@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -30,18 +30,8 @@ class APIServicesDHCPdLeaseRead extends APIModel {
 
     # Formats the leases array to be more REST like
     private function __to_representation($leases) {
-        # Loop through each array item and change the online/offline keywords to True/False accordingly
-        # Also change the 'act' key to 'state'
+        # Change the 'act' key to 'state'
         foreach ($leases as $id=>$lease) {
-            # Change the 'online' keyword to true
-            if ($lease["online"] === "online") {
-                $leases[$id]["online"] = true;
-            }
-            # Otherwise change the 'offline' keyword to false
-            else {
-                $leases[$id]["online"] = false;
-            }
-
             # Change the 'act' key to 'state'
             $leases[$id]["state"] = $leases[$id]["act"];
             unset($leases[$id]["act"]);

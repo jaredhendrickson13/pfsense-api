@@ -1,4 +1,4 @@
-# Copyright 2022 Jared Hendrickson
+# Copyright 2023 Jared Hendrickson
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ import e2e_test_framework
 class APIE2ETestStatusSystem(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/status/system endpoint."""
     uri = "/api/v1/status/system"
+    get_privileges = ["page-all", "page-dashboard-widgets", "page-dashboard-all"]
     get_tests = [
         {
             "name": "Read the system status",

@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -30,13 +30,12 @@ class APIFirewallNATPortForwardCreate extends APIModel {
         $this->protocols = ["tcp", "udp", "tcp/udp", "icmp", "esp", "ah", "gre", "ipv6", "igmp", "pim", "ospf"];
         $this->nat_reflection = ["enable", "disable", "purenat"];
         $this->port_required = false;
-        $this->id = count($this->config["nat"]["rule"]);
     }
 
     public function action() {
         # Add our new configuration
-        $this->__init_config();
-        $this->config["nat"]["rule"][$this->id] = $this->validated_data;
+        $this->id = $this->get_next_id("nat/rule");
+        $this->set_config("nat/rule/{$this->id}", $this->validated_data);
         APITools\sort_nat_rules($this->initial_data["top"], $this->id);
         $this->write_config();
         mark_subsystem_dirty('natconf');
@@ -51,7 +50,7 @@ class APIFirewallNATPortForwardCreate extends APIModel {
     private function __validate_interface() {
         # Require clients to pass in an interface
         if (isset($this->initial_data['interface'])) {
-            $interface = APITools\get_pfsense_if_id($this->initial_data['interface']);
+            $interface = APITools\get_pfsense_if_id($this->initial_data['interface'], false, true, true, true);
             # Require interface to exist
             if ($interface) {
                 $this->validated_data["interface"] = $interface;
@@ -230,15 +229,5 @@ class APIFirewallNATPortForwardCreate extends APIModel {
         $this->validated_data["associated-rule-id"] = "pass";
         $this->validated_data["created"] = array("time" => time(), "username" => $this->created_by_msg);
         $this->validated_data["updated"] = $this->validated_data["created"];
-    }
-
-    private function __init_config() {
-        # Ensure our config is formatted for NAT rules
-        if (!is_array($this->config["nat"])) {
-            $this->config["nat"] = [];
-        }
-        if (!is_array($this->config["nat"]["rule"])) {
-            $this->config["nat"]["rule"] = [];
-        }
     }
 }

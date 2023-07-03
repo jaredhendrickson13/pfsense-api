@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -22,5 +22,9 @@ class APIServicesUnbound extends APIEndpoint {
 
     protected function get() {
         return (new APIServicesUnboundRead())->call();
+    }
+
+    protected function put() {
+        return (new APIServicesUnboundUpdate())->call();
     }
 }

@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -29,9 +29,10 @@ class APIServicesDnsmasqHostOverrideCreate extends APIModel {
     }
 
     public function action() {
-        $this->__init_config();
-        $this->config["dnsmasq"]["hosts"][] = $this->validated_data;
-        usort($this->config["dnsmasq"]["hosts"], "dnsmasq_override_create_host_cmp");
+        $this->id = $this->get_next_id("dnsmasq/hosts");
+        $this->set_config("dnsmasq/hosts/{$this->id}", $this->validated_data);
+        $hosts = $this->get_config("dnsmasq/hosts");
+        usort($hosts, "dnsmasq_override_create_host_cmp");
         $this->write_config();
         mark_subsystem_dirty("hosts");
         $this->apply();
@@ -129,7 +130,7 @@ class APIServicesDnsmasqHostOverrideCreate extends APIModel {
         $IP = $this->validated_data["ip"];
 
         # Loop through each host override and check if the FQDN already exists
-        foreach ($this->config["dnsmasq"]["hosts"] as $ent) {
+        foreach ($this->get_config("dnsmasq/hosts", []) as $ent) {
             # Check the FQDN matches this entry
             if ($ent["host"] === $HOST and $ent["domain"] === $DOMAIN) {
                 # Host overrides are allowed an IPv4 and IPv6 address, check if it already has one.
@@ -139,16 +140,6 @@ class APIServicesDnsmasqHostOverrideCreate extends APIModel {
             }
         }
         return false;
-    }
-
-    private function __init_config() {
-        # Ensure our dnsmasq and dnsmasq hosts arrays exist
-        if (empty($this->config["dnsmasq"])) {
-            $this->config["dnsmasq"] = [];
-        }
-        if (empty($this->config["dnsmasq"]["hosts"])) {
-            $this->config["dnsmasq"]["hosts"] = [];
-        }
     }
 
     public function apply() {

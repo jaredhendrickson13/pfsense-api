@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ class APIInterfaceApplyCreate extends APIModel {
 
     public static function apply() {
         # Local variables
-        global $config, $g;
+        global $g;
         $mtu_redo = array();
 
         # Remove configuration cache if it exists
@@ -76,14 +76,14 @@ class APIInterfaceApplyCreate extends APIModel {
                 $if_mtu = get_interface_mtu(get_real_interface($if_to_apply));
 
                 # Only apply changes to interfaces that are enabled
-                if (isset($config['interfaces'][$if_to_apply]['enable'])) {
+                if (APIModel::is_config_enabled("interfaces/{$if_to_apply}")) {
                     # Bring down existing interface and configure the new one
                     interface_bring_down($if_to_apply, false, $if_conf);
                     interface_configure($if_to_apply, true);
 
                     # Call track6 specific configuration steps
-                    if ($config['interfaces'][$if_to_apply]['ipaddrv6'] == "track6") {
-                        $wancfg = $config['interfaces'][$if_to_apply];
+                    if (APIModel::get_config("interfaces/{$if_to_apply}/ipaddrv6") == "track6") {
+                        $wancfg = APIModel::get_config("interfaces/{$if_to_apply}");
                         interface_track6_configure($if_to_apply, $wancfg, true);
                     }
                 }
@@ -93,8 +93,7 @@ class APIInterfaceApplyCreate extends APIModel {
                     interface_bring_down($if_to_apply, true, $if_conf);
 
                     # Restart DHCP services to remove DHCP server(s) on this interface
-                    if (isset($config['dhcpd'][$if_to_apply]['enable']) ||
-                        isset($config['dhcpdv6'][$if_to_apply]['enable'])) {
+                    if (APIModel::is_config_enabled("dhcpd/{$if_to_apply}") or APIModel::is_config_enabled("dhcpdv6/{$if_to_apply}")) {
                         services_dhcpd_configure();
                     }
                 }
@@ -102,9 +101,9 @@ class APIInterfaceApplyCreate extends APIModel {
                 # Interfaces with sub-interfaces (e.g. VLANs) need their MTU reconfigured if changed
                 if (interface_has_clones(get_real_interface($if_to_apply))) {
                     # When static MTU is set
-                    if (isset($config['interfaces'][$if_to_apply]['mtu'])) {
+                    if (APIModel::is_config_enabled("interfaces/{$if_to_apply}", "mtu")) {
                         # Interface must be redone if MTU has changed
-                        if ($config['interfaces'][$if_to_apply]['mtu'] != $if_mtu) {
+                        if (APIModel::get_config("interfaces/{$if_to_apply}/mtu") != $if_mtu) {
                             $mtu_redo[] = get_real_interface($if_to_apply);
                         }
                     }
@@ -139,8 +138,7 @@ class APIInterfaceApplyCreate extends APIModel {
         }
 
         # Initialize syslog configuration and restart the syslog service
-        init_config_arr(array('syslog'));
-        if (isset($config['syslog']['enable']) and $if_to_apply == $config['syslog']['sourceip']) {
+        if (APIModel::is_config_enabled("syslog") and $if_to_apply == APIModel::get_config("syslog/sourceip")) {
             system_syslogd_start();
         }
 

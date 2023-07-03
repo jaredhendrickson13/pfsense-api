@@ -1,5 +1,5 @@
 <?php
-//   Copyright 2022 Jared Hendrickson
+//   Copyright 2023 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.
@@ -24,11 +24,6 @@ class APIFirewallNATOneToOneRead extends APIModel {
     }
 
     public function action() {
-
-        // Check that we have a virtual IP configuration
-        if (!empty($this->config["nat"]["onetoone"])) {
-            $this->validated_data = $this->config["nat"]["onetoone"];
-        }
-        return APIResponse\get(0, $this->validated_data);
+        return APIResponse\get(0, $this->get_config("nat/onetoone", []));
     }
 }

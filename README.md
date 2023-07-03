@@ -1,5 +1,6 @@
 # pfSense-API
 
+[![Build](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml)
 [![OpenAPI](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/openapi.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/openapi.yml)
 [![PHPlint](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/phplint.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/phplint.yml)
 [![Pylint](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/pylint.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/pylint.yml)
@@ -17,13 +18,11 @@ are made preventing the need for a reboot. All this results in the fastest, safe
 <details>
     <summary>Supported pfSense Versions</summary>
 
-  - pfSense Plus 22.05 (AMD64)
-  - pfSense Plus 22.01 (AMD64)
-  - pfSense CE 2.6.0 (AMD64)
-  - pfSense CE 2.5.2 (AMD64)
-  - pfSense CE 2.5.1 (AMD64)
-  - pfSense CE 2.5.0 (AMD64)
-  ---
+  - pfSense CE 2.7.0 (AMD64)
+  - pfSense Plus 23.01 (AMD64)
+  - pfSense Plus 23.05 (AMD64)
+
+    ---
   
 </details>
 
@@ -37,7 +36,7 @@ are made preventing the need for a reboot. All this results in the fastest, safe
 To install pfSense API, simply run the following command from the pfSense shell:<br>
 
 ```
-pkg add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.6-pkg-API.txz && /etc/rc.restart_webgui
+pkg -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.7-pkg-API.pkg && /etc/rc.restart_webgui
 ```
 
 <br>
@@ -108,9 +107,7 @@ Uses the same credentials as the pfSense webConfigurator. To authenticate API ca
 using basic authentication. For example:<br><br>
 `curl -u admin:pfsense https://pfsense.example.com/api/v1/firewall/rule`
 <br><br>
-_Note: in previous releases, local database authentication used the `client-id` and `client-token` fields in your
-request body to authenticate. This functionality still exists but is not recommended. It will be removed in a future
-release._
+
 </details>
 
 <details>
@@ -156,8 +153,8 @@ an `Authorization` header, these values must be separated by a space. For exampl
 curl -H "Authorization: CLIENT_ID_HERE CLIENT_TOKEN_HERE" -X GET https://pfsense.example.com/api/v1/system/arp
 ```
 
-<br><br>_Note: In previous versions of pfSense API, the client-id and client-token were provided via the request payload. This
-functionality is still supported but is not recommended. It will be removed in a future release._
+<br>
+
 </details>
 
 ### Authorization
