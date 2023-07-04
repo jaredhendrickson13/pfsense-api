@@ -146,6 +146,17 @@ class APIE2ETestFirewallAlias(e2e_test_framework.APIE2ETest):
                 "type": "port",
                 "address": ["!@#!@#!@#"]
             }
+        },
+        {
+            "name": "Check alias entry detail maximum constraint",
+            "status": 400,
+            "return": 4106,
+            "req_data": {
+                "name": "TEST",
+                "type": "port",
+                "address": [80],
+                "detail": ["HTTP", "One-too-many!"]
+            }
         }
     ]
     put_tests = [
