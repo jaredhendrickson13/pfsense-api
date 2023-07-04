@@ -35,7 +35,7 @@ class APISystemAPIVersionRead extends APIModel {
 
     public static function get_api_version() {
         # Pull the raw pkg info for the API package into an array for each line
-        $pkg_info = explode(PHP_EOL, shell_exec("pkg info pfSense-pkg-API"));
+        $pkg_info = explode(PHP_EOL, shell_exec("pkg-static info pfSense-pkg-API"));
 
         # Loop through each line and check the version
         foreach ($pkg_info as $pkg_line) {
