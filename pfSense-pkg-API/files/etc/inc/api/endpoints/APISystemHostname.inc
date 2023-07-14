@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APISystemHostname extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/system/hostname";
+        $this->method_options = ["GET", "PUT"];
+        $this->get_privileges = ["page-all", "page-system-generalsetup"];
+        $this->put_privileges = ["page-all", "page-system-generalsetup"];
     }
 
     protected function get() {

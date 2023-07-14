@@ -21,7 +21,6 @@ class APIInterfaceVLANRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-interfaces-vlan", "page-interfaces-vlan-edit"];
     }
 
     public function action() {

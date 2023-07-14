@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesUnboundHostOverrideFlush extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/unbound/host_override/flush";
+        $this->method_options = ["PUT", "DELETE"];
+        $this->put_privileges = ["page-all", "page-services-dnsresolver-edithost"];
+        $this->delete_privileges = ["page-all", "page-services-dnsresolver-edithost"];
     }
 
     protected function put() {

@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIRoutingGatewayDefault extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/routing/gateway/default";
+        $this->method_options = ["PUT"];
+        $this->put_privileges = ["page-all", "page-system-gateways"];
     }
 
     protected function put() {

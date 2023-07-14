@@ -21,13 +21,6 @@ class APIRoutingApplyCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = [
-            "page-all",
-            "page-system-gateways",
-            "page-system-gateways-editgateway",
-            "page-system-staticroutes",
-            "page-system-staticroutes-editroute"
-        ];
     }
 
     public function action() {

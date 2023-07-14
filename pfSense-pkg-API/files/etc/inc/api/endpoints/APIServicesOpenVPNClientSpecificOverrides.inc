@@ -17,7 +17,14 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesOpenVPNClientSpecificOverrides extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/openvpn/csc";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-openvpn-server"];
+        $this->post_privileges = ["page-all", "page-openvpn-server"];
+        $this->put_privileges = ["page-all", "page-openvpn-server"];
+        $this->delete_privileges = ["page-all", "page-openvpn-server"];
+
     }
 
     protected function get() {

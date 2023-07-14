@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIFirewallTrafficShaperQueue extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/firewall/traffic_shaper/queue";
+        $this->method_options = ["POST", "DELETE"];
+        $this->post_privileges = ["page-all", "page-firewall-trafficshaper-queues"];
+        $this->delete_privileges = ["page-all", "page-firewall-trafficshaper-queues"];
     }
 
     protected function post() {

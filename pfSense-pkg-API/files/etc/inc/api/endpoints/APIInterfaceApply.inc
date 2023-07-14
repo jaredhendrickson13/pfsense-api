@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIInterfaceApply extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/interface/apply";
+        $this->method_options = ["GET", "POST"];
+        $this->get_privileges = ["page-all", "page-interfaces-assignnetworkports"];
+        $this->post_privileges = ["page-all", "page-interfaces-assignnetworkports"];
     }
 
     protected function get() {

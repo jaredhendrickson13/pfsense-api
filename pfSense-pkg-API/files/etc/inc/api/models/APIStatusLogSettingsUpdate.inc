@@ -25,7 +25,6 @@ class APIStatusLogSettingsUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-diagnostics-logs-settings"];
         $this->change_note = "Modified log settings via API";
     }
 

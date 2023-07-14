@@ -23,7 +23,6 @@ class APIFirewallNATOneToOneUpdate extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->change_note = "Modified 1:1 NAT mapping via API";
-        $this->privileges = ["page-all", "page-firewall-nat-1-1-edit"];
         $this->nat_reflection = ["enable", "disable"];
     }
 

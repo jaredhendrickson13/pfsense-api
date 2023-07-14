@@ -17,7 +17,14 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APISystemPackage extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/system/package";
+        $this->method_options = ["GET", "POST", "DELETE"];
+        $this->get_privileges = ["page-all", "page-system-packagemanager-installed"];
+        $this->post_privileges = ["page-all", "page-system-packagemanager-installpackage"];
+        $this->delete_privileges = ["page-all", "page-system-packagemanager-installed"];
+
+
         $this->query_excludes = ["all"];
     }
 

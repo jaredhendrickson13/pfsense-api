@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesDnsmasqApply extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/dnsmasq/apply";
+        $this->method_options = ["POST"];
+        $this->post_privileges = ["page-all", "page-services-dnsforwarder"];
     }
 
     protected function post() {

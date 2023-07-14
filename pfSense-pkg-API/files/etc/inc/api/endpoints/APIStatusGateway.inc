@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIStatusGateway extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/status/gateway";
+        $this->method_options = ["GET"];
+        $this->get_privileges = ["page-all", "page-status-gateways"];
     }
 
     protected function get() {

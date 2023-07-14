@@ -17,7 +17,14 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APISystemAPISync extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/system/api/sync";
+        $this->method_options = ["GET"];
+        $this->put_privileges = ["page-all", "page-system-api"];
+        $this->set_auth_mode = "local";
+        $this->retain_read_mode = false;
+        $this->ignore_enabled = true;
+        $this->ignore_ifs = true;
     }
 
     protected function put() {

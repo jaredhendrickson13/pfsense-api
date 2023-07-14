@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIStatusSystem extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/status/system";
+        $this->method_options = ["GET"];
+        $this->get_privileges = ["page-all", "page-dashboard-widgets", "page-dashboard-all"];
     }
 
     protected function get() {

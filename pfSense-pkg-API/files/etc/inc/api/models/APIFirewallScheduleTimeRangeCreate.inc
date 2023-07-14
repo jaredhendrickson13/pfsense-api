@@ -25,7 +25,6 @@ class APIFirewallScheduleTimeRangeCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-firewall-schedules-edit"];
         $this->change_note = "Added firewall schedule time range via API";
     }
 

@@ -17,7 +17,13 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIFirewallNATOneToOne extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/firewall/nat/one_to_one";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-firewall-nat-1-1"];
+        $this->post_privileges = ["page-all", "page-firewall-nat-1-1-edit"];
+        $this->put_privileges = ["page-all", "page-firewall-nat-1-1-edit"];
+        $this->delete_privileges = ["page-all", "page-firewall-nat-1-1-edit"];
     }
 
     protected function get() {

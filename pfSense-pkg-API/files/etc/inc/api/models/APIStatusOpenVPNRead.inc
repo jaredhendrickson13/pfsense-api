@@ -21,7 +21,6 @@ class APIStatusOpenVPNRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-status-openvpn"];
     }
 
     public function action() {

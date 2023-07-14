@@ -20,7 +20,6 @@ class APIServicesIPsecPhase1EncryptionCreate extends APIModel {
     # Create our method constructor
     public function construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-vpn-ipsec-editphase1"];
         $this->change_note = "Added IPsec phase 1 encryption via API";
     }
 

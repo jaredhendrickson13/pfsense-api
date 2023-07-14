@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServices extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services";
+        $this->method_options = ["GET"];
+        $this->get_privileges = ["page-all", "page-status-services"];
+
     }
 
     protected function get() {

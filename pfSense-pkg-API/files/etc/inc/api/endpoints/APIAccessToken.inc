@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIAccessToken extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/access_token";
+        $this->set_auth_mode = "local";
+        $this->retain_read_mode = false;
+        $this->method_options = ["POST"];
     }
 
     protected function post() {

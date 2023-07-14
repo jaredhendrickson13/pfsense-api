@@ -21,7 +21,6 @@ class APISystemAPIErrorRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->requires_auth = false;
     }
 
     public function action() {

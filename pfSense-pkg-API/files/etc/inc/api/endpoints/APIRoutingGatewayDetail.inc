@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIRoutingGatewayDetail extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/routing/gateway/detail";
+        $this->method_options = ["GET"];
+        $this->get_privileges = ["page-all", "page-system-gateways"];
     }
 
     protected function get() {

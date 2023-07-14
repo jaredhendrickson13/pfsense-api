@@ -20,7 +20,6 @@ class APIUserAuthServerRADIUSDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-authservers"];
         $this->change_note = "Deleted RADIUS authentication server via API";
     }
 

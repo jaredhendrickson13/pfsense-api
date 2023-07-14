@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APISystemAPIVersion extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/system/api/version";
+        $this->method_options = ["GET"];
+        $this->get_privileges = ["page-all", "page-system-api"];
     }
 
     protected function get() {

@@ -20,7 +20,6 @@ class APIFirewallTrafficShaperCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-firewall-trafficshaper"];
         $this->change_note = "Added firewall traffic shaper via API";
     }
 

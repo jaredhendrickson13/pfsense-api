@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesServiceWatchdog extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/service_watchdog";
+        $this->method_options = ["GET", "PUT"];
+        $this->get_privileges = ["page-all", "api-services-servicewatchdog"];
+        $this->put_privileges = ["page-all", "api-services-servicewatchdog"];
     }
 
     protected function get() {

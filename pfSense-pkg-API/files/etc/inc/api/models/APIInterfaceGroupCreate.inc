@@ -21,7 +21,6 @@ class APIInterfaceGroupCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-interfaces-groups-edit"];
         $this->change_note = "Added interface group via API";
     }
 

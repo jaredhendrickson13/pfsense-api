@@ -17,7 +17,13 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIInterfaceVLAN extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/interface/vlan";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-interfaces-vlan", "page-interfaces-vlan-edit"];
+        $this->post_privileges = ["page-all", "page-interfaces-vlan-edit"];
+        $this->put_privileges = ["page-all", "page-interfaces-vlan-edit"];
+        $this->delete_privileges = ["page-all", "page-interfaces-vlan-edit"];
     }
 
     protected function get() {

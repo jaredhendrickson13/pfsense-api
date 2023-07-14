@@ -17,7 +17,14 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIUser extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/user";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-system-usermanager"];
+        $this->post_privileges = ["page-all", "page-system-usermanager"];
+        $this->put_privileges = ["page-all", "page-system-usermanager"];
+        $this->delete_privileges = ["page-all", "page-system-usermanager"];
+
     }
 
     protected function get() {

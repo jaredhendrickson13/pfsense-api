@@ -24,7 +24,6 @@ class APIFirewallRuleUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-firewall-rules-edit"];
         $this->change_note = "Modified firewall rule via API";
         $this->requires_port = false;
         $this->missing_port = false;

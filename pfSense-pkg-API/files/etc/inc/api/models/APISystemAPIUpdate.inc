@@ -21,7 +21,6 @@ class APISystemAPIUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-api"];
         $this->change_note = "Modified API settings via API";
         $this->validated_data = APITools\get_api_config()[1];
     }

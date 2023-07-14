@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesNTPdTimeServer extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/ntpd/time_server";
+        $this->method_options = ["POST", "DELETE"];
+        $this->post_privileges = ["page-all", "page-services-ntpd"];
+        $this->delete_privileges = ["page-all", "page-services-ntpd"];
     }
 
     protected function post() {

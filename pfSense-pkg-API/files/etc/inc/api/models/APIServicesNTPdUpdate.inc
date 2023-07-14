@@ -21,7 +21,6 @@ class APIServicesNTPdUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-services-ntpd"];
         $this->change_note = "Modified NTP settings via API";
     }
 

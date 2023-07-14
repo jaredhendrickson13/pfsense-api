@@ -22,7 +22,6 @@ class APIUserGroupMemberCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-groupmanager"];
         $this->change_note = "Added group membership for user via API";
         $this->__user_groups = [];
     }

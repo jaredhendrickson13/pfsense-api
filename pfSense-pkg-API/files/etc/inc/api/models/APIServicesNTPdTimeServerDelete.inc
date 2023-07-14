@@ -23,7 +23,6 @@ class APIServicesNTPdTimeServerDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-services-ntpd"];
         $this->change_note = "Deleted NTP timeserver via API";
         $this->validated_data = $this->get_config("ntpd");
         $this->timeservers = explode(" ", $this->get_config("system/timeservers"));

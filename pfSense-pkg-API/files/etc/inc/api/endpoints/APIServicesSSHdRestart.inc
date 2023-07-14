@@ -17,6 +17,9 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesSSHdRestart extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
+        $this->method_options = ["POST"];
+        $this->post_privileges = ["page-all", "page-status-services"];
         $this->url = "/api/v1/services/sshd/restart";
     }
 

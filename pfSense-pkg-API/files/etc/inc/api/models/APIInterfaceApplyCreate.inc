@@ -21,7 +21,6 @@ class APIInterfaceApplyCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-interfaces-assignnetworkports"];
         $this->change_note = "Applied interface via API";
     }
 

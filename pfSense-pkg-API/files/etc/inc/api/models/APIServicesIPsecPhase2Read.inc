@@ -20,7 +20,6 @@ class APIServicesIPsecPhase2Read extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-vpn-ipsec-editphase2"];
     }
 
     public function action() {

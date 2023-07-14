@@ -17,7 +17,13 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIRoutingStaticRoute extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/routing/static_route";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-system-staticroutes"];
+        $this->post_privileges = ["page-all", "page-system-staticroutes-editroute"];
+        $this->put_privileges = ["page-all", "page-system-staticroutes-editroute"];
+        $this->delete_privileges = ["page-all", "page-system-staticroutes-editroute"];
     }
 
     protected function get() {

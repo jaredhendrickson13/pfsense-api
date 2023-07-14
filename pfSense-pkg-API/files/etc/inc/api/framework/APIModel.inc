@@ -18,39 +18,35 @@ require_once("api/framework/APIResponse.inc");
 require_once("api/framework/APIAuth.inc");
 
 class APIModel {
-    public $client;
-    public $privileges;
     public $packages;
     public $package_includes;
     public $initial_data;
     public $validated_data;
-    public $type_map;
     public $id;
     public $validate_id;
     public $errors;
-    public $methods;
     public $change_note;
-    public $requires_auth;
-    public $set_auth_mode;
-    public $retain_read_mode;
-    public $ignore_ifs;
-    public $ignore_enabled;
+    public $client;
 
-    public function __construct() {
-        error_reporting(E_ERROR);    // Prevents PHP warnings from printing to API responses
-        $this->privileges = ["page-all"];
+    public function __construct($initial_data=[], $client=null) {
         $this->packages = [];
         $this->package_includes = [];
-        $this->requires_auth = true;
         $this->change_note = "Made unknown change via API";
         $this->validate_id = true;
-        $this->initial_data = APITools\get_request_data();
+        $this->initial_data = $initial_data;
         $this->validated_data = [];
         $this->errors = [];
-        $this->type_map = [];
-        $this->retain_read_mode = true;
-        $this->ignore_ifs = false;
-        $this->ignore_enabled = false;
+
+        # Allow a client APIAuth object to be assigned to this model
+        if ($client) {
+            $this->client = $client;
+        }
+        # Otherwise, define the default system client if one was not specified
+        else {
+            $this->client = new APIAuth();
+            $this->client->username = "(system api)";
+            $this->client->ip_address = "127.0.0.1";
+        }
     }
 
     public function action() {
@@ -179,19 +175,6 @@ class APIModel {
     }
 
     public function validate() {
-        # Checks API status and requirements
-        $this->check_enable();
-        $this->check_server_ip();
-
-        # Checks request data
-        $this->check_request_data();
-
-        # Checks authentication and authorization if required
-        if ($this->requires_auth) {
-            $this->check_authentication();
-            $this->check_authorization();
-        }
-
         # Check for required packages
         $this->check_packages();
 
@@ -220,31 +203,6 @@ class APIModel {
         }
     }
 
-    private function check_authentication() {
-        $read_only = (isset(APITools\get_api_config()[1]["readonly"]) and $this->retain_read_mode) ? true : false;
-        $this->client = new APIAuth($this->privileges, $this->set_auth_mode, $read_only);
-        if ($this->requires_auth === true) {
-            if (!$this->client->is_authenticated) {
-                $this->errors[] = APIResponse\get(3);
-            }
-        }
-    }
-
-    private function check_authorization() {
-        if (!$this->client->is_authorized) {
-            $this->errors[] = APIResponse\get(4);
-        }
-    }
-
-    # Check if the API is enabled before answering calls, if not, redirect to wc login
-    private function check_enable() {
-        $api_config = APITools\get_api_config()[1];
-        if (!isset($api_config["enable"]) and !$this->ignore_enabled) {
-            header("Location: /");
-            die();
-        }
-    }
-
     # Check if all required packages are installed. Sets an error otherwise.
     private function check_packages() {
         # Loop through each required package and ensure it is present on the system.
@@ -262,39 +220,5 @@ class APIModel {
         }
 
         return true;
-    }
-
-    # Check if server IP is allowed to answer API calls. Redirects to login if not
-    private function check_server_ip() {
-        $pkg_conf = APITools\get_api_config()[1];
-        $allow_ifs = $pkg_conf["allowed_interfaces"];
-        $whitelist = explode(",", $allow_ifs);
-
-        # Check if our server IP is in our whitelist
-        foreach ($whitelist as $wif) {
-            $if_info = get_interface_info($wif);
-            # Check if our server IP is a valid if address, VIP, localhost, or any
-            if ($_SERVER["SERVER_ADDR"] === $if_info["ipaddr"] or APITools\is_ip_vip($_SERVER["SERVER_ADDR"], $wif)) {
-                return;
-            } elseif ($_SERVER["SERVER_ADDR"] === $if_info["ipaddrv6"]) {
-                return;
-            } elseif (in_array($_SERVER["SERVER_ADDR"], ["::1", "127.0.0.1", "localhost"]) and $wif === "localhost") {
-                return;
-            } elseif ($wif === "any") {
-                return;
-            } elseif ($this->ignore_ifs === true) {
-                return;
-            }
-        }
-
-        # Return 444 response if we did not find a previous match
-        $this->errors[] = APIResponse\get(6);
-    }
-
-    # Check if our requested content-type is supported and parsed data correctly, sets error if not
-    private function check_request_data() {
-        if ($this->initial_data === false) {
-            $this->errors[] = APIResponse\get(11);
-        }
     }
 }

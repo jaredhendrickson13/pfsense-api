@@ -26,7 +26,6 @@ class APIFirewallNATPortForwardCreate extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->change_note = "Added NAT rule via API";
-        $this->privileges = ["page-all", "page-firewall-nat-portforward-edit"];
         $this->protocols = ["tcp", "udp", "tcp/udp", "icmp", "esp", "ah", "gre", "ipv6", "igmp", "pim", "ospf"];
         $this->nat_reflection = ["enable", "disable", "purenat"];
         $this->port_required = false;

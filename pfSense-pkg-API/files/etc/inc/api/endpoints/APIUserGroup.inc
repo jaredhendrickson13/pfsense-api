@@ -17,7 +17,14 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIUserGroup extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/user/group";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-system-groupmanager"];
+        $this->post_privileges = ["page-all", "page-system-groupmanager"];
+        $this->put_privileges = ["page-all", "page-system-groupmanager"];
+        $this->delete_privileges = ["page-all", "page-system-groupmanager"];
+
     }
 
     protected function get() {

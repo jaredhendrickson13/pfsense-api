@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIStatusLogSystem extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/status/log/system";
+        $this->method_options = ["GET"];
+        $this->get_privileges = ["page-all", "page-diagnostics-logs-system"];
     }
 
     protected function get() {

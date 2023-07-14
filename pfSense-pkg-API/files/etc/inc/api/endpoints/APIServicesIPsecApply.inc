@@ -17,7 +17,18 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesIPsecApply extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/ipsec/apply";
+        $this->method_options = ["POST"];
+        $this->post_privileges = [
+            "page-all",
+            "page-vpn-ipsec",
+            "page-vpn-ipsec-editphase1",
+            "page-vpn-ipsec-editphase2",
+            "page-vpn-ipsec-editkeys",
+            "page-vpn-ipsec-mobile",
+            "page-vpn-ipsec-settings"
+        ];
     }
 
     protected function post() {

@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesNTPd extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/ntpd";
+        $this->method_options = ["GET", "PUT"];
+        $this->get_privileges = ["page-all", "page-services-ntpd"];
+        $this->put_privileges = ["page-all", "page-services-ntpd"];
     }
 
     protected function get() {

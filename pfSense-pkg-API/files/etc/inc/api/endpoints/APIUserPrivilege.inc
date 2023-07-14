@@ -17,7 +17,12 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIUserPrivilege extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/user/privilege";
+        $this->method_options = ["POST", "DELETE"];
+        $this->post_privileges = ["page-all", "page-system-usermanager-addprivs"];
+        $this->delete_privileges = ["page-all", "page-system-usermanager-addprivs"];
+
     }
 
     protected function post() {

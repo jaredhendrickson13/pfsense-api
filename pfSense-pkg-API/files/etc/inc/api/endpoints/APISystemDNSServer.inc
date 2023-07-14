@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APISystemDNSServer extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/system/dns/server";
+        $this->method_options = ["POST", "DELETE"];
+        $this->post_privileges = ["page-all", "page-system-generalsetup"];
+        $this->delete_privileges = ["page-all", "page-system-generalsetup"];
     }
 
     protected function post() {

@@ -23,7 +23,6 @@ class APIInterfaceVLANUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-interfaces-vlan-edit"];
         $this->change_note = "Modified VLAN interface via API";
     }
 

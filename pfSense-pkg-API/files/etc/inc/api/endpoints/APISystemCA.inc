@@ -17,7 +17,12 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APISystemCA extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/system/ca";
+        $this->method_options = ["GET", "POST", "DELETE"];
+        $this->get_privileges = ["page-all", "page-system-camanager"];
+        $this->post_privileges = ["page-all", "page-system-camanager"];
+        $this->delete_privileges = ["page-all", "page-system-camanager"];
     }
 
     protected function get() {

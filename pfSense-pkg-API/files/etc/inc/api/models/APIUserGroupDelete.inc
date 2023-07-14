@@ -20,7 +20,6 @@ class APIUserGroupDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-groupmanager"];
         $this->change_note = "Deleted group via API";
     }
 

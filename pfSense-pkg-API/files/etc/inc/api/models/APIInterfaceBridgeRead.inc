@@ -21,7 +21,6 @@ class APIInterfaceBridgeRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-interfaces-bridge", "page-interfaces-bridge-edit"];
     }
 
     public function action() {

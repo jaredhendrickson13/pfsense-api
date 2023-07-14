@@ -17,7 +17,14 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APISystemTunable extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/system/tunable";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-system-advanced-sysctl"];
+        $this->post_privileges = ["page-all", "page-system-advanced-sysctl"];
+        $this->put_privileges = ["page-all", "page-system-advanced-sysctl"];
+        $this->delete_privileges = ["page-all", "page-system-advanced-sysctl"];
+
     }
 
     protected function get() {

@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesDHCPdOptions extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/dhcpd/options";
+        $this->method_options = ["POST"];
+        $this->post_privileges = ["page-all", "page-services-dhcpserver"];
+
     }
 
     protected function post() {

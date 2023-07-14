@@ -21,7 +21,6 @@ class APISystemTunableRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-advanced-sysctl"];
     }
 
     public function action() {

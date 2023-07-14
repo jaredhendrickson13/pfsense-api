@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APISystemTable extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/system/table";
+        $this->method_options = ["GET"];
+        $this->get_privileges = ["page-all", "page-diagnostics-tables"];
     }
 
     protected function get() {

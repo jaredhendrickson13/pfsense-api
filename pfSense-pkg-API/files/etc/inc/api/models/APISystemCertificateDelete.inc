@@ -22,7 +22,6 @@ class APISystemCertificateDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-certmanager"];
         $this->change_note = "Deleted certificate via API";
         $this->cert_ref_id = "";
     }

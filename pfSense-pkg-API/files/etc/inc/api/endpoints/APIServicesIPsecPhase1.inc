@@ -17,7 +17,13 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesIPsecPhase1 extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/ipsec/phase1";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-vpn-ipsec-editphase1"];
+        $this->post_privileges = ["page-all", "page-vpn-ipsec-editphase1"];
+        $this->put_privileges = ["page-all", "page-vpn-ipsec-editphase1"];
+        $this->delete_privileges = ["page-all", "page-vpn-ipsec-editphase1"];
     }
 
     protected function get() {

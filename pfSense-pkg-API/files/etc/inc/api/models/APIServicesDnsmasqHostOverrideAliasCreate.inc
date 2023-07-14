@@ -22,7 +22,6 @@ class APIServicesDnsmasqHostOverrideAliasCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-services-dnsforwarder-edithost"];
         $this->change_note = "Added DNS Forwarder host override alias via API";
     }
 

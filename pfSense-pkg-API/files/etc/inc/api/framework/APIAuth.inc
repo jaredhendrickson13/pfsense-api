@@ -29,7 +29,7 @@ class APIAuth {
     public $is_authorized;
 
     # Create our method constructor
-    public function __construct($req_privs, $enforce_auth_mode=null, $read_mode=null){
+    public function __construct($req_privs=[], $enforce_auth_mode=null, $read_mode=null){
         $this->api_config = APITools\get_api_config()[1];
         $this->auth_mode = (is_null($enforce_auth_mode)) ? $this->api_config["authmode"] : $enforce_auth_mode;
         $this->read_mode = (is_null($read_mode)) ? array_key_exists("readonly", $this->api_config) : $read_mode;

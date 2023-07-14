@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIFirewallRuleFlush extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/firewall/rule/flush";
+        $this->method_options = ["PUT", "DELETE"];
+        $this->put_privileges = ["page-all", "page-firewall-rules-edit"];
+        $this->delete_privileges = ["page-all", "page-firewall-rules-edit"];
     }
 
     protected function put() {

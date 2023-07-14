@@ -17,7 +17,12 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIUserAuthServerRADIUS extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/user/auth_server/radius";
+        $this->method_options = ["GET", "POST", "DELETE"];
+        $this->get_privileges = ["page-all", "page-system-authservers"];
+        $this->post_privileges = ["page-all", "page-system-authservers"];
+        $this->delete_privileges = ["page-all", "page-system-authservers"];
     }
 
     protected function get() {

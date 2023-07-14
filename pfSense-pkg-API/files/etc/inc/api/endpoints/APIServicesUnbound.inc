@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesUnbound extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/unbound";
+        $this->method_options = ["GET", "PUT"];
+        $this->get_privileges = ["page-all", "page-services-dnsresolver"];
+        $this->put_privileges = ["page-all", "page-services-dnsresolver"];
     }
 
     protected function get() {

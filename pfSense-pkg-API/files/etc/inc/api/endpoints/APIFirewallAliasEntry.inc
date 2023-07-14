@@ -17,7 +17,12 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIFirewallAliasEntry extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/firewall/alias/entry";
+        $this->method_options = ["POST", "DELETE"];
+        $this->post_privileges = ["page-all", "page-firewall-alias-edit"];
+        $this->delete_privileges = ["page-all", "page-firewall-alias-edit"];
+
     }
 
     protected function post() {

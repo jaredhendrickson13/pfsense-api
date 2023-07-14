@@ -27,7 +27,6 @@ class APIFirewallNATOutboundMappingCreate extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->change_note = "Added outbound NAT mapping via API";
-        $this->privileges = ["page-all", "page-firewall-nat-outbound-edit"];
         $this->protocols = ["any", "tcp", "udp", "tcp/udp", "icmp", "esp", "ah", "gre", "ipv6", "igmp", "pim", "ospf"];
         $this->pool_options = ["round-robin", "round-robin sticky-address", "random", "random sticky-address", "source-hash", "bitmask"];
         $this->port_supported = false;

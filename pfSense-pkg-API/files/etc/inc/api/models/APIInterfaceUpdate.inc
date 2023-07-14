@@ -23,7 +23,6 @@ class APIInterfaceUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-interfaces-assignnetworkports"];
         $this->change_note = "Modified interface via API";
         $this->if_list = APITools\get_all_avail_interfaces();
     }

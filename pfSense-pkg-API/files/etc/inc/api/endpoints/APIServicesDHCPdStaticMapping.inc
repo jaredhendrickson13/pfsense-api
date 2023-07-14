@@ -17,7 +17,14 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesDHCPdStaticMapping extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/dhcpd/static_mapping";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"];
+        $this->post_privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"];
+        $this->put_privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"];
+        $this->delete_privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"];
+
         $this->query_excludes = ["interface"];
     }
 

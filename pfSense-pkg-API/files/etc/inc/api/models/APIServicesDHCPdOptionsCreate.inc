@@ -23,7 +23,6 @@ class APIServicesDHCPdOptionsCreate extends APIModel {
 
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-services-dhcpserver"];
         $this->change_note = "Added DHCP options via API";
         $this->__if_conf = [];
         $this->__parent_model = new APIServicesDHCPdUpdate();

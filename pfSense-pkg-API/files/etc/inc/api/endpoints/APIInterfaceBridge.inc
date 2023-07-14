@@ -17,7 +17,13 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIInterfaceBridge extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/interface/bridge";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-interfaces-bridge", "page-interfaces-bridge-edit"];
+        $this->post_privileges = ["page-all", "page-interfaces-bridge-edit"];
+        $this->put_privileges = ["page-all", "page-interfaces-bridge-edit"];
+        $this->delete_privileges = ["page-all", "page-interfaces-bridge-edit"];
     }
 
     protected function get() {

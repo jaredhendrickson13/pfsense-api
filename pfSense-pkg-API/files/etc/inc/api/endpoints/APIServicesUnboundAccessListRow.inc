@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesUnboundAccessListRow extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/unbound/access_list/row";
+        $this->method_options = ["POST"];
+        $this->post_privileges = ["page-all", "page-services-dnsresolver-acls"];
     }
 
     protected function post() {

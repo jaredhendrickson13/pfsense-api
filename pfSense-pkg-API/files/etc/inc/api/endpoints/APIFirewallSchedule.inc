@@ -17,7 +17,13 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIFirewallSchedule extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/firewall/schedule";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-firewall-schedules"];
+        $this->post_privileges = ["page-all", "page-firewall-schedules-edit"];
+        $this->put_privileges = ["page-all", "page-firewall-schedules-edit"];
+        $this->delete_privileges = ["page-all", "page-firewall-schedules-edit"];
     }
 
     protected function get() {

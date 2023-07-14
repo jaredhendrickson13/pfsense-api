@@ -21,15 +21,6 @@ class APIServicesIPsecApplyCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = [
-            "page-all",
-            "page-vpn-ipsec",
-            "page-vpn-ipsec-editphase1",
-            "page-vpn-ipsec-editphase2",
-            "page-vpn-ipsec-editkeys",
-            "page-vpn-ipsec-mobile",
-            "page-vpn-ipsec-settings"
-        ];
     }
 
     public function action() {

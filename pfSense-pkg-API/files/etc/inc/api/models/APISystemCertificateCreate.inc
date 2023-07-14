@@ -25,7 +25,6 @@ class APISystemCertificateCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-certmanager"];
         $this->change_note = "Added certificate via API";
         $this->cert_method = null;
         $this->cert_attr = [];

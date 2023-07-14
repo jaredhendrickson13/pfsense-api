@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIStatusCARP extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/status/carp";
+        $this->method_options = ["GET", "PUT"];
+        $this->get_privileges = ["page-all", "page-status-carp"];
+        $this->put_privileges = ["page-all", "page-status-carp"];
     }
 
     protected function get() {

@@ -21,19 +21,6 @@ class APIFirewallApplyCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = [
-            "page-all",
-            "page-firewall-rules",
-            "page-firewall-rules-edit",
-            "page-firewall-aliases",
-            "page-firewall-alias-edit",
-            "page-firewall-nat-1-1",
-            "page-firewall-nat-1-1-edit",
-            "page-firewall-nat-outbound",
-            "page-firewall-nat-outbound-edit",
-            "page-firewall-nat-portforward",
-            "page-firewall-nat-portforward-edit"
-        ];
     }
 
     public function action() {

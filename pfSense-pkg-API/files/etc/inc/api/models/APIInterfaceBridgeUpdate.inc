@@ -21,7 +21,6 @@ class APIInterfaceBridgeUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-interfaces-bridge-edit"];
         $this->change_note = "Modified bridge interface via API";
     }
 

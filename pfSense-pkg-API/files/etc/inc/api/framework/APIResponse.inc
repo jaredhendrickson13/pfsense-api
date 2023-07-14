@@ -35,7 +35,7 @@ function get($id, $data=[], $all=false) {
             "status" => "method not allowed",
             "code" => 405,
             "return" => $id,
-            "message" => "Invalid HTTP method",
+            "message" => "HTTP method is not allowed or has not been configured",
         ],
         3 => [
             "status" => "unauthorized",

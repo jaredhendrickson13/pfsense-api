@@ -17,12 +17,19 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesUnboundHostOverride extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/unbound/host_override";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-services-dnsresolver"];
+        $this->post_privileges = ["page-all", "page-services-dnsresolver-edithost"];
+        $this->put_privileges = ["page-all", "page-services-dnsresolver-edithost"];
+        $this->delete_privileges = ["page-all", "page-services-dnsresolver-edithost"];
     }
 
     protected function get() {
         return (new APIServicesUnboundHostOverrideRead())->call();
     }
+
     protected function post() {
         return (new APIServicesUnboundHostOverrideCreate())->call();
     }

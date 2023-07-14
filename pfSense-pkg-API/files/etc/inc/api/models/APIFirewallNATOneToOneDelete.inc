@@ -20,7 +20,6 @@ class APIFirewallNATOneToOneDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-firewall-nat-1-1-edit"];
         $this->change_note = "Deleted 1:1 NAT mapping via API";
     }
 

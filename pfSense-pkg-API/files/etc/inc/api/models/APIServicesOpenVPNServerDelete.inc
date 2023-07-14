@@ -20,7 +20,6 @@ class APIServicesOpenVPNServerDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-openvpn-server"];
         $this->change_note = "Deleted OpenVPN server via API";
     }
 

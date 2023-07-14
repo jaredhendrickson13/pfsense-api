@@ -21,7 +21,6 @@ class APISystemTunableCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-advanced-sysctl"];
         $this->change_note = "Added system tunable via API";
     }
 

@@ -20,7 +20,6 @@ class APIUserDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-usermanager"];
         $this->change_note = "Deleted user via API";
     }
 

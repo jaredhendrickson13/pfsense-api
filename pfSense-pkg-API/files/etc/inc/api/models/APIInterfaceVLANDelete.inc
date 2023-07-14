@@ -21,7 +21,6 @@ class APIInterfaceVLANDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-interfaces-vlan-edit"];
         $this->change_note = "Deleted interface VLAN via API";
     }
 

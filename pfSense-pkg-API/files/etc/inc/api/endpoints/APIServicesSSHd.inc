@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesSSHd extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/sshd";
+        $this->method_options = ["GET", "PUT"];
+        $this->get_privileges = ["page-all", "page-system-advanced-admin"];
+        $this->put_privileges = ["page-all", "page-system-advanced-admin"];
     }
 
     protected function get() {

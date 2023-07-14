@@ -17,12 +17,19 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesDnsmasqHostOverride extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/dnsmasq/host_override";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-services-dnsforwarder"];
+        $this->post_privileges = ["page-all", "page-services-dnsforwarder-edithost"];
+        $this->put_privileges = ["page-all", "page-services-dnsforwarder-edithost"];
+        $this->delete_privileges = ["page-all", "page-services-dnsforwarder-edithost"];
     }
 
     protected function get() {
         return (new APIServicesDnsmasqHostOverrideRead())->call();
     }
+
     protected function post() {
         return (new APIServicesDnsmasqHostOverrideCreate())->call();
     }

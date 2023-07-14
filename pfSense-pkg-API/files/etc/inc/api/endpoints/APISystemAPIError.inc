@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APISystemAPIError extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/system/api/error";
+        $this->method_options = ["GET"];
+        $this->requires_auth = false;
     }
 
     protected function get() {

@@ -20,7 +20,6 @@ class APIRoutingStaticRouteCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-staticroutes-editroute"];
         $this->change_note = "Added static route via API";
     }
 

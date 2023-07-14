@@ -17,7 +17,13 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIInterfaceGroup extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/interface/group";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-interfaces-groups"];
+        $this->post_privileges = ["page-all", "page-interfaces-groups-edit"];
+        $this->put_privileges = ["page-all", "page-interfaces-groups-edit"];
+        $this->delete_privileges = ["page-all", "page-interfaces-groups-edit"];
     }
 
     protected function get() {

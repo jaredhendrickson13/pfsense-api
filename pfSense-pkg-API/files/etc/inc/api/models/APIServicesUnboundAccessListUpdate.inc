@@ -21,7 +21,6 @@ class APIServicesUnboundAccessListUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-services-dnsresolver-acls"];
         $this->change_note = "Modified DNS Resolver access list via API";
     }
 

@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIUserAuthServer extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/user/auth_server";
+        $this->method_options = ["GET", "DELETE"];
+        $this->get_privileges = ["page-all", "page-system-authservers"];
+        $this->delete_privileges = ["page-all", "page-system-authservers"];
     }
 
     protected function get() {

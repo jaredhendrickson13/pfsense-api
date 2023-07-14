@@ -17,7 +17,22 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIFirewallApply extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/firewall/apply";
+        $this->method_options = ["POST"];
+        $this->post_privileges = [
+            "page-all",
+            "page-firewall-rules",
+            "page-firewall-rules-edit",
+            "page-firewall-aliases",
+            "page-firewall-alias-edit",
+            "page-firewall-nat-1-1",
+            "page-firewall-nat-1-1-edit",
+            "page-firewall-nat-outbound",
+            "page-firewall-nat-outbound-edit",
+            "page-firewall-nat-portforward",
+            "page-firewall-nat-portforward-edit"
+        ];
     }
 
     protected function post() {

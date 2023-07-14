@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIStatusLogSettings extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/status/log/settings";
+        $this->method_options = ["PUT"];
+        $this->put_privileges = ["page-all", "page-diagnostics-logs-settings"];
     }
 
     protected function put() {

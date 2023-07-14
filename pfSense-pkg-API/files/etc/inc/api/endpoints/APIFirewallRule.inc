@@ -17,7 +17,13 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIFirewallRule extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/firewall/rule";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-firewall-rules"];
+        $this->post_privileges = ["page-all", "page-firewall-rules-edit"];
+        $this->put_privileges = ["page-all", "page-firewall-rules-edit"];
+        $this->delete_privileges = ["page-all", "page-firewall-rules-edit"];
     }
 
     protected function get() {

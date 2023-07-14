@@ -22,7 +22,6 @@ class APIStatusSystemRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-dashboard-widgets", "page-dashboard-all"];
     }
 
     public function action() {

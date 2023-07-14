@@ -20,9 +20,9 @@ class APIUserPrivilegeDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-usermanager-addprivs"];
         $this->change_note = "Deleted privileges for user via API";
     }
+
     public function action() {
         $this->set_config("system/user/{$this->id}/priv", $this->validated_data["priv"]);
         $this->write_config();

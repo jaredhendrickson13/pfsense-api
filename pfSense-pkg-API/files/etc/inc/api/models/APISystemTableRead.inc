@@ -21,7 +21,6 @@ class APISystemTableRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-diagnostics-tables"];
     }
 
     public function action() {

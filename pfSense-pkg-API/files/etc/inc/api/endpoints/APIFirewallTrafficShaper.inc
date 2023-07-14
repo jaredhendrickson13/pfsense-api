@@ -17,7 +17,13 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIFirewallTrafficShaper extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/firewall/traffic_shaper";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-firewall-trafficshaper"];
+        $this->post_privileges = ["page-all", "page-firewall-trafficshaper"];
+        $this->put_privileges = ["page-all", "page-firewall-trafficshaper"];
+        $this->delete_privileges = ["page-all", "page-firewall-trafficshaper"];
     }
 
     protected function get() {

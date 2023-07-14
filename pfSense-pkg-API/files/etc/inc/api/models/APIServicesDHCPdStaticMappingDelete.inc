@@ -21,7 +21,6 @@ class APIServicesDHCPdStaticMappingDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-services-dhcpserver-editstaticmapping"];
         $this->change_note = "Deleted DHCP static mapping via API";
     }
 

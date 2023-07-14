@@ -20,7 +20,6 @@ class APIFirewallAliasEntryCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-firewall-alias-edit"];
         $this->change_note = "Added firewall alias address via API";
     }
 

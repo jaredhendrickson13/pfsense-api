@@ -20,7 +20,6 @@ class APISystemHostnameUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-generalsetup"];
         $this->change_note = "Modified system hostname via API";
     }
 

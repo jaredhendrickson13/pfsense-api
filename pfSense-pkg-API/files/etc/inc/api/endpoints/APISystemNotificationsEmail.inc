@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APISystemNotificationsEmail extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/system/notifications/email";
+        $this->method_options = ["GET", "PUT"];
+        $this->get_privileges = ["page-all", "page-system-advanced-notifications"];
+        $this->put_privileges = ["page-all", "page-system-advanced-notifications"];
     }
 
     protected function get() {

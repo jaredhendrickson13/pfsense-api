@@ -20,8 +20,6 @@ class APIServicesRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->methods = ["GET"];
-        $this->privileges = ["page-all", "page-status-services"];
     }
 
     public function action() {

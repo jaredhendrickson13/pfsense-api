@@ -17,7 +17,12 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIFirewallStates extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/firewall/states";
+        $this->method_options = ["GET", "DELETE"];
+        $this->get_privileges = ["page-all", "page-diagnostics-showstates"];
+        $this->delete_privileges = ["page-all", "page-diagnostics-showstates"];
+
     }
 
     protected function get() {

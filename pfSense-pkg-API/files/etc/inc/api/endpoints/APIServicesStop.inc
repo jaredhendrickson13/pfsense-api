@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesStop extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/stop";
+        $this->method_options = ["POST"];
+        $this->post_privileges = ["page-all", "page-status-services"];
     }
 
     protected function post() {

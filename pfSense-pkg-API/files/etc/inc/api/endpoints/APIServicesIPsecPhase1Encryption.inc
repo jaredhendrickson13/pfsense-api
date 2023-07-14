@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesIPsecPhase1Encryption extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/ipsec/phase1/encryption";
+        $this->method_options = ["POST"];
+        $this->post_privileges = ["page-all", "page-vpn-ipsec-editphase1"];
     }
 
     protected function post() {

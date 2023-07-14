@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIFirewallRuleSort extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/firewall/rule/sort";
+        $this->method_options = ["PUT"];
+        $this->put_privileges = ["page-all", "page-firewall-rules"];
     }
 
     protected function put() {

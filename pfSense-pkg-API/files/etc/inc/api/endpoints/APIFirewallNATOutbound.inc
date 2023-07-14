@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIFirewallNATOutbound extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/firewall/nat/outbound";
+        $this->method_options = ["GET", "PUT"];
+        $this->get_privileges = ["page-all", "page-firewall-nat-outbound"];
+        $this->put_privileges = ["page-all", "page-firewall-nat-outbound"];
     }
 
     protected function get() {

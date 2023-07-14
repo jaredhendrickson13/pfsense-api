@@ -22,7 +22,6 @@ class APISystemConfigUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-diagnostics-backup-restore"];
         $this->change_note = "Updated entire configuration file via API";
     }
 

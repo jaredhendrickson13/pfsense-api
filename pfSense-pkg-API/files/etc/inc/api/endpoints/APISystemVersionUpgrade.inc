@@ -17,7 +17,13 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APISystemVersionUpgrade extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/system/version/upgrade";
+        $this->method_options = ["GET"];
+        $this->get_privileges = [
+            "page-all", "page-dashboard-widgets", "page-diagnostics-command", "page-system-update-settings"
+        ];
+
         $this->query_excludes = ["use_cache"];
     }
 

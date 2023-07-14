@@ -21,7 +21,6 @@ class APIInterfaceGroupDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-interfaces-groups-edit"];
     }
 
     public function action() {

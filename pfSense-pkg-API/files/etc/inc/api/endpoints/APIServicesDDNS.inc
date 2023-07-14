@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesDDNS extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/ddns";
+        $this->method_options = ["GET"];
+        $this->get_privileges = ["page-all", "page-services-dynamicdnsclients"];
     }
 
     protected function get() {

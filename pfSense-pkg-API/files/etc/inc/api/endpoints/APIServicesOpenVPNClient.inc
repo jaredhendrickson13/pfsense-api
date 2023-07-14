@@ -17,7 +17,13 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesOpenVPNClient extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/openvpn/client";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-openvpn-client"];
+        $this->post_privileges = ["page-all", "page-openvpn-client"];
+        $this->put_privileges = ["page-all", "page-openvpn-client"];
+        $this->delete_privileges = ["page-all", "page-openvpn-client"];
     }
 
     protected function get() {

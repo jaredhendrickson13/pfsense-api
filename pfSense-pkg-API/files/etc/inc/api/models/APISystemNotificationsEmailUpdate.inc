@@ -20,7 +20,6 @@ class APISystemNotificationsEmailUpdate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-advanced-notifications"];
         $this->change_note = "Modified system email notifications via API";
     }
 

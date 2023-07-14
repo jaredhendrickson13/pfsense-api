@@ -17,7 +17,16 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIRoutingApply extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/routing/apply";
+        $this->method_options = ["POST"];
+        $this->post_privileges = [
+            "page-all",
+            "page-system-gateways",
+            "page-system-gateways-editgateway",
+            "page-system-staticroutes",
+            "page-system-staticroutes-editroute"
+        ];
     }
 
     protected function post() {

@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APISystemConfig extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/system/config";
+        $this->method_options = ["GET", "PUT"];
+        $this->get_privileges = ["page-all", "page-diagnostics-backup-restore", "page-diagnostics-command"];
+        $this->put_privileges = ["page-all", "page-diagnostics-backup-restore"];
     }
 
     protected function get() {

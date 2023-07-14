@@ -20,7 +20,6 @@ class APIServicesWOLSendCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-services-wakeonlan"];
         $this->change_note = "Sent magic WOL packet via API";
     }
 

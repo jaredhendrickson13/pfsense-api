@@ -17,7 +17,10 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIStatusIPsec extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/status/ipsec";
+        $this->method_options = ["GET"];
+        $this->get_privileges = ["page-all", "page-status-ipsec"];
     }
 
     protected function get() {

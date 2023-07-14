@@ -24,11 +24,6 @@ class APISystemAPISyncUpdate extends APIModel {
     public function __construct() {
         parent::__construct();
         $this->change_note = "Synced API configuration from ".$this->client->ip_address;
-        $this->privileges = ["page-all", "page-system-api"];
-        $this->set_auth_mode = "local";
-        $this->retain_read_mode = false;
-        $this->ignore_enabled = true;
-        $this->ignore_ifs = true;
         $this->pkg_index = APITools\get_api_config()[0];
         $this->pkg_conf = APITools\get_api_config()[1];
     }

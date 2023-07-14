@@ -17,7 +17,14 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APISystemCertificate extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/system/certificate";
+        $this->method_options = ["GET", "POST", "PUT", "DELETE"];
+        $this->get_privileges = ["page-all", "page-system-certmanager"];
+        $this->post_privileges = ["page-all", "page-system-certmanager"];
+        $this->put_privileges = ["page-all", "page-system-certmanager"];
+        $this->delete_privileges = ["page-all", "page-system-certmanager"];
+
     }
 
     protected function get() {

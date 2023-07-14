@@ -21,7 +21,6 @@ class APISystemPackageCreate extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-system-packagemanager-installpackage"];
         $this->change_note = "Added package via API";
     }
 

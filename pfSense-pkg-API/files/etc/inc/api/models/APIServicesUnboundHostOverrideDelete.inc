@@ -20,7 +20,6 @@ class APIServicesUnboundHostOverrideDelete extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-        $this->privileges = ["page-all", "page-services-dnsresolver-edithost"];
         $this->change_note = "Deleted DNS Resolver host override via API";
     }
 

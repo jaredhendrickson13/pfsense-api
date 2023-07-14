@@ -17,7 +17,11 @@ require_once("api/framework/APIEndpoint.inc");
 
 class APIServicesUnboundApply extends APIEndpoint {
     public function __construct() {
+        parent::__construct();
         $this->url = "/api/v1/services/unbound/apply";
+        $this->method_options = ["GET", "POST"];
+        $this->get_privileges = ["page-all", "page-services-dnsresolver"];
+        $this->post_privileges = ["page-all", "page-services-dnsresolver", "page-services-dnsresolver-edithost"];
     }
 
     protected function get() {
