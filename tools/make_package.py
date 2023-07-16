@@ -131,14 +131,14 @@ class MakePackage:
         # Custom tag type for argparse
         def tag(value_string):
             if "." not in value_string:
-                raise argparse.ArgumentTypeError(f"{value_string} is not a semantic version tag")
+                raise ValueError(f"{value_string} is not a semantic version tag")
 
             # Remove the leading 'v' if present
             if value_string.startswith("v"):
                 value_string = value_string[1:]
 
             # Convert the patch section to be prefixed with _ if it is prefixed with .
-            if value_string.split(".") == 3:
+            if len(value_string.split(".")) == 3:
                 value_string = value_string[::-1].replace(".", "_", 1)[::-1]
 
             return value_string
