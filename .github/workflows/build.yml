@@ -17,7 +17,7 @@ jobs:
 
     strategy:
       matrix:
-        build:
+        include:
           - freebsd_version: FreeBSD-14.0-CURRENT
             freebsd_id: freebsd14
 
@@ -25,26 +25,26 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup FreeBSD build VM
         run: |
-          /usr/local/bin/VBoxManage controlvm ${{ matrix.build.freebsd_version }} poweroff || true
-          /usr/local/bin/VBoxManage snapshot ${{ matrix.build.freebsd_version }} restore initial
-          /usr/local/bin/VBoxManage startvm ${{ matrix.build.freebsd_version }} --type headless
+          /usr/local/bin/VBoxManage controlvm ${{ matrix.freebsd_version }} poweroff || true
+          /usr/local/bin/VBoxManage snapshot ${{ matrix.freebsd_version }} restore initial
+          /usr/local/bin/VBoxManage startvm ${{ matrix.freebsd_version }} --type headless
           sleep 5
 
       - name: Build pfSense-pkg-API on FreeBSD
         run: |
-          /usr/bin/ssh -o StrictHostKeyChecking=no ${{ matrix.build.freebsd_version }}.jaredhendrickson.com 'sudo pkill ntpd || true && sudo ntpdate pool.ntp.org || true'
-          /usr/local/bin/python3 tools/make_package.py --host ${{ matrix.build.freebsd_version }}.jaredhendrickson.com --branch ${{ env.commit_id }} --tag ${{ env.build_version }}_${{ matrix.build.freebsd_id }}
+          /usr/bin/ssh -o StrictHostKeyChecking=no ${{ matrix.freebsd_version }}.jaredhendrickson.com 'sudo pkill ntpd || true && sudo ntpdate pool.ntp.org || true'
+          /usr/local/bin/python3 tools/make_package.py --host ${{ matrix.freebsd_version }}.jaredhendrickson.com --branch ${{ env.commit_id }} --tag ${{ env.build_version }}_${{ matrix.freebsd_id }}
 
       - name: Teardown FreeBSD build VM
         if: "${{ always() }}"
         run: |
-          /usr/local/bin/VBoxManage controlvm ${{ matrix.build.freebsd_version }} poweroff || true
-          /usr/local/bin/VBoxManage snapshot ${{matrix.build.freebsd_version}} restore initial
+          /usr/local/bin/VBoxManage controlvm ${{ matrix.freebsd_version }} poweroff || true
+          /usr/local/bin/VBoxManage snapshot ${{matrix.freebsd_version}} restore initial
 
       - uses: actions/upload-artifact@v3
         with:
-          name: pfSense-pkg-API-${{ env.build_version }}_${{ matrix.build.freebsd_id }}.pkg
-          path: pfSense-pkg-API-${{ env.build_version }}_${{ matrix.build.freebsd_id }}.pkg
+          name: pfSense-pkg-API-${{ env.build_version }}_${{ matrix.freebsd_id }}.pkg
+          path: pfSense-pkg-API-${{ env.build_version }}_${{ matrix.freebsd_id }}.pkg
 
   e2e_tests:
     runs-on: self-hosted
@@ -54,19 +54,19 @@ jobs:
       matrix:
         include:
           - pfsense_version: pfSense-2.7.0-RELEASE
-            freebsd_version: FreeBSD-14.0-CURRENT
+            freebsd_id: freebsd14
           - pfsense_version: pfSense-23.01-RELEASE
-            freebsd_version: FreeBSD-14.0-CURRENT
+            freebsd_id: freebsd14
           - pfsense_version: pfSense-23.05-RELEASE
-            freebsd_version: FreeBSD-14.0-CURRENT
+            freebsd_id: freebsd14
         
     steps:
       - uses: actions/checkout@v3
 
       - uses: actions/download-artifact@v3
         with:
-          name: pfSense-pkg-API-${{ env.build_version }}_${{ matrix.build.freebsd_id }}.pkg
-          path: pfSense-pkg-API-${{ env.build_version }}_${{ matrix.build.freebsd_id }}.pkg
+          name: pfSense-pkg-API-${{ env.build_version }}_${{ matrix.freebsd_id }}.pkg
+          path: pfSense-pkg-API-${{ env.build_version }}_${{ matrix.freebsd_id }}.pkg
 
       - name: Setup pfSense VM
         run: |
@@ -80,11 +80,11 @@ jobs:
         run: |
           pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com -u admin -p pfsense -c 'pfSsh.php playback enablesshd' -k
           pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com -u admin -p pfsense -c "mkdir /root/.ssh/ && echo $(cat ~/.ssh/id_rsa.pub) > /root/.ssh/authorized_keys" -k
-          scp -o StrictHostKeyChecking=no pfSense-pkg-API-${{ env.build_version }}_${{ matrix.build.freebsd_id }}.pkg/pfSense-pkg-API-${{ env.build_version }}_${{ matrix.build.freebsd_id }}.pkg admin@${{ matrix.pfsense_version }}.jaredhendrickson.com:/tmp/
+          scp -o StrictHostKeyChecking=no pfSense-pkg-API-${{ env.build_version }}_${{ matrix.freebsd_id }}.pkg/pfSense-pkg-API-${{ env.build_version }}_${{ matrix.freebsd_id }}.pkg admin@${{ matrix.pfsense_version }}.jaredhendrickson.com:/tmp/
 
       - name: Install pfSense-pkg-API on pfSense
         run: |
-          /usr/local/bin/pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com --no_verify -c "pkg -C /dev/null add /tmp/pfSense-pkg-API-${{ env.build_version }}_${{ matrix.build.freebsd_id }}.pkg" -u admin -p pfsense
+          /usr/local/bin/pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com --no_verify -c "pkg -C /dev/null add /tmp/pfSense-pkg-API-${{ env.build_version }}_${{ matrix.freebsd_id }}.pkg" -u admin -p pfsense
           /usr/local/bin/pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com --no_verify -c '/etc/rc.restart_webgui' -u admin -p pfsense || true
           sleep 10
 
