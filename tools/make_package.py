@@ -125,15 +125,23 @@ class MakePackage:
             v=self.port_version,
             r="_" + self.port_revision if self.port_revision != "0" else ""
         )
-        self.run_scp_cmd(src, ".")
+        self.run_scp_cmd(src, f"{self.args.filename}")
 
     def __start_argparse__(self):
         # Custom tag type for argparse
         def tag(value_string):
-            if "." in value_string and "_" in value_string:
-                return value_string
+            if "." not in value_string:
+                raise ValueError(f"{value_string} is not a semantic version tag")
 
-            raise argparse.ArgumentTypeError(f"{value_string} is not a semantic version tag")
+            # Remove the leading 'v' if present
+            if value_string.startswith("v"):
+                value_string = value_string[1:]
+
+            # Convert the patch section to be prefixed with _ if it is prefixed with .
+            if len(value_string.split(".")) == 3:
+                value_string = value_string[::-1].replace(".", "_", 1)[::-1]
+
+            return value_string
 
         parser = argparse.ArgumentParser(
             description="Build the pfSense API on FreeBSD"
@@ -165,6 +173,14 @@ class MakePackage:
             type=tag,
             required=True,
             help="The version tag to use when building."
+        )
+        parser.add_argument(
+            '--filename', '-f',
+            dest="filename",
+            type=str,
+            default=".",
+            required=False,
+            help="The filename to use for the package file."
         )
         self.args = parser.parse_args()
 

@@ -110,24 +110,19 @@ class APIFirewallAliasEntryCreate extends APIModel {
     }
 
     public function __validate_detail() {
+        # Get a list of the new addresses and details requested
+        $this->initial_data["address"] = $this->__value_to_array($this->initial_data["address"]);
         $this->initial_data["detail"] = $this->__value_to_array($this->initial_data["detail"]);
-        $this->validated_data["detail"] = ($this->validated_data["detail"]) ? explode("||", $this->validated_data["detail"]) : [];
-        $this->validated_data["detail"] = $this->__value_to_array($this->validated_data["detail"]);
-        $address = ($this->validated_data["address"]) ? explode(" ", $this->validated_data["address"]) : [];
+        $this->validated_data["detail"] = $this->__value_to_array(explode("||", $this->validated_data["detail"]));
 
-        # If we have less detail values than address values, add some defaults
-        while(true) {
-            # Check if we have the correct number of detail values
-            if (count($this->initial_data["detail"]) < count($address)) {
+        # Ensure the number of addresses is greater than or equal to the number details
+        if (count($this->initial_data["address"]) >= count($this->initial_data["detail"])) {
+            # Add automatic generated details if there are more addresses than details
+            while (count($this->initial_data["address"]) > count($this->initial_data["detail"])) {
                 $this->initial_data["detail"][] = "Entry added " . date('r');
-            } else {
-                break;
             }
-        }
 
-        # Ensure the number of detail values is less than or equal to the number of address values
-        if (count($this->initial_data["detail"]) <= count($address)) {
-            # Loop through each alias detail and ensure it is a string
+            # Loop through each ali:as detail and ensure it is a string
             foreach ($this->initial_data["detail"] as $detail) {
                 if (is_string($detail)) {
                     $this->validated_data["detail"][] = $detail;
@@ -167,7 +162,6 @@ class APIFirewallAliasEntryCreate extends APIModel {
                 return [];
             } else {
                 return [$value];
-
             }
         } else {
             return $value;
