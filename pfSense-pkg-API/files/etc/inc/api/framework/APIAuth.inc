@@ -18,7 +18,6 @@ require_once("api/framework/APITools.inc");
 # Creates an object capable of verifying authentication and authorization based on the configuration
 class APIAuth {
     private $api_config;
-    private $request;
     public $auth_mode;
     public $read_mode;
     public $req_privs;
@@ -33,7 +32,6 @@ class APIAuth {
         $this->api_config = APITools\get_api_config()[1];
         $this->auth_mode = (is_null($enforce_auth_mode)) ? $this->api_config["authmode"] : $enforce_auth_mode;
         $this->read_mode = (is_null($read_mode)) ? array_key_exists("readonly", $this->api_config) : $read_mode;
-        $this->request = APITools\get_request_data();
         $this->req_privs = $req_privs;
         $this->privs = [];
         $this->ip_address = $_SERVER["REMOTE_ADDR"];
@@ -46,7 +44,7 @@ class APIAuth {
     private function authenticate_local_database() {
         # Extract the username and password from basic authentication
         $this->username = $_SERVER['PHP_AUTH_USER'];
-        $client_token = (!empty($_SERVER['PHP_AUTH_PW'])) ? $_SERVER['PHP_AUTH_PW'] : $this->request["client-token"];
+        $client_token = $_SERVER['PHP_AUTH_PW'];
 
         # Authenticate against local database
         if (authenticate_user($this->username, $client_token)) {
