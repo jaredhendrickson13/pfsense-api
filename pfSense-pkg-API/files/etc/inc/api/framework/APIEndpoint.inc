@@ -51,7 +51,7 @@ class APIEndpoint {
         $this->api_config = APITools\get_api_config()[1];
         $this->query_excludes = [];
         $this->request_data = APITools\get_request_data();
-        $this->request_method = $this->request_method;
+        $this->request_method = $_SERVER["REQUEST_METHOD"];
         $this->requires_auth = true;
         $this->retain_read_mode = true;
         $this->ignore_ifs = false;
