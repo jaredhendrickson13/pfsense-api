@@ -37,48 +37,6 @@ require_once("firewall_virtual_ip.inc");
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-# Checks our content type header and parses the content accordingly
-function get_request_data() {
-    # TODO: x-www-form-urlencoded still attempts to use json if no parameters were passed in. This was intentionally done to
-    # TODO: support user scripts that didn't specify a static content type (before it was supported) remove this in a future
-    # TODO: release. It is preferred that content uses a specified content type.
-    $_SERVER["HTTP_CONTENT_TYPE"] = (empty($_SERVER["HTTP_CONTENT_TYPE"])) ? "application/x-www-form-urlencoded" : $_SERVER["HTTP_CONTENT_TYPE"];
-    $content_types = [
-        "application/json" => json_decode(file_get_contents('php://input'), true),
-        "application/x-www-form-urlencoded" => (empty($_GET)) ? json_decode(file_get_contents('php://input'), true) : form_decode($_GET)
-    ];
-
-    # Check if content type is supported, if so return corresponding parsed request data
-    if (array_key_exists($_SERVER["HTTP_CONTENT_TYPE"], $content_types)) {
-        return $content_types[$_SERVER["HTTP_CONTENT_TYPE"]];
-    }
-    # Return false if the content type is unknown or unsupported
-    else {
-        return false;
-    }
-}
-
-# Decode query string into their appropriate data types
-function form_decode($array) {
-    # Loop through each query string item and check for expected data types
-    foreach ($array as $key=>$value) {
-        # Check for boolean type query strings
-        if ($value === "true") {
-            $array[$key] = true;
-        }
-        elseif ($value === "false") {
-            $array[$key] = false;
-        }
-
-        # Check for integer type query strings
-        if (is_numeric($value)) {
-            $array[$key] = intval($value);
-        }
-    }
-
-    return $array;
-}
-
 # Check our local pfSense version
 function get_pfsense_version() {
     # VARIABLES
