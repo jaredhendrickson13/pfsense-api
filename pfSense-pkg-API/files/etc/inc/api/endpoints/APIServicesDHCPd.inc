@@ -25,10 +25,10 @@ class APIServicesDHCPd extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesDHCPdRead())->call();
+        return (new APIServicesDHCPdRead($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIServicesDHCPdUpdate())->call();
+        return (new APIServicesDHCPdUpdate($this->request_data, $this->client))->call();
     }
 }

@@ -24,6 +24,6 @@ class APISystemReboot extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APISystemRebootCreate())->call();
+        return (new APISystemRebootCreate($this->request_data, $this->client))->call();
     }
 }

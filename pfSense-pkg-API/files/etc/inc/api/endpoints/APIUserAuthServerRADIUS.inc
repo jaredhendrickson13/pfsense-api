@@ -26,14 +26,14 @@ class APIUserAuthServerRADIUS extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIUserAuthServerRADIUSRead())->call();
+        return (new APIUserAuthServerRADIUSRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIUserAuthServerRADIUSCreate())->call();
+        return (new APIUserAuthServerRADIUSCreate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIUserAuthServerRADIUSDelete())->call();
+        return (new APIUserAuthServerRADIUSDelete($this->request_data, $this->client))->call();
     }
 }

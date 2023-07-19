@@ -24,6 +24,6 @@ class APIStatusLogConfigHistory extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIStatusLogConfigHistoryRead())->call();
+        return (new APIStatusLogConfigHistoryRead($this->request_data, $this->client))->call();
     }
 }

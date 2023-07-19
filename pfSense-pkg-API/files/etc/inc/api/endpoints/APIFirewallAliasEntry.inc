@@ -26,11 +26,11 @@ class APIFirewallAliasEntry extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIFirewallAliasEntryCreate())->call();
+        return (new APIFirewallAliasEntryCreate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIFirewallAliasEntryDelete())->call();
+        return (new APIFirewallAliasEntryDelete($this->request_data, $this->client))->call();
     }
 
 }

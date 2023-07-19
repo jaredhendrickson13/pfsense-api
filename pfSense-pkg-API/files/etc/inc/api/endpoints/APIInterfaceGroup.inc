@@ -27,18 +27,18 @@ class APIInterfaceGroup extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIInterfaceGroupRead())->call();
+        return (new APIInterfaceGroupRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIInterfaceGroupCreate())->call();
+        return (new APIInterfaceGroupCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIInterfaceGroupUpdate())->call();
+        return (new APIInterfaceGroupUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIInterfaceGroupDelete())->call();
+        return (new APIInterfaceGroupDelete($this->request_data, $this->client))->call();
     }
 }

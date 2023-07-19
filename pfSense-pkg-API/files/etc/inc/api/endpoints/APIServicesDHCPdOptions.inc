@@ -25,6 +25,6 @@ class APIServicesDHCPdOptions extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesDHCPdOptionsCreate())->call();
+        return (new APIServicesDHCPdOptionsCreate($this->request_data, $this->client))->call();
     }
 }

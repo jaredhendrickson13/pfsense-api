@@ -25,10 +25,10 @@ class APISystemDNS extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APISystemDNSRead())->call();
+        return (new APISystemDNSRead($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APISystemDNSUpdate())->call();
+        return (new APISystemDNSUpdate($this->request_data, $this->client))->call();
     }
 }

@@ -27,18 +27,18 @@ class APIFirewallSchedule extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIFirewallScheduleRead())->call();
+        return (new APIFirewallScheduleRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIFirewallScheduleCreate())->call();
+        return (new APIFirewallScheduleCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIFirewallScheduleUpdate())->call();
+        return (new APIFirewallScheduleUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIFirewallScheduleDelete())->call();
+        return (new APIFirewallScheduleDelete($this->request_data, $this->client))->call();
     }
 }

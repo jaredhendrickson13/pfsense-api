@@ -24,6 +24,6 @@ class APISystemHalt extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APISystemHaltCreate())->call();
+        return (new APISystemHaltCreate($this->request_data, $this->client))->call();
     }
 }

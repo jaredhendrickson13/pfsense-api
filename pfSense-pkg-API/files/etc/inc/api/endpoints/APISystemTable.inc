@@ -24,6 +24,6 @@ class APISystemTable extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APISystemTableRead())->call();
+        return (new APISystemTableRead($this->request_data, $this->client))->call();
     }
 }

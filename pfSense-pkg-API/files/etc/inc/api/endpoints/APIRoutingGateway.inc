@@ -27,18 +27,18 @@ class APIRoutingGateway extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIRoutingGatewayDetailRead())->call();
+        return (new APIRoutingGatewayDetailRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIRoutingGatewayCreate())->call();
+        return (new APIRoutingGatewayCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIRoutingGatewayUpdate())->call();
+        return (new APIRoutingGatewayUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIRoutingGatewayDelete())->call();
+        return (new APIRoutingGatewayDelete($this->request_data, $this->client))->call();
     }
 }

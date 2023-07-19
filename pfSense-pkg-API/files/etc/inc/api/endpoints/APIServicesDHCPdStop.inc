@@ -24,6 +24,6 @@ class APIServicesDHCPdStop extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesDHCPdStopCreate())->call();
+        return (new APIServicesDHCPdStopCreate($this->request_data, $this->client))->call();
     }
 }

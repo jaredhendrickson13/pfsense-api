@@ -27,14 +27,14 @@ class APISystemCRL extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APISystemCRLRead())->call();
+        return (new APISystemCRLRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APISystemCRLCreate())->call();
+        return (new APISystemCRLCreate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APISystemCRLDelete())->call();
+        return (new APISystemCRLDelete($this->request_data, $this->client))->call();
     }
 }

@@ -27,19 +27,19 @@ class APIFirewallRule extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIFirewallRuleRead())->call();
+        return (new APIFirewallRuleRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIFirewallRuleCreate())->call();
+        return (new APIFirewallRuleCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIFirewallRuleUpdate())->call();
+        return (new APIFirewallRuleUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIFirewallRuleDelete())->call();
+        return (new APIFirewallRuleDelete($this->request_data, $this->client))->call();
     }
 
 }

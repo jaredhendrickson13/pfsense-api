@@ -25,10 +25,10 @@ class APIUserGroupMember extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIUserGroupMemberCreate())->call();
+        return (new APIUserGroupMemberCreate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIUserGroupMemberDelete())->call();
+        return (new APIUserGroupMemberDelete($this->request_data, $this->client))->call();
     }
 }

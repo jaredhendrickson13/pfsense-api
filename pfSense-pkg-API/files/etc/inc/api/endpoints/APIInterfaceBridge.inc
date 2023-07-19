@@ -27,18 +27,18 @@ class APIInterfaceBridge extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIInterfaceBridgeRead())->call();
+        return (new APIInterfaceBridgeRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIInterfaceBridgeCreate())->call();
+        return (new APIInterfaceBridgeCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIInterfaceBridgeUpdate())->call();
+        return (new APIInterfaceBridgeUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIInterfaceBridgeDelete())->call();
+        return (new APIInterfaceBridgeDelete($this->request_data, $this->client))->call();
     }
 }

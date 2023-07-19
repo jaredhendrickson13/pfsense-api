@@ -27,19 +27,19 @@ class APIInterfaceVLAN extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIInterfaceVLANRead())->call();
+        return (new APIInterfaceVLANRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIInterfaceVLANCreate())->call();
+        return (new APIInterfaceVLANCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIInterfaceVLANUpdate())->call();
+        return (new APIInterfaceVLANUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIInterfaceVLANDelete())->call();
+        return (new APIInterfaceVLANDelete($this->request_data, $this->client))->call();
     }
 
 }

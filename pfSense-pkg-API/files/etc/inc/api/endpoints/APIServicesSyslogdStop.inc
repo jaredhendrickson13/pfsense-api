@@ -24,6 +24,6 @@ class APIServicesSyslogdStop extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesSyslogdStopCreate())->call();
+        return (new APIServicesSyslogdStopCreate($this->request_data, $this->client))->call();
     }
 }

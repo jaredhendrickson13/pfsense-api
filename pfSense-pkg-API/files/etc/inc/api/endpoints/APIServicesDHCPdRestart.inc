@@ -24,6 +24,6 @@ class APIServicesDHCPdRestart extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesDHCPdRestartCreate())->call();
+        return (new APIServicesDHCPdRestartCreate($this->request_data, $this->client))->call();
     }
 }

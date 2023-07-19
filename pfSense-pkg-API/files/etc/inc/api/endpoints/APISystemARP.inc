@@ -25,10 +25,10 @@ class APISystemARP extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APISystemARPRead())->call();
+        return (new APISystemARPRead($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APISystemARPDelete())->call();
+        return (new APISystemARPDelete($this->request_data, $this->client))->call();
     }
 }

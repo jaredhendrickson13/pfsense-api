@@ -30,6 +30,6 @@ class APIRoutingApply extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIRoutingApplyCreate())->call();
+        return (new APIRoutingApplyCreate($this->request_data, $this->client))->call();
     }
 }

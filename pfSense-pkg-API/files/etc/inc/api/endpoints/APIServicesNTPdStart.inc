@@ -24,6 +24,6 @@ class APIServicesNTPdStart extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesNTPdStartCreate())->call();
+        return (new APIServicesNTPdStartCreate($this->request_data, $this->client))->call();
     }
 }

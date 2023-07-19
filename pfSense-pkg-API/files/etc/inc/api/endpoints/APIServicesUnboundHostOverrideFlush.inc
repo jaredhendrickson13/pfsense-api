@@ -25,10 +25,10 @@ class APIServicesUnboundHostOverrideFlush extends APIEndpoint {
     }
 
     protected function put() {
-        return (new APIServicesUnboundHostOverrideFlushUpdate())->call();
+        return (new APIServicesUnboundHostOverrideFlushUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIServicesUnboundHostOverrideFlushDelete())->call();
+        return (new APIServicesUnboundHostOverrideFlushDelete($this->request_data, $this->client))->call();
     }
 }

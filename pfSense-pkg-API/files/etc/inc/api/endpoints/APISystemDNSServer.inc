@@ -25,10 +25,10 @@ class APISystemDNSServer extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APISystemDNSServerCreate())->call();
+        return (new APISystemDNSServerCreate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APISystemDNSServerDelete())->call();
+        return (new APISystemDNSServerDelete($this->request_data, $this->client))->call();
     }
 }

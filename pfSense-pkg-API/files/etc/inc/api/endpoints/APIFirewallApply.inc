@@ -36,6 +36,6 @@ class APIFirewallApply extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIFirewallApplyCreate())->call();
+        return (new APIFirewallApplyCreate($this->request_data, $this->client))->call();
     }
 }

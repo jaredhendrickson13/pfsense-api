@@ -24,6 +24,6 @@ class APIServicesSSHdStop extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesSSHdStopCreate())->call();
+        return (new APIServicesSSHdStopCreate($this->request_data, $this->client))->call();
     }
 }

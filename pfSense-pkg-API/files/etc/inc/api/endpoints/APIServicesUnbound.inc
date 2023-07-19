@@ -25,10 +25,10 @@ class APIServicesUnbound extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesUnboundRead())->call();
+        return (new APIServicesUnboundRead($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIServicesUnboundUpdate())->call();
+        return (new APIServicesUnboundUpdate($this->request_data, $this->client))->call();
     }
 }

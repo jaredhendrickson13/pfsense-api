@@ -25,11 +25,11 @@ class APIFirewallRuleFlush extends APIEndpoint {
     }
 
     protected function put() {
-        return (new APIFirewallRuleFlushUpdate())->call();
+        return (new APIFirewallRuleFlushUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIFirewallRuleFlushDelete())->call();
+        return (new APIFirewallRuleFlushDelete($this->request_data, $this->client))->call();
     }
 
 }

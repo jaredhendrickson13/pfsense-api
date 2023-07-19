@@ -27,18 +27,18 @@ class APIFirewallTrafficShaper extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIFirewallTrafficShaperRead())->call();
+        return (new APIFirewallTrafficShaperRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIFirewallTrafficShaperCreate())->call();
+        return (new APIFirewallTrafficShaperCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIFirewallTrafficShaperUpdate())->call();
+        return (new APIFirewallTrafficShaperUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIFirewallTrafficShaperDelete())->call();
+        return (new APIFirewallTrafficShaperDelete($this->request_data, $this->client))->call();
     }
 }

@@ -24,6 +24,6 @@ class APIStatusLogFirewall extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIStatusLogFirewallRead())->call();
+        return (new APIStatusLogFirewallRead($this->request_data, $this->client))->call();
     }
 }

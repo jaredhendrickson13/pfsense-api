@@ -24,6 +24,6 @@ class APIServicesWOLSend extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesWOLSendCreate())->call();
+        return (new APIServicesWOLSendCreate($this->request_data, $this->client))->call();
     }
 }

@@ -24,6 +24,6 @@ class APIDiagnosticsCommandPrompt extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIDiagnosticsCommandPromptCreate())->call();
+        return (new APIDiagnosticsCommandPromptCreate($this->request_data, $this->client))->call();
     }
 }

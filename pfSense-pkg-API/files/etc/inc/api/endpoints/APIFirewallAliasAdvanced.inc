@@ -25,10 +25,10 @@ class APIFirewallAliasAdvanced extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIFirewallAliasAdvancedRead())->call();
+        return (new APIFirewallAliasAdvancedRead($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIFirewallAliasAdvancedUpdate())->call();
+        return (new APIFirewallAliasAdvancedUpdate($this->request_data, $this->client))->call();
     }
 }

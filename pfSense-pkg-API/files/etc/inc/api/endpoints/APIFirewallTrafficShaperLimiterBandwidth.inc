@@ -26,10 +26,10 @@ class APIFirewallTrafficShaperLimiterBandwidth extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIFirewallTrafficShaperLimiterBandwidthCreate())->call();
+        return (new APIFirewallTrafficShaperLimiterBandwidthCreate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIFirewallTrafficShaperLimiterBandwidthDelete())->call();
+        return (new APIFirewallTrafficShaperLimiterBandwidthDelete($this->request_data, $this->client))->call();
     }
 }

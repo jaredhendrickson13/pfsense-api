@@ -25,10 +25,10 @@ class APIServicesSSHd extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesSSHdRead())->call();
+        return (new APIServicesSSHdRead($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIServicesSSHdUpdate())->call();
+        return (new APIServicesSSHdUpdate($this->request_data, $this->client))->call();
     }
 }

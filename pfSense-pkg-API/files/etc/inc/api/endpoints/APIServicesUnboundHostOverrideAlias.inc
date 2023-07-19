@@ -24,6 +24,6 @@ class APIServicesUnboundHostOverrideAlias extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesUnboundHostOverrideAliasCreate())->call();
+        return (new APIServicesUnboundHostOverrideAliasCreate($this->request_data, $this->client))->call();
     }
 }

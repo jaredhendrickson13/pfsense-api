@@ -24,6 +24,6 @@ class APIServicesUnboundStop extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesUnboundStopCreate())->call();
+        return (new APIServicesUnboundStopCreate($this->request_data, $this->client))->call();
     }
 }

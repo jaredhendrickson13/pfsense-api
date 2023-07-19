@@ -24,6 +24,6 @@ class APIServicesDpingerStop extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesDpingerStopCreate())->call();
+        return (new APIServicesDpingerStopCreate($this->request_data, $this->client))->call();
     }
 }

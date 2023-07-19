@@ -27,18 +27,18 @@ class APIServicesOpenVPNServer extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesOpenVPNServerRead())->call();
+        return (new APIServicesOpenVPNServerRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIServicesOpenVPNServerCreate())->call();
+        return (new APIServicesOpenVPNServerCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIServicesOpenVPNServerUpdate())->call();
+        return (new APIServicesOpenVPNServerUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIServicesOpenVPNServerDelete())->call();
+        return (new APIServicesOpenVPNServerDelete($this->request_data, $this->client))->call();
     }
 }

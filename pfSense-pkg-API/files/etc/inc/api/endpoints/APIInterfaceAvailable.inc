@@ -24,6 +24,6 @@ class APIInterfaceAvailable extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIInterfaceAvailableRead())->call();
+        return (new APIInterfaceAvailableRead($this->request_data, $this->client))->call();
     }
 }

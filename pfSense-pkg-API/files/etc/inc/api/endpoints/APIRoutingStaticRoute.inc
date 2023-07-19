@@ -27,18 +27,18 @@ class APIRoutingStaticRoute extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIRoutingStaticRouteRead())->call();
+        return (new APIRoutingStaticRouteRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIRoutingStaticRouteCreate())->call();
+        return (new APIRoutingStaticRouteCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIRoutingStaticRouteUpdate())->call();
+        return (new APIRoutingStaticRouteUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIRoutingStaticRouteDelete())->call();
+        return (new APIRoutingStaticRouteDelete($this->request_data, $this->client))->call();
     }
 }

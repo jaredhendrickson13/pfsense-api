@@ -25,10 +25,10 @@ class APIStatusCARP extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIStatusCARPRead())->call();
+        return (new APIStatusCARPRead($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIStatusCARPUpdate())->call();
+        return (new APIStatusCARPUpdate($this->request_data, $this->client))->call();
     }
 }

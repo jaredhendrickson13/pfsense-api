@@ -27,19 +27,19 @@ class APIFirewallNATOneToOne extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIFirewallNATOneToOneRead())->call();
+        return (new APIFirewallNATOneToOneRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIFirewallNATOneToOneCreate())->call();
+        return (new APIFirewallNATOneToOneCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIFirewallNATOneToOneUpdate())->call();
+        return (new APIFirewallNATOneToOneUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIFirewallNATOneToOneDelete())->call();
+        return (new APIFirewallNATOneToOneDelete($this->request_data, $this->client))->call();
     }
 
 }

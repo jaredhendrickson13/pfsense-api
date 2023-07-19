@@ -24,6 +24,6 @@ class APIServicesDnsmasqHostOverrideAlias extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesDnsmasqHostOverrideAliasCreate())->call();
+        return (new APIServicesDnsmasqHostOverrideAliasCreate($this->request_data, $this->client))->call();
     }
 }

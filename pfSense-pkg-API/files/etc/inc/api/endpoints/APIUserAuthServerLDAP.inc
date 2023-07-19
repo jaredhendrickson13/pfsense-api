@@ -26,14 +26,14 @@ class APIUserAuthServerLDAP extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIUserAuthServerLDAPRead())->call();
+        return (new APIUserAuthServerLDAPRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIUserAuthServerLDAPCreate())->call();
+        return (new APIUserAuthServerLDAPCreate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIUserAuthServerLDAPDelete())->call();
+        return (new APIUserAuthServerLDAPDelete($this->request_data, $this->client))->call();
     }
 }

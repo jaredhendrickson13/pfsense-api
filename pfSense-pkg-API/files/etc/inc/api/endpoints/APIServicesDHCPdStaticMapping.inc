@@ -29,18 +29,18 @@ class APIServicesDHCPdStaticMapping extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesDHCPdStaticMappingRead())->call();
+        return (new APIServicesDHCPdStaticMappingRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIServicesDHCPdStaticMappingCreate())->call();
+        return (new APIServicesDHCPdStaticMappingCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIServicesDHCPdStaticMappingUpdate())->call();
+        return (new APIServicesDHCPdStaticMappingUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIServicesDHCPdStaticMappingDelete())->call();
+        return (new APIServicesDHCPdStaticMappingDelete($this->request_data, $this->client))->call();
     }
 }

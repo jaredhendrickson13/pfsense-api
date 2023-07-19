@@ -26,10 +26,10 @@ class APIUserPrivilege extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIUserPrivilegeCreate())->call();
+        return (new APIUserPrivilegeCreate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIUserPrivilegeDelete())->call();
+        return (new APIUserPrivilegeDelete($this->request_data, $this->client))->call();
     }
 }

@@ -25,10 +25,10 @@ class APIUserAuthServer extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIUserAuthServerRead())->call();
+        return (new APIUserAuthServerRead($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIUserAuthServerDelete())->call();
+        return (new APIUserAuthServerDelete($this->request_data, $this->client))->call();
     }
 }

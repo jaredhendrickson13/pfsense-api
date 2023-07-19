@@ -24,6 +24,6 @@ class APIStatusOpenVPN extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIStatusOpenVPNRead())->call();
+        return (new APIStatusOpenVPNRead($this->request_data, $this->client))->call();
     }
 }

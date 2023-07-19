@@ -25,10 +25,10 @@ class APIServicesServiceWatchdog extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesServiceWatchdogRead())->call();
+        return (new APIServicesServiceWatchdogRead($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIServicesServiceWatchdogUpdate())->call();
+        return (new APIServicesServiceWatchdogUpdate($this->request_data, $this->client))->call();
     }
 }

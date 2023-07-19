@@ -27,19 +27,19 @@ class APIFirewallAlias extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIFirewallAliasRead())->call();
+        return (new APIFirewallAliasRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIFirewallAliasCreate())->call();
+        return (new APIFirewallAliasCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIFirewallAliasUpdate())->call();
+        return (new APIFirewallAliasUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIFirewallAliasDelete())->call();
+        return (new APIFirewallAliasDelete($this->request_data, $this->client))->call();
     }
 
 }

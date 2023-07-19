@@ -25,10 +25,10 @@ class APIFirewallTrafficShaperQueue extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIFirewallTrafficShaperQueueCreate())->call();
+        return (new APIFirewallTrafficShaperQueueCreate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIFirewallTrafficShaperQueueDelete())->call();
+        return (new APIFirewallTrafficShaperQueueDelete($this->request_data, $this->client))->call();
     }
 }

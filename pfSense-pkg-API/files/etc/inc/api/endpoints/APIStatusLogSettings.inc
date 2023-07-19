@@ -24,6 +24,6 @@ class APIStatusLogSettings extends APIEndpoint {
     }
 
     protected function put() {
-        return (new APIStatusLogSettingsUpdate())->call();
+        return (new APIStatusLogSettingsUpdate($this->request_data, $this->client))->call();
     }
 }

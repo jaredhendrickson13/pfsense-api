@@ -25,10 +25,10 @@ class APIServicesNTPdTimeServer extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesNTPdTimeServerCreate())->call();
+        return (new APIServicesNTPdTimeServerCreate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIServicesNTPdTimeServerDelete())->call();
+        return (new APIServicesNTPdTimeServerDelete($this->request_data, $this->client))->call();
     }
 }

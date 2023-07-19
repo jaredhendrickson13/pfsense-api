@@ -24,6 +24,6 @@ class APIStatusLogSystem extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIStatusLogSystemRead())->call();
+        return (new APIStatusLogSystemRead($this->request_data, $this->client))->call();
     }
 }

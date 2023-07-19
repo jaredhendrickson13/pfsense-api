@@ -24,6 +24,6 @@ class APIServicesSSHdRestart extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesSSHdRestartCreate())->call();
+        return (new APIServicesSSHdRestartCreate($this->request_data, $this->client))->call();
     }
 }

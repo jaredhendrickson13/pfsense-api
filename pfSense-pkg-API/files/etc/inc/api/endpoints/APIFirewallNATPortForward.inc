@@ -27,19 +27,19 @@ class APIFirewallNATPortForward extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIFirewallNATPortForwardRead())->call();
+        return (new APIFirewallNATPortForwardRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIFirewallNATPortForwardCreate())->call();
+        return (new APIFirewallNATPortForwardCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIFirewallNATPortForwardUpdate())->call();
+        return (new APIFirewallNATPortForwardUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIFirewallNATPortForwardDelete())->call();
+        return (new APIFirewallNATPortForwardDelete($this->request_data, $this->client))->call();
     }
 
 }

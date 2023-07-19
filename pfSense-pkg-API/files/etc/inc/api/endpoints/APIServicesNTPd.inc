@@ -25,10 +25,10 @@ class APIServicesNTPd extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesNTPdRead())->call();
+        return (new APIServicesNTPdRead($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIServicesNTPdUpdate())->call();
+        return (new APIServicesNTPdUpdate($this->request_data, $this->client))->call();
     }
 }

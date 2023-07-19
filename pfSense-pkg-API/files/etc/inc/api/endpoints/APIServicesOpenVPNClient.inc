@@ -27,18 +27,18 @@ class APIServicesOpenVPNClient extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesOpenVPNClientRead())->call();
+        return (new APIServicesOpenVPNClientRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIServicesOpenVPNClientCreate())->call();
+        return (new APIServicesOpenVPNClientCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIServicesOpenVPNClientUpdate())->call();
+        return (new APIServicesOpenVPNClientUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIServicesOpenVPNClientDelete())->call();
+        return (new APIServicesOpenVPNClientDelete($this->request_data, $this->client))->call();
     }
 }

@@ -24,6 +24,6 @@ class APIServicesDDNS extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesDDNSRead())->call();
+        return (new APIServicesDDNSRead($this->request_data, $this->client))->call();
     }
 }

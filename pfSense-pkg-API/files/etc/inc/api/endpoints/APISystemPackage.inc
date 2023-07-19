@@ -29,14 +29,14 @@ class APISystemPackage extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APISystemPackageRead())->call();
+        return (new APISystemPackageRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APISystemPackageCreate())->call();
+        return (new APISystemPackageCreate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APISystemPackageDelete())->call();
+        return (new APISystemPackageDelete($this->request_data, $this->client))->call();
     }
 }

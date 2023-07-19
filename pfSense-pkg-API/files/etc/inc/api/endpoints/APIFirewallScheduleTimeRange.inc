@@ -25,10 +25,10 @@ class APIFirewallScheduleTimeRange extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIFirewallScheduleTimeRangeCreate())->call();
+        return (new APIFirewallScheduleTimeRangeCreate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIFirewallScheduleTimeRangeDelete())->call();
+        return (new APIFirewallScheduleTimeRangeDelete($this->request_data, $this->client))->call();
     }
 }

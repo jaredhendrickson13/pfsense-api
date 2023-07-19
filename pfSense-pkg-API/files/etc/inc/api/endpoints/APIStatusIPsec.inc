@@ -24,6 +24,6 @@ class APIStatusIPsec extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIStatusIPsecRead())->call();
+        return (new APIStatusIPsecRead($this->request_data, $this->client))->call();
     }
 }

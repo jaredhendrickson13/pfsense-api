@@ -26,6 +26,6 @@ class APISystemVersion extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APISystemVersionRead())->call();
+        return (new APISystemVersionRead($this->request_data, $this->client))->call();
     }
 }

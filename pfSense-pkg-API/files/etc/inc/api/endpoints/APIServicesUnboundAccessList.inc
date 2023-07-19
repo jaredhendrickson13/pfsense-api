@@ -27,18 +27,18 @@ class APIServicesUnboundAccessList extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesUnboundAccessListRead())->call();
+        return (new APIServicesUnboundAccessListRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIServicesUnboundAccessListCreate())->call();
+        return (new APIServicesUnboundAccessListCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIServicesUnboundAccessListUpdate())->call();
+        return (new APIServicesUnboundAccessListUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIServicesUnboundAccessListDelete())->call();
+        return (new APIServicesUnboundAccessListDelete($this->request_data, $this->client))->call();
     }
 }

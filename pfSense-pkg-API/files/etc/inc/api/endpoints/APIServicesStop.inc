@@ -24,6 +24,6 @@ class APIServicesStop extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesStopCreate())->call();
+        return (new APIServicesStopCreate($this->request_data, $this->client))->call();
     }
 }

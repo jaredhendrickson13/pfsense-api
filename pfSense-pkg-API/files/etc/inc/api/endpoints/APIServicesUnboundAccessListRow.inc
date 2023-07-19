@@ -24,6 +24,6 @@ class APIServicesUnboundAccessListRow extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesUnboundAccessListRowCreate())->call();
+        return (new APIServicesUnboundAccessListRowCreate($this->request_data, $this->client))->call();
     }
 }

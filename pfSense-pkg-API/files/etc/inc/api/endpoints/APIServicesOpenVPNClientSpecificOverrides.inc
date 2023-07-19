@@ -28,18 +28,18 @@ class APIServicesOpenVPNClientSpecificOverrides extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesOpenVPNClientSpecificOverridesRead())->call();
+        return (new APIServicesOpenVPNClientSpecificOverridesRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIServicesOpenVPNClientSpecificOverridesCreate())->call();
+        return (new APIServicesOpenVPNClientSpecificOverridesCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIServicesOpenVPNClientSpecificOverridesUpdate())->call();
+        return (new APIServicesOpenVPNClientSpecificOverridesUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIServicesOpenVPNClientSpecificOverridesDelete())->call();
+        return (new APIServicesOpenVPNClientSpecificOverridesDelete($this->request_data, $this->client))->call();
     }
 }

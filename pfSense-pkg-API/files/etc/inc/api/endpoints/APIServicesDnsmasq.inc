@@ -24,6 +24,6 @@ class APIServicesDnsmasq extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesDnsmasqRead())->call();
+        return (new APIServicesDnsmasqRead($this->request_data, $this->client))->call();
     }
 }

@@ -26,14 +26,14 @@ class APISystemCA extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APISystemCARead())->call();
+        return (new APISystemCARead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APISystemCACreate())->call();
+        return (new APISystemCACreate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APISystemCADelete())->call();
+        return (new APISystemCADelete($this->request_data, $this->client))->call();
     }
 }

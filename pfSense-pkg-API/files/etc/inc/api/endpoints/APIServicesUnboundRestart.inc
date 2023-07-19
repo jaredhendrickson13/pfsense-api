@@ -24,6 +24,6 @@ class APIServicesUnboundRestart extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesUnboundRestartCreate())->call();
+        return (new APIServicesUnboundRestartCreate($this->request_data, $this->client))->call();
     }
 }

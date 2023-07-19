@@ -27,18 +27,18 @@ class APIServicesUnboundHostOverride extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesUnboundHostOverrideRead())->call();
+        return (new APIServicesUnboundHostOverrideRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIServicesUnboundHostOverrideCreate())->call();
+        return (new APIServicesUnboundHostOverrideCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIServicesUnboundHostOverrideUpdate())->call();
+        return (new APIServicesUnboundHostOverrideUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIServicesUnboundHostOverrideDelete())->call();
+        return (new APIServicesUnboundHostOverrideDelete($this->request_data, $this->client))->call();
     }
 }

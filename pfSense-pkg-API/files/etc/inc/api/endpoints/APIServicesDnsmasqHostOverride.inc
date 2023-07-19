@@ -27,18 +27,18 @@ class APIServicesDnsmasqHostOverride extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesDnsmasqHostOverrideRead())->call();
+        return (new APIServicesDnsmasqHostOverrideRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIServicesDnsmasqHostOverrideCreate())->call();
+        return (new APIServicesDnsmasqHostOverrideCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIServicesDnsmasqHostOverrideUpdate())->call();
+        return (new APIServicesDnsmasqHostOverrideUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIServicesDnsmasqHostOverrideDelete())->call();
+        return (new APIServicesDnsmasqHostOverrideDelete($this->request_data, $this->client))->call();
     }
 }

@@ -24,7 +24,7 @@ class APIFirewallRuleSort extends APIEndpoint {
     }
 
     protected function put() {
-        return (new APIFirewallRuleSortUpdate())->call();
+        return (new APIFirewallRuleSortUpdate($this->request_data, $this->client))->call();
     }
 
 }

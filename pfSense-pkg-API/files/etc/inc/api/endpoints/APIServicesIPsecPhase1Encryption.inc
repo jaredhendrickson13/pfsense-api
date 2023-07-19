@@ -24,6 +24,6 @@ class APIServicesIPsecPhase1Encryption extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesIPsecPhase1EncryptionCreate())->call();
+        return (new APIServicesIPsecPhase1EncryptionCreate($this->request_data, $this->client))->call();
     }
 }

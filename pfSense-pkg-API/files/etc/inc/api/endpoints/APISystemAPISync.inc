@@ -28,6 +28,6 @@ class APISystemAPISync extends APIEndpoint {
     }
 
     protected function put() {
-        return (new APISystemAPISyncUpdate())->call();
+        return (new APISystemAPISyncUpdate($this->request_data, $this->client))->call();
     }
 }

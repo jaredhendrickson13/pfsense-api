@@ -24,6 +24,6 @@ class APIServicesSyslogdStart extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesSyslogdStartCreate())->call();
+        return (new APIServicesSyslogdStartCreate($this->request_data, $this->client))->call();
     }
 }

@@ -25,6 +25,6 @@ class APIServices extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesRead())->call();
+        return (new APIServicesRead($this->request_data, $this->client))->call();
     }
 }

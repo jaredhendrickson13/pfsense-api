@@ -26,14 +26,14 @@ class APIFirewallTrafficShaperLimiter extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIFirewallTrafficShaperLimiterRead())->call();
+        return (new APIFirewallTrafficShaperLimiterRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIFirewallTrafficShaperLimiterCreate())->call();
+        return (new APIFirewallTrafficShaperLimiterCreate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIFirewallTrafficShaperLimiterDelete())->call();
+        return (new APIFirewallTrafficShaperLimiterDelete($this->request_data, $this->client))->call();
     }
 }

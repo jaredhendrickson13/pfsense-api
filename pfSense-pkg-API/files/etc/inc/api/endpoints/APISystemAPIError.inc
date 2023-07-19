@@ -24,6 +24,6 @@ class APISystemAPIError extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APISystemAPIErrorRead())->call();
+        return (new APISystemAPIErrorRead($this->request_data, $this->client))->call();
     }
 }

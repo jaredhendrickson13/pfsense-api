@@ -27,18 +27,18 @@ class APIFirewallNATOutboundMapping extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIFirewallNATOutboundMappingRead())->call();
+        return (new APIFirewallNATOutboundMappingRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIFirewallNATOutboundMappingCreate())->call();
+        return (new APIFirewallNATOutboundMappingCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIFirewallNATOutboundMappingUpdate())->call();
+        return (new APIFirewallNATOutboundMappingUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIFirewallNATOutboundMappingDelete())->call();
+        return (new APIFirewallNATOutboundMappingDelete($this->request_data, $this->client))->call();
     }
 }

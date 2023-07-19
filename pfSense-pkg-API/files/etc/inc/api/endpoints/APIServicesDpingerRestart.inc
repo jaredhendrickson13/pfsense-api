@@ -24,6 +24,6 @@ class APIServicesDpingerRestart extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesDpingerRestartCreate())->call();
+        return (new APIServicesDpingerRestartCreate($this->request_data, $this->client))->call();
     }
 }

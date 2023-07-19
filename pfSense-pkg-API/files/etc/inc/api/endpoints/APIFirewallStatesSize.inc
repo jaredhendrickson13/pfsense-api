@@ -25,10 +25,10 @@ class APIFirewallStatesSize extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIFirewallStatesSizeRead())->call();
+        return (new APIFirewallStatesSizeRead($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIFirewallStatesSizeUpdate())->call();
+        return (new APIFirewallStatesSizeUpdate($this->request_data, $this->client))->call();
     }
 }

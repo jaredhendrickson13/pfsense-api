@@ -25,10 +25,10 @@ class APISystemConfig extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APISystemConfigRead())->call();
+        return (new APISystemConfigRead($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APISystemConfigUpdate())->call();
+        return (new APISystemConfigUpdate($this->request_data, $this->client))->call();
     }
 }

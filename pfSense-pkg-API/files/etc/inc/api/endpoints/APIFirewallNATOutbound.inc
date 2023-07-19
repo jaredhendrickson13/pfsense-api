@@ -25,10 +25,10 @@ class APIFirewallNATOutbound extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIFirewallNATOutboundRead())->call();
+        return (new APIFirewallNATOutboundRead($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIFirewallNATOutboundUpdate())->call();
+        return (new APIFirewallNATOutboundUpdate($this->request_data, $this->client))->call();
     }
 }

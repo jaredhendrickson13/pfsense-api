@@ -24,6 +24,6 @@ class APIStatusInterface extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIStatusInterfaceRead())->call();
+        return (new APIStatusInterfaceRead($this->request_data, $this->client))->call();
     }
 }

@@ -27,19 +27,19 @@ class APIFirewallVirtualIP extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIFirewallVirtualIPRead())->call();
+        return (new APIFirewallVirtualIPRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIFirewallVirtualIPCreate())->call();
+        return (new APIFirewallVirtualIPCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIFirewallVirtualIPUpdate())->call();
+        return (new APIFirewallVirtualIPUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIFirewallVirtualIPDelete())->call();
+        return (new APIFirewallVirtualIPDelete($this->request_data, $this->client))->call();
     }
 
 }

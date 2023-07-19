@@ -24,6 +24,6 @@ class APISystemConsole extends APIEndpoint {
     }
 
     protected function put() {
-        return (new APISystemConsoleUpdate())->call();
+        return (new APISystemConsoleUpdate($this->request_data, $this->client))->call();
     }
 }

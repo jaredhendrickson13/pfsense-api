@@ -27,18 +27,18 @@ class APIServicesIPsecPhase2 extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIServicesIPsecPhase2Read())->call();
+        return (new APIServicesIPsecPhase2Read($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIServicesIPsecPhase2Create())->call();
+        return (new APIServicesIPsecPhase2Create($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIServicesIPsecPhase2Update())->call();
+        return (new APIServicesIPsecPhase2Update($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIServicesIPsecPhase2Delete())->call();
+        return (new APIServicesIPsecPhase2Delete($this->request_data, $this->client))->call();
     }
 }

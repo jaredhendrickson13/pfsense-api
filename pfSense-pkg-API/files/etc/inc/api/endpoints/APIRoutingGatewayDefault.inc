@@ -24,6 +24,6 @@ class APIRoutingGatewayDefault extends APIEndpoint {
     }
 
     protected function put() {
-        return (new APIRoutingGatewayDefaultUpdate())->call();
+        return (new APIRoutingGatewayDefaultUpdate($this->request_data, $this->client))->call();
     }
 }

@@ -24,6 +24,6 @@ class APIStatusGateway extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIStatusGatewayRead())->call();
+        return (new APIStatusGatewayRead($this->request_data, $this->client))->call();
     }
 }

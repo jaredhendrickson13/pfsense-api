@@ -24,6 +24,6 @@ class APIStatusLogDHCP extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIStatusLogDHCPRead())->call();
+        return (new APIStatusLogDHCPRead($this->request_data, $this->client))->call();
     }
 }

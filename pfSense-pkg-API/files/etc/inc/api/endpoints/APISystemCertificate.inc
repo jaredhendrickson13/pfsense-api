@@ -28,18 +28,18 @@ class APISystemCertificate extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APISystemCertificateRead())->call();
+        return (new APISystemCertificateRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APISystemCertificateCreate())->call();
+        return (new APISystemCertificateCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APISystemCertificateUpdate())->call();
+        return (new APISystemCertificateUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APISystemCertificateDelete())->call();
+        return (new APISystemCertificateDelete($this->request_data, $this->client))->call();
     }
 }

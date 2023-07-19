@@ -27,19 +27,19 @@ class APIInterface extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIInterfaceRead())->call();
+        return (new APIInterfaceRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIInterfaceCreate())->call();
+        return (new APIInterfaceCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APIInterfaceUpdate())->call();
+        return (new APIInterfaceUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APIInterfaceDelete())->call();
+        return (new APIInterfaceDelete($this->request_data, $this->client))->call();
     }
 
 }

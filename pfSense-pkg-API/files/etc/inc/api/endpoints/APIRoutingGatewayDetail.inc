@@ -24,6 +24,6 @@ class APIRoutingGatewayDetail extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIRoutingGatewayDetailRead())->call();
+        return (new APIRoutingGatewayDetailRead($this->request_data, $this->client))->call();
     }
 }

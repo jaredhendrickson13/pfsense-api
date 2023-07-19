@@ -25,10 +25,10 @@ class APIInterfaceApply extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APIInterfaceApplyRead())->call();
+        return (new APIInterfaceApplyRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APIInterfaceApplyCreate())->call();
+        return (new APIInterfaceApplyCreate($this->request_data, $this->client))->call();
     }
 }

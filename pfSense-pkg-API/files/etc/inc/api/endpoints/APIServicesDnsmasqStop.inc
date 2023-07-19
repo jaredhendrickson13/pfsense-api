@@ -24,6 +24,6 @@ class APIServicesDnsmasqStop extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesDnsmasqStopCreate())->call();
+        return (new APIServicesDnsmasqStopCreate($this->request_data, $this->client))->call();
     }
 }

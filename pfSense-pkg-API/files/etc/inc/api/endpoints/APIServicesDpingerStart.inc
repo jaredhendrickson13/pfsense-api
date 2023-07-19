@@ -24,6 +24,6 @@ class APIServicesDpingerStart extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIServicesDpingerStartCreate())->call();
+        return (new APIServicesDpingerStartCreate($this->request_data, $this->client))->call();
     }
 }

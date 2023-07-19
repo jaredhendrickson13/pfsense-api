@@ -28,18 +28,18 @@ class APISystemTunable extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APISystemTunableRead())->call();
+        return (new APISystemTunableRead($this->request_data, $this->client))->call();
     }
 
     protected function post() {
-        return (new APISystemTunableCreate())->call();
+        return (new APISystemTunableCreate($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APISystemTunableUpdate())->call();
+        return (new APISystemTunableUpdate($this->request_data, $this->client))->call();
     }
 
     protected function delete() {
-        return (new APISystemTunableDelete())->call();
+        return (new APISystemTunableDelete($this->request_data, $this->client))->call();
     }
 }

@@ -25,10 +25,10 @@ class APISystemHostname extends APIEndpoint {
     }
 
     protected function get() {
-        return (new APISystemHostnameRead())->call();
+        return (new APISystemHostnameRead($this->request_data, $this->client))->call();
     }
 
     protected function put() {
-        return (new APISystemHostnameUpdate())->call();
+        return (new APISystemHostnameUpdate($this->request_data, $this->client))->call();
     }
 }
