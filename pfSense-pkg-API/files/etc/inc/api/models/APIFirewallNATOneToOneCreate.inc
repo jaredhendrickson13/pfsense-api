@@ -20,8 +20,8 @@ class APIFirewallNATOneToOneCreate extends APIModel {
     private $nat_reflection;
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Added 1:1 NAT mapping via API";
         $this->nat_reflection = ["enable", "disable"];
     }

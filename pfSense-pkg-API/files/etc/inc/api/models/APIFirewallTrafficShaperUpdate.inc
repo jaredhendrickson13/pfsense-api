@@ -20,8 +20,8 @@ class APIFirewallTrafficShaperUpdate extends APIModel {
     private $type_changed;
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Modified firewall traffic shaper via API";
     }
 

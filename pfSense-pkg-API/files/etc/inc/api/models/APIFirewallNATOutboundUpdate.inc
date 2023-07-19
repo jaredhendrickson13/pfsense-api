@@ -21,8 +21,8 @@ class APIFirewallNATOutboundUpdate extends APIModel {
     private $current_mode;
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->modes = ["automatic", "hybrid", "advanced", "disabled"];
     }
 

@@ -21,8 +21,8 @@ class APIServicesUnboundAccessListRowCreate extends APIModel {
     private $ip_version;
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Added DNS Resolver access list network via API";
         $this->ip_version = "";
     }

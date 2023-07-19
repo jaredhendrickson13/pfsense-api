@@ -18,8 +18,8 @@ require_once("api/framework/APIResponse.inc");
 
 class APIServicesIPsecPhase1Read extends APIModel {
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
     }
 
     public function action() {

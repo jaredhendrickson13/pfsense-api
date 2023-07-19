@@ -21,8 +21,8 @@ class APIServicesIPsecPhase2Create extends APIModel {
     public $def_rand_time = false;
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Added IPsec phase 2 via API";
     }
 

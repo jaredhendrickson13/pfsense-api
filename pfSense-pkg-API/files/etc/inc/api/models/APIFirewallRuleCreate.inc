@@ -20,8 +20,8 @@ class APIFirewallRuleCreate extends APIModel {
     public $tcpflag_options = ["fin", "syn", "rst", "psh", "ack", "urg", "ece", "cwr"];
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Added firewall rule via API";
     }
 

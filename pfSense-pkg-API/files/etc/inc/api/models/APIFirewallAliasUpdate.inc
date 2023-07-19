@@ -21,8 +21,8 @@ class APIFirewallAliasUpdate extends APIModel {
     private $original_name;
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Modified firewall alias address via API";
         $this->type_changed = false;
     }

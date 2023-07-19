@@ -19,8 +19,8 @@ require_once("api/framework/APIResponse.inc");
 
 class APISystemAPIUpdate extends APIModel {
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Modified API settings via API";
         $this->validated_data = APITools\get_api_config()[1];
     }

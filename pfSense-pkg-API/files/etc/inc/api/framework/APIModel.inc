@@ -33,7 +33,7 @@ class APIModel {
         $this->package_includes = [];
         $this->change_note = "Made unknown change via API";
         $this->validate_id = true;
-        $this->initial_data = ($initial_data) ?: APITools\get_request_data();
+        $this->initial_data = $initial_data;
         $this->validated_data = [];
         $this->errors = [];
 

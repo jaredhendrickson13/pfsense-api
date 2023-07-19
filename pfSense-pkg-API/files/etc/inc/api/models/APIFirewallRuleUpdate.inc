@@ -22,8 +22,8 @@ class APIFirewallRuleUpdate extends APIModel {
     private $missing_port;
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Modified firewall rule via API";
         $this->requires_port = false;
         $this->missing_port = false;

@@ -20,8 +20,8 @@ require_once("api/framework/APIResponse.inc");
 class APISystemCRLDelete extends APIModel {
     public $crl_ref_id;
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Deleted Certificate Revocation List via API";
         $this->crl_ref_id = "";
     }

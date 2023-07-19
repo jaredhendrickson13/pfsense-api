@@ -20,8 +20,8 @@ class APIFirewallRuleSortUpdate extends APIModel {
     private $options;
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Sorted firewall rules via API";
         $this->options = [
             "ascend" => SORT_ASC,

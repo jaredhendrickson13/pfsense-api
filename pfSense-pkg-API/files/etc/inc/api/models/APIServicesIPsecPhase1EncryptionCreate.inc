@@ -19,7 +19,7 @@ require_once("api/framework/APIResponse.inc");
 class APIServicesIPsecPhase1EncryptionCreate extends APIModel {
     # Create our method constructor
     public function construct() {
-        parent::__construct();
+        parent::__construct($initial_data, $client);
         $this->change_note = "Added IPsec phase 1 encryption via API";
     }
 

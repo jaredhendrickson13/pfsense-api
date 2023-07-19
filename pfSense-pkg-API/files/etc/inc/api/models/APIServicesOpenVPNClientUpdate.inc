@@ -20,8 +20,8 @@ class APIServicesOpenVPNClientUpdate extends APIModel {
     public $original_client;
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Modified OpenVPN client via API";
     }
 

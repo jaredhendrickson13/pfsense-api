@@ -20,8 +20,8 @@ class APIUserGroupMemberCreate extends APIModel {
     private $__user_groups;
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Added group membership for user via API";
         $this->__user_groups = [];
     }

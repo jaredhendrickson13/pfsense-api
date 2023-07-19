@@ -20,8 +20,8 @@ require_once("api/models/APIFirewallStatesSizeRead.inc");
 
 class APIFirewallStatesSizeUpdate extends APIModel {
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Modified firewall state table size via API";
     }
 

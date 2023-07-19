@@ -20,8 +20,8 @@ class APIFirewallAliasAdvancedUpdate extends APIModel {
     public $alias_interval_changed = false;
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Modified advanced firewall alias settings via API";
     }
 

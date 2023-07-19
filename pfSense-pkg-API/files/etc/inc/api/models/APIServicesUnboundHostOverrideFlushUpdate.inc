@@ -22,8 +22,8 @@ function unbound_override_flush_host_cmp($a, $b) {
 
 class APIServicesUnboundHostOverrideFlushUpdate extends APIModel {
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Flushed and replaced DNS Resolver host overrides via API";
     }
 

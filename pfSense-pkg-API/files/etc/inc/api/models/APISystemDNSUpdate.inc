@@ -20,8 +20,8 @@ require_once("api/models/APISystemDNSRead.inc");
 
 class APISystemDNSUpdate extends APIModel {
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Modified system DNS servers via API";
     }
 

@@ -21,8 +21,8 @@ class APIFirewallScheduleTimeRangeDelete extends APIModel {
     private $parent_id;
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Deleted firewall schedule time range via API";
     }
 

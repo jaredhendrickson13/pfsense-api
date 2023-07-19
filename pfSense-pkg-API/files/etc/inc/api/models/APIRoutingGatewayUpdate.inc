@@ -20,8 +20,8 @@ class APIRoutingGatewayUpdate extends APIModel {
     private $ip_protocol_changed;
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Modified gateway via API";
         $this->ip_protocol_changed = false;
     }

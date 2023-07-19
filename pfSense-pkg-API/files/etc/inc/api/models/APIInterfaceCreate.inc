@@ -22,8 +22,8 @@ class APIInterfaceCreate extends APIModel {
     private $next_if;
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Added interface via API";
         $this->if_list = APITools\get_all_avail_interfaces();
         $this->next_if = APITools\get_next_pfsense_if_id();

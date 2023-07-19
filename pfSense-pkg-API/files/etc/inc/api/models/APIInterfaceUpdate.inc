@@ -21,8 +21,8 @@ class APIInterfaceUpdate extends APIModel {
     private $if_list;
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Modified interface via API";
         $this->if_list = APITools\get_all_avail_interfaces();
     }

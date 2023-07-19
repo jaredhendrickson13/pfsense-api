@@ -19,8 +19,8 @@ require_once("api/framework/APIResponse.inc");
 class APISystemCertificateUpdate extends APIModel {
 
     # Create our method constructor
-    public function __construct() {
-        parent::__construct();
+    public function __construct($initial_data=[], $client=null) {
+        parent::__construct($initial_data, $client);
         $this->change_note = "Modified system certificate via API";
     }
 
