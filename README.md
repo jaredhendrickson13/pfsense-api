@@ -19,7 +19,6 @@ are made preventing the need for a reboot. All this results in the fastest, safe
     <summary>Supported pfSense Versions</summary>
 
   - pfSense CE 2.7.0 (AMD64)
-  - pfSense Plus 23.01 (AMD64)
   - pfSense Plus 23.05 (AMD64)
 
     ---

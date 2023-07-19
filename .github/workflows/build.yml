@@ -55,8 +55,6 @@ jobs:
         include:
           - pfsense_version: pfSense-2.7.0-RELEASE
             freebsd_id: freebsd14
-          - pfsense_version: pfSense-23.01-RELEASE
-            freebsd_id: freebsd14
           - pfsense_version: pfSense-23.05-RELEASE
             freebsd_id: freebsd14
         
