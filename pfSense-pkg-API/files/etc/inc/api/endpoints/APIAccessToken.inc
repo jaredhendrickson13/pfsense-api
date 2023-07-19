@@ -25,6 +25,6 @@ class APIAccessToken extends APIEndpoint {
     }
 
     protected function post() {
-        return (new APIAccessTokenCreate())->call();
+        return (new APIAccessTokenCreate($this->request_data, $this->client))->call();
     }
 }
