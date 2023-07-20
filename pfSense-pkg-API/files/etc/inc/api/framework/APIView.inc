@@ -12,8 +12,15 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
+namespace APIFramework;
+
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIQuery.inc");
+
+use APITools;
+use APIAuth;
+use APIResponse;
+use ReflectionMethod, ReflectionException;
 
 # Allow endpoints to access any API model class
 foreach(glob("/etc/inc/api/models/*.inc") as $model) {
@@ -198,6 +205,7 @@ class APIView {
         }
 
         # Initialize the assigned model
+        $this->model_name = "APIModels\\".$this->model_name;
         $this->model = new $this->model_name($this->request_data, $this->client);
 
         # Checks that request data was properly received.

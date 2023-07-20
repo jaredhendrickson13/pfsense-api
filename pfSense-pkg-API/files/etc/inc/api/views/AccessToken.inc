@@ -12,14 +12,18 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
+namespace APIViews;
 
 require_once("api/framework/APIView.inc");
 
-class APIViewAccessToken extends APIView {
+use APIFramework;
+use APIModels;
+
+class AccessToken extends APIFramework\APIView {
     public function __construct() {
         parent::__construct();
         $this->url = "/api/v1/access_token";
-        $this->model_name = "APIAccessToken";
+        $this->model_name = "AccessToken";
         $this->set_auth_mode = "local";
         $this->retain_read_mode = false;
     }

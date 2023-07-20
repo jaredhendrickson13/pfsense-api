@@ -12,10 +12,16 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
+namespace APIModels;
+
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-class APIAccessToken extends APIModel {
+use APIModel;
+use APITools;
+use APIResponse;
+
+class AccessToken extends APIModel {
     # Create our method constructor
     public function __construct($initial_data=[], $client=null) {
         parent::__construct($initial_data, $client);
