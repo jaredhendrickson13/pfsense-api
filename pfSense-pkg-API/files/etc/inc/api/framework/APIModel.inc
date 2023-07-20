@@ -265,7 +265,7 @@ class APIModel {
             if ($this->initial_data["_action_bypass"] === true) {
                 return APIResponse\get(15);
             } else {
-                return $this->create();
+                return $this->_create();
             }
         } else {
             return $this->errors[0];
@@ -294,7 +294,7 @@ class APIModel {
             if ($this->initial_data["_action_bypass"] === true) {
                 return APIResponse\get(15);
             } else {
-                return $this->update();
+                return $this->_update();
             }
         } else {
             return $this->errors[0];
@@ -323,7 +323,7 @@ class APIModel {
             if ($this->initial_data["_action_bypass"] === true) {
                 return APIResponse\get(15);
             } else {
-                return $this->delete();
+                return $this->_delete();
             }
         } else {
             return $this->errors[0];
