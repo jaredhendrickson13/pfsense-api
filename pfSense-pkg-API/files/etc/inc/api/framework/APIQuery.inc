@@ -14,6 +14,7 @@
 //   limitations under the License.
 
 require_once("api/framework/APITools.inc");
+require_once("api/framework/APIEndpoint.inc");
 
 class APIQuery {
     public $response;
@@ -24,7 +25,7 @@ class APIQuery {
     public function __construct($response, $excluded=[], $payload=null) {
         $this->response = $response;
         $this->data = [];
-        $this->payload = (is_null($payload)) ? APITools\get_request_data() : $payload;
+        $this->payload = (is_null($payload)) ? APIEndpoint::get_request_data() : $payload;
         $this->excluded = $excluded;
     }
 
