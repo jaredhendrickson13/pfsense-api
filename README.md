@@ -76,8 +76,7 @@ pfsense-api revert v1.1.7
 - When updating pfSense, **_you must reinstall pfSense API afterwards_**. Unfortunately, pfSense removes all existing
   packages and only re-installs packages found within pfSense's package repositories. Since pfSense API is not an
   official package in pfSense's repositories, it does not get reinstalled automatically.
-- The `pfsense-api` command line tool was introduced in v1.1.0. Refer to the corresponding documentation for earlier
-  releases.
+
 
 # webConfigurator Settings & Documentation
 

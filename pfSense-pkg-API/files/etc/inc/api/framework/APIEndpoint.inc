@@ -25,8 +25,8 @@ foreach(glob("/etc/inc/api/models/*.inc") as $model) {
 
 class APIEndpoint {
     public $url;
-    public $errors;
-    public $client;
+    protected $errors;
+    protected $client;
     public $api_config;
     public $query_excludes;
     public $request_data;
@@ -65,22 +65,34 @@ class APIEndpoint {
         $this->delete_privileges = [];
     }
 
-    # Model to run when endpoint receives a GET request
-    protected function get() {
+    /**
+     * Method to run whenever this endpoint receives a GET request.
+     * @return array an associative array representation of the API response.
+     */
+    protected function get() : array {
         return APIResponse\get(2);
     }
 
-    # Model to run when endpoint receives a POST request
-    protected function post() {
+    /**
+     * Method to run whenever this endpoint receives a POST request.
+     * @return array an associative array representation of the API response.
+     */
+    protected function post() : array {
         return APIResponse\get(2);
     }
 
-    # Model to run when endpoint receives a PUT request
+    /**
+     * Method to run whenever this endpoint receives a PUT request.
+     * @return array an associative array representation of the API response.
+     */
     protected function put() {
         return APIResponse\get(2);
     }
 
-    # Model to run when endpoint receives a DELETE request
+    /**
+     * Method to run whenever this endpoint receives a DELETE request.
+     * @return array an associative array representation of the API response.
+     */
     protected function delete() {
         return APIResponse\get(2);
     }
