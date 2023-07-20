@@ -126,7 +126,7 @@ class APIFirewallTrafficShaperLimiterCreate extends APIModel {
 
                 # Create an APIFirewallTrafficShaperLimiterCreate object for each item and validate the input
                 foreach ($this->initial_data["bandwidth"] as $bw_item) {
-                    $bw = new APIFirewallTrafficShaperLimiterBandwidthCreate();
+                    $bw = new APIFirewallTrafficShaperLimiterBandwidthCreate($this->initial_data);
                     $bw->initial_data = $bw_item;
                     $bw->validate_payload(true);
                     $this->errors = $this->errors + $bw->errors;

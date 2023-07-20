@@ -112,7 +112,7 @@ class APIFirewallAliasUpdate extends APIModel {
             }
 
             # Use APIFirewallAliasEntryCreate model to validate the address field
-            $alias_ent = new APIFirewallAliasEntryCreate();
+            $alias_ent = new APIFirewallAliasEntryCreate($this->initial_data);
             $alias_ent->initial_data = $this->initial_data;
             $alias_ent->validated_data = $this->validated_data;
             $alias_ent->__validate_address();
@@ -140,7 +140,7 @@ class APIFirewallAliasUpdate extends APIModel {
         }
 
         # Use APIFirewallAliasEntryCreate model to validate the address field
-        $alias_ent = new APIFirewallAliasEntryCreate();
+        $alias_ent = new APIFirewallAliasEntryCreate($this->initial_data);
         $alias_ent->initial_data = $this->initial_data;
         $alias_ent->validated_data = $this->validated_data;
         $alias_ent->__validate_detail();

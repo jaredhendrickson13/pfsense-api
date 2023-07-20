@@ -120,7 +120,7 @@ class APIServicesUnboundHostOverrideCreate extends APIModel {
 
             $this->validated_data["aliases"]["item"] = [];
             foreach ($this->initial_data['aliases'] as $alias) {
-                $alias_create = new APIServicesUnboundHostOverrideAliasCreate();
+                $alias_create = new APIServicesUnboundHostOverrideAliasCreate($this->initial_data);
                 $alias_create->initial_data = $alias;
                 $alias_create->validate_host();
                 $alias_create->validate_domain();

@@ -715,7 +715,7 @@ class APIServicesIPsecPhase1Update extends APIModel {
                 # Loop through each encryption item and ensure it is valid
                 foreach ($this->initial_data["encryption"] as $enc_conf) {
                     # Call the APIServicesIPsecPhase1EncryptionCreate model to validate entries
-                    $enc_create = new APIServicesIPsecPhase1EncryptionCreate();
+                    $enc_create = new APIServicesIPsecPhase1EncryptionCreate($this->initial_data);
                     $enc_create->initial_data = $enc_conf;
                     $enc_create->validate_payload(true, $this->validated_data["prfselect_enable"]);
                     $this->validated_data["encryption"]["item"][] = $enc_create->validated_data;

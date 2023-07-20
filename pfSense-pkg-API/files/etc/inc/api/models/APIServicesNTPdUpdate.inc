@@ -105,7 +105,7 @@ class APIServicesNTPdUpdate extends APIModel {
                 foreach ($this->initial_data["timeservers"] as $timeserver) {
                     # Use the APIServicesNTPdTimeServerCreate model to validate each requested time server. This
                     # essentiall creates a nested/internal API call to validate/create NTPd timeservers
-                    $cts = new APIServicesNTPdTimeServerCreate();
+                    $cts = new APIServicesNTPdTimeServerCreate($this->initial_data);
                     $cts->initial_data = $timeserver;
                     $cts->validate_payload();
 

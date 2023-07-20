@@ -56,7 +56,7 @@ class APISystemDNSUpdate extends APIModel {
     private function __validate_dnsserver() {
         if (isset($this->initial_data['dnsserver'])) {
             # Use an internal API call to the APISystemDNSServerCreate model
-            $dns_server_c = new APISystemDNSServerCreate();
+            $dns_server_c = new APISystemDNSServerCreate($this->initial_data);
             $dns_server_c->initial_data["dnsserver"] = $this->initial_data["dnsserver"];
             $dns_server_c->__validate_dnsserver();
             $this->errors = $this->errors + $dns_server_c->errors;

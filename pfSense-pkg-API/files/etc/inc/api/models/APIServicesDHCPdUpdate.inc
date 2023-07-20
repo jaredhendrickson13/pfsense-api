@@ -368,7 +368,7 @@ class APIServicesDHCPdUpdate extends APIModel {
 
             # Loop through each requested number option and ensure it is valid
             foreach ($this->initial_data["numberoptions"] as $numberoption) {
-                $options_model = new APIServicesDHCPdOptionsCreate();
+                $options_model = new APIServicesDHCPdOptionsCreate($this->initial_data);
                 $options_model->initial_data = $numberoption;
                 $options_model->__validate_number();
                 $options_model->__validate_type();

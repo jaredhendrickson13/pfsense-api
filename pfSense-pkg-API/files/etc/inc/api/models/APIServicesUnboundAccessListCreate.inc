@@ -89,7 +89,7 @@ class APIServicesUnboundAccessListCreate extends APIModel {
                 # Validate each individual row entry
                 foreach ($this->initial_data["row"] as $row) {
                     # Run a nested API call to the APIServicesUnboundAccessListRowCreate model
-                    $create_row = new APIServicesUnboundAccessListRowCreate();
+                    $create_row = new APIServicesUnboundAccessListRowCreate($this->initial_data);
                     $create_row->initial_data = $row;
                     $create_row->__validate_acl_network();
                     $create_row->__validate_mask();

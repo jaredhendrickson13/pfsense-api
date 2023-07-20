@@ -51,7 +51,7 @@ class APIServicesUnboundHostOverrideFlushUpdate extends APIModel {
             # Loop through each host override entry requested
             foreach ($this->initial_data["host_overrides"] as $initial_host_override) {
                 # Check if this entry is valid for creation using the APIServicesUnboundHostOverrideCreate class
-                $ent = new APIServicesUnboundHostOverrideCreate();
+                $ent = new APIServicesUnboundHostOverrideCreate($this->initial_data);
                 $ent->initial_data = $initial_host_override;
                 $ent->validate_payload();
 

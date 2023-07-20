@@ -101,7 +101,7 @@ class APIFirewallAliasCreate extends APIModel {
 
     private function __validate_detail() {
         # Use APIFirewallAliasEntryCreate model to validate the address field
-        $alias_ent = new APIFirewallAliasEntryCreate();
+        $alias_ent = new APIFirewallAliasEntryCreate($this->initial_data);
         $alias_ent->validated_data = $this->validated_data;
         $alias_ent->__validate_detail();
 

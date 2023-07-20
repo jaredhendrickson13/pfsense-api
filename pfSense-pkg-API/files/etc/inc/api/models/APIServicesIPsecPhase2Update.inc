@@ -443,7 +443,7 @@ class APIServicesIPsecPhase2Update extends APIModel {
                     # Loop through each encryption-algorithm-option item and ensure it is valid
                     foreach ($this->initial_data["encryption-algorithm-option"] as $enc_conf) {
                         # Call the APIServicesIPsecPhase1EncryptionCreate model to validate entries
-                        $enc_create = new APIServicesIPsecPhase1EncryptionCreate();
+                        $enc_create = new APIServicesIPsecPhase1EncryptionCreate($this->initial_data);
                         $enc_create->initial_data = ["encryption-algorithm"=>$enc_conf];
                         $enc_create->validate_encryption_algorithm(true);
                         $this->validated_data["encryption-algorithm-option"][] = $enc_conf;

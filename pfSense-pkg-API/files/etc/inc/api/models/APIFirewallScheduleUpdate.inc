@@ -65,7 +65,7 @@ class APIFirewallScheduleUpdate extends APIModel {
                 # Loop through each requested time range to validate
                 foreach ($this->initial_data["timerange"] as $tr_data) {
                     # Validate the time range using the APIFirewallScheduleTimeRangeCreate model
-                    $time_range = new APIFirewallScheduleTimeRangeCreate();
+                    $time_range = new APIFirewallScheduleTimeRangeCreate($this->initial_data);
                     $time_range->initial_data = $tr_data;
                     $time_range->validate_payload(true);
 

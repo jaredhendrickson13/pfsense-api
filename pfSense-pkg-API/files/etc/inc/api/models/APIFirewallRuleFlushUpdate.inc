@@ -46,7 +46,7 @@ class APIFirewallRuleFlushUpdate extends APIModel {
                 # Loop through and validate each rule entry requested
                 foreach ($this->initial_data["rules"] as $initial_rule) {
                     # Check if this entry is valid for creation using the APIFirewallRuleCreate class
-                    $ent = new APIFirewallRuleCreate();
+                    $ent = new APIFirewallRuleCreate($this->initial_data);
                     $ent->client = $this->client;
                     $ent->initial_data = $initial_rule;
                     $ent->validate_payload(false);
