@@ -13,17 +13,20 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
+namespace APIViews;
+
+use APIFramework;
+
 require_once("api/framework/APIEndpoint.inc");
 
-class APIDiagnosticsCommandPrompt extends APIEndpoint {
-    public function __construct() {
+class DiagnosticsCommandPrompt extends APIFramework\APIView
+{
+    public function __construct()
+    {
         parent::__construct();
         $this->url = "/api/v1/diagnostics/command_prompt";
+        $this->model_name = "DiagnosticsCommandPrompt";
         $this->post_privileges = ["page-all", "page-diagnostics-command"];
         $this->method_options = ["POST"];
-    }
-
-    protected function post() : array {
-        return (new APIDiagnosticsCommandPromptCreate($this->request_data, $this->client))->call();
     }
 }

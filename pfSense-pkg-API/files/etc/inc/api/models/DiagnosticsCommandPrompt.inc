@@ -12,18 +12,22 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
+namespace APIModels;
 
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
+use APIModel;
+use APIResponse;
 
-class APIDiagnosticsCommandPromptCreate extends APIModel {
+
+class DiagnosticsCommandPrompt extends APIModel {
     # Create our method constructor
     public function __construct($initial_data=[], $client=null) {
         parent::__construct($initial_data, $client);
     }
 
-    public function action() {
+    public function _create() : array {
         exec($this->validated_data["shell_cmd"]." 2>&1", $cmd_output);
         return APIResponse\get(0, ["cmd_output"=>implode(PHP_EOL, $cmd_output)]);
     }
