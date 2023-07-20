@@ -29,7 +29,7 @@ class APIRoutingApply extends APIEndpoint {
         ];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIRoutingApplyCreate($this->request_data, $this->client))->call();
     }
 }

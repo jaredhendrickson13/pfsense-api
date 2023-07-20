@@ -23,7 +23,7 @@ class APIServicesDnsmasqApply extends APIEndpoint {
         $this->post_privileges = ["page-all", "page-services-dnsforwarder"];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesDnsmasqApplyCreate($this->request_data, $this->client))->call();
     }
 }

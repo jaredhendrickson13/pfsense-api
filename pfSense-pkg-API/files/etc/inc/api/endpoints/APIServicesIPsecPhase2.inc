@@ -26,19 +26,19 @@ class APIServicesIPsecPhase2 extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-vpn-ipsec-editphase2"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIServicesIPsecPhase2Read($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesIPsecPhase2Create($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIServicesIPsecPhase2Update($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIServicesIPsecPhase2Delete($this->request_data, $this->client))->call();
     }
 }

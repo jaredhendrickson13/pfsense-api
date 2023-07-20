@@ -23,7 +23,7 @@ class APIStatusGateway extends APIEndpoint {
         $this->get_privileges = ["page-all", "page-status-gateways"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIStatusGatewayRead($this->request_data, $this->client))->call();
     }
 }

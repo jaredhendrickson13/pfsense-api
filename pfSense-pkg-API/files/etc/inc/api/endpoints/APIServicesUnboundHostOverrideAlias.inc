@@ -23,7 +23,7 @@ class APIServicesUnboundHostOverrideAlias extends APIEndpoint {
         $this->post_privileges = ["page-all", "page-services-dnsresolver-edithost"];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesUnboundHostOverrideAliasCreate($this->request_data, $this->client))->call();
     }
 }

@@ -27,19 +27,19 @@ class APIUser extends APIEndpoint {
 
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIUserRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIUserCreate($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIUserUpdate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIUserDelete($this->request_data, $this->client))->call();
     }
 }

@@ -23,7 +23,7 @@ class APIServicesNTPdStop extends APIEndpoint {
         $this->url = "/api/v1/services/ntpd/stop";
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesNTPdStopCreate($this->request_data, $this->client))->call();
     }
 }

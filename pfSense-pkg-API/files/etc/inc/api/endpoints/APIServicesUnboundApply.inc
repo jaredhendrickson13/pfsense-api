@@ -24,11 +24,11 @@ class APIServicesUnboundApply extends APIEndpoint {
         $this->post_privileges = ["page-all", "page-services-dnsresolver", "page-services-dnsresolver-edithost"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIServicesUnboundApplyRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesUnboundApplyCreate($this->request_data, $this->client))->call();
     }
 }

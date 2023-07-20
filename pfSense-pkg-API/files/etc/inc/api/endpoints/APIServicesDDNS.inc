@@ -23,7 +23,7 @@ class APIServicesDDNS extends APIEndpoint {
         $this->get_privileges = ["page-all", "page-services-dynamicdnsclients"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIServicesDDNSRead($this->request_data, $this->client))->call();
     }
 }

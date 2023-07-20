@@ -23,7 +23,7 @@ class APIServicesUnboundAccessListRow extends APIEndpoint {
         $this->post_privileges = ["page-all", "page-services-dnsresolver-acls"];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesUnboundAccessListRowCreate($this->request_data, $this->client))->call();
     }
 }

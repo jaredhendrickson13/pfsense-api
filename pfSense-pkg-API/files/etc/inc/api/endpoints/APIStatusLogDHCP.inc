@@ -23,7 +23,7 @@ class APIStatusLogDHCP extends APIEndpoint {
         $this->get_privileges = ["page-all", "page-diagnostics-logs-dhcp"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIStatusLogDHCPRead($this->request_data, $this->client))->call();
     }
 }

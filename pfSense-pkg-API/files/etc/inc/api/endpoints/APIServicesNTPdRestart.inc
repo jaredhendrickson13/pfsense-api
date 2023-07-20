@@ -23,7 +23,7 @@ class APIServicesNTPdRestart extends APIEndpoint {
         $this->url = "/api/v1/services/ntpd/restart";
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesNTPdRestartCreate($this->request_data, $this->client))->call();
     }
 }

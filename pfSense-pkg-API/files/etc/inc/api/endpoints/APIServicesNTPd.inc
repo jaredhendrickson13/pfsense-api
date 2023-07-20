@@ -24,11 +24,11 @@ class APIServicesNTPd extends APIEndpoint {
         $this->put_privileges = ["page-all", "page-services-ntpd"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIServicesNTPdRead($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIServicesNTPdUpdate($this->request_data, $this->client))->call();
     }
 }

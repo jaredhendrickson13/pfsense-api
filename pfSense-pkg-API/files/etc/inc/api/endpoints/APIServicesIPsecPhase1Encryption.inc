@@ -23,7 +23,7 @@ class APIServicesIPsecPhase1Encryption extends APIEndpoint {
         $this->post_privileges = ["page-all", "page-vpn-ipsec-editphase1"];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesIPsecPhase1EncryptionCreate($this->request_data, $this->client))->call();
     }
 }

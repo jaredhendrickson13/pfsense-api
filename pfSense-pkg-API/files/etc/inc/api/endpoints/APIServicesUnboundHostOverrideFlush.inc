@@ -24,11 +24,11 @@ class APIServicesUnboundHostOverrideFlush extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-services-dnsresolver-edithost"];
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIServicesUnboundHostOverrideFlushUpdate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIServicesUnboundHostOverrideFlushDelete($this->request_data, $this->client))->call();
     }
 }

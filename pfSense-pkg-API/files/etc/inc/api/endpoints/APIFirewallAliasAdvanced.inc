@@ -24,11 +24,11 @@ class APIFirewallAliasAdvanced extends APIEndpoint {
         $this->put_privileges = ["page-all", "page-system-advanced-firewall"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIFirewallAliasAdvancedRead($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIFirewallAliasAdvancedUpdate($this->request_data, $this->client))->call();
     }
 }

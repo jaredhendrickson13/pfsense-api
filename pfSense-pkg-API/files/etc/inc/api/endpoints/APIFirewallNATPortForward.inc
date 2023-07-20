@@ -26,19 +26,19 @@ class APIFirewallNATPortForward extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-firewall-nat-portforward-edit"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIFirewallNATPortForwardRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIFirewallNATPortForwardCreate($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIFirewallNATPortForwardUpdate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIFirewallNATPortForwardDelete($this->request_data, $this->client))->call();
     }
 

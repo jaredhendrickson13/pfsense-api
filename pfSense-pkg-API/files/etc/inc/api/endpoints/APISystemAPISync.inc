@@ -27,7 +27,7 @@ class APISystemAPISync extends APIEndpoint {
         $this->ignore_ifs = true;
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APISystemAPISyncUpdate($this->request_data, $this->client))->call();
     }
 }

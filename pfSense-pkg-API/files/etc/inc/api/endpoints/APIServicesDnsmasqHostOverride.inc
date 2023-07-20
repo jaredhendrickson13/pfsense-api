@@ -26,19 +26,19 @@ class APIServicesDnsmasqHostOverride extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-services-dnsforwarder-edithost"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIServicesDnsmasqHostOverrideRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesDnsmasqHostOverrideCreate($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIServicesDnsmasqHostOverrideUpdate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIServicesDnsmasqHostOverrideDelete($this->request_data, $this->client))->call();
     }
 }

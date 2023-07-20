@@ -23,7 +23,7 @@ class APIServicesWOLSend extends APIEndpoint {
         $this->post_privileges = ["page-all", "page-services-wakeonlan"];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesWOLSendCreate($this->request_data, $this->client))->call();
     }
 }

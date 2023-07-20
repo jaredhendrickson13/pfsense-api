@@ -23,7 +23,7 @@ class APISystemAPIError extends APIEndpoint {
         $this->requires_auth = false;
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APISystemAPIErrorRead($this->request_data, $this->client))->call();
     }
 }

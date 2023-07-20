@@ -24,11 +24,11 @@ class APISystemNotificationsEmail extends APIEndpoint {
         $this->put_privileges = ["page-all", "page-system-advanced-notifications"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APISystemNotificationsEmailRead($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APISystemNotificationsEmailUpdate($this->request_data, $this->client))->call();
     }
 }

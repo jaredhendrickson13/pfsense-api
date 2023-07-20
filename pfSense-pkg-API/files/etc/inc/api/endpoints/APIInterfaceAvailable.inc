@@ -23,7 +23,7 @@ class APIInterfaceAvailable extends APIEndpoint {
         $this->get_privileges = ["page-all", "page-interfaces-assignnetworkports"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIInterfaceAvailableRead($this->request_data, $this->client))->call();
     }
 }

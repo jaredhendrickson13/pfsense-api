@@ -24,11 +24,11 @@ class APISystemDNSServer extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-system-generalsetup"];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APISystemDNSServerCreate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APISystemDNSServerDelete($this->request_data, $this->client))->call();
     }
 }

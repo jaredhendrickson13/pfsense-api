@@ -25,15 +25,15 @@ class APIUserAuthServerLDAP extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-system-authservers"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIUserAuthServerLDAPRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIUserAuthServerLDAPCreate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIUserAuthServerLDAPDelete($this->request_data, $this->client))->call();
     }
 }

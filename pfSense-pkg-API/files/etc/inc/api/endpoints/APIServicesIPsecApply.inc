@@ -31,7 +31,7 @@ class APIServicesIPsecApply extends APIEndpoint {
         ];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesIPsecApplyCreate($this->request_data, $this->client))->call();
     }
 }

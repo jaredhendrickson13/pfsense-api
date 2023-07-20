@@ -23,7 +23,7 @@ class APIServicesDnsmasqHostOverrideAlias extends APIEndpoint {
         $this->privileges = ["page-all", "page-services-dnsforwarder-edithost"];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesDnsmasqHostOverrideAliasCreate($this->request_data, $this->client))->call();
     }
 }

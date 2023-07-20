@@ -24,11 +24,11 @@ class APISystemHostname extends APIEndpoint {
         $this->put_privileges = ["page-all", "page-system-generalsetup"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APISystemHostnameRead($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APISystemHostnameUpdate($this->request_data, $this->client))->call();
     }
 }

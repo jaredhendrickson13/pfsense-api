@@ -24,11 +24,11 @@ class APIFirewallTrafficShaperLimiterQueue extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-firewall-trafficshaper-limiter"];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIFirewallTrafficShaperLimiterQueueCreate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIFirewallTrafficShaperLimiterQueueDelete($this->request_data, $this->client))->call();
     }
 }

@@ -23,7 +23,7 @@ class APIFirewallRuleSort extends APIEndpoint {
         $this->put_privileges = ["page-all", "page-firewall-rules"];
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIFirewallRuleSortUpdate($this->request_data, $this->client))->call();
     }
 

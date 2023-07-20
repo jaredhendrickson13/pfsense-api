@@ -23,7 +23,7 @@ class APIServicesDpingerStart extends APIEndpoint {
         $this->url = "/api/v1/services/dpinger/start";
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesDpingerStartCreate($this->request_data, $this->client))->call();
     }
 }

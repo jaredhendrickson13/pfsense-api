@@ -23,7 +23,7 @@ class APIStatusLogSettings extends APIEndpoint {
         $this->put_privileges = ["page-all", "page-diagnostics-logs-settings"];
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIStatusLogSettingsUpdate($this->request_data, $this->client))->call();
     }
 }

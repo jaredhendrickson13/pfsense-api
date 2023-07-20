@@ -26,19 +26,19 @@ class APIServicesOpenVPNClient extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-openvpn-client"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIServicesOpenVPNClientRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesOpenVPNClientCreate($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIServicesOpenVPNClientUpdate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIServicesOpenVPNClientDelete($this->request_data, $this->client))->call();
     }
 }

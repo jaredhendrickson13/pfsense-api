@@ -28,19 +28,19 @@ class APIServicesDHCPdStaticMapping extends APIEndpoint {
         $this->query_excludes = ["interface"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIServicesDHCPdStaticMappingRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesDHCPdStaticMappingCreate($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIServicesDHCPdStaticMappingUpdate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIServicesDHCPdStaticMappingDelete($this->request_data, $this->client))->call();
     }
 }

@@ -23,7 +23,7 @@ class APIServicesDHCPdStop extends APIEndpoint {
         $this->url = "/api/v1/services/dhcpd/stop";
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesDHCPdStopCreate($this->request_data, $this->client))->call();
     }
 }

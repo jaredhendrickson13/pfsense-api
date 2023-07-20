@@ -23,7 +23,7 @@ class APISystemHalt extends APIEndpoint {
         $this->post_privileges = ["page-all", "page-diagnostics-haltsystem"];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APISystemHaltCreate($this->request_data, $this->client))->call();
     }
 }

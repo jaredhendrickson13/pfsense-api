@@ -24,11 +24,11 @@ class APIUserGroupMember extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-system-groupmanager"];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIUserGroupMemberCreate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIUserGroupMemberDelete($this->request_data, $this->client))->call();
     }
 }

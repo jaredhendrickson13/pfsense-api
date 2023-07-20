@@ -24,11 +24,11 @@ class APIFirewallRuleFlush extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-firewall-rules-edit"];
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIFirewallRuleFlushUpdate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIFirewallRuleFlushDelete($this->request_data, $this->client))->call();
     }
 

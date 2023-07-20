@@ -23,7 +23,7 @@ class APIServicesDnsmasq extends APIEndpoint {
         $this->get_privileges = ["page-all", "page-services-dnsforwarder"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIServicesDnsmasqRead($this->request_data, $this->client))->call();
     }
 }

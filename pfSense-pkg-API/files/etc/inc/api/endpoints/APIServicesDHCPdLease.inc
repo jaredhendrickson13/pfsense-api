@@ -24,7 +24,7 @@ class APIServicesDHCPdLease extends APIEndpoint {
 
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIServicesDHCPdLeaseRead($this->request_data, $this->client))->call();
     }
 }

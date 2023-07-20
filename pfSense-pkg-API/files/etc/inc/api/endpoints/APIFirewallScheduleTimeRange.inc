@@ -24,11 +24,11 @@ class APIFirewallScheduleTimeRange extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-firewall-schedules-edit"];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIFirewallScheduleTimeRangeCreate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIFirewallScheduleTimeRangeDelete($this->request_data, $this->client))->call();
     }
 }

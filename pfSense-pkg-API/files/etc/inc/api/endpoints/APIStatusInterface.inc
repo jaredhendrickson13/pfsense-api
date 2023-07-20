@@ -23,7 +23,7 @@ class APIStatusInterface extends APIEndpoint {
         $this->get_privileges = ["page-all", "page-status-interfaces"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIStatusInterfaceRead($this->request_data, $this->client))->call();
     }
 }

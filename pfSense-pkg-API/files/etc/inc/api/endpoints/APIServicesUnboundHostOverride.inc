@@ -26,19 +26,19 @@ class APIServicesUnboundHostOverride extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-services-dnsresolver-edithost"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIServicesUnboundHostOverrideRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesUnboundHostOverrideCreate($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIServicesUnboundHostOverrideUpdate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIServicesUnboundHostOverrideDelete($this->request_data, $this->client))->call();
     }
 }

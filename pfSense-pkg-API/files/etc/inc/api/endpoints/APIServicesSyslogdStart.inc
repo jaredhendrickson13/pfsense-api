@@ -23,7 +23,7 @@ class APIServicesSyslogdStart extends APIEndpoint {
         $this->url = "/api/v1/services/syslogd/start";
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesSyslogdStartCreate($this->request_data, $this->client))->call();
     }
 }

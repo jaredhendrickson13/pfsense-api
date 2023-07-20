@@ -24,11 +24,11 @@ class APIFirewallNATOutbound extends APIEndpoint {
         $this->put_privileges = ["page-all", "page-firewall-nat-outbound"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIFirewallNATOutboundRead($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIFirewallNATOutboundUpdate($this->request_data, $this->client))->call();
     }
 }

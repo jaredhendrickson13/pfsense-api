@@ -23,7 +23,7 @@ class APISystemTable extends APIEndpoint {
         $this->get_privileges = ["page-all", "page-diagnostics-tables"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APISystemTableRead($this->request_data, $this->client))->call();
     }
 }

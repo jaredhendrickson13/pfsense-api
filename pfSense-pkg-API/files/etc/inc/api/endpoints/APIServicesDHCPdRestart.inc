@@ -23,7 +23,7 @@ class APIServicesDHCPdRestart extends APIEndpoint {
         $this->post_privileges = ["page-all", "page-status-services"];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesDHCPdRestartCreate($this->request_data, $this->client))->call();
     }
 }

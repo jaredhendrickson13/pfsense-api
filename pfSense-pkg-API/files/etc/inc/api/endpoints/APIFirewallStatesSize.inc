@@ -24,11 +24,11 @@ class APIFirewallStatesSize extends APIEndpoint {
         $this->put_privileges = ["page-all", "page-system-advanced-firewall"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIFirewallStatesSizeRead($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIFirewallStatesSizeUpdate($this->request_data, $this->client))->call();
     }
 }

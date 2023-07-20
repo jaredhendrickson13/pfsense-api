@@ -23,7 +23,7 @@ class APIServicesSSHdStop extends APIEndpoint {
         $this->url = "/api/v1/services/sshd/stop";
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesSSHdStopCreate($this->request_data, $this->client))->call();
     }
 }

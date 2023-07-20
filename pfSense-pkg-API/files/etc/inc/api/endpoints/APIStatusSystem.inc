@@ -23,7 +23,7 @@ class APIStatusSystem extends APIEndpoint {
         $this->get_privileges = ["page-all", "page-dashboard-widgets", "page-dashboard-all"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIStatusSystemRead($this->request_data, $this->client))->call();
     }
 }

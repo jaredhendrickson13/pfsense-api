@@ -23,7 +23,7 @@ class APISystemAPIVersion extends APIEndpoint {
         $this->get_privileges = ["page-all", "page-system-api"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APISystemAPIVersionRead($this->request_data, $this->client))->call();
     }
 }

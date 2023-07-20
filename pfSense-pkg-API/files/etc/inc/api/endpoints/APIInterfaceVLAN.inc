@@ -26,19 +26,19 @@ class APIInterfaceVLAN extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-interfaces-vlan-edit"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIInterfaceVLANRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIInterfaceVLANCreate($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIInterfaceVLANUpdate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIInterfaceVLANDelete($this->request_data, $this->client))->call();
     }
 

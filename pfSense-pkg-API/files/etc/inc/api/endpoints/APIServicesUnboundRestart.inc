@@ -23,7 +23,7 @@ class APIServicesUnboundRestart extends APIEndpoint {
         $this->url = "/api/v1/services/unbound/restart";
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesUnboundRestartCreate($this->request_data, $this->client))->call();
     }
 }

@@ -24,11 +24,11 @@ class APIServicesServiceWatchdog extends APIEndpoint {
         $this->put_privileges = ["page-all", "api-services-servicewatchdog"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIServicesServiceWatchdogRead($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIServicesServiceWatchdogUpdate($this->request_data, $this->client))->call();
     }
 }

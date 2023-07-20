@@ -23,7 +23,7 @@ class APIServicesDnsmasqStop extends APIEndpoint {
         $this->url = "/api/v1/services/dnsmasq/stop";
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesDnsmasqStopCreate($this->request_data, $this->client))->call();
     }
 }

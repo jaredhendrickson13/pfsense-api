@@ -27,7 +27,7 @@ class APISystemVersionUpgrade extends APIEndpoint {
         $this->query_excludes = ["use_cache"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APISystemVersionUpgradeRead($this->request_data, $this->client))->call();
     }
 }

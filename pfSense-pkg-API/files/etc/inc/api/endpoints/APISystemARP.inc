@@ -24,11 +24,11 @@ class APISystemARP extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-diagnostics-arptable"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APISystemARPRead($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APISystemARPDelete($this->request_data, $this->client))->call();
     }
 }

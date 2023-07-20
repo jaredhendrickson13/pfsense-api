@@ -23,7 +23,7 @@ class APIStatusLogSystem extends APIEndpoint {
         $this->get_privileges = ["page-all", "page-diagnostics-logs-system"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIStatusLogSystemRead($this->request_data, $this->client))->call();
     }
 }

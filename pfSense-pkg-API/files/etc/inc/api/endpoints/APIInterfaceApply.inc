@@ -24,11 +24,11 @@ class APIInterfaceApply extends APIEndpoint {
         $this->post_privileges = ["page-all", "page-interfaces-assignnetworkports"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIInterfaceApplyRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIInterfaceApplyCreate($this->request_data, $this->client))->call();
     }
 }

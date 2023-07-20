@@ -23,7 +23,7 @@ class APIDiagnosticsCommandPrompt extends APIEndpoint {
         $this->method_options = ["POST"];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIDiagnosticsCommandPromptCreate($this->request_data, $this->client))->call();
     }
 }

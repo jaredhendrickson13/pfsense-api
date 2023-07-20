@@ -23,7 +23,7 @@ class APIStatusIPsec extends APIEndpoint {
         $this->get_privileges = ["page-all", "page-status-ipsec"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIStatusIPsecRead($this->request_data, $this->client))->call();
     }
 }

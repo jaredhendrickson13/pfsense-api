@@ -24,11 +24,11 @@ class APIServicesSSHd extends APIEndpoint {
         $this->put_privileges = ["page-all", "page-system-advanced-admin"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIServicesSSHdRead($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIServicesSSHdUpdate($this->request_data, $this->client))->call();
     }
 }

@@ -26,19 +26,19 @@ class APIFirewallNATOutboundMapping extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-firewall-nat-outbound-edit"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIFirewallNATOutboundMappingRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIFirewallNATOutboundMappingCreate($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIFirewallNATOutboundMappingUpdate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIFirewallNATOutboundMappingDelete($this->request_data, $this->client))->call();
     }
 }

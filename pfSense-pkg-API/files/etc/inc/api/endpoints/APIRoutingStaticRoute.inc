@@ -26,19 +26,19 @@ class APIRoutingStaticRoute extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-system-staticroutes-editroute"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIRoutingStaticRouteRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIRoutingStaticRouteCreate($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIRoutingStaticRouteUpdate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIRoutingStaticRouteDelete($this->request_data, $this->client))->call();
     }
 }

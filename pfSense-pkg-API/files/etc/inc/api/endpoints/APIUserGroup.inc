@@ -27,19 +27,19 @@ class APIUserGroup extends APIEndpoint {
 
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIUserGroupRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIUserGroupCreate($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIUserGroupUpdate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIUserGroupDelete($this->request_data, $this->client))->call();
     }
 }

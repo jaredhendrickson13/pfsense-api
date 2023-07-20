@@ -23,7 +23,7 @@ class APIStatusLogConfigHistory extends APIEndpoint {
         $this->get_privileges = ["page-all", "page-diagnostics-configurationhistory"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIStatusLogConfigHistoryRead($this->request_data, $this->client))->call();
     }
 }

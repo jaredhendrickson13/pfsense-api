@@ -24,11 +24,11 @@ class APIServicesNTPdTimeServer extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-services-ntpd"];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesNTPdTimeServerCreate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIServicesNTPdTimeServerDelete($this->request_data, $this->client))->call();
     }
 }

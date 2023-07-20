@@ -23,7 +23,7 @@ class APIStatusLogFirewall extends APIEndpoint {
         $this->get_privileges = ["page-all", "page-diagnostics-logs-firewall"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIStatusLogFirewallRead($this->request_data, $this->client))->call();
     }
 }

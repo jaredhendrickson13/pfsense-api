@@ -23,7 +23,7 @@ class APIServicesDnsmasqRestart extends APIEndpoint {
         $this->url = "/api/v1/services/dnsmasq/restart";
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesDnsmasqRestartCreate($this->request_data, $this->client))->call();
     }
 }

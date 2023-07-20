@@ -23,7 +23,7 @@ class APISystemReboot extends APIEndpoint {
         $this->post_privileges = ["page-all", "page-diagnostics-rebootsystem"];
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APISystemRebootCreate($this->request_data, $this->client))->call();
     }
 }

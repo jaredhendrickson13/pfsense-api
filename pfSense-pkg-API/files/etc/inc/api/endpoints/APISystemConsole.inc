@@ -23,7 +23,7 @@ class APISystemConsole extends APIEndpoint {
         $this->put_privileges = ["page-all", "page-system-advanced-admin"];
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APISystemConsoleUpdate($this->request_data, $this->client))->call();
     }
 }

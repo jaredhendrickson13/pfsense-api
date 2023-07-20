@@ -26,19 +26,19 @@ class APIInterfaceGroup extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-interfaces-groups-edit"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIInterfaceGroupRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIInterfaceGroupCreate($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIInterfaceGroupUpdate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIInterfaceGroupDelete($this->request_data, $this->client))->call();
     }
 }

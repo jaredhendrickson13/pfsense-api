@@ -28,15 +28,15 @@ class APISystemPackage extends APIEndpoint {
         $this->query_excludes = ["all"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APISystemPackageRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APISystemPackageCreate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APISystemPackageDelete($this->request_data, $this->client))->call();
     }
 }

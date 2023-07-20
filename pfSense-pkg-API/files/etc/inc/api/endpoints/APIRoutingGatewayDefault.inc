@@ -23,7 +23,7 @@ class APIRoutingGatewayDefault extends APIEndpoint {
         $this->put_privileges = ["page-all", "page-system-gateways"];
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIRoutingGatewayDefaultUpdate($this->request_data, $this->client))->call();
     }
 }

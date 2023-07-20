@@ -23,7 +23,7 @@ class APIServicesSyslogdRestart extends APIEndpoint {
         $this->url = "/api/v1/services/syslogd/restart";
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIServicesSyslogdRestartCreate($this->request_data, $this->client))->call();
     }
 }

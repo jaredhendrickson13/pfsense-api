@@ -26,19 +26,19 @@ class APIRoutingGateway extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-system-gateways-editgateway"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIRoutingGatewayDetailRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIRoutingGatewayCreate($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIRoutingGatewayUpdate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIRoutingGatewayDelete($this->request_data, $this->client))->call();
     }
 }

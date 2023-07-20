@@ -24,11 +24,11 @@ class APIServicesDHCPd extends APIEndpoint {
         $this->put_privileges = ["page-all", "page-services-dhcpserver"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIServicesDHCPdRead($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIServicesDHCPdUpdate($this->request_data, $this->client))->call();
     }
 }

@@ -26,19 +26,19 @@ class APIFirewallNATOneToOne extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-firewall-nat-1-1-edit"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIFirewallNATOneToOneRead($this->request_data, $this->client))->call();
     }
 
-    protected function post() {
+    protected function post() : array {
         return (new APIFirewallNATOneToOneCreate($this->request_data, $this->client))->call();
     }
 
-    protected function put() {
+    protected function put() : array {
         return (new APIFirewallNATOneToOneUpdate($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIFirewallNATOneToOneDelete($this->request_data, $this->client))->call();
     }
 

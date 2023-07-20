@@ -24,11 +24,11 @@ class APIUserAuthServer extends APIEndpoint {
         $this->delete_privileges = ["page-all", "page-system-authservers"];
     }
 
-    protected function get() {
+    protected function get() : array {
         return (new APIUserAuthServerRead($this->request_data, $this->client))->call();
     }
 
-    protected function delete() {
+    protected function delete() : array {
         return (new APIUserAuthServerDelete($this->request_data, $this->client))->call();
     }
 }
