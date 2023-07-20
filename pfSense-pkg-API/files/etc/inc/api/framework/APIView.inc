@@ -304,4 +304,32 @@ class APIView {
 
         return $array;
     }
+
+    /**
+     * Generate an endpoint for this view in the pfSense webroot.
+     */
+    public function build_view() {
+        # Variables
+        $class_name = get_class($this);
+
+        # Specify the PHP code to write to the endpoints index.php file
+        $code = "<?php\nrequire_once('api/views/".$class_name.".inc');\n(new APIViews\\".$class_name."())->listen();\n";
+
+        # Create directories and files corresponding with class
+        if (!is_null($this->url)) {
+            mkdir("/usr/local/www".$this->url, 0755, true);
+            file_put_contents(
+                "/usr/local/www".$this->url."/index.php",
+                $code
+            );
+        }
+
+        # Print success output if file now exists, otherwise output error and exit on non-zero code
+        if (!is_null($this->url) and is_file("/usr/local/www".$this->url."/index.php")) {
+            echo "Building ".$class_name." view at URL \"".$this->url."\"... done.".PHP_EOL;
+        } else {
+            echo "Building ".$class_name." view at URL \"".$this->url."\"... failed.".PHP_EOL;
+            exit(1);
+        }
+    }
 }

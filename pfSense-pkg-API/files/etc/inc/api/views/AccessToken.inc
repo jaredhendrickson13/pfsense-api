@@ -17,7 +17,6 @@ namespace APIViews;
 require_once("api/framework/APIView.inc");
 
 use APIFramework;
-use APIModels;
 
 class AccessToken extends APIFramework\APIView {
     public function __construct() {
