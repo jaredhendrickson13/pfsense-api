@@ -20,7 +20,6 @@ require_once("api/framework/APIQuery.inc");
 use APITools;
 use APIAuth;
 use APIResponse;
-use ReflectionMethod, ReflectionException;
 
 # Allow endpoints to access any API model class
 foreach(glob("/etc/inc/api/models/*.inc") as $model) {
@@ -93,9 +92,9 @@ class APIView {
         foreach ($method_map as $http_method=>$class_method) {
             # Try to create a reflection object to use when comparing child class to the parent class
             try {
-                $reflection = new ReflectionMethod($this->model, $class_method);
+                $reflection = new \ReflectionMethod($this->model, $class_method);
             }
-            catch (ReflectionException $ref_ex) {
+            catch (\ReflectionException $ref_ex) {
                 continue;
             }
 
@@ -309,11 +308,12 @@ class APIView {
      * Generate an endpoint for this view in the pfSense webroot.
      */
     public function build_view() {
-        # Variables
-        $class_name = get_class($this);
+        # Get the fully qualified and non qualified class names for this object
+        $fq_class_name = (new \ReflectionClass($this))->getShortName();
+        $nq_class_name = get_class($this);
 
         # Specify the PHP code to write to the endpoints index.php file
-        $code = "<?php\nrequire_once('api/views/".$class_name.".inc');\n(new APIViews\\".$class_name."())->listen();\n";
+        $code = "<?php\nrequire_once('api/views/".$nq_class_name.".inc');\n(new ".$fq_class_name."())->listen();\n";
 
         # Create directories and files corresponding with class
         if (!is_null($this->url)) {
@@ -326,9 +326,9 @@ class APIView {
 
         # Print success output if file now exists, otherwise output error and exit on non-zero code
         if (!is_null($this->url) and is_file("/usr/local/www".$this->url."/index.php")) {
-            echo "Building ".$class_name." view at URL \"".$this->url."\"... done.".PHP_EOL;
+            echo "Building ".$fq_class_name." at URL \"".$this->url."\"... done.".PHP_EOL;
         } else {
-            echo "Building ".$class_name." view at URL \"".$this->url."\"... failed.".PHP_EOL;
+            echo "Building ".$fq_class_name." at URL \"".$this->url."\"... failed.".PHP_EOL;
             exit(1);
         }
     }
