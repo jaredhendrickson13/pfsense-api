@@ -12,11 +12,10 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIResponse.inc");
 
-class APIAccessTokenCreate extends APIModel {
+class APIAccessToken extends APIModel {
     # Create our method constructor
     public function __construct($initial_data=[], $client=null) {
         parent::__construct($initial_data, $client);
@@ -46,8 +45,9 @@ class APIAccessTokenCreate extends APIModel {
     }
 
     # Override action subclass to create a JWT and return it to the user after successful validation
-    public function action() {
+    public function create() : array {
         # Create and return the JWT to the client
+        $this->validate_payload();
         return APIResponse\get(0, $this->validated_data);
     }
 }

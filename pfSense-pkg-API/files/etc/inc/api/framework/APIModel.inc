@@ -221,4 +221,44 @@ class APIModel {
 
         return true;
     }
+
+    /**
+     * Initializes the default 'read' method. Child classes will override this class to add functionality that
+     * performs a 'read' action for this object (if applicable). If not overridden, an API error will simply return
+     * a method not implemented error.
+     * @return array an associative array containing the API response
+     */
+    public function read() : array {
+        return APIResponse\get(2);
+    }
+
+    /**
+     * Initializes the default 'create' method. Child classes will override this class to add functionality that
+     * performs a 'create' action for this object (if applicable). If not overridden, an API error will simply return
+     * a method not implemented error.
+     * @return array an associative array containing the API response
+     */
+    public function create() : array {
+        return APIResponse\get(2);
+    }
+
+    /**
+     * Initializes the default 'update' method. Child classes will override this class to add functionality that
+     * performs an 'update' action for this object (if applicable). If not overridden, an API error will simply return
+     * a method not implemented error.
+     * @return array an associative array containing the API response
+     */
+    public function update() : array {
+        return APIResponse\get(2);
+    }
+
+    /**
+     * Initializes the default 'delete' method. Child classes will override this class to add functionality that
+     * performs an 'delete' action for this object (if applicable). If not overridden, an API error will simply return
+     * a method not implemented error.
+     * @return array an associative array containing the API response
+     */
+    public function delete() : array {
+        return APIResponse\get(2);
+    }
 }

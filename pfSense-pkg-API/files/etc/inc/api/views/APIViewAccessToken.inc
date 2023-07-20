@@ -13,18 +13,14 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-require_once("api/framework/APIEndpoint.inc");
+require_once("api/framework/APIView.inc");
 
-class APIAccessToken extends APIEndpoint {
+class APIViewAccessToken extends APIView {
     public function __construct() {
         parent::__construct();
         $this->url = "/api/v1/access_token";
+        $this->model_name = "APIAccessToken";
         $this->set_auth_mode = "local";
         $this->retain_read_mode = false;
-        $this->method_options = ["POST"];
-    }
-
-    protected function post() : array {
-        return (new APIAccessTokenCreate($this->request_data, $this->client))->call();
     }
 }
