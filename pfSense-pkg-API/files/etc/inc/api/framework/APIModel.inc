@@ -223,42 +223,110 @@ class APIModel {
     }
 
     /**
-     * Initializes the default 'read' method. Child classes will override this class to add functionality that
+     * Initializes the default '_read' method. Child classes will override this class to add functionality that
      * performs a 'read' action for this object (if applicable). If not overridden, an API error will simply return
-     * a method not implemented error.
+     * a method not implemented error. This method is not intended to be called directly, rather it should be called
+     * using the public 'read' method.
+     * @return array an associative array containing the API response
+     */
+    public function _read() : array {
+        return APIResponse\get(2);
+    }
+
+    /**
+     * Execute the read action of the current model. In addition to calling the object's
+     * _read() method, this method will allow for an optional query to be performed as well as optionally
+     * embedding the object ID in the API response.
      * @return array an associative array containing the API response
      */
     public function read() : array {
-        return APIResponse\get(2);
+        return $this->_read();
     }
 
     /**
      * Initializes the default 'create' method. Child classes will override this class to add functionality that
      * performs a 'create' action for this object (if applicable). If not overridden, an API error will simply return
-     * a method not implemented error.
+     * a method not implemented error. This method is not intended to be called directly, rather it should be called
+     * using the public 'create' method.
+     * @return array an associative array containing the API response
+     */
+    public function _create() : array {
+        return APIResponse\get(2);
+    }
+
+    /**
+     * Perform validation and execute the create action of the current model.
      * @return array an associative array containing the API response
      */
     public function create() : array {
-        return APIResponse\get(2);
+        # If the API call was valid, execute the action. Otherwise, return the first error encountered.
+        if ($this->validate()) {
+            # Bypass the action if requested
+            if ($this->initial_data["_action_bypass"] === true) {
+                return APIResponse\get(15);
+            } else {
+                return $this->create();
+            }
+        } else {
+            return $this->errors[0];
+        }
     }
 
     /**
      * Initializes the default 'update' method. Child classes will override this class to add functionality that
      * performs an 'update' action for this object (if applicable). If not overridden, an API error will simply return
-     * a method not implemented error.
+     * a method not implemented error. This method is not intended to be called directly, rather it should be called
+     * using the public 'update' method.
+     * @return array an associative array containing the API response
+     */
+    public function _update() : array {
+        return APIResponse\get(2);
+    }
+
+    /**
+     * Perform validation and execute the update action of the current model.
      * @return array an associative array containing the API response
      */
     public function update() : array {
-        return APIResponse\get(2);
+        # If the API call was valid, execute the action. Otherwise, return the first error encountered.
+        if ($this->validate()) {
+            # Bypass the action if requested
+            if ($this->initial_data["_action_bypass"] === true) {
+                return APIResponse\get(15);
+            } else {
+                return $this->update();
+            }
+        } else {
+            return $this->errors[0];
+        }
     }
 
     /**
      * Initializes the default 'delete' method. Child classes will override this class to add functionality that
      * performs an 'delete' action for this object (if applicable). If not overridden, an API error will simply return
-     * a method not implemented error.
+     * a method not implemented error. This method is not intended to be called directly, rather it should be called
+     * using the public 'delete' method.
+     * @return array an associative array containing the API response
+     */
+    public function _delete() : array {
+        return APIResponse\get(2);
+    }
+
+    /**
+     * Perform validation and execute the delete action of the current model.
      * @return array an associative array containing the API response
      */
     public function delete() : array {
-        return APIResponse\get(2);
+        # If the API call was valid, execute the action. Otherwise, return the first error encountered.
+        if ($this->validate()) {
+            # Bypass the action if requested
+            if ($this->initial_data["_action_bypass"] === true) {
+                return APIResponse\get(15);
+            } else {
+                return $this->delete();
+            }
+        } else {
+            return $this->errors[0];
+        }
     }
 }

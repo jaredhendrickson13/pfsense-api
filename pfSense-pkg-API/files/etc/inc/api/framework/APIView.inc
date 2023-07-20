@@ -71,10 +71,10 @@ class APIView {
         # Variables
         $method_options = [];
         $method_map = [
-            "GET" => "read",
-            "POST" => "create",
-            "PUT" => "update",
-            "DELETE" => "delete"
+            "GET" => "_read",
+            "POST" => "_create",
+            "PUT" => "_update",
+            "DELETE" => "_delete"
         ];
 
         # Allow OPTIONS requests if configured

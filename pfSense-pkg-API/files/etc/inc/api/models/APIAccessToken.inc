@@ -45,13 +45,7 @@ class APIAccessToken extends APIModel {
     }
 
     # Override action subclass to create a JWT and return it to the user after successful validation
-    public function create() : array {
-        if ($this->errors) {
-            return $this->errors[0];
-        }
-
-        # Create and return the JWT to the client
-        $this->validate_payload();
+    public function _create() : array {
         return APIResponse\get(0, $this->validated_data);
     }
 }
