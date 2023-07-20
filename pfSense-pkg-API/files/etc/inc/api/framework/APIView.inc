@@ -188,21 +188,21 @@ class APIView {
 
     # Listen for HTTP requests and call the corresponding method
     public function listen() {
-        # Initialize the assigned model
-        $this->model = new $this->model_name($this->request_data);
-
         # Ensure API is enabled and the receiving interface is allowed to answer API calls.
         $this->check_enable();
         $this->check_server_ip();
-
-        # Checks that request data was properly received.
-        $this->check_request_method();
-        $this->check_request_data();
 
         # Checks client authentication and authorization if required
         if ($this->requires_auth) {
             $this->check_auth();
         }
+
+        # Initialize the assigned model
+        $this->model = new $this->model_name($this->request_data, $this->client);
+
+        # Checks that request data was properly received.
+        $this->check_request_method();
+        $this->check_request_data();
 
         # Proceed if no errors were encountered
         if (!$this->errors) {
