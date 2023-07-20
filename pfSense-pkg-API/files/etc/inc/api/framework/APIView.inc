@@ -309,8 +309,8 @@ class APIView {
      */
     public function build_view() {
         # Get the fully qualified and non qualified class names for this object
-        $fq_class_name = (new \ReflectionClass($this))->getShortName();
-        $nq_class_name = get_class($this);
+        $fq_class_name = get_class($this);
+        $nq_class_name = (new \ReflectionClass($this))->getShortName();
 
         # Specify the PHP code to write to the endpoints index.php file
         $code = "<?php\nrequire_once('api/views/".$nq_class_name.".inc');\n(new ".$fq_class_name."())->listen();\n";
