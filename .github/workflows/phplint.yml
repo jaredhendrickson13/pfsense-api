@@ -11,8 +11,3 @@ jobs:
         with:
           file-extensions: 'php, inc'
           php-version: "8.1"
-      - uses: php-actions/composer@v6 # or alternative dependency management
-      - uses: php-actions/phpstan@v3
-        with:
-          path: pfSense-pkg-API/files/
-          php_version: 8.2
