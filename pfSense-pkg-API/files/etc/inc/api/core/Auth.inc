@@ -41,7 +41,7 @@ class Auth {
      */
     public function __construct(array $req_privs=[], string $auth_mode="", bool|null $read_mode=null){
         $this->api_config = API\Core\Tools\get_api_config()[1];
-        $this->auth_mode = ($auth_mode) ? $this->api_config["authmode"] : $auth_mode;
+        $this->auth_mode = (!$auth_mode) ? $this->api_config["authmode"] : $auth_mode;
         $this->read_mode = (is_null($read_mode)) ? array_key_exists("readonly", $this->api_config) : $read_mode;
         $this->req_privs = $req_privs;
         $this->privs = [];

@@ -56,7 +56,7 @@ class View {
         $this->api_config = API\Core\Tools\get_api_config()[1];
 
         # Fetch request data and method whenever the object is first created.
-        $this->request_data = View::get_request_data();
+        $this->request_data = $this->get_request_data();
         $this->request_method = strtoupper($_SERVER["REQUEST_METHOD"]);
     }
 
