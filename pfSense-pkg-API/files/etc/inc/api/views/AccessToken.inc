@@ -14,7 +14,7 @@
 //   limitations under the License.
 namespace API\Views;
 
-require_once("api/framework/View.inc");
+require_once("api/core/View.inc");
 
 use API;
 
