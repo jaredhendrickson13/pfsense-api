@@ -33,7 +33,7 @@ class View {
     protected array $errors = [];
     protected API\Core\Auth $client;
     public array $api_config = [];
-    public array $request_data = [];
+    public mixed $request_data = [];
     public string $request_method;
     public bool $requires_auth = true;
     public bool $set_auth_mode;
