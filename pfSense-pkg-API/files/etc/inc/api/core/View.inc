@@ -50,7 +50,7 @@ class View {
      */
     public function __construct() {
         # Prevent PHP warnings in API responses.
-        # error_reporting(E_ERROR);
+        error_reporting(E_ERROR);
 
         # Fetch the current API configuration whenever the object is first created.
         $this->api_config = API\Core\Tools\get_api_config()[1];
