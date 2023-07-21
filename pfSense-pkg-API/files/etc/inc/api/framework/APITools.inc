@@ -28,7 +28,7 @@ require_once("priv.inc");
 require_once("service-utils.inc");
 require_once("filter.inc");
 require_once("shaper.inc");
-require_once("Auth.inc");
+require_once("auth.inc");
 require_once("functions.inc");
 require_once("openvpn.inc");
 require_once("certs.inc");
