@@ -36,12 +36,12 @@ class Auth {
     /**
      * Values and functions to run anytime an `Auth` object is created.
      * @param array $req_privs an array of required pfSense privileges to check during authorization.
-     * @param bool $enforce_auth_mode explicitly sets the API `auth_mode` to use during authentication. Defaults to `auth_mode` API configuration value.
-     * @param bool $read_mode explicitly set the API `read_mode`. Defaults to `readonly` API configuration value.
+     * @param string $auth_mode explicitly sets the API `auth_mode` to use during authentication. Defaults to `auth_mode` API configuration value.
+     * @param bool|null $read_mode explicitly set the API `read_mode`. Defaults to `readonly` API configuration value.
      */
-    public function __construct(array $req_privs=[], bool $enforce_auth_mode=null, bool $read_mode=null){
+    public function __construct(array $req_privs=[], string $auth_mode="", bool|null $read_mode=null){
         $this->api_config = API\Core\Tools\get_api_config()[1];
-        $this->auth_mode = (is_null($enforce_auth_mode)) ? $this->api_config["authmode"] : $enforce_auth_mode;
+        $this->auth_mode = ($auth_mode) ? $this->api_config["authmode"] : $auth_mode;
         $this->read_mode = (is_null($read_mode)) ? array_key_exists("readonly", $this->api_config) : $read_mode;
         $this->req_privs = $req_privs;
         $this->privs = [];

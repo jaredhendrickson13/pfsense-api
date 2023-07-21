@@ -36,7 +36,7 @@ class View {
     public mixed $request_data = [];
     public string $request_method;
     public bool $requires_auth = true;
-    public bool $set_auth_mode;
+    public string $set_auth_mode;
     public bool $retain_read_mode = true;
     public bool $ignore_ifs = false;
     public bool $ignore_enabled = false;
