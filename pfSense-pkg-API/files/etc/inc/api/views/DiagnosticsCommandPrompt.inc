@@ -17,7 +17,7 @@ namespace API\Views;
 
 use API;
 
-require_once("api/core/APIEndpoint.inc");
+require_once("api/core/View.inc");
 
 class DiagnosticsCommandPrompt extends API\Core\View
 {
