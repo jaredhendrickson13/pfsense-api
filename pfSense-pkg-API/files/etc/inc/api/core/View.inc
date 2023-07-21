@@ -12,14 +12,11 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-namespace API\Framework;
+namespace API\Core;
 
-require_once("api/framework/APIModel.inc");
-require_once("api/framework/APIQuery.inc");
+require_once("api/core/Model.inc");
 
-use APITools;
-use APIAuth;
-use APIResponse;
+use API;
 
 # Allow endpoints to access any API model class
 foreach(glob("/etc/inc/api/models/*.inc") as $model) {
@@ -50,7 +47,7 @@ class View {
         error_reporting(E_ERROR);
 
         # Fetch the current API configuration whenever the object is first created.
-        $this->api_config = APITools\get_api_config()[1];
+        $this->api_config = API\Core\Tools\get_api_config()[1];
 
         # Fetch request data and method whenever the object is first created.
         $this->request_data = View::get_request_data();
@@ -120,20 +117,20 @@ class View {
 
     private function check_auth() {
         $read_only = (isset($this->api_config["readonly"]) and $this->retain_read_mode) ? true : false;
-        $this->client = new APIAuth($this->get_required_privs(), $this->set_auth_mode, $read_only);
+        $this->client = new API\Core\Auth($this->get_required_privs(), $this->set_auth_mode, $read_only);
         if ($this->requires_auth === true) {
             if (!$this->client->is_authenticated) {
-                $this->errors[] = APIResponse\get(3);
+                $this->errors[] = API\Core\Response\get(3);
             }
             if (!$this->client->is_authorized) {
-                $this->errors[] = APIResponse\get(4);
+                $this->errors[] = API\Core\Response\get(4);
             }
         }
     }
 
     # Check if the API is enabled before answering calls, if not, redirect to wc login
     private function check_enable() {
-        $api_config = APITools\get_api_config()[1];
+        $api_config = API\Core\Tools\get_api_config()[1];
         if (!isset($api_config["enable"]) and !$this->ignore_enabled) {
             header("Location: /");
             die();
@@ -149,7 +146,7 @@ class View {
         foreach ($whitelist as $wif) {
             $if_info = get_interface_info($wif);
             # Check if our server IP is a valid if address, VIP, localhost, or any
-            if ($_SERVER["SERVER_ADDR"] === $if_info["ipaddr"] or APITools\is_ip_vip($_SERVER["SERVER_ADDR"], $wif)) {
+            if ($_SERVER["SERVER_ADDR"] === $if_info["ipaddr"] or API\Core\Tools\is_ip_vip($_SERVER["SERVER_ADDR"], $wif)) {
                 return;
             } elseif ($_SERVER["SERVER_ADDR"] === $if_info["ipaddrv6"]) {
                 return;
@@ -163,20 +160,20 @@ class View {
         }
 
         # Return 444 response if we did not find a previous match
-        $this->errors[] = APIResponse\get(6);
+        $this->errors[] = API\Core\Response\get(6);
     }
 
     private function check_request_method() {
         # Check if the requested HTTP method is a supported HTTP method.
         if (!in_array($this->request_method, $this->get_method_options())) {
-            $this->errors[] = APIResponse\get(2);
+            $this->errors[] = API\Core\Response\get(2);
         }
     }
 
     # Check if our requested content-type is supported and parsed data correctly, sets error if not
     private function check_request_data() {
         if ($this->request_data === false) {
-            $this->errors[] = APIResponse\get(11);
+            $this->errors[] = API\Core\Response\get(11);
         }
     }
 
@@ -215,7 +212,7 @@ class View {
                 $resp = $this->model->delete();
             }
             elseif ($this->request_method === "OPTIONS") {
-                $resp = APIResponse\get(0);
+                $resp = API\Core\Response\get(0);
                 header("access-control-allow-methods: ".implode(", ", $this->get_method_options()));
             }
         }

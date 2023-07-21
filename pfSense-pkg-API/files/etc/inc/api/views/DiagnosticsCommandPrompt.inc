@@ -19,7 +19,7 @@ use API;
 
 require_once("api/framework/APIEndpoint.inc");
 
-class DiagnosticsCommandPrompt extends API\Framework\View
+class DiagnosticsCommandPrompt extends API\Core\View
 {
     public function __construct()
     {

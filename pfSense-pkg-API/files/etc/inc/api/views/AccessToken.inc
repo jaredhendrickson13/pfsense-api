@@ -18,7 +18,7 @@ require_once("api/framework/View.inc");
 
 use API;
 
-class AccessToken extends API\Framework\View {
+class AccessToken extends API\Core\View {
     public function __construct() {
         parent::__construct();
         $this->url = "/api/v1/access_token";

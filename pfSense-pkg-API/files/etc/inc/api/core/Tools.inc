@@ -13,7 +13,8 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-namespace APITools;
+namespace API\Core\Tools;
+
 require_once("firebase/php-jwt/src/JWT.php");
 require_once("firebase/php-jwt/src/ExpiredException.php");
 require_once("firebase/php-jwt/src/SignatureInvalidException.php");
@@ -34,6 +35,7 @@ require_once("openvpn.inc");
 require_once("certs.inc");
 require_once("pkg-utils.inc");
 require_once("firewall_virtual_ip.inc");
+
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
