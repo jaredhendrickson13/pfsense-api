@@ -21,18 +21,28 @@ require_once("api/core/Auth.inc");
 
 use API;
 
+/**
+ * Creates a Model object that relates to some pfSense configuration or service. This model defines the necessary steps
+ * to validate incoming configuration and create, read, update, and/or delete data from the pfSense configuration this
+ * object relates to.
+ */
 class Model {
-    public $packages;
-    public $package_includes;
-    public $initial_data;
-    public $validated_data;
-    public $id;
-    public $validate_id;
-    public $errors;
-    public $change_note;
-    public $client;
+    public array $packages;
+    public array $package_includes;
+    public array $initial_data;
+    public array $validated_data;
+    public mixed $id;
+    public bool $validate_id;
+    public array $errors;
+    public string $change_note;
+    public API\Core\Auth $client;
 
-    public function __construct($initial_data=[], $client=null) {
+    /**
+     * Values to assign when a Model object is first constructed.
+     * @param array $initial_data The data to use when validating/creating/updating/reading/deleting this object.
+     * @param Auth|null $client Optionally assign an API client's `Auth` object. Required for tying users to changes made through Models.
+     */
+    public function __construct(array $initial_data=[], API\Core\Auth $client=null) {
         $this->packages = [];
         $this->package_includes = [];
         $this->change_note = "Made unknown change via API";
@@ -53,17 +63,9 @@ class Model {
         }
     }
 
-    public function action() {
-        # This function is intended to be overridden by an API model extended class
-        # Any configuration writes, system configurations, etc should be added when overriding this base class
-        # If this class is not overridden a 500 unexpected error is returned
-        return API\Core\Response\get(10);
-    }
-
     /**
      * Initialize the configuration array of a specific config path
      * @param $path string config path with '/' as separators
-     * @returns null
      */
     public static function init_config(string $path) {
         # Initialize the configuration array of a specified path.
@@ -90,7 +92,7 @@ class Model {
      * @param $default mixed value to return if the path is not found
      * @returns mixed $val or $default if the path prefix does not exist
      */
-    public static function set_config(string $path, $value, $default=null) {
+    public static function set_config(string $path, mixed $value, mixed $default=null) {
         global $config;
         return (array_set_path($config, $path, $value, $default));
     }
@@ -100,7 +102,7 @@ class Model {
      * @param $path string path with '/' separators
      * @returns array copy of the removed value or null
      */
-    public static function del_config(string $path) {
+    public static function del_config(string $path) : array {
         global $config;
         return (array_del_path($config, $path));
     }
@@ -114,7 +116,7 @@ class Model {
      * @returns bool true if $enable_key exists in the array at $path, and has a
      * non-null value, otherwise false.
      */
-    public static function is_config_enabled(string $path, string $enable_key="enable") {
+    public static function is_config_enabled(string $path, string $enable_key="enable") : bool {
         global $config;
         return (array_path_enabled($config, $path, $enable_key));
     }
@@ -123,10 +125,10 @@ class Model {
      * Finds the next available ID for a specific configuration array. This function
      * only works for numeric-keyed arrays in the configuration.
      * @param $path string path with '/' separators
-     * @throws Error when the path leads to a existing non-empty, non-array value
+     * @throws \Error when the path leads to a existing non-empty, non-array value
      * @returns int the next array key (ID) for the config path specified
      */
-    public static function get_next_id(string $path) {
+    public static function get_next_id(string $path) : int {
         # First, get the configuration at the specific path
         $conf = Model::get_config($path);
 
@@ -172,13 +174,20 @@ class Model {
         }
     }
 
+    /**
+     * This function is intended to be overridden by an API model extended class
+     * Any payload validation must be specified here
+     * If this class is not overridden no validation takes place
+     */
     public function validate_payload() {
-        # This function is intended to be overridden by an API model extended class
-        # Any payload validation must be specified here
-        # If this class is not overridden no validation takes place
     }
 
-    public function validate() {
+    /**
+     * Performs a full validation on the API model. This checks for model pre-requisites like package dependencies and
+     * then validates the model's `initial_data`.
+     * @return bool `true` if the model's data is valid, `false` if there was a validation error.
+     */
+    public function validate() : bool {
         # Check for required packages
         $this->check_packages();
 
@@ -193,22 +202,12 @@ class Model {
         }
     }
 
-    public function call() {
-        # If the API call was valid, execute the action. Otherwise, return the first error encountered.
-        if ($this->validate()) {
-            # Bypass the action if requested
-            if ($this->initial_data["_action_bypass"] === true) {
-                return API\Core\Response\get(15);
-            } else {
-                return $this->action();
-            }
-        } else {
-            return $this->errors[0];
-        }
-    }
-
-    # Check if all required packages are installed. Sets an error otherwise.
-    private function check_packages() {
+    /**
+     * Checks if the required pfSense packages for this model are installed.
+     * @return bool `true` if all required pfSense packages are installed, `false` if any required pfSense packages
+     *      are not installed.
+     */
+    private function check_packages() : bool {
         # Loop through each required package and ensure it is present on the system.
         foreach ($this->packages as $pkg) {
             # Return an error if the package is not installed
