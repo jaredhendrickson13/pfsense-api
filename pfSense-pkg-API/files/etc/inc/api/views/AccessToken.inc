@@ -12,13 +12,13 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-namespace APIViews;
+namespace API\Views;
 
-require_once("api/framework/APIView.inc");
+require_once("api/framework/View.inc");
 
-use APIFramework;
+use API;
 
-class AccessToken extends APIFramework\APIView {
+class AccessToken extends API\Framework\View {
     public function __construct() {
         parent::__construct();
         $this->url = "/api/v1/access_token";

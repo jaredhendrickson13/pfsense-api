@@ -51,7 +51,7 @@ function build_views() {
     foreach(glob("/etc/inc/api/views/*.inc") as $file) {
         # Import classes files and create object
         require_once($file);
-        $view_class = "APIViews\\".str_replace(".inc", "", basename($file));
+        $view_class = "API\\Views\\".str_replace(".inc", "", basename($file));
         $view_obj = new $view_class();
         $view_obj->build_view();
     }

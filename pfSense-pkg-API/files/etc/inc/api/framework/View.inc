@@ -12,7 +12,7 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-namespace APIFramework;
+namespace API\Framework;
 
 require_once("api/framework/APIModel.inc");
 require_once("api/framework/APIQuery.inc");
@@ -26,52 +26,40 @@ foreach(glob("/etc/inc/api/models/*.inc") as $model) {
     require_once($model);
 }
 
-class APIView {
-    public $url;
-    protected $model_name;
-    protected $model;
-    protected $errors;
-    protected $client;
-    public $api_config;
-    public $query_excludes;
-    public $request_data;
-    public $request_method;
-    public $requires_auth;
-    public $set_auth_mode;
-    public $retain_read_mode;
-    public $ignore_ifs;
-    public $ignore_enabled;
-    public $method_options;
-    public $get_privileges;
-    public $post_privileges;
-    public $put_privileges;
-    public $delete_privileges;
+class View {
+    public $url = null;
+    protected $model_name = null;
+    protected $model = null;
+    protected $errors = [];
+    protected $client = null;
+    public $api_config = [];
+    public $request_data = [];
+    public $request_method = null;
+    public $requires_auth = true;
+    public $set_auth_mode = null;
+    public $retain_read_mode = true;
+    public $ignore_ifs = false;
+    public $ignore_enabled = false;
+    public $get_privileges = [];
+    public $post_privileges = [];
+    public $put_privileges = [];
+    public $delete_privileges = [];
 
     public function __construct() {
-        # Prevent PHP warnings in API responses
+        # Prevent PHP warnings in API responses.
         error_reporting(E_ERROR);
 
-        $this->url = null;
-        $this->model_name = "APIModel";
-        $this->errors = [];
+        # Fetch the current API configuration whenever the object is first created.
         $this->api_config = APITools\get_api_config()[1];
-        $this->query_excludes = [];
-        $this->request_data = APIView::get_request_data();
+
+        # Fetch request data and method whenever the object is first created.
+        $this->request_data = View::get_request_data();
         $this->request_method = strtoupper($_SERVER["REQUEST_METHOD"]);
-        $this->requires_auth = true;
-        $this->retain_read_mode = true;
-        $this->ignore_ifs = false;
-        $this->ignore_enabled = false;
-        $this->method_options = [];
-        $this->get_privileges = [];
-        $this->post_privileges = [];
-        $this->put_privileges = [];
-        $this->delete_privileges = [];
     }
 
     /**
      * Checks which HTTP methods are supported by checking which APModel methods were overridden.
-     * @return void No value returned but $this->method_options will be pop
+     * @return array An array of supported HTTP methods
      */
     private function get_method_options() : array {
         # Variables
@@ -85,7 +73,7 @@ class APIView {
 
         # Allow OPTIONS requests if configured
         if (isset($this->api_config["allow_options"])) {
-            $this->method_options[] = "OPTIONS";
+            $method_options[] = "OPTIONS";
         }
 
         # Check if the corresponding model method is configured for each HTTP method
@@ -270,7 +258,7 @@ class APIView {
         $_SERVER["HTTP_CONTENT_TYPE"] = (empty($_SERVER["HTTP_CONTENT_TYPE"])) ? "application/x-www-form-urlencoded" : $_SERVER["HTTP_CONTENT_TYPE"];
         $content_types = [
             "application/json" => json_decode(file_get_contents('php://input'), true),
-            "application/x-www-form-urlencoded" => (empty($_GET)) ? json_decode(file_get_contents('php://input'), true) : APIView::form_decode($_GET)
+            "application/x-www-form-urlencoded" => (empty($_GET)) ? json_decode(file_get_contents('php://input'), true) : View::form_decode($_GET)
         ];
 
         # Check if content type is supported, if so return corresponding parsed request data
