@@ -23,15 +23,15 @@ use API;
  * Creates object that performs authentication and authorization for API views.
  */
 class Auth {
-    private $api_config;
-    public $auth_mode;
-    public $read_mode;
-    public $req_privs;
-    public $username;
-    public $privs;
-    public $ip_address;
-    public $is_authenticated;
-    public $is_authorized;
+    private array $api_config;
+    public string $auth_mode;
+    public bool $read_mode;
+    public array $req_privs;
+    public string $username;
+    public array $privs;
+    public string $ip_address;
+    public bool $is_authenticated;
+    public bool $is_authorized;
 
     /**
      * Values and functions to run anytime an `Auth` object is created.
