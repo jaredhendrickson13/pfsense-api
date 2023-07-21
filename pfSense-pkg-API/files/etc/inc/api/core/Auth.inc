@@ -19,7 +19,9 @@ require_once("api/core/Tools.inc");
 
 use API;
 
-# Creates an object capable of verifying authentication and authorization based on the configuration
+/**
+ * Creates object that performs authentication and authorization for API views.
+ */
 class Auth {
     private $api_config;
     public $auth_mode;
@@ -31,8 +33,13 @@ class Auth {
     public $is_authenticated;
     public $is_authorized;
 
-    # Create our method constructor
-    public function __construct($req_privs=[], $enforce_auth_mode=null, $read_mode=null){
+    /**
+     * Values and functions to run anytime an `Auth` object is created.
+     * @param array $req_privs an array of required pfSense privileges to check during authorization.
+     * @param bool $enforce_auth_mode explicitly sets the API `auth_mode` to use during authentication. Defaults to `auth_mode` API configuration value.
+     * @param bool $read_mode explicitly set the API `read_mode`. Defaults to `readonly` API configuration value.
+     */
+    public function __construct(array $req_privs=[], bool $enforce_auth_mode=null, bool $read_mode=null){
         $this->api_config = API\Core\Tools\get_api_config()[1];
         $this->auth_mode = (is_null($enforce_auth_mode)) ? $this->api_config["authmode"] : $enforce_auth_mode;
         $this->read_mode = (is_null($read_mode)) ? array_key_exists("readonly", $this->api_config) : $read_mode;
@@ -43,9 +50,11 @@ class Auth {
         $this->is_authorized = $this->authorize();
     }
 
-    # AUTHENTICATION #
-    # Attempts to authenticate using local database authentication
-    private function authenticate_local_database() {
+    /**
+     * Attempts to authenticate using local authentication.
+     * @return bool `true` if authentication was successful, `false` if authentication was unsuccessful.
+     */
+    private function authenticate_local_database() : bool {
         # Extract the username and password from basic authentication
         $this->username = $_SERVER['PHP_AUTH_USER'];
         $client_token = $_SERVER['PHP_AUTH_PW'];
@@ -62,8 +71,11 @@ class Auth {
         return false;
     }
 
-    # Attempts to authenticate using JWT authentication
-    private function authenticate_jwt() {
+    /**
+     * Attempts to authenticate using JWT authentication.
+     * @return bool `true` if authentication was successful, `false` if authentication was unsuccessful.
+     */
+    private function authenticate_jwt() : bool {
         # Extract token type and JWT from authorization header
         $auth_header = explode(" ", $_SERVER["HTTP_AUTHORIZATION"]);
         $token_type = $auth_header[0];
@@ -85,8 +97,11 @@ class Auth {
         return false;
     }
 
-    # Attempts to authenticate using API token authentication
-    private function authenticate_token() {
+    /**
+     * Attempts to authenticate using token authentication.
+     * @return bool `true` if authentication was successful, `false` if authentication was unsuccessful.
+     */
+    private function authenticate_token() : bool {
         # Extract client ID and token from the authorization header
         $client_id = explode(" ", $_SERVER["HTTP_AUTHORIZATION"])[0];
         $client_token = explode(" ", $_SERVER["HTTP_AUTHORIZATION"])[1];
@@ -104,8 +119,11 @@ class Auth {
         return false;
     }
 
-    # Chooses correct auth method based on configured auth mode. Returns bool.
-    public function authenticate() {
+    /**
+     * Run authentication using the current configured auth mode.
+     * @return bool `true` if authentication was successful, `false` if authentication was unsuccessful.
+     */
+    public function authenticate() : bool {
         # Attempt to authenticate
         if ($this->auth_mode === "local") {
             $resp = $this->authenticate_local_database();
@@ -126,9 +144,11 @@ class Auth {
         return $this->is_authenticated;
     }
 
-    # AUTHORIZATION #
-    # Checks if the current user has the necessary privileges to access this resource
-    public function authorize() {
+    /**
+     * Checks if the API client has the necessary privileges to authorize this call.
+     * @return bool `true` if authorization was successful, `false` if authorization was unsuccessful.
+     */
+    public function authorize() : bool {
         # Local variables
         $authorized = false;
         $client_config =& getUserEntry($this->username);;
@@ -158,7 +178,10 @@ class Auth {
         return $authorized;
     }
 
-    # Check if our client's IP is within our API access list
+    /**
+     * Checks if the API client's IP address is authorized in the API access list.
+     * @return bool `true` if the client's IP is authorized, `false` if the client's IP is not authorized.
+     */
     private function __is_ip_authorized() {
         # Check if we have any API access list entries
         if (!empty($this->api_config["access_list"])) {
@@ -178,7 +201,9 @@ class Auth {
         }
     }
 
-    # Logs the authentication attempt if login protection is enabled for the API
+    /**
+     * Logs API authentication according to the current API configuration.
+     */
     private function __log_authentication($authenticated) {
         # Variables
         $username = ($this->username) ?: "unknown";

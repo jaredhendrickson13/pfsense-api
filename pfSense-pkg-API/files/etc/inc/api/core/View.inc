@@ -23,25 +23,31 @@ foreach(glob("/etc/inc/api/models/*.inc") as $model) {
     require_once($model);
 }
 
+/**
+ * Creates a View object that contains all metrics required to generate an API endpoint and facilitate API calls.
+ */
 class View {
-    public $url = null;
-    protected $model_name = null;
-    protected $model = null;
-    protected $errors = [];
-    protected $client = null;
-    public $api_config = [];
-    public $request_data = [];
-    public $request_method = null;
-    public $requires_auth = true;
-    public $set_auth_mode = null;
-    public $retain_read_mode = true;
-    public $ignore_ifs = false;
-    public $ignore_enabled = false;
-    public $get_privileges = [];
-    public $post_privileges = [];
-    public $put_privileges = [];
-    public $delete_privileges = [];
+    public string $url = "";
+    protected string $model_name = "";
+    protected mixed $model = null;
+    protected array $errors = [];
+    protected API\Core\Auth $client;
+    public array $api_config = [];
+    public array $request_data = [];
+    public string $request_method;
+    public bool $requires_auth = true;
+    public bool $set_auth_mode;
+    public bool $retain_read_mode = true;
+    public bool $ignore_ifs = false;
+    public bool $ignore_enabled = false;
+    public array $get_privileges = [];
+    public array $post_privileges = [];
+    public array $put_privileges = [];
+    public array $delete_privileges = [];
 
+    /**
+     * Sets values whenever the View object is crated.
+     */
     public function __construct() {
         # Prevent PHP warnings in API responses.
         error_reporting(E_ERROR);
@@ -96,7 +102,7 @@ class View {
      * Checks the required privileges based on the request method.
      * @return array an array of privileges required for the API call
      */
-    private function get_required_privs() {
+    private function get_required_privs() : array {
         # Determine the privileges required for this API call
         if ($this->request_method === "GET") {
             return $this->get_privileges;
@@ -115,6 +121,9 @@ class View {
         }
     }
 
+    /**
+     * Checks if the API client is authenticated and authorized to make this call.
+     */
     private function check_auth() {
         $read_only = (isset($this->api_config["readonly"]) and $this->retain_read_mode) ? true : false;
         $this->client = new API\Core\Auth($this->get_required_privs(), $this->set_auth_mode, $read_only);
@@ -128,7 +137,9 @@ class View {
         }
     }
 
-    # Check if the API is enabled before answering calls, if not, redirect to wc login
+    /**
+     * Checks if the API is enabled before allowing the call.
+     */
     private function check_enable() {
         $api_config = API\Core\Tools\get_api_config()[1];
         if (!isset($api_config["enable"]) and !$this->ignore_enabled) {
@@ -137,7 +148,9 @@ class View {
         }
     }
 
-    # Check if server IP is allowed to answer API calls. Redirects to login if not
+    /**
+     * Checks if the interface receiving the API call is allowed to answer API calls.
+     */
     private function check_server_ip() {
         $allow_ifs = $this->api_config["allowed_interfaces"];
         $whitelist = explode(",", $allow_ifs);
@@ -163,6 +176,9 @@ class View {
         $this->errors[] = API\Core\Response\get(6);
     }
 
+    /**
+     * Check if the HTTP method requested by the API client is supported by this view.
+     */
     private function check_request_method() {
         # Check if the requested HTTP method is a supported HTTP method.
         if (!in_array($this->request_method, $this->get_method_options())) {
@@ -170,14 +186,18 @@ class View {
         }
     }
 
-    # Check if our requested content-type is supported and parsed data correctly, sets error if not
+    /**
+     * Checks if the API client's request data was successfully received and parsed by the API.
+     */
     private function check_request_data() {
         if ($this->request_data === false) {
             $this->errors[] = API\Core\Response\get(11);
         }
     }
 
-    # Listen for HTTP requests and call the corresponding method
+    /**
+     * Listens for incoming API calls from API clients and checks if the API call is allowed.
+     */
     public function listen() {
         # Ensure API is enabled and the receiving interface is allowed to answer API calls.
         $this->check_enable();
@@ -238,8 +258,12 @@ class View {
         exit();
     }
 
-    # Encodes the API response data to the requested or most relevant content type
-    public function content_type_encode($data) {
+    /**
+     * Encodes the API response according to the Accept header received by the API client.
+     * @param array $data The API response data to encode in the requested format.
+     * @return false|string The encoded API response or `false` if the data could not be encoded.
+     */
+    public function content_type_encode(array $data) : bool|string {
         # TODO: in future if additional response Content-Types need to be supported we can add them here
         # TODO: and control the requested content-type using the Accept HTTP header
         # Encode response as JSON if content type is application/json
@@ -247,7 +271,10 @@ class View {
         return json_encode($data);
     }
 
-    # Checks our content type header and parses the content accordingly
+    /**
+     * Parses the API client's request data using the Content-Type specified by the API client.
+     * @return false|mixed the API client's parsed request data or `false` if the data could not be parsed.
+     */
     public static function get_request_data() {
         # TODO: x-www-form-urlencoded still attempts to use json if no parameters were passed in. This was intentionally done to
         # TODO: support user scripts that didn't specify a static content type (before it was supported) remove this in a future
@@ -268,8 +295,12 @@ class View {
         }
     }
 
-    # Decode query string into their appropriate data types
-    public static function form_decode($array) {
+    /**
+     * Applies primitive type assumption to application/x-www-form-urlencoded request data.
+     * @param array $array The form data array to decode.
+     * @return array The parsed API client's request data
+     */
+    public static function form_decode($array) : array {
         # Loop through each query string item and check for expected data types
         foreach ($array as $key=>$value) {
             # Check for boolean type query strings

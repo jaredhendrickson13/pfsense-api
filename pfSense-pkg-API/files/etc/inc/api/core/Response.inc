@@ -15,8 +15,14 @@
 
 namespace API\Core\Response;
 
-# Pulls a assoc array API response from our response library. Optionally formats descriptive data into messages.
-function get($id, $data=[], $all=false) {
+/**
+ * Fetches the API response corresponding with a specific API response ID.
+ * @param int $id The API response ID to pull.
+ * @param array $data The data to return in the API response.
+ * @param bool $all Return all available API responses instead of a single response. This will ignore `$id`.
+ * @return array|array[] The formatted API response.
+ */
+function get(int $id, array $data=[], bool $all=false) {
     $responses = [
         // 0-999 reserved for /api/v1core API level responses
         0 => [
