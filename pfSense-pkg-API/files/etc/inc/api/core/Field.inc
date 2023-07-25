@@ -13,6 +13,7 @@ class Field
     public bool $allow_empty = false;
     public bool $allow_null = false;
     public mixed $default = null;
+    public bool $read_only = false;
     public string $description = "";
     public string $name = "";
     public string $internal_name = "";
@@ -27,6 +28,8 @@ class Field
      * are supported, the underlying pfSense configuration field will be removed entirely when receiving a null value.
      * @param mixed|null $default The default value to assign this field if no value was found. If not set, it assumed
      * this Field requires a value and should fail validation if no value was found.
+     * @param bool $read_only Set to `true` to make this field read-only. Attempts to write to a read-only field will
+     * result in a thrown exception.
      * @param bool $many Set to `true` if this field should accept an array of many values. `false` if only one value
      * should be allowed. If `true`, validation will run against each value in the value array individual.
      * @param string $delimiter Assigns the string delimiter to use when writing array values to config. This is only
@@ -43,6 +46,7 @@ class Field
         bool $allow_empty = false,
         bool $allow_null = false,
         mixed $default = null,
+        bool $read_only = false,
         bool $many = false,
         string $delimiter = ",",
         string $description = "",
@@ -55,6 +59,7 @@ class Field
         $this->allow_empty = $allow_empty;
         $this->allow_null = $allow_null;
         $this->default = $default;
+        $this->read_only = $read_only;
         $this->many = $many;
         $this->delimiter = $delimiter;
         $this->description = $description;

@@ -216,46 +216,51 @@ class View {
      * Listens for incoming API calls from API clients and checks if the API call is allowed.
      */
     public function listen() {
-        # Ensure API is enabled and the receiving interface is allowed to answer API calls.
-        $this->check_enable();
-        $this->check_server_ip();
+        try {
+            # Ensure API is enabled and the receiving interface is allowed to answer API calls.
+            $this->check_enable();
+            $this->check_server_ip();
 
-        # Checks client authentication and authorization if required
-        if ($this->requires_auth) {
-            $this->check_auth();
-        }
+            # Checks client authentication and authorization if required
+            if ($this->requires_auth) {
+                $this->check_auth();
+            }
 
-        # Initialize the assigned model
-        $this->model_name = "APIModels\\".$this->model_name;
-        $this->model = new $this->model_name($this->request_data, $this->client);
+            # Initialize the assigned model
+            $this->model_name = "API\\Models\\".$this->model_name;
+            $this->model = new $this->model_name($this->request_data, $this->client);
 
-        # Checks that request data was properly received.
-        $this->check_request_method();
-        $this->check_request_data();
+            # Checks that request data was properly received.
+            $this->check_request_method();
+            $this->check_request_data();
 
-        # Proceed if no errors were encountered
-        if (!$this->errors) {
             # Run the associated model method based on the incoming HTTP method
             if ($this->request_method === "GET") {
-                $resp = $this->model->read();
+                $resp_data = $this->model->read();
             }
             elseif ($this->request_method === "POST") {
-                $resp = $this->model->create();
+                $resp_data = $this->model->create();
             }
             elseif ($this->request_method === "PUT") {
-                $resp = $this->model->update();
+                $resp_data = $this->model->update();
             }
             elseif ($this->request_method === "DELETE") {
-                $resp = $this->model->delete();
+                $resp_data = $this->model->delete();
             }
             elseif ($this->request_method === "OPTIONS") {
-                $resp = API\Core\Response\get(0);
                 header("access-control-allow-methods: ".implode(", ", $this->get_method_options()));
+                $resp_data = [];
             }
+
+            # Create our success API response object if no errors were thrown
+            $response = new Response(
+                message: "",
+                return: "SUCCESS",
+                code: 200,
+                data: $resp_data
+            );
         }
-        # Respond with endpoint error if one was encountered
-        else {
-            $resp = $this->errors[0];
+        catch (Response $response) {
         }
 
         # Add custom response headers if configured
@@ -269,8 +274,8 @@ class View {
         header("Referer: no-referrer");
 
         # Format the HTTP response as JSON and set response code
-        http_response_code($resp["code"]);
-        echo $this->content_type_encode($resp) . PHP_EOL;
+        http_response_code($response->code);
+        echo $this->content_type_encode($response->to_array()) . PHP_EOL;
         session_destroy();
         exit();
     }

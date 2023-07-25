@@ -42,6 +42,19 @@ class Response extends \Error {
     }
 
     /**
+     * Converts this Response object to an array representation of it's contents.
+     * @return array An array containing the response details.
+     */
+    public function to_array() : array {
+        return [
+            "code" => $this->code,
+            "status" => $this->status,
+            "message" => $this->message,
+            "data" => $this->data
+        ];
+    }
+
+    /**
      * Fetch HTTP status message associated with a given HTTP status code.
      * @param int $http_status The HTTP status code to fetch the descriptive message for.
      * @return string The HTTP status message associated with the give HTTP response code OR `unknown` if not found.
