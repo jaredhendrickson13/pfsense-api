@@ -129,10 +129,16 @@ class View {
         $this->client = new API\Core\Auth($this->get_required_privs(), $this->set_auth_mode, $read_only);
         if ($this->requires_auth === true) {
             if (!$this->client->is_authenticated) {
-                $this->errors[] = API\Core\Response\get(3);
+                throw new AuthenticationError(
+                    message: "Authentication failed",
+                    return: "INVALID_AUTH"
+                );
             }
             if (!$this->client->is_authorized) {
-                $this->errors[] = API\Core\Response\get(4);
+                throw new ForbiddenError(
+                    message: "Client does not have sufficient privileges to access this resource.",
+                    return: "INSUFFICIENT_PRIVILEGES"
+                );
             }
         }
     }
@@ -141,6 +147,7 @@ class View {
      * Checks if the API is enabled before allowing the call.
      */
     private function check_enable() {
+        # TODO: redirect to 404 so it appears the API is not even there.
         $api_config = API\Core\Tools\get_api_config()[1];
         if (!isset($api_config["enable"]) and !$this->ignore_enabled) {
             header("Location: /");
@@ -172,8 +179,11 @@ class View {
             }
         }
 
-        # Return 444 response if we did not find a previous match
-        $this->errors[] = API\Core\Response\get(6);
+        # Throw a forbidden error if this API call was made to a non-API enabled interface
+        throw new ForbiddenError(
+            message: "The requested action is not allowed by admin policy",
+            return: "NOT_ALLOWED"
+        );
     }
 
     /**
@@ -182,7 +192,10 @@ class View {
     private function check_request_method() {
         # Check if the requested HTTP method is a supported HTTP method.
         if (!in_array($this->request_method, $this->get_method_options())) {
-            $this->errors[] = API\Core\Response\get(2);
+            throw new MethodNotAllowedError(
+                message: "Resource at $this->url does not support the requested HTTP method '$this->request_method`",
+                return: "METHOD_NOT_ALLOWED"
+            );
         }
     }
 
@@ -191,7 +204,11 @@ class View {
      */
     private function check_request_data() {
         if ($this->request_data === false) {
-            $this->errors[] = API\Core\Response\get(11);
+            throw new ValidationError(
+                message: "The requested content-type is not supported",
+                return: "UNSUPPORTED_CONTENT_TYPE",
+                code: 415
+            );
         }
     }
 
