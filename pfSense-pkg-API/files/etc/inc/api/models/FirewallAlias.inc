@@ -2,7 +2,6 @@
 
 namespace API\Models;
 use API;
-use API\Validators\AliasNameValidator;
 use API\Fields\StringField;
 
 class FirewallAlias extends API\Core\Model {
@@ -15,9 +14,9 @@ class FirewallAlias extends API\Core\Model {
     public function __construct(array $initial_data = [], API\Core\Auth $client = null) {
         parent::__construct($initial_data, $client);
         $this->name = new StringField(
-            validators: [new AliasNameValidator()],
+            unique: true,
             required: true,
-            description: "Sets the unique name for the alias."
+            description: "Sets the name for the alias. This name must be unique from all other aliases."
         );
         $this->type = new StringField(
             choices: ["host", "network", "port"],
@@ -49,13 +48,83 @@ class FirewallAlias extends API\Core\Model {
         );
     }
 
-    public function validate_address(string $value) {
-        # Ensure value is a port, port range or port alias when `type` is `port`
-        if ($this->type->value === "port" and !is_port_or_range_or_alias($value)) {
+    /**
+     * Adds custom validation to the `name` field.
+     * @param string $name The alias name to validate.
+     * @returns string The validated $name to set.
+     * @throws API\Core\ValidationError When the `name` value is invalid.
+     */
+    public function validate_name(string $name) : string {
+        # Throw an exception if this name is not a valid alias name
+        if (!is_validaliasname($name)) {
             throw new API\Core\ValidationError(
-                message: "",
-                return: ""
+                message: "Invalid firewall alias name '$name'.",
+                return: "INVALID_FIREWALL_ALIAS_NAME"
             );
         }
+
+        return $name;
+    }
+
+    /**
+     * Adds custom validation to the `address` field.
+     * @param array $addresses The array of `address` items to validate.
+     * @returns array The validated $addresses to set.
+     * @throws API\Core\ValidationError When the `address` value is invalid.
+     */
+    public function validate_address(array $addresses) : array {
+        # Loop through each address item to validate.
+        foreach ($addresses as $address) {
+            # Ensure value is a port, port range or port alias when `type` is `port`
+            if ($this->type->value === "port" and !is_port_or_range_or_alias($address)) {
+                throw new API\Core\ValidationError(
+                    message: "Port alias 'address' value '$address' is not a valid port, range, or alias.",
+                    return: "INVALID_PORT_ALIAS_ADDRESS"
+                );
+            }
+
+            # Ensure value is an IP, FQDN or alias when `type` is `host`
+            if ($this->type->value === "host" and !is_ipaddroralias($address) and !is_fqdn($address)) {
+                throw new API\Core\ValidationError(
+                    message: "Host alias 'address' value '$address' is not a valid IP, FQDN, or alias.",
+                    return: "INVALID_HOST_ALIAS_ADDRESS"
+                );
+            }
+
+            # Ensure value is a CIDR, FQDN or alias when `type` is `network`
+            if ($this->type->value === "network") {
+                if (!is_subnet($address) and alias_get_type($address) != "network" and !is_fqdn($address)) {
+                    throw new API\Core\ValidationError(
+                        message: "Host alias 'address' value '$address' is not a valid CIDR, FQDN, or alias.",
+                        return: "INVALID_NETWORK_ALIAS_ADDRESS"
+                    );
+                }
+            }
+        }
+
+        return $addresses;
+    }
+
+    /**
+     * Adds custom validation to `detail` field
+     * @param array $detail The array of `detail` fields to validate.
+     * @returns array The validated $detail to set.
+     * @throws API\Core\ValidationError When the `detail` value is invalid.
+     */
+    public function validate_detail(array $detail) : array {
+        # Throw an error if there are more `detail` items than `address` items
+        if (count($detail) > count($this->address->value)) {
+            throw new API\Core\ValidationError(
+                message: "Aliases cannot contain more 'detail' items than 'address' items.",
+                return: "TOO_MANY_ALIAS_DETAILS"
+            );
+        }
+
+        # Automatically generate detail items if there are less details than addresses
+        while (count($detail) < count($this->address->value)) {
+            $detail[] = "Entry added " . date('r');
+        }
+
+        return $detail;
     }
 }

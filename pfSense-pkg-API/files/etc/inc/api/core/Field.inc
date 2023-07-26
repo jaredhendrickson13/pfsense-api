@@ -7,6 +7,7 @@ class Field
     public mixed $value = null;
     public array $types = [];
     public array $validators = [];
+    public bool $unique = false;
     public bool $many = false;
     public string $delimiter = ",";
     public array $choices = [];
@@ -26,6 +27,7 @@ class Field
      * the type as returned by PHP's gettype() function.
      * @param array $validators An array of API\Core\Validator objects to use when validating this field.
      * @param array $choices An array of explicitly choices this field's value can be.
+     * @param bool $unique Set to `true` if this value must be unique from all other objects of the same model.
      * @param bool $allow_empty Set to `true` if empty values (blank strings, 0, etc) should be allowed.
      * @param bool $allow_null Set to `true` if `null` values should be supported for this field. When `null` values
      * are supported, the underlying pfSense configuration field will be removed entirely when receiving a null value.
@@ -48,6 +50,7 @@ class Field
         array $types = [],
         array $validators = [],
         array $choices = [],
+        bool $unique = false,
         bool $allow_empty = false,
         bool $allow_null = false,
         bool $required = false,
@@ -62,6 +65,7 @@ class Field
         $this->types = $types;
         $this->validators = $validators;
         $this->choices = $choices;
+        $this->unique = $unique;
         $this->allow_empty = $allow_empty;
         $this->allow_null = ($read_only) ? true : $allow_null;
         $this->required = $required;

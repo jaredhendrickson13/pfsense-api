@@ -84,6 +84,7 @@ class View {
             # Try to create a reflection object to use when comparing child class to the parent class
             try {
                 $reflection = new \ReflectionMethod($this->model, $class_method);
+                $reflection2 = new \ReflectionClass($this->model);
             }
             catch (\ReflectionException $ref_ex) {
                 continue;

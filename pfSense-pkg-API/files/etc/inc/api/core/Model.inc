@@ -22,12 +22,15 @@ require_once("api/core/Auth.inc");
 use API;
 
 /**
- * Creates a Model object that relates to some pfSense configuration or service. This model defines the necessary steps
+ * Creates a Model object that relates to a pfSense configuration or service. This model defines the necessary steps
  * to validate incoming configuration and create, read, update, and/or delete data from the pfSense configuration this
  * object relates to.
  */
 class Model {
-    public int $id;
+    public string $config_path;
+    public mixed $id;
+    public string $id_field = "";
+    public bool $many = false;
     public API\Core\Auth $client;
     public array $packages = [];
     public array $package_includes = [];
@@ -40,7 +43,8 @@ class Model {
      * @param Auth|null $client Optionally assign an API client's `Auth` object. Required for tying users to changes made through Models.
      */
     public function __construct(array $initial_data=[], API\Core\Auth $client=null) {
-        $this->id =
+        # Extract the ID from the initial data if present
+        $this->id = $initial_data["id"];
         $this->initial_data = $initial_data;
 
         # Allow a client API\Core\Auth object to be assigned to this model
@@ -59,7 +63,7 @@ class Model {
      * Initialize the configuration array of a specific config path
      * @param $path string config path with '/' as separators
      */
-    public static function init_config(string $path) {
+    protected static function init_config(string $path) {
         # Initialize the configuration array of a specified path.
         global $config;
         array_init_path($config, $path);
@@ -72,7 +76,7 @@ class Model {
      * @returns mixed value at path or $default if the path does not exist or if the
      *          path keys an empty string and $default is non-null
      */
-    public static function get_config(string $path, $default=null) {
+    protected static function get_config(string $path, $default=null) {
         global $config;
         return(array_get_path($config, $path, $default));
     }
@@ -84,7 +88,7 @@ class Model {
      * @param $default mixed value to return if the path is not found
      * @returns mixed $val or $default if the path prefix does not exist
      */
-    public static function set_config(string $path, mixed $value, mixed $default=null) {
+    protected static function set_config(string $path, mixed $value, mixed $default=null) {
         global $config;
         return (array_set_path($config, $path, $value, $default));
     }
@@ -94,7 +98,7 @@ class Model {
      * @param $path string path with '/' separators
      * @returns array copy of the removed value or null
      */
-    public static function del_config(string $path) : array {
+    protected static function del_config(string $path) : array {
         global $config;
         return (array_del_path($config, $path));
     }
@@ -108,7 +112,7 @@ class Model {
      * @returns bool true if $enable_key exists in the array at $path, and has a
      * non-null value, otherwise false.
      */
-    public static function is_config_enabled(string $path, string $enable_key="enable") : bool {
+    protected static function is_config_enabled(string $path, string $enable_key="enable") : bool {
         global $config;
         return (array_path_enabled($config, $path, $enable_key));
     }
@@ -120,7 +124,7 @@ class Model {
      * @throws \Error when the path leads to a existing non-empty, non-array value
      * @returns int the next array key (ID) for the config path specified
      */
-    public static function get_next_id(string $path) : int {
+    protected static function get_next_id(string $path) : int {
         # First, get the configuration at the specific path
         $conf = Model::get_config($path);
 
@@ -140,7 +144,7 @@ class Model {
     /**
      * Write configuration changes to the config file
      */
-    public function write_config() {
+    protected function write_config() {
         # Local variables
         $lock_file = "/tmp/.api.write_config.lock";
 
@@ -167,11 +171,27 @@ class Model {
     }
 
     /**
-     * This function is intended to be overridden by an API model extended class
-     * Any payload validation must be specified here
-     * If this class is not overridden no validation takes place
+     * Populates an array of field names for this model.
+     * @return array An array of field names for this model.
      */
-    public function validate_payload() {
+    protected function get_fields() : array {
+        # Variables
+        $fields = [];
+
+        # Loop through each var in this object and extract the objects with a base class of API\Core\Field.
+        foreach (get_object_vars($this) as $var => $value) {
+            # Skip this var if it's not an object
+            if (!is_object($value)) {
+                continue;
+            }
+
+            # Add this var to our fields if API\Core\Field is this object's ancestor
+            if (in_array("API\Core\Field", class_parents($value))) {
+                $fields[] = $var;
+            }
+        }
+
+        return $fields;
     }
 
     /**
@@ -183,15 +203,6 @@ class Model {
         # Check for required packages
         $this->check_packages();
 
-        # Attempt to validate the request
-        $this->validate_payload();
-
-        # All checks pass if no errors were encountered. Otherwise, validation failed.
-        if (count($this->errors) === 0) {
-            return true;
-        } else {
-            return false;
-        }
     }
 
     /**
