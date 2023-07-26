@@ -10,11 +10,13 @@ class Validator {
     /**
      * Runs the necessary validation against a specified value. This method is intended to be overridden by a child
      * class to add the desired validation steps.
-     * @param mixed $value
-     * @throws ServerError When the validate() method is called by a extended child class but has not overridden the
-     * default validate() method.
+     * @param mixed $value The value to be validated
+     * @param string $field_name The name of the field that the value belongs to. This is used for error messages.
      */
-    public function validate(mixed $value) {
-        throw new ServerError("Validators must override default validate() method.");
+    public function validate(mixed $value, string $field_name = "") {
+        throw new ServerError(
+            message: "Validators must override default validate() method.",
+            return: "INCOMPLETE_VALIDATOR"
+        );
     }
 }

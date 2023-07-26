@@ -27,15 +27,12 @@ use API;
  * object relates to.
  */
 class Model {
-    public array $packages;
-    public array $package_includes;
-    public array $initial_data;
-    public array $validated_data;
-    public mixed $id;
-    public bool $validate_id;
-    public array $errors;
-    public string $change_note;
+    public int $id;
     public API\Core\Auth $client;
+    public array $packages = [];
+    public array $package_includes = [];
+    public array $initial_data = [];
+    public string $change_note = "Made unknown change via API";
 
     /**
      * Values to assign when a Model object is first constructed.
@@ -43,13 +40,8 @@ class Model {
      * @param Auth|null $client Optionally assign an API client's `Auth` object. Required for tying users to changes made through Models.
      */
     public function __construct(array $initial_data=[], API\Core\Auth $client=null) {
-        $this->packages = [];
-        $this->package_includes = [];
-        $this->change_note = "Made unknown change via API";
-        $this->validate_id = true;
+        $this->id =
         $this->initial_data = $initial_data;
-        $this->validated_data = [];
-        $this->errors = [];
 
         # Allow a client API\Core\Auth object to be assigned to this model
         if ($client) {
