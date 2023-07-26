@@ -2,6 +2,8 @@
 
 namespace API\Fields;
 
+require_once("api/core/Field.inc");
+
 use API;
 
 class StringField extends API\Core\Field {

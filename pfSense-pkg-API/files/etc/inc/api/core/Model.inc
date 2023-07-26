@@ -19,6 +19,16 @@ require_once("api/core/Tools.inc");
 require_once("api/core/Response.inc");
 require_once("api/core/Auth.inc");
 
+# Allow models to access all API validators
+foreach(glob("/etc/inc/api/validators/*.inc") as $validator) {
+    require_once($validator);
+}
+
+# Allow models to access all API fields
+foreach(glob("/etc/inc/api/fields/*.inc") as $field) {
+    require_once($field);
+}
+
 use API;
 
 /**
@@ -174,7 +184,7 @@ class Model {
      * Populates an array of field names for this model.
      * @return array An array of field names for this model.
      */
-    protected function get_fields() : array {
+    public function get_fields() : array {
         # Variables
         $fields = [];
 

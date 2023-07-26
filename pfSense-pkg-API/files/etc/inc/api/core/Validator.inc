@@ -2,7 +2,6 @@
 
 namespace API\Core;
 
-
 /**
  * Defines a Validator object which Field objects can use to quickly validate its value.
  */

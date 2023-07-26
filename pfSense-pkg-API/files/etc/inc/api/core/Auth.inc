@@ -45,9 +45,7 @@ class Auth {
         $this->read_mode = (is_null($read_mode)) ? array_key_exists("readonly", $this->api_config) : $read_mode;
         $this->req_privs = $req_privs;
         $this->privs = [];
-        $this->ip_address = $_SERVER["REMOTE_ADDR"];
-        $this->is_authenticated = $this->authenticate();
-        $this->is_authorized = $this->authorize();
+        $this->ip_address = ($_SERVER["REMOTE_ADDR"]) ?: "unknown IP";
     }
 
     /**
@@ -56,7 +54,7 @@ class Auth {
      */
     private function authenticate_local_database() : bool {
         # Extract the username and password from basic authentication
-        $this->username = $_SERVER['PHP_AUTH_USER'];
+        $this->username = ($_SERVER['PHP_AUTH_USER']) ?: "unknown";
         $client_token = $_SERVER['PHP_AUTH_PW'];
 
         # Authenticate against local database

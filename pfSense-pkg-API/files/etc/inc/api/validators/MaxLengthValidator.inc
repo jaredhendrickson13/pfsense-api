@@ -2,6 +2,8 @@
 
 namespace API\Validators;
 
+require_once("api/core/Validator.inc");
+
 use API;
 
 class MaxLengthValidator extends API\Core\Validator {

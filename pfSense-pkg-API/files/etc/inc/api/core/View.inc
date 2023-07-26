@@ -129,13 +129,13 @@ class View {
         $read_only = (isset($this->api_config["readonly"]) and $this->retain_read_mode) ? true : false;
         $this->client = new API\Core\Auth($this->get_required_privs(), $this->set_auth_mode, $read_only);
         if ($this->requires_auth === true) {
-            if (!$this->client->is_authenticated) {
+            if (!$this->client->authenticate()) {
                 throw new AuthenticationError(
                     message: "Authentication failed",
                     return: "INVALID_AUTH"
                 );
             }
-            if (!$this->client->is_authorized) {
+            if (!$this->client->authorize()) {
                 throw new ForbiddenError(
                     message: "Client does not have sufficient privileges to access this resource.",
                     return: "INSUFFICIENT_PRIVILEGES"
