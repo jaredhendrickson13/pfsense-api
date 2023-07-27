@@ -29,7 +29,7 @@ class MaxLengthValidator extends API\Core\Validator {
             if (strlen($value) > $this->max_length) {
                 throw new API\Core\ValidationError(
                     message: "Field '$field_name' exceeds the maximum character length of $this->max_length.",
-                    return: "EXCEEDS_MAX_LENGTH"
+                    ref_id: "EXCEEDS_MAX_LENGTH"
                 );
             }
         }
@@ -38,7 +38,7 @@ class MaxLengthValidator extends API\Core\Validator {
             if (count($value) > $this->max_length) {
                 throw new API\Core\ValidationError(
                     message: "Field '$field_name' exceeds the maximum array length of $this->max_length.",
-                    return: "EXCEEDS_MAX_LENGTH"
+                    ref_id: "EXCEEDS_MAX_LENGTH"
                 );
             }
         }
@@ -46,7 +46,7 @@ class MaxLengthValidator extends API\Core\Validator {
         else {
             throw new API\Core\ServerError(
                 message: "Field '$field_name' request max length validation but is not a string or an array.",
-                return: "EXCEEDS_MAX_LENGTH"
+                ref_id: "EXCEEDS_MAX_LENGTH"
             );
         }
     }

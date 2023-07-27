@@ -197,7 +197,7 @@ class Model {
         if (!$this->config_path) {
             throw new ServerError(
                 message: "Model must have a 'config_path' to get internal values from config.",
-                return: "MODEL_NO_CONFIG_PATH"
+                ref_id: "MODEL_NO_CONFIG_PATH"
             );
         }
 
@@ -205,7 +205,7 @@ class Model {
         if ($this->many and !isset($id)) {
             throw new ServerError(
                 message: "An ID is required when refreshing objects from config on model with 'many'.",
-                return: "MODEL_ID_REQUIRED_FOR_REFRESH"
+                ref_id: "MODEL_ID_REQUIRED_FOR_REFRESH"
             );
         }
 
@@ -216,7 +216,7 @@ class Model {
         if ($this->many and !array_key_exists($id, $internal_objects)) {
             throw new NotFoundError(
                 message: "Object with ID '$id' does not exist.",
-                return: "MODEL_OBJECT_NOT_FOUND"
+                ref_id: "MODEL_OBJECT_NOT_FOUND"
             );
         }
 
@@ -369,7 +369,7 @@ class Model {
             if (!is_pkg_installed($pkg)) {
                 throw new NotFoundError(
                     message: "The requested action requires the '$pkg' package but it is not installed.",
-                    return: "MDOEL_MISSING_REQUIRED_PACKAGE"
+                    ref_id: "MDOEL_MISSING_REQUIRED_PACKAGE"
                 );
             }
         }

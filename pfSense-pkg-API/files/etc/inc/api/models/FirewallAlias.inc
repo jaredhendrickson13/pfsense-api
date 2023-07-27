@@ -68,7 +68,7 @@ class FirewallAlias extends Model {
         if (!is_validaliasname($name)) {
             throw new ValidationError(
                 message: "Invalid firewall alias name '$name'.",
-                return: "INVALID_FIREWALL_ALIAS_NAME"
+                ref_id: "INVALID_FIREWALL_ALIAS_NAME"
             );
         }
 
@@ -88,7 +88,7 @@ class FirewallAlias extends Model {
             if ($this->type->value === "port" and !is_port_or_range_or_alias($address)) {
                 throw new ValidationError(
                     message: "Port alias 'address' value '$address' is not a valid port, range, or alias.",
-                    return: "INVALID_PORT_ALIAS_ADDRESS"
+                    ref_id: "INVALID_PORT_ALIAS_ADDRESS"
                 );
             }
 
@@ -96,7 +96,7 @@ class FirewallAlias extends Model {
             if ($this->type->value === "host" and !is_ipaddroralias($address) and !is_fqdn($address)) {
                 throw new ValidationError(
                     message: "Host alias 'address' value '$address' is not a valid IP, FQDN, or alias.",
-                    return: "INVALID_HOST_ALIAS_ADDRESS"
+                    ref_id: "INVALID_HOST_ALIAS_ADDRESS"
                 );
             }
 
@@ -105,7 +105,7 @@ class FirewallAlias extends Model {
                 if (!is_subnet($address) and alias_get_type($address) != "network" and !is_fqdn($address)) {
                     throw new ValidationError(
                         message: "Host alias 'address' value '$address' is not a valid CIDR, FQDN, or alias.",
-                        return: "INVALID_NETWORK_ALIAS_ADDRESS"
+                        ref_id: "INVALID_NETWORK_ALIAS_ADDRESS"
                     );
                 }
             }
@@ -125,7 +125,7 @@ class FirewallAlias extends Model {
         if (count($detail) > count($this->address->value)) {
             throw new ValidationError(
                 message: "Aliases cannot contain more 'detail' items than 'address' items.",
-                return: "TOO_MANY_ALIAS_DETAILS"
+                ref_id: "TOO_MANY_ALIAS_DETAILS"
             );
         }
 

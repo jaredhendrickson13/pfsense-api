@@ -15,7 +15,7 @@ class Validator {
     public function validate(mixed $value, string $field_name = "") {
         throw new ServerError(
             message: "Validators must override default validate() method.",
-            return: "INCOMPLETE_VALIDATOR"
+            ref_id: "INCOMPLETE_VALIDATOR"
         );
     }
 }

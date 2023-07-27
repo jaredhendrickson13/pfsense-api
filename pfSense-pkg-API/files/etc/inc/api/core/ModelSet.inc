@@ -22,7 +22,7 @@ class ModelSet {
             if (get_parent_class($model_object) === "Model") {
                 throw new ServerError(
                     message: "Model sets can only contain model objects.",
-                    return: "MODEL_SET_CONTAINS_NON_MODEL"
+                    ref_id: "MODEL_SET_CONTAINS_NON_MODEL"
                 );
             }
         }
@@ -137,7 +137,7 @@ class ModelSet {
             if (count($query_target) > 2) {
                 throw new ValidationError(
                     message: "Queries only support two levels of depth.",
-                    return: "MODELSET_QUERY_TOO_DEEP"
+                    ref_id: "MODELSET_QUERY_TOO_DEEP"
                 );
             }
 

@@ -18,12 +18,13 @@ require_once("api/core/TestCase.inc");
 
 use API\Core\Tools;
 
+
 function build_views() {
     # Import each view class
     foreach(glob("/etc/inc/api/views/*.inc") as $file) {
         # Import classes files and create object
         require_once($file);
-        $view_class = "API\\Views\\".str_replace(".inc", "", basename($file));
+        $view_class = "\\API\\Views\\".str_replace(".inc", "", basename($file));
         $view_obj = new $view_class();
         $view_obj->build_view();
     }
@@ -37,27 +38,33 @@ function run_tests() {
     $succeed_count = 0;
 
     # Import each test class and run the test
-    foreach(glob("/etc/inc/api/tests/*.inc") as $test_case_file) {
+    foreach($test_cases as $test_case_file) {
         # Import classes files and create object
         require_once($test_case_file);
-        $test_case = "API\\Tests\\".str_replace(".inc", "", basename($test_case_file));
+        $test_case = "\\API\\Tests\\".str_replace(".inc", "", basename($test_case_file));
 
         # Print that we're starting this test
         echo "Running test case $test_case... ";
 
         # Try to run the test case.
+        $test_obj = new $test_case();
         try {
-            new $test_case();
-            echo "done.";
+            $test_obj->run();
+            echo "done.".PHP_EOL;
             $succeed_count++;
         }
         # If an AssertionError is received, there was a test failure. Print the traceback.
         catch (AssertionError $fail_results) {
-            echo "failed! : $fail_results->message".PHP_EOL;
+            $fail_msg = $fail_results->getMessage();
+            echo "failed!".PHP_EOL;
             echo "---------------------------------------------------------".PHP_EOL;
-            echo $fail_results->getTraceAsString();
-            echo "---------------------------------------------------------".PHP_EOL;
+            echo "Test name: $test_obj->method".PHP_EOL;
+            echo "Failure message: $fail_msg".PHP_EOL;
+            echo $fail_results->getTraceAsString().PHP_EOL;
             $exit_code = 1;
+        }
+        catch (Exception $exc) {
+            throw $exc;
         }
     }
     echo "---------------------------------------------------------".PHP_EOL;
@@ -156,7 +163,8 @@ function help() {
     echo "COMMANDS:".PHP_EOL;
     echo "  version          : Display the current package version and build information".PHP_EOL;
     echo "  help             : Display the help page (this page)".PHP_EOL;
-    echo "  buildendpoints   : Build all API endpoints included in this package".PHP_EOL;
+    echo "  buildviews       : Build all API views included in this package".PHP_EOL;
+    echo "  runtests         : Run all API unit tests. Warning: this may be disruptive!".PHP_EOL;
     echo "  update           : Update package to the latest stable version available".PHP_EOL;
     echo "  revert           : Revert package to a specified version".PHP_EOL;
     echo "  delete           : Delete package from this system".PHP_EOL;
@@ -167,9 +175,13 @@ function help() {
     echo PHP_EOL;
 }
 
-# MAKEENDPOINTS COMMAND
-if (in_array($argv[1], ["buildendpoints"])) {
+# BUILDVIEWS COMMAND
+if (in_array($argv[1], ["buildviews"])) {
     build_views();
+}
+# RUNTESTS COMMAND
+elseif (in_array($argv[1], ["runtests"])) {
+    run_tests();
 }
 # BACKUP COMMAND
 elseif (in_array($argv[1], ["backup"])) {

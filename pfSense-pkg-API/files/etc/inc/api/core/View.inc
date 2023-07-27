@@ -132,13 +132,13 @@ class View {
             if (!$this->client->authenticate()) {
                 throw new AuthenticationError(
                     message: "Authentication failed",
-                    return: "INVALID_AUTH"
+                    ref_id: "INVALID_AUTH"
                 );
             }
             if (!$this->client->authorize()) {
                 throw new ForbiddenError(
                     message: "Client does not have sufficient privileges to access this resource.",
-                    return: "INSUFFICIENT_PRIVILEGES"
+                    ref_id: "INSUFFICIENT_PRIVILEGES"
                 );
             }
         }
@@ -183,7 +183,7 @@ class View {
         # Throw a forbidden error if this API call was made to a non-API enabled interface
         throw new ForbiddenError(
             message: "The requested action is not allowed by admin policy",
-            return: "NOT_ALLOWED"
+            ref_id: "NOT_ALLOWED"
         );
     }
 
@@ -195,7 +195,7 @@ class View {
         if (!in_array($this->request_method, $this->get_method_options())) {
             throw new MethodNotAllowedError(
                 message: "Resource at $this->url does not support the requested HTTP method '$this->request_method`",
-                return: "METHOD_NOT_ALLOWED"
+                ref_id: "METHOD_NOT_ALLOWED"
             );
         }
     }
@@ -207,7 +207,7 @@ class View {
         if ($this->request_data === false) {
             throw new ValidationError(
                 message: "The requested content-type is not supported",
-                return: "UNSUPPORTED_CONTENT_TYPE",
+                ref_id: "UNSUPPORTED_CONTENT_TYPE",
                 code: 415
             );
         }
@@ -256,7 +256,7 @@ class View {
             # Create our success API response object if no errors were thrown
             $response = new Response(
                 message: "",
-                return: "SUCCESS",
+                ref_id: "SUCCESS",
                 code: 200,
                 data: $resp_data
             );
