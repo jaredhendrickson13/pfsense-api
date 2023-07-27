@@ -26,7 +26,7 @@ class StringField extends API\Core\Field {
     )
     {
         parent::__construct(
-            types: ["string"],
+            type: "string",
             validators: $validators + [new API\Validators\MaxLengthValidator($max_length)],
             choices: $choices,
             unique: $unique,
@@ -41,5 +41,9 @@ class StringField extends API\Core\Field {
             internal_name: $internal_name
         );
         $this->max_length = $max_length;
+    }
+
+    protected function _from_internal($internal_value) : string {
+        return strval($internal_value);
     }
 }

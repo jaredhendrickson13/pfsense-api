@@ -5,7 +5,7 @@ namespace API\Core;
 class Field
 {
     public mixed $value = null;
-    public array $types = [];
+    public string $type = "";
     public array $validators = [];
     public bool $unique = false;
     public bool $many = false;
@@ -20,11 +20,11 @@ class Field
     public string $name = "";
     public string $internal_name = "";
     public array $when = [];
-    protected object $context;
+    public Model $context;
 
     /**
-     * @param array $types An array of the types supported by this field. Each item must be a string representation of
-     * the type as returned by PHP's gettype() function.
+     * @param string $type The primary type supported by this field. This must be a string representation of the type
+     * as it is returned by PHP's gettype() function.
      * @param array $validators An array of API\Core\Validator objects to use when validating this field.
      * @param array $choices An array of explicitly choices this field's value can be.
      * @param bool $unique Set to `true` if this value must be unique from all other objects of the same model.
@@ -47,7 +47,7 @@ class Field
      * internal name will utilize the $name of the Field object.
      */
     public function __construct(
-        array $types = [],
+        string $type = "",
         array $validators = [],
         array $choices = [],
         bool $unique = false,
@@ -62,7 +62,7 @@ class Field
         string $internal_name = "",
     ){
         # Assign values to object properties
-        $this->types = $types;
+        $this->type = $type;
         $this->validators = $validators;
         $this->choices = $choices;
         $this->unique = $unique;
@@ -74,11 +74,6 @@ class Field
         $this->many = $many;
         $this->delimiter = $delimiter;
         $this->description = $description;
-
-        # Add NULL to our allowed types if `allow_null` or `read_only` is enabled
-        if ($allow_null or $read_only) {
-            $this->types[] = "NULL";
-        }
 
         # Ensure the $default value is in $choices if set
         if ($default and $choices and !in_array($default, $choices, true)) {
@@ -102,6 +97,9 @@ class Field
      * @throws ServerError If a programming error is detected.
      */
     public function validate() : bool {
+        # Ensure model context exists if needed
+        $this->check_model_context();
+
         # Ensure this field object has a name set
         $this->check_field_names();
 
@@ -132,8 +130,21 @@ class Field
             foreach ($this->validators as $validator) {
                 $validator->validate($value);
             }
+
+            # Ensure value is unique if set
+            $this->check_field_unique();
         }
         return true;
+    }
+
+    private function check_model_context() {
+        # Throw an error if this field is unique but no model context was provided
+        if ($this->unique and !$this->context) {
+            throw new ServerError(
+                message: "Unique fields must have model context provided.",
+                return: "UNIQUE_FIELD_WITH_NO_CONTEXT"
+            );
+        }
     }
 
     /**
@@ -207,13 +218,18 @@ class Field
      * @throws ValidationError When `many` is enabled, but `value` is not an array.
      */
     private function get_value_as_array() : array {
+        # Assume the default value if no value was set and a default was specified
+        if (isset($this->default) and !isset($this->value)) {
+            $this->value = $this->default;
+        }
+
         # Check if many is enabled
         if ($this->many) {
             # Throw an error if the value is not already an array
             if (!is_array($this->value)) {
                 throw new ValidationError(
                     message: "Field `$this->name` must be an array.",
-                    return: "INVALID_MANY_VALUE"
+                    return: "FIELD_INVALID_MANY_VALUE"
                 );
             }
 
@@ -230,12 +246,12 @@ class Field
      * `internal_name` was not specified, the `internal_name` will be assigned the same value as `name` by this method.
      * @throws ServerError When this object's `name` has not been set.
      */
-    private function check_field_names() {
+    public function check_field_names() {
         # Throw an error if no `name` has been set.
         if (empty($this->name)) {
             throw new ServerError(
                 message: "Field object must be assigned a `name` value after it is constructed.",
-                return: "UNNAMED_FIELD"
+                return: "FIELD_UNNAMED"
             );
         }
 
@@ -246,19 +262,78 @@ class Field
     }
 
     /**
-     * Checks if a given value's type is one of the available `types`.
-     * @param mixed $value The value to check against available `types`.
-     * $value is not an available choice.
+     * Checks if a 'unique' field is actually unique from all other objects related to the $context Model's config path.
+     * The $context Model must have a `config_path` set AND have it's `many` value set to `true` to support unique
+     * validation.
+     * @throws ValidationError When the assigned $context Model does not have a `config_path` set OR the assigned
+     * $context Model does not have it's $many value to `true`.
+     */
+    private function check_field_unique() {
+        # Only check this if `unique` is enabled
+        if ($this->unique) {
+            # Throw an error if unique is set but the model context has no config path specified
+            if (!$this->context->config_path) {
+                throw new ServerError(
+                    message: "Field '$this->name' cannot be 'unique' when its model context has no 'config_path'.",
+                    return: "FIELD_UNIQUE_WITH_NO_MODEL_CONFIG_PATH"
+                );
+            }
+
+            # Throw an error if unique is set but the model context is not a 'many' model.
+            if (!$this->context->many) {
+                throw new ServerError(
+                    message: "Field '$this->name' cannot be 'unique' when its model context does not have 'many' enabled.",
+                    return: "FIELD_UNIQUE_WITHOUT_MANY_MODEL_CONTEXT"
+                );
+            }
+
+            # Fetch model objects for each internal object stored in config for this model
+            $model_objects = $this->context->get_all_from_config();
+            $field_name = $this->name;
+
+            foreach ($model_objects as $model_object_id => $model_object) {
+                # Move onto the next model object if this model object's field value does not match our objects value.
+                if ($model_object->$field_name->value != $this->value) {
+                    continue;
+                }
+                # Move onto the next item if the model object's ID matches our object's model context's ID.
+                # This prevents `unique` errors on objects that are trying to update their own value with the value
+                # it already has set.
+                elseif ($model_object->id === $this->context->id) {
+                    continue;
+                }
+                # When neither of previous conditions are met, we've found a unique conflict. Throw an error.
+                else {
+                    throw new ValidationError(
+                        message: "Field '$this->name' must be unique. Value is in use by object with ID '$model_object_id'.",
+                        return: "FIELD_MUST_BE_UNIQUE"
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks if a given value's type matches this Field object's primary `type`
+     * @param mixed $value The value to check against assigned `type`.
      * @throws ValidationError If the specified value is not a supported type.
      */
     private function check_value_type(mixed $value) {
-        # Raise an exception if the value is not a supported type.
-        if (!in_array(gettype($value), $this->types, true)) {
-            # Convert the type array to a string format and throw a type not supported
-            $types_str = implode(", ", $this->types);
+        # Don't validate type for `read_only` fields
+        if ($this->read_only) {
+            return;
+        }
+
+        # Allow value to be NULL if `allow_null` is set
+        if ($this->allow_null and gettype($value) === "NULL") {
+            return;
+        }
+
+        # Raise an exception if the value is not the supported type.
+        if ($this->type !== gettype($value)) {
             throw new ValidationError(
-                message: "Field `$this->name` must be one of types [$types_str]",
-                return: "INVALID_TYPE"
+                message: "Field `$this->name` must be of type `$this->type`",
+                return: "FIELD_INVALID_TYPE"
             );
         }
     }
@@ -275,7 +350,7 @@ class Field
             $choices_str = implode(", ", $this->choices);
             throw new ValidationError(
                 message: "Field `$this->name` must be one of [$choices_str]",
-                return: "INVALID_CHOICE"
+                return: "FIELD_INVALID_CHOICE"
             );
         }
     }
@@ -285,14 +360,14 @@ class Field
      * @param mixed $value The value to check for emptiness.
      * @returns ValidationError When the $value is not a supported type.
      */
-    private function check_value_empty(mixed $value,) {
+    private function check_value_empty(mixed $value) {
         # Check if value is an empty string or array. These are the only two types we consider possible to be empty
         # to avoid having to enable `allow_empty` for booleans, 0 integers, and null values
         # (which are checked separately).
         if (!$this->allow_empty and ($value === "" or $value === [])) {
             throw new ValidationError(
                 message: "Field `$this->name` cannot be empty.",
-                return: "EMPTY_NOT_ALLOWED"
+                return: "FIELD_EMPTY_NOT_ALLOWED"
             );
         }
     }
@@ -307,8 +382,91 @@ class Field
         if (!$this->allow_null and is_null($value)) {
             throw new ValidationError(
                 message: "Field `$this->name` cannot be nullified.",
-                return: "NULL_NOT_ALLOWED"
+                return: "FIELD_NULL_NOT_ALLOWED"
             );
+        }
+    }
+
+    /**
+     * Converts the stored internal config value to a represented value. This method must be overridden by a child
+     * Field class with the necessary steps to convert the internal value to the representation value. This method must
+     * return value in it's represented form! In the case of a `many` field, this method will be called for each
+     * individual value after it's been converted to an array by from_internal(). You do not need to worry about
+     * converting the $internal_value to an array in this method!
+     * @param string $internal_value The internal config value to convert to a representation value.
+     * @throws ServerError When the child Field class does not override this method.
+     */
+    protected function _from_internal(string $internal_value) : mixed {
+        throw new ServerError(
+            message: "Field '$this->name' does not have method of converting internal value to representation.",
+            return: "FIELD_CANNOT_REPRESENT_INTERNAL_VALUE"
+        );
+    }
+
+    /**
+     * Sets a public version of _from_internal() that calls the Field's _from_internal() method. In the case
+     * of a `many` Field, the internal value will be expanded into it's array form and _from_internal() will run
+     * against each item within that array. This method will automatically assign the representation value to the
+     * `value` property for this object.
+     * @param string $internal_value The raw internal config value to convert to a representation value.
+     */
+    public function from_internal(string $internal_value) {
+        # For `many` type fields, convert all values to representation.
+        if ($this->many) {
+            # Expand the value into it's array form
+            $values = explode($this->delimiter, $internal_value);
+            $representation = [];
+
+            # Run the field's `to_representation()` method for value to represent
+            foreach ($values as $value) {
+                $representation[] = $this->_from_internal($value);
+            }
+
+            $this->value = $representation;
+        }
+        # Otherwise, just convert the value to representation directly
+        else {
+            $this->value = $this->_from_internal($internal_value);
+        }
+    }
+
+    /**
+     * Converts the represented value into the internal pfSense value. In most cases child Field classes do not need to
+     * override this method as the default behavior of converting the value into a string is sufficient. However, this
+     * method can be overridden by a child Field class with custom steps to convert the represented value back into
+     * the internal value if needed. This method must return the value in its internal form! In the case of a `many`
+     * field, this method will be called for each `$this->value` before it's been joined into it's internal string by
+     * to_internal(). If `$this->value` is an array, you do not need to worry about joining `$this->value` into a
+     * string. Leave it as an array.
+     * @param mixed $representation_value The value to convert into it's internal form.
+     * @return array|string The internal value(s) suitable for writing to the pfSense configuration.
+     */
+    protected function _to_internal(mixed $representation_value) : array|string {
+        return strval($representation_value);
+    }
+
+    /**
+     * Sets a public version of _to_internal() that calls the Field's _to_internal() method. In the case
+     * of a `many` Field, _to_internal() method will run against all current values and will then be joined back into
+     * the internal string value suitable for writing to the pfSense configuration.
+     * @return array|string The internal array or string value suitable for writing the pfSense configuration.
+     */
+    public function to_internal() : array|string {
+        # For `many` fields, allow for individual value conversions before joining array back into internal string value
+        if ($this->many) {
+            $internal_values = [];
+
+            # Run the field's `to_representation()` method for value to represent
+            foreach ($this->value as $value) {
+                $internal_values[] = $this->_to_internal($value);
+            }
+
+            # Join the array back into it's internal string format.
+            return implode($this->delimiter, $internal_values);
+        }
+        # Otherwise, just convert the individual value to it's internal value
+        else {
+            return $this->_to_internal($this->value);
         }
     }
 }

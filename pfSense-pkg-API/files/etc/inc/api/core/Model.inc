@@ -37,10 +37,10 @@ use API;
  * object relates to.
  */
 class Model {
-    public string $config_path;
-    public mixed $id;
-    public string $id_field = "";
+    public string|null $config_path = null;
     public bool $many = false;
+
+    public mixed $id = null;
     public API\Core\Auth $client;
     public array $packages = [];
     public array $package_includes = [];
@@ -52,10 +52,15 @@ class Model {
      * @param array $initial_data The data to use when validating/creating/updating/reading/deleting this object.
      * @param Auth|null $client Optionally assign an API client's `Auth` object. Required for tying users to changes made through Models.
      */
-    public function __construct(array $initial_data=[], API\Core\Auth $client=null) {
-        # Extract the ID from the initial data if present
-        $this->id = $initial_data["id"];
+    public function __construct(mixed $id=null, array $initial_data=[], API\Core\Auth $client=null) {
+        # Use the explicit $id parameter if set otherwise attempt to obtain it from the $initial_data
+        $this->id = (isset($id)) ? $id : $initial_data["id"];
         $this->initial_data = $initial_data;
+
+        # If an ID is present, fetch the object from configuration
+        if (isset($this->id)) {
+            $this->refresh_from_config($this->id);
+        }
 
         # Allow a client API\Core\Auth object to be assigned to this model
         if ($client) {
@@ -86,7 +91,7 @@ class Model {
      * @returns mixed value at path or $default if the path does not exist or if the
      *          path keys an empty string and $default is non-null
      */
-    protected static function get_config(string $path, $default=null) {
+    public static function get_config(string $path, mixed $default=null) {
         global $config;
         return(array_get_path($config, $path, $default));
     }
@@ -181,6 +186,112 @@ class Model {
     }
 
     /**
+     * Obtain this Model object from the internal pfSense configuration by object ID. If the specified ID exists in
+     * config, this Model object will be overwritten with the contents of that object.
+     * @param mixed $id Specify the ID of the object to obtain.
+     * @throws ServerError When this Model does not have a `config_path` set.
+     * @throws NotFoundError When an object with the specified $id does not exist.
+     */
+    public function refresh_from_config(mixed $id ) {
+        # Variables
+        $internal_objects = $this->get_config($this->config_path, []);
+
+        # Throw an error if no config_path is set
+        if (!$this->config_path) {
+            throw new ServerError(
+                message: "Model must have a 'config_path' to get internal values from config.",
+                return: "MODEL_NO_CONFIG_PATH"
+            );
+        }
+
+        # If an ID was requested that doesn't exist, throw a not found error
+        if (!array_key_exists($id, $internal_objects)) {
+            throw new NotFoundError(
+                message: "Object with ID '$id' does not exist.",
+                return: "MODEL_OBJECT_NOT_FOUND"
+            );
+        }
+
+        # Set this objects ID to the ID requested
+        $this->id = $id;
+
+        # Loop through each of this Model's fields and convert the internal value to the representation value
+        foreach ($this->get_fields() as $field) {
+            # Assign names and model context to this field
+            $this->$field->context = $this;
+            $this->$field->name = $field;
+            $this->$field->check_field_names();
+
+            # Convert the internal value to it's representation value if it exists in the internal object
+            if (array_key_exists($this->$field->internal_name, $internal_objects[$id])) {
+                $this->$field->from_internal($internal_objects[$id][$this->$field->internal_name]);
+            }
+        }
+    }
+
+    /**
+     * Fetches Model objects for all objects stored in the internal pfSense configuration for this Model.
+     * @return array An array of Model objects fetched from the internal pfSense configuration.
+     */
+    private function get_all_from_config() : array {
+        # Only allow this method if this model has `many` enabled.
+        if (!$this->many) {
+            throw new ServerError(
+                message: "Cannot get all model objects from config on model without `many`",
+                return: "MODEL_WITHOUT_MANY"
+            );
+        }
+
+        # Variables
+        $model = get_class($this);
+        $model_objects = [];
+        $internal_objects = $this->get_config($this->config_path, []);
+
+        # Loop through each internal object and create a Model object for it
+        foreach ($internal_objects as $internal_id=>$internal_object) {
+            $model_object = new $model();
+            $model_object->refresh_from_config($internal_id);
+            $model_objects[] = $model_object;
+        }
+
+        return $model_objects;
+    }
+
+    /**
+     * Creates a serializable array representation of this object. This array is suitable for content
+     * serialization such as JSON, YAML, etc.
+     * @return array The serializable array representation of this object.
+     */
+    public function to_representation() : array {
+        # Variables
+        $representation = [];
+
+        # Embed this object's ID if set
+        if (isset($this->id)) {
+            $representation["id"] = $this->id;
+        }
+
+        # Loop through each of this Model's fields and add its value to a serializable array
+        foreach ($this->get_fields() as $field) {
+            $representation[$field] = $this->$field->value;
+        }
+
+        return $representation;
+    }
+
+    public function to_internal() : array {
+        # Variables
+        $internal_object = [];
+
+        # Loop through each of this Model's fields and add its value to a serializable array
+        foreach ($this->get_fields() as $field) {
+            $internal_object[$this->$field->internal_name] = $this->$field->to_internal();
+        }
+
+        return $internal_object;
+    }
+
+    /**
      * Populates an array of field names for this model.
      * @return array An array of field names for this model.
      */
@@ -205,14 +316,37 @@ class Model {
     }
 
     /**
-     * Performs a full validation on the API model. This checks for model pre-requisites like package dependencies and
-     * then validates the model's `initial_data`.
-     * @return bool `true` if the model's data is valid, `false` if there was a validation error.
+     * Performs a full validation on the API mode. This includes checking that required packages are installed and
+     * validating all assigned fields. Note: Fields are validated in the order they are defined in the class.
+     * @return bool `true` if the model's data is valid.
+     * @throws ServerError When a server or programming error is detected.
+     * @throws ValidationError When model validation fails.
      */
     public function validate() : bool {
         # Check for required packages
         $this->check_packages();
 
+        # Obtain the names of Fields assigned to this object
+        $fields = $this->get_fields();;
+
+        # Loop through each of this object's assigned fields and validate them.
+        foreach ($fields as $field) {
+            # Assign the name of this field and context to this Field object
+            $this->$field->name = $field;
+            $this->$field->context = $this;
+
+            # Run validation on this field
+            $this->$field->validate();
+
+            # Check if a custom validation method was implemented for this model
+            $custom_validate_method = "validate_$field";
+            if (method_exists($this, $custom_validate_method)) {
+                # Run the custom validation method and reassign the fields value to its return value.
+                $this->$field->value = $this->$custom_validate_method($this->$field->value);
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -225,8 +359,10 @@ class Model {
         foreach ($this->packages as $pkg) {
             # Return an error if the package is not installed
             if (!is_pkg_installed($pkg)) {
-                $this->errors[] = API\Core\Response\get(12);
-                return false;
+                throw new NotFoundError(
+                    message: "The requested action requires the '$pkg' package but it is not installed.",
+                    return: "MDOEL_MISSING_REQUIRED_PACKAGE"
+                );
             }
         }
 
@@ -246,7 +382,7 @@ class Model {
      * @return array an associative array containing the API response
      */
     public function _read() : array {
-        return API\Core\Response\get(2);
+        # Throw an error if a config path was not defined.
     }
 
     /**

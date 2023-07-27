@@ -16,8 +16,9 @@ class FirewallAlias extends Model {
     public StringField $address;
     public StringField $detail;
 
-    public function __construct(array $initial_data = [], Auth $client = null) {
-        parent::__construct($initial_data, $client);
+    public function __construct(mixed $id=null, array $initial_data=[], Auth $client=null) {
+        $this->config_path = "aliases/alias";
+        $this->many = true;
         $this->name = new StringField(
             unique: true,
             required: true,
@@ -51,6 +52,9 @@ class FirewallAlias extends Model {
                 value it relates to. For example, the first value specified here is the description for the first
                 value specified in the `address` field. This value cannot contain "
         );
+
+        # Needs to be constructed after fields are defined
+        parent::__construct($id, $initial_data, $client);
     }
 
     /**

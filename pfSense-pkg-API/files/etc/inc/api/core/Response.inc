@@ -33,8 +33,8 @@ class Response extends \Error {
         int $code = 500,
         array $data = [],
     ) {
-        parent::__construct(strtolower($message), $code);
-        $this->message = strtolower($message);
+        parent::__construct($message, $code);
+        $this->message = $message;
         $this->code = $code;
         $this->status = strtolower($this->get_http_status_message($code));
         $this->return = strtoupper($return);
@@ -168,6 +168,16 @@ class MethodNotAllowedError extends Response {
  */
 class ValidationError extends Response {
     public function __construct(string $message, string $return, int $code = 400, array $data = []) {
+        parent::__construct($message, $return, $code, $data);
+    }
+}
+
+/**
+ * Exception class tha indicates a requested resource was not found. This exception generally corresponds with a 404
+ * Not Found HTTP code.
+ */
+class NotFoundError extends Response {
+    public function __construct(string $message, string $return, int $code = 404, array $data = []) {
         parent::__construct($message, $return, $code, $data);
     }
 }
