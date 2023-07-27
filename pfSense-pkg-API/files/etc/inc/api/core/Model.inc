@@ -18,6 +18,7 @@ namespace API\Core;
 require_once("api/core/Tools.inc");
 require_once("api/core/Response.inc");
 require_once("api/core/Auth.inc");
+require_once("api/core/ModelSet.inc");
 
 # Allow models to access all API validators
 foreach(glob("/etc/inc/api/validators/*.inc") as $validator) {
@@ -39,7 +40,6 @@ use API;
 class Model {
     public string|null $config_path = null;
     public bool $many = false;
-
     public mixed $id = null;
     public API\Core\Auth $client;
     public array $packages = [];
@@ -192,11 +192,8 @@ class Model {
      * @throws ServerError When this Model does not have a `config_path` set.
      * @throws NotFoundError When an object with the specified $id does not exist.
      */
-    public function refresh_from_config(mixed $id ) {
-        # Variables
-        $internal_objects = $this->get_config($this->config_path, []);
-
-        # Throw an error if no config_path is set
+    public function refresh_from_config(mixed $id = null) {
+        # Throw an error if no `config_path` is set
         if (!$this->config_path) {
             throw new ServerError(
                 message: "Model must have a 'config_path' to get internal values from config.",
@@ -204,16 +201,30 @@ class Model {
             );
         }
 
+        # Require an $id if `many` is set
+        if ($this->many and !isset($id)) {
+            throw new ServerError(
+                message: "An ID is required when refreshing objects from config on model with 'many'.",
+                return: "MODEL_ID_REQUIRED_FOR_REFRESH"
+            );
+        }
+
+        # Get the internal object(s) from config
+        $internal_objects = $this->get_config($this->config_path, []);
+
         # If an ID was requested that doesn't exist, throw a not found error
-        if (!array_key_exists($id, $internal_objects)) {
+        if ($this->many and !array_key_exists($id, $internal_objects)) {
             throw new NotFoundError(
                 message: "Object with ID '$id' does not exist.",
                 return: "MODEL_OBJECT_NOT_FOUND"
             );
         }
 
-        # Set this objects ID to the ID requested
-        $this->id = $id;
+        # Set the object ID if `many` is enabled
+        $this->id = ($this->many) ? $id : $this->id;
+
+        # Fetch the requested object if `many` is enabled
+        $internal_object = ($this->many) ? $internal_objects[$id] : $internal_objects;
 
         # Loop through each of this Model's fields and convert the internal value to the representation value
         foreach ($this->get_fields() as $field) {
@@ -223,29 +234,25 @@ class Model {
             $this->$field->check_field_names();
 
             # Convert the internal value to it's representation value if it exists in the internal object
-            if (array_key_exists($this->$field->internal_name, $internal_objects[$id])) {
-                $this->$field->from_internal($internal_objects[$id][$this->$field->internal_name]);
+            if (array_key_exists($this->$field->internal_name, $internal_object)) {
+                $this->$field->from_internal($internal_object[$this->$field->internal_name]);
             }
         }
     }
 
     /**
      * Fetches Model objects for all objects stored in the internal pfSense configuration for this Model.
-     * @return array An array of Model objects fetched from the internal pfSense configuration.
+     * @return array|Model Returns a ModelSet of Models if `many` is enabled or a single Model object if `many` is
+     * not enabled.
      */
-    private function get_all_from_config() : array {
-        # Only allow this method if this model has `many` enabled.
-        if (!$this->many) {
-            throw new ServerError(
-                message: "Cannot get all model objects from config on model without `many`",
-                return: "MODEL_WITHOUT_MANY"
-            );
-        }
-
+    public function get_all_from_config() : ModelSet|Model {
         # Variables
         $model = get_class($this);
         $model_objects = [];
         $internal_objects = $this->get_config($this->config_path, []);
+
+        # For non `many` models, wrap the internal object in an array so we can loop
+        $internal_objects = ($this->many) ? $internal_objects : [$internal_objects];
 
         # Loop through each internal object and create a Model object for it
         foreach ($internal_objects as $internal_id=>$internal_object) {
@@ -254,7 +261,8 @@ class Model {
             $model_objects[] = $model_object;
         }
 
-        return $model_objects;
+        # Unwrap the array for non `many` models, otherwise return all objects
+        return ($this->many) ? new ModelSet($model_objects) : $model_objects[0];
     }
 
     /**
@@ -375,24 +383,15 @@ class Model {
     }
 
     /**
-     * Initializes the default '_read' method. Child classes will override this class to add functionality that
-     * performs a 'read' action for this object (if applicable). If not overridden, an API error will simply return
-     * a method not implemented error. This method is not intended to be called directly, rather it should be called
-     * using the public 'read' method.
-     * @return array an associative array containing the API response
+     * Initializes the default '_read' method. By default this method attempts to read objects relating to this model
+     * from the internal pfSense configuration. This method can be overridden by a child class to implement custom
+     * read handling.
+     * @return array|Model Returns a ModelSet of model objects read from the pfSense configuration if `many` is enabled
+     * or returns a single Model object if `many` is not enabled.
+     * @throws ServerError When `config_path` is not set by this Model.
      */
-    public function _read() : array {
-        # Throw an error if a config path was not defined.
-    }
-
-    /**
-     * Execute the read action of the current model. In addition to calling the object's
-     * _read() method, this method will allow for an optional query to be performed as well as optionally
-     * embedding the object ID in the API response.
-     * @return array an associative array containing the API response
-     */
-    public function read() : array {
-        return $this->_read();
+    public function read() : ModelSet|Model {
+        return $this->get_all_from_config();
     }
 
     /**
