@@ -13,41 +13,13 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-require_once("api/framework/APITools.inc");
+require_once("api/core/Tools.inc");
+require_once("api/core/TestCase.inc");
 
-# TODO: Remove this once all endpoints are migrated to views
-function build_endpoints() {
-    # Import each endpoint class
-    foreach(glob("/etc/inc/api/endpoints/*.inc") as $file) {
-        # Import classes files and create object
-        require_once($file);
-        $endpoint_class = str_replace(".inc", "", basename($file));
-        $endpoint_obj = new $endpoint_class();
-
-        # Specify the PHP code to write to the endpoints index.php file
-        $code = "<?php\nrequire_once('".$file."');\n(new ".$endpoint_class."())->listen();\n";
-
-        # Create directories and files corresponding with class
-        if (!is_null($endpoint_obj->url)) {
-            mkdir("/usr/local/www".$endpoint_obj->url, 0755, true);
-            file_put_contents(
-                "/usr/local/www".$endpoint_obj->url."/index.php",
-                $code
-            );
-        }
-
-        # Print success output if file now exists, otherwise output error and exit on non-zero code
-        if (!is_null($endpoint_obj->url) and is_file("/usr/local/www".$endpoint_obj->url."/index.php")) {
-            echo "Building ".$endpoint_class." endpoint at URL \"".$endpoint_obj->url."\"... done.".PHP_EOL;
-        } else {
-            echo "Building ".$endpoint_class." endpoint at URL \"".$endpoint_obj->url."\"... failed.".PHP_EOL;
-            exit(1);
-        }
-    }
-}
+use API\Core\Tools;
 
 function build_views() {
-    # Import each endpoint class
+    # Import each view class
     foreach(glob("/etc/inc/api/views/*.inc") as $file) {
         # Import classes files and create object
         require_once($file);
@@ -57,9 +29,45 @@ function build_views() {
     }
 }
 
+function run_tests() {
+    # Variables
+    $test_cases = glob("/etc/inc/api/tests/*.inc");
+    $exit_code = 0;
+    $test_count = count($test_cases);
+    $succeed_count = 0;
+
+    # Import each test class and run the test
+    foreach(glob("/etc/inc/api/tests/*.inc") as $test_case_file) {
+        # Import classes files and create object
+        require_once($test_case_file);
+        $test_case = "API\\Tests\\".str_replace(".inc", "", basename($test_case_file));
+
+        # Print that we're starting this test
+        echo "Running test case $test_case... ";
+
+        # Try to run the test case.
+        try {
+            new $test_case();
+            echo "done.";
+            $succeed_count++;
+        }
+        # If an AssertionError is received, there was a test failure. Print the traceback.
+        catch (AssertionError $fail_results) {
+            echo "failed! : $fail_results->message".PHP_EOL;
+            echo "---------------------------------------------------------".PHP_EOL;
+            echo $fail_results->getTraceAsString();
+            echo "---------------------------------------------------------".PHP_EOL;
+            $exit_code = 1;
+        }
+    }
+    echo "---------------------------------------------------------".PHP_EOL;
+    echo "Ran call tests: $succeed_count/$test_count tests passed.".PHP_EOL;
+    exit($exit_code);
+}
+
 function backup() {
     # Local Variables
-    $api_conf = APITools\get_api_config()[1];
+    $api_conf = API\Core\Tools\get_api_config()[1];
     $backup_api_conf = json_encode($api_conf);
     file_put_contents("/usr/local/share/pfSense-pkg-API/backup.json", $backup_api_conf);
     echo "Backing up API configuration... done.".PHP_EOL;
@@ -67,7 +75,7 @@ function backup() {
 
 function restore() {
     # Local Variables
-    $api_conf = APITools\get_api_config();
+    $api_conf = API\Core\Tools\get_api_config();
 
     # Only retrieve file contents if it exists
     if (is_file("/usr/local/share/pfSense-pkg-API/backup.json")) {
@@ -91,11 +99,11 @@ function restore() {
 }
 
 function sync() {
-    APITools\sync();
+    API\Core\Tools\sync();
 }
 
 function update() {
-    $pf_version = APITools\get_pfsense_version()["base"];
+    $pf_version = API\Core\Tools\get_pfsense_version()["base"];
     echo shell_exec("/usr/sbin/pkg delete -y pfSense-pkg-API");
     echo shell_exec("/usr/sbin/pkg -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-".$pf_version."-pkg-API.pkg");
     echo shell_exec("/etc/rc.restart_webgui");
@@ -103,7 +111,7 @@ function update() {
 
 function revert($version) {
     # Local variables
-    $pf_version = APITools\get_pfsense_version()["base"];
+    $pf_version = API\Core\Tools\get_pfsense_version()["base"];
     $url = "https://github.com/jaredhendrickson13/pfsense-api/releases/download/".urlencode($version)."/pfSense-".$pf_version."-pkg-API.pkg";
     echo "Locating pfSense-pkg-API-".$version." at ".$url."... ";
 
@@ -128,10 +136,10 @@ function delete() {
 }
 
 function rotate_server_key() {
-    $pkg_index = APITools\get_api_config()[0];
+    $pkg_index = API\Core\Tools\get_api_config()[0];
     config_set_path("installedpackages/package/{$pkg_index}/conf/keys", []);
     echo "Rotating API server key... ";
-    APITools\create_jwt_server_key(true);
+    API\Core\Tools\create_jwt_server_key(true);
     echo "done.".PHP_EOL;
     sync();
 }
@@ -162,7 +170,6 @@ function help() {
 # MAKEENDPOINTS COMMAND
 if (in_array($argv[1], ["buildendpoints"])) {
     build_views();
-    build_endpoints();    # TODO: Remove this once endpoints are migrated to views
 }
 # BACKUP COMMAND
 elseif (in_array($argv[1], ["backup"])) {

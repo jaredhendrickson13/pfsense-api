@@ -29,15 +29,56 @@ require_once("priv.inc");
 require_once("service-utils.inc");
 require_once("filter.inc");
 require_once("shaper.inc");
-require_once("Auth.inc");
+require_once("auth.inc");
 require_once("functions.inc");
 require_once("openvpn.inc");
 require_once("certs.inc");
 require_once("pkg-utils.inc");
 require_once("firewall_virtual_ip.inc");
-
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
+
+# Checks our content type header and parses the content accordingly
+function get_request_data() {
+    # TODO: x-www-form-urlencoded still attempts to use json if no parameters were passed in. This was intentionally done to
+    # TODO: support user scripts that didn't specify a static content type (before it was supported) remove this in a future
+    # TODO: release. It is preferred that content uses a specified content type.
+    $_SERVER["HTTP_CONTENT_TYPE"] = (empty($_SERVER["HTTP_CONTENT_TYPE"])) ? "application/x-www-form-urlencoded" : $_SERVER["HTTP_CONTENT_TYPE"];
+    $content_types = [
+        "application/json" => json_decode(file_get_contents('php://input'), true),
+        "application/x-www-form-urlencoded" => (empty($_GET)) ? json_decode(file_get_contents('php://input'), true) : form_decode($_GET)
+    ];
+
+    # Check if content type is supported, if so return corresponding parsed request data
+    if (array_key_exists($_SERVER["HTTP_CONTENT_TYPE"], $content_types)) {
+        return $content_types[$_SERVER["HTTP_CONTENT_TYPE"]];
+    }
+    # Return false if the content type is unknown or unsupported
+    else {
+        return false;
+    }
+}
+
+# Decode query string into their appropriate data types
+function form_decode($array) {
+    # Loop through each query string item and check for expected data types
+    foreach ($array as $key=>$value) {
+        # Check for boolean type query strings
+        if ($value === "true") {
+            $array[$key] = true;
+        }
+        elseif ($value === "false") {
+            $array[$key] = false;
+        }
+
+        # Check for integer type query strings
+        if (is_numeric($value)) {
+            $array[$key] = intval($value);
+        }
+    }
+
+    return $array;
+}
 
 # Check our local pfSense version
 function get_pfsense_version() {
@@ -354,7 +395,7 @@ function get_pfsense_if_id($interface, $include_carp=false, $include_ifgroup=fal
     if($include_ifgroup and is_ifgroup($interface)) {
         return $interface;
     }
-    
+
     # Only include the default IPsec interface (enc0) if explicitly requested
     if ($include_ipsec and $interface === "enc0") {
         return $interface;
@@ -728,8 +769,8 @@ function get_all_avail_interfaces() {
     // Local variables
     global $ipsec_descrs;
     $base_ifs = get_interface_list();
-    
-    # Include wireless clone interfaces 
+
+    # Include wireless clone interfaces
     if (config_get_path('wireless/clone') && is_array(config_get_path('wireless/clone')) && count(config_get_path('wireless/clone'))) {
         foreach (config_get_path('wireless/clone', []) as $clone) {
             $base_ifs[$clone['cloneif']] = $clone;
@@ -737,7 +778,7 @@ function get_all_avail_interfaces() {
         }
     }
 
-    # Include VLAN interfaces 
+    # Include VLAN interfaces
     if (config_get_path('vlans/vlan') && is_array(config_get_path('vlans/vlan')) && count(config_get_path('vlans/vlan'))) {
         foreach (config_get_path('vlans/vlan', []) as $vlan) {
             $base_ifs[$vlan['vlanif']] = $vlan;
@@ -745,7 +786,7 @@ function get_all_avail_interfaces() {
         }
     }
 
-    # Include Bridge interfaces 
+    # Include Bridge interfaces
     if (config_get_path('bridges/bridged') && is_array(config_get_path('bridges/bridged')) && count(config_get_path('bridges/bridged'))) {
         foreach (config_get_path('bridges/bridged', []) as $bridge) {
             $base_ifs[$bridge['bridgeif']] = $bridge;
@@ -753,7 +794,7 @@ function get_all_avail_interfaces() {
         }
     }
 
-    # Include GIF interfaces 
+    # Include GIF interfaces
     if (config_get_path('gifs/gif') && is_array(config_get_path('gifs/gif')) && count(config_get_path('gifs/gif'))) {
         foreach (config_get_path('gifs/gif', []) as $gif) {
             $base_ifs[$gif['gifif']] = $gif;
@@ -761,7 +802,7 @@ function get_all_avail_interfaces() {
         }
     }
 
-    # Include GRE interfaces 
+    # Include GRE interfaces
     if (config_get_path('gres/gre') && is_array(config_get_path('gres/gre')) && count(config_get_path('gres/gre'))) {
         foreach (config_get_path('gres/gre', []) as $gre) {
             $base_ifs[$gre['greif']] = $gre;
@@ -769,12 +810,12 @@ function get_all_avail_interfaces() {
         }
     }
 
-    # Include LAGG interfaces 
+    # Include LAGG interfaces
     if (config_get_path('laggs/lagg') && is_array(config_get_path('laggs/lagg')) && count(config_get_path('laggs/lagg'))) {
         foreach (config_get_path('laggs/lagg', []) as $lagg) {
             $base_ifs[$lagg['laggif']] = $lagg;
             $base_ifs[$lagg['laggif']]['islagg'] = true;
-            # LAGG members cannot be assigned 
+            # LAGG members cannot be assigned
             $lagifs = explode(',', $lagg['members']);
             foreach ($lagifs as $lagif) {
                 if (isset($base_ifs[$lagif])) {
@@ -784,12 +825,12 @@ function get_all_avail_interfaces() {
         }
     }
 
-    # Include QinQ interfaces 
+    # Include QinQ interfaces
     if (config_get_path('qinqs/qinqentry') && is_array(config_get_path('qinqs/qinqentry')) && count(config_get_path('qinqs/qinqentry'))) {
         foreach (config_get_path('qinqs/qinqentry', []) as $qinq) {
             $base_ifs["{$qinq['vlanif']}"]['descr'] = "VLAN {$qinq['tag']} on {$qinq['if']}";
             $base_ifs["{$qinq['vlanif']}"]['isqinq'] = true;
-            # QinQ members 
+            # QinQ members
             $qinqifs = explode(' ', $qinq['members']);
             foreach ($qinqifs as $qinqif) {
                 $base_ifs["{$qinq['vlanif']}.{$qinqif}"]['descr'] = "QinQ {$qinqif} on VLAN {$qinq['tag']} on {$qinq['if']}";
@@ -798,7 +839,7 @@ function get_all_avail_interfaces() {
         }
     }
 
-    # Include PPP interfaces 
+    # Include PPP interfaces
     if (config_get_path('ppps/ppp') && is_array(config_get_path('ppps/ppp')) && count(config_get_path('ppps/ppp'))) {
         foreach (config_get_path('ppps/ppp', []) as $pppid => $ppp) {
             $portname = $ppp['if'];
@@ -1079,7 +1120,7 @@ function is_assoc_array($array, $strict_seq=false) {
         foreach ($array as $key => $value) {
             # Check if key is numeric
             if (!is_numeric($key) or ($strict_seq and $i !== intval($key))) {
-               return true;
+                return true;
             }
             $i++;
         }

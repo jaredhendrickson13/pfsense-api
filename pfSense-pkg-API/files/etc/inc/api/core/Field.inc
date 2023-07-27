@@ -76,7 +76,7 @@ class Field
         $this->description = $description;
 
         # Ensure the $default value is in $choices if set
-        if ($default and $choices and !in_array($default, $choices, true)) {
+        if (isset($default) and $choices and !in_array($default, $choices, true)) {
             throw new ServerError(
                 message: "Field object `default` must be one of available `choices`.",
                 return: "INVALID_CHOICE_DEFAULT"
