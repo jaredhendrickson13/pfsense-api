@@ -9,6 +9,9 @@ use API\Core\Auth;
 use API\Core\ValidationError;
 use API\Fields\StringField;
 
+/**
+ * Defines a model object for firewall aliases.
+ */
 class FirewallAlias extends Model {
     public StringField $name;
     public StringField $type;
