@@ -88,7 +88,7 @@ jobs:
 
       - name: Run pfSense-pkg-API unit tests
         run: |
-          /usr/local/bin/pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com --no_verify -c 'pfsense-api runtests'
+          ssh -o StrictHostKeyChecking=no ${{ matrix.pfsense_version }}.jaredhendrickson.com 'pfsense-api runtests'
 
       - name: Teardown pfSense VM
         if: "${{ always() }}"
