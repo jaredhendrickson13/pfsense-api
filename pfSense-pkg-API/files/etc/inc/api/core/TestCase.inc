@@ -5,6 +5,8 @@ namespace API\Core;
 use AssertionError;
 use Error;
 use Exception;
+use ReflectionException;
+use ReflectionMethod;
 
 require_once("api/core/Field.inc");
 require_once("api/core/Validator.inc");
@@ -34,9 +36,11 @@ foreach(glob("/etc/inc/api/views/*.inc") as $view) {
  */
 class TestCase {
     public string $method = "unknown";
+    public string $method_docstring = "";
 
     /**
      * Runs this TestCase when the object is created. Any method that starts with `test` will automatically be run.
+     * @throws ReflectionException When ReflectionMethod could not find a test method.
      */
     public function run() {
         # use a property to keep track of the method that is currently running
@@ -46,7 +50,11 @@ class TestCase {
         foreach (get_class_methods($this) as $method) {
             # If this method starts with `test`, run the function.
             if (str_starts_with($method, "test")) {
+                # Set the current method undergoing testing
                 $this->method = $method;
+
+                # Gather the description for this test method from its doc comment
+                $this->method_docstring = (new ReflectionMethod($this, $method))->getDocComment();
                 $this->$method();
             }
         }
@@ -114,12 +122,25 @@ class TestCase {
     }
 
     /**
+     * Checks if a given callable throws any exception.
+     * @param mixed $callable A callable to run and check for thrown exception.
+     * @throws AssertionError If the $callable throws any exception.
+     */
+    protected function assert_does_not_throw(mixed $callable) {
+        try {
+            $callable();
+        }
+        catch (Error | Exception $exc) {
+            $class_name = $exc::class;
+            throw new AssertionError("Expected callable to not throw an exception. Received $class_name.");
+        }
+    }
+
+    /**
      * Checks if an embedded callable raises a specific API\Core\Response exception and ensures that the expected
      * 'return' code is given
-     * @param string $exception The specific Response exception this method will expect the callable to raise.
      * @param string $ref_id The unique response return code string to check the Response object for.
      * @param mixed $callable An anonymous function that raises one of the $exceptions.
-     * @param string $message Set the error message embedded in any AssertionError thrown by this method.
      * @throws AssertionError When the $callable did not raise one of the $exceptions.
      */
     protected function assert_throws_response(string $ref_id, mixed $callable) {
@@ -128,18 +149,23 @@ class TestCase {
             $callable();
         }
             # If an exception was thrown, make sure it was one of the expected exceptions.
-        catch (Exception | Error $exc) {
-            # Capture the class of this exception object
+        catch (Response | Error | Exception $exc) {
             $exc_class_name = $exc::class;
-            if ($exception == $exc_class_name) {
-                $message = "Expected callable to raise '$exception' Received '$exc_class_name'.";
+
+            # Ensure this is a Response object or one of its child classes.
+            if ($exc::class !== Response::class and !in_array(Response::class, class_parents($exc))) {
+                $message = "Expected callable to throw Response object. Received '$exc_class_name'.";
                 throw new AssertionError($message);
+            }
+            # Ensure the $ref_id matches this object
+            if ($ref_id !== $exc->ref_id) {
+                throw new AssertionError("Expected Response to contain ref_id $ref_id. Received $exc->ref_id");
             }
             return;
         }
 
         # If we ended up here, no exception was thrown. Throw an AssertionError
-        throw new AssertionError($message);
+        throw new AssertionError("Expected callable to throw an exception.");
     }
 
     /**

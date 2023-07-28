@@ -80,7 +80,7 @@ class Field
         if (isset($default) and $choices and !in_array($default, $choices, true)) {
             throw new ServerError(
                 message: "Field object `default` must be one of available `choices`.",
-                ref_id: "INVALID_CHOICE_DEFAULT"
+                ref_id: "FIELD_INVALID_CHOICE_DEFAULT"
             );
         }
     }
@@ -108,6 +108,9 @@ class Field
         # Ensure the value(s) to validate are always in an array, so we can loop.
         $values = $this->get_value_as_array();
 
+        # Ensure value is not an empty array before we start the loop.
+        $this->check_value_empty($this->value);
+
         # Loop through each value to be validated
         foreach($values as $value) {
             # Ensure the value's type is supported
@@ -118,9 +121,6 @@ class Field
 
             # Ensure this value is not empty unless empty values are allowed by this field
             $this->check_value_empty($value);
-
-            # Ensure this value is not null unless null values are allowed by this field
-            $this->check_value_null($value);
 
             # Loop through each validator and run it's `validate` method against the current value.
             foreach ($this->validators as $validator) {
@@ -153,7 +153,7 @@ class Field
         if ($this->required and isset($this->default)) {
             throw new ServerError(
                 message: "Required field `$this->name` cannot have a default.",
-                ref_id: "CANNOT_REQUIRE_DEFAULT"
+                ref_id: "FIELD_CANNOT_BE_REQUIRED_WITH_DEFAULT"
             );
         }
 
@@ -161,7 +161,7 @@ class Field
         if ($this->required and $this->allow_null) {
             throw new ServerError(
                 message: "Required field `$this->name` cannot allow null values.",
-                ref_id: "CANNOT_REQUIRE_NULL"
+                ref_id: "FIELD_CANNOT_BE_REQUIRED_WITH_ALLOW_NULL"
             );
         }
 
@@ -169,7 +169,7 @@ class Field
         if ($this->required and is_null($this->value)) {
             throw new ValidationError(
                 message: "Field `$this->name` is required.",
-                ref_id: "MISSING_REQUIRED_FIELD"
+                ref_id: "FIELD_IS_REQUIRED"
             );
         }
     }
@@ -184,7 +184,7 @@ class Field
         if ($this->read_only and isset($this->default)) {
             throw new ServerError(
                 message: "Read-only field `$this->name` cannot have a default value.",
-                ref_id: "NO_DEFAULT_WITH_READ_ONLY"
+                ref_id: "FIELD_NO_DEFAULT_WITH_READ_ONLY"
             );
         }
 
@@ -192,15 +192,7 @@ class Field
         if ($this->read_only and $this->choices) {
             throw new ServerError(
                 message: "Read-only field `$this->name` cannot have value choices.",
-                ref_id: "NO_CHOICES_WITH_READ_ONLY"
-            );
-        }
-
-        # Throw an error if this field has a non-null value and is a read-only field.
-        if ($this->read_only and !is_null($this->value)) {
-            throw new ValidationError(
-                message: "Cannot assign value to read-only field `$this->name`.",
-                ref_id: "READ_ONLY_FIELD"
+                ref_id: "FIELD_NO_CHOICES_WITH_READ_ONLY"
             );
         }
     }
@@ -321,7 +313,7 @@ class Field
         }
 
         # Allow value to be NULL if `allow_null` is set
-        if ($this->allow_null and gettype($value) === "NULL") {
+        if ($this->allow_null and is_null($value)) {
             return;
         }
 
@@ -364,21 +356,6 @@ class Field
             throw new ValidationError(
                 message: "Field `$this->name` cannot be empty.",
                 ref_id: "FIELD_EMPTY_NOT_ALLOWED"
-            );
-        }
-    }
-
-    /**
-     * Checks if a given `value` is null and checks if null values are allowed.
-     * @param mixed $value The value to check for emptiness.
-     * @returns ValidationError When the $value is not a supported type.
-     */
-    private function check_value_null(mixed $value) {
-        # Throw an error if the value is null and null values are not allowed.
-        if (!$this->allow_null and is_null($value)) {
-            throw new ValidationError(
-                message: "Field `$this->name` cannot be nullified.",
-                ref_id: "FIELD_NULL_NOT_ALLOWED"
             );
         }
     }

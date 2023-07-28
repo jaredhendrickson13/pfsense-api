@@ -2,6 +2,7 @@
 
 namespace API\Tests;
 
+use API\Core\Response;
 use API\Core\TestCase;
 use AssertionError;
 use Error;
@@ -12,6 +13,27 @@ use Exception;
  */
 class TestCaseTestCase extends TestCase
 {
+    public function test_assert_does_not_throw() {
+        $this->assert_does_not_throw(
+            callable: function () {}
+        );
+    }
+
+    public function test_bad_assert_does_not_throw() {
+        try {
+            $this->assert_does_not_throw(
+                callable: function () {
+                    throw new Exception("test");
+                }
+            );
+        }
+        catch (AssertionError) {
+            return;
+        }
+
+        throw new AssertionError("Expected AssertionError for throwing an exception.");
+    }
+
     public function test_assert_throws() {
         # Ensure assertion passes when proper exception is thrown
         $this->assert_throws(
@@ -68,6 +90,51 @@ class TestCaseTestCase extends TestCase
         }
 
         throw new AssertionError("Expected AssertionError for receiving fields that are not equal.");
+    }
+
+    public function test_assert_throws_response() {
+        $this->assert_throws_response(
+            ref_id: "EXAMPLE_ID",
+            callable: function () {
+                throw new Response(
+                    message: "Test",
+                    ref_id: "EXAMPLE_ID"
+                );
+            }
+        );
+    }
+
+    public function test_bad_ref_id_asset_throws_response() {
+        try {
+            $this->assert_throws_response(
+                ref_id: "ID_DOES_NOT_MATCH_RESPONSE",
+                callable: function () {
+                    throw new Response(
+                        message: "Test",
+                        ref_id: "EXAMPLE_ID"
+                    );
+                }
+            );
+        }
+        catch (AssertionError) {
+            return;
+        }
+
+        throw new AssertionError("Expected AssertionError for mismatched ref_ids");
+    }
+
+    public function test_no_exception_asset_throws_response() {
+        try {
+            $this->assert_throws_response(
+                ref_id: "EXAMPLE_ID",
+                callable: function () {}
+            );
+        }
+        catch (AssertionError) {
+            return;
+        }
+
+        throw new AssertionError("Expected AssertionError for no exception being thrown.");
     }
 
     public function test_assert_not_equals() {

@@ -52,19 +52,27 @@ function run_tests() {
             $test_obj->run();
             echo "done.".PHP_EOL;
             $succeed_count++;
+            $fail_results = null;
         }
         # If an AssertionError is received, there was a test failure. Print the traceback.
         catch (AssertionError $fail_results) {
-            $fail_msg = $fail_results->getMessage();
             echo "failed!".PHP_EOL;
-            echo "---------------------------------------------------------".PHP_EOL;
-            echo "Test name: $test_obj->method".PHP_EOL;
-            echo "Failure message: $fail_msg".PHP_EOL;
-            echo $fail_results->getTraceAsString().PHP_EOL;
+            $exit_code = 2;
+        }
+        catch (Exception | Error $fail_results) {
+            echo "fatal!".PHP_EOL;
             $exit_code = 1;
         }
-        catch (Exception $exc) {
-            throw $exc;
+
+        if ($fail_results) {
+            $exc_class = $fail_results::class;
+            $fail_msg = $fail_results->getMessage();
+            echo "---------------------------------------------------------".PHP_EOL;
+            echo "Failure message: [$exc_class] $fail_msg".PHP_EOL;
+            echo "Test name: $test_obj->method".PHP_EOL;
+            echo "Test description: $test_obj->method_docstring".PHP_EOL.PHP_EOL;
+            echo $fail_results->getTraceAsString().PHP_EOL;
+            echo "---------------------------------------------------------".PHP_EOL;
         }
     }
     echo "---------------------------------------------------------".PHP_EOL;
