@@ -11,7 +11,7 @@ use Exception;
 /**
  * Tests that test the API\Core\TestCase class.
  */
-class TestCaseTestCase extends TestCase
+class APICoreTestCaseTestCase extends TestCase
 {
     public function test_assert_does_not_throw() {
         $this->assert_does_not_throw(

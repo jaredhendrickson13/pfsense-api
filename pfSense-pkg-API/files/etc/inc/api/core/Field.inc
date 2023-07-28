@@ -124,7 +124,7 @@ class Field
 
             # Loop through each validator and run it's `validate` method against the current value.
             foreach ($this->validators as $validator) {
-                $validator->validate($value);
+                $validator->validate(value: $value, field_name: $this->name);
             }
 
             # Ensure value is unique if set

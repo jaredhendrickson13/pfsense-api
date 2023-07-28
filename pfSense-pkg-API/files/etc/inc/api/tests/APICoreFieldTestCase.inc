@@ -4,7 +4,7 @@ namespace API\Tests;
 
 use API;
 
-class CoreFieldTestCase extends API\Core\TestCase
+class APICoreFieldTestCase extends API\Core\TestCase
 {
     /**
      * Ensures an error is thrown when a Field object has a `default` value that is not specified as a `choice`.
