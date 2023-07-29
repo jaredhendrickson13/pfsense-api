@@ -367,6 +367,8 @@ class APIE2ETest:
         :param needs_privs: (bool) whether or not the request requires privileges
         :return: (boolean) returns true if the privilege authorized the request
         """
+        # pylint: disable=too-many-arguments
+
         # Create/update the test user with no privileges to start and make a request
         self.create_or_update_user(username, password, [])
         no_priv_resp = self.make_request(
