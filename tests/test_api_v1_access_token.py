@@ -19,6 +19,7 @@ import e2e_test_framework
 class APIE2ETestAccessToken(e2e_test_framework.APIE2ETest):
     """Class used to test the /api/v1/access_token endpoint."""
     uri = "/api/v1/access_token"
+    post_privilges = []
     post_tests = [
         {
             "name": "Change auth mode to local to test token-based auth restriction",
