@@ -245,10 +245,6 @@ class APIServicesIPsecPhase1Update extends APIModel {
             elseif (is_ipaddrv4($this->initial_data["remote-gateway"]) and $this->validated_data["protocol"] === "inet6") {
                 $this->errors[] = APIResponse\get(2168);
             }
-            # For domain name remote gateways, ensure the protocol is 'both'
-            elseif (is_fqdn($this->initial_data["remote-gateway"]) and $this->validated_data["protocol"] !== "both") {
-                $this->errors[] = APIResponse\get(2169);
-            }
             # Ensure remote gateway is not already in use
             elseif ($this->is_ipsec_remote_gateway_in_use($this->initial_data["remote-gateway"])) {
                 $this->errors[] = APIResponse\get(2170);
