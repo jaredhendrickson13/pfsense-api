@@ -426,7 +426,7 @@ class APIE2ETest:
                 if self.is_priv_allowed(method.upper(), username, password, [], needs_privs=False):
                     print(self.__format_msg__(method.upper(), test_params, "Response is valid", mode="ok"))
                 else:
-                    msg = f"Expected API to authorize call with out privilege privileges"
+                    msg = "Expected API to authorize call with out privilege privileges"
                     print(self.__format_msg__(method.upper(), test_params, msg))
                     self.exit_code = 1
 
