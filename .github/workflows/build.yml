@@ -88,6 +88,7 @@ jobs:
 
       - name: Run pfSense-pkg-API unit tests
         run: |
+          pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com -u admin -p pfsense -c "mkdir /root/.ssh/ && echo $(cat ~/.ssh/id_rsa.pub) > /root/.ssh/authorized_keys" -k
           ssh -o StrictHostKeyChecking=no ${{ matrix.pfsense_version }}.jaredhendrickson.com 'pfsense-api runtests'
 
       - name: Teardown pfSense VM
