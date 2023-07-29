@@ -55,6 +55,7 @@ class TestCase {
 
                 # Gather the description for this test method from its doc comment
                 $this->method_docstring = (new ReflectionMethod($this, $method))->getDocComment();
+                $this->method_docstring = str_replace([PHP_EOL, "/**", "*/", "*", "  "], "", $this->method_docstring);
                 $this->$method();
             }
         }
@@ -151,10 +152,11 @@ class TestCase {
             # If an exception was thrown, make sure it was one of the expected exceptions.
         catch (Response | Error | Exception $exc) {
             $exc_class_name = $exc::class;
+            $exc_message = $exc->getMessage();
 
             # Ensure this is a Response object or one of its child classes.
             if ($exc::class !== Response::class and !in_array(Response::class, class_parents($exc))) {
-                $message = "Expected callable to throw Response object. Received '$exc_class_name'.";
+                $message = "Expected callable to throw Response object. Received '$exc_class_name: $exc_message'.";
                 throw new AssertionError($message);
             }
             # Ensure the $ref_id matches this object
@@ -199,6 +201,18 @@ class TestCase {
         # Check if this value is false
         if ($value !== false ) {
             throw new AssertionError($message);
+        }
+    }
+
+    /**
+     * Checks if a given $value1 is greater than $value2.
+     * @param mixed $value1 The first value to evaluate. This value must be greater than value 2 to pass check.
+     * @param mixed $value2 The second value to evaluate. This value must be less than value 1 to pass check.
+     */
+    protected function assert_is_greater_than(mixed $value1, mixed $value2) {
+        # Fail test if $value2 is greater than $value1.
+        if ($value1 < $value2) {
+            throw new AssertionError("Expected $value1 to be greater than $value2");
         }
     }
 

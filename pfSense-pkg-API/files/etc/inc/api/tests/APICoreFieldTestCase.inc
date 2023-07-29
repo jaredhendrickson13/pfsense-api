@@ -323,7 +323,8 @@ class APICoreFieldTestCase extends API\Core\TestCase
     }
 
     /**
-     * Checks that the default to_internal() methods converts values to strings.
+     * Checks that the default to_internal() methods converts values to proper types AND joins `many` enabled fields
+     * back into strings using the specified `delimiter`.
      */
     public function test_default_to_internal_conversion() {
         # Check for single values
@@ -333,9 +334,12 @@ class APICoreFieldTestCase extends API\Core\TestCase
         $this->assert_equals($test_field->to_internal(), "0");
 
         # Check for many values
-        $test_field = new API\Core\Field(type: "integer", many: true);
+        $test_field = new API\Core\Field(type: "integer", many: true, delimiter: " ");
         $test_field->name = "test_field";
         $test_field->value = [0, 1, 2, 3, 4, 5];
+
+        # Ensure the internal value of `many` fields is joined back into a string using the `delimiter`
+        $this->assert_equals($test_field->to_internal(), implode($test_field->delimiter, $test_field->value));
 
         # Loop through each set value and ensure it is a string
         foreach ($test_field->to_internal() as $internal_value) {

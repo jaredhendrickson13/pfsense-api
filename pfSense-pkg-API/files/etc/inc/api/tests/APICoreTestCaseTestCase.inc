@@ -114,6 +114,27 @@ class APICoreTestCaseTestCase extends TestCase
     }
 
     /**
+     * Checks that the TestCase's assert_is_greater_than() passes test if both values were equal.
+     */
+    public function test_assert_is_greater_than() {
+        $this->assert_is_greater_than(2, 1);
+    }
+
+    /**
+     * Checks that the TestCase's assert_is_greater_than() passes test if values were not equal.
+     */
+    public function test_bad_assert_is_greater_than() {
+        try {
+            $this->assert_equals(1, 2);
+        }
+        catch (AssertionError) {
+            return;
+        }
+
+        throw new AssertionError("Expected AssertionError for second value being greater than first value.");
+    }
+
+    /**
      * Checks that the TestCase's assert_throws_response() passes test if a Response object or one of its children
      * were thrown with a specific 'ref_id' and 'code'.
      */
