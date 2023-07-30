@@ -209,7 +209,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
     public function test_model_validate_missing_package_includes() {
         $this->assert_throws_response(
             ref_id: "MODEL_WITH_FAILED_INCLUDE",
-            code: 404,
+            code: 500,
             callable: function () {
                 $test_model = new API\Core\Model();
                 $test_model->package_includes = ["this_inc_file_does_not_exist.inc"];
