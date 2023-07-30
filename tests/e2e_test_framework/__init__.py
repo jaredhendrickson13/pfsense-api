@@ -357,18 +357,15 @@ class APIE2ETest:
         # Otherwise, raise an error
         raise ConnectionError(f"Failed to run '{cmd}' at '{self.format_url(test_params['uri'])}'")
 
-    def is_priv_allowed(self, method, username, password, privs, needs_privs=True):
+    def is_priv_allowed(self, method, username, password, priv):
         """
         Makes a test API call to check if a specified privilege authorizes the API call
         :param method: (string) the method to use when testing
         :param username: (string) the username to create/update and use for tests
         :param password: (string) the password to create/update and use for tests
-        :param privs: (array) the array of privs to assign the user and test
-        :param needs_privs: (bool) whether or not the request requires privileges
+        :param priv: (string) the priv to assign the user and test
         :return: (boolean) returns true if the privilege authorized the request
         """
-        # pylint: disable=too-many-arguments
-
         # Create/update the test user with no privileges to start and make a request
         self.create_or_update_user(username, password, [])
         no_priv_resp = self.make_request(
@@ -378,7 +375,7 @@ class APIE2ETest:
         )
 
         # Create the test user with no privileges to start and make a request
-        self.create_or_update_user(username, password, privs)
+        self.create_or_update_user(username, password, [priv])
         priv_resp = self.make_request(
             method,
             test_params={"username": username, "password": password, "req_data": {"_action_bypass": True}},
@@ -388,8 +385,8 @@ class APIE2ETest:
         # Delete the test user
         self.delete_user(username)
 
-        # Ensure unprivileged request returned a 403 if needed, and the privileged request didn't
-        if (no_priv_resp.status_code == 403 or not needs_privs) and priv_resp.status_code != 403:
+        # Ensure unprivileged reqeust returned a 403 and the privileged request didn't
+        if no_priv_resp.status_code == 403 and priv_resp.status_code != 403:
             return True
 
         return False
@@ -416,22 +413,12 @@ class APIE2ETest:
                     test_params = {"name": f"Checking privilege '{privilege}' acceptance"}
 
                     # Check if the privilege was allowed
-                    if self.is_priv_allowed(method.upper(), username, password, [privilege]):
+                    if self.is_priv_allowed(method.upper(), username, password, privilege):
                         print(self.__format_msg__(method.upper(), test_params, "Response is valid", mode="ok"))
                     else:
                         msg = f"Expected API to authorize call with privilege '{privilege}'"
                         print(self.__format_msg__(method.upper(), test_params, msg))
                         self.exit_code = 1
-            # If we don't have privileges, ensure the endpoint doesn't require privileges
-            else:
-                # Check if the privilege was allowed
-                if self.is_priv_allowed(method.upper(), username, password, [], needs_privs=False):
-                    print(self.__format_msg__(method.upper(), test_params, "Response is valid", mode="ok"))
-                else:
-                    msg = "Expected API to authorize call with out privilege privileges"
-                    print(self.__format_msg__(method.upper(), test_params, msg))
-                    self.exit_code = 1
-
 
     @staticmethod
     def has_json_response(resp):
