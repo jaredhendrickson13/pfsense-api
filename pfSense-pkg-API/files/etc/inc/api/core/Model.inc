@@ -32,6 +32,7 @@ foreach(glob("/etc/inc/api/fields/*.inc") as $field) {
 
 use API;
 use Exception;
+use ReflectionClass;
 
 # Constants
 const DEFAULT_CLIENT_USERNAME = "(system api)";
@@ -95,7 +96,7 @@ class Model {
 
         # Set the verbose and verbose plural names for this object if not specified
         if (!$this->verbose_name) {
-            $model_name = get_class($this);
+            $model_name = (new ReflectionClass($this))->getShortName();;
             $this->verbose_name = preg_replace('/([a-z])([A-Z])/s','$1 $2', $model_name);
         }
         if (!$this->verbose_name_plural) {
