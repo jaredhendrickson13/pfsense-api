@@ -52,6 +52,21 @@ class APICoreModelTestCase extends API\Core\TestCase {
     }
 
     /**
+     * Checks the Model's default `verbose_name` and `verbose_name_plural` are properly derived from its class name.
+     */
+    public function test_model_default_verbose_name() {
+        # Create a normal Model object and a FirewallAlias Model object for testing
+        $test_model = new API\Core\Model();
+        $test_fw_alias = new API\Models\FirewallAlias();
+
+        # Ensure their default names are correct
+        $this->assert_equals($test_model->verbose_name, "Model");
+        $this->assert_equals($test_model->verbose_name_plural, "Models");
+        $this->assert_equals($test_fw_alias->verbose_name, "Firewall Alias");
+        $this->assert_equals($test_fw_alias->verbose_name_plural, "Firewall Aliases");
+    }
+
+    /**
      * Checks that we are able to read items from the internal pfSense configuration by path.
      */
     public function test_model_get_config_valid_path() {

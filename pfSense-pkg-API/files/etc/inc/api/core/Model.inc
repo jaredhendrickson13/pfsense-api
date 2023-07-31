@@ -51,6 +51,8 @@ class Model {
     public array $package_includes = [];
     public array $representation_data = [];
     public string $internal_callable = "";
+    public string $verbose_name = "";
+    public string $verbose_name_plural = "";
 
     /**
      * Values to assign when a Model object is first constructed.
@@ -89,6 +91,16 @@ class Model {
             $this->client = new API\Core\Auth();
             $this->client->username = DEFAULT_CLIENT_USERNAME;
             $this->client->ip_address = DEFAULT_CLIENT_IP_ADDRESS;
+        }
+
+        # Set the verbose and verbose plural names for this object if not specified
+        if (!$this->verbose_name) {
+            $model_name = get_class($this);
+            $this->verbose_name = preg_replace('/([a-z])([A-Z])/s','$1 $2', $model_name);
+        }
+        if (!$this->verbose_name_plural) {
+            $plural_suffix = (str_ends_with($this->verbose_name, "s")) ? "es" : "s";
+            $this->verbose_name_plural = $this->verbose_name.$plural_suffix;
         }
     }
 
@@ -200,7 +212,7 @@ class Model {
      * Write configuration changes to the config file
      * @param string $change_note The message to write to the change log.
      */
-    protected function write_config(string $change_note = "Made unknown change via API") {
+    protected function write_config(string $change_note) {
         # Local variables
         $lock_file = "/tmp/.api.write_config.lock";
 
@@ -453,10 +465,10 @@ class Model {
 
     /**
      * Checks if the required pfSense packages for this model are installed.
-     * @return bool `true` if all required pfSense packages are installed, `false` if any required pfSense packages
-     *      are not installed.
+     * @throws NotFoundError When the Model requires a pfSense package that is not installed.
+     * @throws ServerError When a package requires a PHP include file that could not be found.
      */
-    private function check_packages() : bool {
+    private function check_packages() {
         # Loop through each required package and ensure it is present on the system.
         foreach ($this->packages as $pkg) {
             # Return an error if the package is not installed
@@ -478,8 +490,13 @@ class Model {
             }
 
         }
+    }
 
-        return true;
+    /**
+     * Initializes the default 'apply' method. This method is intended to be overridden by a child model class and is
+     * responsible for reloading/restarting services after changes occur.
+     */
+    protected function apply() {
     }
 
     /**
@@ -499,84 +516,111 @@ class Model {
     }
 
     /**
-     * Initializes the default '_create' method. By default, this method
-     * @return array an associative array containing the API response
+     * Initializes the default '_create' method. For models with a `config_path` and `many` set, this method will
+     * automatically obtain the next model ID for the object and write this object to the pfSense config. Other models
+     * will require this method to be overridden to support creations for this object.
+     * @throws ServerError When the Model requesting creation does not have `many` enable and/or does not have a
+     * `config_path` set. These Models' child class must override this method to add context-specific creations.
      */
-    public function _create() : array {
-        $this->write_config();
+    protected function _create() {
+        # Check if this model has a `config_path` and `many` set, we will apply a default behavior for these models
+        if ($this->config_path and $this->many) {
+            # Get the next ID and name of this model
+            $this->id = $this->get_next_id();
+            $this->set_config(path: "$this->config_path/$this->id", value: $this->to_internal());
+            $this->write_config("Added $this->verbose_name via API");
+            return;
+        }
+
+        # Otherwise, this method needs to be overridden by a child class to add specific context. Throw an error.
+        throw new ServerError(
+            message: "Models without a 'config_path' or 'many' require an overridden _create method",
+            ref_id: "MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD"
+        );
     }
 
     /**
-     * Perform validation and execute the create action of the current model.
-     * @return array an associative array containing the API response
+     * Perform validation, create this object internally and restart any associated services.
      */
-    final public function create() : array {
-        # If the API call was valid, execute the action. Otherwise, return the first error encountered.
+    final public function create() {
+        # Ensure all object fields and validations succeed for proceeding.
         if ($this->validate()) {
-            # Bypass the action if requested
-            if ($this->representation_data["_action_bypass"] === true) {
-                return API\Core\Response\get(15);
-            } else {
-                return $this->_create();
-            }
+            # Run the creation method and apply methods
+            $this->_create();
+            $this->apply();
         }
     }
 
     /**
-     * Initializes the default 'update' method. Child classes will override this class to add functionality that
-     * performs an 'update' action for this object (if applicable). If not overridden, an API error will simply return
-     * a method not implemented error. This method is not intended to be called directly, rather it should be called
-     * using the public 'update' method.
-     * @return array an associative array containing the API response
+     * Initializes the default '_update' method. For models with a `config_path`, this method will automatically
+     * write changes to the existing object in configuration. Other models must override this method with context
+     * specific updates.
+     * @throws ServerError When the Model requesting update does not have a `config_path` set. These Models' child
+     * class must override this method to add context-specific updates.
      */
-    public function _update() : array {
-        return API\Core\Response\get(2);
+    protected function _update() {
+        # Check if this model has a `config_path`, we will apply a default behavior for these models
+        if ($this->config_path) {
+            # Only use the ID in the config path if 'many' is enabled. Otherwise, just use the base config path.
+            $update_config_path = ($this->many) ? "$this->config_path/$this->id" : $this->config_path;
+
+            # Write the changes to the object in config.
+            $this->set_config(path: $update_config_path, value: $this->to_internal());
+            $this->write_config("Modified $this->verbose_name via API");
+            return;
+        }
+
+        # Otherwise, this method needs to be overridden by a child class to add specific context. Throw an error.
+        throw new ServerError(
+            message: "Models without a 'config_path' require an overridden _update method",
+            ref_id: "MODEL_REQUIRE_OVERRIDDEN_UPDATE_METHOD"
+        );
     }
 
     /**
-     * Perform validation and execute the update action of the current model.
-     * @return array an associative array containing the API response
+     * Perform validation, update this object internally and restart any associated services.
      */
-    public function update() : array {
-        # If the API call was valid, execute the action. Otherwise, return the first error encountered.
+    final public function update() {
+        # Ensure all object fields and validations succeed for proceeding.
         if ($this->validate()) {
-            # Bypass the action if requested
-            if ($this->representation_data["_action_bypass"] === true) {
-                return API\Core\Response\get(15);
-            } else {
-                return $this->_update();
-            }
-        } else {
-            return $this->errors[0];
+            # Run the update method and apply methods
+            $this->_update();
+            $this->apply();
         }
     }
 
     /**
-     * Initializes the default 'delete' method. Child classes will override this class to add functionality that
-     * performs an 'delete' action for this object (if applicable). If not overridden, an API error will simply return
-     * a method not implemented error. This method is not intended to be called directly, rather it should be called
-     * using the public 'delete' method.
-     * @return array an associative array containing the API response
+     * Initializes the default '_delete' method. For models with a `config_path` and `many`, this method will
+     * automatically remove the existing object from configuration. Other models must override this method with
+     * context-specific deletions.
+     * @throws ServerError When the Model requesting delete does not have a `config_path` or `many` set. These Models'
+     * child class must override this method to add context-specific deletions.
      */
-    public function _delete() : array {
-        return API\Core\Response\get(2);
+    protected function _delete() {
+        # Check if this model has a `config_path`, we will apply a default behavior for these models
+        if ($this->config_path and $this->many) {
+            # Write the changes to the object in config.
+            $this->del_config(path: "$this->config_path/$this->id");
+            $this->write_config("Deleted $this->verbose_name via API");
+            return;
+        }
+
+        # Otherwise, this method needs to be overridden by a child class to add specific context. Throw an error.
+        throw new ServerError(
+            message: "Models without a 'config_path' require an overridden _update method",
+            ref_id: "MODEL_REQUIRE_OVERRIDDEN_UPDATE_METHOD"
+        );
     }
 
     /**
-     * Perform validation and execute the delete action of the current model.
-     * @return array an associative array containing the API response
+     * Perform validation, delete this object internally and restart any associated services.
      */
-    public function delete() : array {
-        # If the API call was valid, execute the action. Otherwise, return the first error encountered.
+    final public function delete() {
+        # Ensure all object fields and validations succeed for proceeding.
         if ($this->validate()) {
-            # Bypass the action if requested
-            if ($this->representation_data["_action_bypass"] === true) {
-                return API\Core\Response\get(15);
-            } else {
-                return $this->_delete();
-            }
-        } else {
-            return $this->errors[0];
+            # Run the update method and apply methods
+            $this->_delete();
+            $this->apply();
         }
     }
 }
