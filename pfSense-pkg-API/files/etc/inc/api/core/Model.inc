@@ -51,7 +51,6 @@ class Model {
     public array $package_includes = [];
     public array $representation_data = [];
     public string $internal_callable = "";
-    public string $change_note = "Made unknown change via API";
 
     /**
      * Values to assign when a Model object is first constructed.
@@ -196,10 +195,12 @@ class Model {
             );
         }
     }
+
     /**
      * Write configuration changes to the config file
+     * @param string $change_note The message to write to the change log.
      */
-    protected function write_config() {
+    protected function write_config(string $change_note = "Made unknown change via API") {
         # Local variables
         $lock_file = "/tmp/.api.write_config.lock";
 
@@ -213,7 +214,7 @@ class Model {
                 # Start a temporary session to write the config that contains the user's username in the config history
                 session_start();
                 $_SESSION["Username"] = $this->client->username;
-                write_config(sprintf(gettext(" ".$this->change_note)));
+                write_config(sprintf(gettext(" ".$change_note)));
                 unset($_SESSION);
                 phpsession_destroy();
                 unlink($lock_file);
@@ -396,7 +397,7 @@ class Model {
      * Populates an array of field names for this model.
      * @return array An array of field names for this model.
      */
-    public function get_fields() : array {
+    final public function get_fields() : array {
         # Variables
         $fields = [];
 
@@ -423,7 +424,7 @@ class Model {
      * @throws ServerError When a server or programming error is detected.
      * @throws ValidationError When model validation fails.
      */
-    public function validate() : bool {
+    final public function validate() : bool {
         # Check for required packages
         $this->check_packages();
 
@@ -489,7 +490,7 @@ class Model {
      * this Model is a `many` model, this returns a representation of ALL model objects from the internal config or
      * callable.
      */
-    public function read(bool $all=false) : array {
+    final public function read(bool $all=false) : array {
         if ($all and $this->many) {
             return $this->get_all_from_internal();
         }
@@ -502,14 +503,14 @@ class Model {
      * @return array an associative array containing the API response
      */
     public function _create() : array {
-        return API\Core\Response\get(2);
+        $this->write_config();
     }
 
     /**
      * Perform validation and execute the create action of the current model.
      * @return array an associative array containing the API response
      */
-    public function create() : array {
+    final public function create() : array {
         # If the API call was valid, execute the action. Otherwise, return the first error encountered.
         if ($this->validate()) {
             # Bypass the action if requested
@@ -518,8 +519,6 @@ class Model {
             } else {
                 return $this->_create();
             }
-        } else {
-            return $this->errors[0];
         }
     }
 
