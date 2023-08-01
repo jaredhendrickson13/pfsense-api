@@ -412,9 +412,9 @@ class Field
      * to_internal(). If `$this->value` is an array, you do not need to worry about joining `$this->value` into a
      * string. Leave it as an array.
      * @param mixed $representation_value The value to convert into it's internal form.
-     * @return array|string The internal value(s) suitable for writing to the pfSense configuration.
+     * @return array|string|null The internal value(s) suitable for writing to the pfSense configuration.
      */
-    protected function _to_internal(mixed $representation_value) : array|string {
+    protected function _to_internal(mixed $representation_value) : array|string|null {
         return strval($representation_value);
     }
 
@@ -422,9 +422,9 @@ class Field
      * Sets a public version of _to_internal() that calls the Field's _to_internal() method. In the case
      * of a `many` Field, _to_internal() method will run against all current values and will then be joined back into
      * the internal string value suitable for writing to the pfSense configuration.
-     * @return array|string The internal array or string value suitable for writing the pfSense configuration.
+     * @return array|string|null The internal array or string value suitable for writing the pfSense configuration.
      */
-    public function to_internal() : array|string {
+    public function to_internal() : array|string|null {
         # For `many` fields, allow for individual value conversions before joining array back into internal string value
         if ($this->many) {
             $internal_values = [];

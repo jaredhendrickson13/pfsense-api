@@ -160,23 +160,20 @@ class APICoreModelTestCase extends API\Core\TestCase {
      * Checks that Models can correctly convert to their internal values.
      */
     public function test_model_to_internal_simple() {
-        # Since the default Model does not have any fields, use a FirewallAlias Model to test this.
-        $test_model = new API\Models\FirewallAlias();
-        $test_model->name->value = "test_alias";
-        $test_model->type->value = "port";
-        $test_model->address->value = ["1","2","3","4","5"];
-        $test_model->detail->value = ["a", "b", "c", "d", "e"];
+        # Since the default Model does not have any fields, use a Test Model to test this.
+        $test_model = new API\Models\Test();
+        $test_model->test_bool->value = true;
+        $test_model->test_string_unique->value = "test_unique_value";
+        $test_model->test_string_many->value = ["a","b","c","d","e"];
         $test_model->validate();
 
         # Ensure the internal value of this object matches what is expected
         $this->assert_equals(
             $test_model->to_internal(),
             [
-                "name"=>$test_model->name->value,
-                "type"=>$test_model->type->value,
-                "descr"=>$test_model->descr->value,
-                "address"=>implode($test_model->address->delimiter, $test_model->address->value),
-                "detail"=>implode($test_model->detail->delimiter, $test_model->detail->value)
+                "test_bool"=>"on",
+                "test_string_unique"=>"test_unique_value",
+                "test_string_many"=>"a/b/c/d/e"
             ]
         );
     }
@@ -185,10 +182,10 @@ class APICoreModelTestCase extends API\Core\TestCase {
      * Checks that the Model's get_fields() method properly finds Field objects and their assigned names.
      */
     public function test_model_get_fields() {
-        # Use a FirewallAlias model since the base Model has no fields assigned.
+        # Use the Test model since the base Model has no fields assigned.
         $this->assert_equals(
-            (new API\Models\FirewallAlias())->get_fields(),
-            ["name", "type", "descr", "address", "detail"]
+            (new API\Models\Test())->get_fields(),
+            ["test_bool", "test_string_unique", "test_string_many"]
         );
     }
 
@@ -233,3 +230,5 @@ class APICoreModelTestCase extends API\Core\TestCase {
         );
     }
 }
+
+

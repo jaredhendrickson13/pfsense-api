@@ -52,6 +52,7 @@ class Model {
     public array $package_includes = [];
     public array $representation_data = [];
     public string $internal_callable = "";
+    public string $subsystem = "";
     public string $verbose_name = "";
     public string $verbose_name_plural = "";
 
@@ -228,6 +229,13 @@ class Model {
                 session_start();
                 $_SESSION["Username"] = $this->client->username;
                 write_config(sprintf(gettext(" ".$change_note)));
+
+                # If a subsystem is specified for this Model, mark it as dirty
+                if ($this->subsystem) {
+                    mark_subsystem_dirty($this->subsystem);
+                }
+
+                # Remove the temporary session and write lock
                 unset($_SESSION);
                 phpsession_destroy();
                 unlink($lock_file);
@@ -542,13 +550,18 @@ class Model {
 
     /**
      * Perform validation, create this object internally and restart any associated services.
+     * @param bool $apply Set to `true` if you would like to immediately apply the changes after they are made.
      */
-    final public function create() {
+    final public function create(bool $apply = false) {
         # Ensure all object fields and validations succeed for proceeding.
         if ($this->validate()) {
-            # Run the creation method and apply methods
-            $this->_create();
-            $this->apply();
+            # Run the _create method
+            $this-_create();
+
+            # Only apply this change immediately if requested
+            if ($apply) {
+                $this->apply();
+            }
         }
     }
 
@@ -580,13 +593,18 @@ class Model {
 
     /**
      * Perform validation, update this object internally and restart any associated services.
+     * @param bool $apply Set to `true` if you would like to immediately apply the changes after they are made.
      */
-    final public function update() {
+    final public function update(bool $apply = false) {
         # Ensure all object fields and validations succeed for proceeding.
         if ($this->validate()) {
-            # Run the update method and apply methods
+            # Run the _update method
             $this->_update();
-            $this->apply();
+
+            # Only apply this change immediately if requested
+            if ($apply) {
+                $this->apply();
+            }
         }
     }
 
@@ -615,13 +633,18 @@ class Model {
 
     /**
      * Perform validation, delete this object internally and restart any associated services.
+     * @param bool $apply Set to `true` if you would like to immediately apply the changes after they are made.
      */
-    final public function delete() {
+    final public function delete(bool $apply = false) {
         # Ensure all object fields and validations succeed for proceeding.
         if ($this->validate()) {
-            # Run the update method and apply methods
+            # Run the _delete method
             $this->_delete();
-            $this->apply();
+
+            # Only apply this change immediately if requested
+            if ($apply) {
+                $this->apply();
+            }
         }
     }
 }

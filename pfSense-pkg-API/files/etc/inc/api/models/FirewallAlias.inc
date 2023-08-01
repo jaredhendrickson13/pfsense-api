@@ -21,6 +21,7 @@ class FirewallAlias extends Model {
 
     public function __construct(mixed $id=null, array $initial_data=[], Auth $client=null) {
         $this->config_path = "aliases/alias";
+        $this->subsystem = "aliases";
         $this->many = true;
         $this->name = new StringField(
             unique: true,
@@ -138,5 +139,13 @@ class FirewallAlias extends Model {
         }
 
         return $detail;
+    }
+
+    /**
+     * Set the apply method to reload the firewall filter after successfully validating and writing firewall alias
+     * changes to config.
+     */
+    public function apply() {
+
     }
 }
