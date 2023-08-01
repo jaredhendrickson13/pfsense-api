@@ -626,8 +626,8 @@ class Model {
 
         # Otherwise, this method needs to be overridden by a child class to add specific context. Throw an error.
         throw new ServerError(
-            message: "Models without a 'config_path' require an overridden _update method",
-            ref_id: "MODEL_REQUIRE_OVERRIDDEN_UPDATE_METHOD"
+            message: "Models without a 'config_path' require an overridden _delete method",
+            ref_id: "MODEL_REQUIRE_OVERRIDDEN_DELETE_METHOD"
         );
     }
 

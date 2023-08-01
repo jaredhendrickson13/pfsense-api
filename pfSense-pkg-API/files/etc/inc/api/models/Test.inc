@@ -37,11 +37,13 @@ class Test extends Model {
         );
         $this->test_string_unique = new StringField(
             unique: true,
-            required: true,
+            required: false,
+            default: "test",
             description: "Demonstrates a string field that must be unique from all other Test model objects stored
                 in configuration."
         );
         $this->test_string_many = new StringField(
+            allow_empty: true,
             default: [],
             many: true,
             delimiter: "/",

@@ -222,7 +222,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
                 $test_model = new API\Core\Model();
 
                 # Create a field to test with and ensure the test model is assigned as its parent context
-                $test_field = new API\Core\Field(type: "string", unique: true);
+                $test_field = new API\Core\Field(type: "string", unique: true, required: true);
                 $test_field->name = "test_field";
                 $test_field->value = "test_value";
                 $test_field->context = $test_model;
@@ -244,7 +244,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
                 $test_model->config_path = "test/config/path";
 
                 # Create a field to test with and ensure the test model is assigned as its parent context
-                $test_field = new API\Core\Field(type: "string", unique: true);
+                $test_field = new API\Core\Field(type: "string", unique: true, required: true);
                 $test_field->name = "test_field";
                 $test_field->value = "test_value";
                 $test_field->context = $test_model;
@@ -261,7 +261,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
             ref_id: "FIELD_INVALID_TYPE",
             code: 400,
             callable: function () {
-                $test_field = new API\Core\Field(type: "string");
+                $test_field = new API\Core\Field(type: "string", required: true);
                 $test_field->name = "test_field";
                 $test_field->value = 1;
                 $test_field->validate();
@@ -270,7 +270,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
     }
 
     /**
-     * Checks that null values are not allowed unless `allowed_null` is set.
+     * Checks that null values are not allowed unless `allow_null` is set.
      */
     public function test_no_empty_values_without_allow_empty() {
         # Check for string
@@ -278,7 +278,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
             ref_id: "FIELD_EMPTY_NOT_ALLOWED",
             code: 400,
             callable: function () {
-                $test_field = new API\Core\Field(type: "string");
+                $test_field = new API\Core\Field(type: "string", required: true);
                 $test_field->name = "test_field";
                 $test_field->value = "";
                 $test_field->validate();
@@ -290,7 +290,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
             ref_id: "FIELD_EMPTY_NOT_ALLOWED",
             code: 400,
             callable: function () {
-                $test_field = new API\Core\Field(type: "string", many: true);
+                $test_field = new API\Core\Field(type: "string", required: true, many: true);
                 $test_field->name = "test_field";
                 $test_field->value = [];
                 $test_field->validate();
@@ -311,7 +311,8 @@ class APICoreFieldTestCase extends API\Core\TestCase
                     type: "string",
                     validators: [
                         new API\Validators\MaxLengthValidator(max_length: 5)
-                    ]
+                    ],
+                    required: true
                 );
                 $test_field->name = "test_field";
                 $test_field->value = "THIS_VALUE_EXCEEDS_OUR_MAX_LENGTH";
@@ -329,6 +330,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
                     validators: [
                         new API\Validators\MaxLengthValidator(max_length: 5)
                     ],
+                    required: true,
                     many: true
                 );
                 $test_field->name = "test_field";
@@ -344,13 +346,13 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_default_to_internal_conversion() {
         # Check for single values
-        $test_field = new API\Core\Field(type: "integer");
+        $test_field = new API\Core\Field(type: "integer", required: true);
         $test_field->name = "test_field";
         $test_field->value = 0;
         $this->assert_equals($test_field->to_internal(), "0");
 
         # Check for many values
-        $test_field = new API\Core\Field(type: "integer", many: true, delimiter: " ");
+        $test_field = new API\Core\Field(type: "integer", required: true, many: true, delimiter: " ");
         $test_field->name = "test_field";
         $test_field->value = [0, 1, 2, 3, 4, 5];
 
@@ -371,7 +373,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
             ref_id: "FIELD_CANNOT_REPRESENT_INTERNAL_VALUE",
             code: 500,
             callable: function () {
-                $test_field = new API\Core\Field(type: "integer");
+                $test_field = new API\Core\Field(type: "integer", required: true);
                 $test_field->name = "test_field";
                 $test_field->from_internal("test");
             }
