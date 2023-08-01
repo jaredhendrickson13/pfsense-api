@@ -229,6 +229,59 @@ class APICoreModelTestCase extends API\Core\TestCase {
             }
         );
     }
+
+    /**
+     * Check default Model object `create()` method to ensure it throws an error if `many` is not set to `true`. Model
+     * objects cannot be created unless the Model supports many objects OR the base Model class's `_create()` method
+     * is overridden.
+     */
+    public function test_model_create_without_many() {
+        $this->assert_throws_response(
+            ref_id: "MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD",
+            code: 500,
+            callable: function () {
+                $test_model = new API\Models\Test();
+                $test_model->many = false;
+                $test_model->create();
+            }
+        );
+    }
+
+    /**
+     * Check default Model object `create()` method to ensure it throws an error if `config_path` is not set. Model
+     * objects cannot be created unless the Model has a valid config path OR the base Model class's `_create()` method
+     * is overridden.
+     */
+    public function test_model_create_without_config_path() {
+        $this->assert_throws_response(
+            ref_id: "MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD",
+            code: 500,
+            callable: function () {
+                $test_model = new API\Models\Test();
+                $test_model->many = true;
+                $test_model->config_path = "";
+                $test_model->create();
+            }
+        );
+    }
+
+    /**
+     * Check default Model object `update()` method to ensure it throws an error if `config_path` is not set. Model
+     * objects cannot be updated unless the Model has a valid config path OR the base Model class's `_update()` method
+     * is overridden.
+     */
+    public function test_model_update_without_config_path() {
+        $this->assert_throws_response(
+            ref_id: "MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD",
+            code: 500,
+            callable: function () {
+                $test_model = new API\Models\Test();
+                $test_model->many = true;
+                $test_model->config_path = "";
+                $test_model->create();
+            }
+        );
+    }
 }
 
 

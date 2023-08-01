@@ -556,7 +556,7 @@ class Model {
         # Ensure all object fields and validations succeed for proceeding.
         if ($this->validate()) {
             # Run the _create method
-            $this-_create();
+            $this->_create();
 
             # Only apply this change immediately if requested
             if ($apply) {
