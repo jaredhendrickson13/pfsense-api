@@ -165,6 +165,22 @@ class APICoreFieldTestCase extends API\Core\TestCase
     }
 
     /**
+     * Checks that a Field that is not required must have a default value.
+     */
+    public function test_require_default_when_field_is_not_required() {
+        # Ensure required fields must have a value set
+        $this->assert_throws_response(
+            ref_id: "FIELD_NEEDS_DEFAULT",
+            code: 500,
+            callable: function () {
+                $test_field = new API\Core\Field(required: false);
+                $test_field->name = "test_field";
+                $test_field->validate();
+            }
+        );
+    }
+
+    /**
      * Checks that the field cannot contain a `default` value when it is `read_only`.
      */
     public function test_no_default_when_field_is_read_only() {

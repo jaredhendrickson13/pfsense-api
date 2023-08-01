@@ -172,6 +172,14 @@ class Field
                 ref_id: "FIELD_IS_REQUIRED"
             );
         }
+
+        # Throw an error if field is not required but no default was specified and `allow_null` is not set.
+        if (!$this->required and !$this->default and !$this->allow_null) {
+            throw new ServerError(
+                message: "Field `$this->name` must have a default or allow null values if not required.",
+                ref_id: "FIELD_NEEDS_DEFAULT"
+            );
+        }
     }
 
     /**

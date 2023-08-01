@@ -31,15 +31,18 @@ class Test extends Model {
         $this->test_bool = new BooleanField(
             indicates_true: "on",
             indicates_false: "off",
+            default: true,
             description: "Demonstrates a boolean field that internally uses 'on' to indicate 'true' or 'off' 
                 to indicate 'false'."
         );
         $this->test_string_unique = new StringField(
             unique: true,
+            required: true,
             description: "Demonstrates a string field that must be unique from all other Test model objects stored
                 in configuration."
         );
         $this->test_string_many = new StringField(
+            default: [],
             many: true,
             delimiter: "/",
             description: "Demonstrates a string field that allows many values to be passed in as an array. When 'many'
