@@ -36,7 +36,7 @@ use ReflectionClass;
 
 # Constants
 const DEFAULT_CLIENT_USERNAME = "(system api)";
-const DEFAULT_CLIENT_IP_ADDRESS = "127.0.0.1";
+const DEFAULT_CLIENT_IP_ADDRESS = "1.2.3.4";
 
 /**
  * Creates a Model object that relates to a pfSense configuration or service. This model defines the necessary steps

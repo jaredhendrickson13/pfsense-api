@@ -10,7 +10,7 @@ fi
 /bin/chmod +x /usr/local/share/pfSense-pkg-API/manage.php
 /bin/ln -s /usr/local/share/pfSense-pkg-API/manage.php /usr/local/bin/pfsense-api
 
-# Build API endpoints and restore any existing configuration
-/usr/local/bin/php -f /usr/local/share/pfSense-pkg-API/manage.php buildendpoints
+# Build API views and restore any existing configuration
+/usr/local/bin/php -f /usr/local/share/pfSense-pkg-API/manage.php buildviews
 /usr/local/bin/php -f /usr/local/share/pfSense-pkg-API/manage.php restore
 

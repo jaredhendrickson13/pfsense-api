@@ -23,9 +23,9 @@ class Test extends Model {
         # required for the `unique` field to work.
         $this->many = true;
 
-        # Make up a configuration path to store 'Test' model objects. This must be a config path that is not
-        # legitimately used by pfSense.
-        $this->config_path = "api_unit_tests/test_model";
+        # Use the dedicate `tests` config section of the API configuration for tests
+        $api_pkg_id = API\Core\Tools\get_api_config()[0];
+        $this->config_path = "installedpackages/package/$api_pkg_id/tests";
 
         # Assign fields and field parameters for this model.
         $this->test_bool = new BooleanField(

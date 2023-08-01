@@ -13,6 +13,3 @@ rm -rf /usr/local/www/api/v1
 # Remove the pfsense-api command line tool
 /bin/rm /usr/local/bin/pfsense-api
 
-# Restore overridden files to their original state
-/bin/mv /etc/inc/system.inc.original /etc/inc/system.inc
-echo "Restoring file overrides to their original state... done."

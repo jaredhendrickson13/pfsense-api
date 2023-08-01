@@ -265,6 +265,34 @@ class APICoreModelTestCase extends API\Core\TestCase {
     }
 
     /**
+     * Checks the default `create()` method correctly validates and writes the Model object to config.
+     */
+    public function test_model_create() {
+        # Create a new test model object in config
+        $test_model = new API\Models\Test();
+        $test_model->test_bool->value = true;
+        $test_model->test_string_unique->value ="Test Value";
+        $test_model->test_string_many->value = ["a", "b", "c"];
+        $test_model->create();
+
+        # Attempt to load the written object from config using it's ID and ensure the values match.
+        $test_model_from_config = new API\Models\Test($test_model->id);
+        $this->assert_equals(
+            $test_model->test_bool->value,
+            $test_model_from_config->test_bool->value
+        );
+        $this->assert_equals(
+            $test_model->test_string_unique->value,
+            $test_model_from_config->test_string_unique->value
+        );
+        $this->assert_equals(
+            $test_model->test_string_many->value,
+            $test_model_from_config->test_string_many->value
+        );
+        $test_model->delete();
+    }
+
+    /**
      * Check default Model object `update()` method to ensure it throws an error if `config_path` is not set. Model
      * objects cannot be updated unless the Model has a valid config path OR the base Model class's `_update()` method
      * is overridden.
