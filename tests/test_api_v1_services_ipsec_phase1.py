@@ -198,28 +198,6 @@ class APIE2ETestServicesIPsecPhase1(e2e_test_framework.APIE2ETest):
             }
         },
         {
-            "name": "Check remote-gateway domain only when protocol is 'both' constraint (inet)",
-            "status": 400,
-            "return": 2169,
-            "req_data": {
-                "iketype": "ikev2",
-                "protocol": "inet",
-                "interface": "wan",
-                "remote-gateway": "example.com"
-            }
-        },
-        {
-            "name": "Check remote-gateway domain only when protocol is 'both' constraint (inet6)",
-            "status": 400,
-            "return": 2169,
-            "req_data": {
-                "iketype": "ikev2",
-                "protocol": "inet6",
-                "interface": "wan",
-                "remote-gateway": "example.com"
-            }
-        },
-        {
             "name": "Check remote gateway unique constraint",
             "status": 400,
             "return": 2170,

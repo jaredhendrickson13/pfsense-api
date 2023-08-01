@@ -1625,12 +1625,6 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "IPsec remote gateway must be IPv6 address when protocol is set to 'inet6'"
         ],
-        2169 => [
-            "status" => "bad request",
-            "code" => 400,
-            "return" => $id,
-            "message" => "IPsec remote gateway cannot be a hostname unless protocol is set to 'both'"
-        ],
         2170 => [
             "status" => "bad request",
             "code" => 400,

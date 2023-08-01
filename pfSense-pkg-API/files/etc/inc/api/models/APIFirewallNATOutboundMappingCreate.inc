@@ -36,7 +36,7 @@ class APIFirewallNATOutboundMappingCreate extends APIModel {
 
     public function action() {
         # Add our new configuration
-        $this->id = count($this->get_config("nat/outbound/rule"));
+        $this->id = $this->get_next_id("nat/outbound/rule");
         $this->set_config("nat/outbound/rule/{$this->id}", $this->validated_data);
         APITools\sort_nat_rules($this->initial_data["top"], $this->id, "outbound");
         $this->write_config();
