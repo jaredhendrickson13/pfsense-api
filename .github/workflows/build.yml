@@ -32,7 +32,7 @@ jobs:
 
       - name: Build pfSense-pkg-API on FreeBSD
         run: |
-          /usr/bin/ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR ${{ matrix.freebsd_version }}.jaredhendrickson.com 'sudo pkill ntpd || true && sudo ntpdate pool.ntp.org || true'
+          /usr/bin/ssh -o StrictHostKeyChecking=no -o LogLevel=quiet ${{ matrix.freebsd_version }}.jaredhendrickson.com 'sudo pkill ntpd || true && sudo ntpdate pool.ntp.org || true'
           /usr/local/bin/python3 tools/make_package.py --host ${{ matrix.freebsd_version }}.jaredhendrickson.com --branch ${{ env.commit_id }} --tag ${{ env.build_version }}_${{ matrix.freebsd_id }}
 
       - name: Teardown FreeBSD build VM
@@ -88,7 +88,7 @@ jobs:
 
       - name: Run pfSense-pkg-API unit tests
         run: |
-          ssh -o StrictHostKeyChecking=no -o LogLevel=ERROR admin@${{ matrix.pfsense_version }}.jaredhendrickson.com 'pfsense-api runtests'
+          ssh -o StrictHostKeyChecking=no -o LogLevel=quiet admin@${{ matrix.pfsense_version }}.jaredhendrickson.com 'pfsense-api runtests'
 
       - name: Teardown pfSense VM
         if: "${{ always() }}"

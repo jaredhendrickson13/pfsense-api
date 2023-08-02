@@ -237,7 +237,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
     public function test_field_many_minimum() {
         $this->assert_throws_response(
             ref_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT",
-            code: 500,
+            code: 400,
             callable: function () {
                 # Create a model to use for testing
                 $test_model = new API\Core\Model();
@@ -259,7 +259,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
     public function test_field_many_maximum() {
         $this->assert_throws_response(
             ref_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT",
-            code: 500,
+            code: 400,
             callable: function () {
                 # Create a model to use for testing
                 $test_model = new API\Core\Model();
