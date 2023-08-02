@@ -244,7 +244,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
                 $test_model->config_path = "test/config/path";
 
                 # Create a field to test with and ensure the test model is assigned as its parent context
-                $test_field = new API\Core\Field(type: "string", many: true, many_minimum: 1);
+                $test_field = new API\Core\Field(type: "string", required: true, many: true, many_minimum: 1);
                 $test_field->name = "test_field";
                 $test_field->value = [];
                 $test_field->context = $test_model;
@@ -266,7 +266,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
                 $test_model->config_path = "test/config/path";
 
                 # Create a field to test with and ensure the test model is assigned as its parent context
-                $test_field = new API\Core\Field(type: "string", many: true, many_maximum: 3);
+                $test_field = new API\Core\Field(type: "string", required: true, many: true, many_maximum: 3);
                 $test_field->name = "test_field";
                 $test_field->value = ["too", "many", "values", "!"];
                 $test_field->context = $test_model;
@@ -280,7 +280,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_field_many_minimum_set_according_to_allow_empty() {
         # Ensure that the `many_minimum` value is automatically changed to 0 when `allow_empty` is enabled
-        $test_field = new API\Core\Field(type: "string", allow_empty: true, many: true, many_minimum: 3);
+        $test_field = new API\Core\Field(type: "string", allow_empty: true, required: true, many: true, many_minimum: 3);
         $this->assert_equals($test_field->many_minimum, 0);
     }
 
