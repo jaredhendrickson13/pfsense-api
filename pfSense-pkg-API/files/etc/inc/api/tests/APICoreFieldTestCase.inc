@@ -348,7 +348,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
     }
 
     /**
-     * Checks that null values are not allowed unless `allow_null` is set.
+     * Checks that empty values are not allowed unless `allow_empty` is set.
      */
     public function test_no_empty_values_without_allow_empty() {
         # Check for string
@@ -368,9 +368,41 @@ class APICoreFieldTestCase extends API\Core\TestCase
             ref_id: "FIELD_EMPTY_NOT_ALLOWED",
             code: 400,
             callable: function () {
-                $test_field = new API\Core\Field(type: "string", required: true, many: true);
+                $test_field = new API\Core\Field(type: "string", required: true, many: true, many_minimum: 0);
                 $test_field->name = "test_field";
                 $test_field->value = [];
+                $test_field->validate();
+            }
+        );
+    }
+
+    /**
+     * Check that null values are not allowed unless `allow_null` is set.
+     */
+    public function test_no_null_values_without_allow_null() {
+        $this->assert_throws_response(
+            ref_id: "FIELD_INVALID_TYPE",
+            code: 400,
+            callable: function () {
+                $test_field = new API\Core\Field(type: "string", required: true);
+                $test_field->name = "test_field";
+                $test_field->value = null;
+                $test_field->validate();
+            }
+        );
+    }
+
+    /**
+     * Check that null values are allowed if `allow_null` is set.
+     */
+    public function test_allow_null_values_with_allow_null() {
+        $this->assert_throws_response(
+            ref_id: "FIELD_INVALID_TYPE",
+            code: 400,
+            callable: function () {
+                $test_field = new API\Core\Field(type: "string", allow_null: true, default: null);
+                $test_field->name = "test_field";
+                $test_field->value = null;
                 $test_field->validate();
             }
         );
