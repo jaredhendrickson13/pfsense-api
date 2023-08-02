@@ -25,7 +25,7 @@ class Test extends Model {
 
         # Use the dedicate `tests` config section of the API configuration for tests
         $api_pkg_id = API\Core\Tools\get_api_config()[0];
-        $this->config_path = "installedpackages/package/$api_pkg_id/tests";
+        $this->config_path = "installedpackages/package/$api_pkg_id/conf/tests";
 
         # Assign fields and field parameters for this model.
         $this->test_bool = new BooleanField(
