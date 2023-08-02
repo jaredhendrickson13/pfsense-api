@@ -10,7 +10,7 @@ require_once("api/core/Model.inc");
  */
 class ModelSet {
     const QUERY_MODIFIERS = ["startswith", "endswith", "contains", "lt", "lte", "gt", "gte", "exact"];
-    private array $model_objects;
+    public array $model_objects;
 
     /**
      * Creates a ModelSet object that contains multiple Model objects.

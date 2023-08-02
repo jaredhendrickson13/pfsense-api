@@ -290,18 +290,12 @@ class Field
             }
 
             # Fetch model objects for each internal object stored in config for this model
-            $model_objects = $this->context->get_all_from_internal();
+            $modelset = $this->context->get_all_from_internal();
             $field_name = $this->name;
 
-            foreach ($model_objects as $model_object_id => $model_object) {
+            foreach ($modelset->model_objects as $model_object_id => $model_object) {
                 # Move onto the next model object if this model object's field value does not match our objects value.
-                if ($model_object->$field_name->value != $this->value) {
-                    continue;
-                }
-                # Move onto the next item if the model object's ID matches our object's model context's ID.
-                # This prevents `unique` errors on objects that are trying to update their own value with the value
-                # it already has set.
-                elseif ($model_object->id === $this->context->id) {
+                if ($model_object->$field_name->value != $this->value or $model_object->id === $this->context->id) {
                     continue;
                 }
                 # When neither of previous conditions are met, we've found a unique conflict. Throw an error.

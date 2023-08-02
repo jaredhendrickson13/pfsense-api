@@ -50,7 +50,6 @@ class Model {
     public API\Core\Auth $client;
     public array $packages = [];
     public array $package_includes = [];
-    public array $representation_data = [];
     public string $internal_callable = "";
     public string $subsystem = "";
     public string $verbose_name = "";
@@ -80,8 +79,8 @@ class Model {
         }
 
         # Use the representation to obtain or construct this object if present.
-        if ($this->representation_data) {
-            $this->from_internal($id);
+        if ($representation_data) {
+            $this->from_representation($representation_data);
         }
 
         # Allow an Auth object to be assigned the model. Allows models to view a client's IP address and username.
@@ -409,7 +408,7 @@ class Model {
      * serialization such as JSON, YAML, etc.
      * @return array The serializable array representation of this object.
      */
-    public function to_representation() : array {
+    final public function to_representation() : array {
         # Variables
         $representation = [];
 
@@ -426,7 +425,12 @@ class Model {
         return $representation;
     }
 
-    public function from_representation(array $representation_data) {
+    /**
+     * Loads the Model object using an array representation of the object.
+     * @param array $representation_data The array of key-value pairs to use when loading the Model object from
+     * representation.
+     */
+    final public function from_representation(array $representation_data) {
         # When an ID is provided, fetch this objects from the internal configuration using the ID.
         if (array_key_exists("id", $representation_data)) {
             $this->from_internal($representation_data["id"]);

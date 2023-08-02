@@ -422,7 +422,33 @@ class APICoreModelTestCase extends API\Core\TestCase {
         );
     }
 
+    /**
+     * Checks that we are able to construct a Model object with an array of representation data.
+     */
+    public function test_model_constructs_from_representation() {
+        # Construct a new test model object using representation data
+        $test_model = new API\Models\Test(
+            representation_data: [
+                "test_bool" => true,
+                "test_string_unique" => "Test value",
+                "test_string_many" => ["a", "b", "c"]
+            ]
+        );
 
+        # Ensure fields were properly set from the representation data
+        $this->assert_equals(
+            $test_model->test_bool->value,
+            true
+        );
+        $this->assert_equals(
+            $test_model->test_string_unique->value,
+            "Test value"
+        );
+        $this->assert_equals(
+            $test_model->test_string_many->value,
+            ["a", "b", "c"]
+        );
+    }
 }
 
 

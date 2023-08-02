@@ -254,6 +254,31 @@ class APICoreFieldTestCase extends API\Core\TestCase
     }
 
     /**
+     * Checks that `unique` fields successfully require the field to be unique from all other objects in the
+     * parent Model context's `config_path`.
+     */
+    public function test_field_unique_constraint() {
+        # Create a test object
+        $test_model = new API\Models\Test();
+        $test_model->test_string_unique->value = "This must be unique";
+        $test_model->create();
+
+        # Try to create another object with the same value for the unique field and ensure it throws an error
+        $this->assert_throws_response(
+            ref_id: "FIELD_MUST_BE_UNIQUE",
+            code: 400,
+            callable: function () {
+                $non_unique_test_model = new API\Models\Test();
+                $non_unique_test_model->test_string_unique->value = "This must be unique";
+                $non_unique_test_model->create();
+            }
+        );
+
+        # Delete the test object
+        $test_model->delete();
+    }
+
+    /**
      * Checks that an error is thrown if a value is set with a type that doesn't match this field.
      */
     public function test_field_type_constraint() {
