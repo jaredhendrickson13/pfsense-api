@@ -257,6 +257,23 @@ class Model {
 
         # Loop through each of this Model's fields and add its value to a serializable array
         foreach ($this->get_fields() as $field) {
+            # Don't add this field if it's value is `null`. This is how values are unset.
+            if (is_null($this->$field->value)) {
+                continue;
+            }
+
+            # Init the namespace for this field if a namespace is specified and does not exist yet.
+            if ($this->$field->internal_namespace and !array_key_exists($this->$field->internal_namespace, $internal_object)) {
+                $internal_object[$this->$field->internal_namespace] = [];
+            }
+
+            # Nest this field under the namespace if specified and continue through the loop.
+            if ($this->$field->internal_namespace) {
+                $internal_object[$this->$field->internal_namespace][$this->$field->internal_name] = $this->$field->to_internal();
+                continue;
+            }
+
+            # Otherwise, just store the field directly to the object
             $internal_object[$this->$field->internal_name] = $this->$field->to_internal();
         }
 
@@ -311,9 +328,19 @@ class Model {
             $this->$field->name = $field;
             $this->$field->check_field_names();
 
-            # Convert the internal value to it's representation value if it exists in the internal object
-            if (array_key_exists($this->$field->internal_name, $internal_object)) {
+            # Check the internal object for this field directly and convert it's value from internal to representation
+            if (!$this->$field->internal_namespace and array_key_exists($this->$field->internal_name, $internal_object)) {
                 $this->$field->from_internal($internal_object[$this->$field->internal_name]);
+            }
+
+            # Check if this field has a namespace and check if the internal object has the namespace
+            if ($this->$field->internal_namespace and array_key_exists($this->$field->internal_namespace, $internal_object)) {
+                # Check the namespace for the field and convert it's value from internal to representation
+                if (array_key_exists($this->$field->internal_name, $internal_object[$this->$field->internal_namespace])) {
+                    $this->$field->from_internal(
+                        $internal_object[$this->$field->internal_namespace][$this->$field->internal_name]
+                    );
+                }
             }
         }
     }
@@ -449,14 +476,15 @@ class Model {
         # Check for required packages
         $this->check_packages();
 
-        # Obtain the names of Fields assigned to this object
-        $fields = $this->get_fields();
-
         # Loop through each of this object's assigned fields and validate them.
-        foreach ($fields as $field) {
+        foreach ($this->get_fields() as $field) {
             # Assign the name of this field and context to this Field object
             $this->$field->name = $field;
+            $this->$field->internal_name = ($this->$field->internal_name) ?: $this->$field->name;
             $this->$field->context = $this;
+
+            # Ensure this field's internal name is unique to its namespace
+            $this->is_fields_internal_name_unique($field);
 
             # Run validation on this field
             $this->$field->validate();
@@ -470,6 +498,32 @@ class Model {
         }
 
         return true;
+    }
+
+    /**
+     * Checks to ensure each of this Model's Field object has an internal name that is unique to it's namespace.
+     * @param string $field The name of the field to check for a unique internal name
+     * @throws ServerError When this Model contains a Field object with an internal name that is not unique to it's
+     * namespace.
+     */
+    private function is_fields_internal_name_unique(string $field) {
+        # Loop to compare each field's names against each other to ensure there are no conflicts
+        foreach ($this->get_fields() as $eval_field) {
+            # Ignore if we are evaluating the same field, they will always have the same names.
+            if ($field === $eval_field) {
+                continue;
+            }
+
+            # Throw an error if the namespace and the internal name are the same. These must be unique.
+            if ($this->$field->internal_namespace === $this->$eval_field->internal_namespace) {
+                if ($this->$field->internal_name === $this->$eval_field->internal_name) {
+                    throw new ServerError(
+                        message: "Model field internal names must be unique to it's namespace.",
+                        ref_id: "MODEL_FIELDS_WITH_CONFLICTING_INTERNAL_NAMES"
+                    );
+                }
+            }
+        }
     }
 
     /**

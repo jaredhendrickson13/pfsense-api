@@ -17,15 +17,15 @@ class Test extends Model {
     public Field $test_bool;
     public Field $test_string_unique;
     public Field $test_string_many;
+    public Field $test_string_namespace;
 
     public function __construct(mixed $id = null, array $representation_data = [], Auth $client = null) {
         # Mark this model as a `many` model indicating multiple Test model objects can be created. This is also
         # required for the `unique` field to work.
         $this->many = true;
 
-        # Use the dedicate `tests` config section of the API configuration for tests
-        $api_pkg_id = API\Core\Tools\get_api_config()[0];
-        $this->config_path = "installedpackages/package/$api_pkg_id/conf/tests";
+        # pfSense won't let us use an arbitrary path so use filter/rule instead
+        $this->config_path = "filter/rule";
 
         # Assign fields and field parameters for this model.
         $this->test_bool = new BooleanField(
@@ -50,6 +50,12 @@ class Test extends Model {
             description: "Demonstrates a string field that allows many values to be passed in as an array. When 'many'
                 is set, values must be passed in as an array of strings. Also demonstrates that the internal version
                 of this value will be the array of strings joined together by '/'."
+        );
+        $this->test_string_namespace = new StringField(
+            required: false,
+            default: "test namespace field value",
+            description: "Demonstrates a string field that is nested under the namespace ",
+            internal_namespace: "test_namespace"
         );
 
         # Parent base 'Model' object must be constructed very last to ensure the Model has all configured attributes.

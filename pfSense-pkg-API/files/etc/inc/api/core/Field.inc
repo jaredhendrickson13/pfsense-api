@@ -19,6 +19,7 @@ class Field
     public string $description = "";
     public string $name = "";
     public string $internal_name = "";
+    public string $internal_namespace = "";
     public array $when = [];
     public Model|null $context = null;
 
@@ -45,6 +46,9 @@ class Field
      * for this field in the API documentation.
      * @param string $internal_name The name of the field as it is stored in the pfSense configuration. If not set, the
      * internal name will utilize the $name of the Field object.
+     * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
+     * the field internal value under a specific namespace as an associative array. This only applies to the internal
+     * value, not the representation value.
      */
     public function __construct(
         string $type = "",
@@ -60,6 +64,7 @@ class Field
         string $delimiter = ",",
         string $description = "",
         string $internal_name = "",
+        string $internal_namespace = ""
     ){
         # Assign values to object properties
         $this->type = $type;
@@ -75,6 +80,7 @@ class Field
         $this->delimiter = $delimiter;
         $this->description = $description;
         $this->internal_name = $internal_name;
+        $this->internal_namespace = $internal_namespace;
 
         # Ensure the $default value is in $choices if set
         if (isset($default) and $choices and !in_array($default, $choices, true)) {

@@ -76,7 +76,7 @@ function run_tests() {
         }
     }
     echo "---------------------------------------------------------".PHP_EOL;
-    echo "Ran call tests: $succeed_count/$test_count tests passed.".PHP_EOL;
+    echo "Ran all tests: $succeed_count/$test_count tests passed.".PHP_EOL;
     exit($exit_code);
 }
 

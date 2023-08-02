@@ -159,21 +159,27 @@ class APICoreModelTestCase extends API\Core\TestCase {
     /**
      * Checks that Models can correctly convert to their internal values.
      */
-    public function test_model_to_internal_simple() {
+    public function test_model_to_internal() {
         # Since the default Model does not have any fields, use a Test Model to test this.
         $test_model = new API\Models\Test();
         $test_model->test_bool->value = true;
         $test_model->test_string_unique->value = "test_unique_value";
         $test_model->test_string_many->value = ["a","b","c","d","e"];
+        $test_model->test_string_namespace->value = "test string namespace value";
         $test_model->validate();
 
         # Ensure the internal value of this object matches what is expected
         $this->assert_equals(
             $test_model->to_internal(),
             [
-                "test_bool"=>"on",
-                "test_string_unique"=>"test_unique_value",
-                "test_string_many"=>"a/b/c/d/e"
+                $test_model->test_bool->internal_name => $test_model->test_bool->indicates_true,
+                $test_model->test_string_unique->internal_name => $test_model->test_string_unique->value,
+                $test_model->test_string_many->internal_name => implode(
+                    $test_model->test_string_many->delimiter, $test_model->test_string_many->value
+                ),
+                $test_model->test_string_namespace->internal_namespace => [
+                    $test_model->test_string_namespace->internal_name=>$test_model->test_string_namespace->value
+                ]
             ]
         );
     }
@@ -185,7 +191,25 @@ class APICoreModelTestCase extends API\Core\TestCase {
         # Use the Test model since the base Model has no fields assigned.
         $this->assert_equals(
             (new API\Models\Test())->get_fields(),
-            ["test_bool", "test_string_unique", "test_string_many"]
+            ["test_bool", "test_string_unique", "test_string_many", "test_string_namespace"]
+        );
+    }
+
+    /**
+     * Checks to ensure Models cannot have Field objects with the same internal namespace and internal name.
+     */
+    public function test_model_field_internal_name_unique_to_namespace() {
+        $this->assert_throws_response(
+            ref_id: "MODEL_FIELDS_WITH_CONFLICTING_INTERNAL_NAMES",
+            code: 500,
+            callable: function () {
+                $test_model = new API\Models\Test();
+                $test_model->test_bool->internal_namespace = "same_namespace";
+                $test_model->test_bool->internal_name = "same_name";
+                $test_model->test_string_unique->internal_namespace = "same_namespace";
+                $test_model->test_string_unique->internal_name = "same_name";
+                $test_model->validate();
+            }
         );
     }
 
@@ -310,6 +334,41 @@ class APICoreModelTestCase extends API\Core\TestCase {
     }
 
     /**
+     * Checks the default `update()` method correctly validates, updates and writes the Model object to config.
+     */
+    public function test_model_update() {
+        # Create a new test model object in config
+        $test_model = new API\Models\Test();
+        $test_model->test_bool->value = true;
+        $test_model->test_string_unique->value ="Test Value";
+        $test_model->test_string_many->value = ["a", "b", "c"];
+        $test_model->create();
+
+        # Create a new test model object in config
+        $test_model_to_update = new API\Models\Test($test_model->id);
+        $test_model_to_update->test_bool->value = false;
+        $test_model_to_update->test_string_unique->value ="Updated Test Value";
+        $test_model_to_update->test_string_many->value = ["c", "b", "a"];
+        $test_model_to_update->update();
+
+        # Attempt to load the written object from config using it's ID and ensure the values match.
+        $test_model_from_config = new API\Models\Test($test_model_to_update->id);
+        $this->assert_equals(
+            $test_model_to_update->test_bool->value,
+            $test_model_from_config->test_bool->value
+        );
+        $this->assert_equals(
+            $test_model_to_update->test_string_unique->value,
+            $test_model_from_config->test_string_unique->value
+        );
+        $this->assert_equals(
+            $test_model_to_update->test_string_many->value,
+            $test_model_from_config->test_string_many->value
+        );
+        $test_model->delete();
+    }
+
+    /**
      * Check default Model object `delete()` method to ensure it throws an error if `many` is not set to `true`. Model
      * objects cannot be deleted unless the Model supports many objects OR the base Model class's `_delete()` method
      * is overridden.
@@ -342,6 +401,28 @@ class APICoreModelTestCase extends API\Core\TestCase {
             }
         );
     }
+
+    /**
+     * Checks that the default `delete()` method actually deletes the object from configuration.
+     */
+    public function test_model_delete() {
+        # Ensure we cannot find the object from config after it's deleted.
+        $this->assert_throws_response(
+            ref_id: "MODEL_OBJECT_NOT_FOUND",
+            code: 404,
+            callable: function () {
+                # Create a new test model object in config
+                $test_model = new API\Models\Test();
+                $test_model->create();
+
+                # Delete the object and try to load the object from config
+                $test_model->delete();
+                new API\Models\Test(id: $test_model->id);
+            }
+        );
+    }
+
+
 }
 
 

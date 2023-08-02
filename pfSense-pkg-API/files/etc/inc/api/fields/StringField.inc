@@ -31,6 +31,9 @@ class StringField extends API\Core\Field {
      * @param string $description Set a description for this field. This description will be used in API documentation.
      * @param string $internal_name Assign a different field name to use when referring to the internal field as it's
      * stored in the pfSense configuration.
+     * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
+     * the fields internal value under a specific namespace as an associative array. This only applies to the internal
+     * value, not the representation value.
      */
     public function __construct(
         int $max_length = 128,
@@ -45,7 +48,8 @@ class StringField extends API\Core\Field {
         bool $many = false,
         string $delimiter = ",",
         string $description = "",
-        string $internal_name = ""
+        string $internal_name = "",
+        string $internal_namespace = ""
     )
     {
         parent::__construct(
@@ -61,7 +65,8 @@ class StringField extends API\Core\Field {
             many: $many,
             delimiter: $delimiter,
             description: $description,
-            internal_name: $internal_name
+            internal_name: $internal_name,
+            internal_namespace: $internal_namespace
         );
         $this->max_length = $max_length;
     }
