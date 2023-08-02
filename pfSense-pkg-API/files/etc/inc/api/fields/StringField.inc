@@ -11,7 +11,6 @@ use API;
  * string Model fields.
  */
 class StringField extends API\Core\Field {
-
     /**
      * Defines the StringField object and sets its options.
      * @param int $min_length The minimum number of characters required for this string field.
@@ -32,6 +31,10 @@ class StringField extends API\Core\Field {
      * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
      * the fields internal value under a specific namespace as an associative array. This only applies to the internal
      * value, not the representation value.
+     * @param array $conditions An array of conditions the field must meet to be included. This allows you to specify
+     * conditions of other fields within the parent Model context. For example, if the parent Model context has two
+     * fields, one field named `type` and the other being this field; and you only want this field to be included if
+     * `type` is equal to `type1`, you could assign ["type" => "type1"] to this parameter.
      * @param array $validators An array of Validator objects to run against this field.
      * @param string $description Set a description for this field. This description will be used in API documentation.
      */
@@ -49,6 +52,7 @@ class StringField extends API\Core\Field {
         string $delimiter = ",",
         string $internal_name = "",
         string $internal_namespace = "",
+        array $conditions = [],
         array $validators = [],
         string $description = "",
     )
@@ -66,6 +70,7 @@ class StringField extends API\Core\Field {
             delimiter: $delimiter,
             internal_name: $internal_name,
             internal_namespace: $internal_namespace,
+            conditions: $conditions,
             validators: $validators + [new API\Validators\LengthValidator(minimum: $min_length, maximum: $max_length)],
             description: $description
         );

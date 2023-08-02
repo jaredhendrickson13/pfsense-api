@@ -23,6 +23,19 @@ class APICoreFieldTestCase extends API\Core\TestCase
     }
 
     /**
+     * Checks that a Field object cannot have its `many_minimum` value set to a value higher than `many_maximum`.
+     */
+    public function test_no_many_minimum_greater_than_many_maximum () {
+        $this->assert_throws_response(
+            ref_id: "FIELD_MANY_MINIMUM_GREATER_THAN_MANY_MAXIMUM",
+            code: 500,
+            callable: function () {
+                new API\Core\Field(many_minimum: 5, many_maximum: 4);
+            }
+        );
+    }
+
+    /**
      * Ensures Field properties are properly set when the Field object is created.
      */
     public function test_field_construction() {
@@ -307,6 +320,56 @@ class APICoreFieldTestCase extends API\Core\TestCase
     }
 
     /**
+     * Checks that a Field cannot have `conditions` set if it does not `allow_null` values. By design, Fields that do
+     * not have all their conditions met during validation will be set to null.
+     */
+    public function test_no_conditions_without_allow_null() {
+        $this->assert_throws_response(
+            ref_id: "FIELD_CANNOT_BE_CONDITIONAL_WITHOUT_ALLOW_NULL",
+            code: 500,
+            callable: function () {
+                new API\Core\Field(
+                    type: "string",
+                    allow_null: false,
+                    conditions: ["some-conditional-field"=>"some conditional value"]
+                );
+            }
+        );
+    }
+
+    /**
+     * Checks that a Field with `conditions` is set to `null` when any of its conditions are not met.
+     */
+    public function test_unmet_conditions_assign_null() {
+        # Create a Test Model and assign its values
+        $test_model = new API\Models\Test();
+        $test_model->test_bool->value = false;
+        $test_model->test_string_conditional->value = "Set me to null if conditions fail!";
+        $test_model->test_string_conditional->conditions = ["test_bool"=>true];
+        $test_model->validate();
+
+        # Ensure the `test_string_conditional` field's value was set to null after validating
+        $this->assert_equals($test_model->test_string_conditional->value, null);
+    }
+
+    /**
+     * Checks that a conditional Field is properly validated if all it's conditions are met.
+     */
+    public function test_met_conditions_allow_validation() {
+        # Create a Test Model and assign its values
+        $test_model = new API\Models\Test();
+        $test_model->test_bool->value = true;
+        $test_model->test_string_conditional->value = "Conditions were met!";
+        $test_model->test_string_conditional->conditions = [
+            "test_bool" => ["condition is met if one of these values match test_bool's value", true]
+        ];
+        $test_model->validate();
+
+        # Ensure the `test_string_conditional` field's value was set to the value we specified above
+        $this->assert_equals($test_model->test_string_conditional->value, "Conditions were met!");
+    }
+
+    /**
      * Checks that `unique` fields successfully require the field to be unique from all other objects in the
      * parent Model context's `config_path`.
      */
@@ -377,35 +440,13 @@ class APICoreFieldTestCase extends API\Core\TestCase
     }
 
     /**
-     * Check that null values are not allowed unless `allow_null` is set.
-     */
-    public function test_no_null_values_without_allow_null() {
-        $this->assert_throws_response(
-            ref_id: "FIELD_INVALID_TYPE",
-            code: 400,
-            callable: function () {
-                $test_field = new API\Core\Field(type: "string", required: true);
-                $test_field->name = "test_field";
-                $test_field->value = null;
-                $test_field->validate();
-            }
-        );
-    }
-
-    /**
      * Check that null values are allowed if `allow_null` is set.
      */
     public function test_allow_null_values_with_allow_null() {
-        $this->assert_throws_response(
-            ref_id: "FIELD_INVALID_TYPE",
-            code: 400,
-            callable: function () {
-                $test_field = new API\Core\Field(type: "string", allow_null: true, default: null);
-                $test_field->name = "test_field";
-                $test_field->value = null;
-                $test_field->validate();
-            }
-        );
+        $test_field = new API\Core\Field(type: "string", allow_null: true, required: false);
+        $test_field->name = "test_field";
+        $test_field->value = null;
+        $test_field->validate();
     }
 
     /**

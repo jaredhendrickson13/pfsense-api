@@ -166,6 +166,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
         $test_model->test_string_unique->value = "test_unique_value";
         $test_model->test_string_many->value = ["a","b","c","d","e"];
         $test_model->test_string_namespace->value = "test string namespace value";
+        $test_model->test_string_conditional->value = "Conditions were met so I will be present!";
         $test_model->validate();
 
         # Ensure the internal value of this object matches what is expected
@@ -173,6 +174,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
             $test_model->to_internal(),
             [
                 $test_model->test_bool->internal_name => $test_model->test_bool->indicates_true,
+                $test_model->test_string_conditional->internal_name => $test_model->test_string_conditional->value,
                 $test_model->test_string_unique->internal_name => $test_model->test_string_unique->value,
                 $test_model->test_string_many->internal_name => implode(
                     $test_model->test_string_many->delimiter, $test_model->test_string_many->value
@@ -191,7 +193,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
         # Use the Test model since the base Model has no fields assigned.
         $this->assert_equals(
             (new API\Models\Test())->get_fields(),
-            ["test_bool", "test_string_unique", "test_string_many", "test_string_namespace"]
+            ["test_bool", "test_string_conditional", "test_string_unique", "test_string_many", "test_string_namespace"]
         );
     }
 

@@ -15,6 +15,7 @@ use API\Fields\StringField;
  */
 class Test extends Model {
     public Field $test_bool;
+    public Field $test_string_conditional;
     public Field $test_string_unique;
     public Field $test_string_many;
     public Field $test_string_namespace;
@@ -34,6 +35,13 @@ class Test extends Model {
             default: true,
             description: "Demonstrates a boolean field that internally uses 'on' to indicate 'true' or 'off' 
                 to indicate 'false'."
+        );
+        $this->test_string_conditional = new StringField(
+            allow_empty: true,
+            allow_null: true,
+            required: false,
+            default: "Conditions were met!",
+            conditions: ["test_bool"=>true]
         );
         $this->test_string_unique = new StringField(
             unique: true,

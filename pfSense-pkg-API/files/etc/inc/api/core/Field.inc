@@ -24,7 +24,7 @@ class Field
     public string $name = "";
     public string $internal_name = "";
     public string $internal_namespace = "";
-    public array $when = [];
+    public array $conditions = [];
     public Model|null $context = null;
 
     /**
@@ -52,6 +52,10 @@ class Field
      * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
      * the field internal value under a specific namespace as an associative array. This only applies to the internal
      * value, not the representation value.
+     * @param array $conditions An array of conditions the field must meet to be included. This allows you to specify
+     * conditions of other fields within the parent Model context. For example, if the parent Model context has two
+     * fields, one field named `type` and the other being this field; and you only want this field to be included if
+     * `type` is equal to `type1`, you could assign ["type" => "type1"] to this parameter.
      * @param array $validators An array of API\Core\Validator objects to use when validating this field.
      * @param string $description Sets a description for this field. This description will be used as the description
      * for this field in the API documentation.
@@ -71,9 +75,34 @@ class Field
         string $delimiter = ",",
         string $internal_name = "",
         string $internal_namespace = "",
+        array $conditions = [],
         array $validators = [],
         string $description = ""
     ){
+        # Ensure the $default value is in $choices if set
+        if (isset($default) and $choices and !in_array($default, $choices, true)) {
+            throw new ServerError(
+                message: "Field object `default` must be one of available `choices`.",
+                ref_id: "FIELD_INVALID_CHOICE_DEFAULT"
+            );
+        }
+
+        # Do not allow $conditions to be set if the field does not $allow_null
+        if ($conditions and !$allow_null) {
+            throw new ServerError(
+                message: "Fields cannot have 'conditions' unless they 'allow_null' values",
+                ref_id: "FIELD_CANNOT_BE_CONDITIONAL_WITHOUT_ALLOW_NULL"
+            );
+        }
+
+        # Do not allow the $many_minimum value to greater than the $many_maximum value
+        if ($many_minimum > $many_maximum) {
+            throw new ServerError(
+                message: "Fields cannot have a 'many_minimum' value greater than 'many_maximum'",
+                ref_id: "FIELD_MANY_MINIMUM_GREATER_THAN_MANY_MAXIMUM"
+            );
+        }
+
         # Assign values to object properties
         $this->type = $type;
         $this->validators = $validators;
@@ -91,14 +120,7 @@ class Field
         $this->description = $description;
         $this->internal_name = $internal_name;
         $this->internal_namespace = $internal_namespace;
-
-        # Ensure the $default value is in $choices if set
-        if (isset($default) and $choices and !in_array($default, $choices, true)) {
-            throw new ServerError(
-                message: "Field object `default` must be one of available `choices`.",
-                ref_id: "FIELD_INVALID_CHOICE_DEFAULT"
-            );
-        }
+        $this->conditions = $conditions;
 
         # Set the many_minimum value to 0 if allow_empty and many are enabled
         if ($this->many and $this->allow_empty) {
@@ -114,8 +136,14 @@ class Field
      * @throws ServerError If a programming error is detected.
      */
     public function validate() : bool {
-        # Ensure model context exists if needed
+        # Ensure model context exists when needed
         $this->check_model_context();
+
+        # Do not validate this field if conditions are not met, unset any existing value.
+        if (!$this->are_conditions_met()) {
+            $this->value = null;
+            return true;
+        }
 
         # Ensure this field object has a name set
         $this->check_field_names();
@@ -157,6 +185,10 @@ class Field
         return true;
     }
 
+    /**
+     * Ensures this field has a parent model context assigned if a parent model context is required.
+     * @throws ServerError When `unique` or `conditions` are set, but no Model `context` has been assigned.
+     */
     private function check_model_context() {
         # Throw an error if this field is unique but no model context was provided
         if ($this->unique and !$this->context) {
@@ -165,6 +197,54 @@ class Field
                 ref_id: "FIELD_UNIQUE_WITH_NO_CONTEXT"
             );
         }
+
+        # Throw an error if this field is a conditional field, but no model context was provided
+        if ($this->conditions and !$this->context) {
+            throw new ServerError(
+                message: "Conditional fields must have model context provided.",
+                ref_id: "FIELD_CONDITIONAL_WITH_NO_CONTEXT"
+            );
+        }
+    }
+
+    /**
+     * Checks if the conditions defined in the `conditions` property are met.
+     * @returns bool `true` if all conditions were met, `false` if any conditions failed.
+     */
+    private function are_conditions_met() : bool {
+        # Variables
+        $conditions_met = true;
+
+        # Consider conditions to be met if no conditions were specified
+        if (!$this->conditions) {
+            return true;
+        }
+
+        # Loop through each condition and check if it is met
+        foreach ($this->conditions as $condition_field => $condition_value) {
+            # Safety check to ensure the Model context even has a field with the field name specified in the condition
+            if (!in_array($condition_field, $this->context->get_fields())) {
+                $parent_model_class = get_class($this->context);
+                throw new ServerError(
+                    message: "Field '$this->name' contains a condition for field `$condition_field` from 
+                        its parent Model '$parent_model_class', but '$parent_model_class' has no such field. ",
+                    ref_id: "FIELD_CONDITIONS_REQUIRE_NON_EXISTENT_PARENT_MODEL_FIELD"
+                );
+            }
+
+            # When the condition value is an array, the context Model's field value must be one of the array values.
+            if (is_array($condition_value) and !in_array($this->context->$condition_field->value, $condition_value)) {
+                $conditions_met = false;
+                break;
+            }
+            # When the condition value is not an array, the context Model's field value must match exactly
+            if (!is_array($condition_value) and !$this->context->$condition_field->value === $condition_value) {
+                $conditions_met = false;
+                break;
+            }
+        }
+
+        return $conditions_met;
     }
 
     /**
