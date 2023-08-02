@@ -1134,6 +1134,11 @@ function is_assoc_array($array, $strict_seq=false) {
 function api_request($url, $method, $data=[], $headers=[], $username="", $password="") {
     # Format data and headers
     $data = json_encode($data);
+
+    # Ensure headers is always an array
+    if (!is_array($headers)) {
+        $headers = [];
+    }
     $headers["Content-Type"] = "application/json";
     $headers["Content-Length"] = strlen($data);
 
