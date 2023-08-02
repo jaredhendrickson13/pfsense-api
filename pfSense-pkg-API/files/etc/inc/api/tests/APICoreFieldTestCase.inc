@@ -232,6 +232,59 @@ class APICoreFieldTestCase extends API\Core\TestCase
     }
 
     /**
+     * Checks that a validation error occurs if there are less array entries than the `many_minimum` requires.
+     */
+    public function test_field_many_minimum() {
+        $this->assert_throws_response(
+            ref_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT",
+            code: 500,
+            callable: function () {
+                # Create a model to use for testing
+                $test_model = new API\Core\Model();
+                $test_model->config_path = "test/config/path";
+
+                # Create a field to test with and ensure the test model is assigned as its parent context
+                $test_field = new API\Core\Field(type: "string", many: true, many_minimum: 1);
+                $test_field->name = "test_field";
+                $test_field->value = [];
+                $test_field->context = $test_model;
+                $test_field->validate();
+            }
+        );
+    }
+
+    /**
+     * Checks that a validation error occurs if there are more array entries than the `many_maximum` allows.
+     */
+    public function test_field_many_maximum() {
+        $this->assert_throws_response(
+            ref_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT",
+            code: 500,
+            callable: function () {
+                # Create a model to use for testing
+                $test_model = new API\Core\Model();
+                $test_model->config_path = "test/config/path";
+
+                # Create a field to test with and ensure the test model is assigned as its parent context
+                $test_field = new API\Core\Field(type: "string", many: true, many_maximum: 3);
+                $test_field->name = "test_field";
+                $test_field->value = ["too", "many", "values", "!"];
+                $test_field->context = $test_model;
+                $test_field->validate();
+            }
+        );
+    }
+
+    /**
+     * Checks that the `many_minimum` value is automatically changed to `0` when `allow_empty` is `true`.
+     */
+    public function test_field_many_minimum_set_according_to_allow_empty() {
+        # Ensure that the `many_minimum` value is automatically changed to 0 when `allow_empty` is enabled
+        $test_field = new API\Core\Field(type: "string", allow_empty: true, many: true, many_minimum: 3);
+        $this->assert_equals($test_field->many_minimum, 0);
+    }
+
+    /**
      * Checks that the field's parent model context is a `many` model if the field is `unique`.
      */
     public function test_context_has_many_when_field_is_unique() {

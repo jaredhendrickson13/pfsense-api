@@ -2,6 +2,8 @@
 
 namespace API\Core;
 
+use API\Validators\LengthValidator;
+
 class Field
 {
     public mixed $value = null;
@@ -9,6 +11,8 @@ class Field
     public array $validators = [];
     public bool $unique = false;
     public bool $many = false;
+    public int $many_minimum = 1;
+    public int $many_maximum = 128;
     public string $delimiter = ",";
     public array $choices = [];
     public bool $allow_empty = false;
@@ -39,6 +43,8 @@ class Field
      * result in a thrown exception.
      * @param bool $many Set to `true` if this field should accept an array of many values. `false` if only one value
      * should be allowed. If `true`, validation will run against each value in the value array individual.
+     * @param int $many_minimum When $many is set to `true`, this sets the minimum number of array entries required.
+     * @param int $many_maximum When $many is set to `true`, this sets the maximum number of array entries allowed.
      * @param string $delimiter Assigns the string delimiter to use when writing array values to config. This is only
      * available if $many is set to `true`. Defaults to `,` to store as comma-separated string.
      * @param string $internal_name The name of the field as it is stored in the pfSense configuration. If not set, the
@@ -60,6 +66,8 @@ class Field
         mixed $default = null,
         bool $read_only = false,
         bool $many = false,
+        int $many_minimum = 1,
+        int $many_maximum = 128,
         string $delimiter = ",",
         string $internal_name = "",
         string $internal_namespace = "",
@@ -77,6 +85,8 @@ class Field
         $this->default = $default;
         $this->read_only = $read_only;
         $this->many = $many;
+        $this->many_minimum = $many_minimum;
+        $this->many_maximum = $many_maximum;
         $this->delimiter = $delimiter;
         $this->description = $description;
         $this->internal_name = $internal_name;
@@ -88,6 +98,11 @@ class Field
                 message: "Field object `default` must be one of available `choices`.",
                 ref_id: "FIELD_INVALID_CHOICE_DEFAULT"
             );
+        }
+
+        # Set the many_minimum value to 0 if allow_empty and many are enabled
+        if ($this->many and $this->allow_empty) {
+            $this->many_minimum = 0;
         }
     }
 
@@ -111,10 +126,13 @@ class Field
         # Ensure a value is not set if field is `read_only`
         $this->check_field_read_only();
 
+        # Ensure an appropriate number of array entries are specified for `many` fields
+        $this->check_many_value_length();
+
         # Ensure the value(s) to validate are always in an array, so we can loop.
         $values = $this->get_value_as_array();
 
-        # Ensure value is not an empty array before we start the loop.
+        # Ensure value is not an empty array before we start the loop unless allowed
         $this->check_value_empty($this->value);
 
         # Loop through each value to be validated
@@ -208,6 +226,19 @@ class Field
                 message: "Read-only field `$this->name` cannot have value choices.",
                 ref_id: "FIELD_NO_CHOICES_WITH_READ_ONLY"
             );
+        }
+    }
+
+    /**
+     * Checks the length of the value array when `many` is enabled. This ensures there are at least as many array
+     * entries as specified with `many_minimum` but no more array entries than specified with `many_maximum`.
+     */
+    private function check_many_value_length() {
+        # Only validate this if 'many' is enabled.
+        if ($this->many and is_array($this->value)) {
+            # Ensure the value contains an appropriate number of array entries
+            $validator = new LengthValidator(minimum: $this->many_minimum, maximum: $this->many_maximum);
+            $validator->validate($this->value, $this->name);
         }
     }
 

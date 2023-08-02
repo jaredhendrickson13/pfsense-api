@@ -5,7 +5,7 @@ namespace API\Tests;
 use API\Core\TestCase;
 use API\Validators\LengthValidator;
 
-class APIValidatorsMaxLengthValidatorTestCase extends TestCase {
+class APIValidatorsLengthValidatorTestCase extends TestCase {
     /**
      * Check that MaximumLengthValidator throws a server error if a non-string or non-array value is passed to the
      * `validate()` method.

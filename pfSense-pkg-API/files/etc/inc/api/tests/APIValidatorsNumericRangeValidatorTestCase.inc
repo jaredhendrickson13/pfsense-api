@@ -15,7 +15,7 @@ class APIValidatorsNumericRangeValidatorTestCase extends TestCase {
             code: 500,
             callable: function () {
                 $test_validator = new NumericRangeValidator();
-                $test_validator->validate("not a integer or float");
+                $test_validator->validate("not an integer or float");
             }
         );
     }
