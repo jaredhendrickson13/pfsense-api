@@ -19,7 +19,6 @@ class BooleanField extends API\Core\Field {
      * @param string $indicates_true The internal string that indicates whether a value is `true`.
      * @param string|null $indicates_false The internal value that indicates whether a value is `false`. Use `null`
      * if the lack of a value for this field indicates `false` internally.
-     * @param array $validators An array of Validator objects to run against this field.
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
      * @param bool $allow_empty If `true`, empty strings will be allowed by this field.
@@ -28,33 +27,33 @@ class BooleanField extends API\Core\Field {
      * @param mixed|null $default Assign a default string value to assign this Field if no value is present.
      * @param bool $read_only If `true`, this field can only read its value and cannot write its value to config.
      * $many is enabled.
-     * @param string $description Set a description for this field. This description will be used in API documentation.
      * @param string $internal_name Assign a different field name to use when referring to the internal field as it's
      * stored in the pfSense configuration.
      * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
      * the field internal value under a specific namespace as an associative array. This only applies to the internal
      * value, not the representation value.
+     * @param array $validators An array of Validator objects to run against this field.
+     * @param string $description Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
         string $indicates_true = "",
         string $indicates_false = null,
-        array $validators = [],
         bool $unique = false,
         bool $allow_empty = false,
         bool $allow_null = false,
         bool $required = false,
         mixed $default = null,
         bool $read_only = false,
-        string $description = "",
         string $internal_name = "",
-        string $internal_namespace = ""
+        string $internal_namespace = "",
+        array $validators = [],
+        string $description = ""
     )
     {
         $this->indicates_true = $indicates_true;
         $this->indicates_false = $indicates_false;
         parent::__construct(
             type: "boolean",
-            validators: $validators,
             unique: $unique,
             allow_empty: $allow_empty,
             allow_null: $allow_null,
@@ -62,9 +61,10 @@ class BooleanField extends API\Core\Field {
             default: $default,
             read_only: $read_only,
             many: false,
-            description: $description,
             internal_name: $internal_name,
-            internal_namespace: $internal_namespace
+            internal_namespace: $internal_namespace,
+            validators: $validators,
+            description: $description
         );
     }
 

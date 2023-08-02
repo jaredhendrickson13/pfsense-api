@@ -44,7 +44,6 @@ class APICoreFieldTestCase extends API\Core\TestCase
         # Create a Field object and ensure all values were properly set during construction
         $test_field = new API\Core\Field(
             type: $type,
-            validators: $validators,
             choices: $choices,
             unique: $unique,
             allow_empty: $allow_empty,
@@ -54,8 +53,9 @@ class APICoreFieldTestCase extends API\Core\TestCase
             read_only: $read_only,
             many: $many,
             delimiter: $delimiter,
-            description: $description,
-            internal_name: $internal_name
+            internal_name: $internal_name,
+            validators: $validators,
+            description: $description
         );
 
         # Ensure the values we passed in are the values that are assigned to the object
@@ -329,15 +329,15 @@ class APICoreFieldTestCase extends API\Core\TestCase
     function test_validators_check_values() {
         # Check against single value
         $this->assert_throws_response(
-            ref_id: "EXCEEDS_MAX_LENGTH",
+            ref_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT",
             code: 400,
             callable: function () {
                 $test_field = new API\Core\Field(
                     type: "string",
+                    required: true,
                     validators: [
-                        new API\Validators\MaxLengthValidator(max_length: 5)
-                    ],
-                    required: true
+                        new API\Validators\LengthValidator(minimum: 0, maximum: 5)
+                    ]
                 );
                 $test_field->name = "test_field";
                 $test_field->value = "THIS_VALUE_EXCEEDS_OUR_MAX_LENGTH";
@@ -347,16 +347,16 @@ class APICoreFieldTestCase extends API\Core\TestCase
 
         # Check against many value
         $this->assert_throws_response(
-            ref_id: "EXCEEDS_MAX_LENGTH",
+            ref_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT",
             code: 400,
             callable: function () {
                 $test_field = new API\Core\Field(
                     type: "string",
-                    validators: [
-                        new API\Validators\MaxLengthValidator(max_length: 5)
-                    ],
                     required: true,
-                    many: true
+                    many: true,
+                    validators: [
+                        new API\Validators\LengthValidator(minimum: 0, maximum: 5)
+                    ]
                 );
                 $test_field->name = "test_field";
                 $test_field->value = ["OK", "THIS_VALUE_EXCEEDS_OUR_MAX_LENGTH"];

@@ -10,16 +10,14 @@ use API;
  * Defines a StringField class that extends the core Field method. This Field adds validation and representation for
  * string Model fields.
  */
-class StringField extends API\Core\Field {
-
+class IntegerField extends API\Core\Field {
     /**
-     * Defines the StringField object and sets its options.
-     * @param int $min_length The minimum number of characters required for this string field.
-     * @param int $max_length The maximum number of characters allowed by this string field.
+     * Defines the IntegerField object and sets its options.
+     * @param int $minimum The minimum value this value can be.
+     * @param int $maximum The maximum value this value can be.
      * @param array $choices An array of explicit choices this string field value can be.
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
-     * @param bool $allow_empty If `true`, empty strings will be allowed by this field.
      * @param bool $allow_null If `true`, null values will be allowed by this field.
      * @param bool $required If `true`, this field is required to have a value at all times.
      * @param mixed|null $default Assign a default string value to assign this Field if no value is present.
@@ -36,11 +34,10 @@ class StringField extends API\Core\Field {
      * @param string $description Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
-        int $min_length = 0,
-        int $max_length = 1024,
+        int $minimum = 0,
+        int $maximum = 99999999999,
         array $choices = [],
         bool $unique = false,
-        bool $allow_empty = false,
         bool $allow_null = false,
         bool $required = false,
         mixed $default = null,
@@ -54,10 +51,10 @@ class StringField extends API\Core\Field {
     )
     {
         parent::__construct(
-            type: "string",
+            type: "integer",
             choices: $choices,
             unique: $unique,
-            allow_empty: $allow_empty,
+            allow_empty: false,
             allow_null: $allow_null,
             required: $required,
             default: $default,
@@ -66,17 +63,25 @@ class StringField extends API\Core\Field {
             delimiter: $delimiter,
             internal_name: $internal_name,
             internal_namespace: $internal_namespace,
-            validators: $validators + [new API\Validators\LengthValidator(minimum: $min_length, maximum: $max_length)],
+            validators: $validators + [new API\Validators\NumericRangeValidator(minimum: $minimum, maximum: $maximum)],
             description: $description
         );
     }
 
     /**
      * Converts the field value to its representation form from it's internal pfSense configuration value.
-     * @param mixed $internal_value The internal value from the pfSense configuration.
-     * @return string The field value in its representation form.
+     * @param string $internal_value The internal value from the pfSense configuration.
+     * @return int The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value) : string {
-        return strval($internal_value);
+    protected function _from_internal(string $internal_value) : int {
+        # Throw an error if the value is not numeric
+        if (!is_numeric($internal_value)) {
+            throw new API\Core\ServerError(
+                message: "Cannot parse IntegerField '$this->name' from internal because its internal value is not
+                    a numeric value. Consider changing this field to a StringField.",
+                ref_id: "INTEGER_FIELD_WITH_NON_INTEGER_INTERNAL_VALUE"
+            );
+        }
+        return intval($internal_value);
     }
 }

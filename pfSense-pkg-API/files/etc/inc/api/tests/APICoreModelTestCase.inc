@@ -423,6 +423,34 @@ class APICoreModelTestCase extends API\Core\TestCase {
     }
 
     /**
+     * Checks that the Test Model's `apply()` method runs after creations, updates and deletion when requested. The
+     * Test model's `apply()` method has been overridden to write a text file to /tmp/.api_model_test_apply.txt whenever
+     * it is called. This test checks for that file after `create()`, `update()` or `delete()` is called.
+     */
+    public function test_model_calls_apply_when_requested() {
+        # In case a test file was leftover, try to remove the test file first
+        unlink("/tmp/.api_models_test_apply.txt");
+
+        # Create a new test model object in config and request to apply the change immediately.
+        $test_model = new API\Models\Test();
+        $test_model->create(apply: true);
+
+        # Ensure the expected txt file is present and remove it.
+        $this->assert_is_true(file_exists("/tmp/.api_models_test_apply.txt"));
+        unlink("/tmp/.api_models_test_apply.txt");
+
+        # Update the model and ensure the txt file is present once again
+        $test_model->update(apply: true);
+        $this->assert_is_true(file_exists("/tmp/.api_models_test_apply.txt"));
+        unlink("/tmp/.api_models_test_apply.txt");
+
+        # Delete the model and ensure the txt file is present once again
+        $test_model->delete(apply: true);
+        $this->assert_is_true(file_exists("/tmp/.api_models_test_apply.txt"));
+        unlink("/tmp/.api_models_test_apply.txt");
+    }
+
+    /**
      * Checks that we are able to construct a Model object with an array of representation data.
      */
     public function test_model_constructs_from_representation() {

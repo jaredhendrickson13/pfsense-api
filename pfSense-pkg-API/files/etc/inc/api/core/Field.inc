@@ -26,7 +26,6 @@ class Field
     /**
      * @param string $type The primary type supported by this field. This must be a string representation of the type
      * as it is returned by PHP's gettype() function.
-     * @param array $validators An array of API\Core\Validator objects to use when validating this field.
      * @param array $choices An array of explicitly choices this field's value can be.
      * @param bool $unique Set to `true` if this value must be unique from all other objects of the same model.
      * @param bool $allow_empty Set to `true` if empty values (blank strings, 0, etc) should be allowed.
@@ -42,17 +41,17 @@ class Field
      * should be allowed. If `true`, validation will run against each value in the value array individual.
      * @param string $delimiter Assigns the string delimiter to use when writing array values to config. This is only
      * available if $many is set to `true`. Defaults to `,` to store as comma-separated string.
-     * @param string $description Sets a description for this field. This description will be used as the description
-     * for this field in the API documentation.
      * @param string $internal_name The name of the field as it is stored in the pfSense configuration. If not set, the
      * internal name will utilize the $name of the Field object.
      * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
      * the field internal value under a specific namespace as an associative array. This only applies to the internal
      * value, not the representation value.
+     * @param array $validators An array of API\Core\Validator objects to use when validating this field.
+     * @param string $description Sets a description for this field. This description will be used as the description
+     * for this field in the API documentation.
      */
     public function __construct(
         string $type = "",
-        array $validators = [],
         array $choices = [],
         bool $unique = false,
         bool $allow_empty = false,
@@ -62,9 +61,10 @@ class Field
         bool $read_only = false,
         bool $many = false,
         string $delimiter = ",",
-        string $description = "",
         string $internal_name = "",
-        string $internal_namespace = ""
+        string $internal_namespace = "",
+        array $validators = [],
+        string $description = ""
     ){
         # Assign values to object properties
         $this->type = $type;
@@ -377,7 +377,7 @@ class Field
      * @param string $internal_value The internal config value to convert to a representation value.
      * @throws ServerError When the child Field class does not override this method.
      */
-    protected function _from_internal(string $internal_value) : mixed {
+    protected function _from_internal(string $internal_value) {
         throw new ServerError(
             message: "Field '$this->name' does not have method of converting internal value to representation.",
             ref_id: "FIELD_CANNOT_REPRESENT_INTERNAL_VALUE"
@@ -389,9 +389,14 @@ class Field
      * of a `many` Field, the internal value will be expanded into it's array form and _from_internal() will run
      * against each item within that array. This method will automatically assign the representation value to the
      * `value` property for this object.
-     * @param string $internal_value The raw internal config value to convert to a representation value.
+     * @param string|null $internal_value The raw internal config value to convert to a representation value.
      */
-    public function from_internal(string $internal_value) {
+    public function from_internal(string|null $internal_value) {
+        # Simply return a null if the value null, there is no processing to be done on null values
+        if (is_null($internal_value)) {
+            $this->value = null;
+        }
+
         # For `many` type fields, convert all values to representation.
         if ($this->many) {
             # Expand the value into it's array form

@@ -38,7 +38,7 @@ class Test extends Model {
         $this->test_string_unique = new StringField(
             unique: true,
             required: false,
-            default: "test",
+            default: uniqid(),
             description: "Demonstrates a string field that must be unique from all other Test model objects stored
                 in configuration."
         );
@@ -54,12 +54,24 @@ class Test extends Model {
         $this->test_string_namespace = new StringField(
             required: false,
             default: "test namespace field value",
-            description: "Demonstrates a string field that is nested under the namespace ",
-            internal_namespace: "test_namespace"
+            internal_namespace: "test_namespace",
+            description: "Demonstrates a string field that is nested under the namespace "
         );
 
         # Parent base 'Model' object must be constructed very last to ensure the Model has all configured attributes.
         parent::__construct($id, $representation_data, $client);
+    }
+
+    /**
+     * Override the default apply method to write a file to disk. This is used for testing to determine if the
+     * `apply` method did or didn't run when expected.
+     */
+    public function apply() {
+        file_put_contents(
+            filename: "/tmp/.api_models_test_apply.txt",
+            data: "This file is written by \API\Models\Test to demonstrate a specific action is taken when the Model's
+                `apply()` method is executed."
+        );
     }
 
 }
