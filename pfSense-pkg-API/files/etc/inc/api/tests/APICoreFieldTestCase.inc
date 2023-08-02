@@ -258,7 +258,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_field_many_maximum() {
         $this->assert_throws_response(
-            ref_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT",
+            ref_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT",
             code: 400,
             callable: function () {
                 # Create a model to use for testing
