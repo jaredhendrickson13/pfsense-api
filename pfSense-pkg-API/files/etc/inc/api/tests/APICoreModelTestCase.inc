@@ -85,6 +85,15 @@ class APICoreModelTestCase extends API\Core\TestCase {
     }
 
     /**
+     * Checks that the Model's get_id_field() method correctly returns an empty string when no Fields are assigned
+     * the `is_id` property.
+     */
+    public function test_model_empty_string_when_no_fields_with_is_id() {
+        $test_model = new API\Models\Test();
+        $this->assert_equals($test_model->get_id_field(), "");
+    }
+
+    /**
      * Checks that we cannot call the default get_next_id() method if the model object does not have a config path set.
      */
     public function test_model_cant_get_next_id_without_config_path() {
@@ -163,6 +172,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
         # Since the default Model does not have any fields, use a Test Model to test this.
         $test_model = new API\Models\Test();
         $test_model->test_bool->value = true;
+        $test_model->test_integer->value = 3;
         $test_model->test_string_unique->value = "test_unique_value";
         $test_model->test_string_many->value = ["a","b","c","d","e"];
         $test_model->test_string_namespace->value = "test string namespace value";
@@ -174,6 +184,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
             $test_model->to_internal(),
             [
                 $test_model->test_bool->internal_name => $test_model->test_bool->indicates_true,
+                $test_model->test_integer->internal_name => strval($test_model->test_integer->value),
                 $test_model->test_string_conditional->internal_name => $test_model->test_string_conditional->value,
                 $test_model->test_string_unique->internal_name => $test_model->test_string_unique->value,
                 $test_model->test_string_many->internal_name => implode(
@@ -193,7 +204,14 @@ class APICoreModelTestCase extends API\Core\TestCase {
         # Use the Test model since the base Model has no fields assigned.
         $this->assert_equals(
             (new API\Models\Test())->get_fields(),
-            ["test_bool", "test_string_conditional", "test_string_unique", "test_string_many", "test_string_namespace"]
+            [
+                "test_bool",
+                "test_integer",
+                "test_string_conditional",
+                "test_string_unique",
+                "test_string_many",
+                "test_string_namespace"
+            ]
         );
     }
 
@@ -291,13 +309,37 @@ class APICoreModelTestCase extends API\Core\TestCase {
     }
 
     /**
+     * Checks that we are able to use a Field with `is_id` enabled to correctly determine the internal ID of the object.
+     */
+    public function test_model_with_field_id() {
+        # Create a new test model object in config
+        $test_model = new API\Models\Test();
+
+        # Use the `test_string_unique` field as the ID for this object
+        $test_model->test_string_unique->is_id = true;
+
+        # Assing values to this Model object and create it.
+        $test_model->test_bool->value = true;
+        $test_model->test_string_unique->value ="This value will be used as the ID!";
+        $test_model->test_string_many->value = ["a", "b", "c"];
+        $test_model->create();
+
+        # Ensure the Model object's ID matches the ID field `test_string_unique` value and the internal ID is obtainable
+        $this->assert_equals($test_model->id, $test_model->test_string_unique->value);
+        $this->assert_is_greater_than($test_model->get_internal_id(), 1);
+
+        # Delete the object now that we're done with it.
+        $test_model->delete();
+    }
+
+    /**
      * Checks the default `create()` method correctly validates and writes the Model object to config.
      */
     public function test_model_create() {
         # Create a new test model object in config
         $test_model = new API\Models\Test();
         $test_model->test_bool->value = true;
-        $test_model->test_string_unique->value ="Test Value";
+        $test_model->test_string_unique->value ="test_model_create";
         $test_model->test_string_many->value = ["a", "b", "c"];
         $test_model->create();
 
@@ -336,20 +378,37 @@ class APICoreModelTestCase extends API\Core\TestCase {
     }
 
     /**
+     * Checks the deafult Model object `update()` method to ensure it throws an error if `many` is set but no `id`
+     * value has been assigned. We must have an ID to determine which object is being updated.
+     */
+    public function test_model_update_without_id() {
+        $this->assert_throws_response(
+            ref_id: "MODEL_REQUIRES_ID",
+            code: 400,
+            callable: function () {
+                $test_model = new API\Core\Model();
+                $test_model->config_path = "test/path";
+                $test_model->many = true;
+                $test_model->update();
+            }
+        );
+    }
+
+    /**
      * Checks the default `update()` method correctly validates, updates and writes the Model object to config.
      */
     public function test_model_update() {
         # Create a new test model object in config
         $test_model = new API\Models\Test();
         $test_model->test_bool->value = true;
-        $test_model->test_string_unique->value ="Test Value";
+        $test_model->test_string_unique->value ="test_model_update initial value";
         $test_model->test_string_many->value = ["a", "b", "c"];
         $test_model->create();
 
         # Create a new test model object in config
         $test_model_to_update = new API\Models\Test($test_model->id);
         $test_model_to_update->test_bool->value = false;
-        $test_model_to_update->test_string_unique->value ="Updated Test Value";
+        $test_model_to_update->test_string_unique->value ="test_model_update updated value";
         $test_model_to_update->test_string_many->value = ["c", "b", "a"];
         $test_model_to_update->update();
 
@@ -399,6 +458,23 @@ class APICoreModelTestCase extends API\Core\TestCase {
             callable: function () {
                 $test_model = new API\Core\Model();
                 $test_model->config_path = "";
+                $test_model->delete();
+            }
+        );
+    }
+
+    /**
+     * Checks the default Model object `delete()` method to ensure it throws an error if `many` is set but no `id`
+     * value has been assigned. We must have an ID to determine which object is being deleted.
+     */
+    public function test_model_delete_without_id() {
+        $this->assert_throws_response(
+            ref_id: "MODEL_REQUIRES_ID",
+            code: 400,
+            callable: function () {
+                $test_model = new API\Core\Model();
+                $test_model->config_path = "test/path";
+                $test_model->many = true;
                 $test_model->delete();
             }
         );
@@ -460,7 +536,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
         $test_model = new API\Models\Test(
             representation_data: [
                 "test_bool" => true,
-                "test_string_unique" => "Test value",
+                "test_string_unique" => "test_model_constructs_from_representation",
                 "test_string_many" => ["a", "b", "c"]
             ]
         );
@@ -472,7 +548,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
         );
         $this->assert_equals(
             $test_model->test_string_unique->value,
-            "Test value"
+            "test_model_constructs_from_representation"
         );
         $this->assert_equals(
             $test_model->test_string_many->value,

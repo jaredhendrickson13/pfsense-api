@@ -27,6 +27,9 @@ class BooleanField extends API\Core\Field {
      * @param mixed|null $default Assign a default string value to assign this Field if no value is present.
      * @param bool $read_only If `true`, this field can only read its value and cannot write its value to config.
      * $many is enabled.
+     * @param bool $write_only Set the `true` to make this field write-only. This will prevent the field's current value
+     * from being displayed in the representation data. This is ideal for potentially sensitive fields like passwords,
+     * keys, and hashes.
      * @param string $internal_name Assign a different field name to use when referring to the internal field as it's
      * stored in the pfSense configuration.
      * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
@@ -48,6 +51,7 @@ class BooleanField extends API\Core\Field {
         bool $required = false,
         mixed $default = null,
         bool $read_only = false,
+        bool $write_only = false,
         string $internal_name = "",
         string $internal_namespace = "",
         array $conditions = [],
@@ -65,6 +69,7 @@ class BooleanField extends API\Core\Field {
             required: $required,
             default: $default,
             read_only: $read_only,
+            write_only: $write_only,
             many: false,
             internal_name: $internal_name,
             internal_namespace: $internal_namespace,

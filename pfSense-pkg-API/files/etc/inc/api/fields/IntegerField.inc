@@ -16,12 +16,20 @@ class IntegerField extends API\Core\Field {
      * @param int $minimum The minimum value this value can be.
      * @param int $maximum The maximum value this value can be.
      * @param array $choices An array of explicit choices this string field value can be.
+     * @param bool $is_id If `true`, the value of this field will be used to identify the parent Model objects. If no
+     * Field assigned to the parent Model have $is_id set to `true`, the Model will use the pfSense configuration
+     * index ID by default. Only one Field per parent Model can have $is_id set to `true`. If enabled, this Field must
+     * also have $required and $unique set to `true`. Fields cannot enable $allow_empty, $allow_null, $read_only,
+     * $write_only, or $many.
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
      * @param bool $allow_null If `true`, null values will be allowed by this field.
      * @param bool $required If `true`, this field is required to have a value at all times.
      * @param mixed|null $default Assign a default string value to assign this Field if no value is present.
      * @param bool $read_only If `true`, this field can only read its value and cannot write its value to config.
+     * @param bool $write_only Set the `true` to make this field write-only. This will prevent the field's current value
+     * from being displayed in the representation data. This is ideal for potentially sensitive fields like passwords,
+     * keys, and hashes.
      * @param bool $many If `true`, the value must be an array of many strings.
      * @param string $delimiter Assign the delimiter used to join the value array back to its internal string form when
      * $many is enabled.
@@ -41,11 +49,13 @@ class IntegerField extends API\Core\Field {
         int $minimum = 0,
         int $maximum = 99999999999,
         array $choices = [],
+        bool $is_id = false,
         bool $unique = false,
         bool $allow_null = false,
         bool $required = false,
         mixed $default = null,
         bool $read_only = false,
+        bool $write_only = false,
         bool $many = false,
         string $delimiter = ",",
         string $internal_name = "",
@@ -58,12 +68,14 @@ class IntegerField extends API\Core\Field {
         parent::__construct(
             type: "integer",
             choices: $choices,
+            is_id: $is_id,
             unique: $unique,
             allow_empty: false,
             allow_null: $allow_null,
             required: $required,
             default: $default,
             read_only: $read_only,
+            write_only: $write_only,
             many: $many,
             delimiter: $delimiter,
             internal_name: $internal_name,

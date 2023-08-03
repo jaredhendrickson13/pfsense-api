@@ -7,6 +7,7 @@ use API\Core\Auth;
 use API\Core\Field;
 use API\Core\Model;
 use API\Fields\BooleanField;
+use API\Fields\IntegerField;
 use API\Fields\StringField;
 
 /**
@@ -15,6 +16,7 @@ use API\Fields\StringField;
  */
 class Test extends Model {
     public Field $test_bool;
+    public Field $test_integer;
     public Field $test_string_conditional;
     public Field $test_string_unique;
     public Field $test_string_many;
@@ -35,6 +37,10 @@ class Test extends Model {
             default: true,
             description: "Demonstrates a boolean field that internally uses 'on' to indicate 'true' or 'off' 
                 to indicate 'false'."
+        );
+        $this->test_integer = new IntegerField(
+            default: 5,
+            description: "Demonstrates an integer field that defaults to 5."
         );
         $this->test_string_conditional = new StringField(
             allow_empty: true,

@@ -9,6 +9,7 @@ class Field
     public mixed $value = null;
     public string $type = "";
     public array $validators = [];
+    public bool $is_id = false;
     public bool $unique = false;
     public bool $many = false;
     public int $many_minimum = 1;
@@ -20,6 +21,7 @@ class Field
     public bool $required = false;
     public mixed $default = null;
     public bool $read_only = false;
+    public bool $write_only = false;
     public string $description = "";
     public string $name = "";
     public string $internal_name = "";
@@ -31,6 +33,11 @@ class Field
      * @param string $type The primary type supported by this field. This must be a string representation of the type
      * as it is returned by PHP's gettype() function.
      * @param array $choices An array of explicitly choices this field's value can be.
+     * @param bool $is_id If `true`, the value of this field will be used to identify the parent Model objects. If no
+     * Field assigned to the parent Model have $is_id set to `true`, the Model will use the pfSense configuration
+     * index ID by default. Only one Field per parent Model can have $is_id set to `true`. If enabled, this Field must
+     * also have $required and $unique set to `true`. Fields cannot enable $allow_empty, $allow_null, $read_only,
+     * $write_only, or $many.
      * @param bool $unique Set to `true` if this value must be unique from all other objects of the same model.
      * @param bool $allow_empty Set to `true` if empty values (blank strings, 0, etc) should be allowed.
      * @param bool $allow_null Set to `true` if `null` values should be supported for this field. When `null` values
@@ -41,6 +48,9 @@ class Field
      * this Field requires a value and should fail validation if no value was found.
      * @param bool $read_only Set to `true` to make this field read-only. Attempts to write to a read-only field will
      * result in a thrown exception.
+     * @param bool $write_only Set the `true` to make this field write-only. This will prevent the field's current value
+     * from being displayed in the representation data. This is ideal for potentially sensitive fields like passwords,
+     * keys, and hashes.
      * @param bool $many Set to `true` if this field should accept an array of many values. `false` if only one value
      * should be allowed. If `true`, validation will run against each value in the value array individual.
      * @param int $many_minimum When $many is set to `true`, this sets the minimum number of array entries required.
@@ -63,12 +73,14 @@ class Field
     public function __construct(
         string $type = "",
         array $choices = [],
+        bool $is_id = false,
         bool $unique = false,
         bool $allow_empty = false,
         bool $allow_null = false,
         bool $required = false,
         mixed $default = null,
         bool $read_only = false,
+        bool $write_only = false,
         bool $many = false,
         int $many_minimum = 1,
         int $many_maximum = 128,
@@ -79,40 +91,18 @@ class Field
         array $validators = [],
         string $description = ""
     ){
-        # Ensure the $default value is in $choices if set
-        if (isset($default) and $choices and !in_array($default, $choices, true)) {
-            throw new ServerError(
-                message: "Field object `default` must be one of available `choices`.",
-                ref_id: "FIELD_INVALID_CHOICE_DEFAULT"
-            );
-        }
-
-        # Do not allow $conditions to be set if the field does not $allow_null
-        if ($conditions and !$allow_null) {
-            throw new ServerError(
-                message: "Fields cannot have 'conditions' unless they 'allow_null' values",
-                ref_id: "FIELD_CANNOT_BE_CONDITIONAL_WITHOUT_ALLOW_NULL"
-            );
-        }
-
-        # Do not allow the $many_minimum value to greater than the $many_maximum value
-        if ($many_minimum > $many_maximum) {
-            throw new ServerError(
-                message: "Fields cannot have a 'many_minimum' value greater than 'many_maximum'",
-                ref_id: "FIELD_MANY_MINIMUM_GREATER_THAN_MANY_MAXIMUM"
-            );
-        }
-
         # Assign values to object properties
         $this->type = $type;
         $this->validators = $validators;
         $this->choices = $choices;
         $this->unique = $unique;
+        $this->is_id = $is_id;
         $this->allow_empty = $allow_empty;
         $this->allow_null = ($read_only) ? true : $allow_null;
         $this->required = $required;
         $this->default = $default;
         $this->read_only = $read_only;
+        $this->write_only = $write_only;
         $this->many = $many;
         $this->many_minimum = $many_minimum;
         $this->many_maximum = $many_maximum;
@@ -125,6 +115,111 @@ class Field
         # Set the many_minimum value to 0 if allow_empty and many are enabled
         if ($this->many and $this->allow_empty) {
             $this->many_minimum = 0;
+        }
+
+        # Ensure values do not conflict
+        $this->check_construct();
+    }
+
+    /**
+     * Checks that values passed in during __construct are valid and do not conflict.
+     * @throws ServerError When any Field properties have conflicting values.
+     */
+    private function check_construct() {
+        # Throw an error if `required` and `default` are both set
+        if ($this->required and isset($this->default)) {
+            throw new ServerError(
+                message: "Required fields cannot have a default.",
+                ref_id: "FIELD_CANNOT_BE_REQUIRED_WITH_DEFAULT"
+            );
+        }
+
+        # Throw an error if `required` and `read_only` are both set
+        if ($this->required and $this->read_only) {
+            throw new ServerError(
+                message: "Required fields cannot be read only.",
+                ref_id: "FIELD_CANNOT_BE_REQUIRED_WITH_READ_ONLY"
+            );
+        }
+
+        # Throw an error if `required` and `allow_null` are both set
+        if ($this->required and $this->allow_null) {
+            throw new ServerError(
+                message: "Required fields cannot allow null values.",
+                ref_id: "FIELD_CANNOT_BE_REQUIRED_WITH_ALLOW_NULL"
+            );
+        }
+
+        # Ensure the `default` value is in `choices` if set
+        if (isset($this->default) and $this->choices and !in_array($this->default, $this->choices, true)) {
+            throw new ServerError(
+                message: "Field object `default` must be one of available `choices`.",
+                ref_id: "FIELD_INVALID_CHOICE_DEFAULT"
+            );
+        }
+
+        # Do not allow this field to be `read_only` AND `write_only`
+        if ($this->read_only and $this->write_only) {
+            throw new ServerError(
+                message: "Fields cannot be both read-only and write-only.",
+                ref_id: "FIELD_WITH_READ_ONLY_AND_WRITE_ONLY"
+            );
+        }
+
+        # Do not allow `conditions` to be set if the field does not `allow_null`
+        if ($this->conditions and !$this->allow_null) {
+            throw new ServerError(
+                message: "Fields cannot have 'conditions' unless they 'allow_null' values",
+                ref_id: "FIELD_CANNOT_BE_CONDITIONAL_WITHOUT_ALLOW_NULL"
+            );
+        }
+
+        # Do not allow the `many_minimum` value to greater than the `many_maximum` value
+        if ($this->many_minimum > $this->many_maximum) {
+            throw new ServerError(
+                message: "Fields cannot have a 'many_minimum' value greater than 'many_maximum'",
+                ref_id: "FIELD_MANY_MINIMUM_GREATER_THAN_MANY_MAXIMUM"
+            );
+        }
+
+        # Do not allow this field to be the ID if the field is not `required`.
+        if ($this->is_id and !$this->required) {
+            throw new ServerError(
+                message: "Field cannot be delegated as the 'id' if it is not a 'required' field.",
+                ref_id: "FIELD_IS_ID_WITHOUT_REQUIRED"
+            );
+        }
+
+        # Do not allow this field to be the ID if the field is not `unique`.
+        if ($this->is_id and !$this->unique) {
+            throw new ServerError(
+                message: "Field cannot be delegated as the 'id' if it is not a 'unique' field.",
+                ref_id: "FIELD_IS_ID_WITHOUT_UNIQUE"
+            );
+        }
+
+        # Do not allow this field to be the ID if it is `write_only``
+        if ($this->is_id and $this->write_only) {
+            throw new ServerError(
+                message: "Field cannot be delegated as the 'id' if it is a 'write_only' field.",
+                ref_id: "FIELD_IS_ID_WITH_WRITE_ONLY"
+            );
+        }
+
+        # Do not allow this field to be the ID if it is a `many` field
+        if ($this->is_id and $this->many) {
+            throw new ServerError(
+                message: "Field cannot be delegated as the 'id' if it is a 'many' field.",
+                ref_id: "FIELD_IS_ID_WITH_MANY"
+            );
+        }
+
+        # Do not allow empty values if this field is delegated as the ID
+        if ($this->is_id and $this->allow_empty) {
+            throw new ServerError(
+                message: "Field cannot 'allow_empty' values when 'is_id' is enabled.",
+                ref_id: "FIELD_IS_ID_WITH_ALLOW_EMPTY"
+            );
         }
     }
 
@@ -147,6 +242,9 @@ class Field
 
         # Ensure this field object has a name set
         $this->check_field_names();
+
+        # Ensure there are no duplicate ID fields
+        $this->check_is_id();
 
         # Ensure a value is specified if field is `required`
         $this->check_field_required();
@@ -208,6 +306,31 @@ class Field
     }
 
     /**
+     * When `is_id` is enabled, checks that no other Fields defined in the parent Model context are also enabled as the
+     * `is_id` field.
+     */
+    private function check_is_id() {
+        # Only validate this if this field has `is_id` enabled.
+        if (!$this->is_id) {
+            return;
+        }
+
+        # Get the class name of the parent Model context
+        $parent_model_class = get_class($this->context);
+
+        # Loop through each of the parent Model context's Fields and ensure there a maximum of one `is_id` field.
+        foreach ($this->context->get_fields() as $field) {
+            if ($this->context->$field->is_id and $field !== $this->name) {
+                throw new ServerError(
+                    message: "Field cannot enable 'is_id' because another Field in the parent Model 
+                        '$parent_model_class' already has 'is_id' enabled.",
+                    ref_id: "FIELD_IS_ID_ALREADY_EXISTS"
+                );
+            }
+        }
+    }
+
+    /**
      * Checks if the conditions defined in the `conditions` property are met.
      * @returns bool `true` if all conditions were met, `false` if any conditions failed.
      */
@@ -253,22 +376,6 @@ class Field
      * @throws ValidationError If `required` is set but no value was assigned.
      */
     private function check_field_required() {
-        # Throw an error if `required` and `default` are both set
-        if ($this->required and isset($this->default)) {
-            throw new ServerError(
-                message: "Required field `$this->name` cannot have a default.",
-                ref_id: "FIELD_CANNOT_BE_REQUIRED_WITH_DEFAULT"
-            );
-        }
-
-        # Throw an error if `required` and `allow_null` are both set
-        if ($this->required and $this->allow_null) {
-            throw new ServerError(
-                message: "Required field `$this->name` cannot allow null values.",
-                ref_id: "FIELD_CANNOT_BE_REQUIRED_WITH_ALLOW_NULL"
-            );
-        }
-
         # Throw an error if this field is required but no value was set.
         if ($this->required and is_null($this->value)) {
             throw new ValidationError(

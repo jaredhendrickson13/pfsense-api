@@ -75,7 +75,8 @@ class Model {
 
         # Use the ID to obtain this Model object if present.
         if (isset($id)) {
-            $this->from_internal($id);
+            $this->id = $id;
+            $this->from_internal();
         }
 
         # Use the representation to obtain or construct this object if present.
@@ -213,7 +214,7 @@ class Model {
      * Write configuration changes to the config file
      * @param string $change_note The message to write to the change log.
      */
-    protected function write_config(string $change_note) {
+    final protected function write_config(string $change_note) {
         # Local variables
         $lock_file = "/tmp/.api.write_config.lock";
 
@@ -280,45 +281,96 @@ class Model {
     }
 
     /**
+     * Obtains the internal pfSense configuration ID for this Model's current assigned ID. In the event that this Model
+     * has a Field assigned `is_id`, this method will check internal objects for a value that matches $this->id on
+     * that Field.
+     * @throws NotFoundError When an internal object matching $this->id does not exist
+     * @returns mixed The internal configuration ID associated with this Model.
+     */
+    public function get_internal_id() : mixed {
+        # Variables
+        $id_field = $this->get_id_field();
+        $internal_objects = $this->get_internal_objects();
+
+        # Check if this Model has a Field that is used as the ID
+        if ($id_field) {
+            # Locate the internal ID of the object using the ID field
+            foreach ($internal_objects as $internal_id => $internal_object) {
+                # Check if the ID field's value in this object matches our ID
+                if (array_key_exists($id_field, $internal_object) and $internal_object[$id_field] === $this->id) {
+                    return $internal_id;
+                }
+            }
+        }
+        # Otherwise, check if the ID is already the internal value and check if an internal object exists with this ID
+        elseif (array_key_exists($this->id, $internal_objects)) {
+            return $this->id;
+        }
+
+        # Throw a Not Found error if we could not determine an existing internal object with this ID.
+        throw new NotFoundError(
+            message: "Object with ID '$this->id' does not exist.",
+            ref_id: "MODEL_OBJECT_NOT_FOUND"
+        );
+    }
+
+    /**
+     * Obtains all internal objects for this Model. When a `config_path` is specified, this method will obtain the
+     * internal objects directly from config. When an `internal_callable` is assigned, this method will return
+     * the output of the assigned callable.
+     * @throws ServerError When neither a `config_path` nor a `internal_callable` are assigned to this model, OR both a
+     * `config_path` and a `internal_callable` are assigned to this model
+     * @return array The array of internal objects without any additional processing performed.
+     */
+    private function get_internal_objects() : array {
+        # Throw an error if both `config_path` and `internal_callable` are set.
+        if ($this->config_path and $this->internal_callable) {
+            throw new ServerError(
+                message: "Models cannot define both a config path and an internal callable.",
+                ref_id: "MODEL_WITH_CONFIG_PATH"
+            );
+        }
+        # Obtain the internal objects from the config path if specified
+        elseif ($this->config_path) {
+            $internal_objects = $this->get_config($this->config_path, []);
+        }
+        # Obtain the internal objects by calling the `internal_callable` if specified
+        elseif ($this->internal_callable) {
+            $callable = $this->internal_callable;
+            $internal_objects = $callable();
+        }
+        # Otherwise, throw an error. Either a `config_path` or an `internal_callable` is required.
+        else {
+            throw new ServerError(
+                message: "Model requires a 'config_path' or 'internal_callable' value to be defined before 
+                    obtaining internal objects.",
+                ref_id: "MODEL_WITH_NO_INTERNAL_METHOD"
+            );
+        }
+
+        return $internal_objects;
+    }
+
+    /**
      * Obtain this Model object from the internal pfSense configuration by object ID. If the specified ID exists in
      * config, this Model object will be overwritten with the contents of that object.
-     * @param mixed $id Specify the ID of the object to obtain.
      * @throws ServerError When this Model does not have a `config_path` set.
      * @throws NotFoundError When an object with the specified $id does not exist.
      */
     public function from_internal(mixed $id = null) {
-        # Throw an error if no `config_path` is set
-        if (!$this->config_path) {
-            throw new ServerError(
-                message: "Model must have a 'config_path' to get internal values from config.",
-                ref_id: "MODEL_NO_CONFIG_PATH"
-            );
-        }
-
         # Require an $id if `many` is set
-        if ($this->many and !isset($id)) {
+        if ($this->many and !isset($this->id)) {
             throw new ServerError(
                 message: "An ID is required when refreshing objects from config on model with 'many'.",
                 ref_id: "MODEL_ID_REQUIRED_FOR_REFRESH"
             );
         }
 
-        # Get the internal object(s) from config
-        $internal_objects = $this->get_config($this->config_path, []);
-
-        # If an ID was requested that doesn't exist, throw a not found error
-        if ($this->many and !array_key_exists($id, $internal_objects)) {
-            throw new NotFoundError(
-                message: "Object with ID '$id' does not exist.",
-                ref_id: "MODEL_OBJECT_NOT_FOUND"
-            );
-        }
-
-        # Set the object ID if `many` is enabled
-        $this->id = ($this->many) ? $id : $this->id;
+        # Get the internal object(s) from config and
+        $internal_objects = $this->get_internal_objects();
 
         # Fetch the requested object if `many` is enabled
-        $internal_object = ($this->many) ? $internal_objects[$id] : $internal_objects;
+        $internal_object = ($this->many) ? $internal_objects[$this->get_internal_id()] : $internal_objects;
 
         # Loop through each of this Model's fields and convert the internal value to the representation value
         foreach ($this->get_fields() as $field) {
@@ -355,47 +407,15 @@ class Model {
         # Variables
         $model = get_class($this);
         $model_objects = [];
-
-        # Throw an error if both `config_path` and `internal_callable` are set.
-        if ($this->config_path and $this->internal_callable) {
-            throw new ServerError(
-                message: "Models cannot define both a config path and an internal callable.",
-                ref_id: "MODEL_WITH_CONFIG_PATH"
-            );
-        }
-        # Obtain the internal objects from the config path if specified
-        elseif ($this->config_path) {
-            $internal_objects = $this->get_config($this->config_path, []);
-        }
-        # Obtain the internal objects by calling the `internal_callable` if specified
-        elseif ($this->internal_callable) {
-            $callable = $this->internal_callable;
-            $internal_objects = $callable();
-        }
-        # Otherwise, throw an error. Either a `config_path` or an `internal_callable` is required.
-        else {
-            throw new ServerError(
-                message: "Model requires a 'config_path' or 'internal_callable' value to be defined before 
-                    obtaining internal objects.",
-                ref_id: "MODEL_WITH_NO_INTERNAL_METHOD"
-            );
-        }
-
-        # Ensure internal objects are of type `array`
-        if (!is_array($internal_objects)) {
-            throw new ServerError(
-                message: "Model expected internal objects to be of type 'array'.",
-                ref_id: "MODEL_INVALID_INTERNAL_OBJECT_TYPE"
-            );
-        }
+        $internal_objects = $this->get_internal_objects();
 
         # For non `many` models, wrap the internal object in an array so we can loop
         $internal_objects = ($this->many) ? $internal_objects : [$internal_objects];
 
         # Loop through each internal object and create a Model object for it
         foreach ($internal_objects as $internal_id=>$internal_object) {
-            $model_object = new $model();
-            $model_object->from_internal($internal_id);
+            $model_object = new $model(id: $internal_id);
+            $model_object->from_internal();
             $model_objects[] = $model_object;
         }
 
@@ -419,7 +439,10 @@ class Model {
 
         # Loop through each of this Model's fields and add its value to a serializable array
         foreach ($this->get_fields() as $field) {
-            $representation[$field] = $this->$field->value;
+            # Only add this field if it is not a `write_only` field.
+            if (!$this->$field->write_only) {
+                $representation[$field] = $this->$field->value;
+            }
         }
 
         return $representation;
@@ -470,13 +493,38 @@ class Model {
     }
 
     /**
+     * Obtains the name of the Field that has `is_id` enabled. If no Field's have `is_id` enabled, return an empty
+     * string to indicate this Model should use the pfSense configuration index ID.
+     * @returns string The name of the Field object that is assigned `is_id`. If no Field object is found with `is_id`,
+     * returns an empty string to indicate the default pfSense configuration index ID should be used.
+     */
+    final public function get_id_field() {
+        # Loop through each Field in this Model and check for a Field with `is_id` enabled.
+        foreach ($this->get_fields() as $field) {
+            if ($this->$field->is_id) {
+                return $field;
+            }
+        }
+
+        return "";
+    }
+
+    /**
      * Performs a full validation on the API mode. This includes checking that required packages are installed and
      * validating all assigned fields. Note: Fields are validated in the order they are defined in the class.
      * @return bool `true` if the model's data is valid.
      * @throws ServerError When a server or programming error is detected.
      * @throws ValidationError When model validation fails.
      */
-    final public function validate() : bool {
+    final public function validate(bool $requires_id = false) : bool {
+        # When an ID is required and this is a `many` model, check that an ID is set.
+        if ($requires_id and $this->many and !isset($this->id)) {
+            throw new ValidationError(
+                message: "Field 'id' is required.",
+                ref_id: "MODEL_REQUIRES_ID"
+            );
+        }
+
         # Check for required packages
         $this->check_packages();
 
@@ -592,9 +640,15 @@ class Model {
     protected function _create() {
         # Check if this model has a `config_path` and `many` set, we will apply a default behavior for these models
         if ($this->config_path and $this->many) {
-            # Get the next ID and name of this model
-            $this->id = $this->get_next_id();
-            $this->set_config(path: "$this->config_path/$this->id", value: $this->to_internal());
+            # Get the ID field for this Model and the next available internal ID
+            $id_field = $this->get_id_field();
+            $internal_id = $this->get_next_id();
+
+            # Use the value of the current ID field if one was specified, otherwise just use the internal ID.
+            $this->id = ($id_field) ? $this->$id_field->value : $internal_id;
+
+            # Write the new object to the internal config
+            $this->set_config(path: "$this->config_path/$internal_id", value: $this->to_internal());
             $this->write_config("Added $this->verbose_name via API");
             return;
         }
@@ -655,7 +709,7 @@ class Model {
      */
     final public function update(bool $apply = false) {
         # Ensure all object fields and validations succeed for proceeding.
-        if ($this->validate()) {
+        if ($this->validate(requires_id: true)) {
             # Run the _update method
             $this->_update();
 
@@ -695,7 +749,7 @@ class Model {
      */
     final public function delete(bool $apply = false) {
         # Ensure all object fields and validations succeed for proceeding.
-        if ($this->validate()) {
+        if ($this->validate(requires_id: true)) {
             # Run the _delete method
             $this->_delete();
 
