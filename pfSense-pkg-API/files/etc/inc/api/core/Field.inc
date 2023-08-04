@@ -436,9 +436,6 @@ class Field
             $field_name = $this->name;
 
             foreach ($modelset->model_objects as $model_object) {
-                var_dump($model_object->id);
-                var_dump($this->context->id);
-
                 # Move onto the next model object if this model object's field value does not match our objects value.
                 if ($model_object->$field_name->value != $this->value or $model_object->id === $this->context->id) {
                     continue;
