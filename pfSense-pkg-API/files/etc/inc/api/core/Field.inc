@@ -66,12 +66,12 @@ class Field
      */
     public function __construct(
         string $type = "",
-        array $choices = [],
+        bool $required = false,
         bool $unique = false,
+        mixed $default = null,
+        array $choices = [],
         bool $allow_empty = false,
         bool $allow_null = false,
-        bool $required = false,
-        mixed $default = null,
         bool $read_only = false,
         bool $write_only = false,
         bool $many = false,

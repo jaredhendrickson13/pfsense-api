@@ -32,9 +32,9 @@ class Test extends Model {
 
         # Assign fields and field parameters for this model.
         $this->test_bool = new BooleanField(
+            default: true,
             indicates_true: "on",
             indicates_false: "off",
-            default: true,
             help_text: "Demonstrates a boolean field that internally uses 'on' to indicate 'true' or 'off' 
                 to indicate 'false'."
         );
@@ -43,22 +43,22 @@ class Test extends Model {
             help_text: "Demonstrates an integer field that defaults to 5."
         );
         $this->test_string_conditional = new StringField(
-            allow_empty: true,
-            allow_null: true,
             required: false,
             default: "Conditions were met!",
+            allow_empty: true,
+            allow_null: true,
             conditions: ["test_bool"=>true]
         );
         $this->test_string_unique = new StringField(
-            unique: true,
             required: false,
+            unique: true,
             default: uniqid(),
             help_text: "Demonstrates a string field that must be unique from all other Test model objects stored
                 in configuration."
         );
         $this->test_string_many = new StringField(
-            allow_empty: true,
             default: [],
+            allow_empty: true,
             many: true,
             delimiter: "/",
             help_text: "Demonstrates a string field that allows many values to be passed in as an array. When 'many'

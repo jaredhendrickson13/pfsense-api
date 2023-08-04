@@ -43,15 +43,15 @@ class BooleanField extends API\Core\Field {
      * @param string $help_text Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
-        string $indicates_true = "",
-        string $indicates_false = null,
+        bool $required = false,
         bool $unique = false,
+        mixed $default = null,
         bool $allow_empty = false,
         bool $allow_null = false,
-        bool $required = false,
-        mixed $default = null,
         bool $read_only = false,
         bool $write_only = false,
+        string $indicates_true = "",
+        string $indicates_false = null,
         string $internal_name = "",
         string $internal_namespace = "",
         array $conditions = [],
@@ -63,11 +63,11 @@ class BooleanField extends API\Core\Field {
         $this->indicates_false = $indicates_false;
         parent::__construct(
             type: "boolean",
+            required: $required,
             unique: $unique,
+            default: $default,
             allow_empty: $allow_empty,
             allow_null: $allow_null,
-            required: $required,
-            default: $default,
             read_only: $read_only,
             write_only: $write_only,
             many: false,
