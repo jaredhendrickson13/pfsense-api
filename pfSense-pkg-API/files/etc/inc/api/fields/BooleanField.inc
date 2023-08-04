@@ -40,7 +40,7 @@ class BooleanField extends API\Core\Field {
      * fields, one field named `type` and the other being this field; and you only want this field to be included if
      * `type` is equal to `type1`, you could assign ["type" => "type1"] to this parameter.
      * @param array $validators An array of Validator objects to run against this field.
-     * @param string $description Set a description for this field. This description will be used in API documentation.
+     * @param string $help_text Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
         string $indicates_true = "",
@@ -56,7 +56,7 @@ class BooleanField extends API\Core\Field {
         string $internal_namespace = "",
         array $conditions = [],
         array $validators = [],
-        string $description = ""
+        string $help_text = ""
     )
     {
         $this->indicates_true = $indicates_true;
@@ -75,7 +75,7 @@ class BooleanField extends API\Core\Field {
             internal_namespace: $internal_namespace,
             conditions: $conditions,
             validators: $validators,
-            description: $description
+            help_text: $help_text
         );
     }
 

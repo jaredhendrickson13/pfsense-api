@@ -35,12 +35,12 @@ class Test extends Model {
             indicates_true: "on",
             indicates_false: "off",
             default: true,
-            description: "Demonstrates a boolean field that internally uses 'on' to indicate 'true' or 'off' 
+            help_text: "Demonstrates a boolean field that internally uses 'on' to indicate 'true' or 'off' 
                 to indicate 'false'."
         );
         $this->test_integer = new IntegerField(
             default: 5,
-            description: "Demonstrates an integer field that defaults to 5."
+            help_text: "Demonstrates an integer field that defaults to 5."
         );
         $this->test_string_conditional = new StringField(
             allow_empty: true,
@@ -53,7 +53,7 @@ class Test extends Model {
             unique: true,
             required: false,
             default: uniqid(),
-            description: "Demonstrates a string field that must be unique from all other Test model objects stored
+            help_text: "Demonstrates a string field that must be unique from all other Test model objects stored
                 in configuration."
         );
         $this->test_string_many = new StringField(
@@ -61,7 +61,7 @@ class Test extends Model {
             default: [],
             many: true,
             delimiter: "/",
-            description: "Demonstrates a string field that allows many values to be passed in as an array. When 'many'
+            help_text: "Demonstrates a string field that allows many values to be passed in as an array. When 'many'
                 is set, values must be passed in as an array of strings. Also demonstrates that the internal version
                 of this value will be the array of strings joined together by '/'."
         );
@@ -69,7 +69,7 @@ class Test extends Model {
             required: false,
             default: "test namespace field value",
             internal_namespace: "test_namespace",
-            description: "Demonstrates a string field that is nested under the namespace "
+            help_text: "Demonstrates a string field that is nested under the namespace "
         );
 
         # Parent base 'Model' object must be constructed very last to ensure the Model has all configured attributes.

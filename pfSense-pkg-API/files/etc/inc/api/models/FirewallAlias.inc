@@ -24,26 +24,27 @@ class FirewallAlias extends Model {
         $this->subsystem = "aliases";
         $this->many = true;
         $this->name = new StringField(
+            max_length: 31,
             unique: true,
             required: true,
-            description: "Sets the name for the alias. This name must be unique from all other aliases."
+            help_text: "Sets the name for the alias. This name must be unique from all other aliases."
         );
         $this->type = new StringField(
             choices: ["host", "network", "port"],
             required: true,
-            description: "Sets the type of alias this object will be. This directly impacts what values can be
+            help_text: "Sets the type of alias this object will be. This directly impacts what values can be
                 specified in the `address` field."
         );
         $this->descr = new StringField(
             allow_empty: true,
             default: "",
-            description: "Sets a description to help specify the purpose or contents of the alias."
+            help_text: "Sets a description to help specify the purpose or contents of the alias."
         );
         $this->address = new StringField(
             default: [],
             many: true,
             delimiter: " ",
-            description: "Sets the host, network or port entries for the alias. When `type` is set to `host`, each
+            help_text: "Sets the host, network or port entries for the alias. When `type` is set to `host`, each
                 entry must be a valid IP address or FQDN. When `type` is set to `network`, each entry must be a valid
                 network CIDR or FQDN. When `type` is set to `port`, each entry must be a valid port or port range. You
                 may also specify an existing alias's `name` as an entry to created nested aliases."
@@ -52,7 +53,7 @@ class FirewallAlias extends Model {
             default: [],
             many: true,
             delimiter: "||",
-            description: "Sets descriptions for each alias `address`. Values must match the order of the `address` 
+            help_text: "Sets descriptions for each alias `address`. Values must match the order of the `address` 
                 value it relates to. For example, the first value specified here is the description for the first
                 value specified in the `address` field. This value cannot contain "
         );
@@ -146,6 +147,6 @@ class FirewallAlias extends Model {
      * changes to config.
      */
     public function apply() {
-
+        filter_configure();
     }
 }

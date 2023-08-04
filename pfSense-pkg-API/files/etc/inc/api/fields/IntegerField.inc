@@ -38,7 +38,7 @@ class IntegerField extends API\Core\Field {
      * fields, one field named `type` and the other being this field; and you only want this field to be included if
      * `type` is equal to `type1`, you could assign ["type" => "type1"] to this parameter.
      * @param array $validators An array of Validator objects to run against this field.
-     * @param string $description Set a description for this field. This description will be used in API documentation.
+     * @param string $help_text Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
         int $minimum = 0,
@@ -46,17 +46,17 @@ class IntegerField extends API\Core\Field {
         array $choices = [],
         bool $unique = false,
         bool $allow_null = false,
-        bool $required = false,
-        mixed $default = null,
-        bool $read_only = false,
-        bool $write_only = false,
-        bool $many = false,
+        bool   $required = false,
+        mixed  $default = null,
+        bool   $read_only = false,
+        bool   $write_only = false,
+        bool   $many = false,
         string $delimiter = ",",
         string $internal_name = "",
         string $internal_namespace = "",
-        array $conditions = [],
-        array $validators = [],
-        string $description = "",
+        array  $conditions = [],
+        array  $validators = [],
+        string $help_text = "",
     )
     {
         parent::__construct(
@@ -75,7 +75,7 @@ class IntegerField extends API\Core\Field {
             internal_namespace: $internal_namespace,
             conditions: $conditions,
             validators: $validators + [new API\Validators\NumericRangeValidator(minimum: $minimum, maximum: $maximum)],
-            description: $description
+            help_text: $help_text
         );
     }
 

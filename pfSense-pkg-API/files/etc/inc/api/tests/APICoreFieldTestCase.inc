@@ -104,7 +104,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
         $read_only = false;
         $many = false;
         $delimiter = " ";
-        $description = "Test description";
+        $help_text = "Test description";
         $internal_name = "test_name";
 
         # Create a Field object and ensure all values were properly set during construction
@@ -121,7 +121,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
             delimiter: $delimiter,
             internal_name: $internal_name,
             validators: $validators,
-            description: $description
+            help_text: $help_text
         );
 
         # Ensure the values we passed in are the values that are assigned to the object
@@ -136,7 +136,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
         $this->assert_equals($test_field->read_only, $read_only);
         $this->assert_equals($test_field->many, $many);
         $this->assert_equals($test_field->delimiter, $delimiter);
-        $this->assert_equals($test_field->description, $description);
+        $this->assert_equals($test_field->help_text, $help_text);
         $this->assert_equals($test_field->internal_name, $internal_name);
     }
 

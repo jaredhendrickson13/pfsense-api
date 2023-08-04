@@ -21,7 +21,7 @@ class Field
     public mixed $default = null;
     public bool $read_only = false;
     public bool $write_only = false;
-    public string $description = "";
+    public string $help_text = "";
     public string $name = "";
     public string $internal_name = "";
     public string $internal_namespace = "";
@@ -61,7 +61,7 @@ class Field
      * fields, one field named `type` and the other being this field; and you only want this field to be included if
      * `type` is equal to `type1`, you could assign ["type" => "type1"] to this parameter.
      * @param array $validators An array of API\Core\Validator objects to use when validating this field.
-     * @param string $description Sets a description for this field. This description will be used as the description
+     * @param string $help_text Sets a description for this field. This description will be used as the description
      * for this field in the API documentation.
      */
     public function __construct(
@@ -82,7 +82,7 @@ class Field
         string $internal_namespace = "",
         array $conditions = [],
         array $validators = [],
-        string $description = ""
+        string $help_text = ""
     ){
         # Assign values to object properties
         $this->type = $type;
@@ -99,7 +99,7 @@ class Field
         $this->many_minimum = $many_minimum;
         $this->many_maximum = $many_maximum;
         $this->delimiter = $delimiter;
-        $this->description = $description;
+        $this->help_text = $help_text;
         $this->internal_name = $internal_name;
         $this->internal_namespace = $internal_namespace;
         $this->conditions = $conditions;
