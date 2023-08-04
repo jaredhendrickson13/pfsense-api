@@ -52,6 +52,7 @@ class Auth {
         $this->required_privileges = $required_privileges;
         $this->client_privileges = [];
         $this->ip_address = ($_SERVER["REMOTE_ADDR"]) ?: "unknown IP";
+        $this->username = "";
     }
 
     /**
