@@ -9,7 +9,6 @@ class Field
     public mixed $value = null;
     public string $type = "";
     public array $validators = [];
-    public bool $is_id = false;
     public bool $unique = false;
     public bool $many = false;
     public int $many_minimum = 1;
@@ -33,11 +32,6 @@ class Field
      * @param string $type The primary type supported by this field. This must be a string representation of the type
      * as it is returned by PHP's gettype() function.
      * @param array $choices An array of explicitly choices this field's value can be.
-     * @param bool $is_id If `true`, the value of this field will be used to identify the parent Model objects. If no
-     * Field assigned to the parent Model have $is_id set to `true`, the Model will use the pfSense configuration
-     * index ID by default. Only one Field per parent Model can have $is_id set to `true`. If enabled, this Field must
-     * also have $required and $unique set to `true`. Fields cannot enable $allow_empty, $allow_null, $read_only,
-     * $write_only, or $many.
      * @param bool $unique Set to `true` if this value must be unique from all other objects of the same model.
      * @param bool $allow_empty Set to `true` if empty values (blank strings, 0, etc) should be allowed.
      * @param bool $allow_null Set to `true` if `null` values should be supported for this field. When `null` values
@@ -73,7 +67,6 @@ class Field
     public function __construct(
         string $type = "",
         array $choices = [],
-        bool $is_id = false,
         bool $unique = false,
         bool $allow_empty = false,
         bool $allow_null = false,
@@ -96,7 +89,6 @@ class Field
         $this->validators = $validators;
         $this->choices = $choices;
         $this->unique = $unique;
-        $this->is_id = $is_id;
         $this->allow_empty = $allow_empty;
         $this->allow_null = ($read_only) ? true : $allow_null;
         $this->required = $required;
@@ -181,46 +173,6 @@ class Field
                 ref_id: "FIELD_MANY_MINIMUM_GREATER_THAN_MANY_MAXIMUM"
             );
         }
-
-        # Do not allow this field to be the ID if the field is not `required`.
-        if ($this->is_id and !$this->required) {
-            throw new ServerError(
-                message: "Field cannot be delegated as the 'id' if it is not a 'required' field.",
-                ref_id: "FIELD_IS_ID_WITHOUT_REQUIRED"
-            );
-        }
-
-        # Do not allow this field to be the ID if the field is not `unique`.
-        if ($this->is_id and !$this->unique) {
-            throw new ServerError(
-                message: "Field cannot be delegated as the 'id' if it is not a 'unique' field.",
-                ref_id: "FIELD_IS_ID_WITHOUT_UNIQUE"
-            );
-        }
-
-        # Do not allow this field to be the ID if it is `write_only``
-        if ($this->is_id and $this->write_only) {
-            throw new ServerError(
-                message: "Field cannot be delegated as the 'id' if it is a 'write_only' field.",
-                ref_id: "FIELD_IS_ID_WITH_WRITE_ONLY"
-            );
-        }
-
-        # Do not allow this field to be the ID if it is a `many` field
-        if ($this->is_id and $this->many) {
-            throw new ServerError(
-                message: "Field cannot be delegated as the 'id' if it is a 'many' field.",
-                ref_id: "FIELD_IS_ID_WITH_MANY"
-            );
-        }
-
-        # Do not allow empty values if this field is delegated as the ID
-        if ($this->is_id and $this->allow_empty) {
-            throw new ServerError(
-                message: "Field cannot 'allow_empty' values when 'is_id' is enabled.",
-                ref_id: "FIELD_IS_ID_WITH_ALLOW_EMPTY"
-            );
-        }
     }
 
 
@@ -242,9 +194,6 @@ class Field
 
         # Ensure this field object has a name set
         $this->check_field_names();
-
-        # Ensure there are no duplicate ID fields
-        $this->check_is_id();
 
         # Ensure a value is specified if field is `required`
         $this->check_field_required();
@@ -302,31 +251,6 @@ class Field
                 message: "Conditional fields must have model context provided.",
                 ref_id: "FIELD_CONDITIONAL_WITH_NO_CONTEXT"
             );
-        }
-    }
-
-    /**
-     * When `is_id` is enabled, checks that no other Fields defined in the parent Model context are also enabled as the
-     * `is_id` field.
-     */
-    private function check_is_id() {
-        # Only validate this if this field has `is_id` enabled.
-        if (!$this->is_id) {
-            return;
-        }
-
-        # Get the class name of the parent Model context
-        $parent_model_class = get_class($this->context);
-
-        # Loop through each of the parent Model context's Fields and ensure there a maximum of one `is_id` field.
-        foreach ($this->context->get_fields() as $field) {
-            if ($this->context->$field->is_id and $field !== $this->name) {
-                throw new ServerError(
-                    message: "Field cannot enable 'is_id' because another Field in the parent Model 
-                        '$parent_model_class' already has 'is_id' enabled.",
-                    ref_id: "FIELD_IS_ID_ALREADY_EXISTS"
-                );
-            }
         }
     }
 
@@ -511,7 +435,10 @@ class Field
             $modelset = $this->context->get_all_from_internal();
             $field_name = $this->name;
 
-            foreach ($modelset->model_objects as $model_object_id => $model_object) {
+            foreach ($modelset->model_objects as $model_object) {
+                var_dump($model_object->id);
+                var_dump($this->context->id);
+
                 # Move onto the next model object if this model object's field value does not match our objects value.
                 if ($model_object->$field_name->value != $this->value or $model_object->id === $this->context->id) {
                     continue;
@@ -519,7 +446,7 @@ class Field
                 # When neither of previous conditions are met, we've found a unique conflict. Throw an error.
                 else {
                     throw new ValidationError(
-                        message: "Field '$this->name' must be unique. Value is in use by object with ID '$model_object_id'.",
+                        message: "Field '$this->name' must be unique. Value is in use by object with ID '$model_object->id'.",
                         ref_id: "FIELD_MUST_BE_UNIQUE"
                     );
                 }

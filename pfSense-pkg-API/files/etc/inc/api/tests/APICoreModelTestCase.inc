@@ -85,15 +85,6 @@ class APICoreModelTestCase extends API\Core\TestCase {
     }
 
     /**
-     * Checks that the Model's get_id_field() method correctly returns an empty string when no Fields are assigned
-     * the `is_id` property.
-     */
-    public function test_model_empty_string_when_no_fields_with_is_id() {
-        $test_model = new API\Models\Test();
-        $this->assert_equals($test_model->get_id_field(), "");
-    }
-
-    /**
      * Checks that we cannot call the default get_next_id() method if the model object does not have a config path set.
      */
     public function test_model_cant_get_next_id_without_config_path() {
@@ -306,30 +297,6 @@ class APICoreModelTestCase extends API\Core\TestCase {
                 $test_model->create();
             }
         );
-    }
-
-    /**
-     * Checks that we are able to use a Field with `is_id` enabled to correctly determine the internal ID of the object.
-     */
-    public function test_model_with_field_id() {
-        # Create a new test model object in config
-        $test_model = new API\Models\Test();
-
-        # Use the `test_string_unique` field as the ID for this object
-        $test_model->test_string_unique->is_id = true;
-
-        # Assing values to this Model object and create it.
-        $test_model->test_bool->value = true;
-        $test_model->test_string_unique->value ="This value will be used as the ID!";
-        $test_model->test_string_many->value = ["a", "b", "c"];
-        $test_model->create();
-
-        # Ensure the Model object's ID matches the ID field `test_string_unique` value and the internal ID is obtainable
-        $this->assert_equals($test_model->id, $test_model->test_string_unique->value);
-        $this->assert_is_greater_than($test_model->get_internal_id(), 1);
-
-        # Delete the object now that we're done with it.
-        $test_model->delete();
     }
 
     /**

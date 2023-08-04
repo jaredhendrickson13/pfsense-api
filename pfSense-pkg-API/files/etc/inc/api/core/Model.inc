@@ -281,40 +281,6 @@ class Model {
     }
 
     /**
-     * Obtains the internal pfSense configuration ID for this Model's current assigned ID. In the event that this Model
-     * has a Field assigned `is_id`, this method will check internal objects for a value that matches $this->id on
-     * that Field.
-     * @throws NotFoundError When an internal object matching $this->id does not exist
-     * @returns mixed The internal configuration ID associated with this Model.
-     */
-    public function get_internal_id() : mixed {
-        # Variables
-        $id_field = $this->get_id_field();
-        $internal_objects = $this->get_internal_objects();
-
-        # Check if this Model has a Field that is used as the ID
-        if ($id_field) {
-            # Locate the internal ID of the object using the ID field
-            foreach ($internal_objects as $internal_id => $internal_object) {
-                # Check if the ID field's value in this object matches our ID
-                if (array_key_exists($id_field, $internal_object) and $internal_object[$id_field] === $this->id) {
-                    return $internal_id;
-                }
-            }
-        }
-        # Otherwise, check if the ID is already the internal value and check if an internal object exists with this ID
-        elseif (array_key_exists($this->id, $internal_objects)) {
-            return $this->id;
-        }
-
-        # Throw a Not Found error if we could not determine an existing internal object with this ID.
-        throw new NotFoundError(
-            message: "Object with ID '$this->id' does not exist.",
-            ref_id: "MODEL_OBJECT_NOT_FOUND"
-        );
-    }
-
-    /**
      * Obtains all internal objects for this Model. When a `config_path` is specified, this method will obtain the
      * internal objects directly from config. When an `internal_callable` is assigned, this method will return
      * the output of the assigned callable.
@@ -366,11 +332,19 @@ class Model {
             );
         }
 
-        # Get the internal object(s) from config and
+        # Get the internal object(s) from config
         $internal_objects = $this->get_internal_objects();
 
-        # Fetch the requested object if `many` is enabled
-        $internal_object = ($this->many) ? $internal_objects[$this->get_internal_id()] : $internal_objects;
+        # Require there to be an internal object with this ID, throw a not found error otherwise
+        if (!array_key_exists($this->id, $internal_objects)) {
+            throw new NotFoundError(
+                message: "Object with ID '$this->id' does not exist.",
+                ref_id: "MODEL_OBJECT_NOT_FOUND"
+            );
+        }
+
+        # When `many` is enabled, obtain the object with our ID. Otherwise, just assign the direct object
+        $internal_object = ($this->many) ? $internal_objects[$this->id] : $internal_objects;
 
         # Loop through each of this Model's fields and convert the internal value to the representation value
         foreach ($this->get_fields() as $field) {
@@ -490,23 +464,6 @@ class Model {
         }
 
         return $fields;
-    }
-
-    /**
-     * Obtains the name of the Field that has `is_id` enabled. If no Field's have `is_id` enabled, return an empty
-     * string to indicate this Model should use the pfSense configuration index ID.
-     * @returns string The name of the Field object that is assigned `is_id`. If no Field object is found with `is_id`,
-     * returns an empty string to indicate the default pfSense configuration index ID should be used.
-     */
-    final public function get_id_field() {
-        # Loop through each Field in this Model and check for a Field with `is_id` enabled.
-        foreach ($this->get_fields() as $field) {
-            if ($this->$field->is_id) {
-                return $field;
-            }
-        }
-
-        return "";
     }
 
     /**
@@ -640,15 +597,11 @@ class Model {
     protected function _create() {
         # Check if this model has a `config_path` and `many` set, we will apply a default behavior for these models
         if ($this->config_path and $this->many) {
-            # Get the ID field for this Model and the next available internal ID
-            $id_field = $this->get_id_field();
-            $internal_id = $this->get_next_id();
-
-            # Use the value of the current ID field if one was specified, otherwise just use the internal ID.
-            $this->id = ($id_field) ? $this->$id_field->value : $internal_id;
+            # Get the next available internal ID and assign it to this object
+            $this->id = $this->get_next_id();
 
             # Write the new object to the internal config
-            $this->set_config(path: "$this->config_path/$internal_id", value: $this->to_internal());
+            $this->set_config(path: "$this->config_path/$this->id", value: $this->to_internal());
             $this->write_config("Added $this->verbose_name via API");
             return;
         }

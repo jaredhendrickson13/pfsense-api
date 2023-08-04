@@ -89,71 +89,6 @@ class APICoreFieldTestCase extends API\Core\TestCase
     }
 
     /**
-     * Checks that a Field object cannot be set as the ID field (via `is_id`) unless it is also a `required` field.
-     */
-    public function test_no_is_id_without_required () {
-        $this->assert_throws_response(
-            ref_id: "FIELD_IS_ID_WITHOUT_REQUIRED",
-            code: 500,
-            callable: function () {
-                new API\Core\Field(is_id: true, required: false);
-            }
-        );
-    }
-
-    /**
-     * Checks that a Field object cannot be set as the ID field (via `is_id`) unless it is also a `unique` field.
-     */
-    public function test_no_is_id_without_unique () {
-        $this->assert_throws_response(
-            ref_id: "FIELD_IS_ID_WITHOUT_UNIQUE",
-            code: 500,
-            callable: function () {
-                new API\Core\Field(is_id: true, unique: false, required: true);
-            }
-        );
-    }
-
-    /**
-     * Checks that a Field object cannot be set as the ID field (via `is_id`) if it is also a `write_only` field.
-     */
-    public function test_no_is_id_with_write_only () {
-        $this->assert_throws_response(
-            ref_id: "FIELD_IS_ID_WITH_WRITE_ONLY",
-            code: 500,
-            callable: function () {
-                new API\Core\Field(is_id: true, unique: true, required: true, write_only: true);
-            }
-        );
-    }
-
-    /**
-     * Checks that a Field object cannot be set as the ID field (via `is_id`) if it is also a `many` field.
-     */
-    public function test_no_is_id_with_many () {
-        $this->assert_throws_response(
-            ref_id: "FIELD_IS_ID_WITH_MANY",
-            code: 500,
-            callable: function () {
-                new API\Core\Field(is_id: true, unique: true, required: true, many: true);
-            }
-        );
-    }
-
-    /**
-     * Checks that a Field object cannot be set as the ID field (via `is_id`) if `allow_empty` is enabled
-     */
-    public function test_no_is_id_with_allow_empty () {
-        $this->assert_throws_response(
-            ref_id: "FIELD_IS_ID_WITH_ALLOW_EMPTY",
-            code: 500,
-            callable: function () {
-                new API\Core\Field(is_id: true, unique: true, allow_empty: true, required: true);
-            }
-        );
-    }
-
-    /**
      * Ensures Field properties are properly set when the Field object is created.
      */
     public function test_field_construction() {
@@ -400,32 +335,6 @@ class APICoreFieldTestCase extends API\Core\TestCase
                 $test_field->value = "test_value";
                 $test_field->context = $test_model;
                 $test_field->validate();
-            }
-        );
-    }
-
-    /**
-     * Checks that a Fields is not allowed to set `is_id` if another Field on the parent Model also has `is_id` set.
-     */
-    public function test_no_is_id_when_already_exists_on_parent_model() {
-        $this->assert_throws_response(
-            ref_id: "FIELD_IS_ID_ALREADY_EXISTS",
-            code: 500,
-            callable: function () {
-                # Create a new Test model object and assign the `is_id` field to `test_string_unique`.
-                $test_model = new API\Models\Test();
-                $test_model->test_string_unique->is_id = true;
-
-                # Set up the `test_integer` field so it meets pre-requisites for `is_id`, and also assign it `is_id`.
-                $test_model->test_integer->required = true;
-                $test_model->test_integer->unique = true;
-                $test_model->test_integer->is_id = true;
-                $test_model->test_integer->context = $test_model;
-                $test_model->test_integer->name = "test_integer";
-                $test_model->test_integer->value = 3;
-
-                # Validate the `test_integer` field, it should throw a ServerError because both fields have `is_id` set.
-                $test_model->test_integer->validate();
             }
         );
     }

@@ -16,11 +16,6 @@ class StringField extends API\Core\Field {
      * @param int $min_length The minimum number of characters required for this string field.
      * @param int $max_length The maximum number of characters allowed by this string field.
      * @param array $choices An array of explicit choices this string field value can be.
-     * @param bool $is_id If `true`, the value of this field will be used to identify the parent Model objects. If no
-     * Field assigned to the parent Model have $is_id set to `true`, the Model will use the pfSense configuration
-     * index ID by default. Only one Field per parent Model can have $is_id set to `true`. If enabled, this Field must
-     * also have $required and $unique set to `true`. Fields cannot enable $allow_empty, $allow_null, $read_only,
-     * $write_only, or $many.
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
      * @param bool $allow_empty If `true`, empty strings will be allowed by this field.
@@ -50,7 +45,6 @@ class StringField extends API\Core\Field {
         int $min_length = 0,
         int $max_length = 1024,
         array $choices = [],
-        bool $is_id = false,
         bool $unique = false,
         bool $allow_empty = false,
         bool $allow_null = false,
@@ -70,7 +64,6 @@ class StringField extends API\Core\Field {
         parent::__construct(
             type: "string",
             choices: $choices,
-            is_id: $is_id,
             unique: $unique,
             allow_empty: $allow_empty,
             allow_null: $allow_null,
