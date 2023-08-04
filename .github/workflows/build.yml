@@ -33,7 +33,7 @@ jobs:
       - name: Build pfSense-pkg-API on FreeBSD
         run: |
           /usr/bin/ssh -o StrictHostKeyChecking=no -o LogLevel=quiet ${{ matrix.freebsd_version }}.jaredhendrickson.com 'sudo pkill ntpd || true && sudo ntpdate pool.ntp.org || true'
-          /usr/bin/ssh -o StrictHostKeyChecking=no -o LogLevel=quiet ${{ matrix.freebsd_version }}.jaredhendrickson.com 'sudo pkg install -y php82-extensions'
+          /usr/bin/ssh -o StrictHostKeyChecking=no -o LogLevel=quiet ${{ matrix.freebsd_version }}.jaredhendrickson.com 'sudo pkg-static install -y php82-extensions'
           /usr/local/bin/python3 tools/make_package.py --host ${{ matrix.freebsd_version }}.jaredhendrickson.com --branch ${{ env.commit_id }} --tag ${{ env.build_version }}_${{ matrix.freebsd_id }}
 
       - name: Teardown FreeBSD build VM

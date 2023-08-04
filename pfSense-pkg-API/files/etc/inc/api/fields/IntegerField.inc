@@ -52,7 +52,7 @@ class IntegerField extends API\Core\Field {
         int $many_minimum = 1,
         int $many_maximum = 128,
         int $minimum = 0,
-        int $maximum = 999999999999999999999999,
+        int $maximum = 99999999999999999,
         string $delimiter = ",",
         string $internal_name = "",
         string $internal_namespace = "",
