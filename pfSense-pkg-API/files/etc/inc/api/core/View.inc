@@ -126,7 +126,7 @@ class View {
      * Checks if the API client is authenticated and authorized to make this call.
      */
     private function check_auth() {
-        $read_only = (isset($this->api_config["readonly"]) and $this->retain_read_mode) ? true : false;
+        $read_only = (isset($this->api_config["readonly"]) and $this->retain_read_mode);
         $this->client = new API\Core\Auth($this->get_required_privs(), $this->set_auth_mode, $read_only);
         if ($this->requires_auth === true) {
             if (!$this->client->authenticate()) {

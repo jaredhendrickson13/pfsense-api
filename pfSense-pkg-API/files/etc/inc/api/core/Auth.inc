@@ -18,169 +18,285 @@ namespace API\Core;
 require_once("api/core/Tools.inc");
 
 use API;
+use Exception;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use function API\Core\Tools\get_api_config;
 
 /**
  * Creates object that performs authentication and authorization for API views.
  */
 class Auth {
     private array $api_config;
-    public string $auth_mode;
-    public bool $read_mode;
-    public array $req_privs;
+    public string $mode;
+    public bool $read_only;
     public string $username;
-    public array $privs;
     public string $ip_address;
+    public array $required_privileges;
+    public array $client_privileges;
     public bool $is_authenticated;
     public bool $is_authorized;
 
     /**
-     * Values and functions to run anytime an `Auth` object is created.
-     * @param array $req_privs an array of required pfSense privileges to check during authorization.
-     * @param string $auth_mode explicitly sets the API `auth_mode` to use during authentication. Defaults to `auth_mode` API configuration value.
-     * @param bool|null $read_mode explicitly set the API `read_mode`. Defaults to `readonly` API configuration value.
+     * Creates an Auth object which can be used to authenticate an external client requesting API access.
+     * @param array $required_privileges An array of required pfSense privileges to check during authorization.
+     * @param string $mode Explicitly sets the API `auth_mode` to use during authentication.
+     * Defaults to `auth_mode` API configuration value.
+     * @param bool|null $read_only Explicitly set the API `read_mode` during authentication. Defaults to `readonly`
+     * API configuration value.
      */
-    public function __construct(array $req_privs=[], string $auth_mode="", bool|null $read_mode=null){
+    public function __construct(array $required_privileges=[], string $mode="", bool|null $read_only=null){
         $this->api_config = API\Core\Tools\get_api_config()[1];
-        $this->auth_mode = (!$auth_mode) ? $this->api_config["authmode"] : $auth_mode;
-        $this->read_mode = (is_null($read_mode)) ? array_key_exists("readonly", $this->api_config) : $read_mode;
-        $this->req_privs = $req_privs;
-        $this->privs = [];
+        $this->mode = (!$mode) ? $this->api_config["authmode"] : $mode;
+        $this->read_only = (is_null($read_only)) ? array_key_exists("readonly", $this->api_config) : $read_only;
+        $this->required_privileges = $required_privileges;
+        $this->client_privileges = [];
         $this->ip_address = ($_SERVER["REMOTE_ADDR"]) ?: "unknown IP";
     }
 
     /**
      * Attempts to authenticate using local authentication.
+     * @param string $username The username of the user authenticating.
+     * @param string $password The password of the user authenticating.
      * @return bool `true` if authentication was successful, `false` if authentication was unsuccessful.
      */
-    private function authenticate_local_database() : bool {
-        # Extract the username and password from basic authentication
-        $this->username = ($_SERVER['PHP_AUTH_USER']) ?: "unknown";
-        $client_token = $_SERVER['PHP_AUTH_PW'];
-
-        # Authenticate against local database
-        if (authenticate_user($this->username, $client_token)) {
-            # Ensure user is not disabled
-            if (API\Core\Tools\is_user_disabled($this->username) === false) {
-                unset($_SESSION["Username"]);
-                $_SESSION["Username"] = $this->username;
-                return true;
-            }
+    private function authenticate_local_database(string $username, string $password) : bool {
+        # Authenticate against the local user database
+        if (authenticate_user($username, $password)) {
+            $this->username = $username;
+            unset($_SESSION["Username"]);
+            $_SESSION["Username"] = $username;
+            return true;
         }
+
         return false;
     }
 
     /**
      * Attempts to authenticate using JWT authentication.
+     * @param string $jwt The JWT encoded string to authenticate.
      * @return bool `true` if authentication was successful, `false` if authentication was unsuccessful.
      */
-    private function authenticate_jwt() : bool {
-        # Extract token type and JWT from authorization header
-        $auth_header = explode(" ", $_SERVER["HTTP_AUTHORIZATION"]);
-        $token_type = $auth_header[0];
-        $token = $auth_header[1];
-        $decoded_jwt = API\Core\Tools\decode_jwt($token);
+    private function authenticate_jwt(string $jwt) : bool {
+        # Decode the JWT
+        $decoded_jwt = $this->decode_jwt($jwt);
 
         # Check that the JWT from our Authorization header is valid
-        if ($token_type === "Bearer" and $decoded_jwt !== false) {
+        if ($decoded_jwt !== []) {
             # Extract the owner's username from the JWT's payload data
             $this->username = $decoded_jwt["data"];
-
-            # Ensure user is not disabled
-            if (API\Core\Tools\is_user_disabled($this->username) === false) {
-                unset($_SESSION["Username"]);
-                $_SESSION["Username"] = $this->username;
-                return true;
+            unset($_SESSION["Username"]);
+            $_SESSION["Username"] = $this->username;
+            return true;
             }
-        }
+
         return false;
     }
 
     /**
-     * Attempts to authenticate using token authentication.
+     * Attempts to authenticate using API key authentication.
      * @return bool `true` if authentication was successful, `false` if authentication was unsuccessful.
      */
-    private function authenticate_token() : bool {
-        # Extract client ID and token from the authorization header
-        $client_id = explode(" ", $_SERVER["HTTP_AUTHORIZATION"])[0];
-        $client_token = explode(" ", $_SERVER["HTTP_AUTHORIZATION"])[1];
+    private function authenticate_key(string $key) : bool {
+        # Loop through the existing keys for this user and check the key hashes for a match
+        foreach ($this->get_existing_keys() as $key_from_config) {
+            # Hash the incoming key according to the algorithm of this stored key
+            $key_hash = hash($key_from_config["algo"], $key);
 
-        # Check if authentication is successful with this client ID and token
-        if (API\Core\Tools\authenticate_token($client_id, $client_token) === true) {
-            $this->username = pack("H*", $client_id);
-            # Ensure user is not disabled
-            if (API\Core\Tools\is_user_disabled($this->username) === false) {
+            # Authentication is success when incoming client key matches the hashed key stored in config
+            if ($key_hash === $key_from_config["key_hash"]) {
+                $this->username = $key_from_config["username"];
                 unset($_SESSION["Username"]);
-                $_SESSION["Username"] = $this->username;
+                $_SESSION["Username"] = $key_from_config["username"];
                 return true;
             }
         }
+
         return false;
     }
 
     /**
      * Run authentication using the current configured auth mode.
+     * @param string $secret The secret password, token or key from the authenticating client.
+     * @param string $username The username of the authenticating client. This only applies to `local` authentication.
      * @return bool `true` if authentication was successful, `false` if authentication was unsuccessful.
      */
-    public function authenticate() : bool {
-        # Attempt to authenticate
-        if ($this->auth_mode === "local") {
-            $resp = $this->authenticate_local_database();
-        }
-        elseif ($this->auth_mode === "jwt") {
-            $resp = $this->authenticate_jwt();
-        }
-        elseif ($this->auth_mode === "token") {
-            $resp = $this->authenticate_token();
-        }
-        else {
-            $resp = false;
+    public function authenticate(string $secret, string $username = "") : bool {
+        # Attempt to authenticate using the assigned auth mode
+        $this->is_authenticated = match ($this->mode) {
+            "local" => $this->authenticate_local_database(username: $username, password: $secret),
+            "jwt" => $this->authenticate_jwt(jwt: $secret),
+            "key" => $this->authenticate_key(key: $secret),
+            default => false,
+        };
+
+        # Fail authentication if the user authenticating is disabled
+        if ($this->is_user_disabled($this->username)) {
+            $this->is_authenticated = false;
         }
 
-        # Set our object is_authenticated attribute to our authentication resp, log auth, and return the resp
-        $this->is_authenticated = $resp;
-        $this->__log_authentication($this->is_authenticated);
+        # Log this authentication attempt and return the authentication result
+        $this->log_authentication();
         return $this->is_authenticated;
     }
 
     /**
-     * Checks if the API client has the necessary privileges to authorize this call.
+     * Checks if the client is authorized to make this request.
      * @return bool `true` if authorization was successful, `false` if authorization was unsuccessful.
      */
     public function authorize() : bool {
-        # Local variables
-        $authorized = false;
-        $client_config =& getUserEntry($this->username);;
-        $this->privs = get_user_privileges($client_config);
+        # Variables
+        $is_not_authorized = false;
+        $this->client_privileges = get_user_privileges(getUserEntry($this->username));
 
-        # If no require privileges were given, assume call is always authorized
-        if (!empty($this->req_privs)) {
-            # Check that client's IP is authorized
-            if ($this->__is_ip_authorized()) {
-                # If API is in readonly mode, only allow GET requests
-                if (!$this->read_mode or ($this->read_mode and $_SERVER['REQUEST_METHOD'] === "GET")) {
-                    # Loop through each of our req privs and ensure client has them, also check if access is read only
-                    foreach ($this->req_privs as &$priv) {
-                        if (in_array($priv, $this->privs)) {
-                            $authorized = true;
-                            break;
-                        }
-                    }
-                }
-            }
-        } else {
-            $authorized = true;
+        # This client is not authorized if their IP is not authorized
+        if (!$this->is_ip_authorized()) {
+            $is_not_authorized = true;
         }
 
-        # Set our class is_authorized attribute to our authorization resp and return the resp
-        $this->is_authorized = $authorized;
-        return $authorized;
+        # This client is not authorized if this `readonly` mode is enabled but this isn't a read request
+        if ($this->read_only and $_SERVER['REQUEST_METHOD'] !== "GET") {
+            $is_not_authorized= true;
+        }
+
+        # This client is not authorized if the client does not have at least one of the required privileges
+        if ($this->required_privileges and !array_intersect($this->required_privileges, $this->client_privileges)) {
+            $is_not_authorized= true;
+        }
+
+        # Return the authorization results
+        $this->is_authorized = !$is_not_authorized;
+        return $this->is_authorized;
+    }
+
+    /**
+     * Initializes the JWT server key if none is present. Optionally allows the existing JWT server key to be rotated.
+     * @param bool $rotate Force the JWT server key to be rotated.
+     * @throws Exception When insufficient source of randomness is not found for `random_bytes`.
+     */
+    public static function init_jwt_server_key(bool $rotate = false) {
+        # Obtain the API package's ID and configuration
+        $pkg_id = Tools\get_api_config()[0];
+        $api_config = Tools\get_api_config()[1];
+
+        # Create a new server key if one is not set
+        if (empty($api_config["server_key"]) or $rotate === true) {
+            config_set_path("installedpackages/package/{$pkg_id}/conf/server_key", bin2hex(random_bytes(32)));
+            write_config("API server key created");
+        }
+    }
+
+    /**
+     * @param mixed $username The username the JWT is to be issued for.
+     * @return string The JWT string clients will use for JWT authentication.
+     * @throws Exception When the JWT server key could not be created.
+     */
+    public static function generate_jwt(string $username) : string {
+        # Pull the API configuration from config
+        $api_config = get_api_config()[1];
+
+        # Initialize the JWT server key in case it is not present
+        self::init_jwt_server_key();
+
+        # Assign the JWT payload values. Assign the configured JWT expiration from the API configuration
+        $payload = array(
+            "iss" => config_get_path("system/hostname"),
+            "aud" => config_get_path("system/hostname"),
+            "exp" => time() + $api_config["jwt_exp"],
+            "nbf" => time(),
+            "data" => $username
+        );
+
+        # Return the encoded JWT
+        return JWT::encode($payload, $api_config["server_key"], "HS256");
+    }
+
+
+    /**
+     * Decodes a provided JWT string and extracts its attributes.
+     * @param string $jwt The incoming JWT string to decode.
+     * @return array An array of decoded JWT attributes. If the JWT could not be decoded, this array will be empty.
+     */
+    public static function decode_jwt(string $jwt) : array {
+        # Obtain the JWT server key from config
+        $jwt_server_key = get_api_config()[1]["server_key"];
+
+        # Attempt to decode the JWT, if decoding fails return empty array.
+        try {
+            return (array) JWT::decode($jwt, new Key($jwt_server_key, "HS256"));
+        }
+        catch (Exception) {
+            return [];
+        }
+    }
+
+
+    /**
+     * Generates a new persistent API key.
+     * @param string $username The username to assign this API key to.
+     * @return string The real (unhashed)
+     * @throws Exception
+     */
+    public static function generate_key(string $username) : string {
+        # Variables
+        $pkg_index = get_api_config()[0];
+        $api_config = get_api_config()[1];
+        $key_hash_algo = $api_config["keyhash"];
+        $key_bit_strength = $api_config["keybytes"];
+        $key_new = bin2hex(random_bytes(intval($key_bit_strength)));
+        $key_hash = hash($key_hash_algo, $key_new);
+
+        # Initialize keys config and add this key
+        $api_config["keys"] = !is_array($api_config["keys"]) ? array("key" => []) : $api_config["keys"];
+        $api_config["keys"]["key"][] = ["username" => $username, "key_hash" => $key_hash, "algo" => $key_hash_algo];
+
+        # Write the new key to config
+        config_set_path("installedpackages/package/{$pkg_index}/conf", $api_config);
+        write_config(sprintf(gettext(" Generated API key")));
+        return $key_new;
+    }
+
+    /**
+     * Obtain the API keys that belong to a provided username.
+     * @param string $username The username to obtain API keys for.
+     * @return array An array of API keys that belong to the $username
+     */
+    public static function get_existing_keys(string $username = "", $all = true) : array {
+        # Variables
+        $api_config = get_api_config()[1];
+        $user_keys = [];
+
+        # Only loop through if we have configured keys
+        if (is_array($api_config["keys"]) and is_array($api_config["keys"]["key"])) {
+            foreach ($api_config["keys"]["key"] as $id=>$key) {
+                if ($key["username"] === $username or $all) {
+                    $user_keys[$id] = $key;
+                }
+            }
+        }
+
+        return $user_keys;
+    }
+
+    /**
+     * Checks if a given username is an existing user, but is disabled.
+     * @param string $username The username to check.
+     * @return bool `true` if the user is disabled, `false` if it is not.
+     */
+    private function is_user_disabled(string $username) : bool {
+        $users = index_users();
+        $user = $users[$username];
+        if (config_path_enabled("system/user/{$user}", "disabled")) {
+            return true;
+        }
+        return false;
     }
 
     /**
      * Checks if the API client's IP address is authorized in the API access list.
      * @return bool `true` if the client's IP is authorized, `false` if the client's IP is not authorized.
      */
-    private function __is_ip_authorized() {
+    private function is_ip_authorized() : bool {
         # Check if we have any API access list entries
         if (!empty($this->api_config["access_list"])) {
             # Check if the client's IP is within any of the allowed subnets
@@ -202,7 +318,7 @@ class Auth {
     /**
      * Logs API authentication according to the current API configuration.
      */
-    private function __log_authentication($authenticated) {
+    private function log_authentication() {
         # Variables
         $username = ($this->username) ?: "unknown";
         $ip_address = $this->ip_address;
@@ -210,7 +326,7 @@ class Auth {
         # Log authentication attempts if enabled
         if (isset($this->api_config["enable_login_protection"])) {
             # Log failed authentication
-            if (!$authenticated) {
+            if (!$this->is_authenticated) {
                 # This log entry is required for Login Protection to work, do not change the log text.
                 log_auth(
                     gettext("webConfigurator authentication error for user '{$username}' from: {$ip_address}")
