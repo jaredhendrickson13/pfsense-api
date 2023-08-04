@@ -51,8 +51,8 @@ class Auth {
         $this->read_only = (is_null($read_only)) ? array_key_exists("readonly", $this->api_config) : $read_only;
         $this->required_privileges = $required_privileges;
         $this->client_privileges = [];
+        $this->username = "unknown user";
         $this->ip_address = ($_SERVER["REMOTE_ADDR"]) ?: "unknown IP";
-        $this->username = "";
     }
 
     /**
@@ -83,7 +83,7 @@ class Auth {
         $decoded_jwt = $this->decode_jwt($jwt);
 
         # Check that the JWT from our Authorization header is valid
-        if ($decoded_jwt !== []) {
+        if ($decoded_jwt) {
             # Extract the owner's username from the JWT's payload data
             $this->username = $decoded_jwt["data"];
             unset($_SESSION["Username"]);
