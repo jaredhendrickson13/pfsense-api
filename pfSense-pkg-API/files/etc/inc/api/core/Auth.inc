@@ -193,11 +193,11 @@ class Auth {
      * @throws Exception When the JWT server key could not be created.
      */
     public static function generate_jwt(string $username) : string {
-        # Pull the API configuration from config
-        $api_config = get_api_config()[1];
-
         # Initialize the JWT server key in case it is not present
         self::init_jwt_server_key();
+
+        # Pull the API configuration from config
+        $api_config = get_api_config()[1];
 
         # Assign the JWT payload values. Assign the configured JWT expiration from the API configuration
         $payload = array(
