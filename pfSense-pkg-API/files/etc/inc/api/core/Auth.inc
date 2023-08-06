@@ -102,10 +102,10 @@ class Auth {
         # Loop through the existing keys for this user and check the key hashes for a match
         foreach ($this->get_existing_keys() as $key_from_config) {
             # Hash the incoming key according to the algorithm of this stored key
-            $key_hash = hash($key_from_config["algo"], $key);
+            $hash = hash($key_from_config["algo"], $key);
 
             # Authentication is success when incoming client key matches the hashed key stored in config
-            if ($key_hash === $key_from_config["key_hash"]) {
+            if ($hash === $key_from_config["hash"]) {
                 $this->username = $key_from_config["username"];
                 unset($_SESSION["Username"]);
                 $_SESSION["Username"] = $key_from_config["username"];
@@ -242,14 +242,14 @@ class Auth {
         # Variables
         $pkg_index = get_api_config()[0];
         $api_config = get_api_config()[1];
-        $key_hash_algo = $api_config["keyhash"];
+        $hash_algo = $api_config["keyhash"];
         $key_bit_strength = $api_config["keybytes"];
         $key_new = bin2hex(random_bytes(intval($key_bit_strength)));
-        $key_hash = hash($key_hash_algo, $key_new);
+        $hash = hash($hash_algo, $key_new);
 
         # Initialize keys config and add this key
         $api_config["keys"] = !is_array($api_config["keys"]) ? array("key" => []) : $api_config["keys"];
-        $api_config["keys"]["key"][] = ["username" => $username, "key_hash" => $key_hash, "algo" => $key_hash_algo];
+        $api_config["keys"]["key"][] = ["username" => $username, "hash" => $hash, "algo" => $hash_algo];
 
         # Write the new key to config
         config_set_path("installedpackages/package/{$pkg_index}/conf", $api_config);

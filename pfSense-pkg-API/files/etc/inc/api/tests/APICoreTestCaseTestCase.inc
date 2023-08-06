@@ -307,6 +307,30 @@ class APICoreTestCaseTestCase extends TestCase
     }
 
     /**
+     * Checks that the TestCase's assert_is_not_empty() passes test if value is not empty.
+     */
+    public function test_assert_is_not_empty() {
+        $this->assert_is_not_empty(true);
+        $this->assert_is_not_empty(1);
+        $this->assert_is_not_empty("not empty");
+        $this->assert_is_not_empty([1,2,3,4]);
+    }
+
+    /**
+     * Checks that the TestCase's assert_is_not_empty() fails test if value is empty.
+     */
+    public function test_bad_assert_is_not_empty() {
+        try {
+            $this->assert_is_not_empty("");
+        }
+        catch (AssertionError) {
+            return;
+        }
+
+        throw new AssertionError("Expected AssertionError for receiving value that is empty.");
+    }
+
+    /**
      * Checks that the TestCase's test_assert_type() passes test if value is of given the type.
      */
     public function test_assert_type() {

@@ -230,6 +230,19 @@ class TestCase {
     }
 
     /**
+     * Checks if a given value is not empty.
+     * @param mixed $value The value to evaluate.
+     * @param string $message Set the error message embedded in any AssertionError thrown by this method.
+     * @throws AssertionError When the value is not empty.
+     */
+    protected function assert_is_not_empty(mixed $value,string $message = "Expected value to not be empty.") {
+        # Check if this value is false
+        if (empty($value)) {
+            throw new AssertionError($message);
+        }
+    }
+
+    /**
      * Checks if a given value is of a given type.
      * @param mixed $value The value to evaluate.
      * @param string $type The string representation of the type to expect. This must match a gettype() return value.
