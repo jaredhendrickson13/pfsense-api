@@ -2,10 +2,10 @@
 
 namespace API\Tests;
 
-use API\Fields\BooleanField;
+use API\Core\TestCase;
 use API\Fields\StringField;
 
-class APIFieldsStringFieldTestCase extends \API\Core\TestCase
+class APIFieldsStringFieldTestCase extends TestCase
 {
     /**
      * Checks to ensure StringField value's internal values are always strings
@@ -23,6 +23,6 @@ class APIFieldsStringFieldTestCase extends \API\Core\TestCase
     public function test_string_field_length_validator_default() {
         # Create an example string field and ensure it is created with a LengthValidator
         $test_string_field = new StringField();
-        $this->assert_equals(get_class($test_string_field->validators[0]), "\API\Validators\LengthValidator");
+        $this->assert_equals(get_class($test_string_field->validators[0]), "API\Validators\LengthValidator");
     }
 }

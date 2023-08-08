@@ -2,9 +2,10 @@
 
 namespace API\Tests;
 
+use API\Core\TestCase;
 use API\Fields\BooleanField;
 
-class APIFieldsBooleanFieldTestCase extends \API\Core\TestCase
+class APIFieldsBooleanFieldTestCase extends TestCase
 {
     /**
      * Checks that the BooleanField's `from_internal()` method correctly represents the internal value.
