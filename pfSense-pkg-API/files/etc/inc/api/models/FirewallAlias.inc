@@ -19,25 +19,25 @@ class FirewallAlias extends Model {
     public StringField $address;
     public StringField $detail;
 
-    public function __construct(mixed $id=null, array $initial_data=[], Auth $client=null) {
+    public function __construct(mixed $id=null, array $representation_data=[], Auth $client=null) {
         $this->config_path = "aliases/alias";
         $this->subsystem = "aliases";
         $this->many = true;
         $this->name = new StringField(
-            max_length: 31,
-            unique: true,
             required: true,
+            unique: true,
+            max_length: 31,
             help_text: "Sets the name for the alias. This name must be unique from all other aliases."
         );
         $this->type = new StringField(
-            choices: ["host", "network", "port"],
             required: true,
+            choices: ["host", "network", "port"],
             help_text: "Sets the type of alias this object will be. This directly impacts what values can be
                 specified in the `address` field."
         );
         $this->descr = new StringField(
-            allow_empty: true,
             default: "",
+            allow_empty: true,
             help_text: "Sets a description to help specify the purpose or contents of the alias."
         );
         $this->address = new StringField(
@@ -59,7 +59,7 @@ class FirewallAlias extends Model {
         );
 
         # Needs to be constructed after fields are defined
-        parent::__construct($id, $initial_data, $client);
+        parent::__construct($id, $representation_data, $client);
     }
 
     /**
@@ -147,6 +147,6 @@ class FirewallAlias extends Model {
      * changes to config.
      */
     public function apply() {
-        filter_configure();
+        filter_configure_sync();
     }
 }

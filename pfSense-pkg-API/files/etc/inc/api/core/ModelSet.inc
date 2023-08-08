@@ -27,7 +27,7 @@ class ModelSet {
             }
         }
 
-        # Assign the model objecs to this model set
+        # Assign the model objects to this model set
         $this->model_objects = $model_objects;
     }
 

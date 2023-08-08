@@ -5,7 +5,7 @@ if [ "${2}" != "DEINSTALL" ]; then
 fi
 
 # Remove endpoints
-rm -rf /usr/local/www/api/v1
+rm -rf /usr/local/www/api/v2
 
 # Unlink this package from pfSense
 /usr/local/bin/php -f /etc/rc.packages %%PORTNAME%% POST-DEINSTALL

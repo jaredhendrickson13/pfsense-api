@@ -190,4 +190,22 @@ class APICoreAuthTestCase extends TestCase
     }
 
     # TODO: Need test to check is_user_disabled()
+
+    /**
+     * Checks that get_existing_keys() returns all configured API keys.
+     */
+    public function test_get_existing_keys() {
+        # TODO: Need test to create a new user and ensure the $username parameter correctly limit's scope of keys.
+        # Generate a few API keys so we have some to loop through
+        Auth::generate_key(username: "admin");
+        Auth::generate_key(username: "admin");
+        Auth::generate_key(username: "admin");
+
+        # Loop through each key return by get_existing_keys() and ensure they have the necessary values
+        foreach (Auth::get_existing_keys() as $key) {
+            $this->assert_is_not_empty($key["hash"]);
+            $this->assert_is_not_empty($key["username"]);
+            $this->assert_is_not_empty($key["algo"]);
+        }
+    }
 }

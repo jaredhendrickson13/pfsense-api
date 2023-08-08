@@ -15,12 +15,14 @@
 
 namespace API\Core;
 
+use Error;
+
 /**
  * Defines the API response object. Response objects are throwable objects that contain response information such as
  * HTTP status code, HTTP status message, API return code, error messages, and API response data. All API Error classes
  * will originate as Response objects.
  */
-class Response extends \Error {
+class Response extends Error {
     public $message;
     public $code;
     public string $ref_id;
@@ -33,22 +35,24 @@ class Response extends \Error {
         int $code = 500,
         array $data = [],
     ) {
-        parent::__construct($message, $code);
-        $this->message = $message;
+        $this->message = str_replace(["\"", "'"], "`", $message);
         $this->code = $code;
         $this->status = strtolower($this->get_http_status_message($code));
         $this->ref_id = strtoupper($ref_id);
         $this->data = $data;
+        parent::__construct($this->message, $this->code);
+
     }
 
     /**
-     * Converts this Response object to an array representation of it's contents.
+     * Converts this Response object to an array representation of its contents.
      * @return array An array containing the response details.
      */
-    public function to_array() : array {
+    public function to_representation() : array {
         return [
             "code" => $this->code,
             "status" => $this->status,
+            "ref_id" => $this->ref_id,
             "message" => $this->message,
             "data" => $this->data
         ];

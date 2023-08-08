@@ -323,7 +323,7 @@ class Model {
      * @throws ServerError When this Model does not have a `config_path` set.
      * @throws NotFoundError When an object with the specified $id does not exist.
      */
-    public function from_internal(mixed $id = null) {
+    public function from_internal() {
         # Require an $id if `many` is set
         if ($this->many and !isset($this->id)) {
             throw new ServerError(
@@ -374,7 +374,7 @@ class Model {
      * Fetches Model objects for all objects stored in the internal pfSense values. If `config_path` is set, this will
      * create Model objects for each object stored at the config path. If `internal_callable` is set, this will create
      * Model objects for each object returned by the specified callable.
-     * @return array|Model Returns a ModelSet of Models if `many` is enabled or a single Model object if `many` is
+     * @return ModelSet|Model Returns a ModelSet of Models if `many` is enabled or a single Model object if `many` is
      * not enabled.
      */
     public function get_all_from_internal() : ModelSet|Model {
@@ -430,7 +430,8 @@ class Model {
     final public function from_representation(array $representation_data) {
         # When an ID is provided, fetch this objects from the internal configuration using the ID.
         if (array_key_exists("id", $representation_data)) {
-            $this->from_internal($representation_data["id"]);
+            $this->id = $representation_data["id"];
+            $this->from_internal();
         }
 
         # Loop through each field in this Model and assign their values using the `representation_data`.
@@ -581,7 +582,7 @@ class Model {
      */
     final public function read(bool $all=false) : array {
         if ($all and $this->many) {
-            return $this->get_all_from_internal();
+            return $this->get_all_from_internal()->to_representation();
         }
 
         return $this->to_representation();
@@ -623,11 +624,19 @@ class Model {
             # Run the _create method
             $this->_create();
 
+            # Mark the subsystem as dirty if set
+            if ($this->subsystem) {
+                mark_subsystem_dirty($this->subsystem);
+            }
+
             # Only apply this change immediately if requested
             if ($apply) {
                 $this->apply();
             }
         }
+
+        # Return the current representation of this object
+        return $this->to_representation();
     }
 
     /**
@@ -666,11 +675,19 @@ class Model {
             # Run the _update method
             $this->_update();
 
+            # Mark the subsystem as dirty if set
+            if ($this->subsystem) {
+                mark_subsystem_dirty($this->subsystem);
+            }
+
             # Only apply this change immediately if requested
             if ($apply) {
                 $this->apply();
             }
         }
+
+        # Return the current representation of this object
+        return $this->to_representation();
     }
 
     /**
@@ -706,10 +723,18 @@ class Model {
             # Run the _delete method
             $this->_delete();
 
+            # Mark the subsystem as dirty if set
+            if ($this->subsystem) {
+                mark_subsystem_dirty($this->subsystem);
+            }
+
             # Only apply this change immediately if requested
             if ($apply) {
                 $this->apply();
             }
         }
+
+        # Return the current representation of this object
+        return $this->to_representation();
     }
 }

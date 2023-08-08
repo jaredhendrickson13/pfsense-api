@@ -17,6 +17,9 @@ namespace API\Core;
 require_once("api/core/Model.inc");
 
 use API;
+use Error;
+use Exception;
+use JsonException;
 
 # Allow endpoints to access any API model class
 foreach(glob("/etc/inc/api/models/*.inc") as $model) {
@@ -33,16 +36,17 @@ class View {
     protected array $errors = [];
     protected API\Core\Auth $client;
     public array $api_config = [];
-    public mixed $request_data = [];
+    public array $request_data = [];
     public string $request_method;
+    public array $request_method_options = [];
     public bool $requires_auth = true;
-    public string $set_auth_mode = "";
-    public bool $retain_read_mode = true;
-    public bool $ignore_ifs = false;
+    public string $enforce_auth_mode = "";
+    public bool $ignore_read_mode = false;
+    public bool $ignore_interfaces = false;
     public bool $ignore_enabled = false;
     public array $get_privileges = [];
     public array $post_privileges = [];
-    public array $put_privileges = [];
+    public array $patch_privileges = [];
     public array $delete_privileges = [];
 
     /**
@@ -55,48 +59,27 @@ class View {
         # Fetch the current API configuration whenever the object is first created.
         $this->api_config = API\Core\Tools\get_api_config()[1];
 
-        # Fetch request data and method whenever the object is first created.
-        $this->request_data = $this->get_request_data();
+        # Fetch request method whenever the object is first created.
         $this->request_method = strtoupper($_SERVER["REQUEST_METHOD"]);
     }
 
     /**
-     * Checks which HTTP methods are supported by checking which APModel methods were overridden.
-     * @return array An array of supported HTTP methods
+     * Obtains the API key or JWT as a bearer token from the client.
+     * @returns String A string containing the API token or the JWT from the client.
      */
-    private function get_method_options() : array {
-        # Variables
-        $method_options = [];
-        $method_map = [
-            "GET" => "_read",
-            "POST" => "_create",
-            "PUT" => "_update",
-            "DELETE" => "_delete"
-        ];
+    private function get_bearer_token() : string {
+        # Obtain the API key or JWT from the authorization header.
+        $auth_header = explode(" ", $_SERVER["HTTP_AUTHORIZATION"]);
+        $token_type = strtolower($auth_header[0]);
+        $secret = ($auth_header[1]) ?: "";
 
-        # Allow OPTIONS requests if configured
-        if (isset($this->api_config["allow_options"])) {
-            $method_options[] = "OPTIONS";
+        # Ensure this API key or JWT was passed in as a bearer token
+        if ($token_type === "bearer") {
+            return $secret;
         }
 
-        # Check if the corresponding model method is configured for each HTTP method
-        foreach ($method_map as $http_method=>$class_method) {
-            # Try to create a reflection object to use when comparing child class to the parent class
-            try {
-                $reflection = new \ReflectionMethod($this->model, $class_method);
-                $reflection2 = new \ReflectionClass($this->model);
-            }
-            catch (\ReflectionException $ref_ex) {
-                continue;
-            }
-
-            # If the child class has overridden the method, add this HTTP method as an allowed option.
-            if ($reflection->getDeclaringClass()->getName() === get_class($this->model)) {
-                $method_options[] = $http_method;
-            }
-        }
-
-        return $method_options;
+        # Return an empty string if there were any problems obtaining the secret
+        return "";
     }
 
     /**
@@ -111,8 +94,8 @@ class View {
         elseif ($this->request_method === "POST") {
             return $this->post_privileges;
         }
-        elseif ($this->request_method === "PUT") {
-            return $this->put_privileges;
+        elseif ($this->request_method === "PATCH") {
+            return $this->patch_privileges;
         }
         elseif ($this->request_method === "DELETE") {
             return $this->delete_privileges;
@@ -126,10 +109,29 @@ class View {
      * Checks if the API client is authenticated and authorized to make this call.
      */
     private function check_auth() {
-        $read_only = (isset($this->api_config["readonly"]) and $this->retain_read_mode);
-        $this->client = new API\Core\Auth($this->get_required_privs(), $this->set_auth_mode, $read_only);
+        # Variables
+        $read_only = (isset($this->api_config["readonly"]) and !$this->ignore_read_mode);
+        $this->client = new API\Core\Auth($this->get_required_privs(), $this->enforce_auth_mode, $read_only);
+
+        # Obtain the auth credentials from client according to the current API auth mode
+        switch ($this->api_config["authmode"]) {
+            case "local":
+                $this->client->username = ($_SERVER["PHP_AUTH_USER"]) ?: "";
+                $secret = ($_SERVER["PHP_AUTH_PW"]) ?: "";
+                break;
+            case "jwt" or "key":
+                $secret = $this->get_bearer_token();
+                break;
+            default:
+                throw new ServerError(
+                    message: "Unknown authentication mode configured.",
+                    ref_id: "VIEW_WITH_UNKNOWN_AUTH_MODE"
+                );
+        }
+
+        # Only proceed if this a view that requires auth
         if ($this->requires_auth === true) {
-            if (!$this->client->authenticate()) {
+            if (!$this->client->authenticate(secret: $secret, username: $this->client->username)) {
                 throw new AuthenticationError(
                     message: "Authentication failed",
                     ref_id: "INVALID_AUTH"
@@ -148,11 +150,10 @@ class View {
      * Checks if the API is enabled before allowing the call.
      */
     private function check_enable() {
-        # TODO: redirect to 404 so it appears the API is not even there.
         $api_config = API\Core\Tools\get_api_config()[1];
         if (!isset($api_config["enable"]) and !$this->ignore_enabled) {
             header("Location: /");
-            die();
+            exit();
         }
     }
 
@@ -175,7 +176,7 @@ class View {
                 return;
             } elseif ($wif === "any") {
                 return;
-            } elseif ($this->ignore_ifs === true) {
+            } elseif ($this->ignore_interfaces) {
                 return;
             }
         }
@@ -192,22 +193,39 @@ class View {
      */
     private function check_request_method() {
         # Check if the requested HTTP method is a supported HTTP method.
-        if (!in_array($this->request_method, $this->get_method_options())) {
+        if (!in_array($this->request_method, $this->request_method_options) and $this->request_method !== "OPTIONS") {
             throw new MethodNotAllowedError(
-                message: "Resource at $this->url does not support the requested HTTP method '$this->request_method`",
+                message: "Resource at $this->url does not support the requested HTTP method '$this->request_method'",
                 ref_id: "METHOD_NOT_ALLOWED"
             );
         }
     }
 
     /**
-     * Checks if the API client's request data was successfully received and parsed by the API.
+     * Checks if the API client's request data was successfully received and parsed by the API. This method populates
+     * the $this->request_data property according to the client's requested content-type.
      */
     private function check_request_data() {
-        if ($this->request_data === false) {
+        # Variables
+        $content_type_unknown = false;
+
+        # Parse the content according to the content-type request header
+        switch ($_SERVER["HTTP_CONTENT_TYPE"]) {
+            case "application/json":
+                $this->request_data = $this->decode_json_content(file_get_contents('php://input'));
+                break;
+            case "application/x-www-form-urlencoded":
+                $this->request_data = $this->decode_form_content($_GET);
+                break;
+            default:
+                $content_type_unknown = true;
+        }
+
+        # Check if the client requested an unknown content type
+        if ($content_type_unknown) {
             throw new ValidationError(
                 message: "The requested content-type is not supported",
-                ref_id: "UNSUPPORTED_CONTENT_TYPE",
+                ref_id: "VIEW_CONTENT_TYPE_UNSUPPORTED",
                 code: 415
             );
         }
@@ -227,30 +245,35 @@ class View {
                 $this->check_auth();
             }
 
-            # Initialize the assigned model
-            $this->model_name = "API\\Models\\".$this->model_name;
-            $this->model = new $this->model_name($this->request_data, $this->client);
-
-            # Checks that request data was properly received.
+            # Checks that request data was properly received and parsed.
             $this->check_request_method();
             $this->check_request_data();
 
+            # Initialize the assigned model
+            $this->model_name = "API\\Models\\".$this->model_name;
+            $this->model = new $this->model_name(
+                representation_data: $this->request_data,
+                client: $this->client
+            );
+
+            # Define a variable to store our response data (if any)
+            $resp_data = [];
+
             # Run the associated model method based on the incoming HTTP method
             if ($this->request_method === "GET") {
-                $resp_data = $this->model->read();
+                $resp_data = $this->model->read(all: true);
             }
             elseif ($this->request_method === "POST") {
-                $resp_data = $this->model->create();
+                $resp_data = $this->model->create(apply: ($this->request_data["apply"] === true));
             }
-            elseif ($this->request_method === "PUT") {
-                $resp_data = $this->model->update();
+            elseif ($this->request_method === "PATCH") {
+                $resp_data = $this->model->update(apply: ($this->request_data["apply"] === true));
             }
             elseif ($this->request_method === "DELETE") {
-                $resp_data = $this->model->delete();
+                $resp_data = $this->model->delete(apply: ($this->request_data["apply"] === true));
             }
             elseif ($this->request_method === "OPTIONS") {
-                header("access-control-allow-methods: ".implode(", ", $this->get_method_options()));
-                $resp_data = [];
+                header("access-control-allow-methods: ".implode(", ", $this->request_method_options));
             }
 
             # Create our success API response object if no errors were thrown
@@ -263,11 +286,17 @@ class View {
         }
         catch (Response $response) {
         }
+        catch (Exception|Error $error) {
+            $response = new ServerError(
+                message: $error->getMessage(),
+                ref_id: "VIEW_RECEIVED_UNEXPECTED_ERROR"
+            );
+        }
 
         # Add custom response headers if configured
         if (!empty($this->api_config["custom_headers"])) {
             foreach ($this->api_config["custom_headers"] as $name=>$value) {
-                header(strval($name).": ".strval($value));
+                header("$name: $value");
             }
         }
 
@@ -276,7 +305,7 @@ class View {
 
         # Format the HTTP response as JSON and set response code
         http_response_code($response->code);
-        echo $this->content_type_encode($response->to_array()) . PHP_EOL;
+        echo $this->content_type_encode($response->to_representation()) . PHP_EOL;
         session_destroy();
         exit();
     }
@@ -284,9 +313,9 @@ class View {
     /**
      * Encodes the API response according to the Accept header received by the API client.
      * @param array $data The API response data to encode in the requested format.
-     * @return false|string The encoded API response or `false` if the data could not be encoded.
+     * @return string The encoded API response or `false` if the data could not be encoded.
      */
-    public function content_type_encode(array $data) : bool|string {
+    public function content_type_encode(array $data) : string {
         # TODO: in future if additional response Content-Types need to be supported we can add them here
         # TODO: and control the requested content-type using the Accept HTTP header
         # Encode response as JSON if content type is application/json
@@ -295,26 +324,25 @@ class View {
     }
 
     /**
-     * Parses the API client's request data using the Content-Type specified by the API client.
-     * @return false|mixed the API client's parsed request data or `false` if the data could not be parsed.
+     * Attempts to decode a given JSON string into a PHP array. This is essentially a wrapper for the default
+     * `json_decode()` PHP function that allows us to apply some additional logic.
      */
-    public static function get_request_data() {
-        # TODO: x-www-form-urlencoded still attempts to use json if no parameters were passed in. This was intentionally done to
-        # TODO: support user scripts that didn't specify a static content type (before it was supported) remove this in a future
-        # TODO: release. It is preferred that content uses a specified content type.
-        $_SERVER["HTTP_CONTENT_TYPE"] = (empty($_SERVER["HTTP_CONTENT_TYPE"])) ? "application/x-www-form-urlencoded" : $_SERVER["HTTP_CONTENT_TYPE"];
-        $content_types = [
-            "application/json" => json_decode(file_get_contents('php://input'), true),
-            "application/x-www-form-urlencoded" => (empty($_GET)) ? json_decode(file_get_contents('php://input'), true) : View::form_decode($_GET)
-        ];
-
-        # Check if content type is supported, if so return corresponding parsed request data
-        if (array_key_exists($_SERVER["HTTP_CONTENT_TYPE"], $content_types)) {
-            return $content_types[$_SERVER["HTTP_CONTENT_TYPE"]];
+    public static function decode_json_content(string $json_string) : array {
+        # Allow empty strings, but convert it to an empty array.
+        if (empty($json_string)) {
+            return [];
         }
-        # Return false if the content type is unknown or unsupported
-        else {
-            return false;
+
+        # Try to decode the JSON string, throw a not acceptable error if the string is not JSON encoded.
+        try {
+            return json_decode($json_string, associative: true, flags: JSON_THROW_ON_ERROR);
+        }
+        catch (JsonException) {
+            throw new ValidationError(
+                message: "Request body could not be decoded as JSON.",
+                ref_id: "VIEW_COULD_NOT_DECODE_JSON",
+                code: 406
+            );
         }
     }
 
@@ -323,7 +351,7 @@ class View {
      * @param array $array The form data array to decode.
      * @return array The parsed API client's request data
      */
-    public static function form_decode($array) : array {
+    public static function decode_form_content(array $array) : array {
         # Loop through each query string item and check for expected data types
         foreach ($array as $key=>$value) {
             # Check for boolean type query strings

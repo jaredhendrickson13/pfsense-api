@@ -29,7 +29,7 @@
         </tab>
         <tab>
             <text>Documentation</text>
-            <url>/api/v1/</url>
+            <url>/api/v2/</url>
             <active/>
         </tab>
     </tabs>
