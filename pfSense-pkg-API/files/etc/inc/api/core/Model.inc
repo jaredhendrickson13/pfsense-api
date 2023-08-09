@@ -73,8 +73,8 @@ class Model {
             );
         }
 
-        # Use the ID to obtain this Model object if present.
-        if (isset($id)) {
+        # Obtain the current object from internal if an ID was given or this is not a `many` model.
+        if (isset($id) or !$this->many) {
             $this->id = $id;
             $this->from_internal();
         }

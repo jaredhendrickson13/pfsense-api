@@ -23,6 +23,8 @@ class APISettings extends Model {
     public BooleanField $login_protection;
     public BooleanField $log_successful_auth;
     public BooleanField $allow_pre_releases;
+    public StringField $allowed_interfaces;
+    public StringField $represent_interfaces_as;
     public StringField $auth_mode;
     public IntegerField $jwt_exp;
     public IntegerField $key_length_bytes;
@@ -84,6 +86,21 @@ class APISettings extends Model {
             help_text: "Enables or disables displaying pre-releases in available API updates. Pre-releases contain fixes
             and features that are currently under development and may not be fully stable. Use of pre-release versions
             is at your own risk."
+        );
+        $this->allowed_interfaces = new StringField(
+            default: [],
+            allow_empty: true,
+            many: true,
+            delimiter: ",",
+            help_text: "Sets the interfaces allowed to accept incoming API calls."
+        );
+        $this->represent_interfaces_as = new StringField(
+            default: "description",
+            choices: ["description", "internal", "physical"],
+            help_text: "Specifies how the API should represent interface names. Use `description` to represent 
+            interface objects by their description name, use `internal` to represent interface objects by their
+            internal pfSense ID (e.g. wan, lan, opt1), or use `physical` to represent interface objects by their
+            physical interface ID (e.g. em0, igb1, bxe3)."
         );
         $this->auth_mode = new StringField(
             default: "local",

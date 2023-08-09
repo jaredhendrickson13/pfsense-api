@@ -27,7 +27,7 @@ use function API\Core\Tools\get_api_config;
  * Creates object that performs authentication and authorization for API views.
  */
 class Auth {
-    private array $api_config;
+    private API\Models\APISettings $api_settings;
     public string $mode;
     public bool $read_only;
     public string $username;
@@ -46,9 +46,9 @@ class Auth {
      * API configuration value.
      */
     public function __construct(array $required_privileges=[], string $mode="", bool|null $read_only=null){
-        $this->api_config = API\Core\Tools\get_api_config()[1];
-        $this->mode = (!$mode) ? $this->api_config["authmode"] : $mode;
-        $this->read_only = (is_null($read_only)) ? array_key_exists("readonly", $this->api_config) : $read_only;
+        $this->api_settings = new API\Models\APISettings();
+        $this->mode = (!$mode) ? $this->api_settings->auth_mode() : $mode;
+        $this->read_only = (is_null($read_only)) ? $this->read_only() : $read_only;
         $this->required_privileges = $required_privileges;
         $this->client_privileges = [];
         $this->username = "unknown user";
@@ -150,11 +150,6 @@ class Auth {
         $is_not_authorized = false;
         $this->client_privileges = get_user_privileges(getUserEntry($this->username));
 
-        # This client is not authorized if their IP is not authorized
-        if (!$this->is_ip_authorized()) {
-            $is_not_authorized = true;
-        }
-
         # This client is not authorized if this `readonly` mode is enabled but this isn't a read request
         if ($this->read_only and $_SERVER['REQUEST_METHOD'] !== "GET") {
             $is_not_authorized= true;
@@ -242,8 +237,8 @@ class Auth {
         # Variables
         $pkg_index = get_api_config()[0];
         $api_config = get_api_config()[1];
-        $hash_algo = $api_config["keyhash"];
-        $key_bit_strength = $api_config["keybytes"];
+        $hash_algo = $api_config["key_hash_algo"];
+        $key_bit_strength = $api_config["key_length_bytes"];
         $key_new = bin2hex(random_bytes(intval($key_bit_strength)));
         $hash = hash($hash_algo, $key_new);
 
@@ -294,29 +289,6 @@ class Auth {
     }
 
     /**
-     * Checks if the API client's IP address is authorized in the API access list.
-     * @return bool `true` if the client's IP is authorized, `false` if the client's IP is not authorized.
-     */
-    private function is_ip_authorized() : bool {
-        # Check if we have any API access list entries
-        if (!empty($this->api_config["access_list"])) {
-            # Check if the client's IP is within any of the allowed subnets
-            foreach (explode(" ", $this->api_config["access_list"]) as $subnet) {
-                # This IP is authorized if it's within this subnet
-                if (API\Core\Tools\is_ip_in_cidr($this->ip_address, $subnet)) {
-                    return true;
-                }
-            }
-            # IP is not authorized if it's not within any configured subnet
-            return false;
-        }
-        # The API access list is not configured, authorize any IP
-        else {
-            return true;
-        }
-    }
-
-    /**
      * Logs API authentication according to the current API configuration.
      */
     private function log_authentication() {
@@ -325,7 +297,7 @@ class Auth {
         $ip_address = $this->ip_address;
 
         # Log authentication attempts if enabled
-        if (isset($this->api_config["enable_login_protection"])) {
+        if ($this->api_settings->login_protection()) {
             # Log failed authentication
             if (!$this->is_authenticated) {
                 # This log entry is required for Login Protection to work, do not change the log text.
@@ -334,7 +306,7 @@ class Auth {
                 );
             }
             # Log successful authentication if the API is configured to do so. Disabled by default to avoid log spam.
-            elseif (isset($this->api_config["log_successful_auth"])) {
+            elseif ($this->api_settings->log_successful_auth()) {
                 log_auth(
                     gettext("Successful login for user '{$username}' from: {$ip_address} (Local Database)")
                 );

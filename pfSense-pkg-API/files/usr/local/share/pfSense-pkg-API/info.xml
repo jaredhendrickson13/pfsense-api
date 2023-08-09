@@ -10,17 +10,24 @@
         <configurationfile>api.xml</configurationfile>
         <maintainer>github@jaredhendrickson.com</maintainer>
         <conf>
-				<enable></enable>
-                <persist></persist>
-				<allowed_interfaces>any</allowed_interfaces>
-                <authmode>local</authmode>
-				<content_type>json</content_type>
-                <server_key></server_key>
-                <jwt_exp>3600</jwt_exp>
-				<keyhash>sha256</keyhash>
-				<keybytes>16</keybytes>
-				<keys></keys>
-                <enable_login_protection></enable_login_protection>
+            <enabled>enabled</enabled>
+            <read_only>disabled</read_only>
+            <keep_backup>enabled</keep_backup>
+            <login_protection>enabled</login_protection>
+            <log_successful_auth>disabled</log_successful_auth>
+            <allow_pre_releases>disabled</allow_pre_releases>
+            <allowed_interfaces></allowed_interfaces>
+            <represent_interfaces_as>description</represent_interfaces_as>
+            <auth_mode>local</auth_mode>
+            <ha_sync>disabled</ha_sync>
+            <ha_sync_hosts></ha_sync_hosts>
+            <ha_sync_username></ha_sync_username>
+            <ha_sync_password></ha_sync_password>
+            <server_key></server_key>
+            <jwt_exp>3600</jwt_exp>
+            <key_hash_algo>sha256</key_hash_algo>
+            <key_length_bytes>16</key_length_bytes>
+            <keys></keys>
         </conf>
     </package>
 </pfsensepkgs>

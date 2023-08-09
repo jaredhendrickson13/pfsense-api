@@ -35,7 +35,7 @@ class View {
     protected mixed $model = null;
     protected array $errors = [];
     protected API\Core\Auth $client;
-    public array $api_config = [];
+    public API\Models\APISettings $api_settings;
     public array $request_data = [];
     public string $request_method;
     public array $request_method_options = [];
@@ -57,7 +57,8 @@ class View {
         error_reporting(E_ERROR);
 
         # Fetch the current API configuration whenever the object is first created.
-        $this->api_config = API\Core\Tools\get_api_config()[1];
+        $this->api_settings = new API\Models\APISettings();
+
 
         # Fetch request method whenever the object is first created.
         $this->request_method = strtoupper($_SERVER["REQUEST_METHOD"]);
@@ -110,11 +111,11 @@ class View {
      */
     private function check_auth() {
         # Variables
-        $read_only = (isset($this->api_config["readonly"]) and !$this->ignore_read_mode);
+        $read_only = ($this->api_settings->read_only() and !$this->ignore_read_mode);
         $this->client = new API\Core\Auth($this->get_required_privs(), $this->enforce_auth_mode, $read_only);
 
         # Obtain the auth credentials from client according to the current API auth mode
-        switch ($this->api_config["authmode"]) {
+        switch ($this->api_settings->auth_mode()) {
             case "local":
                 $this->client->username = ($_SERVER["PHP_AUTH_USER"]) ?: "";
                 $secret = ($_SERVER["PHP_AUTH_PW"]) ?: "";
@@ -149,9 +150,9 @@ class View {
     /**
      * Checks if the API is enabled before allowing the call.
      */
-    private function check_enable() {
+    private function check_enabled() {
         $api_config = API\Core\Tools\get_api_config()[1];
-        if (!isset($api_config["enable"]) and !$this->ignore_enabled) {
+        if (!$this->api_settings->enabled() and !$this->ignore_enabled) {
             header("Location: /");
             exit();
         }
@@ -161,7 +162,7 @@ class View {
      * Checks if the interface receiving the API call is allowed to answer API calls.
      */
     private function check_server_ip() {
-        $allow_ifs = $this->api_config["allowed_interfaces"];
+        $allow_ifs = $this->api_settings["allowed_interfaces"];
         $whitelist = explode(",", $allow_ifs);
 
         # Check if our server IP is in our whitelist
@@ -237,7 +238,6 @@ class View {
     public function listen() {
         try {
             # Ensure API is enabled and the receiving interface is allowed to answer API calls.
-            $this->check_enable();
             $this->check_server_ip();
 
             # Checks client authentication and authorization if required
@@ -291,13 +291,6 @@ class View {
                 message: $error->getMessage(),
                 ref_id: "VIEW_RECEIVED_UNEXPECTED_ERROR"
             );
-        }
-
-        # Add custom response headers if configured
-        if (!empty($this->api_config["custom_headers"])) {
-            foreach ($this->api_config["custom_headers"] as $name=>$value) {
-                header("$name: $value");
-            }
         }
 
         # Add API required response headers, these will override any custom headers
@@ -383,7 +376,7 @@ class View {
         $code = "<?php\nrequire_once('api/views/".$nq_class_name.".inc');\n(new ".$fq_class_name."())->listen();\n";
 
         # Create directories and files corresponding with class
-        if (!is_null($this->url)) {
+        if ($this->url) {
             mkdir("/usr/local/www".$this->url, 0755, true);
             file_put_contents(
                 "/usr/local/www".$this->url."/index.php",
@@ -392,7 +385,7 @@ class View {
         }
 
         # Print success output if file now exists, otherwise output error and exit on non-zero code
-        if (!is_null($this->url) and is_file("/usr/local/www".$this->url."/index.php")) {
+        if ($this->url and is_file("/usr/local/www".$this->url."/index.php")) {
             echo "Building ".$fq_class_name." at URL \"".$this->url."\"... done.".PHP_EOL;
         } else {
             echo "Building ".$fq_class_name." at URL \"".$this->url."\"... failed.".PHP_EOL;

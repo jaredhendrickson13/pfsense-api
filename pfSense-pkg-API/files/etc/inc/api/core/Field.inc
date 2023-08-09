@@ -114,6 +114,14 @@ class Field
     }
 
     /**
+     * Allows the Field's current value to be obtained by invoking the field object.
+     * @returns mixed The value current set in $this->value
+     */
+    final public function __invoke() : mixed {
+        return $this->value;
+    }
+
+    /**
      * Checks that values passed in during __construct are valid and do not conflict.
      * @throws ServerError When any Field properties have conflicting values.
      */
