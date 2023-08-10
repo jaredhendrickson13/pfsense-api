@@ -12,7 +12,7 @@ class APIValidatorsLengthValidatorTestCase extends TestCase {
      */
     public function test_throws_server_error_for_unsupported_type() {
         $this->assert_throws_response(
-            ref_id: "LENGTH_VALIDATOR_UNSUPPORTED_TYPE",
+            response_id: "LENGTH_VALIDATOR_UNSUPPORTED_TYPE",
             code: 500,
             callable: function () {
                 $test_validator = new LengthValidator(minimum: 0, maximum: 120);
@@ -26,7 +26,7 @@ class APIValidatorsLengthValidatorTestCase extends TestCase {
      */
     public function test_string_minimum_constraint() {
         $this->assert_throws_response(
-            ref_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT",
+            response_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT",
             code: 400,
             callable: function () {
                 $test_validator = new LengthValidator(minimum: 50, maximum: 120);
@@ -40,7 +40,7 @@ class APIValidatorsLengthValidatorTestCase extends TestCase {
      */
     public function test_string_maximum_constraint() {
         $this->assert_throws_response(
-            ref_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT",
+            response_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT",
             code: 400,
             callable: function () {
                 $test_validator = new LengthValidator(minimum: 0, maximum: 5);
@@ -54,7 +54,7 @@ class APIValidatorsLengthValidatorTestCase extends TestCase {
      */
     public function test_array_minimum_constraint() {
         $this->assert_throws_response(
-            ref_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT",
+            response_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT",
             code: 400,
             callable: function () {
                 $test_validator = new LengthValidator(minimum: 10, maximum: 120);
@@ -68,7 +68,7 @@ class APIValidatorsLengthValidatorTestCase extends TestCase {
      */
     public function test_array_maximum_constraint() {
         $this->assert_throws_response(
-            ref_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT",
+            response_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT",
             code: 400,
             callable: function () {
                 $test_validator = new LengthValidator(minimum: 0, maximum: 3);

@@ -94,7 +94,7 @@ class IntegerField extends API\Core\Field {
             throw new API\Core\ServerError(
                 message: "Cannot parse IntegerField '$this->name' from internal because its internal value is not
                     a numeric value. Consider changing this field to a StringField.",
-                ref_id: "INTEGER_FIELD_WITH_NON_INTEGER_INTERNAL_VALUE"
+                response_id: "INTEGER_FIELD_WITH_NON_INTEGER_INTERNAL_VALUE"
             );
         }
         return intval($internal_value);

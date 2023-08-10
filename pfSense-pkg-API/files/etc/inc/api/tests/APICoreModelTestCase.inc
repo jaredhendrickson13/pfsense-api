@@ -11,7 +11,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
      */
     public function test_no_model_with_id_and_representation_data() {
         $this->assert_throws_response(
-            ref_id: "MODEL_WITH_ID_AND_REPRESENTATION",
+            response_id: "MODEL_WITH_ID_AND_REPRESENTATION",
             code: 500,
             callable: function () {
                 new API\Core\Model(id: 0, representation_data: ["id" => 0]);
@@ -31,7 +31,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
         $test_client->ip_address = "1.2.3.4";
 
         # Create a Model object and provide the Auth object
-        $test_model = new API\Core\Model(client: $test_client);
+        $test_model = new API\Models\Test(client: $test_client);
 
         # Ensure the Auth object was accepted and is using the correct values
         $this->assert_equals($test_model->client->username, $test_client->username);
@@ -44,7 +44,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
      */
     public function test_model_default_auth_obj() {
         # Create a Model object and but do not provide an Auth object
-        $test_model = new API\Core\Model();
+        $test_model = new API\Models\Test();
 
         # Ensure the Auth object was accepted and is using the correct values
         $this->assert_equals($test_model->client->username, API\Core\DEFAULT_CLIENT_USERNAME);
@@ -56,12 +56,12 @@ class APICoreModelTestCase extends API\Core\TestCase {
      */
     public function test_model_default_verbose_name() {
         # Create a normal Model object and a FirewallAlias Model object for testing
-        $test_model = new API\Core\Model();
+        $test_model = new API\Models\Test();
         $test_fw_alias = new API\Models\FirewallAlias();
 
         # Ensure their default names are correct
-        $this->assert_equals($test_model->verbose_name, "Model");
-        $this->assert_equals($test_model->verbose_name_plural, "Models");
+        $this->assert_equals($test_model->verbose_name, "Test");
+        $this->assert_equals($test_model->verbose_name_plural, "Tests");
         $this->assert_equals($test_fw_alias->verbose_name, "Firewall Alias");
         $this->assert_equals($test_fw_alias->verbose_name_plural, "Firewall Aliases");
     }
@@ -89,10 +89,11 @@ class APICoreModelTestCase extends API\Core\TestCase {
      */
     public function test_model_cant_get_next_id_without_config_path() {
         $this->assert_throws_response(
-            ref_id: "MODEL_NEXT_ID_WITHOUT_CONFIG_PATH",
+            response_id: "MODEL_NEXT_ID_WITHOUT_CONFIG_PATH",
             code: 500,
             callable: function () {
-                $test_model = new API\Core\Model();
+                $test_model = new API\Models\Test();
+                $test_model->config_path = null;
                 $test_model->get_next_id();
             }
         );
@@ -103,11 +104,11 @@ class APICoreModelTestCase extends API\Core\TestCase {
      */
     public function test_model_cant_get_next_id_without_many() {
         $this->assert_throws_response(
-            ref_id: "MODEL_NEXT_ID_WITHOUT_MANY",
+            response_id: "MODEL_NEXT_ID_WITHOUT_MANY",
             code: 500,
             callable: function () {
-                $test_model = new API\Core\Model();
-                $test_model->config_path = "test/config/path";
+                $test_model = new API\Models\Test();
+                $test_model->many = false;
                 $test_model->get_next_id();
             }
         );
@@ -122,10 +123,10 @@ class APICoreModelTestCase extends API\Core\TestCase {
         # Try to read the system hostname (which is a primitive string in the pfSense configuration). To get an ID, we
         # expect the value be to an indexed array or an empty value.
         $this->assert_throws_response(
-            ref_id: "MODEL_DANGEROUS_CONFIG_PATH",
+            response_id: "MODEL_DANGEROUS_CONFIG_PATH",
             code: 500,
             callable: function () {
-                $test_model = new API\Core\Model();
+                $test_model = new API\Models\Test();
                 $test_model->config_path = "system/hostname";
                 $test_model->many = true;
                 $test_model->get_next_id();
@@ -138,7 +139,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
      * return the first available ID, `0`.
      */
     public function test_model_can_get_next_id_at_empty_path() {
-        $test_model = new API\Core\Model();
+        $test_model = new API\Models\Test();
         $test_model->config_path = "this/path/does/not/exist/yet";
         $test_model->many = true;
         $this->assert_equals($test_model->get_next_id(), 0);
@@ -150,7 +151,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
      * will always be at least one item in filter/rule.
      */
     public function test_model_can_get_next_id_from_existing_array_path() {
-        $test_model = new API\Core\Model();
+        $test_model = new API\Models\Test();
         $test_model->config_path = "filter/rule";
         $test_model->many = true;
         $this->assert_is_greater_than($test_model->get_next_id(), 1);
@@ -211,7 +212,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
      */
     public function test_model_field_internal_name_unique_to_namespace() {
         $this->assert_throws_response(
-            ref_id: "MODEL_FIELDS_WITH_CONFLICTING_INTERNAL_NAMES",
+            response_id: "MODEL_FIELDS_WITH_CONFLICTING_INTERNAL_NAMES",
             code: 500,
             callable: function () {
                 $test_model = new API\Models\Test();
@@ -230,10 +231,10 @@ class APICoreModelTestCase extends API\Core\TestCase {
      */
     public function test_model_validate_packages_missing_package() {
         $this->assert_throws_response(
-            ref_id: "MDOEL_MISSING_REQUIRED_PACKAGE",
+            response_id: "MDOEL_MISSING_REQUIRED_PACKAGE",
             code: 404,
             callable: function () {
-                $test_model = new API\Core\Model();
+                $test_model = new API\Models\Test();
                 $test_model->packages = ["pfSense-pkg-some_package_we_dont_have"];
                 $test_model->validate();
             }
@@ -244,7 +245,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
      * Checks to ensure the validate() method is successful when we have the correct packages installed.
      */
     public function test_model_validate_packages_installed_package() {
-        $test_model = new API\Core\Model();
+        $test_model = new API\Models\Test();
         $test_model->packages = ["pfSense-pkg-API"];    # Use pfSense-pkg-API since we know we have it.
         $test_model->validate();
     }
@@ -255,10 +256,10 @@ class APICoreModelTestCase extends API\Core\TestCase {
      */
     public function test_model_validate_missing_package_includes() {
         $this->assert_throws_response(
-            ref_id: "MODEL_WITH_FAILED_INCLUDE",
+            response_id: "MODEL_WITH_FAILED_INCLUDE",
             code: 500,
             callable: function () {
-                $test_model = new API\Core\Model();
+                $test_model = new API\Models\Test();
                 $test_model->package_includes = ["this_inc_file_does_not_exist.inc"];
                 $test_model->validate();
             }
@@ -272,11 +273,15 @@ class APICoreModelTestCase extends API\Core\TestCase {
      */
     public function test_model_create_without_many() {
         $this->assert_throws_response(
-            ref_id: "MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD",
+            response_id: "MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD",
             code: 500,
             callable: function () {
-                $test_model = new API\Core\Model();
+                $test_model = new API\Models\Test();
                 $test_model->many = false;
+
+                # Prevent this unique field from throwing an error first
+                $test_model->test_string_unique->unique = false;
+
                 $test_model->create();
             }
         );
@@ -289,11 +294,15 @@ class APICoreModelTestCase extends API\Core\TestCase {
      */
     public function test_model_create_without_config_path() {
         $this->assert_throws_response(
-            ref_id: "MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD",
+            response_id: "MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD",
             code: 500,
             callable: function () {
-                $test_model = new API\Core\Model();
+                $test_model = new API\Models\Test();
                 $test_model->config_path = "";
+
+                # Prevent this unique field from throwing an error first
+                $test_model->test_string_unique->unique = false;
+
                 $test_model->create();
             }
         );
@@ -334,11 +343,16 @@ class APICoreModelTestCase extends API\Core\TestCase {
      */
     public function test_model_update_without_config_path() {
         $this->assert_throws_response(
-            ref_id: "MODEL_REQUIRE_OVERRIDDEN_UPDATE_METHOD",
+            response_id: "MODEL_REQUIRE_OVERRIDDEN_UPDATE_METHOD",
             code: 500,
             callable: function () {
-                $test_model = new API\Core\Model();
+                $test_model = new API\Models\Test();
                 $test_model->config_path = "";
+                $test_model->id = 0;
+
+                # Prevent this unique field from throwing an error first
+                $test_model->test_string_unique->unique = false;
+
                 $test_model->update();
             }
         );
@@ -350,10 +364,10 @@ class APICoreModelTestCase extends API\Core\TestCase {
      */
     public function test_model_update_without_id() {
         $this->assert_throws_response(
-            ref_id: "MODEL_REQUIRES_ID",
+            response_id: "MODEL_REQUIRES_ID",
             code: 400,
             callable: function () {
-                $test_model = new API\Core\Model();
+                $test_model = new API\Models\Test();
                 $test_model->config_path = "test/path";
                 $test_model->many = true;
                 $test_model->update();
@@ -403,11 +417,15 @@ class APICoreModelTestCase extends API\Core\TestCase {
      */
     public function test_model_delete_without_many() {
         $this->assert_throws_response(
-            ref_id: "MODEL_REQUIRE_OVERRIDDEN_DELETE_METHOD",
+            response_id: "MODEL_REQUIRE_OVERRIDDEN_DELETE_METHOD",
             code: 500,
             callable: function () {
-                $test_model = new API\Core\Model();
+                $test_model = new API\Models\Test();
                 $test_model->many = false;
+
+                # Prevent this unique field from throwing an error first
+                $test_model->test_string_unique->unique = false;
+
                 $test_model->delete();
             }
         );
@@ -420,11 +438,16 @@ class APICoreModelTestCase extends API\Core\TestCase {
      */
     public function test_model_delete_without_config_path() {
         $this->assert_throws_response(
-            ref_id: "MODEL_REQUIRE_OVERRIDDEN_DELETE_METHOD",
+            response_id: "MODEL_REQUIRE_OVERRIDDEN_DELETE_METHOD",
             code: 500,
             callable: function () {
-                $test_model = new API\Core\Model();
+                $test_model = new API\Models\Test();
                 $test_model->config_path = "";
+                $test_model->id = 0;
+
+                # Prevent this unique field from throwing an error first
+                $test_model->test_string_unique->unique = false;
+
                 $test_model->delete();
             }
         );
@@ -436,10 +459,10 @@ class APICoreModelTestCase extends API\Core\TestCase {
      */
     public function test_model_delete_without_id() {
         $this->assert_throws_response(
-            ref_id: "MODEL_REQUIRES_ID",
+            response_id: "MODEL_REQUIRES_ID",
             code: 400,
             callable: function () {
-                $test_model = new API\Core\Model();
+                $test_model = new API\Models\Test();
                 $test_model->config_path = "test/path";
                 $test_model->many = true;
                 $test_model->delete();
@@ -453,7 +476,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
     public function test_model_delete() {
         # Ensure we cannot find the object from config after it's deleted.
         $this->assert_throws_response(
-            ref_id: "MODEL_OBJECT_NOT_FOUND",
+            response_id: "MODEL_OBJECT_NOT_FOUND",
             code: 404,
             callable: function () {
                 # Create a new test model object in config

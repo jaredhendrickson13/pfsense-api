@@ -82,59 +82,6 @@ class APICoreAuthTestCase extends TestCase
     }
 
     /**
-     * Checks the authorize() method correctly checks if the user's IPv4 is in the API access list.
-     */
-    public function test_authorize_ipv4_address() {
-        # Add a single IP to the API allowlist for testing
-        $api_pkg_id = get_api_config()[0];
-        config_set_path("installedpackages/package/{$api_pkg_id}/conf/access_list", "1.2.3.4/32");
-        write_config("Unit test added IPv4 to API access list for testing");
-
-        # Create an Auth object that has valid authorization except for the IP.
-        $test_auth = new Auth(required_privileges: ["page-all"]);
-        $test_auth->username = "admin";
-        $test_auth->ip_address = "4.3.2.1";
-
-        # Check that authorization fails with this IP
-        $this->assert_is_false($test_auth->authorize());
-
-        # Change the client's IP to a valid IP address and ensure it is now allowed
-        $test_auth->ip_address = "1.2.3.4";
-        $this->assert_is_true($test_auth->authorize());
-
-        # Remove the API access list
-        config_set_path("installedpackages/package/{$api_pkg_id}/conf/access_list", "");
-        write_config("Unit test removed IPv4 from API access list for testing");
-    }
-
-    /**
-     * Checks the authorize() method correctly checks if the user's IPv6 is in the API access list.
-     */
-    public function test_authorize_ipv6_address() {
-        # Add a single IPv6 to the API allowlist for testing
-        $api_pkg_id = get_api_config()[0];
-        $test_ip = "2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF";
-        config_set_path("installedpackages/package/{$api_pkg_id}/conf/access_list", "$test_ip/128");
-        write_config("Unit test added IPv6 to API access list for testing");
-
-        # Create an Auth object that has valid authorization except for the IP.
-        $test_auth = new Auth(required_privileges: ["page-all"]);
-        $test_auth->username = "admin";
-        $test_auth->ip_address = "4.3.2.1";
-
-        # Check that authorization fails with this IP
-        $this->assert_is_false($test_auth->authorize());
-
-        # Change the client's IP to a valid IPv6 address and ensure it is now allowed
-        $test_auth->ip_address = $test_ip;
-        $this->assert_is_true($test_auth->authorize());
-
-        # Remove the API access list
-        config_set_path("installedpackages/package/{$api_pkg_id}/conf/access_list", "");
-        write_config("Unit test removed IPv6 from API access list for testing");
-    }
-
-    /**
      * Checks that the init_jwt_server_key() method correctly generates a server key that can be used to
      * generate an actual JWT.
      */

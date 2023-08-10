@@ -140,11 +140,11 @@ class TestCase {
     /**
      * Checks if an embedded callable raises a specific API\Core\Response exception and ensures that the expected
      * 'return' code is given
-     * @param string $ref_id The unique response return code string to check the Response object for.
+     * @param string $response_id The unique response return code string to check the Response object for.
      * @param int $code The Response object's error code. This typically corresponds with an HTTP status code.
      * @param mixed $callable An anonymous function that raises one of the $exceptions.
      */
-    protected function assert_throws_response(string $ref_id, int $code, mixed $callable) {
+    protected function assert_throws_response(string $response_id, int $code, mixed $callable) {
         # Try to run the call able
         try {
             $callable();
@@ -159,9 +159,9 @@ class TestCase {
                 $message = "Expected callable to throw Response object. Received '$exc_class_name: $exc_message'.";
                 throw new AssertionError($message);
             }
-            # Ensure the $ref_id matches this object
-            if ($ref_id !== $exc->ref_id) {
-                throw new AssertionError("Expected Response to contain ref_id $ref_id. Received $exc->ref_id");
+            # Ensure the $response_id matches this object
+            if ($response_id !== $exc->response_id) {
+                throw new AssertionError("Expected Response to contain response_id $response_id. Received $exc->response_id");
             }
             # Ensure the $code matches this object
             if ($code !== $exc->code) {

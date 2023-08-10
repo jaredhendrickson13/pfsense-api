@@ -130,7 +130,7 @@ class Field
         if ($this->required and isset($this->default)) {
             throw new ServerError(
                 message: "Required fields cannot have a default.",
-                ref_id: "FIELD_CANNOT_BE_REQUIRED_WITH_DEFAULT"
+                response_id: "FIELD_CANNOT_BE_REQUIRED_WITH_DEFAULT"
             );
         }
 
@@ -138,7 +138,7 @@ class Field
         if ($this->required and $this->read_only) {
             throw new ServerError(
                 message: "Required fields cannot be read only.",
-                ref_id: "FIELD_CANNOT_BE_REQUIRED_WITH_READ_ONLY"
+                response_id: "FIELD_CANNOT_BE_REQUIRED_WITH_READ_ONLY"
             );
         }
 
@@ -146,15 +146,7 @@ class Field
         if ($this->required and $this->allow_null) {
             throw new ServerError(
                 message: "Required fields cannot allow null values.",
-                ref_id: "FIELD_CANNOT_BE_REQUIRED_WITH_ALLOW_NULL"
-            );
-        }
-
-        # Ensure the `default` value is in `choices` if set
-        if (isset($this->default) and $this->choices and !in_array($this->default, $this->choices, true)) {
-            throw new ServerError(
-                message: "Field object `default` must be one of available `choices`.",
-                ref_id: "FIELD_INVALID_CHOICE_DEFAULT"
+                response_id: "FIELD_CANNOT_BE_REQUIRED_WITH_ALLOW_NULL"
             );
         }
 
@@ -162,7 +154,7 @@ class Field
         if ($this->read_only and $this->write_only) {
             throw new ServerError(
                 message: "Fields cannot be both read-only and write-only.",
-                ref_id: "FIELD_WITH_READ_ONLY_AND_WRITE_ONLY"
+                response_id: "FIELD_WITH_READ_ONLY_AND_WRITE_ONLY"
             );
         }
 
@@ -170,7 +162,7 @@ class Field
         if ($this->conditions and !$this->allow_null) {
             throw new ServerError(
                 message: "Fields cannot have 'conditions' unless they 'allow_null' values",
-                ref_id: "FIELD_CANNOT_BE_CONDITIONAL_WITHOUT_ALLOW_NULL"
+                response_id: "FIELD_CANNOT_BE_CONDITIONAL_WITHOUT_ALLOW_NULL"
             );
         }
 
@@ -178,7 +170,7 @@ class Field
         if ($this->many_minimum > $this->many_maximum) {
             throw new ServerError(
                 message: "Fields cannot have a 'many_minimum' value greater than 'many_maximum'",
-                ref_id: "FIELD_MANY_MINIMUM_GREATER_THAN_MANY_MAXIMUM"
+                response_id: "FIELD_MANY_MINIMUM_GREATER_THAN_MANY_MAXIMUM"
             );
         }
     }
@@ -249,7 +241,7 @@ class Field
         if ($this->unique and !$this->context) {
             throw new ServerError(
                 message: "Unique fields must have model context provided.",
-                ref_id: "FIELD_UNIQUE_WITH_NO_CONTEXT"
+                response_id: "FIELD_UNIQUE_WITH_NO_CONTEXT"
             );
         }
 
@@ -257,7 +249,7 @@ class Field
         if ($this->conditions and !$this->context) {
             throw new ServerError(
                 message: "Conditional fields must have model context provided.",
-                ref_id: "FIELD_CONDITIONAL_WITH_NO_CONTEXT"
+                response_id: "FIELD_CONDITIONAL_WITH_NO_CONTEXT"
             );
         }
     }
@@ -283,7 +275,7 @@ class Field
                 throw new ServerError(
                     message: "Field '$this->name' contains a condition for field `$condition_field` from 
                         its parent Model '$parent_model_class', but '$parent_model_class' has no such field. ",
-                    ref_id: "FIELD_CONDITIONS_REQUIRE_NON_EXISTENT_PARENT_MODEL_FIELD"
+                    response_id: "FIELD_CONDITIONS_REQUIRE_NON_EXISTENT_PARENT_MODEL_FIELD"
                 );
             }
 
@@ -312,7 +304,7 @@ class Field
         if ($this->required and is_null($this->value)) {
             throw new ValidationError(
                 message: "Field `$this->name` is required.",
-                ref_id: "FIELD_IS_REQUIRED"
+                response_id: "FIELD_IS_REQUIRED"
             );
         }
 
@@ -320,7 +312,7 @@ class Field
         if (!$this->required and !isset($this->default) and !$this->allow_null) {
             throw new ServerError(
                 message: "Field `$this->name` must have a default or allow null values if not required.",
-                ref_id: "FIELD_NEEDS_DEFAULT"
+                response_id: "FIELD_NEEDS_DEFAULT"
             );
         }
     }
@@ -335,7 +327,7 @@ class Field
         if ($this->read_only and isset($this->default)) {
             throw new ServerError(
                 message: "Read-only field `$this->name` cannot have a default value.",
-                ref_id: "FIELD_NO_DEFAULT_WITH_READ_ONLY"
+                response_id: "FIELD_NO_DEFAULT_WITH_READ_ONLY"
             );
         }
 
@@ -343,7 +335,7 @@ class Field
         if ($this->read_only and $this->choices) {
             throw new ServerError(
                 message: "Read-only field `$this->name` cannot have value choices.",
-                ref_id: "FIELD_NO_CHOICES_WITH_READ_ONLY"
+                response_id: "FIELD_NO_CHOICES_WITH_READ_ONLY"
             );
         }
     }
@@ -380,8 +372,8 @@ class Field
             # Throw an error if the value is not already an array
             if (!is_array($this->value)) {
                 throw new ValidationError(
-                    message: "Field `$this->name` must be an array.",
-                    ref_id: "FIELD_INVALID_MANY_VALUE"
+                    message: "Field `$this->name` must be of type `array`.",
+                    response_id: "FIELD_INVALID_MANY_VALUE"
                 );
             }
 
@@ -403,7 +395,7 @@ class Field
         if (empty($this->name)) {
             throw new ServerError(
                 message: "Field object must be assigned a `name` value after it is constructed.",
-                ref_id: "FIELD_UNNAMED"
+                response_id: "FIELD_UNNAMED"
             );
         }
 
@@ -427,7 +419,7 @@ class Field
             if (!$this->context->config_path) {
                 throw new ServerError(
                     message: "Field '$this->name' cannot be 'unique' when its model context has no 'config_path'.",
-                    ref_id: "FIELD_UNIQUE_WITH_NO_MODEL_CONFIG_PATH"
+                    response_id: "FIELD_UNIQUE_WITH_NO_MODEL_CONFIG_PATH"
                 );
             }
 
@@ -435,7 +427,7 @@ class Field
             if (!$this->context->many) {
                 throw new ServerError(
                     message: "Field '$this->name' cannot be 'unique' when its model context does not have 'many' enabled.",
-                    ref_id: "FIELD_UNIQUE_WITHOUT_MANY_MODEL_CONTEXT"
+                    response_id: "FIELD_UNIQUE_WITHOUT_MANY_MODEL_CONTEXT"
                 );
             }
 
@@ -452,7 +444,7 @@ class Field
                 else {
                     throw new ValidationError(
                         message: "Field '$this->name' must be unique. Value is in use by object with ID '$model_object->id'.",
-                        ref_id: "FIELD_MUST_BE_UNIQUE"
+                        response_id: "FIELD_MUST_BE_UNIQUE"
                     );
                 }
             }
@@ -479,7 +471,7 @@ class Field
         if ($this->type !== gettype($value)) {
             throw new ValidationError(
                 message: "Field `$this->name` must be of type `$this->type`",
-                ref_id: "FIELD_INVALID_TYPE"
+                response_id: "FIELD_INVALID_TYPE"
             );
         }
     }
@@ -496,7 +488,7 @@ class Field
             $choices_str = implode(", ", $this->choices);
             throw new ValidationError(
                 message: "Field `$this->name` must be one of [$choices_str]",
-                ref_id: "FIELD_INVALID_CHOICE"
+                response_id: "FIELD_INVALID_CHOICE"
             );
         }
     }
@@ -513,7 +505,7 @@ class Field
         if (!$this->allow_empty and ($value === "" or $value === [])) {
             throw new ValidationError(
                 message: "Field `$this->name` cannot be empty.",
-                ref_id: "FIELD_EMPTY_NOT_ALLOWED"
+                response_id: "FIELD_EMPTY_NOT_ALLOWED"
             );
         }
     }
@@ -530,7 +522,7 @@ class Field
     protected function _from_internal(string $internal_value) {
         throw new ServerError(
             message: "Field '$this->name' does not have method of converting internal value to representation.",
-            ref_id: "FIELD_CANNOT_REPRESENT_INTERNAL_VALUE"
+            response_id: "FIELD_CANNOT_REPRESENT_INTERNAL_VALUE"
         );
     }
 
@@ -549,8 +541,8 @@ class Field
 
         # For `many` type fields, convert all values to representation.
         if ($this->many) {
-            # Expand the value into it's array form
-            $values = explode($this->delimiter, $internal_value);
+            # Expand the value into it's array form.
+            $values = ($internal_value === "") ? [] : explode($this->delimiter, $internal_value);
             $representation = [];
 
             # Run the field's `to_representation()` method for value to represent

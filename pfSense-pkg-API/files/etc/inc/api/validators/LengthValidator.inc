@@ -34,14 +34,14 @@ class LengthValidator extends API\Core\Validator {
             if (strlen($value) < $this->minimum) {
                 throw new API\Core\ValidationError(
                     message: "Field '$field_name' must contain a minimum of $this->maximum characters.",
-                    ref_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT"
+                    response_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT"
                 );
             }
             # Throw an error if the string contains more characters than the specified maximum
             if (strlen($value) > $this->maximum) {
                 throw new API\Core\ValidationError(
                     message: "Field '$field_name' exceeds the maximum character length of $this->maximum.",
-                    ref_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT"
+                    response_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT"
                 );
             }
         }
@@ -51,14 +51,14 @@ class LengthValidator extends API\Core\Validator {
             if (count($value) < $this->minimum) {
                 throw new API\Core\ValidationError(
                     message: "Field '$field_name' must contain a minimum of $this->minimum entries.",
-                    ref_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT"
+                    response_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT"
                 );
             }
             # Throw an error if the array contains more array entries than the specified maximum
             if (count($value) > $this->maximum) {
                 throw new API\Core\ValidationError(
                     message: "Field '$field_name' exceeds the maximum array length of $this->maximum.",
-                    ref_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT"
+                    response_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT"
                 );
             }
         }
@@ -66,7 +66,7 @@ class LengthValidator extends API\Core\Validator {
         else {
             throw new API\Core\ServerError(
                 message: "Field '$field_name' requested max length validation but is not a string or an array.",
-                ref_id: "LENGTH_VALIDATOR_UNSUPPORTED_TYPE"
+                response_id: "LENGTH_VALIDATOR_UNSUPPORTED_TYPE"
             );
         }
     }

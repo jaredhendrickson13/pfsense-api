@@ -2,19 +2,22 @@
 
 namespace API\Models;
 
+require_once("api/core/Model.inc");
+
 use API;
 use API\Core\Auth;
 use API\Core\Model;
 use API\Fields\BooleanField;
 use API\Fields\IntegerField;
+use API\Fields\InterfaceField;
 use API\Fields\StringField;
 
 # Constants
-const API_BACKUP_FILE_PATH = "/usr/local/share/pfSense-pkg-API/backup.json";
-const API_BACKUP_NOT_CONFIGURED = -1;
-const API_RESTORE_SUCCESS = 0;
-const API_RESTORE_NO_CHANGE = 1;
-const API_RESTORE_NO_BACKUP = 2;
+const API_SETTINGS_BACKUP_FILE_PATH = "/usr/local/share/pfSense-pkg-API/backup.json";
+const API_SETTINGS_BACKUP_NOT_CONFIGURED = -1;
+const API_SETTINGS_RESTORE_SUCCESS = 0;
+const API_SETTINGS_RESTORE_NO_CHANGE = 1;
+const API_SETTINGS_RESTORE_NO_BACKUP = 2;
 
 class APISettings extends Model {
     public BooleanField $enabled;
@@ -23,7 +26,7 @@ class APISettings extends Model {
     public BooleanField $login_protection;
     public BooleanField $log_successful_auth;
     public BooleanField $allow_pre_releases;
-    public StringField $allowed_interfaces;
+    public InterfaceField $allowed_interfaces;
     public StringField $represent_interfaces_as;
     public StringField $auth_mode;
     public IntegerField $jwt_exp;
@@ -37,7 +40,7 @@ class APISettings extends Model {
     public function __construct(mixed $id = null, array $representation_data = [], Auth $client = null)
     {
         # Obtain the API config index and set the config path to the API configuration
-        $this->id = API\Core\Tools\get_api_config()[0];
+        $this->id = $this->get_api_config()["id"];
         $this->config_path = "installedpackages/package/$this->id/conf";
 
         # Set Fields for this Model
@@ -52,7 +55,8 @@ class APISettings extends Model {
             default: false,
             indicates_true: "enabled",
             indicates_false: "disabled",
-            help_text: "Enables or disables read-only API access. If enabled, the API will only respond to GET requests"
+            help_text: "Enables or disables read-only API access. If enabled, the API will only respond to GET requests
+            and can only be disabled via webConfigurator."
         );
         $this->keep_backup = new BooleanField(
             default: true,
@@ -87,7 +91,7 @@ class APISettings extends Model {
             and features that are currently under development and may not be fully stable. Use of pre-release versions
             is at your own risk."
         );
-        $this->allowed_interfaces = new StringField(
+        $this->allowed_interfaces = new InterfaceField(
             default: [],
             allow_empty: true,
             many: true,
@@ -163,18 +167,16 @@ class APISettings extends Model {
      * Creates a backup of the current API configuration at /usr/local/share/pfSense-pkg-API/backup.json.
      * @returns integer Returns 0 when backup was successful, or -1 when the API's `keep_backup` field is disabled.
      */
-    public static function backup_from_file() : int {
+    public static function backup_to_file() : int {
         # Read current API settings
-        $api_settings = new APISettings();
-        $api_settings->from_internal();
+        $api_config = APISettings::get_api_config()["config"];
 
         # Don't allow restore if the `keep_backup` is not enabled
-        if (!$api_settings->keep_backup->value) {
-            return API_BACKUP_NOT_CONFIGURED;
+        if ($api_config["keep_backup"] !== "enabled") {
+            return API_SETTINGS_BACKUP_NOT_CONFIGURED;
         }
 
-        $backup_api_conf = json_encode($api_settings->to_internal());
-        file_put_contents(API_BACKUP_FILE_PATH, $backup_api_conf);
+        file_put_contents(API_SETTINGS_BACKUP_FILE_PATH, json_encode($api_config));
         return 0;
     }
 
@@ -186,31 +188,49 @@ class APISettings extends Model {
      */
     public static function restore_from_backup() : int {
         # Variables
-        $backup_api_conf_json = (is_file(API_BACKUP_FILE_PATH)) ? file_get_contents(API_BACKUP_FILE_PATH) : "";
+        $backup_api_conf_json = (is_file(API_SETTINGS_BACKUP_FILE_PATH)) ? file_get_contents(API_SETTINGS_BACKUP_FILE_PATH) : "";
         $backup_api_conf = ($backup_api_conf_json) ? json_decode($backup_api_conf_json, true) : [];
+        $current_api_id = APISettings::get_api_config()["id"];
+        $current_api_conf = APISettings::get_api_config()["config"];
 
-        # Read current API settings
-        $api_settings = new APISettings();
-        $api_settings->from_internal();
-        
         # Don't allow restore if the `keep_backup` is not enabled
-        if (!$api_settings->keep_backup->value) {
-            return API_BACKUP_NOT_CONFIGURED;
+        if ($current_api_conf["keep_backup"] !== "enabled") {
+            return API_SETTINGS_BACKUP_NOT_CONFIGURED;
         }
 
         # Don't allow restore if there is no backup present
         if (!$backup_api_conf) {
-            return API_RESTORE_NO_BACKUP;
+            return API_SETTINGS_RESTORE_NO_BACKUP;
         }
 
         # Don't allow restore if there is no change to backup
-        if ($api_settings->to_internal() === $backup_api_conf) {
-            return API_RESTORE_NO_CHANGE;
+        if ($current_api_conf === $backup_api_conf) {
+            return API_SETTINGS_RESTORE_NO_CHANGE;
         }
 
-        config_set_path("installedpackages/package/$api_settings->id/conf", $backup_api_conf);
+        config_set_path("installedpackages/package/$current_api_id/conf", $backup_api_conf);
         write_config("Synchronized persistent API configuration");
-        return API_RESTORE_SUCCESS;
+        return API_SETTINGS_RESTORE_SUCCESS;
+    }
+
+    /**
+     * Obtains the internal pfSense-pkg-API configuration and package ID from the pfSense configuration.
+     * @return array An associative array containing the API configuration under the `config` key, and the API package
+     * ID under the `id` key. Returns an empty array if the API package could not be found.
+     */
+    public static function get_api_config() : array {
+        # Variables
+        $api_pkg_name = "API";
+        $pkg_conf = self::get_config("installedpackages/package", []);
+
+        # Loop through each package and locate the API package
+        foreach ($pkg_conf as $id => $pkg) {
+            if ($pkg["name"] === $api_pkg_name) {
+                return ["id"=>$id, "config"=>$pkg["conf"]];
+            }
+        }
+
+        return [];
     }
 
     /**
@@ -218,6 +238,6 @@ class APISettings extends Model {
      */
     public function apply()
     {
-        parent::apply(); // TODO: Change the autogenerated stub
+        $this->backup_to_file();
     }
 }

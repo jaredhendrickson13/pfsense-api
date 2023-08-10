@@ -14,7 +14,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_no_default_when_field_is_required() {
         $this->assert_throws_response(
-            ref_id: "FIELD_CANNOT_BE_REQUIRED_WITH_DEFAULT",
+            response_id: "FIELD_CANNOT_BE_REQUIRED_WITH_DEFAULT",
             code: 500,
             callable: function () {
                 $test_field = new API\Core\Field(required: true, default: "");
@@ -27,7 +27,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_no_read_only_when_field_is_required() {
         $this->assert_throws_response(
-            ref_id: "FIELD_CANNOT_BE_REQUIRED_WITH_READ_ONLY",
+            response_id: "FIELD_CANNOT_BE_REQUIRED_WITH_READ_ONLY",
             code: 500,
             callable: function () {
                 $test_field = new API\Core\Field(required: true, read_only: true);
@@ -40,24 +40,10 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_no_allow_null_when_field_is_required() {
         $this->assert_throws_response(
-            ref_id: "FIELD_CANNOT_BE_REQUIRED_WITH_ALLOW_NULL",
+            response_id: "FIELD_CANNOT_BE_REQUIRED_WITH_ALLOW_NULL",
             code: 500,
             callable: function () {
                 $test_field = new API\Core\Field(allow_null: true, required: true);
-            }
-        );
-    }
-
-    /**
-     * Checks that an error is thrown when a Field object has a `default` value that is not specified as a `choice`.
-     */
-
-    public function test_default_with_choices () {
-        $this->assert_throws_response(
-            ref_id: "FIELD_INVALID_CHOICE_DEFAULT",
-            code: 500,
-            callable: function () {
-                new API\Core\Field(choices: ["a", "b"], default: "INVALID_CHOICE");
             }
         );
     }
@@ -67,7 +53,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_no_field_with_read_only_and_write_only () {
         $this->assert_throws_response(
-            ref_id: "FIELD_WITH_READ_ONLY_AND_WRITE_ONLY",
+            response_id: "FIELD_WITH_READ_ONLY_AND_WRITE_ONLY",
             code: 500,
             callable: function () {
                 new API\Core\Field(read_only: true, write_only: true);
@@ -80,7 +66,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_no_many_minimum_greater_than_many_maximum () {
         $this->assert_throws_response(
-            ref_id: "FIELD_MANY_MINIMUM_GREATER_THAN_MANY_MAXIMUM",
+            response_id: "FIELD_MANY_MINIMUM_GREATER_THAN_MANY_MAXIMUM",
             code: 500,
             callable: function () {
                 new API\Core\Field(many_minimum: 5, many_maximum: 4);
@@ -110,12 +96,12 @@ class APICoreFieldTestCase extends API\Core\TestCase
         # Create a Field object and ensure all values were properly set during construction
         $test_field = new API\Core\Field(
             type: $type,
-            choices: $choices,
+            required: $required,
             unique: $unique,
+            default: $default,
+            choices: $choices,
             allow_empty: $allow_empty,
             allow_null: $allow_null,
-            required: $required,
-            default: $default,
             read_only: $read_only,
             many: $many,
             delimiter: $delimiter,
@@ -146,7 +132,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
     public function test_context_required_with_unique() {
         # Ensure an error raised when a Field is `unique`, but no parent model context assigned during validation.
         $this->assert_throws_response(
-            ref_id: "FIELD_UNIQUE_WITH_NO_CONTEXT",
+            response_id: "FIELD_UNIQUE_WITH_NO_CONTEXT",
             code: 500,
             callable: function () {
                 $test_field = new API\Core\Field(unique: true);
@@ -161,7 +147,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
     public function test_field_requires_name() {
         # Ensure the field has a name when it's validated.
         $this->assert_throws_response(
-            ref_id: "FIELD_UNNAMED",
+            response_id: "FIELD_UNNAMED",
             code: 500,
             callable: function () {
                 $test_field = new API\Core\Field(required: true);
@@ -187,7 +173,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
     public function test_require_value_when_field_is_required() {
         # Ensure required fields must have a value set
         $this->assert_throws_response(
-            ref_id: "FIELD_IS_REQUIRED",
+            response_id: "FIELD_IS_REQUIRED",
             code: 400,
             callable: function () {
                 $test_field = new API\Core\Field(required: true);
@@ -203,7 +189,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
     public function test_require_default_when_field_is_not_required() {
         # Ensure required fields must have a value set
         $this->assert_throws_response(
-            ref_id: "FIELD_NEEDS_DEFAULT",
+            response_id: "FIELD_NEEDS_DEFAULT",
             code: 500,
             callable: function () {
                 $test_field = new API\Core\Field(required: false);
@@ -218,7 +204,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_no_default_when_field_is_read_only() {
         $this->assert_throws_response(
-            ref_id: "FIELD_NO_DEFAULT_WITH_READ_ONLY",
+            response_id: "FIELD_NO_DEFAULT_WITH_READ_ONLY",
             code: 500,
             callable: function () {
                 $test_field = new API\Core\Field(type: "string", default: "test", read_only: true);
@@ -233,7 +219,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_no_choices_when_field_is_read_only() {
         $this->assert_throws_response(
-            ref_id: "FIELD_NO_CHOICES_WITH_READ_ONLY",
+            response_id: "FIELD_NO_CHOICES_WITH_READ_ONLY",
             code: 500,
             callable: function () {
                 $test_field = new API\Core\Field(type: "string", choices: ["test"], read_only: true);
@@ -248,14 +234,15 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_context_has_config_path_when_field_is_unique() {
         $this->assert_throws_response(
-            ref_id: "FIELD_UNIQUE_WITH_NO_MODEL_CONFIG_PATH",
+            response_id: "FIELD_UNIQUE_WITH_NO_MODEL_CONFIG_PATH",
             code: 500,
             callable: function () {
                 # Create a model to use for testing
-                $test_model = new API\Core\Model();
+                $test_model = new API\Models\Test();
+                $test_model->config_path = null;
 
                 # Create a field to test with and ensure the test model is assigned as its parent context
-                $test_field = new API\Core\Field(type: "string", unique: true, required: true);
+                $test_field = new API\Core\Field(type: "string", required: true, unique: true);
                 $test_field->name = "test_field";
                 $test_field->value = "test_value";
                 $test_field->context = $test_model;
@@ -269,12 +256,11 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_field_many_minimum() {
         $this->assert_throws_response(
-            ref_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT",
+            response_id: "LENGTH_VALIDATOR_MINIMUM_CONSTRAINT",
             code: 400,
             callable: function () {
                 # Create a model to use for testing
-                $test_model = new API\Core\Model();
-                $test_model->config_path = "test/config/path";
+                $test_model = new API\Models\Test();
 
                 # Create a field to test with and ensure the test model is assigned as its parent context
                 $test_field = new API\Core\Field(type: "string", required: true, many: true, many_minimum: 1);
@@ -291,12 +277,11 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_field_many_maximum() {
         $this->assert_throws_response(
-            ref_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT",
+            response_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT",
             code: 400,
             callable: function () {
                 # Create a model to use for testing
-                $test_model = new API\Core\Model();
-                $test_model->config_path = "test/config/path";
+                $test_model = new API\Models\Test();
 
                 # Create a field to test with and ensure the test model is assigned as its parent context
                 $test_field = new API\Core\Field(type: "string", required: true, many: true, many_maximum: 3);
@@ -313,7 +298,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_field_many_minimum_set_according_to_allow_empty() {
         # Ensure that the `many_minimum` value is automatically changed to 0 when `allow_empty` is enabled
-        $test_field = new API\Core\Field(type: "string", allow_empty: true, required: true, many: true, many_minimum: 3);
+        $test_field = new API\Core\Field(type: "string", required: true, allow_empty: true, many: true, many_minimum: 3);
         $this->assert_equals($test_field->many_minimum, 0);
     }
 
@@ -322,15 +307,15 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_context_has_many_when_field_is_unique() {
         $this->assert_throws_response(
-            ref_id: "FIELD_UNIQUE_WITHOUT_MANY_MODEL_CONTEXT",
+            response_id: "FIELD_UNIQUE_WITHOUT_MANY_MODEL_CONTEXT",
             code: 500,
             callable: function () {
                 # Create a model to use for testing
-                $test_model = new API\Core\Model();
-                $test_model->config_path = "test/config/path";
+                $test_model = new API\Models\Test();
+                $test_model->many = false;
 
                 # Create a field to test with and ensure the test model is assigned as its parent context
-                $test_field = new API\Core\Field(type: "string", unique: true, required: true);
+                $test_field = new API\Core\Field(type: "string", required: true, unique: true);
                 $test_field->name = "test_field";
                 $test_field->value = "test_value";
                 $test_field->context = $test_model;
@@ -345,7 +330,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_no_conditions_without_allow_null() {
         $this->assert_throws_response(
-            ref_id: "FIELD_CANNOT_BE_CONDITIONAL_WITHOUT_ALLOW_NULL",
+            response_id: "FIELD_CANNOT_BE_CONDITIONAL_WITHOUT_ALLOW_NULL",
             code: 500,
             callable: function () {
                 new API\Core\Field(
@@ -401,7 +386,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
 
         # Try to create another object with the same value for the unique field and ensure it throws an error
         $this->assert_throws_response(
-            ref_id: "FIELD_MUST_BE_UNIQUE",
+            response_id: "FIELD_MUST_BE_UNIQUE",
             code: 400,
             callable: function () {
                 $non_unique_test_model = new API\Models\Test();
@@ -419,7 +404,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_field_type_constraint() {
         $this->assert_throws_response(
-            ref_id: "FIELD_INVALID_TYPE",
+            response_id: "FIELD_INVALID_TYPE",
             code: 400,
             callable: function () {
                 $test_field = new API\Core\Field(type: "string", required: true);
@@ -436,7 +421,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
     public function test_no_empty_values_without_allow_empty() {
         # Check for string
         $this->assert_throws_response(
-            ref_id: "FIELD_EMPTY_NOT_ALLOWED",
+            response_id: "FIELD_EMPTY_NOT_ALLOWED",
             code: 400,
             callable: function () {
                 $test_field = new API\Core\Field(type: "string", required: true);
@@ -448,7 +433,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
 
         # Check an array (field has `many` set).
         $this->assert_throws_response(
-            ref_id: "FIELD_EMPTY_NOT_ALLOWED",
+            response_id: "FIELD_EMPTY_NOT_ALLOWED",
             code: 400,
             callable: function () {
                 $test_field = new API\Core\Field(type: "string", required: true, many: true, many_minimum: 0);
@@ -475,7 +460,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
     function test_validators_check_values() {
         # Check against single value
         $this->assert_throws_response(
-            ref_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT",
+            response_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT",
             code: 400,
             callable: function () {
                 $test_field = new API\Core\Field(
@@ -493,7 +478,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
 
         # Check against many value
         $this->assert_throws_response(
-            ref_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT",
+            response_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT",
             code: 400,
             callable: function () {
                 $test_field = new API\Core\Field(
@@ -541,7 +526,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
      */
     public function test_default_from_internal_conversion() {
         $this->assert_throws_response(
-            ref_id: "FIELD_CANNOT_REPRESENT_INTERNAL_VALUE",
+            response_id: "FIELD_CANNOT_REPRESENT_INTERNAL_VALUE",
             code: 500,
             callable: function () {
                 $test_field = new API\Core\Field(type: "integer", required: true);

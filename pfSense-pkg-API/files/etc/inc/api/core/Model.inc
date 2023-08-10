@@ -69,7 +69,7 @@ class Model {
         if (isset($id) and $representation_data) {
             throw new ServerError(
                 message: "Model objects cannot be constructed with both an ID and representation data.",
-                ref_id: "MODEL_WITH_ID_AND_REPRESENTATION"
+                response_id: "MODEL_WITH_ID_AND_REPRESENTATION"
             );
         }
 
@@ -177,7 +177,7 @@ class Model {
         if (!$this->config_path) {
             throw new ServerError(
                 message: "Model cannot use default method to obtain next available ID without 'config_path'",
-                ref_id: "MODEL_NEXT_ID_WITHOUT_CONFIG_PATH"
+                response_id: "MODEL_NEXT_ID_WITHOUT_CONFIG_PATH"
             );
         }
 
@@ -185,7 +185,7 @@ class Model {
         if (!$this->many) {
             throw new ServerError(
                 message: "Models cannot obtain next ID when 'many' is not enabled.",
-                ref_id: "MODEL_NEXT_ID_WITHOUT_MANY"
+                response_id: "MODEL_NEXT_ID_WITHOUT_MANY"
             );
         }
 
@@ -205,7 +205,7 @@ class Model {
             throw new ServerError(
                 message: "Model failed to obtain the next available ID because the config path leads to an existing, 
                 non-indexed array value.",
-                ref_id: "MODEL_DANGEROUS_CONFIG_PATH"
+                response_id: "MODEL_DANGEROUS_CONFIG_PATH"
             );
         }
     }
@@ -293,7 +293,7 @@ class Model {
         if ($this->config_path and $this->internal_callable) {
             throw new ServerError(
                 message: "Models cannot define both a config path and an internal callable.",
-                ref_id: "MODEL_WITH_CONFIG_PATH"
+                response_id: "MODEL_WITH_CONFIG_PATH"
             );
         }
         # Obtain the internal objects from the config path if specified
@@ -303,14 +303,14 @@ class Model {
         # Obtain the internal objects by calling the `internal_callable` if specified
         elseif ($this->internal_callable) {
             $callable = $this->internal_callable;
-            $internal_objects = $callable();
+            $internal_objects = $this->$callable();
         }
         # Otherwise, throw an error. Either a `config_path` or an `internal_callable` is required.
         else {
             throw new ServerError(
                 message: "Model requires a 'config_path' or 'internal_callable' value to be defined before 
                     obtaining internal objects.",
-                ref_id: "MODEL_WITH_NO_INTERNAL_METHOD"
+                response_id: "MODEL_WITH_NO_INTERNAL_METHOD"
             );
         }
 
@@ -328,7 +328,7 @@ class Model {
         if ($this->many and !isset($this->id)) {
             throw new ServerError(
                 message: "An ID is required when refreshing objects from config on model with 'many'.",
-                ref_id: "MODEL_ID_REQUIRED_FOR_REFRESH"
+                response_id: "MODEL_ID_REQUIRED_FOR_REFRESH"
             );
         }
 
@@ -336,10 +336,10 @@ class Model {
         $internal_objects = $this->get_internal_objects();
 
         # Require there to be an internal object with this ID, throw a not found error otherwise
-        if (!array_key_exists($this->id, $internal_objects)) {
+        if ($this->many and !array_key_exists($this->id, $internal_objects)) {
             throw new NotFoundError(
                 message: "Object with ID '$this->id' does not exist.",
-                ref_id: "MODEL_OBJECT_NOT_FOUND"
+                response_id: "MODEL_OBJECT_NOT_FOUND"
             );
         }
 
@@ -479,7 +479,7 @@ class Model {
         if ($requires_id and $this->many and !isset($this->id)) {
             throw new ValidationError(
                 message: "Field 'id' is required.",
-                ref_id: "MODEL_REQUIRES_ID"
+                response_id: "MODEL_REQUIRES_ID"
             );
         }
 
@@ -529,7 +529,7 @@ class Model {
                 if ($this->$field->internal_name === $this->$eval_field->internal_name) {
                     throw new ServerError(
                         message: "Model field internal names must be unique to it's namespace.",
-                        ref_id: "MODEL_FIELDS_WITH_CONFLICTING_INTERNAL_NAMES"
+                        response_id: "MODEL_FIELDS_WITH_CONFLICTING_INTERNAL_NAMES"
                     );
                 }
             }
@@ -548,7 +548,7 @@ class Model {
             if (!is_pkg_installed($pkg)) {
                 throw new NotFoundError(
                     message: "The requested action requires the '$pkg' package but it is not installed.",
-                    ref_id: "MDOEL_MISSING_REQUIRED_PACKAGE"
+                    response_id: "MDOEL_MISSING_REQUIRED_PACKAGE"
                 );
             }
         }
@@ -558,7 +558,7 @@ class Model {
             if (!include_once($include)) {
                 throw new ServerError(
                     message: "Model requires include file $include but it could not be found in the PHP path.",
-                    ref_id: "MODEL_WITH_FAILED_INCLUDE"
+                    response_id: "MODEL_WITH_FAILED_INCLUDE"
                 );
             }
 
@@ -610,7 +610,7 @@ class Model {
         # Otherwise, this method needs to be overridden by a child class to add specific context. Throw an error.
         throw new ServerError(
             message: "Models without a 'config_path' or 'many' require an overridden _create method",
-            ref_id: "MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD"
+            response_id: "MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD"
         );
     }
 
@@ -652,8 +652,13 @@ class Model {
             # Only use the ID in the config path if 'many' is enabled. Otherwise, just use the base config path.
             $update_config_path = ($this->many) ? "$this->config_path/$this->id" : $this->config_path;
 
+            # Merge the differences between the stored object and the updated internal object
+            $stored_object = $this->get_config($update_config_path, []);
+            $updated_object = array_merge($stored_object, $this->to_internal());
+
+
             # Write the changes to the object in config.
-            $this->set_config(path: $update_config_path, value: $this->to_internal());
+            $this->set_config(path: $update_config_path, value: $updated_object);
             $this->write_config("Modified $this->verbose_name via API");
             return;
         }
@@ -661,7 +666,7 @@ class Model {
         # Otherwise, this method needs to be overridden by a child class to add specific context. Throw an error.
         throw new ServerError(
             message: "Models without a 'config_path' require an overridden _update method",
-            ref_id: "MODEL_REQUIRE_OVERRIDDEN_UPDATE_METHOD"
+            response_id: "MODEL_REQUIRE_OVERRIDDEN_UPDATE_METHOD"
         );
     }
 
@@ -709,7 +714,7 @@ class Model {
         # Otherwise, this method needs to be overridden by a child class to add specific context. Throw an error.
         throw new ServerError(
             message: "Models without a 'config_path' require an overridden _delete method",
-            ref_id: "MODEL_REQUIRE_OVERRIDDEN_DELETE_METHOD"
+            response_id: "MODEL_REQUIRE_OVERRIDDEN_DELETE_METHOD"
         );
     }
 

@@ -16,26 +16,27 @@
 namespace API\Core;
 
 require_once("api/core/Tools.inc");
+require_once("api/models/APISettings.inc");
 
 use API;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use function API\Core\Tools\get_api_config;
 
 /**
  * Creates object that performs authentication and authorization for API views.
  */
 class Auth {
-    private API\Models\APISettings $api_settings;
+    private int $api_config_id;
+    private array $api_config;
     public string $mode;
     public bool $read_only;
-    public string $username;
-    public string $ip_address;
     public array $required_privileges;
-    public array $client_privileges;
-    public bool $is_authenticated;
-    public bool $is_authorized;
+    public array $client_privileges = [];
+    public string $username = "unknown user";
+    public string $ip_address = "unknown IP";
+    public bool $is_authenticated = false;
+    public bool $is_authorized = false;
 
     /**
      * Creates an Auth object which can be used to authenticate an external client requesting API access.
@@ -46,12 +47,16 @@ class Auth {
      * API configuration value.
      */
     public function __construct(array $required_privileges=[], string $mode="", bool|null $read_only=null){
-        $this->api_settings = new API\Models\APISettings();
-        $this->mode = (!$mode) ? $this->api_settings->auth_mode() : $mode;
-        $this->read_only = (is_null($read_only)) ? $this->read_only() : $read_only;
+        # Obtain the internal API package configuration
+        $this->api_config_id = API\Models\APISettings::get_api_config()["id"];
+        $this->api_config = API\Models\APISettings::get_api_config()["config"];
+
+        # Allow the auth_mode and read_only settings to be overwritten, otherwise default to their configured values
+        $this->mode = (!$mode) ? $this->api_config["auth_mode"] : $mode;
+        $this->read_only = (is_null($read_only)) ? $this->api_config["read_only"] === "enabled" : $read_only;
+
+        # Assign required privileges
         $this->required_privileges = $required_privileges;
-        $this->client_privileges = [];
-        $this->username = "unknown user";
         $this->ip_address = ($_SERVER["REMOTE_ADDR"]) ?: "unknown IP";
     }
 
@@ -172,12 +177,12 @@ class Auth {
      */
     public static function init_jwt_server_key(bool $rotate = false) {
         # Obtain the API package's ID and configuration
-        $pkg_id = Tools\get_api_config()[0];
-        $api_config = Tools\get_api_config()[1];
+        $pkg_id = API\Models\APISettings::get_api_config()["id"];
+        $api_config = API\Models\APISettings::get_api_config()["config"];
 
         # Create a new server key if one is not set
         if (empty($api_config["server_key"]) or $rotate === true) {
-            config_set_path("installedpackages/package/{$pkg_id}/conf/server_key", bin2hex(random_bytes(32)));
+            config_set_path("installedpackages/package/$pkg_id/conf/server_key", bin2hex(random_bytes(32)));
             write_config("API server key created");
         }
     }
@@ -192,7 +197,7 @@ class Auth {
         self::init_jwt_server_key();
 
         # Pull the API configuration from config
-        $api_config = get_api_config()[1];
+        $api_config = API\Models\APISettings::get_api_config()["config"];
 
         # Assign the JWT payload values. Assign the configured JWT expiration from the API configuration
         $payload = array(
@@ -215,7 +220,7 @@ class Auth {
      */
     public static function decode_jwt(string $jwt) : array {
         # Obtain the JWT server key from config
-        $jwt_server_key = get_api_config()[1]["server_key"];
+        $jwt_server_key = $api_config = API\Models\APISettings::get_api_config()["config"]["server_key"];
 
         # Attempt to decode the JWT, if decoding fails return empty array.
         try {
@@ -235,8 +240,8 @@ class Auth {
      */
     public static function generate_key(string $username) : string {
         # Variables
-        $pkg_index = get_api_config()[0];
-        $api_config = get_api_config()[1];
+        $pkg_id = API\Models\APISettings::get_api_config()["id"];
+        $api_config = API\Models\APISettings::get_api_config()["config"];
         $hash_algo = $api_config["key_hash_algo"];
         $key_bit_strength = $api_config["key_length_bytes"];
         $key_new = bin2hex(random_bytes(intval($key_bit_strength)));
@@ -247,7 +252,7 @@ class Auth {
         $api_config["keys"]["key"][] = ["username" => $username, "hash" => $hash, "algo" => $hash_algo];
 
         # Write the new key to config
-        config_set_path("installedpackages/package/{$pkg_index}/conf", $api_config);
+        config_set_path("installedpackages/package/$pkg_id/conf", $api_config);
         write_config(sprintf(gettext(" Generated API key")));
         return $key_new;
     }
@@ -259,7 +264,7 @@ class Auth {
      */
     public static function get_existing_keys(string $username = "", $all = true) : array {
         # Variables
-        $api_config = get_api_config()[1];
+        $api_config = API\Models\APISettings::get_api_config()["config"];
         $user_keys = [];
 
         # Only loop through if we have configured keys
@@ -297,7 +302,7 @@ class Auth {
         $ip_address = $this->ip_address;
 
         # Log authentication attempts if enabled
-        if ($this->api_settings->login_protection()) {
+        if ($this->api_config["login_protection"] === "enabled") {
             # Log failed authentication
             if (!$this->is_authenticated) {
                 # This log entry is required for Login Protection to work, do not change the log text.
@@ -306,7 +311,7 @@ class Auth {
                 );
             }
             # Log successful authentication if the API is configured to do so. Disabled by default to avoid log spam.
-            elseif ($this->api_settings->log_successful_auth()) {
+            elseif ($this->api_config["log_successful_auth"] === "enabled") {
                 log_auth(
                     gettext("Successful login for user '{$username}' from: {$ip_address} (Local Database)")
                 );

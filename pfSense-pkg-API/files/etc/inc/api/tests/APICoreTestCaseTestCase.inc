@@ -136,16 +136,16 @@ class APICoreTestCaseTestCase extends TestCase
 
     /**
      * Checks that the TestCase's assert_throws_response() passes test if a Response object or one of its children
-     * were thrown with a specific 'ref_id' and 'code'.
+     * were thrown with a specific 'response_id' and 'code'.
      */
     public function test_assert_throws_response() {
         $this->assert_throws_response(
-            ref_id: "EXAMPLE_ID",
+            response_id: "EXAMPLE_ID",
             code: 500,
             callable: function () {
                 throw new Response(
                     message: "Test",
-                    ref_id: "EXAMPLE_ID"
+                    response_id: "EXAMPLE_ID"
                 );
             }
         );
@@ -153,17 +153,17 @@ class APICoreTestCaseTestCase extends TestCase
 
     /**
      * Checks that the TestCase's assert_throws_response() fails test if a Response object or one of its children
-     * was thrown with the wrong 'ref_id'.
+     * was thrown with the wrong 'response_id'.
      */
-    public function test_bad_ref_id_assert_throws_response() {
+    public function test_bad_response_id_assert_throws_response() {
         try {
             $this->assert_throws_response(
-                ref_id: "ID_DOES_NOT_MATCH_RESPONSE",
+                response_id: "ID_DOES_NOT_MATCH_RESPONSE",
                 code: 500,
                 callable: function () {
                     throw new Response(
                         message: "Test",
-                        ref_id: "EXAMPLE_ID"
+                        response_id: "EXAMPLE_ID"
                     );
                 }
             );
@@ -172,7 +172,7 @@ class APICoreTestCaseTestCase extends TestCase
             return;
         }
 
-        throw new AssertionError("Expected AssertionError for mismatched `ref_id`");
+        throw new AssertionError("Expected AssertionError for mismatched `response_id`");
     }
 
     /**
@@ -182,12 +182,12 @@ class APICoreTestCaseTestCase extends TestCase
     public function test_bad_code_assert_throws_response() {
         try {
             $this->assert_throws_response(
-                ref_id: "EXAMPLE_ID",
+                response_id: "EXAMPLE_ID",
                 code: 500,
                 callable: function () {
                     throw new Response(
                         message: "Test",
-                        ref_id: "EXAMPLE_ID",
+                        response_id: "EXAMPLE_ID",
                         code: 502
                     );
                 }
@@ -206,7 +206,7 @@ class APICoreTestCaseTestCase extends TestCase
     public function test_no_exception_assert_throws_response() {
         try {
             $this->assert_throws_response(
-                ref_id: "EXAMPLE_ID",
+                response_id: "EXAMPLE_ID",
                 code: 500,
                 callable: function () {}
             );

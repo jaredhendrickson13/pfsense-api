@@ -11,7 +11,7 @@ class APIValidatorsNumericRangeValidatorTestCase extends TestCase {
      */
     public function test_throws_server_error_for_non_int_float() {
         $this->assert_throws_response(
-            ref_id: "NUMERIC_RANGE_VALIDATOR_UNSUPPORTED_TYPE",
+            response_id: "NUMERIC_RANGE_VALIDATOR_UNSUPPORTED_TYPE",
             code: 500,
             callable: function () {
                 $test_validator = new NumericRangeValidator();
@@ -26,7 +26,7 @@ class APIValidatorsNumericRangeValidatorTestCase extends TestCase {
      */
     public function test_throws_validation_error_for_less_than_minimum() {
         $this->assert_throws_response(
-            ref_id: "NUMERIC_RANGE_VALIDATOR_MINIMUM_CONSTRAINT",
+            response_id: "NUMERIC_RANGE_VALIDATOR_MINIMUM_CONSTRAINT",
             code: 400,
             callable: function () {
                 $test_validator = new NumericRangeValidator(minimum: 5);
@@ -41,7 +41,7 @@ class APIValidatorsNumericRangeValidatorTestCase extends TestCase {
      */
     public function test_throws_validation_error_for_greater_than_maximum() {
         $this->assert_throws_response(
-            ref_id: "NUMERIC_RANGE_VALIDATOR_MAXIMUM_CONSTRAINT",
+            response_id: "NUMERIC_RANGE_VALIDATOR_MAXIMUM_CONSTRAINT",
             code: 400,
             callable: function () {
                 $test_validator = new NumericRangeValidator(maximum: 5);

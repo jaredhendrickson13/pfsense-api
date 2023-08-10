@@ -35,7 +35,7 @@ class View {
     protected mixed $model = null;
     protected array $errors = [];
     protected API\Core\Auth $client;
-    public API\Models\APISettings $api_settings;
+    public array $api_config;
     public array $request_data = [];
     public string $request_method;
     public array $request_method_options = [];
@@ -57,8 +57,7 @@ class View {
         error_reporting(E_ERROR);
 
         # Fetch the current API configuration whenever the object is first created.
-        $this->api_settings = new API\Models\APISettings();
-
+        $this->api_config = API\Models\APISettings::get_api_config()["config"];
 
         # Fetch request method whenever the object is first created.
         $this->request_method = strtoupper($_SERVER["REQUEST_METHOD"]);
@@ -111,11 +110,11 @@ class View {
      */
     private function check_auth() {
         # Variables
-        $read_only = ($this->api_settings->read_only() and !$this->ignore_read_mode);
+        $read_only = ($this->api_config["read_only"] === "enabled" and !$this->ignore_read_mode);
         $this->client = new API\Core\Auth($this->get_required_privs(), $this->enforce_auth_mode, $read_only);
 
         # Obtain the auth credentials from client according to the current API auth mode
-        switch ($this->api_settings->auth_mode()) {
+        switch ($this->api_config["auth_mode"]) {
             case "local":
                 $this->client->username = ($_SERVER["PHP_AUTH_USER"]) ?: "";
                 $secret = ($_SERVER["PHP_AUTH_PW"]) ?: "";
@@ -126,7 +125,7 @@ class View {
             default:
                 throw new ServerError(
                     message: "Unknown authentication mode configured.",
-                    ref_id: "VIEW_WITH_UNKNOWN_AUTH_MODE"
+                    response_id: "VIEW_WITH_UNKNOWN_AUTH_MODE"
                 );
         }
 
@@ -135,13 +134,13 @@ class View {
             if (!$this->client->authenticate(secret: $secret, username: $this->client->username)) {
                 throw new AuthenticationError(
                     message: "Authentication failed",
-                    ref_id: "INVALID_AUTH"
+                    response_id: "INVALID_AUTH"
                 );
             }
             if (!$this->client->authorize()) {
                 throw new ForbiddenError(
                     message: "Client does not have sufficient privileges to access this resource.",
-                    ref_id: "INSUFFICIENT_PRIVILEGES"
+                    response_id: "INSUFFICIENT_PRIVILEGES"
                 );
             }
         }
@@ -151,8 +150,7 @@ class View {
      * Checks if the API is enabled before allowing the call.
      */
     private function check_enabled() {
-        $api_config = API\Core\Tools\get_api_config()[1];
-        if (!$this->api_settings->enabled() and !$this->ignore_enabled) {
+        if (!$this->api_config["enabled"] == "enabled" and !$this->ignore_enabled) {
             header("Location: /");
             exit();
         }
@@ -162,8 +160,14 @@ class View {
      * Checks if the interface receiving the API call is allowed to answer API calls.
      */
     private function check_server_ip() {
-        $allow_ifs = $this->api_settings["allowed_interfaces"];
+        # Variables
+        $allow_ifs = $this->api_config["allowed_interfaces"];
         $whitelist = explode(",", $allow_ifs);
+
+        # Allow the action if the allowed interfaces is empty
+        if (empty($allow_ifs)) {
+            return;
+        }
 
         # Check if our server IP is in our whitelist
         foreach ($whitelist as $wif) {
@@ -185,7 +189,7 @@ class View {
         # Throw a forbidden error if this API call was made to a non-API enabled interface
         throw new ForbiddenError(
             message: "The requested action is not allowed by admin policy",
-            ref_id: "NOT_ALLOWED"
+            response_id: "NOT_ALLOWED"
         );
     }
 
@@ -197,7 +201,7 @@ class View {
         if (!in_array($this->request_method, $this->request_method_options) and $this->request_method !== "OPTIONS") {
             throw new MethodNotAllowedError(
                 message: "Resource at $this->url does not support the requested HTTP method '$this->request_method'",
-                ref_id: "METHOD_NOT_ALLOWED"
+                response_id: "METHOD_NOT_ALLOWED"
             );
         }
     }
@@ -226,7 +230,7 @@ class View {
         if ($content_type_unknown) {
             throw new ValidationError(
                 message: "The requested content-type is not supported",
-                ref_id: "VIEW_CONTENT_TYPE_UNSUPPORTED",
+                response_id: "VIEW_CONTENT_TYPE_UNSUPPORTED",
                 code: 415
             );
         }
@@ -279,7 +283,7 @@ class View {
             # Create our success API response object if no errors were thrown
             $response = new Response(
                 message: "",
-                ref_id: "SUCCESS",
+                response_id: "SUCCESS",
                 code: 200,
                 data: $resp_data
             );
@@ -289,7 +293,7 @@ class View {
         catch (Exception|Error $error) {
             $response = new ServerError(
                 message: $error->getMessage(),
-                ref_id: "VIEW_RECEIVED_UNEXPECTED_ERROR"
+                response_id: "VIEW_RECEIVED_UNEXPECTED_ERROR"
             );
         }
 
@@ -333,7 +337,7 @@ class View {
         catch (JsonException) {
             throw new ValidationError(
                 message: "Request body could not be decoded as JSON.",
-                ref_id: "VIEW_COULD_NOT_DECODE_JSON",
+                response_id: "VIEW_COULD_NOT_DECODE_JSON",
                 code: 406
             );
         }

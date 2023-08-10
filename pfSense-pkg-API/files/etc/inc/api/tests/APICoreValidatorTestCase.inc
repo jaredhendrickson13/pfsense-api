@@ -14,7 +14,7 @@ class APICoreValidatorTestCase extends API\Core\TestCase {
      */
     public function test_default_validate_method() {
         $this->assert_throws_response(
-            ref_id: "VALIDATOR_INCOMPLETE",
+            response_id: "VALIDATOR_INCOMPLETE",
             code: 500,
             callable: function () {
                 (new API\Core\Validator())->validate("test");

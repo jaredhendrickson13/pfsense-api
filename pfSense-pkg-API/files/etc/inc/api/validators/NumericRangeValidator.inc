@@ -31,7 +31,7 @@ class NumericRangeValidator extends API\Core\Validator {
         if (!is_integer($value) and !is_float($value)) {
             throw new API\Core\ServerError(
                 message: "NumericRangeValidator can only be used on integer or float values.",
-                ref_id: "NUMERIC_RANGE_VALIDATOR_UNSUPPORTED_TYPE"
+                response_id: "NUMERIC_RANGE_VALIDATOR_UNSUPPORTED_TYPE"
             );
         }
 
@@ -39,7 +39,7 @@ class NumericRangeValidator extends API\Core\Validator {
         if ($value < $this->minimum) {
             throw new API\Core\ValidationError(
                 message: "Field '$field_name' must be greater than or equal to '$this->minimum'. Received '$value'",
-                ref_id: "NUMERIC_RANGE_VALIDATOR_MINIMUM_CONSTRAINT"
+                response_id: "NUMERIC_RANGE_VALIDATOR_MINIMUM_CONSTRAINT"
             );
         }
 
@@ -47,7 +47,7 @@ class NumericRangeValidator extends API\Core\Validator {
         if ($value > $this->maximum) {
             throw new API\Core\ValidationError(
                 message: "Field '$field_name' must be less than or equal to '$this->maximum'. Received '$value'",
-                ref_id: "NUMERIC_RANGE_VALIDATOR_MAXIMUM_CONSTRAINT"
+                response_id: "NUMERIC_RANGE_VALIDATOR_MAXIMUM_CONSTRAINT"
             );
         }
     }

@@ -25,20 +25,20 @@ use Error;
 class Response extends Error {
     public $message;
     public $code;
-    public string $ref_id;
+    public string $response_id;
     public string $status;
     public array $data;
 
     public function __construct(
         string $message,
-        string $ref_id,
+        string $response_id,
         int $code = 500,
         array $data = [],
     ) {
         $this->message = str_replace(["\"", "'"], "`", $message);
         $this->code = $code;
         $this->status = strtolower($this->get_http_status_message($code));
-        $this->ref_id = strtoupper($ref_id);
+        $this->response_id = strtoupper($response_id);
         $this->data = $data;
         parent::__construct($this->message, $this->code);
 
@@ -52,7 +52,7 @@ class Response extends Error {
         return [
             "code" => $this->code,
             "status" => $this->status,
-            "ref_id" => $this->ref_id,
+            "response_id" => $this->response_id,
             "message" => $this->message,
             "data" => $this->data
         ];
@@ -131,8 +131,8 @@ class Response extends Error {
  * Internal Server Error HTTP code.
  */
 class ServerError extends Response {
-    public function __construct(string $message, string $ref_id, int $code = 500, array $data = []) {
-        parent::__construct($message, $ref_id, $code, $data);
+    public function __construct(string $message, string $response_id, int $code = 500, array $data = []) {
+        parent::__construct($message, $response_id, $code, $data);
     }
 }
 
@@ -141,8 +141,8 @@ class ServerError extends Response {
  * HTTP code.
  */
 class AuthenticationError extends Response {
-    public function __construct(string $message, string $ref_id, int $code = 401, array $data = []) {
-        parent::__construct($message, $ref_id, $code, $data);
+    public function __construct(string $message, string $response_id, int $code = 401, array $data = []) {
+        parent::__construct($message, $response_id, $code, $data);
     }
 }
 
@@ -151,8 +151,8 @@ class AuthenticationError extends Response {
  * exception generally corresponds with a 403 forbidden HTTP code.
  */
 class ForbiddenError extends Response {
-    public function __construct(string $message, string $ref_id, int $code = 403, array $data = []) {
-        parent::__construct($message, $ref_id, $code, $data);
+    public function __construct(string $message, string $response_id, int $code = 403, array $data = []) {
+        parent::__construct($message, $response_id, $code, $data);
     }
 }
 
@@ -161,8 +161,8 @@ class ForbiddenError extends Response {
  * 405 method not allowed HTTP code.
  */
 class MethodNotAllowedError extends Response {
-    public function __construct(string $message, string $ref_id, int $code = 405, array $data = [],) {
-        parent::__construct($message, $ref_id, $code, $data);
+    public function __construct(string $message, string $response_id, int $code = 405, array $data = [],) {
+        parent::__construct($message, $response_id, $code, $data);
     }
 }
 
@@ -171,8 +171,8 @@ class MethodNotAllowedError extends Response {
  * HTTP code.
  */
 class ValidationError extends Response {
-    public function __construct(string $message, string $ref_id, int $code = 400, array $data = []) {
-        parent::__construct($message, $ref_id, $code, $data);
+    public function __construct(string $message, string $response_id, int $code = 400, array $data = []) {
+        parent::__construct($message, $response_id, $code, $data);
     }
 }
 
@@ -181,7 +181,7 @@ class ValidationError extends Response {
  * Not Found HTTP code.
  */
 class NotFoundError extends Response {
-    public function __construct(string $message, string $ref_id, int $code = 404, array $data = []) {
-        parent::__construct($message, $ref_id, $code, $data);
+    public function __construct(string $message, string $response_id, int $code = 404, array $data = []) {
+        parent::__construct($message, $response_id, $code, $data);
     }
 }
