@@ -11,6 +11,7 @@ use API\Fields\BooleanField;
 use API\Fields\IntegerField;
 use API\Fields\InterfaceField;
 use API\Fields\StringField;
+use API\Validators\IPAddressValidator;
 
 # Constants
 const API_SETTINGS_BACKUP_FILE_PATH = "/usr/local/share/pfSense-pkg-API/backup.json";
@@ -33,6 +34,7 @@ class APISettings extends Model {
     public IntegerField $key_length_bytes;
     public StringField $key_hash_algo;
     public BooleanField $ha_sync;
+    public BooleanField $ha_sync_validate_certs;
     public StringField $ha_sync_hosts;
     public StringField $ha_sync_username;
     public StringField $ha_sync_password;
@@ -137,6 +139,15 @@ class APISettings extends Model {
             help_text: "Enables or disables syncing API settings to HA peers. When enabled, API settings from this
             host will automatically be synced to any hosts defined in `ha_sync_hosts`."
         );
+        $this->ha_sync_validate_certs = new BooleanField(
+            default: true,
+            indicates_true: "enabled",
+            indicates_false: "disabled",
+            help_text: "Enables or disables certificate validation when syncing API configurations to HA sync peers. If
+            enabled, all hosts defined in `ha_sync_hosts` must have their webConfigurator configured with a certificate
+            trusted by this system. It is strongly recommended this be enabled at all times to help mitigate 
+            Man-in-the-Middle attacks."
+        );
         $this->ha_sync_hosts = new StringField(
             default: [],
             allow_empty: true,
@@ -144,6 +155,7 @@ class APISettings extends Model {
             many_minimum: 0,
             many_maximum: 10,
             delimiter: " ",
+            validators: [new IPAddressValidator(allow_fqdn: true)],
             help_text: "Set a list of IP addresses or hostnames to sync API settings to."
         );
         $this->ha_sync_username = new StringField(
