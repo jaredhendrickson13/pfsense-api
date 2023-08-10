@@ -16,6 +16,7 @@ use API\Validators\IPAddressValidator;
 # Constants
 const API_SETTINGS_BACKUP_FILE_PATH = "/usr/local/share/pfSense-pkg-API/backup.json";
 const API_SETTINGS_BACKUP_NOT_CONFIGURED = -1;
+const API_SETTINGS_BACKUP_SUCCESS = 0;
 const API_SETTINGS_RESTORE_SUCCESS = 0;
 const API_SETTINGS_RESTORE_NO_CHANGE = 1;
 const API_SETTINGS_RESTORE_NO_BACKUP = 2;
@@ -189,7 +190,7 @@ class APISettings extends Model {
         }
 
         file_put_contents(API_SETTINGS_BACKUP_FILE_PATH, json_encode($api_config));
-        return 0;
+        return API_SETTINGS_BACKUP_SUCCESS;
     }
 
     /**

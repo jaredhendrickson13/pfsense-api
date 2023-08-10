@@ -17,6 +17,7 @@ require_once("api/core/Tools.inc");
 require_once("api/core/TestCase.inc");
 
 use API\Core\Tools;
+use API\Models\APISettings;
 
 
 function build_views() {
@@ -81,36 +82,23 @@ function run_tests() {
 }
 
 function backup() {
-    # Local Variables
-    $api_conf = API\Core\Tools\get_api_config()[1];
-    $backup_api_conf = json_encode($api_conf);
-    file_put_contents("/usr/local/share/pfSense-pkg-API/backup.json", $backup_api_conf);
-    echo "Backing up API configuration... done.".PHP_EOL;
+    echo "Backing up API configuration... ";
+    echo match (APISettings::backup_to_file()) {
+        API\Models\API_SETTINGS_BACKUP_SUCCESS => "done." . PHP_EOL,
+        API\Models\API_SETTINGS_BACKUP_NOT_CONFIGURED => "not configured." . PHP_EOL,
+        default => "unknown error occurred." . PHP_EOL,
+    };
 }
 
 function restore() {
-    # Local Variables
-    $api_conf = API\Core\Tools\get_api_config();
-
-    # Only retrieve file contents if it exists
-    if (is_file("/usr/local/share/pfSense-pkg-API/backup.json")) {
-        $backup_api_conf_json = file_get_contents("/usr/local/share/pfSense-pkg-API/backup.json");
-        $backup_api_conf = json_decode($backup_api_conf_json, true);;
-    }
-
-    # Restore our API configuration if the backup exists
-    if (!empty($backup_api_conf_json)) {
-        # Only restore the config if it has changed
-        if ($api_conf[1] !== $backup_api_conf) {
-            config_set_path("installedpackages/package/{$api_conf[0]}/conf", $backup_api_conf);
-            write_config("Synchronized persistent API configuration");
-            echo "Restoring API configuration... done.".PHP_EOL;
-        } else {
-            echo "Restoring API configuration... no changes found.".PHP_EOL;
-        }
-    } else {
-        echo "Restoring API configuration... no configuration found.".PHP_EOL;
-    }
+    echo "Restoring API configuration... ";
+    echo match (APISettings::restore_from_backup()) {
+        API\Models\API_SETTINGS_RESTORE_SUCCESS => "done." . PHP_EOL,
+        API\Models\API_SETTINGS_BACKUP_NOT_CONFIGURED => "not configured." . PHP_EOL,
+        API\Models\API_SETTINGS_RESTORE_NO_CHANGE => "no changes found." . PHP_EOL,
+        API\Models\API_SETTINGS_RESTORE_NO_BACKUP => "no backup found." . PHP_EOL,
+        default => "unknown error occurred." . PHP_EOL,
+    };
 }
 
 function sync() {

@@ -220,7 +220,7 @@ class Auth {
      */
     public static function decode_jwt(string $jwt) : array {
         # Obtain the JWT server key from config
-        $jwt_server_key = $api_config = API\Models\APISettings::get_api_config()["config"]["server_key"];
+        $jwt_server_key = API\Models\APISettings::get_api_config()["config"]["server_key"];
 
         # Attempt to decode the JWT, if decoding fails return empty array.
         try {
