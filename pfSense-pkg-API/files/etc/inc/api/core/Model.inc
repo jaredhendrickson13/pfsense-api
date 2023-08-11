@@ -444,6 +444,25 @@ class Model {
     }
 
     /**
+     * Converts this Model object to a PHP array representation of its OpenAPI schema. This is used when
+     * auto-generating API documentation. This method can be extended to add additional options to the OpenAPI
+     * schema when necessary
+     * @link https://swagger.io/docs/specification/data-models/
+     * @return array A PHP array containing this Model as an OpenAPI schema.
+     */
+    public function to_openapi_schema() : array {
+        # Assign primitive schema attributes
+        $openapi_schema = ["type" => "object", "properties" => []];
+
+        # Loop through each Field in this Model and obtain its OpenAPI property config
+        foreach ($this->get_fields() as $field) {
+            $openapi_schema["properties"][$field] = $this->$field->to_openapi_property();
+        }
+
+        return $openapi_schema;
+    }
+
+    /**
      * Populates an array of field names for this model.
      * @return array An array of field names for this model.
      */

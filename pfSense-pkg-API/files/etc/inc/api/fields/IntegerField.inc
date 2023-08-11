@@ -11,6 +11,8 @@ use API;
  * string Model fields.
  */
 class IntegerField extends API\Core\Field {
+    public int $minimum;
+    public int $maximum;
     /**
      * Defines the IntegerField object and sets its options.
      * @param int $minimum The minimum value this value can be.
@@ -61,13 +63,14 @@ class IntegerField extends API\Core\Field {
         string $help_text = ""
     )
     {
+        $this->minimum = $minimum;
+        $this->maximum = $maximum;
         parent::__construct(
             type: "integer",
             required: $required,
             unique: $unique,
             default: $default,
             choices: $choices,
-            allow_empty: false,
             allow_null: $allow_null,
             read_only: $read_only,
             write_only: $write_only,
@@ -98,5 +101,29 @@ class IntegerField extends API\Core\Field {
             );
         }
         return intval($internal_value);
+    }
+
+    /**
+     * Converts this Field object to a PHP array representation of an OpenAPI schema property configuration. This is
+     * used when auto-generating API documentation. This method can be extended to add additional options to the OpenAPI
+     * schema property.
+     * @link https://swagger.io/docs/specification/data-models/
+     * @return array A PHP array containing this field as a OpenAPI schema property configuration.
+     */
+    public function to_openapi_property() : array {
+        # Run the parent to_openapi_property() to obtain the base property object, then make changes as needed.
+        $openapi_property = parent::to_openapi_property();
+
+        # Add the minimum and maximum to the OpenAPI property.
+        if ($this->many) {
+            $openapi_property["items"]["minimum"] = $this->minimum;
+            $openapi_property["items"]["maximum"] = $this->maximum;
+        }
+        else {
+            $openapi_property["minimum"] = $this->minimum;
+            $openapi_property["maximum"] = $this->maximum;
+        }
+
+        return $openapi_property;
     }
 }

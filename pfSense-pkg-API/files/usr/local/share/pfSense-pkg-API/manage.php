@@ -17,6 +17,7 @@ require_once("api/core/Tools.inc");
 require_once("api/core/TestCase.inc");
 
 use API\Core\Tools;
+use API\Core\View;
 use API\Models\APISettings;
 
 
@@ -160,6 +161,7 @@ function help() {
     echo "  version          : Display the current package version and build information".PHP_EOL;
     echo "  help             : Display the help page (this page)".PHP_EOL;
     echo "  buildviews       : Build all API views included in this package".PHP_EOL;
+    echo "  generatedocs     : Regenerates the OpenAPI documentation".PHP_EOL;
     echo "  runtests         : Run all API unit tests. Warning: this may be disruptive!".PHP_EOL;
     echo "  update           : Update package to the latest stable version available".PHP_EOL;
     echo "  revert           : Revert package to a specified version".PHP_EOL;
@@ -174,6 +176,10 @@ function help() {
 # BUILDVIEWS COMMAND
 if (in_array($argv[1], ["buildviews"])) {
     build_views();
+}
+# GENERATEDOCUMENTATION COMMAND
+if (in_array($argv[1], ["generatedocs"])) {
+    echo API\Core\Tools\generate_documentation();
 }
 # RUNTESTS COMMAND
 elseif (in_array($argv[1], ["runtests"])) {

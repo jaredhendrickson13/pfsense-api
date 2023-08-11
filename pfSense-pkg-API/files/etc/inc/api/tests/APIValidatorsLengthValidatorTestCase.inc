@@ -80,7 +80,7 @@ class APIValidatorsLengthValidatorTestCase extends TestCase {
     /**
      * Check that the NumericRangeValidator does not throw any errors for values that are within the range.
      */
-    public function test_max_length_validator() {
+    public function test_maximum_length_validator() {
         # Set validator with a specified range and ensure values within the range do not throw errors.
         $test_validator = new LengthValidator(minimum: 0, maximum: 5);
         $test_validator->validate("");

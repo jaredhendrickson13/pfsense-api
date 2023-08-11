@@ -31,7 +31,7 @@ foreach(glob("/etc/inc/api/models/*.inc") as $model) {
  */
 class View {
     public string $url = "";
-    protected string $model_name = "";
+    public string $model_name = "";
     protected mixed $model = null;
     protected array $errors = [];
     protected API\Core\Auth $client;
@@ -48,6 +48,11 @@ class View {
     public array $post_privileges = [];
     public array $patch_privileges = [];
     public array $delete_privileges = [];
+    public string $get_help_text = "No description was defined.";
+    public string $post_help_text = "No description was defined.";
+    public string $patch_help_text = "No description was defined.";
+    public string $delete_help_text = "No description was defined.";
+
 
     /**
      * Sets values whenever the View object is crated.

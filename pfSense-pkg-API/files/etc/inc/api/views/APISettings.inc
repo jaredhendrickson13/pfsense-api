@@ -20,5 +20,8 @@ class APISettings extends View
         $this->request_method_options = ["GET", "PATCH"];
         $this->get_privileges = ["page-all", "page-system-api"];
         $this->patch_privileges = ["page-all", "page-system-api"];
+
+        # Assign documentation help text for each request method
+        $this->get_help_text = "Reads the current API settings.";
     }
 }

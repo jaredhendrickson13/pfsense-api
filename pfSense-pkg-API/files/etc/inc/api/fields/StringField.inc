@@ -11,10 +11,13 @@ use API;
  * string Model fields.
  */
 class StringField extends API\Core\Field {
+    public int $minimum_length;
+    public int $maximum_length;
+
     /**
      * Defines the StringField object and sets its options.
-     * @param int $min_length The minimum number of characters required for this string field.
-     * @param int $max_length The maximum number of characters allowed by this string field.
+     * @param int $minimum_length The minimum number of characters required for this string field.
+     * @param int $maximum_length The maximum number of characters allowed by this string field.
      * @param array $choices An array of explicit choices this string field value can be.
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
@@ -53,8 +56,8 @@ class StringField extends API\Core\Field {
         bool $many = false,
         int $many_minimum = 1,
         int $many_maximum = 128,
-        int $min_length = 0,
-        int $max_length = 1024,
+        int $minimum_length = 0,
+        int $maximum_length = 1024,
         string $delimiter = ",",
         string $internal_name = "",
         string $internal_namespace = "",
@@ -63,6 +66,8 @@ class StringField extends API\Core\Field {
         string $help_text = ""
     )
     {
+        $this->minimum_length = $minimum_length;
+        $this->maximum_length = $maximum_length;
         parent::__construct(
             type: "string",
             required: $required,
@@ -80,7 +85,7 @@ class StringField extends API\Core\Field {
             internal_name: $internal_name,
             internal_namespace: $internal_namespace,
             conditions: $conditions,
-            validators: $validators + [new API\Validators\LengthValidator(minimum: $min_length, maximum: $max_length)],
+            validators: $validators + [new API\Validators\LengthValidator(minimum: $minimum_length, maximum: $maximum_length)],
             help_text: $help_text
         );
     }
@@ -92,5 +97,29 @@ class StringField extends API\Core\Field {
      */
     protected function _from_internal(mixed $internal_value) : string {
         return strval($internal_value);
+    }
+
+    /**
+     * Converts this Field object to a PHP array representation of an OpenAPI schema property configuration. This is
+     * used when auto-generating API documentation. This method can be extended to add additional options to the OpenAPI
+     * schema property.
+     * @link https://swagger.io/docs/specification/data-models/
+     * @return array A PHP array containing this field as a OpenAPI schema property configuration.
+     */
+    public function to_openapi_property() : array {
+        # Run the parent to_openapi_property() to obtain the base property object, then make changes as needed.
+        $openapi_property = parent::to_openapi_property();
+
+        # Add the minimum and maximum length to the OpenAPI property.
+        if ($this->many) {
+            $openapi_property["items"]["minLength"] = $this->minimum_length;
+            $openapi_property["items"]["maxLength"] = $this->maximum_length;
+        }
+        else {
+            $openapi_property["minLength"] = $this->minimum_length;
+            $openapi_property["maxLength"] = $this->maximum_length;
+        }
+
+        return $openapi_property;
     }
 }

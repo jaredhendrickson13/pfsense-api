@@ -597,4 +597,37 @@ class Field
             return $this->_to_internal($this->value);
         }
     }
+
+    /**
+     * Converts this Field object to a PHP array representation of an OpenAPI schema property configuration. This is
+     * used when auto-generating API documentation. This method can be extended to add additional options to the OpenAPI
+     * schema property.
+     * @link https://swagger.io/docs/specification/data-models/
+     * @return array A PHP array containing this field as an OpenAPI schema property configuration.
+     */
+    public function to_openapi_property() : array {
+        # Assign primitive property attributes
+        $openapi_property = [];
+        $openapi_property["description"] = $this->help_text;
+        $openapi_property["nullable"] = $this->allow_null;
+        $openapi_property["readOnly"] = $this->read_only;
+        $openapi_property["writeOnly"] = $this->write_only;
+        $openapi_property["default"] = ($this->default) ?: null;
+
+        # Set values that are unique to `many` Fields.
+        if ($this->many) {
+            $openapi_property["type"] = "array";
+            $openapi_property["minItems"] = $this->many_minimum;
+            $openapi_property["maxItems"] = $this->many_maximum;
+            $openapi_property["items"] = ["type" => $this->type];
+            $openapi_property["items"]["enum"] = ($this->choices) ?: null;
+        }
+        else {
+            $openapi_property["type"] = $this->type;
+            $openapi_property["enum"] = ($this->choices) ?: null;
+
+        }
+
+        return $openapi_property;
+    }
 }

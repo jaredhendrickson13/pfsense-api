@@ -26,7 +26,7 @@ class FirewallAlias extends Model {
         $this->name = new StringField(
             required: true,
             unique: true,
-            max_length: 31,
+            maximum_length: 31,
             help_text: "Sets the name for the alias. This name must be unique from all other aliases."
         );
         $this->type = new StringField(
