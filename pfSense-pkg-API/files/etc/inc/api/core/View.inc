@@ -32,7 +32,7 @@ foreach(glob("/etc/inc/api/models/*.inc") as $model) {
 class View {
     public string $url = "";
     public string $model_name = "";
-    protected mixed $model = null;
+    protected Model $model;
     protected array $errors = [];
     protected API\Core\Auth $client;
     public array $api_config;
@@ -48,10 +48,10 @@ class View {
     public array $post_privileges = [];
     public array $patch_privileges = [];
     public array $delete_privileges = [];
-    public string $get_help_text = "No description was defined.";
-    public string $post_help_text = "No description was defined.";
-    public string $patch_help_text = "No description was defined.";
-    public string $delete_help_text = "No description was defined.";
+    public string $get_help_text = "";
+    public string $post_help_text = "";
+    public string $patch_help_text = "";
+    public string $delete_help_text = "";
 
 
     /**
@@ -66,6 +66,37 @@ class View {
 
         # Fetch request method whenever the object is first created.
         $this->request_method = strtoupper($_SERVER["REQUEST_METHOD"]);
+
+        # Initialize the assigned model
+        $model_class = "API\\Models\\".$this->model_name;
+        $this->model = new $model_class();
+
+        # Set default help text for any help text properties that were not set by the child class
+        $this->set_default_help_text();
+    }
+
+    /**
+     * Determines the appropriate default help text for each method according to the assigned Model and View properties.
+     */
+    private function set_default_help_text() {
+        # Variables
+        $model_verbose_name = $this->model->verbose_name;
+        $model_verbose_name_plural = $this->model->verbose_name_plural;
+
+        # Set default help text with an applicable context for `many` models
+        if ($this->model->many) {
+            $this->get_help_text = ($this->get_help_text) ?: "Reads an existing $model_verbose_name.";
+            $this->post_help_text = ($this->post_help_text) ?: "Creates a new $model_verbose_name.";
+            $this->patch_help_text = ($this->patch_help_text) ?: "Updates an existing $model_verbose_name.";
+            $this->delete_help_text = ($this->delete_help_text) ?: "Deletes an existing $model_verbose_name.";
+        }
+        # Set default help text with an applicable context for non `many` models
+        else {
+            $this->get_help_text = ($this->get_help_text) ?: "Reads current $model_verbose_name_plural.";
+            $this->post_help_text = ($this->post_help_text) ?: "Creates $model_verbose_name_plural.";
+            $this->patch_help_text = ($this->patch_help_text) ?: "Updates current $model_verbose_name_plural.";
+            $this->delete_help_text = ($this->delete_help_text) ?: "Deletes current $model_verbose_name_plural.";
+        }
     }
 
     /**
@@ -258,12 +289,9 @@ class View {
             $this->check_request_method();
             $this->check_request_data();
 
-            # Initialize the assigned model
-            $this->model_name = "API\\Models\\".$this->model_name;
-            $this->model = new $this->model_name(
-                representation_data: $this->request_data,
-                client: $this->client
-            );
+            # Refresh the assigned Model using the request data and assign the current client object
+            $this->
+            $this->model->from_representation(representation_data: $this->request_data);
 
             # Define a variable to store our response data (if any)
             $resp_data = [];

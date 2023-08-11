@@ -9,9 +9,6 @@ use API\Core\View;
 class APISettings extends View
 {
     public function __construct() {
-        # Construct the parent View object
-        parent::__construct();
-
         # Assign the URL for this endpoint along with the Model it corresponds to.
         $this->url = "/api/v2/system/api/settings";
         $this->model_name = "APISettings";
@@ -23,5 +20,9 @@ class APISettings extends View
 
         # Assign documentation help text for each request method
         $this->get_help_text = "Reads the current API settings.";
+        $this->patch_help_text = "Updates the current API settings.";
+
+        # Construct the parent View object
+        parent::__construct();
     }
 }
