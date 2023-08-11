@@ -14,7 +14,7 @@
 //   limitations under the License.
 namespace API\Core;
 
-require_once("api/core/Model.inc");
+require_once("api/auto_loader.inc");
 
 use API;
 use Error;

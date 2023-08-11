@@ -8,12 +8,7 @@ use Exception;
 use ReflectionException;
 use ReflectionMethod;
 
-require_once("api/core/Field.inc");
-require_once("api/core/Validator.inc");
-require_once("api/core/Model.inc");
-require_once("api/core/ModelSet.inc");
-require_once("api/core/Response.inc");
-require_once("api/core/View.inc");
+require_once("api/auto_loader.inc");
 
 # Allow test case to use all models
 foreach(glob("/etc/inc/api/models/*.inc") as $model) {

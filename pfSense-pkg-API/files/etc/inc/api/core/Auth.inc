@@ -15,8 +15,7 @@
 
 namespace API\Core;
 
-require_once("api/core/Tools.inc");
-require_once("api/models/APISettings.inc");
+require_once("api/auto_loader.inc");
 
 use API;
 use Exception;

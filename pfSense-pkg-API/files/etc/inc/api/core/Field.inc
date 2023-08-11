@@ -612,7 +612,11 @@ class Field
         $openapi_property["nullable"] = $this->allow_null;
         $openapi_property["readOnly"] = $this->read_only;
         $openapi_property["writeOnly"] = $this->write_only;
-        $openapi_property["default"] = ($this->default) ?: null;
+
+        # Set the default if defined
+        if ($this->default) {
+            $openapi_property["default"] = $this->default;
+        }
 
         # Set values that are unique to `many` Fields.
         if ($this->many) {
@@ -620,12 +624,19 @@ class Field
             $openapi_property["minItems"] = $this->many_minimum;
             $openapi_property["maxItems"] = $this->many_maximum;
             $openapi_property["items"] = ["type" => $this->type];
-            $openapi_property["items"]["enum"] = ($this->choices) ?: null;
+
+            # Assign choices if defined
+            if ($this->choices) {
+                $openapi_property["items"]["enum"] = $this->choices;
+            }
         }
         else {
             $openapi_property["type"] = $this->type;
-            $openapi_property["enum"] = ($this->choices) ?: null;
 
+            # Assign choices if defined
+            if ($this->choices) {
+                $openapi_property["enum"] = $this->choices;
+            }
         }
 
         return $openapi_property;

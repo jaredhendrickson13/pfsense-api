@@ -15,26 +15,8 @@
 
 namespace API\Core\Tools;
 
-require_once("firebase/php-jwt/src/JWT.php");
-require_once("firebase/php-jwt/src/ExpiredException.php");
-require_once("firebase/php-jwt/src/SignatureInvalidException.php");
-require_once("firebase/php-jwt/src/BeforeValidException.php");
-require_once("firebase/php-jwt/src/Key.php");
-require_once("config.inc");
-require_once("util.inc");
-require_once("interfaces.inc");
-require_once("interfaces_fast.inc");
-require_once("priv.defs.inc");
-require_once("priv.inc");
-require_once("service-utils.inc");
-require_once("filter.inc");
-require_once("shaper.inc");
-require_once("auth.inc");
-require_once("functions.inc");
-require_once("openvpn.inc");
-require_once("certs.inc");
-require_once("pkg-utils.inc");
-require_once("firewall_virtual_ip.inc");
+require_once("api/auto_loader.inc");
+
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
@@ -269,65 +251,38 @@ function generate_documentation() {
         $openapi_config["tags"][] = ["name" => $view_tag];
 
         # Obtain the Model assigned to the View
-        $view_model = "API\\Models\\$view_obj->model_name";
-        $view_model = new $view_model();
+        $model = "API\\Models\\$view_obj->model_name";
+        $model = new $model();
 
-        # Generate a schema for this model using it's Field properties
-        $openapi_config["components"]["schemas"][$view_obj->model_name] = ["type" => "object", "properties" => []];
-        foreach ($view_model->get_fields() as $field) {
-            # Create a schema property for this field
-            $openapi_config["components"]["schemas"][$view_obj->model_name]["properties"][$field] = [];
-            $schema_field = &$openapi_config["components"]["schemas"][$view_obj->model_name]["properties"][$field];
-            $schema_field["description"] = $view_model->$field->help_text;
-
-            # Assign values unique to `many` fields
-            if ($view_model->$field->many) {
-                $schema_field["type"] = "array";
-                $schema_field["items"] = ["type" => $view_model->$field->type];
-                $schema_field["minItems"] = $view_model->$field->many_minimum;
-                $schema_field["maxItems"] = $view_model->$field->many_maximum;
-            }
-            # Assign values unique to non-many fields
-            else {
-                $schema_field["type"] = $view_model->$field->type;
-            }
-
-            # Assign choices if set
-            if ($view_model->$field->choices) {
-                $schema_field["enum"] = $view_model->$field->choices;
-            }
-            
-            # If this field allows null, mark it as nullable
-            if ($view_model->$field->allow_null) {
-                $schema_field["nullable"] = true;
-            }
-        }
-
-        # Assign documentation on GET requests when supported
-        if (in_array("GET", $view_obj->request_method_options)) {
-            # Assign endpoint details to variables
-            $priv_options_str = implode(", ", $view_obj->get_privileges);
-            $requires_auth_str = ($view_obj->requires_auth) ? "Yes" : "No";
-            $auth_modes_str = ($view_obj->enforce_auth_mode) ? "[$view_obj->enforce_auth_mode]" : "[local, jwt, key]";
-
-            # Add documentation for GET requests at this path
-            $openapi_config["paths"][$view_obj->url]["get"] = [
-                "operationId" => $view_obj::class."-read",
-                "description" => "<h3>Description:</h3>".
-                    "$view_obj->get_help_text<br>".
-                    "<h3>Details:</h3>".
-                    "**Assigned model**: $view_obj->model_name<br>".
-                    "**Requires authentication**: $requires_auth_str<br>".
-                    "**Supported authentication modes:** $auth_modes_str<br>".
-                    "**Requires privilege**: [$priv_options_str]<br>".
-                    "**Read-only**: Yes"
-            ];
-        }
+        # Obtain the OpenAPI schema for this model
+        $openapi_config["components"]["schemas"][$view_obj->model_name] = $model->to_openapi_schema();
 
         # Assign shared values to each request method defined in this path
         foreach ($view_obj->request_method_options as $request_method) {
             # Convert the request method to lower case so it matches the OpenAPI config
             $request_method = strtolower($request_method);
+            $privilege_property = $request_method."_privileges";
+            $help_text_property = $request_method."_help_text";
+
+            # Assign endpoint details to variables
+            $help_text = $view_obj->$help_text_property;
+            $priv_options_str = implode(", ", $view_obj->$privilege_property);
+            $required_packages_str = ($model->packages) ? implode(", ", $model->packages) : "None";
+            $requires_auth_str = ($view_obj->requires_auth) ? "Yes" : "No";
+            $auth_modes_str = ($view_obj->enforce_auth_mode) ? "$view_obj->enforce_auth_mode" : "local, jwt, key";
+
+            # Add documentation for GET requests at this path
+            $openapi_config["paths"][$view_obj->url][$request_method] = [
+                "operationId" => $view_obj::class."-$request_method",
+                "description" => "<h3>Description:</h3>".
+                    "$help_text<br>".
+                    "<h3>Details:</h3>".
+                    "**Assigned model**: $view_obj->model_name<br>".
+                    "**Requires authentication**: $requires_auth_str<br>".
+                    "**Supported authentication modes:** [ $auth_modes_str ]<br>".
+                    "**Allowed privileges**: [ $priv_options_str ]<br>".
+                    "**Requires packages**: [ $required_packages_str ]"
+            ];
 
             # Assign tags to this path
             $openapi_config["paths"][$view_obj->url][$request_method]["tags"] = [$view_tag];
@@ -336,6 +291,20 @@ function generate_documentation() {
             if ($view_obj->enforce_auth_mode) {
                 $openapi_config["paths"][$view_obj->url][$request_method]["security"] = [
                     [$view_obj->enforce_auth_mode => []]
+                ];
+            }
+
+            # Assign request body schemas to POST and PATCH requests
+            if (in_array($request_method, ["post", "patch"])) {
+                $openapi_config["paths"][$view_obj->url][$request_method]["requestBody"] = [
+                    "content" => [
+                        "application/json" => [
+                            "schema" => ['$ref' => "#/components/schemas/$view_obj->model_name"]
+                        ],
+                        "application/x-www-form-urlencoded" => [
+                            "schema" => ['$ref' => "#/components/schemas/$view_obj->model_name"]
+                        ],
+                    ]
                 ];
             }
 

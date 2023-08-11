@@ -2,6 +2,8 @@
 
 namespace API\Core;
 
+require_once("api/auto_loader.inc");
+
 /**
  * Defines a Validator object which Field objects can use to quickly validate its value.
  */

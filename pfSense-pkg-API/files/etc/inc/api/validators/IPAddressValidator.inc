@@ -2,7 +2,7 @@
 
 namespace API\Validators;
 
-require_once("api/core/Validator.inc");
+require_once("api/auto_loader.inc");
 
 use API;
 

@@ -2,7 +2,7 @@
 
 namespace API\Fields;
 
-require_once("api/core/Field.inc");
+require_once("api/auto_loader.inc");
 
 use API;
 

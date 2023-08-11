@@ -2,7 +2,7 @@
 
 namespace API\Models;
 
-require_once("api/core/Model.inc");
+require_once("api/auto_loader.inc");
 
 use API\Core\Model;
 use API\Core\Auth;

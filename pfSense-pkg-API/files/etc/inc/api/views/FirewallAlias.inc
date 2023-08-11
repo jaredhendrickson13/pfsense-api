@@ -2,7 +2,7 @@
 
 namespace API\Views;
 
-require_once("api/core/View.inc");
+require_once("api/auto_loader.inc");
 
 use API\Core\View;
 

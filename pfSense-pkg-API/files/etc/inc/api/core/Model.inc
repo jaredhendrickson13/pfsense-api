@@ -15,20 +15,7 @@
 
 namespace API\Core;
 
-require_once("api/core/Tools.inc");
-require_once("api/core/Response.inc");
-require_once("api/core/Auth.inc");
-require_once("api/core/ModelSet.inc");
-
-# Allow models to access all API validators
-foreach(glob("/etc/inc/api/validators/*.inc") as $validator) {
-    require_once($validator);
-}
-
-# Allow models to access all API fields
-foreach(glob("/etc/inc/api/fields/*.inc") as $field) {
-    require_once($field);
-}
+require_once("api/auto_loader.inc");
 
 use API;
 use Exception;

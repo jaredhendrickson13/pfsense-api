@@ -2,6 +2,8 @@
 
 namespace API\Models;
 
+require_once("api/auto_loader.inc");
+
 use API;
 use API\Core\Auth;
 use API\Core\Field;

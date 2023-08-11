@@ -15,6 +15,8 @@
 
 namespace API\Core;
 
+require_once("api/auto_loader.inc");
+
 use Error;
 
 /**

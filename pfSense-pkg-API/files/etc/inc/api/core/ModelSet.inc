@@ -2,7 +2,7 @@
 
 namespace API\Core;
 
-require_once("api/core/Model.inc");
+require_once("api/auto_loader.inc");
 
 /**
  * Creates a ModelSet object that acts as a container for multiple Model objects. This can be used to represent a
