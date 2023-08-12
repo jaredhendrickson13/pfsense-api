@@ -253,7 +253,7 @@ function generate_documentation() {
         # Obtain the OpenAPI schema for this Model.
         $openapi_config["components"]["schemas"][$view_obj->model_name] = $model->to_openapi_schema();
 
-        # If this is a `many` model, also obtain a schema for the Model that includes the ID.
+        # If this is a `many` Model, also obtain a schema for the Model that includes the ID.
         if ($model->many) {
             $openapi_config["components"]["schemas"]["$view_obj->model_name"."WithID"] = $model->to_openapi_schema(
                 include_id: true
@@ -299,24 +299,47 @@ function generate_documentation() {
                 ];
             }
 
-            # Only assign request body definitions to POST, PUT and PATCH requests
+            # Assign request body definitions for POST, PUT and PATCH requests
             if (in_array($request_method, ["post", "put", "patch"])) {
-                # Use the WithID schema for this Model if it is not a POST request, and it is a many model
-                if ($model->many and $request_method !== "post") {
-                    $schema_name = "$view_obj->model_name"."WithID";
+                # For non `many` Views with `many` Models, use the schema with the ID for non-POST requests
+                if (!$view_obj->many and $model->many and $request_method !== "post") {
+                    $schema = ["schema" => ['$ref' => "#/components/schemas/$view_obj->model_name"."WithID"]];
                 }
+                # For `many` Views with `many` Models, accept arrays of many schema objects
+                elseif ($view_obj->many and $model->many) {
+                    $schema = [
+                        "schema" => [
+                            "type" => "array", "items" => ['$ref' => "#/components/schemas/$view_obj->model_name"]
+                        ]
+                    ];
+                }
+                # Otherwise, just assign the regular schema
                 else {
-                    $schema_name = $view_obj->model_name;
+                    $schema = ["schema" => ['$ref' => "#/components/schemas/$view_obj->model_name"]];
                 }
 
                 $openapi_config["paths"][$view_obj->url][$request_method]["requestBody"] = [
                     "content" => [
-                        "application/json" => [
-                            "schema" => ['$ref' => "#/components/schemas/$schema_name"]
-                        ],
-                        "application/x-www-form-urlencoded" => [
-                            "schema" => ['$ref' => "#/components/schemas/$schema_name"]
-                        ],
+                        "application/json" => $schema,
+                        "application/x-www-form-urlencoded" => $schema,
+                    ]
+                ];
+            }
+
+            # Assign the ID query parameter for GET and DELETE requests to non `many` Views with a `many` Model assigned
+            if (!$view_obj->many and $model->many and in_array($request_method, ["get", "delete"])) {
+                $openapi_config["paths"][$view_obj->url][$request_method]["parameters"] = [
+                    [
+                        "in" => "query",
+                        "name" => "id",
+                        "description" => "The ID of the object to target.",
+                        "required" => true,
+                        "schema" => [
+                            "oneOf" => [
+                                ["type" => "integer"],
+                                ["type" => "string"]
+                            ]
+                        ]
                     ]
                 ];
             }

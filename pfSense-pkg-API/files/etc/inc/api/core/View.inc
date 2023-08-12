@@ -76,6 +76,33 @@ class View {
 
         # Set default help text for any help text properties that were not set by the child class
         $this->set_default_help_text();
+
+        # Check for conflicting attributes
+        $this->check_construct();
+    }
+
+    /**
+     * Checks for conflicting attributes during object construction.
+     */
+    private function check_construct() {
+        # Do not allow `many` Views that are assigned non `many` Models
+        if ($this->many and !$this->model->many) {
+            throw new ServerError(
+                message: "Views cannot enable `many` when the assigned Model is not a `many` Model",
+                response_id: "VIEW_MANY_WITHOUT_MANY_MODEL"
+            );
+        }
+
+        # Do not allow Views to allow unsupported request methods
+        $supported_methods = ($this->many) ? ["GET", "PUT"] : ["GET", "POST", "PATCH", "DELETE"];
+        foreach ($this->request_method_options as $method_option) {
+            if (!in_array($method_option, $supported_methods)) {
+                throw new ServerError(
+                    "View contains unsupported request method option `$method_option`.",
+                    response_id: "VIEW_WITH_UNSUPPORTED_REQUEST_METHOD_OPTION"
+                );
+            }
+        }
     }
 
     /**
@@ -86,12 +113,17 @@ class View {
         $model_verbose_name = $this->model->verbose_name;
         $model_verbose_name_plural = $this->model->verbose_name_plural;
 
-        # Set default help text with an applicable context for `many` models
-        if ($this->model->many) {
+        # For non `many` Views, set default help text with an applicable context for `many` models
+        if (!$this->many and $this->model->many) {
             $this->get_help_text = ($this->get_help_text) ?: "Reads an existing $model_verbose_name.";
             $this->post_help_text = ($this->post_help_text) ?: "Creates a new $model_verbose_name.";
             $this->patch_help_text = ($this->patch_help_text) ?: "Updates an existing $model_verbose_name.";
             $this->delete_help_text = ($this->delete_help_text) ?: "Deletes an existing $model_verbose_name.";
+        }
+        # For `many` Vies, set default help text with an applicable context for `many` models
+        elseif ($this->many and $this->model->many) {
+            $this->get_help_text = ($this->get_help_text) ?: "Reads all existing $model_verbose_name_plural.";
+            $this->put_help_text = ($this->put_help_text) ?: "Replaces all existing $model_verbose_name_plural.";
         }
         # Set default help text with an applicable context for non `many` models
         else {

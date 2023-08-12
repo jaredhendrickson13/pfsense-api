@@ -23,7 +23,7 @@ use ReflectionClass;
 
 # Constants
 const DEFAULT_CLIENT_USERNAME = "(system api)";
-const DEFAULT_CLIENT_IP_ADDRESS = "1.2.3.4";
+const DEFAULT_CLIENT_IP_ADDRESS = "127.0.0.1";
 
 /**
  * Creates a Model object that relates to a pfSense configuration or service. This model defines the necessary steps
@@ -408,9 +408,10 @@ class Model {
      * auto-generating API documentation. This method can be extended to add additional options to the OpenAPI
      * schema when necessary
      * @link https://swagger.io/docs/specification/data-models/
+     * @param bool $include_id Set to `true` to include the `id` field in the schema.
      * @return array A PHP array containing this Model as an OpenAPI schema.
      */
-    public function to_openapi_schema(bool $include_id = false) : array {
+    public function to_openapi_schema(bool $include_id = false, bool $accept_many = false) : array {
         # Assign primitive schema attributes
         $openapi_schema = ["type" => "object", "properties" => [], "required" => []];
 
