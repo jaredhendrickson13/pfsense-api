@@ -17,9 +17,6 @@ namespace API\Core\Tools;
 
 require_once("api/auto_loader.inc");
 
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
-
 function api_request($url, $method, $data=[], $headers=[], $username="", $password="") {
     # Format data and headers
     $data = json_encode($data);
@@ -238,8 +235,7 @@ function generate_documentation() {
 
     # Import each View class and assign documentation for the endpoint according to the options and Model assigned.
     foreach(glob("/etc/inc/api/views/*.inc") as $file) {
-        # Import classes files and create the View object
-        require_once($file);
+        # Create the View object
         $view_class = "\\API\\Views\\" . str_replace(".inc", "", basename($file));
         $view_obj = new $view_class();
 
@@ -254,13 +250,22 @@ function generate_documentation() {
         $model = "API\\Models\\$view_obj->model_name";
         $model = new $model();
 
-        # Obtain the OpenAPI schema for this model
+        # Obtain the OpenAPI schema for this Model.
         $openapi_config["components"]["schemas"][$view_obj->model_name] = $model->to_openapi_schema();
+
+        # If this is a `many` model, also obtain a schema for the Model that includes the ID.
+        if ($model->many) {
+            $openapi_config["components"]["schemas"]["$view_obj->model_name"."WithID"] = $model->to_openapi_schema(
+                include_id: true
+            );
+        }
 
         # Assign shared values to each request method defined in this path
         foreach ($view_obj->request_method_options as $request_method) {
             # Convert the request method to lower case so it matches the OpenAPI config
             $request_method = strtolower($request_method);
+
+            # Obtain the privileges and help text associated with this request method
             $privilege_property = $request_method."_privileges";
             $help_text_property = $request_method."_help_text";
 
@@ -294,15 +299,23 @@ function generate_documentation() {
                 ];
             }
 
-            # Assign request body schemas to POST and PATCH requests
-            if (in_array($request_method, ["post", "patch"])) {
+            # Only assign request body definitions to POST, PUT and PATCH requests
+            if (in_array($request_method, ["post", "put", "patch"])) {
+                # Use the WithID schema for this Model if it is not a POST request, and it is a many model
+                if ($model->many and $request_method !== "post") {
+                    $schema_name = "$view_obj->model_name"."WithID";
+                }
+                else {
+                    $schema_name = $view_obj->model_name;
+                }
+
                 $openapi_config["paths"][$view_obj->url][$request_method]["requestBody"] = [
                     "content" => [
                         "application/json" => [
-                            "schema" => ['$ref' => "#/components/schemas/$view_obj->model_name"]
+                            "schema" => ['$ref' => "#/components/schemas/$schema_name"]
                         ],
                         "application/x-www-form-urlencoded" => [
-                            "schema" => ['$ref' => "#/components/schemas/$view_obj->model_name"]
+                            "schema" => ['$ref' => "#/components/schemas/$schema_name"]
                         ],
                     ]
                 ];

@@ -432,7 +432,7 @@ class Field
             }
 
             # Fetch model objects for each internal object stored in config for this model
-            $modelset = $this->context->get_all_from_internal();
+            $modelset = $this->context->read_all();
             $field_name = $this->name;
 
             foreach ($modelset->model_objects as $model_object) {

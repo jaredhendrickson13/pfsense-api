@@ -37,6 +37,7 @@ class View {
     protected API\Core\Auth $client;
     public array $api_config;
     public array $request_data = [];
+    public bool $many = false;
     public string $request_method;
     public array $request_method_options = [];
     public bool $requires_auth = true;
@@ -46,10 +47,12 @@ class View {
     public bool $ignore_enabled = false;
     public array $get_privileges = [];
     public array $post_privileges = [];
+    public array $put_privileges = [];
     public array $patch_privileges = [];
     public array $delete_privileges = [];
     public string $get_help_text = "";
     public string $post_help_text = "";
+    public string $put_help_text = "";
     public string $patch_help_text = "";
     public string $delete_help_text = "";
 
@@ -129,6 +132,9 @@ class View {
         }
         elseif ($this->request_method === "POST") {
             return $this->post_privileges;
+        }
+        elseif ($this->request_method === "PUT") {
+            return $this->put_privileges;
         }
         elseif ($this->request_method === "PATCH") {
             return $this->patch_privileges;
@@ -276,6 +282,9 @@ class View {
      * Listens for incoming API calls from API clients and checks if the API call is allowed.
      */
     public function listen() {
+        # Variables
+        $resp_data = null;
+
         try {
             # Ensure API is enabled and the receiving interface is allowed to answer API calls.
             $this->check_server_ip();
@@ -289,26 +298,41 @@ class View {
             $this->check_request_method();
             $this->check_request_data();
 
-            # Refresh the assigned Model using the request data and assign the current client object
-            $this->
-            $this->model->from_representation(representation_data: $this->request_data);
+            # Assign the authenticated client object context to the Model
+            $this->model->client = $this->client;
 
-            # Define a variable to store our response data (if any)
-            $resp_data = [];
-
-            # Run the associated model method based on the incoming HTTP method
-            if ($this->request_method === "GET") {
-                $resp_data = $this->model->read(all: true);
+            # For GET requests on non-many Views, obtain a single object from the assigned Model.
+            if ($this->request_method === "GET" and !$this->many) {
+                $this->model->from_representation(representation_data: $this->request_data);
+                $resp_data = $this->model->read();
             }
-            elseif ($this->request_method === "POST") {
+            # For GET requests on many Views, obtain all objects from the assigned Model.
+            elseif ($this->request_method === "GET" and $this->many) {
+                $resp_data = $this->model->read_all()->query(query_params: $this->request_data);
+            }
+            # For POST requests on non-many Views, create a single object for the assigned Model
+            elseif ($this->request_method === "POST" and !$this->many) {
+                $this->model->from_representation(representation_data: $this->request_data);
                 $resp_data = $this->model->create(apply: ($this->request_data["apply"] === true));
             }
-            elseif ($this->request_method === "PATCH") {
+            # For PUT requests on many Views, replace all existing objects for the assigned Model
+            elseif ($this->request_method === "PUT" and $this->many) {
+                $resp_data = $this->model->replace_all(
+                    representation_data: $this->request_data,
+                    apply: ($this->request_data["apply"] === true)
+                );
+            }
+            # For PATCH requests on non-many Views, update a single object for the assigned Model
+            elseif ($this->request_method === "PATCH" and !$this->many) {
+                $this->model->from_representation(representation_data: $this->request_data);
                 $resp_data = $this->model->update(apply: ($this->request_data["apply"] === true));
             }
-            elseif ($this->request_method === "DELETE") {
+            # For DELETE requests on non-many Views, delete a single object for the assigned Model
+            elseif ($this->request_method === "DELETE" and !$this->many) {
+                $this->model->from_representation(representation_data: $this->request_data);
                 $resp_data = $this->model->delete(apply: ($this->request_data["apply"] === true));
             }
+            # Return the available request methods in a response header
             elseif ($this->request_method === "OPTIONS") {
                 header("access-control-allow-methods: ".implode(", ", $this->request_method_options));
             }
@@ -318,14 +342,14 @@ class View {
                 message: "",
                 response_id: "SUCCESS",
                 code: 200,
-                data: $resp_data
+                data: ($resp_data) ? $resp_data->to_representation() : []
             );
         }
         catch (Response $response) {
         }
         catch (Exception|Error $error) {
             $response = new ServerError(
-                message: $error->getMessage(),
+                message: $error->getMessage().PHP_EOL.$error->getTraceAsString(),
                 response_id: "VIEW_RECEIVED_UNEXPECTED_ERROR"
             );
         }

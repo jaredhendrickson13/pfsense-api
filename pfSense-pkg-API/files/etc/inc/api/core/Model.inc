@@ -358,33 +358,6 @@ class Model {
     }
 
     /**
-     * Fetches Model objects for all objects stored in the internal pfSense values. If `config_path` is set, this will
-     * create Model objects for each object stored at the config path. If `internal_callable` is set, this will create
-     * Model objects for each object returned by the specified callable.
-     * @return ModelSet|Model Returns a ModelSet of Models if `many` is enabled or a single Model object if `many` is
-     * not enabled.
-     */
-    public function get_all_from_internal() : ModelSet|Model {
-        # Variables
-        $model = get_class($this);
-        $model_objects = [];
-        $internal_objects = $this->get_internal_objects();
-
-        # For non `many` models, wrap the internal object in an array so we can loop
-        $internal_objects = ($this->many) ? $internal_objects : [$internal_objects];
-
-        # Loop through each internal object and create a Model object for it
-        foreach ($internal_objects as $internal_id=>$internal_object) {
-            $model_object = new $model(id: $internal_id);
-            $model_object->from_internal();
-            $model_objects[] = $model_object;
-        }
-
-        # Unwrap the array for non `many` models, otherwise return all objects
-        return ($this->many) ? new ModelSet($model_objects) : $model_objects[0];
-    }
-
-    /**
      * Creates a serializable array representation of this object. This array is suitable for content
      * serialization such as JSON, YAML, etc.
      * @return array The serializable array representation of this object.
@@ -437,13 +410,28 @@ class Model {
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this Model as an OpenAPI schema.
      */
-    public function to_openapi_schema() : array {
+    public function to_openapi_schema(bool $include_id = false) : array {
         # Assign primitive schema attributes
-        $openapi_schema = ["type" => "object", "properties" => []];
+        $openapi_schema = ["type" => "object", "properties" => [], "required" => []];
+
+        # Assign the `id` field if this is a `many` model
+        if ($this->many and $include_id) {
+            $openapi_schema["required"][] = "id";
+            $openapi_schema["properties"]["id"] = [
+                "type" => "integer",
+                "description" => "The ID of the object or resource to interact with."
+            ];
+        }
 
         # Loop through each Field in this Model and obtain its OpenAPI property config
         foreach ($this->get_fields() as $field) {
+            # Generate and add the OpenAPI property from the Field object
             $openapi_schema["properties"][$field] = $this->$field->to_openapi_property();
+
+            # Mark this as a required field if required. Fields are not required with an existing object ID.
+            if ($this->$field->required and !$include_id) {
+                $openapi_schema["required"][] = $field;
+            }
         }
 
         return $openapi_schema;
@@ -579,19 +567,52 @@ class Model {
     }
 
     /**
-     * Initializes the default 'read' method. By default, this method will return the representation form of the current
-     * Model object. Optionally if $all is enabled and this is a `many` model, this will return the representation
-     * form of ALL Model objects from the internal config/callable.
-     * @return array Returns the representation of the current Model object if $all is `false`. If $all is `true` and
-     * this Model is a `many` model, this returns a representation of ALL model objects from the internal config or
-     * callable.
+     * Fetches Model objects for all objects stored in the internal pfSense values. If `config_path` is set, this will
+     * load Model objects for each object stored at the config path. If `internal_callable` is set, this will create
+     * Model objects for each object returned by the specified callable.
+     * @return ModelSet|Model Returns a ModelSet of Models if `many` is enabled or a single Model object if `many` is
+     * not enabled.
      */
-    final public function read(bool $all=false) : array {
-        if ($all and $this->many) {
-            return $this->get_all_from_internal()->to_representation();
+    public function read_all() : ModelSet|Model {
+        # Variables
+        $model = get_class($this);
+        $model_objects = [];
+        $internal_objects = $this->get_internal_objects();
+
+        # For non `many` models, wrap the internal object in an array so we can loop
+        $internal_objects = ($this->many) ? $internal_objects : [$internal_objects];
+
+        # Loop through each internal object and create a Model object for it
+        foreach ($internal_objects as $internal_id=>$internal_object) {
+            $model_object = new $model(id: $internal_id);
+            $model_object->from_internal();
+            $model_objects[] = $model_object;
         }
 
-        return $this->to_representation();
+        # Unwrap the array for non `many` models, otherwise return all objects
+        return ($this->many) ? new ModelSet($model_objects) : $model_objects[0];
+    }
+
+    /**
+     * Initializes the default 'read' method. By default, this method loads the Model object from its internal
+     * object using the current $this->id value and returns the ($this) Model object. Running this method will overwrite
+     * $this object.
+     * @return Model Loads the Model object from its internal value using the current $this->id value and
+     * returns that object.
+     */
+    final public function read() : Model {
+        # When an ID is required and this is a `many` model, check that an ID is set.
+        if ($this->many and !isset($this->id)) {
+            throw new ValidationError(
+                message: "Field 'id' is required.",
+                response_id: "MODEL_REQUIRES_ID"
+            );
+        }
+
+        # Obtain the requested Model object from config by ID
+        $this->from_internal();
+
+        return $this;
     }
 
     /**
@@ -623,8 +644,9 @@ class Model {
     /**
      * Perform validation, create this object internally and restart any associated services.
      * @param bool $apply Set to `true` if you would like to immediately apply the changes after they are made.
+     * @return Model Returns the created Model object (this object).
      */
-    final public function create(bool $apply = false) {
+    final public function create(bool $apply = false) : Model {
         # Ensure all object fields and validations succeed for proceeding.
         if ($this->validate()) {
             # Run the _create method
@@ -642,7 +664,7 @@ class Model {
         }
 
         # Return the current representation of this object
-        return $this->to_representation();
+        return $this;
     }
 
     /**
@@ -679,8 +701,9 @@ class Model {
     /**
      * Perform validation, update this object internally and restart any associated services.
      * @param bool $apply Set to `true` if you would like to immediately apply the changes after they are made.
+     * @return Model Returns the updated Model object (this object).
      */
-    final public function update(bool $apply = false) {
+    final public function update(bool $apply = false) : Model {
         # Ensure all object fields and validations succeed for proceeding.
         if ($this->validate(requires_id: true)) {
             # Run the _update method
@@ -698,7 +721,52 @@ class Model {
         }
 
         # Return the current representation of this object
-        return $this->to_representation();
+        return $this;
+    }
+
+    /**
+     * Perform validation and replace all existing objects for this Model with a specified set of Model representations.
+     * This method is only available for `many` models.
+     * @param array $representation_data An array of many Model representations to set. Any existing Model objects will
+     * be replaced with the objects defined in this array.
+     * @return ModelSet A ModelSet containing all the Model objects found in config after replacement.
+     */
+    final public function replace_all(array $representation_data, bool $apply = false) : ModelSet {
+        # Ensure this is a `many` model before continuing
+        if (!$this->many) {
+            throw new ServerError(
+                message: "Model `replace_all()` method is only available for models with `many` enabled.",
+                response_id: "MODEL_UPDATE_ALL_WITHOUT_MANY"
+            );
+        }
+        # Empty the config array for this Model
+        $this->set_config($this->config_path, []);
+
+        # Loop through each Model representation included in the array
+        foreach ($representation_data as $representation_object) {
+            # Define a new Model object using this representation and validate
+            $model_object = new $this(representation_data: $representation_object);
+            $model_object->validate();
+
+            # If an error was not thrown during Model object creation or validation, give it an ID and set the config
+            $model_object->id = $this->get_next_id();
+            $this->set_config("$this->config_path/$model_object->id", $model_object->to_internal());
+        }
+
+        # Write the changes to config
+        $this->write_config("Replaced all $this->verbose_name_plural via API");
+
+        # Mark the subsystem as dirty if set
+        if ($this->subsystem) {
+            mark_subsystem_dirty($this->subsystem);
+        }
+
+        # Apply if requested
+        if ($apply) {
+            $this->apply();
+        }
+
+        return $this->read_all();
     }
 
     /**
@@ -727,8 +795,9 @@ class Model {
     /**
      * Perform validation, delete this object internally and restart any associated services.
      * @param bool $apply Set to `true` if you would like to immediately apply the changes after they are made.
+     * @return Model Returns the deleted Model object (this object).
      */
-    final public function delete(bool $apply = false) {
+    final public function delete(bool $apply = false) : Model {
         # Ensure all object fields and validations succeed for proceeding.
         if ($this->validate(requires_id: true)) {
             # Run the _delete method
@@ -746,6 +815,6 @@ class Model {
         }
 
         # Return the current representation of this object
-        return $this->to_representation();
+        return $this;
     }
 }
