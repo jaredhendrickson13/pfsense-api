@@ -26,7 +26,6 @@ use Firebase\JWT\Key;
  * Creates object that performs authentication and authorization for API views.
  */
 class Auth {
-    private int $api_config_id;
     private array $api_config;
     public string $mode;
     public bool $read_only;
@@ -47,7 +46,6 @@ class Auth {
      */
     public function __construct(array $required_privileges=[], string $mode="", bool|null $read_only=null){
         # Obtain the internal API package configuration
-        $this->api_config_id = API\Models\APISettings::get_api_config()["id"];
         $this->api_config = API\Models\APISettings::get_api_config()["config"];
 
         # Allow the auth_mode and read_only settings to be overwritten, otherwise default to their configured values

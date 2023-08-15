@@ -107,7 +107,7 @@ class IntegerField extends API\Core\Field {
     protected function _from_internal(string $internal_value) : int {
         # Throw an error if the value is not numeric
         if (!is_numeric($internal_value)) {
-            throw new API\Core\ServerError(
+            throw new API\Responses\ServerError(
                 message: "Cannot parse IntegerField '$this->name' from internal because its internal value is not
                     a numeric value. Consider changing this field to a StringField.",
                 response_id: "INTEGER_FIELD_WITH_NON_INTEGER_INTERNAL_VALUE"

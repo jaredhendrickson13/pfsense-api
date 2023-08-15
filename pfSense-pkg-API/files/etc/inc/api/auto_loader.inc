@@ -23,6 +23,7 @@ require_once("firewall_virtual_ip.inc");
 
 const API_LIBRARIES = [
     "/etc/inc/api/core/",
+    "/etc/inc/api/responses/",
     "/etc/inc/api/validators/",
     "/etc/inc/api/fields/",
     "/etc/inc/api/models/",

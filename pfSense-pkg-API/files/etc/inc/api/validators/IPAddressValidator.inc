@@ -5,6 +5,7 @@ namespace API\Validators;
 require_once("api/auto_loader.inc");
 
 use API;
+use API\Responses\ValidationError;
 
 class IPAddressValidator extends API\Core\Validator {
     public bool $allow_fqdn;
@@ -30,7 +31,7 @@ class IPAddressValidator extends API\Core\Validator {
         }
 
         # If the value was not allowed from an earlier statement, throw a validation error
-        throw new API\Core\ValidationError(
+        throw new ValidationError(
             message: "Field `$field_name` must be a valid IP address, received `$value`.",
             response_id: "IP_ADDRESS_VALIDATOR_FAILED"
         );

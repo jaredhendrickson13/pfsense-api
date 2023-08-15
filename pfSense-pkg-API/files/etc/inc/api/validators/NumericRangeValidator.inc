@@ -5,6 +5,8 @@ namespace API\Validators;
 require_once("api/auto_loader.inc");
 
 use API;
+use API\Responses\ServerError;
+use API\Responses\ValidationError;
 
 class NumericRangeValidator extends API\Core\Validator {
     public int|float $minimum;
@@ -23,13 +25,13 @@ class NumericRangeValidator extends API\Core\Validator {
     /**
      * @param mixed $value The value to validate.
      * @param string $field_name The field name of the value being validated. This is used for error messages.
-     * @throws API\Core\ValidationError When the value exceeds the maximum length specified.
-     * @throws API\Core\ServerError When the value was not a string or an array.
+     * @throws ValidationError When the value exceeds the maximum length specified.
+     * @throws ServerError When the value was not a string or an array.
      */
     public function validate(mixed $value, string $field_name = "") {
         # Ensure the value being validated is either an integer or a float (double)
         if (!is_integer($value) and !is_float($value)) {
-            throw new API\Core\ServerError(
+            throw new ServerError(
                 message: "NumericRangeValidator can only be used on integer or float values.",
                 response_id: "NUMERIC_RANGE_VALIDATOR_UNSUPPORTED_TYPE"
             );
@@ -37,7 +39,7 @@ class NumericRangeValidator extends API\Core\Validator {
 
         # Throw a validation error if the value is less than the minimum value
         if ($value < $this->minimum) {
-            throw new API\Core\ValidationError(
+            throw new ValidationError(
                 message: "Field '$field_name' must be greater than or equal to '$this->minimum'. Received '$value'",
                 response_id: "NUMERIC_RANGE_VALIDATOR_MINIMUM_CONSTRAINT"
             );
@@ -45,7 +47,7 @@ class NumericRangeValidator extends API\Core\Validator {
 
         # Throw a validation error if the value is greater than the maximum value
         if ($value > $this->maximum) {
-            throw new API\Core\ValidationError(
+            throw new ValidationError(
                 message: "Field '$field_name' must be less than or equal to '$this->maximum'. Received '$value'",
                 response_id: "NUMERIC_RANGE_VALIDATOR_MAXIMUM_CONSTRAINT"
             );

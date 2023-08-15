@@ -2,6 +2,8 @@
 
 namespace API\Core;
 
+use API\Responses\ServerError;
+
 require_once("api/auto_loader.inc");
 
 /**

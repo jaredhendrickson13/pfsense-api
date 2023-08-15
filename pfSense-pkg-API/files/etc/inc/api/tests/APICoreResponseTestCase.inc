@@ -3,6 +3,12 @@
 namespace API\Tests;
 
 use API;
+use API\Responses\AuthenticationError;
+use API\Responses\ForbiddenError;
+use API\Responses\MethodNotAllowedError;
+use API\Responses\NotFoundError;
+use API\Responses\ServerError;
+use API\Responses\ValidationError;
 
 /**
  * Defines test case for testing API\Core\Response.
@@ -31,7 +37,7 @@ class APICoreResponseTestCase extends API\Core\TestCase {
             response_id: "TEST_ERROR",
             code: 500,
             callable: function () {
-                throw new API\Core\ServerError(
+                throw new ServerError(
                     message: "test error",
                     response_id: "TEST_ERROR");
             }
@@ -46,7 +52,7 @@ class APICoreResponseTestCase extends API\Core\TestCase {
             response_id: "TEST_ERROR",
             code: 400,
             callable: function () {
-                throw new API\Core\ValidationError(
+                throw new ValidationError(
                     message: "test error",
                     response_id: "TEST_ERROR");
             }
@@ -61,7 +67,7 @@ class APICoreResponseTestCase extends API\Core\TestCase {
             response_id: "TEST_ERROR",
             code: 404,
             callable: function () {
-                throw new API\Core\NotFoundError(
+                throw new NotFoundError(
                     message: "test error",
                     response_id: "TEST_ERROR");
             }
@@ -77,7 +83,7 @@ class APICoreResponseTestCase extends API\Core\TestCase {
             response_id: "TEST_ERROR",
             code: 401,
             callable: function () {
-                throw new API\Core\AuthenticationError(
+                throw new AuthenticationError(
                     message: "test error",
                     response_id: "TEST_ERROR");
             }
@@ -92,7 +98,7 @@ class APICoreResponseTestCase extends API\Core\TestCase {
             response_id: "TEST_ERROR",
             code: 403,
             callable: function () {
-                throw new API\Core\ForbiddenError(
+                throw new ForbiddenError(
                     message: "test error",
                     response_id: "TEST_ERROR");
             }
@@ -108,7 +114,7 @@ class APICoreResponseTestCase extends API\Core\TestCase {
             response_id: "TEST_ERROR",
             code: 405,
             callable: function () {
-                throw new API\Core\MethodNotAllowedError(
+                throw new MethodNotAllowedError(
                     message: "test error",
                     response_id: "TEST_ERROR");
             }

@@ -6,8 +6,8 @@ require_once("api/auto_loader.inc");
 
 use API\Core\Model;
 use API\Core\Auth;
-use API\Core\ValidationError;
 use API\Fields\StringField;
+use API\Responses\ValidationError;
 
 /**
  * Defines a model object for firewall aliases.

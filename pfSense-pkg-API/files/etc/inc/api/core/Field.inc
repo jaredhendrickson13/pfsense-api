@@ -4,6 +4,8 @@ namespace API\Core;
 
 require_once("api/auto_loader.inc");
 
+use API\Responses\ServerError;
+use API\Responses\ValidationError;
 use API\Validators\LengthValidator;
 
 class Field

@@ -18,8 +18,10 @@ namespace API\Core;
 require_once("api/auto_loader.inc");
 
 use API;
-use Exception;
-use PhpParser\Node\Expr\AssignOp\Mod;
+use API\Responses\ConflictError;
+use API\Responses\NotFoundError;
+use API\Responses\ServerError;
+use API\Responses\ValidationError;
 use ReflectionClass;
 
 # Constants

@@ -17,14 +17,16 @@ namespace API\Core;
 require_once("api/auto_loader.inc");
 
 use API;
+use API\Responses\ForbiddenError;
+use API\Responses\MediaTypeError;
+use API\Responses\MethodNotAllowedError;
+use API\Responses\ServerError;
+use API\Responses\AuthenticationError;
+use API\Responses\Success;
+use API\Responses\ValidationError;
 use Error;
 use Exception;
 use JsonException;
-
-# Allow endpoints to access any API model class
-foreach(glob("/etc/inc/api/models/*.inc") as $model) {
-    require_once($model);
-}
 
 /**
  * Creates a View object that contains all metrics required to generate an API endpoint and facilitate API calls.
@@ -302,10 +304,9 @@ class View {
 
         # Check if the client requested an unknown content type
         if ($content_type_unknown) {
-            throw new ValidationError(
+            throw new MediaTypeError(
                 message: "The requested content-type is not supported",
-                response_id: "VIEW_CONTENT_TYPE_UNSUPPORTED",
-                code: 415
+                response_id: "VIEW_CONTENT_TYPE_UNSUPPORTED"
             );
         }
     }
@@ -370,10 +371,9 @@ class View {
             }
 
             # Create our success API response object if no errors were thrown
-            $response = new Response(
+            $response = new Success(
                 message: "",
                 response_id: "SUCCESS",
-                code: 200,
                 data: ($resp_data) ? $resp_data->to_representation() : []
             );
         }
