@@ -15,6 +15,9 @@
 
 namespace API\Core\Tools;
 
+use API\Core\Response;
+use ReflectionClass;
+
 require_once("api/auto_loader.inc");
 
 function api_request($url, $method, $data=[], $headers=[], $username="", $password="") {
@@ -103,9 +106,35 @@ function sync() {
 }
 
 /**
+ * Obtains the classes nested under a specified namespace. This only works for namespaces that match the directory
+ * structure (e.g. API\Core for /etc/inc/api/core) and only includes classes defined in their own class .inc file with
+ * a matching name.
+ * @param string $namespace The namespace to obtain classes from. This must be the full namespace including leading
+ * and trailing slash (\Full\Namespace\).
+ * @return array An array containing the class names for each .inc class file.
+ */
+function get_classes_from_namespace(string $namespace) : array {
+    # Variables
+    $classes = [];
+    $namespace_path = "/etc/inc/".strtolower(str_replace("\\", "/", $namespace));
+
+    foreach(glob($namespace_path) as $inc_file) {
+        # Obtain the class name from the file name
+        $class_name = basename($inc_file);
+        $classes[] = $namespace.$class_name;
+    }
+
+    return $classes;
+}
+
+/**
  * Auto-generates OpenAPI documentation for all Views and their associated Models.
  */
 function generate_documentation() {
+    # Variables
+    $view_classes = get_classes_from_namespace("\\API\\Views\\");
+    $response_classes = get_classes_from_namespace("\\API\\Responses\\");
+
     # Set static documentation details
     $openapi_config = [
         "openapi" => "3.0.0",
@@ -126,98 +155,8 @@ function generate_documentation() {
             "description" => ""    # TODO: Pull this from the repos README.md
         ],
         "components" => [
-            "responses" => [
-                "Success" => [
-                    "description" => "Client has made a successful API call",
-                    "content" => [
-                        "application/json" => [
-                            "schema" => ['$ref' => '#/components/schemas/Response']
-                        ]
-                    ]
-                ],
-                "AuthenticationFailed" => [
-                    "description" => "Client has failed to authenticate the API call.",
-                    "content" => [
-                        "application/json" => [
-                            "schema" => ['$ref' => '#/components/schemas/Response']
-                        ]
-                    ]
-                ],
-                "Forbidden" => [
-                    "description" => "Client does not have sufficient privileges to make this API call.",
-                    "content" => [
-                        "application/json" => [
-                            "schema" => ['$ref' => '#/components/schemas/Response']
-                        ]
-                    ]
-                ],
-                "ValidationError" => [
-                    "description" => "Client request has one or more syntax errors.",
-                    "content" => [
-                        "application/json" => [
-                            "schema" => ['$ref' => '#/components/schemas/Response']
-                        ]
-                    ]
-                ],
-                "NotFound" => [
-                    "description" => "Client has requested a resource that does not exist.",
-                    "content" => [
-                        "application/json" => [
-                            "schema" => ['$ref' => '#/components/schemas/Response']
-                        ]
-                    ]
-                ],
-                "ServerError" => [
-                    "description" => "Server encountered an unexpected error.",
-                    "content" => [
-                        "application/json" => [
-                            "schema" => ['$ref' => '#/components/schemas/Response']
-                        ]
-                    ]
-                ],
-                "UndefinedError" => [
-                    "description" => "This response has not been pre-defined in the OpenAPI configuration.",
-                    "content" => [
-                        "application/json" => [
-                            "schema" => ['$ref' => '#/components/schemas/Response']
-                        ]
-                    ]
-                ]
-            ],
-            "schemas" => [
-                "Response" => [
-                    "type" => "object",
-                    "properties" => [
-                        "code" => [
-                            "description" => "The HTTP status code that corresponds with the API response.",
-                            "type" => "integer"
-                        ],
-                        "status" => [
-                            "description" => "The HTTP status message that corresponds with the HTTP status code.",
-                            "type" => "string"
-                        ],
-                        "response_id" => [
-                            "description" => "The unique response ID that corresponds with the result of the API".
-                                "call. In most situations, this will contain an error code.",
-                            "type" => "string"
-                        ],
-                        "message" => [
-                            "description" => "The descriptive message detailing the results of the API call.",
-                            "type" => "string"
-                        ],
-                        "data" => [
-                            "description" => "The data requested from the API. In the event that many objects have".
-                                "been requested, this field will be an array of objects. Otherwise, it will only return".
-                                "the single object requested.",
-                            "example" => [],
-                            "oneOf" => [
-                                ["type" => "array"],
-                                ["type" => "object"]
-                            ]
-                        ],
-                    ],
-                ]
-            ],
+            "responses" => [],
+            "schemas" => Response::to_openapi_schema(),
             "securitySchemes" => [
                 "local" => ["type" => "http", "scheme" => "basic"],
                 "jwt" => ["type" => "http", "scheme" => "bearer", "bearerFormat" => "JWT"],
@@ -233,35 +172,41 @@ function generate_documentation() {
         "tags" => []
     ];
 
+    # Add Response components for each Response class in API\Responses
+    foreach($response_classes as $response_class) {
+        # Create the Response object
+        $response = new $response_class();
+        $openapi_config["components"]["responses"][] = $response->to_openapi_component();
+    }
+
     # Import each View class and assign documentation for the endpoint according to the options and Model assigned.
-    foreach(glob("/etc/inc/api/views/*.inc") as $file) {
-        # Create the View object
-        $view_class = "\\API\\Views\\" . str_replace(".inc", "", basename($file));
-        $view_obj = new $view_class();
+    foreach($view_classes as $view_class) {
+        # Create the Response object
+        $view = new $view_class();
 
         # Add this View's URL to the OpenAPI `paths`
-        $openapi_config["paths"][$view_obj->url] = [];
+        $openapi_config["paths"][$view->url] = [];
 
         # Set the tag for this URL according to it's root namespace (the section in URL after /api/v2/)
-        $view_tag = strtoupper(explode("/", $view_obj->url)[3]);
+        $view_tag = strtoupper(explode("/", $view->url)[3]);
         $openapi_config["tags"][] = ["name" => $view_tag];
 
         # Obtain the Model assigned to the View
-        $model = "API\\Models\\$view_obj->model_name";
+        $model = "API\\Models\\$view->model_name";
         $model = new $model();
 
         # Obtain the OpenAPI schema for this Model.
-        $openapi_config["components"]["schemas"][$view_obj->model_name] = $model->to_openapi_schema();
+        $openapi_config["components"]["schemas"][$view->model_name] = $model->to_openapi_schema();
 
         # If this is a `many` Model, also obtain a schema for the Model that includes the ID.
         if ($model->many) {
-            $openapi_config["components"]["schemas"]["$view_obj->model_name"."WithID"] = $model->to_openapi_schema(
+            $openapi_config["components"]["schemas"]["$view->model_name"."WithID"] = $model->to_openapi_schema(
                 include_id: true
             );
         }
 
         # Assign shared values to each request method defined in this path
-        foreach ($view_obj->request_method_options as $request_method) {
+        foreach ($view->request_method_options as $request_method) {
             # Convert the request method to lower case so it matches the OpenAPI config
             $request_method = strtolower($request_method);
 
@@ -270,19 +215,20 @@ function generate_documentation() {
             $help_text_property = $request_method."_help_text";
 
             # Assign endpoint details to variables
-            $help_text = $view_obj->$help_text_property;
-            $priv_options_str = implode(", ", $view_obj->$privilege_property);
+            $help_text = $view->$help_text_property;
+            $priv_options_str = implode(", ", $view->$privilege_property);
             $required_packages_str = ($model->packages) ? implode(", ", $model->packages) : "None";
-            $requires_auth_str = ($view_obj->requires_auth) ? "Yes" : "No";
-            $auth_modes_str = ($view_obj->enforce_auth_mode) ? "$view_obj->enforce_auth_mode" : "local, jwt, key";
+            $requires_auth_str = ($view->requires_auth) ? "Yes" : "No";
+            $auth_modes_str = ($view->enforce_auth_mode) ? "$view->enforce_auth_mode" : "local, jwt, key";
 
-            # Add documentation for GET requests at this path
-            $openapi_config["paths"][$view_obj->url][$request_method] = [
-                "operationId" => $view_obj::class."-$request_method",
+            # Add documentation for all requests at this path
+            $openapi_config["paths"][$view->url][$request_method] = [
+                "responses" => [],
+                "operationId" => $view::class."-$request_method",
                 "description" => "<h3>Description:</h3>".
                     "$help_text<br>".
                     "<h3>Details:</h3>".
-                    "**Assigned model**: $view_obj->model_name<br>".
+                    "**Assigned model**: $view->model_name<br>".
                     "**Requires authentication**: $requires_auth_str<br>".
                     "**Supported authentication modes:** [ $auth_modes_str ]<br>".
                     "**Allowed privileges**: [ $priv_options_str ]<br>".
@@ -290,35 +236,35 @@ function generate_documentation() {
             ];
 
             # Assign tags to this path
-            $openapi_config["paths"][$view_obj->url][$request_method]["tags"] = [$view_tag];
+            $openapi_config["paths"][$view->url][$request_method]["tags"] = [$view_tag];
 
             # Ensure the security mode is enforced for this path if the View has `enforce_auth_mode` set
-            if ($view_obj->enforce_auth_mode) {
-                $openapi_config["paths"][$view_obj->url][$request_method]["security"] = [
-                    [$view_obj->enforce_auth_mode => []]
+            if ($view->enforce_auth_mode) {
+                $openapi_config["paths"][$view->url][$request_method]["security"] = [
+                    [$view->enforce_auth_mode => []]
                 ];
             }
 
             # Assign request body definitions for POST, PUT and PATCH requests
             if (in_array($request_method, ["post", "put", "patch"])) {
                 # For non `many` Views with `many` Models, use the schema with the ID for non-POST requests
-                if (!$view_obj->many and $model->many and $request_method !== "post") {
-                    $schema = ["schema" => ['$ref' => "#/components/schemas/$view_obj->model_name"."WithID"]];
+                if (!$view->many and $model->many and $request_method !== "post") {
+                    $schema = ["schema" => ['$ref' => "#/components/schemas/$view->model_name"."WithID"]];
                 }
                 # For `many` Views with `many` Models, accept arrays of many schema objects
-                elseif ($view_obj->many and $model->many) {
+                elseif ($view->many and $model->many) {
                     $schema = [
                         "schema" => [
-                            "type" => "array", "items" => ['$ref' => "#/components/schemas/$view_obj->model_name"]
+                            "type" => "array", "items" => ['$ref' => "#/components/schemas/$view->model_name"]
                         ]
                     ];
                 }
                 # Otherwise, just assign the regular schema
                 else {
-                    $schema = ["schema" => ['$ref' => "#/components/schemas/$view_obj->model_name"]];
+                    $schema = ["schema" => ['$ref' => "#/components/schemas/$view->model_name"]];
                 }
 
-                $openapi_config["paths"][$view_obj->url][$request_method]["requestBody"] = [
+                $openapi_config["paths"][$view->url][$request_method]["requestBody"] = [
                     "content" => [
                         "application/json" => $schema,
                         "application/x-www-form-urlencoded" => $schema,
@@ -327,8 +273,8 @@ function generate_documentation() {
             }
 
             # Assign the ID query parameter for GET and DELETE requests to non `many` Views with a `many` Model assigned
-            if (!$view_obj->many and $model->many and in_array($request_method, ["get", "delete"])) {
-                $openapi_config["paths"][$view_obj->url][$request_method]["parameters"] = [
+            if (!$view->many and $model->many and in_array($request_method, ["get", "delete"])) {
+                $openapi_config["paths"][$view->url][$request_method]["parameters"] = [
                     [
                         "in" => "query",
                         "name" => "id",
@@ -344,16 +290,13 @@ function generate_documentation() {
                 ];
             }
 
-            # Assign responses to each request method
-            $openapi_config["paths"][$view_obj->url][$request_method]["responses"] = [
-                "200" => ['$ref' => '#/components/responses/Success'],
-                "400" => ['$ref' => '#/components/responses/ValidationError'],
-                "401" => ['$ref' => '#/components/responses/AuthenticationFailed'],
-                "403" => ['$ref' => '#/components/responses/Forbidden'],
-                "404" => ['$ref' => '#/components/responses/NotFound'],
-                "500" => ['$ref' => '#/components/responses/ServerError'],
-                "default" => ['$ref' => '#/components/responses/UndefinedError'],
-            ];
+            # Assign this request method responses for each Response class defined.
+            foreach ($response_classes as $response_class) {
+                $response = new $response_class();
+                $openapi_config["paths"][$view->url][$request_method]["responses"][$response->code] = [
+                    '$ref' => "#/components/responses/".$response->get_shortname()
+                ];
+            }
         }
     }
 

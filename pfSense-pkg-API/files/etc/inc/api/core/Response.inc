@@ -20,6 +20,65 @@ require_once("api/auto_loader.inc");
 use Error;
 use ReflectionClass;
 
+const HTTP_STATUS_MESSAGES = [
+    100 => "continue",
+    101 => "switching protocols",
+    102 => "processing",
+    103 => "checkpoint",
+    200 => "ok",
+    201 => "created",
+    202 => "accepted",
+    203 => "non-authoritative information",
+    204 => "no content",
+    205 => "reset content",
+    206 => "partial content",
+    207 => "multi-status",
+    300 => "multiple choices",
+    301 => "moved permanently",
+    302 => "found",
+    303 => "see other",
+    304 => "not modified",
+    305 => "use proxy",
+    306 => "switch proxy",
+    307 => "temporary redirect",
+    400 => "bad request",
+    401 => "unauthorized",
+    402 => "payment required",
+    403 => "forbidden",
+    404 => "not found",
+    405 => "method not allowed",
+    406 => "not acceptable",
+    407 => "proxy authentication required",
+    408 => "request timeout",
+    409 => "conflict",
+    410 => "gone",
+    411 => "length required",
+    412 => "precondition failed",
+    413 => "request entity too large",
+    414 => "request-uri too long",
+    415 => "unsupported media type",
+    416 => "requested range not satisfiable",
+    417 => "expectation failed",
+    418 => "i'm a teapot",
+    422 => "unprocessable entity",
+    423 => "locked",
+    424 => "failed dependency",
+    425 => "unordered collection",
+    426 => "upgrade required",
+    449 => "retry with",
+    450 => "blocked by windows parental controls",
+    500 => "internal server error",
+    501 => "not implemented",
+    502 => "bad gateway",
+    503 => "service unavailable",
+    504 => "gateway timeout",
+    505 => "http version not supported",
+    506 => "variant also negotiates",
+    507 => "insufficient storage",
+    509 => "bandwidth limit exceeded",
+    510 => "not extended"
+];
+
 /**
  * Defines the API response object. Response objects are throwable objects that contain response information such as
  * HTTP status code, HTTP status message, API return code, error messages, and API response data. All API Error classes
@@ -52,7 +111,7 @@ class Response extends Error {
      * Converts this Response object to an array representation of its contents.
      * @return array An array containing the response details.
      */
-    public function to_representation() : array {
+    final public function to_representation() : array {
         return [
             "code" => $this->code,
             "status" => $this->status,
@@ -67,75 +126,32 @@ class Response extends Error {
      * @param int $http_status The HTTP status code to fetch the descriptive message for.
      * @return string The HTTP status message associated with the give HTTP response code OR `unknown` if not found.
      */
-    public static function get_http_status_message(int $http_status) : string {
-        return match ($http_status) {
-            100 => "continue",
-            101 => "switching protocols",
-            102 => "processing",
-            103 => "checkpoint",
-            200 => "ok",
-            201 => "created",
-            202 => "accepted",
-            203 => "non-authoritative information",
-            204 => "no content",
-            205 => "reset content",
-            206 => "partial content",
-            207 => "multi-status",
-            300 => "multiple choices",
-            301 => "moved permanently",
-            302 => "found",
-            303 => "see other",
-            304 => "not modified",
-            305 => "use proxy",
-            306 => "switch proxy",
-            307 => "temporary redirect",
-            400 => "bad request",
-            401 => "unauthorized",
-            402 => "payment required",
-            403 => "forbidden",
-            404 => "not found",
-            405 => "method not allowed",
-            406 => "not acceptable",
-            407 => "proxy authentication required",
-            408 => "request timeout",
-            409 => "conflict",
-            410 => "gone",
-            411 => "length required",
-            412 => "precondition failed",
-            413 => "request entity too large",
-            414 => "request-uri too long",
-            415 => "unsupported media type",
-            416 => "requested range not satisfiable",
-            417 => "expectation failed",
-            418 => "i'm a teapot",
-            422 => "unprocessable entity",
-            423 => "locked",
-            424 => "failed dependency",
-            425 => "unordered collection",
-            426 => "upgrade required",
-            449 => "retry with",
-            450 => "blocked by windows parental controls",
-            500 => "internal server error",
-            501 => "not implemented",
-            502 => "bad gateway",
-            503 => "service unavailable",
-            504 => "gateway timeout",
-            505 => "http version not supported",
-            506 => "variant also negotiates",
-            507 => "insufficient storage",
-            509 => "bandwidth limit exceeded",
-            510 => "not extended",
-            default => "unknown",
-        };
+    final public static function get_http_status_message(int $http_status) : string {
+        # Return the message associated with this HTTP status code if it exists
+        if (array_key_exists($http_status,HTTP_STATUS_MESSAGES)) {
+            return HTTP_STATUS_MESSAGES[$http_status];
+        }
+        # Otherwise, return the message 'unknown'
+        else {
+            return "unknown";
+        }
+    }
+
+    /**
+     * Fetches the shortname for this class.
+     * @return string The shortname of the instantiating class.
+     */
+    final public function get_shortname() : string {
+        return (new ReflectionClass($this))->getShortName();
     }
 
     /**
      * Represents this Response object as an OpenAPI response component.
      * @return array This Response object as an OpenAPI response component
      */
-    public function to_openapi_component() : array {
+    final public function to_openapi_component() : array {
         # Variables
-        $class_shortname = (new ReflectionClass($this))->getShortName();
+        $class_shortname = $this->get_shortname();
 
         return [
             "$class_shortname" => [
