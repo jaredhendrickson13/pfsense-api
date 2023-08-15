@@ -11,9 +11,10 @@ use API\Core\Response;
  * with a 409 conflict HTTP code.
  */
 class ConflictError extends Response {
+    public $code = 409;
     public string $help_text = "The client's request cannot be fulfilled due to one or more conflicts.";
 
-    public function __construct(string $message, string $response_id, int $code = 409, array $data = [],) {
-        parent::__construct($message, $response_id, $code, $data);
+    public function __construct(string $message, string $response_id, array $data = [],) {
+        parent::__construct($message, $response_id, $data);
     }
 }

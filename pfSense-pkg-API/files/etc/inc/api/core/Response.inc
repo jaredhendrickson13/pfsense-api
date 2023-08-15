@@ -89,13 +89,12 @@ class Response extends Error {
     public string $response_id;
     public string $status;
     public array $data;
-    public $code;
+    public $code = 500;
     public string $help_text = "";
 
     public function __construct(
         string $message,
         string $response_id,
-        int $code = 500,
         array $data = [],
     ) {
         $this->message = str_replace(["\"", "'"], "`", $message);

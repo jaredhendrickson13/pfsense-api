@@ -11,9 +11,10 @@ use API\Core\Response;
  * Internal Server Error HTTP code.
  */
 class ServerError extends Response {
+    public $code = 500;
     public string $help_text = "The server encountered an unexpected error and cannot complete the request.";
 
-    public function __construct(string $message, string $response_id, int $code = 500, array $data = []) {
-        parent::__construct($message, $response_id, $code, $data);
+    public function __construct(string $message, string $response_id, array $data = []) {
+        parent::__construct($message, $response_id, $data);
     }
 }

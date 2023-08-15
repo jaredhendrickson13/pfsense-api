@@ -11,9 +11,10 @@ use API\Core\Response;
  * Not Found HTTP code.
  */
 class NotFoundError extends Response {
+    public $code = 404;
     public string $help_text = "The client has requested a resource that could not be found.";
 
-    public function __construct(string $message, string $response_id, int $code = 404, array $data = []) {
-        parent::__construct($message, $response_id, $code, $data);
+    public function __construct(string $message, string $response_id, array $data = []) {
+        parent::__construct($message, $response_id, $data);
     }
 }

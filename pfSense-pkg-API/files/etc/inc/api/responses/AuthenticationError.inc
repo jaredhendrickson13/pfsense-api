@@ -11,9 +11,10 @@ use API\Core\Response;
  * HTTP code.
  */
 class AuthenticationError extends Response {
+    public $code = 401;
     public string $help_text = "The client has failed to authenticate the API call.";
 
-    public function __construct(string $message, string $response_id, int $code = 401, array $data = []) {
-        parent::__construct($message, $response_id, $code, $data);
+    public function __construct(string $message, string $response_id, array $data = []) {
+        parent::__construct($message, $response_id, $data);
     }
 }
