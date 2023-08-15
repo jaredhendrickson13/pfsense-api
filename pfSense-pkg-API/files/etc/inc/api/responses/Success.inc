@@ -12,6 +12,8 @@ use API\Core\Response;
  */
 class Success extends Response
 {
+    public string $help_text = "The client has made a successful request.";
+
     public function __construct(string $message, string $response_id, int $code = 200, array $data = []) {
         parent::__construct($message, $response_id, $code, $data);
     }

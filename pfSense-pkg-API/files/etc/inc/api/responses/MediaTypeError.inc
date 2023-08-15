@@ -11,6 +11,8 @@ use API\Core\Response;
  * 415 Unsupported Media Type HTTP code.
  */
 class MediaTypeError extends Response {
+    public string $help_text = "The client has requested a content-type that is not supported by the server.";
+
     public function __construct(string $message, string $response_id, int $code = 415, array $data = []) {
         parent::__construct($message, $response_id, $code, $data);
     }

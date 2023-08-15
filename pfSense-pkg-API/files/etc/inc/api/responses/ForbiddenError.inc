@@ -11,6 +11,8 @@ use API\Core\Response;
  * exception generally corresponds with a 403 forbidden HTTP code.
  */
 class ForbiddenError extends Response {
+    public string $help_text = "The client does not have sufficient privileges to make this API call.";
+
     public function __construct(string $message, string $response_id, int $code = 403, array $data = []) {
         parent::__construct($message, $response_id, $code, $data);
     }

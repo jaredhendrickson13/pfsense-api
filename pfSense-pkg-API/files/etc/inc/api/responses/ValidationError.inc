@@ -11,6 +11,8 @@ use API\Core\Response;
  * HTTP code.
  */
 class ValidationError extends Response {
+    public string $help_text = "The client request data has one or more input validation errors.";
+
     public function __construct(string $message, string $response_id, int $code = 400, array $data = []) {
         parent::__construct($message, $response_id, $code, $data);
     }

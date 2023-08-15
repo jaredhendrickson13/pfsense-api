@@ -18,6 +18,7 @@ namespace API\Core;
 require_once("api/auto_loader.inc");
 
 use Error;
+use ReflectionClass;
 
 /**
  * Defines the API response object. Response objects are throwable objects that contain response information such as
@@ -26,10 +27,11 @@ use Error;
  */
 class Response extends Error {
     public $message;
-    public $code;
     public string $response_id;
     public string $status;
     public array $data;
+    public $code;
+    public string $help_text = "";
 
     public function __construct(
         string $message,
@@ -38,9 +40,9 @@ class Response extends Error {
         array $data = [],
     ) {
         $this->message = str_replace(["\"", "'"], "`", $message);
-        $this->code = $code;
-        $this->status = strtolower($this->get_http_status_message($code));
+        $this->status = strtolower($this->get_http_status_message($this->code));
         $this->response_id = strtoupper($response_id);
+        $this->code = $code;
         $this->data = $data;
         parent::__construct($this->message, $this->code);
 
@@ -125,5 +127,66 @@ class Response extends Error {
             510 => "not extended",
             default => "unknown",
         };
+    }
+
+    /**
+     * Represents this Response object as an OpenAPI response component.
+     * @return array This Response object as an OpenAPI response component
+     */
+    public function to_openapi_component() : array {
+        # Variables
+        $class_shortname = (new ReflectionClass($this))->getShortName();
+
+        return [
+            "$class_shortname" => [
+                "description" => $this->help_text,
+                "content" => [
+                    "application/json" => [
+                        "schema" => ['$ref' => '#/components/schemas/Response']
+                    ]
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * Represents the Response object as an OpenAPI schema.
+     * @return array This Response object as an OpenAPI schema.
+     */
+    final public static function to_openapi_schema() : array {
+        return [
+            "Response" => [
+                "type" => "object",
+                "properties" => [
+                    "code" => [
+                        "description" => "The HTTP status code that corresponds with the API response.",
+                        "type" => "integer"
+                    ],
+                    "status" => [
+                        "description" => "The HTTP status message that corresponds with the HTTP status code.",
+                        "type" => "string"
+                    ],
+                    "response_id" => [
+                        "description" => "The unique response ID that corresponds with the result of the API".
+                            "call. In most situations, this will contain an error code.",
+                        "type" => "string"
+                    ],
+                    "message" => [
+                        "description" => "The descriptive message detailing the results of the API call.",
+                        "type" => "string"
+                    ],
+                    "data" => [
+                        "description" => "The data requested from the API. In the event that many objects have".
+                            "been requested, this field will be an array of objects. Otherwise, it will only return".
+                            "the single object requested.",
+                        "example" => [],
+                        "oneOf" => [
+                            ["type" => "array"],
+                            ["type" => "object"]
+                        ]
+                    ],
+                ],
+            ]
+        ];
     }
 }
