@@ -42,9 +42,9 @@ class APICoreResponseTestCase extends API\Core\TestCase {
     public function test_response_to_representation() {
         $response = new API\Core\Response(
             message: "Test message",
-            response_id: "TEST_RESPONSE_ID",
-            code: 500
+            response_id: "TEST_RESPONSE_ID"
         );
+        $response->code = 500;
         $this->assert_equals(
             $response->to_representation(),
             [
@@ -59,9 +59,10 @@ class APICoreResponseTestCase extends API\Core\TestCase {
         $response = new API\Core\Response(
             message: "Test message 2",
             response_id: "TEST_RESPONSE_ID2",
-            code: 400,
             data: ["test_data_field" => "test_data_value"]
         );
+        $response->code = 400;
+
         $this->assert_equals(
             $response->to_representation(),
             [
