@@ -40,7 +40,7 @@ class APISettings extends Model {
     public StringField $ha_sync_username;
     public StringField $ha_sync_password;
 
-    public function __construct(mixed $id = null, array $representation_data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $representation_data = [], Auth $client = null)
     {
         # Obtain the API config index and set the config path to the API configuration
         $this->id = $this->get_api_config()["id"];

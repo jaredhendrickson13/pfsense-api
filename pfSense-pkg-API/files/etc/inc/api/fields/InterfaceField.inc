@@ -33,9 +33,10 @@ class InterfaceField extends API\Core\Field {
      * @param bool $write_only Set the `true` to make this field write-only. This will prevent the field's current value
      * from being displayed in the representation data. This is ideal for potentially sensitive fields like passwords,
      * keys, and hashes.
+     * @param bool $editable Set to `false` to prevent this field's value from being changed after its initial creation.
      * @param bool $many If `true`, the value must be an array of many strings.
-     * @param int $many_minimum
-     * @param int $many_maximum
+     * @param int $many_minimum When $many is set to `true`, this sets the minimum number of array entries required.
+     * @param int $many_maximum When $many is set to `true`, this sets the maximum number of array entries allowed.
      * @param string $delimiter Assign the delimiter used to join the value array back to its internal string form when
      * $many is enabled.
      * @param string $internal_name Assign a different field name to use when referring to the internal field as it's
@@ -43,6 +44,11 @@ class InterfaceField extends API\Core\Field {
      * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
      * the fields internal value under a specific namespace as an associative array. This only applies to the internal
      * value, not the representation value.
+     * @param array $referenced_by An array that specifies other Models and Field's that reference this Field's parent
+     * Model using this Field's value. This will prevent the parent Model object from being deleted while it is actively
+     * referenced by another Model object. The array key must be the name of the Model class that references this Field,
+     * and the value must be a Field within that Model. The framework will automatically search for any existing Model
+     * objects that have the referenced Field assigned a value that matches this Field's value.
      * @param array $conditions An array of conditions the field must meet to be included. This allows you to specify
      * conditions of other fields within the parent Model context. For example, if the parent Model context has two
      * fields, one field named `type` and the other being this field; and you only want this field to be included if
@@ -62,12 +68,14 @@ class InterfaceField extends API\Core\Field {
         bool $allow_null = false,
         bool $read_only = false,
         bool $write_only = false,
+        bool $editable = true,
         bool $many = false,
         int $many_minimum = 1,
         int $many_maximum = 128,
         string $delimiter = ",",
         string $internal_name = "",
         string $internal_namespace = "",
+        array $referenced_by = [],
         array $conditions = [],
         array $validators = [],
         string $help_text = ""
@@ -89,6 +97,7 @@ class InterfaceField extends API\Core\Field {
             choices: $this->get_interface_choices(),
             allow_empty: $allow_empty,
             allow_null: $allow_null,
+            editable: $editable,
             read_only: $read_only,
             write_only: $write_only,
             many: $many,
@@ -97,6 +106,7 @@ class InterfaceField extends API\Core\Field {
             delimiter: $delimiter,
             internal_name: $internal_name,
             internal_namespace: $internal_namespace,
+            referenced_by: $referenced_by,
             conditions: $conditions,
             validators: $validators,
             help_text: $help_text

@@ -13,21 +13,25 @@ use API;
 class IntegerField extends API\Core\Field {
     public int $minimum;
     public int $maximum;
+
     /**
      * Defines the IntegerField object and sets its options.
-     * @param int $minimum The minimum value this value can be.
-     * @param int $maximum The maximum value this value can be.
-     * @param array $choices An array of explicit choices this string field value can be.
+     * @param bool $required If `true`, this field is required to have a value at all times.
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
-     * @param bool $allow_null If `true`, null values will be allowed by this field.
-     * @param bool $required If `true`, this field is required to have a value at all times.
      * @param mixed|null $default Assign a default string value to assign this Field if no value is present.
+     * @param array $choices An array of explicit choices this string field value can be.
+     * @param bool $allow_null If `true`, null values will be allowed by this field.
+     * @param bool $editable Set to `false` to prevent this field's value from being changed after its initial creation.
      * @param bool $read_only If `true`, this field can only read its value and cannot write its value to config.
      * @param bool $write_only Set the `true` to make this field write-only. This will prevent the field's current value
      * from being displayed in the representation data. This is ideal for potentially sensitive fields like passwords,
      * keys, and hashes.
      * @param bool $many If `true`, the value must be an array of many strings.
+     * @param int $many_minimum When $many is set to `true`, this sets the minimum number of array entries required.
+     * @param int $many_maximum When $many is set to `true`, this sets the maximum number of array entries allowed.
+     * @param int $minimum The minimum value this value can be.
+     * @param int $maximum The maximum value this value can be.
      * @param string $delimiter Assign the delimiter used to join the value array back to its internal string form when
      * $many is enabled.
      * @param string $internal_name Assign a different field name to use when referring to the internal field as it's
@@ -35,6 +39,11 @@ class IntegerField extends API\Core\Field {
      * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
      * the fields internal value under a specific namespace as an associative array. This only applies to the internal
      * value, not the representation value.
+     * @param array $referenced_by An array that specifies other Models and Field's that reference this Field's parent
+     * Model using this Field's value. This will prevent the parent Model object from being deleted while it is actively
+     * referenced by another Model object. The array key must be the name of the Model class that references this Field,
+     * and the value must be a Field within that Model. The framework will automatically search for any existing Model
+     * objects that have the referenced Field assigned a value that matches this Field's value.
      * @param array $conditions An array of conditions the field must meet to be included. This allows you to specify
      * conditions of other fields within the parent Model context. For example, if the parent Model context has two
      * fields, one field named `type` and the other being this field; and you only want this field to be included if
@@ -48,6 +57,7 @@ class IntegerField extends API\Core\Field {
         mixed $default = null,
         array $choices = [],
         bool $allow_null = false,
+        bool $editable = true,
         bool $read_only = false,
         bool $write_only = false,
         bool $many = false,
@@ -58,6 +68,7 @@ class IntegerField extends API\Core\Field {
         string $delimiter = ",",
         string $internal_name = "",
         string $internal_namespace = "",
+        array $referenced_by = [],
         array $conditions = [],
         array $validators = [],
         string $help_text = ""
@@ -72,6 +83,7 @@ class IntegerField extends API\Core\Field {
             default: $default,
             choices: $choices,
             allow_null: $allow_null,
+            editable: $editable,
             read_only: $read_only,
             write_only: $write_only,
             many: $many,
@@ -80,6 +92,7 @@ class IntegerField extends API\Core\Field {
             delimiter: $delimiter,
             internal_name: $internal_name,
             internal_namespace: $internal_namespace,
+            referenced_by: $referenced_by,
             conditions: $conditions,
             validators: $validators + [new API\Validators\NumericRangeValidator(minimum: $minimum, maximum: $maximum)],
             help_text: $help_text

@@ -19,13 +19,14 @@ class FirewallAlias extends Model {
     public StringField $address;
     public StringField $detail;
 
-    public function __construct(mixed $id=null, array $representation_data=[], Auth $client=null) {
+    public function __construct(mixed $id=null, mixed $representation_data=[], Auth $client=null) {
         $this->config_path = "aliases/alias";
         $this->subsystem = "aliases";
         $this->many = true;
         $this->name = new StringField(
             required: true,
             unique: true,
+            editable: false,
             maximum_length: 31,
             help_text: "Sets the name for the alias. This name must be unique from all other aliases."
         );

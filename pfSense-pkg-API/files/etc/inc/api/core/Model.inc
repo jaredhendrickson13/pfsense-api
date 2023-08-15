@@ -19,6 +19,7 @@ require_once("api/auto_loader.inc");
 
 use API;
 use Exception;
+use PhpParser\Node\Expr\AssignOp\Mod;
 use ReflectionClass;
 
 # Constants
@@ -45,18 +46,26 @@ class Model {
     /**
      * Values to assign when a Model object is first constructed.
      * @param mixed $id If specified, the internal object with this ID will be obtained as the Model object.
-     * @param array $representation_data Allows objects to be obtained, created and/or updated using an array of
+     * @param mixed $representation_data Allows objects to be obtained, created and/or updated using an array of
      * field-value pairs. If this array contains an `id` field, the internal object with this ID will be obtained as
      * the Model object first. Any additional fields will be used to set the Model object's values.
      * @param Auth|null $client Optionally assign an API client's `Auth` object. Required for tying users to
      * changes made through Models.
      */
-    public function __construct(mixed $id=null, array $representation_data=[], API\Core\Auth $client=null) {
+    public function __construct(mixed $id=null, mixed $representation_data=[], API\Core\Auth $client=null) {
         # Throw an error if both $id and $representation_data are set.
         if (isset($id) and $representation_data) {
             throw new ServerError(
                 message: "Model objects cannot be constructed with both an ID and representation data.",
                 response_id: "MODEL_WITH_ID_AND_REPRESENTATION"
+            );
+        }
+
+        # Ensure the representation data is an array
+        if (!is_array($representation_data)) {
+            throw new ValidationError(
+                message: "Representation data must be of type `array`.",
+                response_id: "MODEL_NON_ARRAY_REPRESENTATION_DATA"
             );
         }
 
@@ -532,6 +541,44 @@ class Model {
     }
 
     /**
+     * Obtains external Models that reference this Model. This method checks Field objects assigned to this Model object
+     * for the `referenced_by` property. Any Model objects found that reference this Model object will be returned in
+     * a ModelSet object.
+     * @return ModelSet A ModelSet containing any Model objects that reference this Model object.
+     */
+    public function get_model_references() : ModelSet {
+        # Variables
+        $references = [];
+
+        # Loop through each field in this Model object and check for Fields with the `referenced_by` property.
+        foreach ($this->get_fields() as $field) {
+            # Skip this field if it doesn't have any Models specified in its `referenced_by` property
+            if (!$this->$field->referenced_by) {
+                continue;
+            }
+
+            # Loop through each Model specified in `referenced_by`
+            foreach ($this->$field->referenced_by as $reference_model => $reference_fields) {
+                # Ensure the reference fields are always an array and reference model is FQN
+                $reference_fields = (is_array($reference_fields)) ? $reference_fields : [$reference_fields];
+                $reference_model = "\\API\\Models\\$reference_model";
+
+                # Loop through each referenced field and query for matches.
+                foreach ($reference_fields as $reference_field) {
+                    # Query for any referenced Model objects that have this field value assigned to the referenced field
+                    $reference_model = new $reference_model();
+                    $reference_query = $reference_model->read_all()->query(
+                        query_params: [$reference_field => $this->$field->value]
+                    );
+                    $references = $references + $reference_query->model_objects;
+                }
+            }
+        }
+
+        return new ModelSet(model_objects: $references);
+    }
+
+    /**
      * Checks if the required pfSense packages for this model are installed.
      * @throws NotFoundError When the Model requires a pfSense package that is not installed.
      * @throws ServerError When a package requires a PHP include file that could not be found.
@@ -728,11 +775,11 @@ class Model {
     /**
      * Perform validation and replace all existing objects for this Model with a specified set of Model representations.
      * This method is only available for `many` models.
-     * @param array $representation_data An array of many Model representations to set. Any existing Model objects will
+     * @param mixed $representation_data An array of many Model representations to set. Any existing Model objects will
      * be replaced with the objects defined in this array.
      * @return ModelSet A ModelSet containing all the Model objects found in config after replacement.
      */
-    final public function replace_all(array $representation_data, bool $apply = false) : ModelSet {
+    final public function replace_all(mixed $representation_data, bool $apply = false) : ModelSet {
         # Ensure this is a `many` model before continuing
         if (!$this->many) {
             throw new ServerError(
@@ -740,11 +787,23 @@ class Model {
                 response_id: "MODEL_UPDATE_ALL_WITHOUT_MANY"
             );
         }
+
+        # Ensure the representation data is an array
+        if (!is_array($representation_data)) {
+            throw new ValidationError(
+                message: "Representation data must be of type `array`.",
+                response_id: "MODEL_NON_ARRAY_REPRESENTATION_DATA"
+            );
+        }
+
         # Empty the config array for this Model
         $this->set_config($this->config_path, []);
 
         # Loop through each Model representation included in the array
         foreach ($representation_data as $representation_object) {
+            # Remove any ID for this object if it was passed in
+            unset($representation_object["id"]);
+
             # Define a new Model object using this representation and validate
             $model_object = new $this(representation_data: $representation_object);
             $model_object->validate();
@@ -797,10 +856,21 @@ class Model {
      * Perform validation, delete this object internally and restart any associated services.
      * @param bool $apply Set to `true` if you would like to immediately apply the changes after they are made.
      * @return Model Returns the deleted Model object (this object).
+     * @throws ConflictError When this Model object is referenced by another existing Model object.
      */
     final public function delete(bool $apply = false) : Model {
         # Ensure all object fields and validations succeed for proceeding.
         if ($this->validate(requires_id: true)) {
+            # Block the deletion if this Model is still referenced by other Model objects
+            $referenced_by = $this->get_model_references();
+            if ($referenced_by->model_objects) {
+                throw new ConflictError(
+                    message: "Object cannot be deleted because it is referenced by another existing object.",
+                    response_id: "MODEL_CANNOT_BE_DELETED_WHILE_REFERENCED",
+                    data: $referenced_by->to_representation()
+                );
+            }
+
             # Run the _delete method
             $this->_delete();
 

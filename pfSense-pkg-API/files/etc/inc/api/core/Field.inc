@@ -17,6 +17,7 @@ class Field
     public array $choices = [];
     public bool $allow_empty = false;
     public bool $allow_null = false;
+    public bool $editable = true;
     public bool $required = false;
     public mixed $default = null;
     public bool $read_only = false;
@@ -25,21 +26,23 @@ class Field
     public string $name = "";
     public string $internal_name = "";
     public string $internal_namespace = "";
+    public array $referenced_by = [];
     public array $conditions = [];
     public Model|null $context = null;
 
     /**
      * @param string $type The primary type supported by this field. This must be a string representation of the type
      * as it is returned by PHP's gettype() function.
-     * @param array $choices An array of explicitly choices this field's value can be.
+     * @param bool $required Set to `true` if this field is required to be explicitly set. $required and $default are
+     * mutually exclusive.
      * @param bool $unique Set to `true` if this value must be unique from all other objects of the same model.
+     * @param mixed|null $default The default value to assign this field if no value was found. If not set, it assumed
+     * this Field requires a value and should fail validation if no value was found.
+     * @param array $choices An array of explicitly choices this field's value can be.
      * @param bool $allow_empty Set to `true` if empty values (blank strings, 0, etc) should be allowed.
      * @param bool $allow_null Set to `true` if `null` values should be supported for this field. When `null` values
      * are supported, the underlying pfSense configuration field will be removed entirely when receiving a null value.
-     * @param bool $required Set to `true` if this field is required to be explicitly set. $required and $default are
-     * mutually exclusive.
-     * @param mixed|null $default The default value to assign this field if no value was found. If not set, it assumed
-     * this Field requires a value and should fail validation if no value was found.
+     * @param bool $editable Set to `false` to prevent this field's value from being changed after its initial creation.
      * @param bool $read_only Set to `true` to make this field read-only. Attempts to write to a read-only field will
      * result in a thrown exception.
      * @param bool $write_only Set the `true` to make this field write-only. This will prevent the field's current value
@@ -56,6 +59,11 @@ class Field
      * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
      * the field internal value under a specific namespace as an associative array. This only applies to the internal
      * value, not the representation value.
+     * @param array $referenced_by An array that specifies other Models and Field's that reference this Field's parent
+     * Model using this Field's value. This will prevent the parent Model object from being deleted while it is actively
+     * referenced by another Model object. The array key must be the name of the Model class that references this Field,
+     * and the value must be a Field within that Model. The framework will automatically search for any existing Model
+     * objects that have the referenced Field assigned a value that matches this Field's value.
      * @param array $conditions An array of conditions the field must meet to be included. This allows you to specify
      * conditions of other fields within the parent Model context. For example, if the parent Model context has two
      * fields, one field named `type` and the other being this field; and you only want this field to be included if
@@ -66,21 +74,23 @@ class Field
      */
     public function __construct(
         string $type = "",
-        bool $required = false,
-        bool $unique = false,
-        mixed $default = null,
-        array $choices = [],
-        bool $allow_empty = false,
-        bool $allow_null = false,
-        bool $read_only = false,
-        bool $write_only = false,
-        bool $many = false,
-        int $many_minimum = 1,
-        int $many_maximum = 128,
+        bool   $required = false,
+        bool   $unique = false,
+        mixed  $default = null,
+        array  $choices = [],
+        bool   $allow_empty = false,
+        bool   $allow_null = false,
+        bool   $editable = true,
+        bool   $read_only = false,
+        bool   $write_only = false,
+        bool   $many = false,
+        int    $many_minimum = 1,
+        int    $many_maximum = 128,
         string $delimiter = ",",
         string $internal_name = "",
         string $internal_namespace = "",
-        array $conditions = [],
+        array  $referenced_by = [],
+        array  $conditions = [],
         array $validators = [],
         string $help_text = ""
     ){
@@ -93,6 +103,7 @@ class Field
         $this->allow_null = ($read_only) ? true : $allow_null;
         $this->required = $required;
         $this->default = $default;
+        $this->editable = $editable;
         $this->read_only = $read_only;
         $this->write_only = $write_only;
         $this->many = $many;
@@ -102,6 +113,7 @@ class Field
         $this->help_text = $help_text;
         $this->internal_name = $internal_name;
         $this->internal_namespace = $internal_namespace;
+        $this->referenced_by = $referenced_by;
         $this->conditions = $conditions;
 
         # Set the many_minimum value to 0 if allow_empty and many are enabled
@@ -115,7 +127,7 @@ class Field
 
     /**
      * Allows the Field's current value to be obtained by invoking the field object.
-     * @returns mixed The value current set in $this->value
+     * @returns mixed The value currently set in $this->value
      */
     final public function __invoke() : mixed {
         return $this->value;
@@ -198,6 +210,9 @@ class Field
         # Ensure a value is specified if field is `required`
         $this->check_field_required();
 
+        # Ensure a value is editable before allow values to change
+        $this->is_value_editable();
+
         # Ensure a value is not set if field is `read_only`
         $this->check_field_read_only();
 
@@ -250,6 +265,33 @@ class Field
             throw new ServerError(
                 message: "Conditional fields must have model context provided.",
                 response_id: "FIELD_CONDITIONAL_WITH_NO_CONTEXT"
+            );
+        }
+    }
+
+    /**
+     * Checks if this Field should allow changed values. If this is not a `editable` Field, and the value given differs
+     * from the stored value from the parent Model context an error will be thrown
+     * @throws ValidationError When this is not an `editable` Field, but the value given differs from the value stored
+     * for the parent Model context
+     */
+    private function is_value_editable() {
+        # Only proceed with validation if the parent Model context already has an ID (i.e. was created previously) OR
+        # the field is editable.
+        if (is_null($this->context->id) or $this->editable) {
+            return;
+        }
+
+        # Obtain the stored value for this object's from config
+        $field_name = $this->name;
+        $current_value = (new $this->context(id: $this->context->id))->$field_name->value;
+
+        # Throw an error if this is a non `editable` field but the values changed.
+        if ($this->value !== $current_value) {
+            throw new ValidationError(
+                message: "Field `$this->name` is not editable but the requested value `$this->value` differs from its ".
+                    "current value `$current_value`.",
+                response_id: "FIELD_VALUE_CHANGED_WHEN_NOT_EDITABLE"
             );
         }
     }
