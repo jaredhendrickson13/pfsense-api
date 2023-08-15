@@ -100,7 +100,6 @@ class Response extends Error {
         $this->message = str_replace(["\"", "'"], "`", $message);
         $this->status = strtolower($this->get_http_status_message($this->code));
         $this->response_id = strtoupper($response_id);
-        $this->code = $code;
         $this->data = $data;
         parent::__construct($this->message, $this->code);
 
