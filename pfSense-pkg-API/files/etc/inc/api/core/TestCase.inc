@@ -10,21 +10,6 @@ use ReflectionMethod;
 
 require_once("api/auto_loader.inc");
 
-# Allow test case to use all models
-foreach(glob("/etc/inc/api/models/*.inc") as $model) {
-    require_once($model);
-}
-
-# Allow test case to use all fields
-foreach(glob("/etc/inc/api/fields/*.inc") as $field) {
-    require_once($field);
-}
-
-# Allow test case to use all views
-foreach(glob("/etc/inc/api/views/*.inc") as $view) {
-    require_once($view);
-}
-
 /**
  * Defines a TestCase object that can be used to define child TestCase classes that test internal functionality of
  * the API. This is needed because pfSense does not have PHPUnit readily available.
