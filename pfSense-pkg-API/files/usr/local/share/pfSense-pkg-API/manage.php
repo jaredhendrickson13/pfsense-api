@@ -178,7 +178,7 @@ if (in_array($argv[1], ["buildviews"])) {
     build_views();
 }
 # GENERATEDOCUMENTATION COMMAND
-if (in_array($argv[1], ["generatedocs"])) {
+elseif (in_array($argv[1], ["generatedocs"])) {
     echo API\Core\Tools\generate_documentation();
     exit(0);
 }
