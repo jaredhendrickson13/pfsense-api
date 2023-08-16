@@ -419,31 +419,16 @@ class Model {
      * auto-generating API documentation. This method can be extended to add additional options to the OpenAPI
      * schema when necessary
      * @link https://swagger.io/docs/specification/data-models/
-     * @param bool $include_id Set to `true` to include the `id` field in the schema.
      * @return array A PHP array containing this Model as an OpenAPI schema.
      */
-    public function to_openapi_schema(bool $include_id = false, bool $accept_many = false) : array {
+    public function to_openapi_schema() : array {
         # Assign primitive schema attributes
-        $openapi_schema = ["type" => "object", "properties" => [], "required" => []];
-
-        # Assign the `id` field if this is a `many` model
-        if ($this->many and $include_id) {
-            $openapi_schema["required"][] = "id";
-            $openapi_schema["properties"]["id"] = [
-                "type" => "integer",
-                "description" => "The ID of the object or resource to interact with."
-            ];
-        }
+        $openapi_schema = ["type" => "object", "properties" => []];
 
         # Loop through each Field in this Model and obtain its OpenAPI property config
         foreach ($this->get_fields() as $field) {
             # Generate and add the OpenAPI property from the Field object
             $openapi_schema["properties"][$field] = $this->$field->to_openapi_property();
-
-            # Mark this as a required field if required. Fields are not required with an existing object ID.
-            if ($this->$field->required and !$include_id) {
-                $openapi_schema["required"][] = $field;
-            }
         }
 
         return $openapi_schema;
@@ -451,9 +436,10 @@ class Model {
 
     /**
      * Populates an array of field names for this model.
+     * @param bool $required_only Only obtain required Fields
      * @return array An array of field names for this model.
      */
-    final public function get_fields() : array {
+    final public function get_fields(bool $required_only = false) : array {
         # Variables
         $fields = [];
 
@@ -464,14 +450,24 @@ class Model {
                 continue;
             }
 
-            # Add this var to our fields if API\Core\Field is this object's ancestor
-            if (in_array("API\Core\Field", class_parents($value))) {
-                $fields[] = $var;
+            # Skip this item if it is not child class of the API\Core\Field class
+            if (!in_array("API\Core\Field", class_parents($value))) {
+                continue;
             }
+
+            # Skip this item if we are only gathering required Fields and this isn't a required Field
+            if ($required_only and !$this->$var->required) {
+                continue;
+            }
+
+            # Otherwise, this is a valid Field object. Include it.
+            $fields[] = $var;
         }
 
         return $fields;
     }
+
+
 
     /**
      * Performs a full validation on the API mode. This includes checking that required packages are installed and

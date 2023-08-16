@@ -180,6 +180,7 @@ if (in_array($argv[1], ["buildviews"])) {
 # GENERATEDOCUMENTATION COMMAND
 if (in_array($argv[1], ["generatedocs"])) {
     echo API\Core\Tools\generate_documentation();
+    exit(0);
 }
 # RUNTESTS COMMAND
 elseif (in_array($argv[1], ["runtests"])) {

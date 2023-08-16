@@ -148,16 +148,11 @@ class Response extends Error {
      * @return array This Response object as an OpenAPI response component
      */
     final public function to_openapi_component() : array {
-        # Variables
-        $class_shortname = $this->get_shortname();
-
         return [
-            "$class_shortname" => [
-                "description" => $this->help_text,
-                "content" => [
-                    "application/json" => [
-                        "schema" => ['$ref' => '#/components/schemas/Response']
-                    ]
+            "description" => $this->help_text,
+            "content" => [
+                "application/json" => [
+                    "schema" => ['$ref' => '#/components/schemas/Response']
                 ]
             ]
         ];
@@ -169,36 +164,34 @@ class Response extends Error {
      */
     final public static function to_openapi_schema() : array {
         return [
-            "Response" => [
-                "type" => "object",
-                "properties" => [
-                    "code" => [
-                        "description" => "The HTTP status code that corresponds with the API response.",
-                        "type" => "integer"
-                    ],
-                    "status" => [
-                        "description" => "The HTTP status message that corresponds with the HTTP status code.",
-                        "type" => "string"
-                    ],
-                    "response_id" => [
-                        "description" => "The unique response ID that corresponds with the result of the API".
-                            "call. In most situations, this will contain an error code.",
-                        "type" => "string"
-                    ],
-                    "message" => [
-                        "description" => "The descriptive message detailing the results of the API call.",
-                        "type" => "string"
-                    ],
-                    "data" => [
-                        "description" => "The data requested from the API. In the event that many objects have".
-                            "been requested, this field will be an array of objects. Otherwise, it will only return".
-                            "the single object requested.",
-                        "example" => [],
-                        "oneOf" => [
-                            ["type" => "array"],
-                            ["type" => "object"]
-                        ]
-                    ],
+            "type" => "object",
+            "properties" => [
+                "code" => [
+                    "description" => "The HTTP status code that corresponds with the API response.",
+                    "type" => "integer"
+                ],
+                "status" => [
+                    "description" => "The HTTP status message that corresponds with the HTTP status code.",
+                    "type" => "string"
+                ],
+                "response_id" => [
+                    "description" => "The unique response ID that corresponds with the result of the API".
+                        "call. In most situations, this will contain an error code.",
+                    "type" => "string"
+                ],
+                "message" => [
+                    "description" => "The descriptive message detailing the results of the API call.",
+                    "type" => "string"
+                ],
+                "data" => [
+                    "description" => "The data requested from the API. In the event that many objects have".
+                        "been requested, this field will be an array of objects. Otherwise, it will only return".
+                        "the single object requested.",
+                    "example" => [],
+                    "oneOf" => [
+                        ["type" => "array"],
+                        ["type" => "object"]
+                    ]
                 ],
             ]
         ];

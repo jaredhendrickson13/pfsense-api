@@ -91,7 +91,7 @@ class APICoreResponseTestCase extends API\Core\TestCase {
         $response->help_text = "Example OpenAPI description for this response component.";
 
         $this->assert_equals(
-            $response->to_openapi_component(),
+            $response->to_openapi_schema(),
             [
                 "Response" => [
                     "type" => "object",

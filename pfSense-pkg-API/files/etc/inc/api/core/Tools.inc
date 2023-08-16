@@ -16,7 +16,6 @@
 namespace API\Core\Tools;
 
 use API\Core\Response;
-use ReflectionClass;
 
 require_once("api/auto_loader.inc");
 
@@ -116,12 +115,14 @@ function sync() {
 function get_classes_from_namespace(string $namespace) : array {
     # Variables
     $classes = [];
-    $namespace_path = "/etc/inc/".strtolower(str_replace("\\", "/", $namespace));
+    $namespace_path = strtolower(
+        str_replace(["\\", "//"], "/", "/etc/inc/".$namespace)
+    );
 
-    foreach(glob($namespace_path) as $inc_file) {
+    foreach(glob($namespace_path."*.inc") as $inc_file) {
         # Obtain the class name from the file name
         $class_name = basename($inc_file);
-        $classes[] = $namespace.$class_name;
+        $classes[] = str_replace(".inc", "", $namespace.$class_name);
     }
 
     return $classes;
@@ -156,7 +157,7 @@ function generate_documentation() {
         ],
         "components" => [
             "responses" => [],
-            "schemas" => Response::to_openapi_schema(),
+            "schemas" => ["Response" => Response::to_openapi_schema()],
             "securitySchemes" => [
                 "local" => ["type" => "http", "scheme" => "basic"],
                 "jwt" => ["type" => "http", "scheme" => "bearer", "bearerFormat" => "JWT"],
@@ -175,8 +176,8 @@ function generate_documentation() {
     # Add Response components for each Response class in API\Responses
     foreach($response_classes as $response_class) {
         # Create the Response object
-        $response = new $response_class();
-        $openapi_config["components"]["responses"][] = $response->to_openapi_component();
+        $response = new $response_class(message: "", response_id: "");
+        $openapi_config["components"]["responses"][$response->get_shortname()] = $response->to_openapi_component();
     }
 
     # Import each View class and assign documentation for the endpoint according to the options and Model assigned.
@@ -197,13 +198,6 @@ function generate_documentation() {
 
         # Obtain the OpenAPI schema for this Model.
         $openapi_config["components"]["schemas"][$view->model_name] = $model->to_openapi_schema();
-
-        # If this is a `many` Model, also obtain a schema for the Model that includes the ID.
-        if ($model->many) {
-            $openapi_config["components"]["schemas"]["$view->model_name"."WithID"] = $model->to_openapi_schema(
-                include_id: true
-            );
-        }
 
         # Assign shared values to each request method defined in this path
         foreach ($view->request_method_options as $request_method) {
@@ -247,21 +241,49 @@ function generate_documentation() {
 
             # Assign request body definitions for POST, PUT and PATCH requests
             if (in_array($request_method, ["post", "put", "patch"])) {
-                # For non `many` Views with `many` Models, use the schema with the ID for non-POST requests
+                # For non `many` Views with `many` Models, add the ID to the schema and make it required
                 if (!$view->many and $model->many and $request_method !== "post") {
-                    $schema = ["schema" => ['$ref' => "#/components/schemas/$view->model_name"."WithID"]];
+                    $schema = [
+                        "schema" => [
+                            "allOf" => [
+                                [
+                                    "type" => "object",
+                                    "required" => ["id"],
+                                    "properties" => [
+                                        "id" => [
+                                            "type" => "integer",
+                                            "description" => "The ID of the object or resource to interact with."
+                                        ]
+                                    ]
+                                ],
+                                ['$ref' => "#/components/schemas/$view->model_name"]
+                            ]
+                        ]
+                    ];
                 }
                 # For `many` Views with `many` Models, accept arrays of many schema objects
                 elseif ($view->many and $model->many) {
                     $schema = [
                         "schema" => [
-                            "type" => "array", "items" => ['$ref' => "#/components/schemas/$view->model_name"]
+                            "type" => "array", "items" => [
+                                "allOf" => [
+                                    ['$ref' => "#/components/schemas/$view->model_name"],
+                                    ["type" => "object", "required" => $model->get_fields(required_only: true)]
+                                ]
+                            ]
                         ]
                     ];
                 }
-                # Otherwise, just assign the regular schema
+                # Otherwise, just assign the schema with all required Fields included
                 else {
-                    $schema = ["schema" => ['$ref' => "#/components/schemas/$view->model_name"]];
+                    $schema = [
+                        "schema" => [
+                            "allOf" => [
+                                ['$ref' => "#/components/schemas/$view->model_name"],
+                                ["type" => "object", "required" => $model->get_fields(required_only: true)]
+                            ]
+                        ]
+                    ];
                 }
 
                 $openapi_config["paths"][$view->url][$request_method]["requestBody"] = [
@@ -292,7 +314,7 @@ function generate_documentation() {
 
             # Assign this request method responses for each Response class defined.
             foreach ($response_classes as $response_class) {
-                $response = new $response_class();
+                $response = new $response_class(message: "", response_id: "");
                 $openapi_config["paths"][$view->url][$request_method]["responses"][$response->code] = [
                     '$ref' => "#/components/responses/".$response->get_shortname()
                 ];
