@@ -66,7 +66,7 @@ class APICoreResponseTestCase extends API\Core\TestCase {
         $this->assert_equals(
             $response->to_representation(),
             [
-                "code" => 500,
+                "code" => 400,
                 "status" => $response->get_http_status_message(400),
                 "response_id" => "TEST_RESPONSE_ID2",
                 "message" => "Test message 2",
