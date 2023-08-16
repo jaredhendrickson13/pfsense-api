@@ -19,9 +19,9 @@ class ModelSet {
      * @param array $model_objects An array of model objects to include in this model set
      */
     public function __construct(array $model_objects) {
-        # Throw an error if any models is not a Model object
+        # Throw an error if any models are not a Model object
         foreach ($model_objects as $model_object) {
-            if (get_parent_class($model_object) === "Model") {
+            if (!is_object($model_object) or !in_array("API\Core\Model", class_parents($model_object))) {
                 throw new ServerError(
                     message: "Model sets can only contain model objects.",
                     response_id: "MODEL_SET_CONTAINS_NON_MODEL"

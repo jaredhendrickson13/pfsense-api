@@ -23,8 +23,6 @@ class Test extends Model {
     public Field $test_string_unique;
     public Field $test_string_many;
     public Field $test_string_namespace;
-    public Field $test_string_referenced_by;
-
 
     public function __construct(mixed $id = null, array $representation_data = [], Auth $client = null) {
         # Mark this model as a `many` model indicating multiple Test model objects can be created. This is also
