@@ -49,7 +49,7 @@ class APICoreResponseTestCase extends API\Core\TestCase {
             $response->to_representation(),
             [
                 "code" => 500,
-                "status" => $response->get_http_status_message(500),
+                "status" => "internal server error",
                 "response_id" => "TEST_RESPONSE_ID",
                 "message" => "Test message",
                 "data" => []
@@ -63,11 +63,12 @@ class APICoreResponseTestCase extends API\Core\TestCase {
         );
         $response->code = 400;
 
+        var_dump($response->to_representation());
         $this->assert_equals(
             $response->to_representation(),
             [
                 "code" => 400,
-                "status" => $response->get_http_status_message(400),
+                "status" => "bad request",
                 "response_id" => "TEST_RESPONSE_ID2",
                 "message" => "Test message 2",
                 "data" => ["test_data_field" => "test_data_value"]
