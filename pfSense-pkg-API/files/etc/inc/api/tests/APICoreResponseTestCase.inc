@@ -69,12 +69,10 @@ class APICoreResponseTestCase extends API\Core\TestCase {
         $this->assert_equals(
             $response->to_openapi_component(),
             [
-                "Response" => [
-                    "description" => "Example OpenAPI description for this response component.",
-                    "content" => [
-                        "application/json" => [
-                            "schema" => ['$ref' => '#/components/schemas/Response']
-                        ]
+                "description" => "Example OpenAPI description for this response component.",
+                "content" => [
+                    "application/json" => [
+                        "schema" => ['$ref' => '#/components/schemas/Response']
                     ]
                 ]
             ]
@@ -93,36 +91,34 @@ class APICoreResponseTestCase extends API\Core\TestCase {
         $this->assert_equals(
             $response->to_openapi_schema(),
             [
-                "Response" => [
-                    "type" => "object",
-                    "properties" => [
-                        "code" => [
-                            "description" => "The HTTP status code that corresponds with the API response.",
-                            "type" => "integer"
-                        ],
-                        "status" => [
-                            "description" => "The HTTP status message that corresponds with the HTTP status code.",
-                            "type" => "string"
-                        ],
-                        "response_id" => [
-                            "description" => "The unique response ID that corresponds with the result of the API".
-                                "call. In most situations, this will contain an error code.",
-                            "type" => "string"
-                        ],
-                        "message" => [
-                            "description" => "The descriptive message detailing the results of the API call.",
-                            "type" => "string"
-                        ],
-                        "data" => [
-                            "description" => "The data requested from the API. In the event that many objects have".
-                                "been requested, this field will be an array of objects. Otherwise, it will only return".
-                                "the single object requested.",
-                            "example" => [],
-                            "oneOf" => [
-                                ["type" => "array"],
-                                ["type" => "object"]
-                            ]
-                        ],
+                "type" => "object",
+                "properties" => [
+                    "code" => [
+                        "description" => "The HTTP status code that corresponds with the API response.",
+                        "type" => "integer"
+                    ],
+                    "status" => [
+                        "description" => "The HTTP status message that corresponds with the HTTP status code.",
+                        "type" => "string"
+                    ],
+                    "response_id" => [
+                        "description" => "The unique response ID that corresponds with the result of the API".
+                            "call. In most situations, this will contain an error code.",
+                        "type" => "string"
+                    ],
+                    "message" => [
+                        "description" => "The descriptive message detailing the results of the API call.",
+                        "type" => "string"
+                    ],
+                    "data" => [
+                        "description" => "The data requested from the API. In the event that many objects have".
+                            "been requested, this field will be an array of objects. Otherwise, it will only return".
+                            "the single object requested.",
+                        "example" => [],
+                        "oneOf" => [
+                            ["type" => "array"],
+                            ["type" => "object"]
+                        ]
                     ],
                 ]
             ]

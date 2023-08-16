@@ -545,6 +545,23 @@ class APICoreModelTestCase extends API\Core\TestCase {
             ["a", "b", "c"]
         );
     }
+
+    /**
+     * Checks that `to_openapi_schema()` correctly converts the Model object to an OpenAPI schema.
+     */
+    public function test_model_to_openapi_schema() {
+        # Create a model to test with and generate it's OpenAPI schema
+        $test_model = new API\Models\Test();
+        $test_model_schema = $test_model->to_openapi_schema();
+
+        # Ensure the schema type is an object
+        $this->assert_equals($test_model_schema["type"], "object");
+
+        # Ensure each property in the schema is a Field object's OpenAPI property
+        foreach ($test_model_schema["properties"] as $field => $property) {
+            $this->assert_equals($test_model->$field->to_openapi_property(), $property);
+        }
+    }
 }
 
 

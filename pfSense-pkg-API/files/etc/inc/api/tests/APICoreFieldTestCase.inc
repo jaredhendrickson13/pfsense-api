@@ -535,4 +535,48 @@ class APICoreFieldTestCase extends API\Core\TestCase
             }
         );
     }
+
+    /**
+     * Checks that the `to_openapi_property` correctly converts this Field to an OpenAPI property.
+     */
+    public function test_field_to_openapi_property() {
+        # Ensure the `help_text` value is added as the OpenAPI property's `description`
+        $test_field = new API\Core\Field(type: "string", help_text: "test");
+        $this->assert_is_true($test_field->to_openapi_property()["description"] === "test");
+
+        # Ensure the `allow_null` value is added as the OpenAPI property's `nullable`
+        $test_field = new API\Core\Field(type: "string", allow_null: true);
+        $this->assert_is_true($test_field->to_openapi_property()["nullable"] === true);
+
+        # Ensure the `read_only` value is added as the OpenAPI property's `readOnly`
+        $test_field = new API\Core\Field(type: "string", read_only: true);
+        $this->assert_is_true($test_field->to_openapi_property()["readOnly"] === true);
+
+        # Ensure the `write_only` value is added as the OpenAPI property's `writeOnly`
+        $test_field = new API\Core\Field(type: "string", write_only: true);
+        $this->assert_is_true($test_field->to_openapi_property()["writeOnly"] === true);
+
+        # Ensure the `default` isn't present in the OpenAPI property if no default is assigned
+        $test_field = new API\Core\Field(type: "string");
+        $this->assert_is_false(array_key_exists("default", $test_field->to_openapi_property()));
+
+        # Ensure the `default` value is added as the OpenAPI property's `default`
+        $test_field = new API\Core\Field(type: "string", default: "test");
+        $this->assert_is_true($test_field->to_openapi_property()["default"] === "test");
+
+        # Ensure `many` Fields represent the Field as an array of items in the OpenAPI property
+        $test_field = new API\Core\Field(
+            type: "string", choices: ["a","b"], many: true, many_minimum: 5, many_maximum: 14
+        );
+        $this->assert_is_true($test_field->to_openapi_property()["type"] === "array");
+        $this->assert_is_true($test_field->to_openapi_property()["minItems"] === 5);
+        $this->assert_is_true($test_field->to_openapi_property()["maxItems"] === 14);
+        $this->assert_is_true($test_field->to_openapi_property()["items"]["type"] === "string");
+        $this->assert_is_true($test_field->to_openapi_property()["items"]["enum"] === ["a", "b"]);
+
+        # Ensure the `type` value is added as the OpenAPI property's `type`
+        $test_field = new API\Core\Field(type: "string", choices: ["a", "b"]);
+        $this->assert_is_true($test_field->to_openapi_property()["type"] === "string");
+        $this->assert_is_true($test_field->to_openapi_property()["enum"] === ["a", "b"]);
+    }
 }
