@@ -11,7 +11,7 @@ require_once("api/auto_loader.inc");
  * set of Model objects at once. Additionally, ModelSets can be further filtered using queries.
  */
 class ModelSet {
-    const QUERY_MODIFIERS = ["startswith", "endswith", "contains", "lt", "lte", "gt", "gte", "exact"];
+    const QUERY_FILTERS = ["startswith", "endswith", "contains", "lt", "lte", "gt", "gte", "exact"];
     public array $model_objects;
 
     /**
@@ -63,7 +63,7 @@ class ModelSet {
      * Filters the ModelSet to only include Model objects that match a specific query.
      * @param array $query_params An associative array of query targets and values. The array key will be the query
      * target and the array value will be the query value.
-     * @param array $excluded An array of field names and namespaces to exclude from the query. This is helpful when
+     * @param array $excluded An array of field names to exclude from the query. This is helpful when
      * query data may have extra values that you do not want to include in the query.
      * @return ModelSet The filtered ModelSet object containing only Model objects that matched the query.
      */
@@ -80,11 +80,10 @@ class ModelSet {
                 # Loop variables
                 $query_options = $this->get_query_options($query_target);
                 $field = $query_options["field"];
-                $namespace = $query_options["namespace"];
-                $modifier = $query_options["modifier"];
+                $filter = $query_options["filter"];
 
-                # Skip this field/namespace if it's excluded
-                if (in_array($field, $excluded) or in_array($namespace, $excluded)) {
+                # Skip this field if it's excluded
+                if (in_array($field, $excluded)) {
                     continue;
                 }
 
@@ -94,14 +93,8 @@ class ModelSet {
                     break;
                 }
 
-                # When a namespace was specified, ensure this field is a part of that namespace
-                if ($namespace and $this->$field->namespace !== $namespace) {
-                    $is_match = false;
-                    break;
-                }
-
-                # Ensure the modifier matches
-                if (!$this->$modifier($model_object->$field->value, $query_value)) {
+                # Ensure the filter matches
+                if (!$this->$filter($model_object->$field->value, $query_value)) {
                     $is_match = false;
                     break;
                 }
@@ -116,45 +109,27 @@ class ModelSet {
 
     /**
      * Checks for query target options. Query target options allow for more specific queries by limiting the scope to
-     * a specific namespace and/or values that match a specific modifier.
+     * values that match a specific filter.
      * @param string $query_target The query target string (e.g. `field_name`, `field_name__contains`)
      * @return array An array of query target options found in the $query_target string.
      */
     private function get_query_options(string $query_target) : array {
         # Variables
-        $query_options = ["field"=>null, "namespace"=>null, "modifier"=>"exact"];
+        $query_options = ["field"=>$query_target, "filter"=>"exact"];
 
         # Check if the double-underscore indicator is present
         if (str_contains($query_target, "__")) {
             # Separate query target parameters by __ to determine query options
             $query_target = explode("__", $query_target,);
 
-            # Check if a valid query modifier was specified
-            if (in_array(end($query_target), self::QUERY_MODIFIERS)) {
-                # Store the modifier and remove the last item of the array.
-                $query_options["modifier"] = array_pop($query_target);
+            # Check if a valid query filter was specified
+            if (in_array(end($query_target), self::QUERY_FILTERS)) {
+                # Store the filter and remove the last item of the array.
+                $query_options["filter"] = array_pop($query_target);
             }
 
-            # Throw an error if there are still more than 2 query target items left
-            if (count($query_target) > 2) {
-                throw new ValidationError(
-                    message: "Queries only support two levels of depth.",
-                    response_id: "MODELSET_QUERY_TOO_DEEP"
-                );
-            }
-
-            # Check if a namespace and field were specified
-            if (count($query_target) == 2) {
-                $query_options["namespace"] = $query_target[0];
-                $query_options["field"] = $query_target[1];
-            }
-            # Otherwise, only the field was specified. Assign it.
-            else {
-                $query_options["field"] = $query_target[0];
-            }
-        }
-        else {
-            $query_options["field"] = $query_target;
+            # Add the remaining values as the query field
+            $query_options["field"] = implode("__", $query_target);
         }
 
         return $query_options;

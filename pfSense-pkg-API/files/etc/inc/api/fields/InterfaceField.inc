@@ -3,6 +3,7 @@
 namespace API\Fields;
 
 require_once("api/auto_loader.inc");
+require_once("api/fields/StringField.inc");
 
 use API;
 
@@ -10,7 +11,7 @@ use API;
  * Defines an InterfaceField class that extends the core Field method. This Field adds validation and representation for
  * fields that accept interface IDs and/or names as input.
  */
-class InterfaceField extends API\Core\Field {
+class InterfaceField extends API\Fields\StringField {
     public bool $allow_interface_groups;
     public bool $allow_ipsec_interface;
     public bool $allow_openvpn_interface;
@@ -90,7 +91,6 @@ class InterfaceField extends API\Core\Field {
 
         # Construct the parent Field object
         parent::__construct(
-            type: "string",
             required: $required,
             unique: $unique,
             default: $default,
@@ -221,4 +221,20 @@ class InterfaceField extends API\Core\Field {
 
         return $choices;
     }
+
+    /**
+     * Obtains this Fields current interface values as an array of their internal values.
+     * @return array|string An array of the internal interfaces assigned to this Field (e.g. ["wan", "lan", "opt1"])
+     * when this is a `many` Field, or the internal interface value as a string
+     */
+    public function to_internal_interfaces() {
+        # Return the internal interface values for each interface value when this is a `many` Field
+        if ($this->many) {
+            return explode($this->delimiter, $this->to_internal());
+        }
+
+        # Otherwise, just return the internal value
+        return $this->to_internal();
+    }
+
 }

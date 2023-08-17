@@ -104,7 +104,7 @@ class IntegerField extends API\Core\Field {
      * @param string $internal_value The internal value from the pfSense configuration.
      * @return int The field value in its representation form.
      */
-    protected function _from_internal(string $internal_value) : int {
+    protected function _from_internal(mixed $internal_value) : int {
         # Throw an error if the value is not numeric
         if (!is_numeric($internal_value)) {
             throw new API\Responses\ServerError(
@@ -138,5 +138,18 @@ class IntegerField extends API\Core\Field {
         }
 
         return $openapi_property;
+    }
+
+    /**
+     * Converts this Field object into a pfSense webConfigurator form input. This method can be overridden by a child
+     * class to add custom input field creation.
+     * @param string $type The HTML input tag type. Not all Fields support input types.
+     * @param array $attributes An array of additional HTML input tag attributes. Not all Fields support input attributes.
+     * @return object The pfSense webConfigurator form input object.
+     * @link https://github.com/pfsense/pfsense/tree/master/src/usr/local/www/classes/Form
+     */
+    public function to_form_input(string $type = "number", array $attributes = []) : object {
+        $attributes += ["min" => $this->minimum, "max" => $this->maximum];
+        return parent::to_form_input(type: $type, attributes: $attributes);
     }
 }

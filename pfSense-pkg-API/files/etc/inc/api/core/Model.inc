@@ -224,7 +224,7 @@ class Model {
                 file_put_contents($lock_file, microtime());
 
                 # Start a temporary session to write the config that contains the user's username in the config history
-                session_start();
+//                session_start();
                 $_SESSION["Username"] = $this->client->username;
                 write_config(sprintf(gettext(" ".$change_note)));
 
@@ -234,8 +234,8 @@ class Model {
                 }
 
                 # Remove the temporary session and write lock
-                unset($_SESSION);
-                phpsession_destroy();
+//                unset($_SESSION);
+//                phpsession_destroy();
                 unlink($lock_file);
                 return;
             }
@@ -460,14 +460,17 @@ class Model {
                 continue;
             }
 
+            # Assign the name of this field and context to this Field object
+            $this->$var->name = $var;
+            $this->$var->internal_name = ($this->$var->internal_name) ?: $this->$var->name;
+            $this->$var->context = $this;
+
             # Otherwise, this is a valid Field object. Include it.
             $fields[] = $var;
         }
 
         return $fields;
     }
-
-
 
     /**
      * Performs a full validation on the API mode. This includes checking that required packages are installed and
@@ -490,11 +493,6 @@ class Model {
 
         # Loop through each of this object's assigned fields and validate them.
         foreach ($this->get_fields() as $field) {
-            # Assign the name of this field and context to this Field object
-            $this->$field->name = $field;
-            $this->$field->internal_name = ($this->$field->internal_name) ?: $this->$field->name;
-            $this->$field->context = $this;
-
             # Ensure this field's internal name is unique to its namespace
             $this->is_fields_internal_name_unique($field);
 

@@ -39,4 +39,179 @@ class APICoreModelSetTestCase extends API\Core\TestCase {
         $this->assert_is_true($test_modelset->to_representation()[0] === $test_model1->to_representation());
         $this->assert_is_true($test_modelset->to_representation()[1] === $test_model2->to_representation());
     }
+
+    /**
+     * Checks that ModelSet queries using exact matches works as expected.
+     */
+    public function test_query_exact_match() {
+        # Create two Models with unique values to add to the ModelSet
+        $test_model1 = new API\Models\Test(representation_data: ["test_bool" => true]);
+        $test_model2 = new API\Models\Test(representation_data: ["test_bool" => false]);
+
+        # Add the Models to a ModelSet
+        $test_modelset = new API\Core\ModelSet(model_objects: [$test_model1, $test_model2]);
+        $queried_modelset = $test_modelset->query(["test_bool__exact" => true]);
+
+        # Ensure the query only returned Models with `test_bool` set to `true`.
+        $this->assert_equals(count($queried_modelset->model_objects), 1);
+        $this->assert_equals(
+            $queried_modelset->model_objects[0],
+            $test_model1
+        );
+
+        # Ensure the 'exact' query filter is assumed as the default filter if none was specified
+        $this->assert_equals(
+            $queried_modelset->model_objects,
+            $test_modelset->query(["test_bool" => true])->model_objects
+        );
+    }
+
+    /**
+     * Checks that ModelSet queries using the 'startswith' filer works as expected.
+     */
+    public function test_query_startswith() {
+        # Create three Models with unique values to add to the ModelSet
+        $test_model1 = new API\Models\Test(representation_data: ["test_string_unique" => "Don't find me!"]);
+        $test_model2 = new API\Models\Test(representation_data: ["test_string_unique" => "Find me!"]);
+        $test_model3 = new API\Models\Test(representation_data: ["test_string_unique" => "Don't find me!"]);
+
+        # Add the Models to a ModelSet and query for Models with `test_string_unique` values starting with 'Find'
+        $test_modelset = new API\Core\ModelSet(model_objects: [$test_model1, $test_model2, $test_model3]);
+        $queried_modelset = $test_modelset->query(["test_string_unique__startswith" => "Find"]);
+
+        # Ensure the query only returned Models with `test_string_unique` values starting with 'Find'.
+        $this->assert_equals(count($queried_modelset->model_objects), 1);
+        $this->assert_equals(
+            $queried_modelset->model_objects[0],
+            $test_model2
+        );
+    }
+
+    /**
+     * Checks that ModelSet queries using the 'endswith' filer works as expected.
+     */
+    public function test_query_endswith() {
+        # Create three Models with unique values to add to the ModelSet
+        $test_model1 = new API\Models\Test(representation_data: ["test_string_unique" => "I match!"]);
+        $test_model2 = new API\Models\Test(representation_data: ["test_string_unique" => "I don't!"]);
+        $test_model3 = new API\Models\Test(representation_data: ["test_string_unique" => "I match!"]);
+
+        # Add the Models to a ModelSet and query for Models with `test_string_unique` values ending with 'match!'
+        $test_modelset = new API\Core\ModelSet(model_objects: [$test_model1, $test_model2, $test_model3]);
+        $queried_modelset = $test_modelset->query(["test_string_unique__endswith" => "match!"]);
+
+        # Ensure the query only returned Models with `test_string_unique` values ending with 'match!'.
+        $this->assert_equals(count($queried_modelset->model_objects), 2);
+        $this->assert_equals(
+            $queried_modelset->model_objects,
+            [$test_model1, $test_model3]
+        );
+    }
+
+    /**
+     * Checks that ModelSet queries using the 'contains' filer works as expected.
+     */
+    public function test_query_contains() {
+        # Create three Models with unique values to add to the ModelSet
+        $test_model1 = new API\Models\Test(representation_data: ["test_string_unique" => "I match!"]);
+        $test_model2 = new API\Models\Test(representation_data: ["test_string_unique" => "I match!"]);
+        $test_model3 = new API\Models\Test(representation_data: ["test_string_unique" => "I don't!"]);
+
+        # Add the Models to a ModelSet and query for Models with `test_string_unique` values containing  'match'
+        $test_modelset = new API\Core\ModelSet(model_objects: [$test_model1, $test_model2, $test_model3]);
+        $queried_modelset = $test_modelset->query(["test_string_unique__contains" => "match"]);
+
+        # Ensure the query only returned Models with `test_string_unique` values containing 'match'.
+        $this->assert_equals(count($queried_modelset->model_objects), 2);
+        $this->assert_equals(
+            $queried_modelset->model_objects,
+            [$test_model1, $test_model2]
+        );
+    }
+
+    /**
+     * Checks that ModelSet queries using the 'lt' (less than) filer works as expected.
+     */
+    public function test_query_lt() {
+        # Create three Models with unique values to add to the ModelSet
+        $test_model1 = new API\Models\Test(representation_data: ["test_integer" => 10]);
+        $test_model2 = new API\Models\Test(representation_data: ["test_integer" => 30]);
+        $test_model3 = new API\Models\Test(representation_data: ["test_integer" => 20]);
+
+        # Add the Models to a ModelSet and query for Models with `test_integer` values less than 30
+        $test_modelset = new API\Core\ModelSet(model_objects: [$test_model1, $test_model2, $test_model3]);
+        $queried_modelset = $test_modelset->query(["test_integer__lt" => 30]);
+
+        # Ensure the query only returned Models with `test_integer` values less than 30
+        $this->assert_equals(count($queried_modelset->model_objects), 2);
+        $this->assert_equals(
+            $queried_modelset->model_objects,
+            [$test_model1, $test_model3]
+        );
+    }
+
+    /**
+     * Checks that ModelSet queries using the 'lte' (less than or equal to) filter works as expected.
+     */
+    public function test_query_lte() {
+        # Create three Models with unique values to add to the ModelSet
+        $test_model1 = new API\Models\Test(representation_data: ["test_integer" => 10]);
+        $test_model2 = new API\Models\Test(representation_data: ["test_integer" => 31]);
+        $test_model3 = new API\Models\Test(representation_data: ["test_integer" => 20]);
+        $test_model4 = new API\Models\Test(representation_data: ["test_integer" => 30]);
+
+        # Add the Models to a ModelSet and query for Models with `test_integer` values less than or equal to 30
+        $test_modelset = new API\Core\ModelSet(model_objects: [$test_model1, $test_model2, $test_model3, $test_model4]);
+        $queried_modelset = $test_modelset->query(["test_integer__lte" => 30]);
+
+        # Ensure the query only returned Models with `test_integer` values less than or equal to 30
+        $this->assert_equals(count($queried_modelset->model_objects), 3);
+        $this->assert_equals(
+            $queried_modelset->model_objects,
+            [$test_model1, $test_model3, $test_model4]
+        );
+    }
+
+    /**
+     * Checks that ModelSet queries using the 'gt' (greater than) filer works as expected.
+     */
+    public function test_query_gt() {
+        # Create three Models with unique values to add to the ModelSet
+        $test_model1 = new API\Models\Test(representation_data: ["test_integer" => 10]);
+        $test_model2 = new API\Models\Test(representation_data: ["test_integer" => 30]);
+        $test_model3 = new API\Models\Test(representation_data: ["test_integer" => 20]);
+
+        # Add the Models to a ModelSet and query for Models with `test_integer` values greater than 10
+        $test_modelset = new API\Core\ModelSet(model_objects: [$test_model1, $test_model2, $test_model3]);
+        $queried_modelset = $test_modelset->query(["test_integer__gt" => 10]);
+
+        # Ensure the query only returned Models with `test_integer` values greater than 30
+        $this->assert_equals(count($queried_modelset->model_objects), 2);
+        $this->assert_equals(
+            $queried_modelset->model_objects,
+            [$test_model2, $test_model3]
+        );
+    }
+
+    /**
+     * Checks that ModelSet queries using the 'gte' (greater than or equal to) filter works as expected.
+     */
+    public function test_query_gte() {
+        # Create three Models with unique values to add to the ModelSet
+        $test_model1 = new API\Models\Test(representation_data: ["test_integer" => 10]);
+        $test_model2 = new API\Models\Test(representation_data: ["test_integer" => 5]);
+        $test_model3 = new API\Models\Test(representation_data: ["test_integer" => 20]);
+        $test_model4 = new API\Models\Test(representation_data: ["test_integer" => 30]);
+
+        # Add the Models to a ModelSet and query for Models with `test_integer` values greater than or equal to 10
+        $test_modelset = new API\Core\ModelSet(model_objects: [$test_model1, $test_model2, $test_model3, $test_model4]);
+        $queried_modelset = $test_modelset->query(["test_integer__gte" => 10]);
+
+        # Ensure the query only returned Models with `test_integer` values greater than or equal to 10
+        $this->assert_equals(count($queried_modelset->model_objects), 3);
+        $this->assert_equals(
+            $queried_modelset->model_objects,
+            [$test_model1, $test_model3, $test_model4]
+        );
+    }
 }

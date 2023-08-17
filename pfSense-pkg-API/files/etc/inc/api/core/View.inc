@@ -426,8 +426,7 @@ class View {
         catch (JsonException) {
             throw new ValidationError(
                 message: "Request body could not be decoded as JSON.",
-                response_id: "VIEW_COULD_NOT_DECODE_JSON",
-                code: 406
+                response_id: "VIEW_COULD_NOT_DECODE_JSON"
             );
         }
     }

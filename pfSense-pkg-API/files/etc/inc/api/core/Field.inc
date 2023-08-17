@@ -687,4 +687,38 @@ class Field
 
         return $openapi_property;
     }
+
+    /**
+     * Converts this Field object into a pfSense webConfigurator form input. This method can be overridden by a child
+     * class to add custom input field creation.
+     * @param string $type The HTML input tag type. Not all Fields support input types.
+     * @param array $attributes An array of additional HTML input tag attributes. Not all Fields support input attributes.
+     * @return object The pfSense webConfigurator form input object.
+     * @link https://github.com/pfsense/pfsense/tree/master/src/usr/local/www/classes/Form
+     */
+    public function to_form_input(string $type = "text", array $attributes = []) : object {
+        # Return a select input for fields with `choices`
+        if ($this->choices) {
+            $input = new \Form_Select(
+                name: $this->name,
+                title: $this->name,
+                value: $this->value,
+                values: $this->choices,
+                allowMultiple: $this->many
+            );
+            $input->setHelp($this->help_text);
+            return $input;
+        }
+
+        # Return a normal input for other fields
+        $input = new \Form_Input(
+            name: $this->name,
+            title: $this->name,
+            type: $type,
+            value: $this->value,
+            attributes: $attributes,
+        );
+        $input->setHelp($this->help_text);
+        return $input;
+    }
 }

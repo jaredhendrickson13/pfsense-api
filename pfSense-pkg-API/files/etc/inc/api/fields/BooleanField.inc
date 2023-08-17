@@ -118,4 +118,26 @@ class BooleanField extends API\Core\Field {
         # Otherwise, just return the `indicates_false` value.
         return $this->indicates_false;
     }
+
+    /**
+     * Converts this Field object into a pfSense webConfigurator form input. This method can be overridden by a child
+     * class to add custom input field creation.
+     * @param string $type The HTML input tag type. Not all Fields support input types.
+     * @param array $attributes An array of additional HTML input tag attributes. Not all Fields support input attributes.
+     * @return object The pfSense webConfigurator form input object.
+     * @link https://github.com/pfsense/pfsense/tree/master/src/usr/local/www/classes/Form
+     */
+    public function to_form_input(string $type = "text", array $attributes = []) : object {
+        # Populate the GENERAL section of the UI form
+        $input = new \Form_Checkbox(
+            $this->name,
+            $this->name,
+            "Enable $this->name",
+            $this->value,
+            $this->indicates_true
+        );
+        $input->setHelp($this->help_text);
+
+        return $input;
+    }
 }

@@ -15,6 +15,7 @@
 
 namespace API\Core\Tools;
 
+use API\Core\Model;
 use API\Core\Response;
 
 require_once("api/auto_loader.inc");
@@ -102,6 +103,45 @@ function sync() {
     } else {
         echo "Syncing API configuration... not configured.".PHP_EOL;
     }
+}
+
+/**
+ * Converts POST form data submitted by the pfSense webConfigurator to a valid representation of a provided Model object
+ * return array The POST form data in an acceptable representation for the provided Model object.
+ * @param array $form_data The incoming $_POST or $_GET form data from the pfSense webConfigurator.
+ * @param Model $model The Model object to represent.
+ * @return array The representation of the Model object from the form data.
+ */
+function form_data_to_model_representation(array $form_data, Model $model) : array {
+    # Variables
+    $representation = [];
+
+    # Loop through each Field available to this Model
+    foreach ($model->get_fields() as $field) {
+        # Determine the class of this Field.
+        $class = get_class($model->$field);
+
+        # For boolean fields, assume the value is false if it does not match the true value exactly
+        if ($class === "API\Fields\BooleanField" and $form_data[$field] !== $model->$field->indicates_true) {
+            $form_data[$field] = $model->$field->indicates_false;
+        }
+
+        # Skip this field if it is not found in the form data
+        if (!array_key_exists($field, $form_data)) {
+            continue;
+        }
+
+        # If the value is an array, convert it to its internal value first
+        if (is_array($form_data[$field])) {
+            $form_data[$field] = implode($model->$field->delimiter, $form_data[$field]);
+        }
+
+        # Convert this value to its representation value from its internal value
+        $model->$field->from_internal($form_data[$field]);
+        $representation[$field] = $model->$field->value;
+    }
+
+    return $representation;
 }
 
 /**
