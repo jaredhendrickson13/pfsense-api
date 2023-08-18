@@ -1,5 +1,4 @@
 <?php
-require_once("api/framework/APITools.inc");
 include_once("util.inc");
 include_once("guiconfig.inc");
 session_start();

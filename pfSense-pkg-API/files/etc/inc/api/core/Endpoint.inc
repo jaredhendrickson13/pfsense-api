@@ -291,16 +291,10 @@ class Endpoint {
         $content_type_unknown = false;
 
         # Parse the content according to the content-type request header
-        switch ($_SERVER["HTTP_CONTENT_TYPE"]) {
-            case "application/json":
-                $this->request_data = $this->decode_json_content(file_get_contents('php://input'));
-                break;
-            case "application/x-www-form-urlencoded":
-                $this->request_data = $this->decode_form_content($_GET);
-                break;
-            default:
-                $content_type_unknown = true;
-        }
+        $this->request_data = match ($_SERVER["HTTP_CONTENT_TYPE"]) {
+            "application/x-www-form-urlencoded" => $this->decode_form_content($_GET),
+            default => $this->decode_json_content(file_get_contents('php://input')),
+        };
 
         # Check if the client requested an unknown content type
         if ($content_type_unknown) {

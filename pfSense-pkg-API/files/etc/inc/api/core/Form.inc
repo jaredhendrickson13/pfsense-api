@@ -211,20 +211,17 @@ class Form
             require_once('guiconfig.inc');
             (new ".$fq_class_name."())->print_form();";
 
-        # Create directories and files corresponding with class
-        if ($this->url) {
-            # Assign the absolute path to the file. Assume index.php filename if not specified.
-            $filename = "/usr/local/www/$this->url";
-            $filename = (str_ends_with($filename, ".php")) ? $filename : "$filename/index.php";
-            mkdir($filename, 0755, true);
-            file_put_contents(
-                $filename,
-                $code
-            );
-        }
+        # Assign the absolute path to the file. Assume index.php filename if not specified.
+        $filename = "/usr/local/www/$this->url";
+        $filename = (str_ends_with($filename, ".php")) ? $filename : "$filename/index.php";
+        mkdir(dirname($filename), 0755, true);
+        file_put_contents(
+            $filename,
+            $code
+        );
 
         # Print success output if file now exists, otherwise output error and exit on non-zero code
-        if (is_file("/usr/local/www".$this->url."/index.php")) {
+        if (is_file($filename)) {
             echo "Building ".$fq_class_name." at URL \"".$this->url."\"... done.".PHP_EOL;
         }
         else {
