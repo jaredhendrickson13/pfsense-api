@@ -4,16 +4,16 @@ namespace API\Core;
 
 require_once("api/auto_loader.inc");
 
-class Form
-{
-    const SUBMIT_SUCCESS = 0;
-    const SUBMIT_FAILURE = 1;
+/**
+ * Defines a Form object that can be used to dynamically generate custom pfSense webConfigurator pages for a specified
+ * Model object.
+ */
+class Form {
     public string $url;
     public mixed $id = null;
     public array $title_path = [];
     public array $tabs;
     public string $model_name = "";
-    public array $custom_privilege = [];
     public string $custom_css = "";
     public string $custom_js = "";
     public array $sections = ["General" => ["fields" => [], "classes" => []]];
@@ -22,7 +22,7 @@ class Form
     protected Model $model;
 
     /**
-     * Construct the ModelFrom object
+     * Construct the Form object
      */
     public function __construct() {
         # Obtain submitted form data
@@ -41,9 +41,9 @@ class Form
 
     /**
      * Populates the form sections with the desired fields and returns an array of
-     * @return object The pfSense webConfigurator \Form object.
+     * @return \Form The pfSense webConfigurator \Form object.
      */
-    final public function get_form() : object {
+    final public function get_form() : \Form {
         # Create the Form object to assign sections and fields to
         $form = new \Form();
 
@@ -90,6 +90,10 @@ class Form
         return $form;
     }
 
+    /**
+     * Prints this form as a web page. This method is intended to be called by a PHP endpoint somewhere in the pfSense
+     * web root.
+     */
     final public function print_form() {
         # Print the static pfSense UI and include any custom CSS or JS files
         global $config;
@@ -182,19 +186,20 @@ class Form
     }
 
     /**
-     * Prints the results banner at the top of the form after.
-     * @param int $status_code The results status code. This determines what type of banner will be displayed. Typically
-     * this will be 0 for a success banner and 1 for an input validation banner.
+     * Prints the green success banner at the top of the form page.
      * @param string $message Adds an extra message to the banner.
      */
-    public function print_results(int $status_code, string $message = "") {
-        switch ($status_code) {
-            case self::SUBMIT_SUCCESS:
-                print_apply_result_box(retval: $status_code, extra_text: $message);
-                break;
-            case self::SUBMIT_FAILURE:
-                print_input_errors([$message]);
-        }
+    public function print_success_banner(string $message = "") {
+        print_apply_result_box(retval: 0, extra_text: $message);
+
+    }
+
+    /**
+     * Prints the input error banner at the top of the form page.
+     * @param string $message Adds an extra message to the banner.
+     */
+    public function print_input_error_banner(string $message = "") {
+        print_input_errors([$message]);
     }
 
     /**
