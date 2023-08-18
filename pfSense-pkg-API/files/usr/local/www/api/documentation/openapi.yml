@@ -11878,7 +11878,7 @@ paths:
                     - rfc3164
                     - rfc5424
                 reverse:
-                  description: View logs in reverse order.
+                  description: Endpoint logs in reverse order.
                   type: boolean
                 nentries:
                   description: Number of log entries to display in the webConfigurator.

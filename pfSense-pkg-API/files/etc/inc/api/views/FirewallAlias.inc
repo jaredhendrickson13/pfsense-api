@@ -1,12 +1,12 @@
 <?php
 
-namespace API\Views;
+namespace API\Endpoints;
 
 require_once("api/auto_loader.inc");
 
-use API\Core\View;
+use API\Core\Endpoint;
 
-class FirewallAlias extends View
+class FirewallAlias extends Endpoint
 {
     public function __construct() {
         # Assign the URL for this endpoint along with the Model it corresponds to.
@@ -20,7 +20,7 @@ class FirewallAlias extends View
         $this->patch_privileges = ["page-all", "page-firewall-alias-edit"];
         $this->delete_privileges = ["page-all", "page-firewall-alias-edit"];
 
-        # Construct the parent View object
+        # Construct the parent Endpoint object
         parent::__construct();
     }
 }

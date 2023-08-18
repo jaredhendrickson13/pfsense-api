@@ -16,17 +16,14 @@
 require_once("api/core/Tools.inc");
 require_once("api/core/TestCase.inc");
 
-use API\Core\Tools;
-use API\Core\View;
 use API\Models\APISettings;
 
-
-function build_views() {
+function build_endpoints() {
     # Import each view class
-    foreach(glob("/etc/inc/api/views/*.inc") as $file) {
+    foreach(glob("/etc/inc/api/endpoints/*.inc") as $file) {
         # Import classes files and create object
         require_once($file);
-        $view_class = "\\API\\Views\\".str_replace(".inc", "", basename($file));
+        $view_class = "\\API\\Endpoints\\".str_replace(".inc", "", basename($file));
         $view_obj = new $view_class();
         $view_obj->build_view();
     }
@@ -171,7 +168,7 @@ function help() {
     echo "COMMANDS:".PHP_EOL;
     echo "  version          : Display the current package version and build information".PHP_EOL;
     echo "  help             : Display the help page (this page)".PHP_EOL;
-    echo "  buildviews       : Build all API views included in this package".PHP_EOL;
+    echo "  buildendpoints       : Build all API endpoints included in this package".PHP_EOL;
     echo "  buildforms       : Build all API forms included in this package".PHP_EOL;
     echo "  generatedocs     : Regenerates the OpenAPI documentation".PHP_EOL;
     echo "  runtests         : Run all API unit tests. Warning: this may be disruptive!".PHP_EOL;
@@ -189,9 +186,9 @@ function help() {
 if (in_array($argv[1], ["buildforms"])) {
     build_forms();
 }
-# BUILDVIEWS COMMAND
-elseif (in_array($argv[1], ["buildviews"])) {
-    build_views();
+# BUILDENDPOINTS COMMAND
+elseif (in_array($argv[1], ["buildendpoints"])) {
+    build_endpoints();
 }
 # GENERATEDOCUMENTATION COMMAND
 elseif (in_array($argv[1], ["generatedocs"])) {
