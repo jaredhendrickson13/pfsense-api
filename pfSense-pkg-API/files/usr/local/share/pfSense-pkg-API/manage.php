@@ -23,9 +23,9 @@ function build_endpoints() {
     foreach(glob("/etc/inc/api/endpoints/*.inc") as $file) {
         # Import classes files and create object
         require_once($file);
-        $view_class = "\\API\\Endpoints\\".str_replace(".inc", "", basename($file));
-        $view_obj = new $view_class();
-        $view_obj->build_view();
+        $endpoint_class = "\\API\\Endpoints\\".str_replace(".inc", "", basename($file));
+        $endpoint_obj = new $endpoint_class();
+        $endpoint_obj->build_endpoint_url();
     }
 }
 
@@ -192,8 +192,9 @@ elseif (in_array($argv[1], ["buildendpoints"])) {
 }
 # GENERATEDOCUMENTATION COMMAND
 elseif (in_array($argv[1], ["generatedocs"])) {
-    echo API\Core\Tools\generate_documentation();
-    exit(0);
+    echo "Generating OpenAPI documentation... ";
+    API\Core\Tools\generate_documentation();
+    echo "done.".PHP_EOL;
 }
 # RUNTESTS COMMAND
 elseif (in_array($argv[1], ["runtests"])) {

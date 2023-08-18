@@ -459,7 +459,7 @@ class Endpoint {
     /**
      * Generate an endpoint for this view in the pfSense webroot.
      */
-    public function build_view() {
+    public function build_endpoint_url() {
         # Get the fully qualified and non qualified class names for this object
         $fq_class_name = get_class($this);
         $nq_class_name = (new \ReflectionClass($this))->getShortName();
