@@ -213,17 +213,21 @@ class Form
 
         # Create directories and files corresponding with class
         if ($this->url) {
-            mkdir("/usr/local/www".$this->url, 0755, true);
+            # Assign the absolute path to the file. Assume index.php filename if not specified.
+            $filename = "/usr/local/www/$this->url";
+            $filename = (str_ends_with($filename, ".php")) ? $filename : "$filename/index.php";
+            mkdir($filename, 0755, true);
             file_put_contents(
-                "/usr/local/www".$this->url."/index.php",
+                $filename,
                 $code
             );
         }
 
         # Print success output if file now exists, otherwise output error and exit on non-zero code
-        if ($this->url and is_file("/usr/local/www".$this->url."/index.php")) {
+        if (is_file("/usr/local/www".$this->url."/index.php")) {
             echo "Building ".$fq_class_name." at URL \"".$this->url."\"... done.".PHP_EOL;
-        } else {
+        }
+        else {
             echo "Building ".$fq_class_name." at URL \"".$this->url."\"... failed.".PHP_EOL;
             exit(1);
         }

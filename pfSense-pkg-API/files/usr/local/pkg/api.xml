@@ -19,7 +19,7 @@
         <name>API</name>
         <tooltiptext>The missing REST API package for pfSense</tooltiptext>
         <section>System</section>
-        <url>/api/settings/</url>
+        <url>/system_api_settings.php</url>
     </menu>
     <include_file>/usr/local/share/pfSense-pkg-API/nginx.inc</include_file>
     <plugins>

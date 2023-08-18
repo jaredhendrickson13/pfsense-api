@@ -8,7 +8,7 @@ use API\Core\Auth;
 use API\Core\Form;
 
 class APISettings extends Form {
-    public string $url = "/ui/api/settings/";
+    public string $url = "/system_api_settings.php";
     public string $model_name = "\API\Models\APISettings";
     public array $title_path = ["System", "API", "Settings"];
     public string $custom_css = "/css/api/api.css";
