@@ -17,6 +17,7 @@ namespace API\Core\Tools;
 
 use API\Core\Model;
 use API\Core\Response;
+use API\Models\APISettings;
 
 require_once("api/auto_loader.inc");
 
@@ -43,21 +44,25 @@ function is_assoc_array(array $array) : bool {
     return false;
 }
 
-function api_request($url, $method, $data=[], $headers=[], $username="", $password="") {
+function http_request(
+    string $url,
+    string $method,
+    array $data=[],
+    array $headers=[],
+    string $username="",
+    string $password="",
+    bool $validate_certs=true
+) {
     # Format data and headers
     $data = json_encode($data);
 
-    # Ensure headers is always an array
-    if (!is_array($headers)) {
-        $headers = [];
-    }
     $headers["Content-Type"] = "application/json";
     $headers["Content-Length"] = strlen($data);
 
     # Setup cURL options
     $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, (int)$validate_certs);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, (int)$validate_certs);
     curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -79,22 +84,24 @@ function api_request($url, $method, $data=[], $headers=[], $username="", $passwo
 
 function sync() {
     # Local variables
-    $pkg_conf = get_api_config()[1];
+    $api_settings = new APISettings();
     $protocol = config_get_path("system/webgui/protocol", "https");
     $port = config_get_path("system/webgui/port", "443");
 
     # Only perform sync when HA Sync is enabled for the API
-    if (isset($pkg_conf["hasync"])) {
+    if ($api_settings->ha_sync->value) {
         # Loop through each HA sync node and try to sync the configuration
-        foreach (explode(" ", $pkg_conf["hasync_hosts"]) as $node) {
+        foreach ($api_settings->ha_sync_hosts->value as $node) {
             # Make the API request to sync configuration
             echo "Syncing API configuration to node ".$node."... ";
-            $resp = api_request(
-                $protocol."://".$node.":".$port."/api/v1/system/api/sync",
-                "PUT",
-                $pkg_conf,
-                $pkg_conf["hasync_username"],
-                $pkg_conf["hasync_password"]
+            $resp = http_request(
+                url: $protocol."://".$node.":".$port."/api/v2/system/api/sync",
+                method: "PUT",
+                data: $api_settings->to_representation(),
+                headers: [],
+                username: $api_settings->ha_sync_username->value,
+                password: $api_settings->ha_sync_password->value,
+                validate_certs: $api_settings->ha_sync_validate_certs->value
             );
 
             # Ensure the sync was successful
