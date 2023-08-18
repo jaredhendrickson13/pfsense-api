@@ -23,7 +23,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
 /**
- * Creates object that performs authentication and authorization for API views.
+ * Creates object that performs authentication and authorization for API endpoints.
  */
 class Auth {
     private array $api_config;

@@ -29,9 +29,9 @@ use Exception;
 use JsonException;
 
 /**
- * Creates a View object that contains all metrics required to generate an API endpoint and facilitate API calls.
+ * Creates a Endpoint object that contains all metrics required to generate an API endpoint and facilitate API calls.
  */
-class View {
+class Endpoint {
     public string $url = "";
     public string $model_name = "";
     protected Model $model;
@@ -60,7 +60,7 @@ class View {
 
 
     /**
-     * Sets values whenever the View object is crated.
+     * Sets values whenever the Endpoint object is crated.
      */
     public function __construct() {
         # Prevent PHP warnings in API responses.
@@ -87,35 +87,35 @@ class View {
      * Checks for conflicting attributes during object construction.
      */
     private function check_construct() {
-        # Do not allow `many` Views that are assigned non `many` Models
+        # Do not allow `many` Endpoints that are assigned non `many` Models
         if ($this->many and !$this->model->many) {
             throw new ServerError(
-                message: "Views cannot enable `many` when the assigned Model is not a `many` Model",
-                response_id: "VIEW_MANY_WITHOUT_MANY_MODEL"
+                message: "Endpoints cannot enable `many` when the assigned Model is not a `many` Model",
+                response_id: "ENDPOINT_MANY_WITHOUT_MANY_MODEL"
             );
         }
 
-        # Do not allow Views to allow unsupported request methods
+        # Do not allow Endpoints to allow unsupported request methods
         $supported_methods = ($this->many) ? ["GET", "PUT"] : ["GET", "POST", "PATCH", "DELETE"];
         foreach ($this->request_method_options as $method_option) {
             if (!in_array($method_option, $supported_methods)) {
                 throw new ServerError(
-                    "View contains unsupported request method option `$method_option`.",
-                    response_id: "VIEW_WITH_UNSUPPORTED_REQUEST_METHOD_OPTION"
+                    "Endpoint contains unsupported request method option `$method_option`.",
+                    response_id: "ENDPOINT_WITH_UNSUPPORTED_REQUEST_METHOD_OPTION"
                 );
             }
         }
     }
 
     /**
-     * Determines the appropriate default help text for each method according to the assigned Model and View properties.
+     * Determines the appropriate default help text for each method according to the assigned Model and Endpoint properties.
      */
     private function set_default_help_text() {
         # Variables
         $model_verbose_name = $this->model->verbose_name;
         $model_verbose_name_plural = $this->model->verbose_name_plural;
 
-        # For non `many` Views, set default help text with an applicable context for `many` models
+        # For non `many` Endpoints, set default help text with an applicable context for `many` models
         if (!$this->many and $this->model->many) {
             $this->get_help_text = ($this->get_help_text) ?: "Reads an existing $model_verbose_name.";
             $this->post_help_text = ($this->post_help_text) ?: "Creates a new $model_verbose_name.";
@@ -201,7 +201,7 @@ class View {
             default:
                 throw new ServerError(
                     message: "Unknown authentication mode configured.",
-                    response_id: "VIEW_WITH_UNKNOWN_AUTH_MODE"
+                    response_id: "ENDPOINT_WITH_UNKNOWN_AUTH_MODE"
                 );
         }
 
@@ -291,22 +291,16 @@ class View {
         $content_type_unknown = false;
 
         # Parse the content according to the content-type request header
-        switch ($_SERVER["HTTP_CONTENT_TYPE"]) {
-            case "application/json":
-                $this->request_data = $this->decode_json_content(file_get_contents('php://input'));
-                break;
-            case "application/x-www-form-urlencoded":
-                $this->request_data = $this->decode_form_content($_GET);
-                break;
-            default:
-                $content_type_unknown = true;
-        }
+        $this->request_data = match ($_SERVER["HTTP_CONTENT_TYPE"]) {
+            "application/x-www-form-urlencoded" => $this->decode_form_content($_GET),
+            default => $this->decode_json_content(file_get_contents('php://input')),
+        };
 
         # Check if the client requested an unknown content type
         if ($content_type_unknown) {
             throw new MediaTypeError(
                 message: "The requested content-type is not supported",
-                response_id: "VIEW_CONTENT_TYPE_UNSUPPORTED"
+                response_id: "ENDPOINT_CONTENT_TYPE_UNSUPPORTED"
             );
         }
     }
@@ -334,33 +328,33 @@ class View {
             # Assign the authenticated client object context to the Model
             $this->model->client = $this->client;
 
-            # For GET requests on non-many Views, obtain a single object from the assigned Model.
+            # For GET requests on non-many Endpoints, obtain a single object from the assigned Model.
             if ($this->request_method === "GET" and !$this->many) {
                 $this->model->from_representation(representation_data: $this->request_data);
                 $resp_data = $this->model->read();
             }
-            # For GET requests on many Views, obtain all objects from the assigned Model.
+            # For GET requests on many Endpoints, obtain all objects from the assigned Model.
             elseif ($this->request_method === "GET" and $this->many) {
                 $resp_data = $this->model->read_all()->query(query_params: $this->request_data);
             }
-            # For POST requests on non-many Views, create a single object for the assigned Model
+            # For POST requests on non-many Endpoints, create a single object for the assigned Model
             elseif ($this->request_method === "POST" and !$this->many) {
                 $this->model->from_representation(representation_data: $this->request_data);
                 $resp_data = $this->model->create(apply: ($this->request_data["apply"] === true));
             }
-            # For PUT requests on many Views, replace all existing objects for the assigned Model
+            # For PUT requests on many Endpoints, replace all existing objects for the assigned Model
             elseif ($this->request_method === "PUT" and $this->many) {
                 $resp_data = $this->model->replace_all(
                     representation_data: $this->request_data,
                     apply: ($this->request_data["apply"] === true)
                 );
             }
-            # For PATCH requests on non-many Views, update a single object for the assigned Model
+            # For PATCH requests on non-many Endpoints, update a single object for the assigned Model
             elseif ($this->request_method === "PATCH" and !$this->many) {
                 $this->model->from_representation(representation_data: $this->request_data);
                 $resp_data = $this->model->update(apply: ($this->request_data["apply"] === true));
             }
-            # For DELETE requests on non-many Views, delete a single object for the assigned Model
+            # For DELETE requests on non-many Endpoints, delete a single object for the assigned Model
             elseif ($this->request_method === "DELETE" and !$this->many) {
                 $this->model->from_representation(representation_data: $this->request_data);
                 $resp_data = $this->model->delete(apply: ($this->request_data["apply"] === true));
@@ -382,7 +376,7 @@ class View {
         catch (Exception|Error $error) {
             $response = new ServerError(
                 message: $error->getMessage().PHP_EOL.$error->getTraceAsString(),
-                response_id: "VIEW_RECEIVED_UNEXPECTED_ERROR"
+                response_id: "ENDPOINT_RECEIVED_UNEXPECTED_ERROR"
             );
         }
 
@@ -426,7 +420,7 @@ class View {
         catch (JsonException) {
             throw new ValidationError(
                 message: "Request body could not be decoded as JSON.",
-                response_id: "VIEW_COULD_NOT_DECODE_JSON"
+                response_id: "ENDPOINT_COULD_NOT_DECODE_JSON"
             );
         }
     }
@@ -459,13 +453,13 @@ class View {
     /**
      * Generate an endpoint for this view in the pfSense webroot.
      */
-    public function build_view() {
+    public function build_endpoint_url() {
         # Get the fully qualified and non qualified class names for this object
         $fq_class_name = get_class($this);
         $nq_class_name = (new \ReflectionClass($this))->getShortName();
 
         # Specify the PHP code to write to the endpoints index.php file
-        $code = "<?php\nrequire_once('api/views/".$nq_class_name.".inc');\n(new ".$fq_class_name."())->listen();\n";
+        $code = "<?php\nrequire_once('api/endpoints/".$nq_class_name.".inc');\n(new ".$fq_class_name."())->listen();\n";
 
         # Create directories and files corresponding with class
         if ($this->url) {

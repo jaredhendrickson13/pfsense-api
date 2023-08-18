@@ -204,7 +204,7 @@ class InterfaceField extends API\Fields\StringField {
         if ($this->allow_interface_groups) {
             # Loop through all existing interface groups and add their names
             foreach ($interface_groups as $interface_group) {
-                $choices[] = $interface_group["ifname"];
+                $choices[$interface_group["ifname"]] = $interface_group["ifname"];
             }
         }
 
@@ -214,19 +214,19 @@ class InterfaceField extends API\Fields\StringField {
             foreach ($virtual_ips as $virtual_ip) {
                 # Only include CARP virtual iPs with unique IDs
                 if ($virtual_ip["mode"] === "carp" and $virtual_ip["uniqid"]) {
-                    $choices[] = $virtual_ip["uniqid"];
+                    $choices[$virtual_ip["uniqid"]] = $virtual_ip["uniqid"];
                 }
             }
         }
 
         # Allow the IPsec `enc0` interface if requested
         if ($this->allow_ipsec_interface) {
-            $choices[] = "enc0";
+            $choices["enc0"] = "IPsec";
         }
 
         # Allow the OpenVPN `openvpn` interface if requested
         if ($this->allow_openvpn_interface) {
-            $choices[] = "openvpn";
+            $choices["openvpn"] = "OpenVPN";
         }
 
         return $choices;

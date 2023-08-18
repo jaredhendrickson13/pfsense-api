@@ -27,7 +27,7 @@ const API_LIBRARIES = [
     "/etc/inc/api/validators/",
     "/etc/inc/api/fields/",
     "/etc/inc/api/models/",
-    "/etc/inc/api/views/",
+    "/etc/inc/api/endpoints/",
     "/etc/inc/api/forms/",
     "/etc/inc/api/tests/",
 ];

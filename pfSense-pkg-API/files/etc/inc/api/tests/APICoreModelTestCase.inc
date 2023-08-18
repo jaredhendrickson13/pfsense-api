@@ -21,7 +21,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
 
     /**
      * Checks that we are able to pass in an API\Core\Auth object to relay external client information like username
-     * and IP address. This is mostly commonly used by API\Core\View to provide Models information about the client
+     * and IP address. This is mostly commonly used by API\Core\Endpoint to provide Models information about the client
      * that authenticated a REST API call.
      */
     public function test_model_allows_provided_auth_obj() {

@@ -1,12 +1,12 @@
 <?php
 
-namespace API\Views;
+namespace API\Endpoints;
 
 require_once("api/auto_loader.inc");
 
-use API\Core\View;
+use API\Core\Endpoint;
 
-class APISettings extends View
+class APISettings extends Endpoint
 {
     public function __construct() {
         # Assign the URL for this endpoint along with the Model it corresponds to.
@@ -22,7 +22,7 @@ class APISettings extends View
         $this->get_help_text = "Reads the current API settings.";
         $this->patch_help_text = "Updates the current API settings.";
 
-        # Construct the parent View object
+        # Construct the parent Endpoint object
         parent::__construct();
     }
 }
