@@ -31,6 +31,11 @@ class BooleanField extends API\Core\Field {
      * @param string $indicates_true The internal string that indicates whether a value is `true`.
      * @param string|null $indicates_false The internal value that indicates whether a value is `false`. Use `null`
      * if the lack of a value for this field indicates `false` internally.
+     * @param string $verbose_name The detailed name for this Field. This name will be used in non-programmatic areas
+     * like web pages and help text. This Field will default to property name assigned to the parent Model with
+     * underscores converted to spaces.
+     * @param string $verbose_name_plural The plural form of $verbose_name. This defaults to $verbose_name with `s`
+     * suffixed or `es` suffixes to strings already ending with `s`.
      * @param string $internal_name Assign a different field name to use when referring to the internal field as it's
      * stored in the pfSense configuration.
      * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
@@ -59,6 +64,8 @@ class BooleanField extends API\Core\Field {
         bool $write_only = false,
         string $indicates_true = "",
         string $indicates_false = null,
+        string $verbose_name = "",
+        string $verbose_name_plural = "",
         string $internal_name = "",
         string $internal_namespace = "",
         array $referenced_by = [],
@@ -79,6 +86,8 @@ class BooleanField extends API\Core\Field {
             editable: $editable,
             read_only: $read_only,
             write_only: $write_only,
+            verbose_name: $verbose_name,
+            verbose_name_plural: $verbose_name_plural,
             internal_name: $internal_name,
             internal_namespace: $internal_namespace,
             referenced_by: $referenced_by,
@@ -131,8 +140,8 @@ class BooleanField extends API\Core\Field {
         # Populate the GENERAL section of the UI form
         $input = new \Form_Checkbox(
             $this->name,
-            $this->name,
-            "Enable $this->name",
+            ucwords($this->verbose_name),
+            "Enable",
             $this->value,
             $this->indicates_true
         );

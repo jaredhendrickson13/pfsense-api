@@ -78,7 +78,7 @@ if (isset($_POST["save"])) {
     if (!$input_errors) {
         print_apply_result_box(0);
     } else {
-        print_input_errors($input_errors);
+
     }
 }
 

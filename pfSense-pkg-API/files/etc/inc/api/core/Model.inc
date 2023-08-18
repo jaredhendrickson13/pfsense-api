@@ -102,6 +102,11 @@ class Model {
             $plural_suffix = (str_ends_with($this->verbose_name, "s")) ? "es" : "s";
             $this->verbose_name_plural = $this->verbose_name.$plural_suffix;
         }
+
+        # Assign names and model context to each field in this Model
+        foreach ($this->get_fields() as $field) {
+            $this->$field->set_names($field);
+        }
     }
 
     /**
@@ -346,11 +351,6 @@ class Model {
 
         # Loop through each of this Model's fields and convert the internal value to the representation value
         foreach ($this->get_fields() as $field) {
-            # Assign names and model context to this field
-            $this->$field->context = $this;
-            $this->$field->name = $field;
-            $this->$field->check_field_names();
-
             # Check the internal object for this field directly and convert it's value from internal to representation
             if (!$this->$field->internal_namespace and array_key_exists($this->$field->internal_name, $internal_object)) {
                 $this->$field->from_internal($internal_object[$this->$field->internal_name]);
@@ -493,6 +493,9 @@ class Model {
 
         # Loop through each of this object's assigned fields and validate them.
         foreach ($this->get_fields() as $field) {
+            # Assign this object as the Fields parent Model context
+            $this->$field->context = $this;
+
             # Ensure this field's internal name is unique to its namespace
             $this->is_fields_internal_name_unique($field);
 

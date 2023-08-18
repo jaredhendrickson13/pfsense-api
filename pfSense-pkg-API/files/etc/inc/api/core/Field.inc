@@ -7,6 +7,7 @@ require_once("api/auto_loader.inc");
 use API\Responses\ServerError;
 use API\Responses\ValidationError;
 use API\Validators\LengthValidator;
+use function API\Core\Tools\is_assoc_array;
 
 class Field
 {
@@ -19,6 +20,7 @@ class Field
     public int $many_maximum = 128;
     public string $delimiter = ",";
     public array $choices = [];
+    public array $verbose_choices = [];
     public bool $allow_empty = false;
     public bool $allow_null = false;
     public bool $editable = true;
@@ -28,6 +30,8 @@ class Field
     public bool $write_only = false;
     public string $help_text = "";
     public string $name = "";
+    public string $verbose_name = "";
+    public string $verbose_name_plural = "";
     public string $internal_name = "";
     public string $internal_namespace = "";
     public array $referenced_by = [];
@@ -42,7 +46,10 @@ class Field
      * @param bool $unique Set to `true` if this value must be unique from all other objects of the same model.
      * @param mixed|null $default The default value to assign this field if no value was found. If not set, it assumed
      * this Field requires a value and should fail validation if no value was found.
-     * @param array $choices An array of explicitly choices this field's value can be.
+     * @param array $choices An array of value choices this Field can be assigned. This can either be an indexed array
+     * of the exact choice values, or an associative array where the array key is the exact choice value and the array
+     * value is a verbose name for the choice. Verbose choice name are used by ModelForms when generating web pages
+     * for a given Model.
      * @param bool $allow_empty Set to `true` if empty values (blank strings, 0, etc) should be allowed.
      * @param bool $allow_null Set to `true` if `null` values should be supported for this field. When `null` values
      * are supported, the underlying pfSense configuration field will be removed entirely when receiving a null value.
@@ -58,6 +65,11 @@ class Field
      * @param int $many_maximum When $many is set to `true`, this sets the maximum number of array entries allowed.
      * @param string $delimiter Assigns the string delimiter to use when writing array values to config. This is only
      * available if $many is set to `true`. Defaults to `,` to store as comma-separated string.
+     * @param string $verbose_name The detailed name for this Field. This name will be used in non-programmatic areas
+     * like web pages and help text. This Field will default to property name assigned to the parent Model with
+     * underscores converted to spaces.
+     * @param string $verbose_name_plural The plural form of $verbose_name. This defaults to $verbose_name with `s`
+     * suffixed or `es` suffixes to strings already ending with `s`.
      * @param string $internal_name The name of the field as it is stored in the pfSense configuration. If not set, the
      * internal name will utilize the $name of the Field object.
      * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
@@ -91,17 +103,18 @@ class Field
         int    $many_minimum = 1,
         int    $many_maximum = 128,
         string $delimiter = ",",
+        string $verbose_name = "",
+        string $verbose_name_plural = "",
         string $internal_name = "",
         string $internal_namespace = "",
         array  $referenced_by = [],
         array  $conditions = [],
-        array $validators = [],
+        array  $validators = [],
         string $help_text = ""
     ){
         # Assign values to object properties
         $this->type = $type;
         $this->validators = $validators;
-        $this->choices = $choices;
         $this->unique = $unique;
         $this->allow_empty = $allow_empty;
         $this->allow_null = ($read_only) ? true : $allow_null;
@@ -115,10 +128,15 @@ class Field
         $this->many_maximum = $many_maximum;
         $this->delimiter = $delimiter;
         $this->help_text = $help_text;
+        $this->verbose_name = $verbose_name;
+        $this->verbose_name_plural = $verbose_name_plural;
         $this->internal_name = $internal_name;
         $this->internal_namespace = $internal_namespace;
         $this->referenced_by = $referenced_by;
         $this->conditions = $conditions;
+
+        # Assign choices
+        $this->set_choices($choices);
 
         # Set the many_minimum value to 0 if allow_empty and many are enabled
         if ($this->many and $this->allow_empty) {
@@ -188,6 +206,53 @@ class Field
                 message: "Fields cannot have a 'many_minimum' value greater than 'many_maximum'",
                 response_id: "FIELD_MANY_MINIMUM_GREATER_THAN_MANY_MAXIMUM"
             );
+        }
+    }
+
+    /**
+     * Sets this Field's name property and assumes defaults based on current name assignments. This field is intended
+     * to be called by the parent Model that is assigned this Field objects. Names are based off the name of the
+     * property assigned this Field in the parent Model.
+     * @param string $name The name to assign this Field.
+     */
+    public function set_names(string $name) {
+        # Assign the `name` property using the provided name
+        $this->name = $name;
+
+        # If no `internal_name` was provided, assume it's the same as the `name`
+        if (!$this->internal_name) {
+            $this->internal_name = $this->name;
+        }
+
+        # If no `verbose_name` was provided, assign it based off the current `name`
+        if (!$this->verbose_name) {
+            $this->verbose_name = str_replace("_", " ", $this->name);
+        }
+
+        # If no `verbose_name_plural` was provided, assign it based off the current `name`.
+        if (!$this->verbose_name_plural) {
+            $this->verbose_name_plural = (str_ends_with($this->verbose_name, "s")) ? "es" : "s";
+        }
+    }
+
+    /**
+     * Accepts a given array of choices and sets the `choices` and `verbose_choices` properties accordingly.
+     * @param array $choices The choices as provided by the __construct() method.
+     */
+    private function set_choices(array $choices) {
+        # Format choices accordingly when they are provided as an associative array
+        if (is_assoc_array($choices)) {
+            $this->choices = array_keys($choices);
+            $this->verbose_choices = $choices;
+        }
+        # Otherwise, format choices accordingly for indexed arrays
+        else {
+            $this->choices = $choices;
+
+            # Default verbose choice to the value, replace underscores with spaces and capitalize first letter
+            foreach($choices as $choice) {
+                $this->verbose_choices[$choice] = ucfirst(str_replace("_", " ", $choice));
+            }
         }
     }
 
@@ -444,11 +509,6 @@ class Field
                 response_id: "FIELD_UNNAMED"
             );
         }
-
-        # Default the `internal_name` to the field's `name` if it was not explicitly set.
-        if (empty($this->internal_name)) {
-            $this->internal_name = $this->name;
-        }
     }
 
     /**
@@ -697,28 +757,36 @@ class Field
      * @link https://github.com/pfsense/pfsense/tree/master/src/usr/local/www/classes/Form
      */
     public function to_form_input(string $type = "text", array $attributes = []) : object {
+        # Format the title to include an asterisk (*) if it is required.
+        $title = ($this->required) ? ucwords($this->verbose_name)."*" : ucwords($this->verbose_name);
+
         # Return a select input for fields with `choices`
         if ($this->choices) {
             $input = new \Form_Select(
                 name: $this->name,
-                title: $this->name,
+                title: $title,
                 value: $this->value,
-                values: $this->choices,
+                values: $this->verbose_choices,
                 allowMultiple: $this->many
             );
-            $input->setHelp($this->help_text);
-            return $input;
+        }
+        # Return a normal input for other fields
+        else {
+            $input = new \Form_Input(
+                name: $this->name,
+                title: $title,
+                type: $type,
+                value: ($this->many) ? $this->to_internal() : $this->value,
+                attributes: $attributes,
+            );
         }
 
-        # Return a normal input for other fields
-        $input = new \Form_Input(
-            name: $this->name,
-            title: $this->name,
-            type: $type,
-            value: $this->value,
-            attributes: $attributes,
-        );
-        $input->setHelp($this->help_text);
+        # Enhance help text to include instructions on formatting
+        $help_text = $this->help_text;
+        $help_text .= ($this->many) ? " Many values may be specified seperated by <code>$this->delimiter</code>" : "";
+        $help_text .= ($this->unique) ? " Value must be unique from all other objects of its kind." : "";
+
+        $input->setHelp($help_text);
         return $input;
     }
 }

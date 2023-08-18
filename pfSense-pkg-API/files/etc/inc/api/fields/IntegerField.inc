@@ -20,7 +20,10 @@ class IntegerField extends API\Core\Field {
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
      * @param mixed|null $default Assign a default string value to assign this Field if no value is present.
-     * @param array $choices An array of explicit choices this string field value can be.
+     * @param array $choices An array of value choices this Field can be assigned. This can either be an indexed array
+     * of the exact choice values, or an associative array where the array key is the exact choice value and the array
+     * value is a verbose name for the choice. Verbose choice name are used by ModelForms when generating web pages
+     * for a given Model.
      * @param bool $allow_null If `true`, null values will be allowed by this field.
      * @param bool $editable Set to `false` to prevent this field's value from being changed after its initial creation.
      * @param bool $read_only If `true`, this field can only read its value and cannot write its value to config.
@@ -34,6 +37,11 @@ class IntegerField extends API\Core\Field {
      * @param int $maximum The maximum value this value can be.
      * @param string $delimiter Assign the delimiter used to join the value array back to its internal string form when
      * $many is enabled.
+     * @param string $verbose_name The detailed name for this Field. This name will be used in non-programmatic areas
+     * like web pages and help text. This Field will default to property name assigned to the parent Model with
+     * underscores converted to spaces.
+     * @param string $verbose_name_plural The plural form of $verbose_name. This defaults to $verbose_name with `s`
+     * suffixed or `es` suffixes to strings already ending with `s`.
      * @param string $internal_name Assign a different field name to use when referring to the internal field as it's
      * stored in the pfSense configuration.
      * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
@@ -66,6 +74,8 @@ class IntegerField extends API\Core\Field {
         int $minimum = 0,
         int $maximum = 99999999999999,
         string $delimiter = ",",
+        string $verbose_name = "",
+        string $verbose_name_plural = "",
         string $internal_name = "",
         string $internal_namespace = "",
         array $referenced_by = [],
@@ -90,6 +100,8 @@ class IntegerField extends API\Core\Field {
             many_minimum: $many_minimum,
             many_maximum: $many_maximum,
             delimiter: $delimiter,
+            verbose_name: $verbose_name,
+            verbose_name_plural: $verbose_name_plural,
             internal_name: $internal_name,
             internal_namespace: $internal_namespace,
             referenced_by: $referenced_by,

@@ -32,6 +32,17 @@ function build_views() {
     }
 }
 
+function build_forms() {
+    # Import each form class
+    foreach(glob("/etc/inc/api/forms/*.inc") as $file) {
+        # Import classes files and create object
+        require_once($file);
+        $form_class = "\\API\\Forms\\".str_replace(".inc", "", basename($file));
+        $form_obj = new $form_class();
+        $form_obj->build_form_url();
+    }
+}
+
 function run_tests() {
     # Variables
     $test_cases = glob("/etc/inc/api/tests/*.inc");
@@ -161,6 +172,7 @@ function help() {
     echo "  version          : Display the current package version and build information".PHP_EOL;
     echo "  help             : Display the help page (this page)".PHP_EOL;
     echo "  buildviews       : Build all API views included in this package".PHP_EOL;
+    echo "  buildforms       : Build all API forms included in this package".PHP_EOL;
     echo "  generatedocs     : Regenerates the OpenAPI documentation".PHP_EOL;
     echo "  runtests         : Run all API unit tests. Warning: this may be disruptive!".PHP_EOL;
     echo "  update           : Update package to the latest stable version available".PHP_EOL;
@@ -173,8 +185,12 @@ function help() {
     echo PHP_EOL;
 }
 
+# BUILD_FORMS COMMAND
+if (in_array($argv[1], ["buildforms"])) {
+    build_forms();
+}
 # BUILDVIEWS COMMAND
-if (in_array($argv[1], ["buildviews"])) {
+elseif (in_array($argv[1], ["buildviews"])) {
     build_views();
 }
 # GENERATEDOCUMENTATION COMMAND

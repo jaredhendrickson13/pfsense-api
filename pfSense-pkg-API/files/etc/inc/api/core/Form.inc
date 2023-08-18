@@ -1,0 +1,231 @@
+<?php
+
+namespace API\Core;
+
+require_once("api/auto_loader.inc");
+
+class Form
+{
+    const SUBMIT_SUCCESS = 0;
+    const SUBMIT_FAILURE = 1;
+    public string $url;
+    public mixed $id = null;
+    public array $title_path = [];
+    public array $tabs;
+    public string $model_name = "";
+    public array $custom_privilege = [];
+    public string $custom_css = "";
+    public string $custom_js = "";
+    public array $sections = ["General" => ["fields" => [], "classes" => []]];
+    public array $buttons = [];
+    public array $form_data = [];
+    protected Model $model;
+
+    /**
+     * Construct the ModelFrom object
+     */
+    public function __construct() {
+        # Obtain submitted form data
+        $this->form_data = $_POST;
+
+        # Obtain the `id` from URL parameters
+        $this->id = (is_numeric($_GET["id"])) ? intval($_GET["id"]) : null;
+
+        # Create a new object for the assigned Model
+        $this->model = new $this->model_name(id: $this->id);
+
+        foreach ($this->title_path as &$path) {
+            $path = gettext($path);
+        }
+    }
+
+    /**
+     * Populates the form sections with the desired fields and returns an array of
+     * @return object The pfSense webConfigurator \Form object.
+     */
+    final public function get_form() : object {
+        # Create the Form object to assign sections and fields to
+        $form = new \Form();
+
+        # Loop through each of the requested sections populate them
+        foreach ($this->sections as $section_name => $section_params) {
+            # Create the section object
+            $section = new \Form_Section($section_name);
+
+            # Add any custom classes defined
+            $section->addClass(implode(" ", $section_params["classes"] ?? []));
+
+            # Add any defined Fields to this section
+            foreach ($section_params["fields"] as $section_field) {
+                # Make this a password field if it is write only
+                if ($this->model->$section_field->write_only) {
+                    $section->addPassword($this->model->$section_field->to_form_input());
+                }
+                # Otherwise, just add it as a normal input
+                else {
+                    $section->addInput($this->model->$section_field->to_form_input());
+                }
+            }
+
+            # Add this section to the form
+            $form->add($section);
+        }
+
+        # Add any defined buttons to the form globally
+        foreach ($this->buttons as $button_name => $button_params) {
+            $form->addGlobal(
+                new \Form_Button(
+                    name: $button_name,
+                    title: ($button_params["title"]) ?: $button_name,
+                    link: $button_params["link"],
+                    icon: $button_params["icon"]
+                )
+            )->addClass(
+                implode(
+                    " ", $button_params["classes"] ?? []
+                )
+            )->setOnclick($button_params["on_click"]);
+        }
+
+        return $form;
+    }
+
+    final public function print_form() {
+        # Print the static pfSense UI and include any custom CSS or JS files
+        global $config;
+        $pgtitle = $this->title_path;
+        include('head.inc');
+        echo "<link rel='stylesheet' href='$this->custom_css'/>";
+        echo "<script type='application/javascript' src='$this->custom_js'></script>";
+        \display_top_tabs($this->tabs, true);
+
+        # Perform the save action if the save button was submitted
+        if ($this->form_data["save"]) {
+            $this->on_save();
+        }
+
+        # Check if a button press was submitted that is assigned a specific callable
+        foreach ($this->buttons as $button_name => $button_params) {
+            if (array_key_exists($button_name, $this->form_data) and $button_params["callable"]) {
+                $callable = $button_params["callable"];
+                $this->$callable();
+            }
+        }
+
+        # Print the auto-generated form
+        print($this->get_form());
+
+        include('foot.inc');
+    }
+
+    /**
+     * Performs validation and saves the Model assigned to this ModelForm.
+     */
+    public function on_save() {
+        # Update settings with the newly provided values
+        $representation_data = ($this->id) ? ["id" => $this->id] : [];
+        $representation_data += $this->form_data_to_model_representation(form_data: $_POST, model: $this->model);
+        $this->model->from_representation(representation_data: $representation_data);
+
+        # When an ID was found or the assigned model is not a `many` model, update the object. Otherwise create it.
+        try {
+            ($this->id or !$this->model->many) ? $this->model->update() : $this->model->create();
+            $error_message = "";
+            $status_code = self::SUBMIT_SUCCESS;
+        }
+        catch (Response $resp_error) {
+            $error_message = $resp_error->getMessage();
+            $status_code = self::SUBMIT_FAILURE;
+        }
+
+        $this->print_results(status_code: $status_code, message: $error_message);
+
+    }
+
+    /**
+     * Converts POST form data submitted by the pfSense webConfigurator to a valid representation of a provided Model object
+     * return array The POST form data in an acceptable representation for the provided Model object.
+     * @param array $form_data The incoming $_POST or $_GET form data from the pfSense webConfigurator.
+     * @param Model $model The Model object to represent.
+     * @return array The representation of the Model object from the form data.
+     */
+    private function form_data_to_model_representation(array $form_data, Model $model) : array {
+        # Variables
+        $representation = [];
+
+        # Loop through each Field available to this Model
+        foreach ($model->get_fields() as $field) {
+            # Determine the class of this Field.
+            $class = get_class($model->$field);
+
+            # For boolean fields, assume the value is false if it does not match the true value exactly
+            if ($class === "API\Fields\BooleanField" and $form_data[$field] !== $model->$field->indicates_true) {
+                $form_data[$field] = $model->$field->indicates_false;
+            }
+
+            # Skip this field if it is not found in the form data
+            if (!array_key_exists($field, $form_data)) {
+                continue;
+            }
+
+            # If the value is an array, convert it to its internal value first
+            if (is_array($form_data[$field])) {
+                $form_data[$field] = implode($model->$field->delimiter, $form_data[$field]);
+            }
+
+            # Convert this value to its representation value from its internal value
+            $model->$field->from_internal($form_data[$field]);
+            $representation[$field] = $model->$field->value;
+        }
+
+        return $representation;
+    }
+
+    /**
+     * Prints the results banner at the top of the form after.
+     * @param int $status_code The results status code. This determines what type of banner will be displayed. Typically
+     * this will be 0 for a success banner and 1 for an input validation banner.
+     * @param string $message Adds an extra message to the banner.
+     */
+    public function print_results(int $status_code, string $message = "") {
+        switch ($status_code) {
+            case self::SUBMIT_SUCCESS:
+                print_apply_result_box(retval: $status_code, extra_text: $message);
+                break;
+            case self::SUBMIT_FAILURE:
+                print_input_errors([$message]);
+        }
+    }
+
+    /**
+     * Generate an endpoint for this Form in the pfSense webroot.
+     */
+    public function build_form_url() {
+        # Get the fully qualified and non qualified class names for this object
+        $fq_class_name = get_class($this);
+        $nq_class_name = (new \ReflectionClass($this))->getShortName();
+
+        # Specify the PHP code to write to the endpoints index.php file
+        $code = "<?php
+            require_once('api/forms/".$nq_class_name.".inc');
+            require_once('guiconfig.inc');
+            (new ".$fq_class_name."())->print_form();";
+
+        # Create directories and files corresponding with class
+        if ($this->url) {
+            mkdir("/usr/local/www".$this->url, 0755, true);
+            file_put_contents(
+                "/usr/local/www".$this->url."/index.php",
+                $code
+            );
+        }
+
+        # Print success output if file now exists, otherwise output error and exit on non-zero code
+        if ($this->url and is_file("/usr/local/www".$this->url."/index.php")) {
+            echo "Building ".$fq_class_name." at URL \"".$this->url."\"... done.".PHP_EOL;
+        } else {
+            echo "Building ".$fq_class_name." at URL \"".$this->url."\"... failed.".PHP_EOL;
+            exit(1);
+        }
+    }
+}

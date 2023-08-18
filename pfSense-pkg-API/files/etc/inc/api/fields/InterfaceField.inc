@@ -40,6 +40,11 @@ class InterfaceField extends API\Fields\StringField {
      * @param int $many_maximum When $many is set to `true`, this sets the maximum number of array entries allowed.
      * @param string $delimiter Assign the delimiter used to join the value array back to its internal string form when
      * $many is enabled.
+     * @param string $verbose_name The detailed name for this Field. This name will be used in non-programmatic areas
+     * like web pages and help text. This Field will default to property name assigned to the parent Model with
+     * underscores converted to spaces.
+     * @param string $verbose_name_plural The plural form of $verbose_name. This defaults to $verbose_name with `s`
+     * suffixed or `es` suffixes to strings already ending with `s`.
      * @param string $internal_name Assign a different field name to use when referring to the internal field as it's
      * stored in the pfSense configuration.
      * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
@@ -74,6 +79,8 @@ class InterfaceField extends API\Fields\StringField {
         int $many_minimum = 1,
         int $many_maximum = 128,
         string $delimiter = ",",
+        string $verbose_name = "",
+        string $verbose_name_plural = "",
         string $internal_name = "",
         string $internal_namespace = "",
         array $referenced_by = [],
@@ -104,6 +111,8 @@ class InterfaceField extends API\Fields\StringField {
             many_minimum: $many_minimum,
             many_maximum: $many_maximum,
             delimiter: $delimiter,
+            verbose_name: $verbose_name,
+            verbose_name_plural: $verbose_name_plural,
             internal_name: $internal_name,
             internal_namespace: $internal_namespace,
             referenced_by: $referenced_by,
@@ -176,16 +185,17 @@ class InterfaceField extends API\Fields\StringField {
             # In case this interface doesn't have a descriptive name, assume the default uppercase ID name
             $interface["descr"] = $interface["descr"] ?: strtoupper($id);
 
-            # Add the interface's value according to the APIs `represent_interfaces_as` setting
+            # Add the interface's value according to the APIs `represent_interfaces_as` setting.
+            # Always assign the interfaces descriptive name as it's verbose choice
             switch ($this->represented_as) {
                 case "internal":
-                    $choices[] = $id;
+                    $choices[$id] =$interface["descr"];
                     break;
                 case "description":
-                    $choices[] = $interface["descr"];
+                    $choices[$interface["descr"]] = $interface["descr"];
                     break;
                 case "physical":
-                    $choices[] = $interface["if"];
+                    $choices[$interface["if"]] = $interface["descr"];
                     break;
             }
         }

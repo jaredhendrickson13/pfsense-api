@@ -82,6 +82,7 @@ class APISettings extends Model {
             default: false,
             indicates_true: "enabled",
             indicates_false: "disabled",
+            verbose_name: "log successful authentication",
             help_text: "Enables or disables logging of API authentication attempts that are successful. By default, only
             failed API authentication attempts are logged to prevent flooding the authentication logs. This field is
             only applicable when the API `login_protection` setting is enabled."
@@ -90,6 +91,7 @@ class APISettings extends Model {
             default: false,
             indicates_true: "enabled",
             indicates_false: "disabled",
+            verbose_name: "allow pre-releases",
             help_text: "Enables or disables displaying pre-releases in available API updates. Pre-releases contain fixes
             and features that are currently under development and may not be fully stable. Use of pre-release versions
             is at your own risk."
@@ -111,19 +113,22 @@ class APISettings extends Model {
         );
         $this->auth_mode = new StringField(
             default: "local",
-            choices: ["local", "jwt", "key"],
+            choices: ["local" => "Local database", "jwt" => "JWT", "key" => "API key"],
+            verbose_name: "authentication mode",
             help_text: "Sets the API authentication mode required to authenticate API calls."
         );
         $this->jwt_exp = new IntegerField(
             default: 3600,
             minimum: 300,
             maximum: 86400,
+            verbose_name: "JWT expiration",
             help_text: "Sets the amount of time (in seconds) JWTs are valid for. This field is only applicable when
             `auth_mode` is set to `jwt`."
         );
         $this->key_hash_algo = new StringField(
             default: "sha256",
-            choices: ["sha256", "sha384", "sha512"],
+            choices: ["sha256" => "SHA256", "sha384" => "SHA384", "sha512" => "SHA512"],
+            verbose_name: "key hashing algorithm",
             help_text: "Sets the hash algorithm used for API keys. This field is only applicable when `auth_mode` is
             set to `key`."
         );
@@ -137,6 +142,7 @@ class APISettings extends Model {
             default: false,
             indicates_true: "enabled",
             indicates_false: "disabled",
+            verbose_name: "HA sync",
             help_text: "Enables or disables syncing API settings to HA peers. When enabled, API settings from this
             host will automatically be synced to any hosts defined in `ha_sync_hosts`."
         );
@@ -144,6 +150,7 @@ class APISettings extends Model {
             default: true,
             indicates_true: "enabled",
             indicates_false: "disabled",
+            verbose_name: "HA sync validate certs",
             help_text: "Enables or disables certificate validation when syncing API configurations to HA sync peers. If
             enabled, all hosts defined in `ha_sync_hosts` must have their webConfigurator configured with a certificate
             trusted by this system. It is strongly recommended this be enabled at all times to help mitigate 
@@ -156,12 +163,14 @@ class APISettings extends Model {
             many_minimum: 0,
             many_maximum: 10,
             delimiter: " ",
+            verbose_name: "HA sync hosts",
             validators: [new IPAddressValidator(allow_fqdn: true)],
             help_text: "Set a list of IP addresses or hostnames to sync API settings to."
         );
         $this->ha_sync_username = new StringField(
             default: "",
             allow_empty: true,
+            verbose_name: "HA username",
             help_text: "Sets the username to use when authenticating for HA sync processes. This user must be the present
             on all hosts defined in `ha_sync_hosts`."
         );
@@ -169,6 +178,7 @@ class APISettings extends Model {
             default: "",
             allow_empty: true,
             write_only: true,
+            verbose_name: "HA sync password",
             help_text: "Sets the password to use when authenticating for HA sync processes. This must be the password
             for the user defined in `ha_sync_username` and must be the same on all hosts defined in `ha_sync_hosts`."
         );

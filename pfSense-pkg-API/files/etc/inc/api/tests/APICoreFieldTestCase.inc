@@ -157,17 +157,6 @@ class APICoreFieldTestCase extends API\Core\TestCase
     }
 
     /**
-     * Checks that a Field's `internal_name` defaults to the Field's `name` if it's not set.
-     */
-    public function test_field_name_sets_internal_name_default() {
-        # Ensure the fields `internal_name` defaults the `name` if it's not explicitly set.
-        $test_field = new API\Core\Field(type: "string", default: "test");
-        $test_field->name = "test_field";
-        $test_field->validate();
-        $this->assert_equals($test_field->name, $test_field->internal_name);
-    }
-
-    /**
      * Checks that a Field actually requires a value when the Field is `required`.
      */
     public function test_require_value_when_field_is_required() {

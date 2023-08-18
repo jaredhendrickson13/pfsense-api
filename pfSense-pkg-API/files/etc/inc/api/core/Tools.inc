@@ -20,6 +20,29 @@ use API\Core\Response;
 
 require_once("api/auto_loader.inc");
 
+/**
+ * Checks if a given array is an associative array.
+ * @param array $array The array to check.
+ * @return bool `true` if the value is an associative array. `false` if it is an indexed array.
+ */
+function is_assoc_array(array $array) : bool {
+    # Start index tracking at 0
+    $index = 0;
+
+    # Loop through the keys of this array to check for non-associative indexing
+    foreach (array_keys($array) as $key) {
+        # This is an associtive array if the key is not an integer, or the index is not sequential
+        if (!is_integer($key) or $key !== $index) {
+            return true;
+        }
+
+        # Increase the index tracker
+        $index++;
+    }
+
+    return false;
+}
+
 function api_request($url, $method, $data=[], $headers=[], $username="", $password="") {
     # Format data and headers
     $data = json_encode($data);
@@ -103,45 +126,6 @@ function sync() {
     } else {
         echo "Syncing API configuration... not configured.".PHP_EOL;
     }
-}
-
-/**
- * Converts POST form data submitted by the pfSense webConfigurator to a valid representation of a provided Model object
- * return array The POST form data in an acceptable representation for the provided Model object.
- * @param array $form_data The incoming $_POST or $_GET form data from the pfSense webConfigurator.
- * @param Model $model The Model object to represent.
- * @return array The representation of the Model object from the form data.
- */
-function form_data_to_model_representation(array $form_data, Model $model) : array {
-    # Variables
-    $representation = [];
-
-    # Loop through each Field available to this Model
-    foreach ($model->get_fields() as $field) {
-        # Determine the class of this Field.
-        $class = get_class($model->$field);
-
-        # For boolean fields, assume the value is false if it does not match the true value exactly
-        if ($class === "API\Fields\BooleanField" and $form_data[$field] !== $model->$field->indicates_true) {
-            $form_data[$field] = $model->$field->indicates_false;
-        }
-
-        # Skip this field if it is not found in the form data
-        if (!array_key_exists($field, $form_data)) {
-            continue;
-        }
-
-        # If the value is an array, convert it to its internal value first
-        if (is_array($form_data[$field])) {
-            $form_data[$field] = implode($model->$field->delimiter, $form_data[$field]);
-        }
-
-        # Convert this value to its representation value from its internal value
-        $model->$field->from_internal($form_data[$field]);
-        $representation[$field] = $model->$field->value;
-    }
-
-    return $representation;
 }
 
 /**
