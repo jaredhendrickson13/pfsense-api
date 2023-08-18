@@ -346,5 +346,8 @@ function generate_documentation() {
         }
     }
 
-    return json_encode($openapi_config).PHP_EOL;
+    return file_put_contents(
+        filename: "/usr/local/www/api/documentation/openapi.json",
+        data: json_encode($openapi_config).PHP_EOL
+    );
 }

@@ -19,20 +19,8 @@
         <name>API</name>
         <tooltiptext>The missing REST API package for pfSense</tooltiptext>
         <section>System</section>
-        <url>/api/</url>
+        <url>/api/settings/</url>
     </menu>
-    <tabs>
-        <tab>
-            <text>Settings</text>
-            <url>/api/</url>
-            <active/>
-        </tab>
-        <tab>
-            <text>Documentation</text>
-            <url>/api/v2/</url>
-            <active/>
-        </tab>
-    </tabs>
     <include_file>/usr/local/share/pfSense-pkg-API/nginx.inc</include_file>
     <plugins>
         <item>
