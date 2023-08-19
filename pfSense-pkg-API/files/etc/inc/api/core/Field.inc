@@ -294,6 +294,11 @@ class Field
         # Ensure value is not an empty array before we start the loop unless allowed
         $this->check_value_empty($this->value);
 
+        # Don't validate any further if this field allows null values and the value is null
+        if ($this->allow_null and $this->value === null) {
+            return true;
+        }
+
         # Loop through each value to be validated
         foreach($values as $value) {
             # Ensure the value's type is supported

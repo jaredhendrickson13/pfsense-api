@@ -11,7 +11,7 @@ require_once("api/auto_loader.inc");
  * set of Model objects at once. Additionally, ModelSets can be further filtered using queries.
  */
 class ModelSet {
-    const QUERY_FILTERS = ["startswith", "endswith", "contains", "lt", "lte", "gt", "gte", "exact"];
+    const QUERY_FILTERS = ["startswith", "endswith", "contains", "lt", "lte", "gt", "gte", "exact", "except"];
     public array $model_objects;
 
     /**
@@ -182,6 +182,16 @@ class ModelSet {
      */
     private static function exact(mixed $value1, mixed $value2) : bool {
         return ($value1 == $value2);
+    }
+
+    /**
+     * Checks if two values are not equal to each other
+     * @param mixed $value1 The first value to evaluate.
+     * @param mixed $value2 The second value to evaluate.
+     * @return bool `true` if the $value1 and $value2 do not match. `false` if they do not.
+     */
+    private static function except(mixed $value1, mixed $value2) : bool {
+        return ($value1 != $value2);
     }
 
     /**

@@ -249,7 +249,7 @@ class Endpoint {
         foreach ($whitelist as $wif) {
             $if_info = get_interface_info($wif);
             # Check if our server IP is a valid if address, VIP, localhost, or any
-            if ($_SERVER["SERVER_ADDR"] === $if_info["ipaddr"] or API\Core\Tools\is_ip_vip($_SERVER["SERVER_ADDR"], $wif)) {
+            if ($_SERVER["SERVER_ADDR"] === $if_info["ipaddr"]) {
                 return;
             } elseif ($_SERVER["SERVER_ADDR"] === $if_info["ipaddrv6"]) {
                 return;
@@ -289,12 +289,27 @@ class Endpoint {
     private function check_request_data() {
         # Variables
         $content_type_unknown = false;
+        $content_type = $_SERVER["HTTP_CONTENT_TYPE"];
+
+        # Assign the default content type for the request method if no content type was specified
+        if (!$content_type) {
+            $content_type = match ($this->request_method) {
+                "GET", "DELETE" => "application/x-www-form-urlencoded",
+                default => "application/json",
+            };
+        }
 
         # Parse the content according to the content-type request header
-        $this->request_data = match ($_SERVER["HTTP_CONTENT_TYPE"]) {
-            "application/x-www-form-urlencoded" => $this->decode_form_content($_GET),
-            default => $this->decode_json_content(file_get_contents('php://input')),
-        };
+        switch ($content_type) {
+            case "application/x-www-form-urlencoded":
+                $this->request_data = $this->decode_form_content($_GET);
+                break;
+            case "application/json":
+                $this->request_data = $this->decode_json_content(file_get_contents('php://input'));
+                break;
+            default:
+                $content_type_unknown = true;
+        }
 
         # Check if the client requested an unknown content type
         if ($content_type_unknown) {

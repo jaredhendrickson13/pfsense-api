@@ -60,11 +60,11 @@ class InterfaceVLAN extends Model {
      * @returns int|null The validated $name to set.
      * @throws ValidationError When the `tag` value is invalid.
      */
-    public function validate_tag(int|null $tag) : string {
+    public function validate_tag(int|null $tag) : int {
         $if = $this->if->value;
 
         # Throw a validation error if this VLAN is already present as a QinQ
-        if (!$this->is_qinq(if: $if, tag: $tag)) {
+        if ($this->is_qinq(if: $if, tag: $tag)) {
             throw new ValidationError(
                 message: "VLAN interface `$if.$tag` is already in use by a Q-in-Q.",
                 response_id: "VLAN_INTERFACE_IN_USE_BY_QINQ"

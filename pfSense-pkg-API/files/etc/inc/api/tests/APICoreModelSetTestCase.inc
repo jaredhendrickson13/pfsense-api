@@ -67,6 +67,26 @@ class APICoreModelSetTestCase extends API\Core\TestCase {
     }
 
     /**
+     * Checks that ModelSet queries using except matches works as expected.
+     */
+    public function test_query_except() {
+        # Create two Models with unique values to add to the ModelSet
+        $test_model1 = new API\Models\Test(representation_data: ["test_bool" => true]);
+        $test_model2 = new API\Models\Test(representation_data: ["test_bool" => false]);
+
+        # Add the Models to a ModelSet
+        $test_modelset = new API\Core\ModelSet(model_objects: [$test_model1, $test_model2]);
+        $queried_modelset = $test_modelset->query(["test_bool__except" => true]);
+
+        # Ensure the query only returned Models with `test_bool` not set to true
+        $this->assert_equals(count($queried_modelset->model_objects), 1);
+        $this->assert_equals(
+            $queried_modelset->model_objects[1],
+            $test_model1
+        );
+    }
+
+    /**
      * Checks that ModelSet queries using the 'startswith' filer works as expected.
      */
     public function test_query_startswith() {
