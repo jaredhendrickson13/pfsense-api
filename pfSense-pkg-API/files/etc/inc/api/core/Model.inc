@@ -40,6 +40,7 @@ class Model {
     public API\Core\Auth $client;
     public array $packages = [];
     public array $package_includes = [];
+    public array $unique_together_fields = [];
     public string $internal_callable = "";
     public string $subsystem = "";
     public string $verbose_name = "";
@@ -473,6 +474,49 @@ class Model {
     }
 
     /**
+     * Checks that any fields which must be unique together are unique from all other existing objects for this Model.
+     * @throws ServerError When the fields specified in `unique_together_fields` are not Field objects known to this
+     * Model.
+     * @throws ValidationError When the unique together fields are not unique and are present in another Model object.
+     */
+    private function check_unique_together() {
+        # Unique together is only applicable to `many` Models. Skip this validation for non `many` Models.
+        if (!$this->many) {
+            return;
+        }
+
+        # Throw an error if Fields were provided that are not known to the Model
+        if (array_intersect($this->get_fields(), $this->unique_together_fields) != $this->unique_together_fields) {
+            throw new API\Responses\ServerError(
+                message: "Unknown Model fields provided by `unique_together_fields`",
+                response_id: "MODEL_UNIQUE_TOGETHER_FIELDS_WITH_UNKNOWN_FIELD"
+            );
+        }
+
+        # Exclude this Model object from the query
+        $query_params = ["id__except" => $this->id];
+
+        # Format the query parameters as an associative array
+        foreach ($this->unique_together_fields as $field) {
+            $query_params[$field] = $this->$field->value;
+        }
+
+        # Query for existing objects with the same Field values
+        $model_query = $this->read_all()->query(query_params: $query_params);
+
+        # If any existing Models were found matching the query, fields are not unique together, throw an error
+        if ($model_query->model_objects) {
+            $unique_fields_string = implode(", ", $this->unique_together_fields);
+            $in_use_by_id = $model_query->model_objects[0]->id;
+            throw new ValidationError(
+                message: "Fields [$unique_fields_string] together must be unique from all other objects of its kind. ".
+                    "Values in use by object with ID `$in_use_by_id`.",
+                response_id: "MODEL_FIELDS_NOT_UNIQUE_TOGETHER"
+            );
+        }
+    }
+
+    /**
      * Performs a full validation on the API mode. This includes checking that required packages are installed and
      * validating all assigned fields. Note: Fields are validated in the order they are defined in the class.
      * @return bool `true` if the model's data is valid.
@@ -509,6 +553,9 @@ class Model {
                 $this->$field->value = $this->$custom_validate_method($this->$field->value);
             }
         }
+
+        # Validate unique together fields
+        $this->check_unique_together();
 
         return true;
     }

@@ -93,8 +93,11 @@ class ModelSet {
                     break;
                 }
 
+                # Obtain the value for this field. If it is the ID, handle accordingly.
+                $value = ($field === "id") ? $model_object->id : $model_object->$field->value;
+
                 # Ensure the filter matches
-                if (!$this->$filter($model_object->$field->value, $query_value)) {
+                if (!$this->$filter($value, $query_value)) {
                     $is_match = false;
                     break;
                 }

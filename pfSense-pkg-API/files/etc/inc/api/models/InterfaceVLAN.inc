@@ -23,6 +23,7 @@ class InterfaceVLAN extends Model {
         # Set the configuration path for these objects and allow many to be stored.
         $this->config_path = "vlans/vlan";
         $this->many = true;
+        $this->unique_together_fields = ["if", "tag"];
 
         # Model fields
         $this->if = new StringField(
@@ -52,6 +53,24 @@ class InterfaceVLAN extends Model {
 
         # Needs to be constructed after fields are defined
         parent::__construct($id, $representation_data, $client);
+    }
+
+    /**
+     * Adds custom validation to the `if` field.
+     * @param string $if The parent interface value to validate.
+     * @returns string The validated $if to set.
+     * @throws ValidationError When the `if` value is invalid.
+     */
+    public function validate_if(string $if) : string {
+        # Throw a validation error if the requested parent interface does not exist
+        if (!does_interface_exist($if)) {
+            throw new ValidationError(
+                message: "Parent interface `$if` does not exist.",
+                response_id: "VLAN_INTERFACE_PARENT_NOT_FOUND"
+            );
+        }
+
+        return $if;
     }
 
     /**
