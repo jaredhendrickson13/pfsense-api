@@ -480,17 +480,19 @@ class Model {
      * @throws ValidationError When the unique together fields are not unique and are present in another Model object.
      */
     private function check_unique_together() {
-        # Unique together is only applicable to `many` Models. Skip this validation for non `many` Models.
-        if (!$this->many) {
+        # Skip this validation for non `many` Models or Models without unique together fields
+        if (!$this->many or !$this->unique_together_fields) {
             return;
         }
 
         # Throw an error if Fields were provided that are not known to the Model
-        if (array_intersect($this->get_fields(), $this->unique_together_fields) != $this->unique_together_fields) {
-            throw new API\Responses\ServerError(
-                message: "Unknown Model fields provided by `unique_together_fields`",
-                response_id: "MODEL_UNIQUE_TOGETHER_FIELDS_WITH_UNKNOWN_FIELD"
-            );
+        foreach ($this->unique_together_fields as $unique_together_field) {
+            if (!in_array($unique_together_field, $this->get_fields())) {
+                throw new API\Responses\ServerError(
+                    message: "Unknown Model field `$unique_together_field` specified in `unique_together_fields`",
+                    response_id: "MODEL_UNIQUE_TOGETHER_FIELDS_WITH_UNKNOWN_FIELD"
+                );
+            }
         }
 
         # Exclude this Model object from the query

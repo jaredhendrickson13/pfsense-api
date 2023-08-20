@@ -519,6 +519,57 @@ class APICoreModelTestCase extends API\Core\TestCase {
     }
 
     /**
+     * Checks that all fields specified in `unique_together_fields` must be existing Fields assigned to the Model.
+     */
+    public function test_unique_together_fields() {
+        $this->assert_throws_response(
+            response_id: "MODEL_UNIQUE_TOGETHER_FIELDS_WITH_UNKNOWN_FIELD",
+            code: 500,
+            callable: function () {
+                $test_model = new API\Models\Test();
+                $test_model->unique_together_fields = ["this_field_doesnt_exist"];
+                $test_model->validate();
+            }
+        );
+    }
+
+    /**
+     * Checks the unique together validation correctly requires a group of Fields to be unique from all other Model
+     * objects of its kind.
+     */
+    public function test_unique_together_validation() {
+        # Create a Model object that uses the unique fields
+        $original_model_obj = new API\Models\Test(
+            representation_data: [
+                "test_bool" => false,
+                "test_string_namespace" => "This must be unique with `test_bool` being `false`",
+                "test_integer" => 30
+            ]
+        );
+        $original_model_obj->create();
+
+        # Ensure we can't create another object with the same combination of values when unique_together_fields are set
+        $this->assert_throws_response(
+            response_id: "MODEL_FIELDS_NOT_UNIQUE_TOGETHER",
+            code: 400,
+            callable: function () {
+                $non_unique_model_obj = new API\Models\Test(
+                    representation_data: [
+                        "test_bool" => false,
+                        "test_string_namespace" => "This must be unique with `test_bool` being `false`",
+                        "test_integer" => 30
+                    ]
+                );
+                $non_unique_model_obj->unique_together_fields = ["test_bool", "test_string_namespace", "test_integer"];
+                $non_unique_model_obj->create();
+            }
+        );
+
+        # Delete the original Model object
+        $original_model_obj->delete();
+    }
+
+    /**
      * Checks that we are able to construct a Model object with an array of representation data.
      */
     public function test_model_constructs_from_representation() {
