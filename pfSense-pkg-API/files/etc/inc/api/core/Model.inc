@@ -38,6 +38,7 @@ class Model {
     public bool $many = false;
     public mixed $id = null;
     public API\Core\Auth $client;
+    public Model $initial_object;
     public array $packages = [];
     public array $package_includes = [];
     public array $unique_together_fields = [];
@@ -76,6 +77,7 @@ class Model {
         if (isset($id) or !$this->many) {
             $this->id = $id;
             $this->from_internal();
+            $this->initial_object = $this;
         }
 
         # Use the representation to obtain or construct this object if present.
@@ -404,6 +406,7 @@ class Model {
         if (array_key_exists("id", $representation_data)) {
             $this->id = $representation_data["id"];
             $this->from_internal();
+            $this->initial_object = $this;
         }
 
         # Loop through each field in this Model and assign their values using the `representation_data`.
@@ -663,6 +666,38 @@ class Model {
     }
 
     /**
+     * Performs steps and processes required to apply changes after the `create()` method runs. This can be overridden
+     * to add custom steps applying for just create actions. Defaults to simply calling `apply()`.
+     */
+    protected function apply_create() {
+        $this->apply();
+    }
+
+    /**
+     * Performs steps and processes required to apply changes after the `update()` method runs. This can be overridden
+     * to add custom steps to apply after update actions only. Defaults to simply calling `apply()`.
+     */
+    protected function apply_update() {
+        $this->apply();
+    }
+
+    /**
+     * Performs steps and processes required to apply changes after the `delete()` method runs. This can be overridden
+     * to add custom steps to apply after delete actions only. Defaults to simply calling `apply()`.
+     */
+    protected function apply_delete() {
+        $this->apply();
+    }
+
+    /**
+     * Performs steps and processes required to apply changes after the `replace_all()` method runs. This can be
+     * overridden to add custom steps to apply after replace all actions only. Defaults to simply calling `apply()`.
+     */
+    protected function apply_replace_all() {
+        $this->apply();
+    }
+
+    /**
      * Fetches Model objects for all objects stored in the internal pfSense values. If `config_path` is set, this will
      * load Model objects for each object stored at the config path. If `internal_callable` is set, this will create
      * Model objects for each object returned by the specified callable.
@@ -755,7 +790,8 @@ class Model {
 
             # Only apply this change immediately if requested
             if ($apply) {
-                $this->apply();
+                $this->apply_create();
+                clear_subsystem_dirty($this->subsystem);
             }
         }
 
@@ -812,7 +848,8 @@ class Model {
 
             # Only apply this change immediately if requested
             if ($apply) {
-                $this->apply();
+                $this->apply_update();
+                clear_subsystem_dirty($this->subsystem);
             }
         }
 
@@ -871,7 +908,8 @@ class Model {
 
         # Apply if requested
         if ($apply) {
-            $this->apply();
+            $this->apply_replace_all();
+            clear_subsystem_dirty($this->subsystem);
         }
 
         return $this->read_all();
@@ -925,11 +963,12 @@ class Model {
             # Mark the subsystem as dirty if set
             if ($this->subsystem) {
                 mark_subsystem_dirty($this->subsystem);
+                clear_subsystem_dirty($this->subsystem);
             }
 
             # Only apply this change immediately if requested
             if ($apply) {
-                $this->apply();
+                $this->apply_delete();
             }
         }
 

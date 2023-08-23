@@ -111,9 +111,24 @@ class InterfaceVLAN extends Model {
     }
 
     /**
-     * Set the apply method to configure VLAN interfaces after successful validation.
+     * Set the apply method to configure VLAN interfaces after successful creation.
      */
-    public function apply() {
+    public function apply_create() {
         interface_vlan_configure($this->to_internal());
+    }
+
+    /**
+     * Set the apply method to configure VLAN interfaces after successful updates.
+     */
+    public function apply_update() {
+        pfSense_interface_destroy($this->initial_object->if->value.".".$this->initial_object->tag->value);
+        interface_vlan_configure($this->to_internal());
+    }
+
+    /**
+     * Set the apply method to remove VLAN interfaces after successful deletion.
+     */
+    public function apply_delete() {
+        pfSense_interface_destroy($this->initial_object->if->value.".".$this->initial_object->tag->value);
     }
 }
