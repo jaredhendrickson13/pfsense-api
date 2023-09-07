@@ -113,7 +113,7 @@ class APISystemCertificateCreate extends APIModel {
 
     private function __validate_method() {
         # Local variables
-        $methods = ["import", "existing", "internal"];
+        $methods = ["import", "existing", "internal", "sign"];
 
         if (isset($this->initial_data['method'])) {
             # Ensure the method is a supported one
