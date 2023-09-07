@@ -84,8 +84,31 @@ class APISystemCertificateCreate extends APIModel {
             $this->__validate_altnames();
         }
 
-        # Create the certificate
-        $this->create_certificate();
+        # Validate 'sign' method fields
+        if ($this->cert_method === "sign") {
+            $this->__validate_caref();
+            $this->__validate_keytype();
+            $this->__validate_csrpaste;
+            $this->__validate_keylen();
+            $this->__validate_ecname();
+            $this->__validate_digest_alg();
+            $this->__validate_lifetime();
+            $this->__validate_dn_commonname();
+            $this->__validate_dn_country();
+            $this->__validate_dn_state();
+            $this->__validate_dn_city();
+            $this->__validate_dn_organization();
+            $this->__validate_dn_organizationalunit();
+            $this->__validate_type();
+            $this->__validate_altnames();
+        }
+
+        # Create or sign the certificate
+        if ($this->cert_method === "sign") {
+            $this->sign_certificate();
+        } else {
+            $this->create_certificate();
+        }
     }
 
     private function __validate_method() {
@@ -140,6 +163,25 @@ class APISystemCertificateCreate extends APIModel {
             }
             else {
                 $this->validated_data["crt"] = $crt;
+            }
+        } else {
+            $this->errors[] = APIResponse\get(1003);
+        }
+    }
+
+    private function __validate_csrpaste() {
+        # Check for our required 'csrpaste' field
+        if (isset($this->initial_data["csrpaste"])) {
+
+            # Decode certificate from base64 format
+            $crt = base64_decode($this->initial_data["csrpaste"]);
+
+            # Check if our certificate is valid
+            if (!strstr($crt, "BEGIN NEW CERTIFICATE REQUEST") || !strstr($crt, "END NEW CERTIFICATE REQUEST")) {
+                $this->errors[] = APIResponse\get(1003);
+            }
+            else {
+                $this->validated_data["csrpaste"] = $crt;
             }
         } else {
             $this->errors[] = APIResponse\get(1003);
@@ -429,6 +471,26 @@ class APISystemCertificateCreate extends APIModel {
                 $this->cert_attr['digest_alg'],
                 $this->cert_attr['keytype'],
                 $this->cert_attr['ecname']
+            );
+
+            # Check if OpenSSL failed to generate the certificate
+            if (!$openssl_create) {
+                $this->errors[] = APIResponse\get(1050);
+            }
+        }
+    }
+    public function sign_certificate() {
+
+        # Only sign a certificate if no errors were found and the method was sign
+        if (empty($this->errors) and $this->cert_method === "sign") {
+            $openssl_create = csr_sign(
+                $this->validated_data,
+                $this->validated_data["csrpaste"],
+                $this->validated_data["caref"],
+                $this->cert_attr['lifetime'],                
+                $this->validated_data["type"],
+                $this->validated_data["altnames"],
+                $this->cert_attr['digest_alg']
             );
 
             # Check if OpenSSL failed to generate the certificate
