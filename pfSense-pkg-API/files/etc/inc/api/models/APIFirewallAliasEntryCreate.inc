@@ -114,7 +114,15 @@ class APIFirewallAliasEntryCreate extends APIModel {
         # Get a list of the new addresses and details requested
         $this->initial_data["address"] = $this->__value_to_array($this->initial_data["address"]);
         $this->initial_data["detail"] = $this->__value_to_array($this->initial_data["detail"]);
-        $this->validated_data["detail"] = $this->__value_to_array(explode("||", $this->validated_data["detail"]));
+
+        # Only expand existing details if they exist
+        if ($this->validated_data["detail"]) {
+            $this->validated_data["detail"] = $this->__value_to_array(explode("||", $this->validated_data["detail"]));
+        }
+        # Otherwise, default to an empty array
+        else {
+            $this->validated_data["detail"] = [];
+        }
 
         # Ensure the number of addresses is greater than or equal to the number details
         if (count($this->initial_data["address"]) >= count($this->initial_data["detail"])) {
