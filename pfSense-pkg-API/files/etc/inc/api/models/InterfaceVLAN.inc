@@ -23,6 +23,7 @@ class InterfaceVLAN extends Model {
         # Set the configuration path for these objects and allow many to be stored.
         $this->config_path = "vlans/vlan";
         $this->many = true;
+        $this->always_apply = true;
         $this->unique_together_fields = ["if", "tag"];
 
         # Model fields

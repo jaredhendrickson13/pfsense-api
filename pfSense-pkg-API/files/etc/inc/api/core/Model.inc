@@ -44,6 +44,7 @@ class Model {
     public array $unique_together_fields = [];
     public string $internal_callable = "";
     public string $subsystem = "";
+    public bool $always_apply = false;
     public string $verbose_name = "";
     public string $verbose_name_plural = "";
 
@@ -77,7 +78,7 @@ class Model {
         if (isset($id) or !$this->many) {
             $this->id = $id;
             $this->from_internal();
-            $this->initial_object = $this;
+            $this->initial_object = unserialize(serialize($this));
         }
 
         # Use the representation to obtain or construct this object if present.
@@ -232,7 +233,6 @@ class Model {
                 file_put_contents($lock_file, microtime());
 
                 # Start a temporary session to write the config that contains the user's username in the config history
-//                session_start();
                 $_SESSION["Username"] = $this->client->username;
                 write_config(sprintf(gettext(" ".$change_note)));
 
@@ -242,8 +242,6 @@ class Model {
                 }
 
                 # Remove the temporary session and write lock
-//                unset($_SESSION);
-//                phpsession_destroy();
                 unlink($lock_file);
                 return;
             }
@@ -406,7 +404,7 @@ class Model {
         if (array_key_exists("id", $representation_data)) {
             $this->id = $representation_data["id"];
             $this->from_internal();
-            $this->initial_object = $this;
+            $this->initial_object = unserialize(serialize($this));
         }
 
         # Loop through each field in this Model and assign their values using the `representation_data`.
@@ -498,8 +496,13 @@ class Model {
             }
         }
 
-        # Exclude this Model object from the query
-        $query_params = ["id__except" => $this->id];
+        # Use this variable to keep track of query parameters to use when checking uniqueness
+        $query_params = [];
+
+        # Exclude this Model object from the query if this Model has an ID
+        if (isset($this->id)) {
+            $query_params = ["id__except" => $this->id];
+        }
 
         # Format the query parameters as an associative array
         foreach ($this->unique_together_fields as $field) {
@@ -789,10 +792,13 @@ class Model {
             }
 
             # Only apply this change immediately if requested
-            if ($apply) {
+            if ($apply or $this->always_apply) {
                 $this->apply_create();
                 clear_subsystem_dirty($this->subsystem);
             }
+
+            # Refresh the initial object
+            $this->initial_object = unserialize(serialize($this));
         }
 
         # Return the current representation of this object
@@ -847,10 +853,13 @@ class Model {
             }
 
             # Only apply this change immediately if requested
-            if ($apply) {
+            if ($apply or $this->always_apply) {
                 $this->apply_update();
                 clear_subsystem_dirty($this->subsystem);
             }
+
+            # Refresh the initial object
+            $this->initial_object = unserialize(serialize($this));
         }
 
         # Return the current representation of this object
@@ -907,7 +916,7 @@ class Model {
         }
 
         # Apply if requested
-        if ($apply) {
+        if ($apply or $this->always_apply) {
             $this->apply_replace_all();
             clear_subsystem_dirty($this->subsystem);
         }
@@ -967,9 +976,12 @@ class Model {
             }
 
             # Only apply this change immediately if requested
-            if ($apply) {
+            if ($apply or $this->always_apply) {
                 $this->apply_delete();
             }
+
+            # Refresh the initial object
+            $this->initial_object = unserialize(serialize($this));
         }
 
         # Return the current representation of this object

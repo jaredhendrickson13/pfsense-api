@@ -354,6 +354,9 @@ class Endpoint {
             }
             # For POST requests on non-many Endpoints, create a single object for the assigned Model
             elseif ($this->request_method === "POST" and !$this->many) {
+                # POST request cannot include an ID, strip the if present
+                unset($this->request_data["id"]);
+
                 $this->model->from_representation(representation_data: $this->request_data);
                 $resp_data = $this->model->create(apply: ($this->request_data["apply"] === true));
             }
