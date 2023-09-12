@@ -73,11 +73,29 @@ class FirewallAlias extends Model {
      * @throws ValidationError When the `name` value is invalid.
      */
     public function validate_name(string $name) : string {
+        global $pf_reserved_keywords, $reserved_table_names;
+
         # Throw an exception if this name is not a valid alias name
         if (!is_validaliasname($name)) {
             throw new ValidationError(
                 message: "Invalid firewall alias name '$name'.",
                 response_id: "INVALID_FIREWALL_ALIAS_NAME"
+            );
+        }
+
+        # Throw an exception if this name is reserved
+        if (in_array($name, array_merge($pf_reserved_keywords, $reserved_table_names))) {
+            throw new ValidationError(
+                message: "Firewall alias name '$name' is system reserved.",
+                response_id: "CANNOT_USE_RESERVED_FIREWALL_ALIAS_NAME"
+            );
+        }
+
+        # Throw an exception if this name starts with `pkg_
+        if (str_starts_with($name, "pkg_")) {
+            throw new ValidationError(
+                message: "Firewall alias name '$name' cannot begin with `pkg_`",
+                response_id: "FIREWALL_ALIAS_WITH_PKG_NAME"
             );
         }
 

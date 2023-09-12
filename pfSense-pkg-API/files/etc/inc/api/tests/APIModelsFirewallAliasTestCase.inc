@@ -46,7 +46,7 @@ class APIModelsFirewallAliasTestCase extends TestCase {
     public function test_reject_prohibited_alias_names() {
         # Ensure aliases starting with `pkg_` are rejected
         $this->assert_throws_response(
-            response_id: "INVALID_FIREWALL_ALIAS_NAME",
+            response_id: "FIREWALL_ALIAS_WITH_PKG_NAME",
             code: 400,
             callable: function() {
                 $test_alias = new FirewallAlias(
@@ -56,25 +56,95 @@ class APIModelsFirewallAliasTestCase extends TestCase {
             }
         );
 
-        # Ensure aliases starting with `wan` are rejected
+        # Ensure reserved table names cannot be used
         $this->assert_throws_response(
-            response_id: "INVALID_FIREWALL_ALIAS_NAME",
+            response_id: "CANNOT_USE_RESERVED_FIREWALL_ALIAS_NAME",
             code: 400,
             callable: function() {
                 $test_alias = new FirewallAlias(
-                    representation_data: ["name" => "wan", "type" => "host"]
+                    representation_data: ["name" => "sshguard", "type" => "host"]
                 );
                 $test_alias->validate();
             }
         );
 
-        # Ensure aliases with `lan` are rejected
+        # Ensure reserved table names cannot be used
         $this->assert_throws_response(
-            response_id: "INVALID_FIREWALL_ALIAS_NAME",
+            response_id: "CANNOT_USE_RESERVED_FIREWALL_ALIAS_NAME",
             code: 400,
             callable: function() {
                 $test_alias = new FirewallAlias(
-                    representation_data: ["name" => "lan", "type" => "host"]
+                    representation_data: ["name" => "IPsec", "type" => "host"]
+                );
+                $test_alias->validate();
+            }
+        );
+    }
+
+    /**
+     * Checks that address entries for host aliases must be an IP, hostname or alias
+     */
+    public function test_host_alias_address_validation() {
+        # Ensure an error is thrown if address is not a host
+        $this->assert_throws_response(
+            response_id: "INVALID_HOST_ALIAS_ADDRESS",
+            code: 400,
+            callable: function() {
+                $test_alias = new FirewallAlias(
+                    representation_data: ["name" => "test_alias", "type" => "host", "address" => ["!@# Not a host!"]]
+                );
+                $test_alias->validate();
+            }
+        );
+    }
+
+    /**
+     * Checks that address entries for network aliases must be a CIDR, hostname or alias
+     */
+    public function test_network_alias_address_validation() {
+        $this->assert_throws_response(
+            response_id: "INVALID_NETWORK_ALIAS_ADDRESS",
+            code: 400,
+            callable: function() {
+                $test_alias = new FirewallAlias(
+                    representation_data: ["name" => "test_alias", "type" => "network", "address" => ["!@# Not a network!"]]
+                );
+                $test_alias->validate();
+            }
+        );
+    }
+
+    /**
+     * Checks that address entries for port aliases must be a port number or alias
+     */
+    public function test_port_alias_address_validation() {
+        $this->assert_throws_response(
+            response_id: "INVALID_PORT_ALIAS_ADDRESS",
+            code: 400,
+            callable: function() {
+                $test_alias = new FirewallAlias(
+                    representation_data: ["name" => "test_alias", "type" => "port", "address" => ["!@# Not a port!"]]
+                );
+                $test_alias->validate();
+            }
+        );
+    }
+
+    /**
+     * Checks that there cannot be more detail entries than address entries.
+     */
+    public function test_cannot_have_more_details_than_addresses() {
+        $this->assert_throws_response(
+            response_id: "TOO_MANY_ALIAS_DETAILS",
+            code: 400,
+            callable: function() {
+                $test_alias = new FirewallAlias(
+                    representation_data: [
+                        "name" => "test_alias",
+                        "type" => "port",
+                        "address" => ["1", "2", "3", "4"],
+                        "detail" => ["1", "2", "3", "4", "5"]
+                    ]
                 );
                 $test_alias->validate();
             }
