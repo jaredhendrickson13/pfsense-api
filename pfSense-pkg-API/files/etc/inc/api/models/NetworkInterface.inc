@@ -31,10 +31,14 @@ class NetworkInterface extends Model
     public BooleanField $blockpriv;
     public BooleanField $blockbogons;
     public StringField $typev4;
-    public StringField $typev6;
     public StringField $ipaddr;
     public IntegerField $subnet;
     public StringField $gateway;
+    public StringField $dhcphostname;
+    public StringField $alias_address;
+    public IntegerField $alias_subnet;
+    public StringField $dhcprejectfrom;
+    public StringField $typev6;
 
     public function __construct(mixed $id=null, mixed $representation_data=[], Auth $client=null) {
         # Set the configuration path for these objects and allow many to be stored.
@@ -120,22 +124,52 @@ class NetworkInterface extends Model
         );
         $this->ipaddr = new StringField(
             required: true,
-            internal_name: "ipaddr",
             conditions: ["typev4" => ["static", "dhcp"]],
-            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_keywords: ["dhcp"])]
+            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_keywords: ["dhcp"])],
+            help_text: "Sets the IPv4 address to assign to this interface."
         );
         $this->subnet = new IntegerField(
             required: true,
             minimum: 1,
             maximum: 32,
-            internal_name: "subnet",
-            conditions: ["typev4" => "static"]
+            conditions: ["typev4" => "static"],
+            help_text: "Sets the subnet bit count to assign this interface."
         );
         $this->gateway = new StringField(
             allow_null: true,
-            internal_name: "gateway",
             conditions: ["typev4" => "static"],
-            validators: [new GatewayValidator(allow_ipv4: true, allow_ipv6: false, interface: $this->id)]
+            validators: [new GatewayValidator(allow_ipv4: true, allow_ipv6: false, interface: $this->id)],
+            help_text: "Sets the upstream gateway this interface will use. This is only applicable for WAN-type interfaces."
+        );
+        $this->dhcphostname = new StringField(
+            allow_null: true,
+            conditions: ["typev4" => "dhcp"],
+            validators: [new IPAddressValidator(allow_ipv4: false, allow_ipv6: false, allow_fqdn: true)],
+            help_text: "Sets the DHCP hostname this interface will advertise via DHCP."
+        );
+        $this->alias_address = new StringField(
+            allow_null: true,
+            internal_name: "alias-address",
+            conditions: ["typev4" => "dhcp"],
+            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_fqdn: false)],
+            help_text: "Sets the value used as a fixed alias IPv4 address by the DHCP client."
+        );
+        $this->alias_subnet = new IntegerField(
+            default: 32,
+            allow_null: true,
+            minimum: 0,
+            maximum: 32,
+            internal_name: "alias-subnet",
+            conditions: ["typev4" => "dhcp"],
+            help_text: "Sets the value used as the fixed alias IPv4 address's subnet bit count by the DHCP client."
+        );
+        $this->dhcprejectfrom = new StringField(
+            allow_null: true,
+            many: true,
+            delimiter: ",",
+            conditions: ["typev4" => "dhcp"],
+            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_fqdn: false)],
+            help_text: "Sets a list of IPv4 DHCP server addresses to reject DHCP offers for on this interface."
         );
 
         # Needs to be constructed after fields are defined
