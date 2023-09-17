@@ -46,6 +46,12 @@ class NetworkInterface extends Model
     public IntegerField $adv_dhcp_pt_reboot;
     public IntegerField $adv_dhcp_pt_backoff_cutoff;
     public IntegerField $adv_dhcp_pt_initial_interval;
+    public StringField $adv_dhcp_send_options;
+    public StringField $adv_dhcp_request_options;
+    public StringField $adv_dhcp_required_options;
+    public StringField $adv_dhcp_option_modifiers;
+    public BooleanField $adv_dhcp_config_file_override;
+    public StringField $adv_dhcp_config_file_override_path;
     public StringField $typev6;
 
     public function __construct(mixed $id=null, mixed $representation_data=[], Auth $client=null) {
@@ -180,6 +186,7 @@ class NetworkInterface extends Model
             help_text: "Sets a list of IPv4 DHCP server addresses to reject DHCP offers for on this interface."
         );
         $this->adv_dhcp_config_advanced = new BooleanField(
+            default: false,
             indicates_true: "yes",
             indicates_false: "",
             conditions: ["typev4" => "dhcp"],
@@ -225,6 +232,38 @@ class NetworkInterface extends Model
             minimum: 1,
             conditions: ["typev4" => "dhcp", "adv_dhcp_config_advanced" => true],
             help_text: "Manually sets the initial interval timing value used when requested DHCP leases on this interface."
+        );
+        $this->adv_dhcp_send_options = new StringField(
+            allow_null: true,
+            conditions: ["typev4" => "dhcp", "adv_dhcp_config_advanced" => true],
+            help_text: "Sets DHCP options to be sent when requesting a DHCP lease for this interface."
+        );
+        $this->adv_dhcp_request_options = new StringField(
+            allow_null: true,
+            conditions: ["typev4" => "dhcp", "adv_dhcp_config_advanced" => true],
+            help_text: "Sets DHCP option 55 values to be sent when requesting a DHCP lease for this interface."
+        );
+        $this->adv_dhcp_required_options = new StringField(
+            allow_null: true,
+            conditions: ["typev4" => "dhcp", "adv_dhcp_config_advanced" => true],
+            help_text: "Sets DHCP options required by the client when requesting a DHCP lease for this interface."
+        );
+        $this->adv_dhcp_option_modifiers = new StringField(
+            allow_null: true,
+            conditions: ["typev4" => "dhcp", "adv_dhcp_config_advanced" => true],
+            help_text: "Sets DHCP option modifiers applied to the obtained DHCP lease."
+        );
+        $this->adv_dhcp_config_file_override = new BooleanField(
+            default: false,
+            indicates_true: "yes",
+            indicates_false: "",
+            conditions: ["typev4" => "dhcp"],
+            help_text: "Enables or disables overriding the entire DHCP configuration file for this interface."
+        );
+        $this->adv_dhcp_config_file_override_path = new StringField(
+            allow_null: true,
+            conditions: ["typev4" => "dhcp", "adv_dhcp_config_file_override" => true],
+            help_text: "Sets the local file path of the custom DHCP configuration file."
         );
 
         # Needs to be constructed after fields are defined
