@@ -314,24 +314,6 @@ class APICoreFieldTestCase extends API\Core\TestCase
     }
 
     /**
-     * Checks that a Field cannot have `conditions` set if it does not `allow_null` values. By design, Fields that do
-     * not have all their conditions met during validation will be set to null.
-     */
-    public function test_no_conditions_without_allow_null() {
-        $this->assert_throws_response(
-            response_id: "FIELD_CANNOT_BE_CONDITIONAL_WITHOUT_ALLOW_NULL",
-            code: 500,
-            callable: function () {
-                new API\Core\Field(
-                    type: "string",
-                    allow_null: false,
-                    conditions: ["some-conditional-field"=>"some conditional value"]
-                );
-            }
-        );
-    }
-
-    /**
      * Checks that a Field with `conditions` is set to `null` when any of its conditions are not met.
      */
     public function test_unmet_conditions_assign_null() {

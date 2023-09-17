@@ -42,6 +42,7 @@ class Test extends Model {
         );
         $this->test_integer = new IntegerField(
             default: 5,
+            allow_null: true,
             help_text: "Demonstrates an integer field that defaults to 5."
         );
         $this->test_string_conditional = new StringField(

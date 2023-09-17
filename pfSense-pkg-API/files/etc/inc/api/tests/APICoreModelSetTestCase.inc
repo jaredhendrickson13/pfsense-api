@@ -234,4 +234,19 @@ class APICoreModelSetTestCase extends API\Core\TestCase {
             [$test_model1, $test_model3, $test_model4]
         );
     }
+
+    /**
+     * Checks that the ModelSet exists() method correctly identifies when Model objects are set.
+     */
+    public function test_exists() {
+        $test_model = new API\Models\Test();
+
+        # Ensure exists() returns true when at least one Model is assigned
+        $test_modelset = new API\Core\ModelSet(model_objects: [$test_model]);
+        $this->assert_is_true($test_modelset->exists());
+
+        # Ensure exists() returns false when no Models are assigned
+        $test_modelset = new API\Core\ModelSet(model_objects: []);
+        $this->assert_is_false($test_modelset->exists());
+    }
 }

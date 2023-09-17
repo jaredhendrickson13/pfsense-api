@@ -192,14 +192,6 @@ class Field
             );
         }
 
-        # Do not allow `conditions` to be set if the field does not `allow_null`
-        if ($this->conditions and !$this->allow_null) {
-            throw new ServerError(
-                message: "Fields cannot have 'conditions' unless they 'allow_null' values",
-                response_id: "FIELD_CANNOT_BE_CONDITIONAL_WITHOUT_ALLOW_NULL"
-            );
-        }
-
         # Do not allow the `many_minimum` value to greater than the `many_maximum` value
         if ($this->many_minimum > $this->many_maximum) {
             throw new ServerError(
@@ -312,6 +304,8 @@ class Field
 
             # Loop through each validator and run it's `validate` method against the current value.
             foreach ($this->validators as $validator) {
+                # Provide the Validator context to this Field's parent Model
+                $validator->context = $this->context;
                 $validator->validate(value: $value, field_name: $this->name);
             }
 
@@ -395,13 +389,27 @@ class Field
                 );
             }
 
-            # When the condition value is an array, the context Model's field value must be one of the array values.
-            if (is_array($condition_value) and !in_array($this->context->$condition_field->value, $condition_value)) {
+            # Variables
+            $invert = str_starts_with($condition_field, "!");
+            $condition_field_value = $this->context->$condition_field->value;
+
+            # For 'value in array' conditions, mark condition as unmet if value is not present in the array
+            if (!$invert and is_array($condition_value) and !in_array($condition_field_value, $condition_value)) {
                 $conditions_met = false;
                 break;
             }
-            # When the condition value is not an array, the context Model's field value must match exactly
-            if (!is_array($condition_value) and !$this->context->$condition_field->value === $condition_value) {
+            # For 'value equals' conditions, mark condition as unmet if values are not equal
+            if (!$invert and !is_array($condition_value) and $condition_field_value !== $condition_value) {
+                $conditions_met = false;
+                break;
+            }
+            # For 'value not in array' conditions, mark condition as unmet if value is present in the array
+            if ($invert and is_array($condition_value) and in_array($condition_field_value, $condition_value)) {
+                $conditions_met = false;
+                break;
+            }
+            # For 'value does not equal' conditions, mark condition as unmet if values are equal
+            if ($invert and !is_array($condition_value) and $condition_field_value === $condition_value) {
                 $conditions_met = false;
                 break;
             }
@@ -645,9 +653,10 @@ class Field
      * @param string|null $internal_value The raw internal config value to convert to a representation value.
      */
     public function from_internal(string|null $internal_value) {
-        # Simply return a null if the value null, there is no processing to be done on null values
+        # Keep null values
         if (is_null($internal_value)) {
             $this->value = null;
+            return;
         }
 
         # For `many` type fields, convert all values to representation.

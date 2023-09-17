@@ -34,6 +34,14 @@ class ModelSet {
     }
 
     /**
+     * Checks if Model objects exist in this ModelSet. This helpful when determining if an API query found matches.
+     * @return bool true if Model objects exist in this ModelSet, false if they do not.
+     */
+    public function exists() : bool {
+        return count($this->model_objects) > 0;
+    }
+
+    /**
      * Runs the to_representation() method for each model object within the model set and returns them all in an array.
      * @return array A serializable representation of all model objects within this model set.
      */

@@ -45,6 +45,7 @@ class Model {
     public string $internal_callable = "";
     public string $subsystem = "";
     public bool $always_apply = false;
+    public string $update_strategy = "merge";
     public string $verbose_name = "";
     public string $verbose_name_plural = "";
 
@@ -177,9 +178,9 @@ class Model {
      * For models that do not use a `config_path` or does not use config index IDs, this method can be overridden by
      * the child model class to add custom processes to obtain the next available ID.
      * @throws ServerError When the path leads to an existing non-empty, non-sequential array value
-     * @returns int the next array key (ID) for the config path specified.
+     * @returns string|int the next array key (ID) for the config path specified.
      */
-    public function get_next_id() : int {
+    public function get_next_id() : string|int {
         # Since this references config IDs, this method requires `config_path` to be set. Throw an error if it's not.
         if (!$this->config_path) {
             throw new ServerError(
@@ -262,7 +263,7 @@ class Model {
         # Loop through each of this Model's fields and add its value to a serializable array
         foreach ($this->get_fields() as $field) {
             # Don't add this field if it's value is `null`. This is how values are unset.
-            if (is_null($this->$field->value)) {
+            if (is_null($this->$field->value) or is_null($this->$field->to_internal())) {
                 continue;
             }
 
@@ -353,7 +354,7 @@ class Model {
         # Loop through each of this Model's fields and convert the internal value to the representation value
         foreach ($this->get_fields() as $field) {
             # Check the internal object for this field directly and convert it's value from internal to representation
-            if (!$this->$field->internal_namespace and array_key_exists($this->$field->internal_name, $internal_object)) {
+            if (!$this->$field->internal_namespace) {
                 $this->$field->from_internal($internal_object[$this->$field->internal_name]);
             }
 
@@ -554,9 +555,9 @@ class Model {
             # Run validation on this field
             $this->$field->validate();
 
-            # Check if a custom validation method was implemented for this model
+            # Check if a custom validation method was implemented for this model. Skip if null.
             $custom_validate_method = "validate_$field";
-            if (method_exists($this, $custom_validate_method)) {
+            if (method_exists($this, $custom_validate_method) and !is_null($this->$field->value)) {
                 # Run the custom validation method and reassign the fields value to its return value.
                 $this->$field->value = $this->$custom_validate_method($this->$field->value);
             }
@@ -707,14 +708,15 @@ class Model {
      * @return ModelSet|Model Returns a ModelSet of Models if `many` is enabled or a single Model object if `many` is
      * not enabled.
      */
-    public function read_all() : ModelSet|Model {
+    public static function read_all() : ModelSet|Model {
         # Variables
-        $model = get_class($this);
+        $model_name = get_called_class();
+        $model = new $model_name();
         $model_objects = [];
-        $internal_objects = $this->get_internal_objects();
+        $internal_objects = $model->get_internal_objects();
 
         # For non `many` models, wrap the internal object in an array so we can loop
-        $internal_objects = ($this->many) ? $internal_objects : [$internal_objects];
+        $internal_objects = ($model->many) ? $internal_objects : [$internal_objects];
 
         # Loop through each internal object and create a Model object for it
         foreach ($internal_objects as $internal_id=>$internal_object) {
@@ -724,7 +726,7 @@ class Model {
         }
 
         # Unwrap the array for non `many` models, otherwise return all objects
-        return ($this->many) ? new ModelSet($model_objects) : $model_objects[0];
+        return ($model->many) ? new ModelSet($model_objects) : $model_objects[0];
     }
 
     /**
@@ -818,10 +820,22 @@ class Model {
             # Only use the ID in the config path if 'many' is enabled. Otherwise, just use the base config path.
             $update_config_path = ($this->many) ? "$this->config_path/$this->id" : $this->config_path;
 
-            # Merge the differences between the stored object and the updated internal object
-            $stored_object = $this->get_config($update_config_path, []);
-            $updated_object = array_merge($stored_object, $this->to_internal());
-
+            # Merge differences between the stored object and updated internal object when update strategy is 'merge'
+            if ($this->update_strategy === "merge") {
+                $stored_object = $this->get_config($update_config_path, []);
+                $updated_object = array_merge($stored_object, $this->to_internal());
+            }
+            # Replace the internal object entirely when update strategy is 'replace'
+            elseif ($this->update_strategy === "replace") {
+                $updated_object = $this->to_internal();
+            }
+            # Throw an error if the update strategy is unknown
+            else {
+                throw new ServerError(
+                    message: "Model has unknown update strategy '$this->update_strategy'",
+                    response_id: "MODEL_WITH_UNKNOWN_MERGE_STRATEGY"
+                );
+            }
 
             # Write the changes to the object in config.
             $this->set_config(path: $update_config_path, value: $updated_object);

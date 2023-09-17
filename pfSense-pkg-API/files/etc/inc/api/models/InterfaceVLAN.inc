@@ -16,6 +16,7 @@ use API\Responses\ValidationError;
 class InterfaceVLAN extends Model {
     public StringField $if;
     public IntegerField $tag;
+    public StringField $vlanif;
     public IntegerField $pcp;
     public StringField $descr;
 
@@ -38,6 +39,12 @@ class InterfaceVLAN extends Model {
             minimum: 1,
             maximum: 4094,
             help_text: "The VLAN ID tag to use. This must be unique from all other VLANs on the parent interface."
+        );
+        $this->vlanif = new StringField(
+            required: false,
+            default: "",
+            allow_empty: true,
+            help_text: "Displays the full interface VLAN. This value is automatically populated and cannot be set."
         );
         $this->pcp = new IntegerField(
             default: null,
@@ -92,6 +99,15 @@ class InterfaceVLAN extends Model {
         }
 
         return $tag;
+    }
+
+    /**
+     * Automatically populates the `vlanif` field value using the `if` and `tag` values.
+     * @param string $vlanif The incoming `vlanif` value. This value is immediately overwritten.
+     * @returns string The full `vlanif` value.
+     */
+    public function validate_vlanif(string $vlanif) {
+        return $this->if->value . "." . $this->tag->value;
     }
 
     /**

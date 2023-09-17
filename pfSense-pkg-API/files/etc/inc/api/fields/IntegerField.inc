@@ -116,16 +116,23 @@ class IntegerField extends API\Core\Field {
      * @param string $internal_value The internal value from the pfSense configuration.
      * @return int The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value) : int {
-        # Throw an error if the value is not numeric
-        if (!is_numeric($internal_value)) {
-            throw new API\Responses\ServerError(
-                message: "Cannot parse IntegerField '$this->name' from internal because its internal value is not
-                    a numeric value. Consider changing this field to a StringField.",
-                response_id: "INTEGER_FIELD_WITH_NON_INTEGER_INTERNAL_VALUE"
-            );
+    protected function _from_internal(mixed $internal_value) : mixed {
+        # Return the value as an integer if it's numeric
+        if (is_numeric($internal_value)) {
+            return intval($internal_value);
         }
-        return intval($internal_value);
+
+        # If the value is an empty string, assume it's null
+        if ($internal_value === "") {
+            return null;
+        }
+
+        # Otherwise, the internal value cannot be represented by this Field. Throw an error.
+        throw new API\Responses\ServerError(
+            message: "Cannot parse IntegerField '$this->name' from internal because its internal value is not
+                    a numeric value. Consider changing this field to a StringField.",
+            response_id: "INTEGER_FIELD_WITH_NON_INTEGER_INTERNAL_VALUE"
+        );
     }
 
     /**

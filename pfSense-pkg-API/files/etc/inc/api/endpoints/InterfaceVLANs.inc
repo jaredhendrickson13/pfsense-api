@@ -15,7 +15,7 @@ class InterfaceVLANs extends Endpoint
         $this->many = true;
 
         # Assign allowed request methods along with the privileges required for each
-        $this->request_method_options = ["GET", "PUT"];
+        $this->request_method_options = ["GET"];
         $this->get_privileges = ["page-all", "page-interfaces-vlan"];
         $this->put_privileges = ["page-all", "page-interfaces-vlan-edit"];
 
