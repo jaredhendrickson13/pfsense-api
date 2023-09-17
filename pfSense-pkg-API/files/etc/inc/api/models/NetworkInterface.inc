@@ -38,6 +38,14 @@ class NetworkInterface extends Model
     public StringField $alias_address;
     public IntegerField $alias_subnet;
     public StringField $dhcprejectfrom;
+    public BooleanField $adv_dhcp_config_advanced;
+    public StringField $adv_dhcp_pt_values;
+    public IntegerField $adv_dhcp_pt_timeout;
+    public IntegerField $adv_dhcp_pt_retry;
+    public IntegerField $adv_dhcp_pt_select_timeout;
+    public IntegerField $adv_dhcp_pt_reboot;
+    public IntegerField $adv_dhcp_pt_backoff_cutoff;
+    public IntegerField $adv_dhcp_pt_initial_interval;
     public StringField $typev6;
 
     public function __construct(mixed $id=null, mixed $representation_data=[], Auth $client=null) {
@@ -170,6 +178,53 @@ class NetworkInterface extends Model
             conditions: ["typev4" => "dhcp"],
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_fqdn: false)],
             help_text: "Sets a list of IPv4 DHCP server addresses to reject DHCP offers for on this interface."
+        );
+        $this->adv_dhcp_config_advanced = new BooleanField(
+            indicates_true: "yes",
+            indicates_false: "",
+            conditions: ["typev4" => "dhcp"],
+            help_text: "Enables or disables the advanced DHCP settings on this interface."
+        );
+        $this->adv_dhcp_pt_values = new StringField(
+            default: "SavedCfg",
+            choices: ["SavedCfg"],
+            help_text: "Selects the advanced DHCP timing preset."
+        );
+        $this->adv_dhcp_pt_timeout = new IntegerField(
+            allow_null: true,
+            minimum: 1,
+            conditions: ["typev4" => "dhcp", "adv_dhcp_config_advanced" => true],
+            help_text: "Manually sets the timeout timing value used when requested DHCP leases on this interface."
+        );
+        $this->adv_dhcp_pt_retry = new IntegerField(
+            allow_null: true,
+            minimum: 1,
+            conditions: ["typev4" => "dhcp", "adv_dhcp_config_advanced" => true],
+            help_text: "Manually sets the retry timing value used when requested DHCP leases on this interface."
+        );
+        $this->adv_dhcp_pt_select_timeout = new IntegerField(
+            allow_null: true,
+            minimum: 0,
+            conditions: ["typev4" => "dhcp", "adv_dhcp_config_advanced" => true],
+            help_text: "Manually sets the select timing value used when requested DHCP leases on this interface."
+        );
+        $this->adv_dhcp_pt_reboot = new IntegerField(
+            allow_null: true,
+            minimum: 1,
+            conditions: ["typev4" => "dhcp", "adv_dhcp_config_advanced" => true],
+            help_text: "Manually sets the reboot timing value used when requested DHCP leases on this interface."
+        );
+        $this->adv_dhcp_pt_backoff_cutoff = new IntegerField(
+            allow_null: true,
+            minimum: 1,
+            conditions: ["typev4" => "dhcp", "adv_dhcp_config_advanced" => true],
+            help_text: "Manually sets the backoff cutoff timing value used when requested DHCP leases on this interface."
+        );
+        $this->adv_dhcp_pt_initial_interval = new IntegerField(
+            allow_null: true,
+            minimum: 1,
+            conditions: ["typev4" => "dhcp", "adv_dhcp_config_advanced" => true],
+            help_text: "Manually sets the initial interval timing value used when requested DHCP leases on this interface."
         );
 
         # Needs to be constructed after fields are defined
