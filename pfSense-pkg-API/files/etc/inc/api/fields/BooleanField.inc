@@ -25,9 +25,12 @@ class BooleanField extends API\Core\Field {
      * @param bool $editable Set to `false` to prevent this field's value from being changed after its initial creation.
      * @param bool $read_only If `true`, this field can only read its value and cannot write its value to config.
      * $many is enabled.
-     * @param bool $write_only Set the `true` to make this field write-only. This will prevent the field's current value
+     * @param bool $write_only Set to `true` to make this field write-only. This will prevent the field's current value
      * from being displayed in the representation data. This is ideal for potentially sensitive fields like passwords,
      * keys, and hashes.
+     * @param bool $representation_only Set to `true` to make this field only present in its representation form. This
+     * effectively prevents the Field from being converted to an internal value which is saved to the pfSense config.
+     * This should only be used for fields that do not relate directly to a configuration value.
      * @param string $indicates_true The internal string that indicates whether a value is `true`.
      * @param string|null $indicates_false The internal value that indicates whether a value is `false`. Use `null`
      * if the lack of a value for this field indicates `false` internally.
@@ -62,6 +65,7 @@ class BooleanField extends API\Core\Field {
         bool $editable = true,
         bool $read_only = false,
         bool $write_only = false,
+        bool $representation_only = false,
         string $indicates_true = "",
         string $indicates_false = null,
         string $verbose_name = "",
@@ -86,6 +90,7 @@ class BooleanField extends API\Core\Field {
             editable: $editable,
             read_only: $read_only,
             write_only: $write_only,
+            representation_only: $representation_only,
             verbose_name: $verbose_name,
             verbose_name_plural: $verbose_name_plural,
             internal_name: $internal_name,

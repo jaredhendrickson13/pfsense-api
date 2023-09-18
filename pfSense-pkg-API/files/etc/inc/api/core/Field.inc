@@ -28,6 +28,7 @@ class Field
     public mixed $default = null;
     public bool $read_only = false;
     public bool $write_only = false;
+    public bool $representation_only = false;
     public string $help_text = "";
     public string $name = "";
     public string $verbose_name = "";
@@ -56,9 +57,12 @@ class Field
      * @param bool $editable Set to `false` to prevent this field's value from being changed after its initial creation.
      * @param bool $read_only Set to `true` to make this field read-only. Attempts to write to a read-only field will
      * result in a thrown exception.
-     * @param bool $write_only Set the `true` to make this field write-only. This will prevent the field's current value
+     * @param bool $write_only Set to `true` to make this field write-only. This will prevent the field's current value
      * from being displayed in the representation data. This is ideal for potentially sensitive fields like passwords,
      * keys, and hashes.
+     * @param bool $representation_only Set to `true` to make this field only present in its representation form. This
+     * effectively prevents the Field from being converted to an internal value which is saved to the pfSense config.
+     * This should only be used for fields that do not relate directly to a configuration value.
      * @param bool $many Set to `true` if this field should accept an array of many values. `false` if only one value
      * should be allowed. If `true`, validation will run against each value in the value array individual.
      * @param int $many_minimum When $many is set to `true`, this sets the minimum number of array entries required.
@@ -99,6 +103,7 @@ class Field
         bool   $editable = true,
         bool   $read_only = false,
         bool   $write_only = false,
+        bool   $representation_only = false,
         bool   $many = false,
         int    $many_minimum = 1,
         int    $many_maximum = 128,
@@ -123,6 +128,7 @@ class Field
         $this->editable = $editable;
         $this->read_only = $read_only;
         $this->write_only = $write_only;
+        $this->representation_only = $representation_only;
         $this->many = $many;
         $this->many_minimum = $many_minimum;
         $this->many_maximum = $many_maximum;
@@ -700,6 +706,11 @@ class Field
      * @return array|string|null The internal array or string value suitable for writing the pfSense configuration.
      */
     public function to_internal() : array|string|null {
+        # Do not convert 'representation_only' fields to internal
+        if ($this->representation_only) {
+            return null;
+        }
+
         # For `many` fields, allow for individual value conversions before joining array back into internal string value
         if ($this->many) {
             $internal_values = [];

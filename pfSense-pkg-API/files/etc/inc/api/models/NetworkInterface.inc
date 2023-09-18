@@ -53,6 +53,10 @@ class NetworkInterface extends Model
     public BooleanField $adv_dhcp_config_file_override;
     public StringField $adv_dhcp_config_file_override_path;
     public StringField $typev6;
+    public StringField $ipaddrv6;
+    public IntegerField $subnetv6;
+    public StringField $gatewayv6;
+    public BooleanField $ipv6usev4iface;
 
     public function __construct(mixed $id=null, mixed $representation_data=[], Auth $client=null) {
         # Set the configuration path for these objects and allow many to be stored.
@@ -127,13 +131,16 @@ class NetworkInterface extends Model
             help_text: "Enable or disable automatically blocking bogon networks on this interface."
         );
         $this->typev4 = new StringField(
+            default: "none",
             choices: ["static", "dhcp", "none"],
             allow_null: true,
+            representation_only: true,
             help_text: "Selects the IPv4 address type to assign this interface."
         );
         $this->typev6 = new StringField(
             choices: ["static", "dhcp", "slaac", "6rd", "track6", "6to4", "none"],
             allow_null: true,
+            representation_only: true,
             help_text: "Selects the IPv6 address type to assign this interface."
         );
         $this->ipaddr = new StringField(
@@ -265,6 +272,31 @@ class NetworkInterface extends Model
             conditions: ["typev4" => "dhcp", "adv_dhcp_config_file_override" => true],
             help_text: "Sets the local file path of the custom DHCP configuration file."
         );
+        $this->ipaddrv6 = new StringField(
+            required: true,
+            conditions: ["typev6" => ["static", "dhcp"]],
+            validators: [new IPAddressValidator(allow_ipv4: false, allow_ipv6: true, allow_keywords: ["dhcp6"])],
+            help_text: "Sets the IPv6 address to assign to this interface."
+        );
+        $this->subnetv6 = new IntegerField(
+            required: true,
+            minimum: 1,
+            maximum: 128,
+            conditions: ["typev6" => "static"],
+            help_text: "Sets the subnet bit count to assign this interface."
+        );
+        $this->gatewayv6 = new StringField(
+            allow_null: true,
+            conditions: ["typev6" => "static"],
+            validators: [new GatewayValidator(allow_ipv4: false, allow_ipv6: true, interface: $this->id)],
+            help_text: "Sets the upstream gateway this interface will use. This is only applicable for WAN-type interfaces."
+        );
+        $this->ipv6usev4iface = new BooleanField(
+            default: false,
+            conditions: ["typev6" => "static"],
+            help_text: "Enable or disable IPv6 using the IPv4 connectivity link (PPPoE)."
+        );
+
 
         # Needs to be constructed after fields are defined
         parent::__construct($id, $representation_data, $client);
@@ -360,6 +392,31 @@ class NetworkInterface extends Model
     }
 
     /**
+     * Populates the `typev4` field if a value is not present
+     * @param string $typev4 The typev4 value to validate
+     * @returns string The validated $typev4 to set.
+     * @throws ValidationError When the `$typev4` value is invalid.
+     */
+    public function validate_typev4(mixed $typev4) : string {
+        # Only populate this value if a value was not already set
+        if (is_null($typev4)) {
+            # Set the type to static if an IP address is set
+            if (is_ipaddrv4($this->ipaddr->value)) {
+                return "static";
+            }
+            elseif ($this->ipaddr->value === "dhcp") {
+                return "dhcp";
+            }
+            else {
+                return "none";
+            }
+
+        }
+
+        return $typev4;
+    }
+
+    /**
      * Adds custom validation to the `ipaddr` field.
      * @param string $ipaddr The ipaddr value to validate
      * @returns string The validated $ipaddr to set.
@@ -378,6 +435,27 @@ class NetworkInterface extends Model
         }
 
         return $ipaddr;
+    }
+
+    /**
+     * Adds custom validation to the `ipaddrv6` field.
+     * @param string $ipaddrv6 The ipaddr value to validate
+     * @returns string The validated $ipaddrv6 to set.
+     * @throws ValidationError When the `ipaddrv6` value is invalid.
+     */
+    public function validate_ipaddrv6(string $ipaddrv6) : string {
+        # Force `ipaddrv6` to be `dhcp6` if `typev6` is `dhcp6`. Otherwise, retain original value.
+        $ipaddrv6 = ($this->typev6->value === "dhcp6") ? "dhcp6" : $ipaddrv6;
+
+        # Only allow `dhcp6` as a value if the type is also `dhcp6`
+        if ($ipaddrv6 === "dhcp6" and $this->typev6->value !== "dhcp6") {
+            throw new ValidationError(
+                message: "Interface `ipaddrv6` cannot be `dhcp6` unless `typev6` is also `dhcp`",
+                response_id: "INTERFACE_IPADDRV6_IS_DHCP6_WITH_NON_DHCP6_TYPEV6"
+            );
+        }
+
+        return $ipaddrv6;
     }
 
     /**
