@@ -40,7 +40,7 @@ class IPAddressValidator extends API\Core\Validator {
             return;
         }
         # IPv6 values are valid if allowed
-        if ($this->allow_ipv4 and is_ipaddrv6($value)) {
+        if ($this->allow_ipv6 and is_ipaddrv6($value)) {
             return;
         }
         # FQDN values are valid if allowed

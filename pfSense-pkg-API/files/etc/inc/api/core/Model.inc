@@ -367,6 +367,13 @@ class Model {
                     );
                 }
             }
+
+            # Check if a custom override method was implemented for this model field.
+            $custom_override_method = "override_$field";
+            if (method_exists($this, $custom_override_method)) {
+                # Run the custom override method and reassign the field's value to its return value.
+                $this->$field->value = $this->$custom_override_method($this->$field->value);
+            }
         }
     }
 
@@ -555,7 +562,7 @@ class Model {
             # Run validation on this field
             $this->$field->validate();
 
-            # Check if a custom validation method was implemented for this model. Skip if null.
+            # Check if a custom validation method was implemented for this model field. Skip if null.
             $custom_validate_method = "validate_$field";
             if (method_exists($this, $custom_validate_method) and !is_null($this->$field->value)) {
                 # Run the custom validation method and reassign the fields value to its return value.

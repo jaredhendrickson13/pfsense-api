@@ -659,8 +659,8 @@ class Field
      * @param string|null $internal_value The raw internal config value to convert to a representation value.
      */
     public function from_internal(string|null $internal_value) {
-        # Keep null values for non boolean values
-        if (is_null($internal_value) and $this->type !== "boolean") {
+        # Keep null values for non boolean values and representation only values
+        if ($this->representation_only or (is_null($internal_value) and $this->type !== "boolean")) {
             $this->value = null;
             return;
         }

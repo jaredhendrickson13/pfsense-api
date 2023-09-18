@@ -89,7 +89,7 @@ class NetworkInterface extends Model
             default: "",
             allow_empty: true,
             maximum_length: 17,
-            validators: [new MACAddressValidator()],
+            validators: [new MACAddressValidator(allow_keywords: [""])],
             help_text: "Assigns (spoofs) the MAC address for this interface instead of using the interface's real MAC."
         );
         $this->mtu = new IntegerField(
@@ -131,17 +131,10 @@ class NetworkInterface extends Model
             help_text: "Enable or disable automatically blocking bogon networks on this interface."
         );
         $this->typev4 = new StringField(
-            default: "none",
             choices: ["static", "dhcp", "none"],
             allow_null: true,
             representation_only: true,
             help_text: "Selects the IPv4 address type to assign this interface."
-        );
-        $this->typev6 = new StringField(
-            choices: ["static", "dhcp", "slaac", "6rd", "track6", "6to4", "none"],
-            allow_null: true,
-            representation_only: true,
-            help_text: "Selects the IPv6 address type to assign this interface."
         );
         $this->ipaddr = new StringField(
             required: true,
@@ -185,7 +178,8 @@ class NetworkInterface extends Model
             help_text: "Sets the value used as the fixed alias IPv4 address's subnet bit count by the DHCP client."
         );
         $this->dhcprejectfrom = new StringField(
-            allow_null: true,
+            default: [],
+            allow_empty: true,
             many: true,
             delimiter: ",",
             conditions: ["typev4" => "dhcp"],
@@ -202,6 +196,7 @@ class NetworkInterface extends Model
         $this->adv_dhcp_pt_values = new StringField(
             default: "SavedCfg",
             choices: ["SavedCfg"],
+            conditions: ["typev4" => "dhcp", "adv_dhcp_config_advanced" => true],
             help_text: "Selects the advanced DHCP timing preset."
         );
         $this->adv_dhcp_pt_timeout = new IntegerField(
@@ -272,28 +267,40 @@ class NetworkInterface extends Model
             conditions: ["typev4" => "dhcp", "adv_dhcp_config_file_override" => true],
             help_text: "Sets the local file path of the custom DHCP configuration file."
         );
+        $this->typev6 = new StringField(
+            choices: ["staticv6", "dhcp6", "slaac", "6rd", "track6", "6to4", "none"],
+            allow_null: true,
+            representation_only: true,
+            help_text: "Selects the IPv6 address type to assign this interface."
+        );
         $this->ipaddrv6 = new StringField(
             required: true,
-            conditions: ["typev6" => ["static", "dhcp"]],
-            validators: [new IPAddressValidator(allow_ipv4: false, allow_ipv6: true, allow_keywords: ["dhcp6"])],
+            conditions: ["typev6" => ["staticv6", "dhcp6", "slaac", "6rd", "track6", "6to4"]],
+            validators: [
+                new IPAddressValidator(
+                    allow_ipv4: false,
+                    allow_ipv6: true,
+                    allow_keywords: ["dhcp6", "slaac", "6rd", "track6", "6to4"]
+                )
+            ],
             help_text: "Sets the IPv6 address to assign to this interface."
         );
         $this->subnetv6 = new IntegerField(
             required: true,
             minimum: 1,
             maximum: 128,
-            conditions: ["typev6" => "static"],
+            conditions: ["typev6" => "staticv6"],
             help_text: "Sets the subnet bit count to assign this interface."
         );
         $this->gatewayv6 = new StringField(
             allow_null: true,
-            conditions: ["typev6" => "static"],
+            conditions: ["typev6" => "staticv6"],
             validators: [new GatewayValidator(allow_ipv4: false, allow_ipv6: true, interface: $this->id)],
             help_text: "Sets the upstream gateway this interface will use. This is only applicable for WAN-type interfaces."
         );
         $this->ipv6usev4iface = new BooleanField(
             default: false,
-            conditions: ["typev6" => "static"],
+            conditions: ["typev6" => "staticv6"],
             help_text: "Enable or disable IPv6 using the IPv4 connectivity link (PPPoE)."
         );
 
@@ -393,11 +400,11 @@ class NetworkInterface extends Model
 
     /**
      * Populates the `typev4` field if a value is not present
-     * @param string $typev4 The typev4 value to validate
-     * @returns string The validated $typev4 to set.
+     * @param string $typev4 The typev4 value to override
+     * @returns string The overridden $typev4 value to set.
      * @throws ValidationError When the `$typev4` value is invalid.
      */
-    public function validate_typev4(mixed $typev4) : string {
+    public function override_typev4(mixed $typev4) : string {
         # Only populate this value if a value was not already set
         if (is_null($typev4)) {
             # Set the type to static if an IP address is set
@@ -410,7 +417,6 @@ class NetworkInterface extends Model
             else {
                 return "none";
             }
-
         }
 
         return $typev4;
@@ -435,6 +441,39 @@ class NetworkInterface extends Model
         }
 
         return $ipaddr;
+    }
+
+    /**
+     * Populates the `typev6` field if a value is not present
+     * @param string $typev6 The typev6 value to override
+     * @returns string The overridden $typev6 value to set.
+     * @throws ValidationError When the `$typev6` value is invalid.
+     */
+    public function override_typev6(mixed $typev6) : string {
+        # Only populate this value if a value was not already set
+        if (is_null($typev6)) {
+            # Set the type to static if an IP address is set
+            if (is_ipaddrv6($this->ipaddrv6->value)) {
+                return "staticv6";
+            }
+            elseif ($this->ipaddrv6->value === "dhcp6") {
+                return "dhcp6";
+            }
+            elseif ($this->ipaddrv6->value === "6rd") {
+                return "6rd";
+            }
+            elseif ($this->ipaddrv6->value === "6to4") {
+                return "6to4";
+            }
+            elseif ($this->ipaddrv6->value === "track6") {
+                return "track6";
+            }
+            else {
+                return "none";
+            }
+        }
+
+        return $typev6;
     }
 
     /**
