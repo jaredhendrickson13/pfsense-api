@@ -12,6 +12,7 @@ use API;
  * fields that accept interface IDs and/or names as input.
  */
 class InterfaceField extends API\Fields\StringField {
+    public array $interface_query;
     public bool $allow_interface_groups;
     public bool $allow_ipsec_interface;
     public bool $allow_openvpn_interface;
@@ -24,6 +25,8 @@ class InterfaceField extends API\Fields\StringField {
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
      * @param mixed|null $default Assign a default string value to assign this Field if no value is present.
+     * @param array $interface_query Set query parameters to limit the scope of NetworkInterface lookups for this field.
+     * Leave as an empty array to include all NetworkInterface objects in lookups.
      * @param bool $allow_interface_groups If `true`, all existing interface groups will be included as valid choices.
      * @param bool $allow_ipsec_interface If `true`, IPsec's `enc0` interface will included as a valid choice.
      * @param bool $allow_openvpn_interface If `true`, the `openvpn` interface will be included as valid choice.
@@ -69,6 +72,7 @@ class InterfaceField extends API\Fields\StringField {
         bool $required = false,
         bool $unique = false,
         mixed $default = null,
+        array $interface_query = [],
         bool $allow_interface_groups = false,
         bool $allow_ipsec_interface = false,
         bool $allow_openvpn_interface = false,
@@ -94,18 +98,19 @@ class InterfaceField extends API\Fields\StringField {
     )
     {
         # Assign properties unique to this Field
+        $this->interface_query = $interface_query;
         $this->allow_interface_groups = $allow_interface_groups;
         $this->allow_ipsec_interface = $allow_ipsec_interface;
         $this->allow_openvpn_interface = $allow_openvpn_interface;
         $this->allow_carp_interface = $allow_carp_interface;
-        $this->represented_as = API\Models\APISettings::get_api_config()["config"]["represent_interfaces_as"];
+        $this->represented_as = "descr";
 
         # Construct the parent Field object
         parent::__construct(
             required: $required,
             unique: $unique,
             default: $default,
-            choices: $this->get_interface_choices(),
+            choices_callable: "get_interface_choices",
             allow_empty: $allow_empty,
             allow_null: $allow_null,
             editable: $editable,
@@ -133,79 +138,63 @@ class InterfaceField extends API\Fields\StringField {
      * @return string The field value in its representation form.
      */
     protected function _from_internal(mixed $internal_value) : string {
-        # Get all current interfaces
+        # Variables
         $interfaces = API\Core\Model::get_config("interfaces", []);
 
-        # If the value is an existing interface ID, return the representation value for that interface
+        # Check if this value is an existing interface ID
         if (array_key_exists($internal_value, $interfaces)) {
             switch ($this->represented_as) {
-                case "internal":
+                case "id":
                     return $internal_value;
-                case "description":
-                    return $interfaces[$internal_value]["descr"] ?: strtoupper($internal_value);
-                case "physical":
+                case "if":
                     return $interfaces[$internal_value]["if"];
+                case "descr":
+                    return ($interfaces[$internal_value]["descr"]) ?: strtoupper($internal_value);
             }
         }
 
-        return strval($internal_value);
+        # Otherwise, just return the internal value
+        return $internal_value;
     }
 
     /**
      * Converts the field's representation value into it's internal pfSense value.
      */
     protected function _to_internal(mixed $representation_value): string {
-        # Loop through current interfaces and find a match for this value.
-        $interfaces = API\Core\Model::get_config("interfaces", []);
-        foreach ($interfaces as $id => $interface) {
-            # In case this interface doesn't have a descriptive name, assume the default uppercase ID name
-            $interface["descr"] = $interface["descr"] ?: strtoupper($id);
-            if ($this->represented_as === "internal" and $representation_value === $id) {
-                return $id;
-            }
-            if ($this->represented_as === "description" and $representation_value === $interface["descr"]) {
-                return $id;
-            }
-            if ($this->represented_as === "physical" and $representation_value === $interface["if"]) {
-                return $id;
-            }
-        }
+        # Query to find this interface using the interfaces representation field and value
+        $interface_query = API\Models\NetworkInterface::read_all()->query(
+            query_params: [$this->represented_as => $representation_value]
+        );
 
-        return $representation_value;
+        return $interface_query->first()->id;
     }
 
     /**
      * Enumerates a list of every interface choice available to this Field.
      * @return array A list of every interface option available to this Field.
      */
-    private function get_interface_choices() : array {
+    public function get_interface_choices() : array {
         # Variables
         $choices = [];
-        $interfaces = API\Core\Model::get_config("interfaces", []);
+        $interface_query = API\Models\NetworkInterface::read_all()->query($this->interface_query);
         $interface_groups = API\Core\Model::get_config("ifgroups/ifgroupentry", []);
         $virtual_ips = API\Core\Model::get_config("virtualip/vip", []);
 
         # Loop through each configured interface and check for a match
-        foreach ($interfaces as $id => $interface) {
-            # In case this interface doesn't have a descriptive name, assume the default uppercase ID name
-            $interface["descr"] = $interface["descr"] ?: strtoupper($id);
-
-            # Add the interface's value according to the APIs `represent_interfaces_as` setting.
-            # Always assign the interfaces descriptive name as it's verbose choice
-            switch ($this->represented_as) {
-                case "internal":
-                    $choices[$id] =$interface["descr"];
-                    break;
-                case "description":
-                    $choices[$interface["descr"]] = $interface["descr"];
-                    break;
-                case "physical":
-                    $choices[$interface["if"]] = $interface["descr"];
-                    break;
+        foreach ($interface_query->model_objects as $interface) {
+            $represented_as = $this->represented_as;
+            # Use the interface's ID if interfaces are represented by `id`
+            if ($this->represented_as === "id") {
+                $choices[$interface->id] = $interface->descr->value;
+            }
+            # Otherwise, use the field interfaces are represented by
+            else {
+                $choices[$interface->$represented_as->value] = $interface->descr->value;
             }
         }
 
         # Include interface groups if requested
+        # TODO: Replace this with a query when the InterfaceGroup model is developed
         if ($this->allow_interface_groups) {
             # Loop through all existing interface groups and add their names
             foreach ($interface_groups as $interface_group) {
@@ -214,6 +203,7 @@ class InterfaceField extends API\Fields\StringField {
         }
 
         # Include CARP interfaces if requested
+        # TODO: Replace this with a query when the VirtualIP model is developed
         if ($this->allow_carp_interface) {
             # Loop through all existing interface groups and add their names
             foreach ($virtual_ips as $virtual_ip) {

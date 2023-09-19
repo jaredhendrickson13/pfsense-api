@@ -249,4 +249,26 @@ class APICoreModelSetTestCase extends API\Core\TestCase {
         $test_modelset = new API\Core\ModelSet(model_objects: []);
         $this->assert_is_false($test_modelset->exists());
     }
+
+    /**
+     * Checks that the ModelSet first() method correctly identifies the first Model object set.
+     */
+    public function test_first() {
+        $test_model1 = new API\Models\Test();
+        $test_model2 = new API\Models\Test();
+
+        # Ensure first() returns the first object when at least one Model is assigned
+        $test_modelset = new API\Core\ModelSet(model_objects: [$test_model1, $test_model2]);
+        $this->assert_equals($test_modelset->first(), $test_model1);
+
+        # Ensure an error is thrown if first() is called without any model objects assigned
+        $this->assert_throws_response(
+            response_id: "MODELSET_FIRST_REQUESTED_WITH_NO_MODEL_OBJECTS",
+            code: 500,
+            callable: function () {
+                $test_modelset = new API\Core\ModelSet(model_objects: []);
+                $test_modelset->first();
+            }
+        );
+    }
 }

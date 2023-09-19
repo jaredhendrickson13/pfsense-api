@@ -24,6 +24,10 @@ class IntegerField extends API\Core\Field {
      * of the exact choice values, or an associative array where the array key is the exact choice value and the array
      * value is a verbose name for the choice. Verbose choice name are used by ModelForms when generating web pages
      * for a given Model.
+     * @param string $choices_callable Assign a callable method from this Field object OR the parent Model context to
+     * execute to populate choices for this field. This callable must be a method assigned on this Field object OR the
+     * parent Model object that returns an array of valid choices in the same format as $choices. This is helpful when
+     * choices are dynamic and must be populate at runtime instead of pre-determined sets of values.
      * @param bool $allow_null If `true`, null values will be allowed by this field.
      * @param bool $editable Set to `false` to prevent this field's value from being changed after its initial creation.
      * @param bool $read_only If `true`, this field can only read its value and cannot write its value to config.
@@ -67,6 +71,7 @@ class IntegerField extends API\Core\Field {
         bool $unique = false,
         mixed $default = null,
         array $choices = [],
+        string $choices_callable = "",
         bool $allow_null = false,
         bool $editable = true,
         bool $read_only = false,
@@ -96,6 +101,7 @@ class IntegerField extends API\Core\Field {
             unique: $unique,
             default: $default,
             choices: $choices,
+            choices_callable: $choices_callable,
             allow_null: $allow_null,
             editable: $editable,
             read_only: $read_only,

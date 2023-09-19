@@ -20,6 +20,7 @@ class Field
     public int $many_maximum = 128;
     public string $delimiter = ",";
     public array $choices = [];
+    public string $choices_callable = "";
     public array $verbose_choices = [];
     public bool $allow_empty = false;
     public bool $allow_null = false;
@@ -51,6 +52,11 @@ class Field
      * of the exact choice values, or an associative array where the array key is the exact choice value and the array
      * value is a verbose name for the choice. Verbose choice name are used by ModelForms when generating web pages
      * for a given Model.
+     * @param string $choices_callable Assign a callable method from this Field object OR the parent Model context to
+     *  execute to populate choices for this field. This callable must be a method assigned on this Field object OR the
+     *  parent Model object that returns an array of valid choices in the same format as $choices. This is helpful when
+     *  choices are dynamic and must be populate at runtime instead of pre-determined sets of values.
+     * @param bool $allow_empty If `true`, empty strings will be allowed by this field.
      * @param bool $allow_empty Set to `true` if empty values (blank strings, 0, etc) should be allowed.
      * @param bool $allow_null Set to `true` if `null` values should be supported for this field. When `null` values
      * are supported, the underlying pfSense configuration field will be removed entirely when receiving a null value.
@@ -98,6 +104,7 @@ class Field
         bool   $unique = false,
         mixed  $default = null,
         array  $choices = [],
+        string $choices_callable = "",
         bool   $allow_empty = false,
         bool   $allow_null = false,
         bool   $editable = true,
@@ -121,6 +128,8 @@ class Field
         $this->type = $type;
         $this->validators = $validators;
         $this->unique = $unique;
+        $this->choices = $choices;
+        $this->choices_callable = $choices_callable;
         $this->allow_empty = $allow_empty;
         $this->allow_null = ($read_only) ? true : $allow_null;
         $this->required = $required;
@@ -141,13 +150,13 @@ class Field
         $this->referenced_by = $referenced_by;
         $this->conditions = $conditions;
 
-        # Assign choices
-        $this->set_choices($choices);
-
         # Set the many_minimum value to 0 if allow_empty and many are enabled
         if ($this->many and $this->allow_empty) {
             $this->many_minimum = 0;
         }
+
+        # Assign choices
+        $this->set_choices($this->choices);
 
         # Ensure values do not conflict
         $this->check_construct();
@@ -205,6 +214,14 @@ class Field
                 response_id: "FIELD_MANY_MINIMUM_GREATER_THAN_MANY_MAXIMUM"
             );
         }
+
+        # Do not allow `choices` and a `choices_callable` to be set at the same time
+        if ($this->choices and $this->choices_callable) {
+            throw new ServerError(
+                message: "Fields cannot have `choices' and a `choices_callable` assigned",
+                response_id: "FIELD_WITH_CHOICES_AND_CHOICES_CALLABLE"
+            );
+        }
     }
 
     /**
@@ -236,8 +253,31 @@ class Field
     /**
      * Accepts a given array of choices and sets the `choices` and `verbose_choices` properties accordingly.
      * @param array $choices The choices as provided by the __construct() method.
+     * @param bool $from_callable Allow or disallow fetching choices from the `choices_callable` before setting choices.
      */
-    private function set_choices(array $choices) {
+    private function set_choices(array $choices, bool $from_callable = false) {
+        # If a choices callable is assigned, run the callable to populate the choices if allowed
+        if ($from_callable and $this->choices_callable) {
+            # Set a variable we can use to dynamic invoke the callable
+            $callable = $this->choices_callable;
+
+            # First check if the parent Model context has a callable with this name. If so, run it and assign choices
+            if (in_array($callable, get_class_methods($this->context))) {
+                $choices = $this->context->$callable();
+            }
+            # Next, check if this Field object has a callable with this name. If so, run it and assign choices
+            elseif (in_array($callable, get_class_methods($this))) {
+                $choices = $this->$callable();
+            }
+            # Otherwise, throw an error because we could not find a callable with this name
+            else {
+                throw new ServerError(
+                    message: "Could not find choices callable method `$callable` in Field object nor its parent Model.",
+                    response_id: "FIELD_CHOICES_CALLABLE_NOT_FOUND"
+                );
+            }
+        }
+
         # Format choices accordingly when they are provided as an associative array
         if (is_assoc_array($choices)) {
             $this->choices = array_keys($choices);
@@ -607,6 +647,14 @@ class Field
      * @returns ValidationError When the $value is not an available choice.
      */
     private function check_value_choice(mixed $value) {
+        # Skip choice validation if no choices were specified and no choice callable was assigned
+        if (!$this->choices and !$this->choices_callable) {
+            return;
+        }
+
+        # Assign choices
+        $this->set_choices($this->choices, from_callable: true);
+
         # If choices are set, ensure this value is one of the choices
         if ($this->choices and !in_array($value, $this->choices)) {
             # Convert the choices array to a string format and throw a choice not supported
@@ -786,7 +834,8 @@ class Field
         $title = ($this->required) ? ucwords($this->verbose_name)."*" : ucwords($this->verbose_name);
 
         # Return a select input for fields with `choices`
-        if ($this->choices) {
+        if ($this->choices or $this->choices_callable) {
+            $this->set_choices($this->choices, from_callable: true);
             $input = new \Form_Select(
                 name: $this->name,
                 title: $title,

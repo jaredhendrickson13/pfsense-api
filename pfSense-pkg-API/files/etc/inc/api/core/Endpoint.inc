@@ -35,6 +35,7 @@ class Endpoint {
     public string $url = "";
     public string $model_name = "";
     protected Model $model;
+    public string $tag = "";
     protected array $errors = [];
     protected API\Core\Auth $client;
     public array $api_config;
@@ -76,6 +77,9 @@ class Endpoint {
         $model_class = "API\\Models\\".$this->model_name;
         $this->model = new $model_class();
 
+        # Set the default OpenAPI tag for this endpoint if no tag was explicitly assigned
+        $this->set_default_tag();
+
         # Set default help text for any help text properties that were not set by the child class
         $this->set_default_help_text();
 
@@ -86,7 +90,8 @@ class Endpoint {
     /**
      * Checks for conflicting attributes during object construction.
      */
-    private function check_construct() {
+    private function check_construct(): void
+    {
         # Do not allow `many` Endpoints that are assigned non `many` Models
         if ($this->many and !$this->model->many) {
             throw new ServerError(
@@ -104,6 +109,18 @@ class Endpoint {
                     response_id: "ENDPOINT_WITH_UNSUPPORTED_REQUEST_METHOD_OPTION"
                 );
             }
+        }
+    }
+
+    /**
+     * Use the endpoint's URL to determine a default OpenAPI tag for this endpoint.
+     */
+    private function set_default_tag(): void
+    {
+        # Only assume the default if a tag was not set
+        if (!$this->tag) {
+            # Set the tag for this URL according to it's root namespace (the section in URL after /api/v2/)
+            $this->tag = strtoupper(explode("/", $this->url)[3]);
         }
     }
 

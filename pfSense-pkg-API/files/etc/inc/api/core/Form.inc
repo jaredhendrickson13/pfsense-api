@@ -134,16 +134,13 @@ class Form {
         # When an ID was found or the assigned model is not a `many` model, update the object. Otherwise create it.
         try {
             ($this->id or !$this->model->many) ? $this->model->update() : $this->model->create();
-            $error_message = "";
-            $status_code = self::SUBMIT_SUCCESS;
+            $this->print_success_banner();
         }
         catch (Response $resp_error) {
             $error_message = $resp_error->getMessage();
-            $status_code = self::SUBMIT_FAILURE;
+            $this->print_input_error_banner(message: $error_message);
+
         }
-
-        $this->print_results(status_code: $status_code, message: $error_message);
-
     }
 
     /**

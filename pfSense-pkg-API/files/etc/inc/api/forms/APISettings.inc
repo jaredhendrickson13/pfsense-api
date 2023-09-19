@@ -63,6 +63,6 @@ class APISettings extends Form {
      */
     public function rotate_server_key() {
         Auth::init_jwt_server_key(rotate: true);
-        $this->print_results(self::SUBMIT_SUCCESS, "The JWT server key has been rotated.");
+        $this->print_success_banner(message: "The JWT server key has been rotated.");
     }
 }

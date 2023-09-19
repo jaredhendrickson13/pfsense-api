@@ -18,22 +18,22 @@ class APIFieldsInterfaceFieldTestCase extends TestCase
         # Variables
         $api_settings = new APISettings();
 
-        # Check standard interfaces with `represent_interfaces_as` set to `internal`.
-        $api_settings->represent_interfaces_as->value = "internal";
+        # Check standard interfaces with `represent_interfaces_as` set to `id`.
+        $api_settings->represent_interfaces_as->value = "id";
         $api_settings->update();
         $test_field = new InterfaceField();
         $this->assert_is_true(in_array("wan", $test_field->choices));
         $this->assert_is_true(in_array("lan", $test_field->choices));
 
-        # Check standard interfaces with `represent_interfaces_as` set to `description`.
-        $api_settings->represent_interfaces_as->value = "description";
+        # Check standard interfaces with `represent_interfaces_as` set to `descr`.
+        $api_settings->represent_interfaces_as->value = "descr";
         $api_settings->update();
         $test_field = new InterfaceField();
         $this->assert_is_true(in_array("WAN", $test_field->choices));
         $this->assert_is_true(in_array("LAN", $test_field->choices));
 
-        # Check standard interfaces with `represent_interfaces_as` set to `physical`.
-        $api_settings->represent_interfaces_as->value = "physical";
+        # Check standard interfaces with `represent_interfaces_as` set to `if`.
+        $api_settings->represent_interfaces_as->value = "if";
         $api_settings->update();
         $test_field = new InterfaceField();
         $this->assert_is_true(in_array("em0", $test_field->choices));
@@ -76,22 +76,22 @@ class APIFieldsInterfaceFieldTestCase extends TestCase
         # Variables
         $api_settings = new APISettings();
 
-        # Check with `represent_interfaces_as` set to `internal`.
-        $api_settings->represent_interfaces_as->value = "internal";
+        # Check with `represent_interfaces_as` set to `id`.
+        $api_settings->represent_interfaces_as->value = "id";
         $api_settings->update();
         $test_field = new InterfaceField();
         $test_field->value = "wan";
         $this->assert_equals($test_field->to_internal(), "wan");
 
-        # Check with `represent_interfaces_as` set to `description`.
-        $api_settings->represent_interfaces_as->value = "description";
+        # Check with `represent_interfaces_as` set to `descr`.
+        $api_settings->represent_interfaces_as->value = "descr";
         $api_settings->update();
         $test_field = new InterfaceField();
         $test_field->value = "WAN";
         $this->assert_equals($test_field->to_internal(), "wan");
 
-        # Check with `represent_interfaces_as` set to `physical`.
-        $api_settings->represent_interfaces_as->value = "physical";
+        # Check with `represent_interfaces_as` set to `if`.
+        $api_settings->represent_interfaces_as->value = "if";
         $api_settings->update();
         $test_field = new InterfaceField();
         $test_field->value = "em0";
@@ -106,22 +106,22 @@ class APIFieldsInterfaceFieldTestCase extends TestCase
         # Variables
         $api_settings = new APISettings();
 
-        # Check with `represent_interfaces_as` set to `internal`.
-        $api_settings->represent_interfaces_as->value = "internal";
+        # Check with `represent_interfaces_as` set to `id`.
+        $api_settings->represent_interfaces_as->value = "id";
         $api_settings->update();
         $test_field = new InterfaceField();
         $test_field->from_internal("wan");
         $this->assert_equals($test_field->value, "wan");
 
-        # Check with `represent_interfaces_as` set to `description`.
-        $api_settings->represent_interfaces_as->value = "description";
+        # Check with `represent_interfaces_as` set to `descr`.
+        $api_settings->represent_interfaces_as->value = "descr";
         $api_settings->update();
         $test_field = new InterfaceField();
         $test_field->from_internal("wan");
         $this->assert_equals($test_field->value, "WAN");
 
-        # Check with `represent_interfaces_as` set to `physical`.
-        $api_settings->represent_interfaces_as->value = "physical";
+        # Check with `represent_interfaces_as` set to `if`.
+        $api_settings->represent_interfaces_as->value = "if";
         $api_settings->update();
         $test_field = new InterfaceField();
         $test_field->from_internal("wan");

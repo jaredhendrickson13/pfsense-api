@@ -164,7 +164,7 @@ function get_classes_from_namespace(string $namespace) : array {
  */
 function generate_documentation() {
     # Variables
-    $view_classes = get_classes_from_namespace("\\API\\Endpoints\\");
+    $endpoint_classes = get_classes_from_namespace("\\API\\Endpoints\\");
     $response_classes = get_classes_from_namespace("\\API\\Responses\\");
 
     # Set static documentation details
@@ -212,26 +212,25 @@ function generate_documentation() {
     }
 
     # Import each Endpoint class and assign documentation for the endpoint according to the options and Model assigned.
-    foreach($view_classes as $view_class) {
+    foreach($endpoint_classes as $endpoint_class) {
         # Create the Response object
-        $view = new $view_class();
+        $endpoint = new $endpoint_class();
 
         # Add this Endpoint's URL to the OpenAPI `paths`
-        $openapi_config["paths"][$view->url] = [];
+        $openapi_config["paths"][$endpoint->url] = [];
 
-        # Set the tag for this URL according to it's root namespace (the section in URL after /api/v2/)
-        $view_tag = strtoupper(explode("/", $view->url)[3]);
-        $openapi_config["tags"][] = ["name" => $view_tag];
+        # Initialize this endpoint's OpenAPI tag
+        $openapi_config["tags"][] = ["name" => $endpoint->tag];
 
         # Obtain the Model assigned to the Endpoint
-        $model = "API\\Models\\$view->model_name";
+        $model = "API\\Models\\$endpoint->model_name";
         $model = new $model();
 
         # Obtain the OpenAPI schema for this Model.
-        $openapi_config["components"]["schemas"][$view->model_name] = $model->to_openapi_schema();
+        $openapi_config["components"]["schemas"][$endpoint->model_name] = $model->to_openapi_schema();
 
         # Assign shared values to each request method defined in this path
-        foreach ($view->request_method_options as $request_method) {
+        foreach ($endpoint->request_method_options as $request_method) {
             # Convert the request method to lower case so it matches the OpenAPI config
             $request_method = strtolower($request_method);
 
@@ -240,40 +239,40 @@ function generate_documentation() {
             $help_text_property = $request_method."_help_text";
 
             # Assign endpoint details to variables
-            $help_text = $view->$help_text_property;
-            $priv_options_str = implode(", ", $view->$privilege_property);
+            $help_text = $endpoint->$help_text_property;
+            $priv_options_str = implode(", ", $endpoint->$privilege_property);
             $required_packages_str = ($model->packages) ? implode(", ", $model->packages) : "None";
-            $requires_auth_str = ($view->requires_auth) ? "Yes" : "No";
-            $auth_modes_str = ($view->enforce_auth_mode) ? "$view->enforce_auth_mode" : "local, jwt, key";
+            $requires_auth_str = ($endpoint->requires_auth) ? "Yes" : "No";
+            $auth_modes_str = ($endpoint->enforce_auth_mode) ? "$endpoint->enforce_auth_mode" : "local, jwt, key";
 
             # Add documentation for all requests at this path
-            $openapi_config["paths"][$view->url][$request_method] = [
+            $openapi_config["paths"][$endpoint->url][$request_method] = [
                 "responses" => [],
-                "operationId" => $view::class."-$request_method",
+                "operationId" => $endpoint::class."-$request_method",
                 "description" => "<h3>Description:</h3>".
                     "$help_text<br>".
                     "<h3>Details:</h3>".
-                    "**Assigned model**: $view->model_name<br>".
+                    "**Assigned model**: $endpoint->model_name<br>".
                     "**Requires authentication**: $requires_auth_str<br>".
                     "**Supported authentication modes:** [ $auth_modes_str ]<br>".
                     "**Allowed privileges**: [ $priv_options_str ]<br>".
                     "**Requires packages**: [ $required_packages_str ]"
             ];
 
-            # Assign tags to this path
-            $openapi_config["paths"][$view->url][$request_method]["tags"] = [$view_tag];
+            # Nest this endpoint under its assigned or assumed tag
+            $openapi_config["paths"][$endpoint->url][$request_method]["tags"] = [$endpoint->tag];
 
             # Ensure the security mode is enforced for this path if the Endpoint has `enforce_auth_mode` set
-            if ($view->enforce_auth_mode) {
-                $openapi_config["paths"][$view->url][$request_method]["security"] = [
-                    [$view->enforce_auth_mode => []]
+            if ($endpoint->enforce_auth_mode) {
+                $openapi_config["paths"][$endpoint->url][$request_method]["security"] = [
+                    [$endpoint->enforce_auth_mode => []]
                 ];
             }
 
             # Assign request body definitions for POST, PUT and PATCH requests
             if (in_array($request_method, ["post", "put", "patch"])) {
                 # For non `many` Endpoints with `many` Models, add the ID to the schema and make it required
-                if (!$view->many and $model->many and $request_method !== "post") {
+                if (!$endpoint->many and $model->many and $request_method !== "post") {
                     $schema = [
                         "schema" => [
                             "allOf" => [
@@ -287,18 +286,18 @@ function generate_documentation() {
                                         ]
                                     ]
                                 ],
-                                ['$ref' => "#/components/schemas/$view->model_name"]
+                                ['$ref' => "#/components/schemas/$endpoint->model_name"]
                             ]
                         ]
                     ];
                 }
                 # For `many` Endpoints with `many` Models, accept arrays of many schema objects
-                elseif ($view->many and $model->many) {
+                elseif ($endpoint->many and $model->many) {
                     $schema = [
                         "schema" => [
                             "type" => "array", "items" => [
                                 "allOf" => [
-                                    ['$ref' => "#/components/schemas/$view->model_name"],
+                                    ['$ref' => "#/components/schemas/$endpoint->model_name"],
                                     ["type" => "object", "required" => $model->get_fields(required_only: true)]
                                 ]
                             ]
@@ -310,14 +309,14 @@ function generate_documentation() {
                     $schema = [
                         "schema" => [
                             "allOf" => [
-                                ['$ref' => "#/components/schemas/$view->model_name"],
+                                ['$ref' => "#/components/schemas/$endpoint->model_name"],
                                 ["type" => "object", "required" => $model->get_fields(required_only: true)]
                             ]
                         ]
                     ];
                 }
 
-                $openapi_config["paths"][$view->url][$request_method]["requestBody"] = [
+                $openapi_config["paths"][$endpoint->url][$request_method]["requestBody"] = [
                     "content" => [
                         "application/json" => $schema,
                         "application/x-www-form-urlencoded" => $schema,
@@ -326,8 +325,8 @@ function generate_documentation() {
             }
 
             # Assign the ID query parameter for GET and DELETE requests to non `many` Endpoints with a `many` Model assigned
-            if (!$view->many and $model->many and in_array($request_method, ["get", "delete"])) {
-                $openapi_config["paths"][$view->url][$request_method]["parameters"] = [
+            if (!$endpoint->many and $model->many and in_array($request_method, ["get", "delete"])) {
+                $openapi_config["paths"][$endpoint->url][$request_method]["parameters"] = [
                     [
                         "in" => "query",
                         "name" => "id",
@@ -346,7 +345,7 @@ function generate_documentation() {
             # Assign this request method responses for each Response class defined.
             foreach ($response_classes as $response_class) {
                 $response = new $response_class(message: "", response_id: "");
-                $openapi_config["paths"][$view->url][$request_method]["responses"][$response->code] = [
+                $openapi_config["paths"][$endpoint->url][$request_method]["responses"][$response->code] = [
                     '$ref' => "#/components/responses/".$response->get_shortname()
                 ];
             }

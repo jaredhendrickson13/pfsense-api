@@ -670,10 +670,26 @@ class Model {
     }
 
     /**
+     * Initializes the default 'pre_apply' method. This method is intended to be overidden by a child model class and
+     * is called immediately before the 'apply' method. This method runs regardless of whether an apply was requested.
+     */
+    protected function pre_apply() {
+    }
+
+    /**
      * Initializes the default 'apply' method. This method is intended to be overridden by a child model class and is
      * responsible for reloading/restarting services after changes occur.
      */
     protected function apply() {
+    }
+
+    /**
+     * Initializes the default 'pre_apply_create' method. This method is intended to be overridden by a child model class and
+     * is called immediately before the 'apply' method for create actions only. This method runs regardless of whether
+     * an apply was requested. By default, this method simply calls the global 'pre_apply' method.
+     */
+    protected function pre_apply_create() {
+        $this->pre_apply();
     }
 
     /**
@@ -685,11 +701,29 @@ class Model {
     }
 
     /**
+     * Initializes the default 'pre_apply_update' method. This method is intended to be overridden by a child model class and
+     * is called immediately before the 'apply' method for update actions only. This method runs regardless of whether
+     * an apply was requested. By default, this method simply calls the global 'pre_apply' method.
+     */
+    protected function pre_apply_update() {
+        $this->pre_apply();
+    }
+
+    /**
      * Performs steps and processes required to apply changes after the `update()` method runs. This can be overridden
      * to add custom steps to apply after update actions only. Defaults to simply calling `apply()`.
      */
     protected function apply_update() {
         $this->apply();
+    }
+
+    /**
+     * Initializes the default 'pre_apply_delete' method. This method is intended to be overridden by a child model class and
+     * is called immediately before the 'apply' method for delete actions only. This method runs regardless of whether
+     * an apply was requested. By default, this method simply calls the global 'pre_apply' method.
+     */
+    protected function pre_apply_delete() {
+        $this->pre_apply();
     }
 
     /**
@@ -800,6 +834,9 @@ class Model {
                 mark_subsystem_dirty($this->subsystem);
             }
 
+            # Run the pre-apply method
+            $this->pre_apply_create();
+
             # Only apply this change immediately if requested
             if ($apply or $this->always_apply) {
                 $this->apply_create();
@@ -872,6 +909,9 @@ class Model {
             if ($this->subsystem) {
                 mark_subsystem_dirty($this->subsystem);
             }
+
+            # Run the pre-apply method
+            $this->pre_apply_update();
 
             # Only apply this change immediately if requested
             if ($apply or $this->always_apply) {
@@ -993,12 +1033,15 @@ class Model {
             # Mark the subsystem as dirty if set
             if ($this->subsystem) {
                 mark_subsystem_dirty($this->subsystem);
-                clear_subsystem_dirty($this->subsystem);
             }
 
-            # Only apply this change immediately if requested
+            # Run the pre-apply method
+            $this->pre_apply_delete();
+
+            # Only apply this change immediately if requested or configured to do so
             if ($apply or $this->always_apply) {
                 $this->apply_delete();
+                clear_subsystem_dirty($this->subsystem);
             }
 
             # Refresh the initial object

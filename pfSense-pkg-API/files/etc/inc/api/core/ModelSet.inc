@@ -42,6 +42,24 @@ class ModelSet {
     }
 
     /**
+     * Returns the first Model object in the ModelSet. This is helpful when locating the first Model object that matched
+     * a query.
+     */
+    public function first() : Model {
+        # Ensure there is at least 1 Model object in this ModelSet
+        if ($this->exists()) {
+            # Return the first Model object in the ModelSet
+            return $this->model_objects[0];
+        }
+
+        # Throw an error if there are no Model objects in this ModelSet
+        throw new ServerError(
+            message: "Cannot locate first Model object in a ModelSet with no Model objects",
+            response_id: "MODELSET_FIRST_REQUESTED_WITH_NO_MODEL_OBJECTS"
+        );
+    }
+
+    /**
      * Runs the to_representation() method for each model object within the model set and returns them all in an array.
      * @return array A serializable representation of all model objects within this model set.
      */

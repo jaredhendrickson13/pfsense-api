@@ -6,6 +6,7 @@ use API\Core\Auth;
 use API\Core\Model;
 use API\Fields\BooleanField;
 use API\Fields\IntegerField;
+use API\Fields\InterfaceField;
 use API\Fields\StringField;
 use API\Responses\ServerError;
 use API\Responses\ValidationError;
@@ -13,6 +14,7 @@ use API\Validators\FilterNameValidator;
 use API\Validators\GatewayValidator;
 use API\Validators\IPAddressValidator;
 use API\Validators\MACAddressValidator;
+use API\Validators\SubnetValidator;
 
 /**
  * A Model that allows us to read, create, update and delete network interfaces. Note: PHP does not allow us to name a
@@ -57,6 +59,12 @@ class NetworkInterface extends Model
     public IntegerField $subnetv6;
     public StringField $gatewayv6;
     public BooleanField $ipv6usev4iface;
+    public BooleanField $slaacusev4iface;
+    public StringField $prefix_6rd;
+    public StringField $gateway_6rd;
+    public IntegerField $prefix_6rd_v4plen;
+    public InterfaceField $track6_interface;
+    public StringField $track6_prefix_id_hex;
 
     public function __construct(mixed $id=null, mixed $representation_data=[], Auth $client=null) {
         # Set the configuration path for these objects and allow many to be stored.
@@ -70,7 +78,7 @@ class NetworkInterface extends Model
             required: true,
             unique: true,
             maximum_length: 128,
-            help_text: "The physical interface this configuration will be applied to."
+            help_text: "The real interface this configuration will be applied to."
         );
         $this->enable = new BooleanField(
             required: false,
@@ -303,7 +311,49 @@ class NetworkInterface extends Model
             conditions: ["typev6" => "staticv6"],
             help_text: "Enable or disable IPv6 using the IPv4 connectivity link (PPPoE)."
         );
-
+        $this->slaacusev4iface = new BooleanField(
+            default: false,
+            conditions: ["typev6" => "slaac"],
+            help_text: "Enable or disable IPv6 using the IPv4 connectivity link (PPPoE)."
+        );
+        $this->prefix_6rd = new StringField(
+            required: true,
+            unique: true,
+            internal_name: "prefix-6rd",
+            conditions: ["typev6" => "6rd"],
+            validators: [new SubnetValidator(allow_ipv4: false, allow_ipv6: true)],
+            help_text: "Sets the 6RD IPv6 prefix assigned by the ISP for this interface."
+        );
+        $this->gateway_6rd = new StringField(
+            required: true,
+            internal_name: "gateway-6rd",
+            conditions: ["typev6" => "6rd"],
+            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
+            help_text: "Sets the 6RD IPv4 gateway address assigned by the ISP for this interface."
+        );
+        $this->prefix_6rd_v4plen = new IntegerField(
+            required: true,
+            minimum: 0,
+            maximum: 32,
+            internal_name: "prefix-6rd-v4plen",
+            conditions: ["typev6" => "6rd"],
+            help_text: "Sets the 6RD IPv4 prefix length. Normally specified by the ISP. A value of 0 means embed the".
+                "entire IPv4 address in the 6RD prefix."
+        );
+        $this->track6_interface = new InterfaceField(
+            required: true,
+            interface_query: ["id__except" => &$this->id, "typev6__except" => "none"],
+            internal_name: "track6-interface",
+            conditions: ["typev6" => "track6"],
+            help_text: "Sets the dynamic IPv6 WAN interface to track for configuration."
+        );
+        $this->track6_prefix_id_hex = new StringField(
+            default: "0",
+            internal_name: "track6-prefix-id--hex",
+            conditions: ["typev6" => "track6"],
+            help_text: "Sets the hexadecimal IPv6 prefix ID. This determines the configurable network ID based on the ".
+                "dynamic IPv6 connection."
+        );
 
         # Needs to be constructed after fields are defined
         parent::__construct($id, $representation_data, $client);
@@ -319,12 +369,26 @@ class NetworkInterface extends Model
         # Throw a validation error if the requested real interface does not exist
         if (!does_interface_exist($if)) {
             throw new ValidationError(
-                message: "Physical interface `$if` does not exist.",
-                response_id: "PHYSICAL_INTERFACE_NOT_FOUND"
+                message: "Real interface `$if` does not exist.",
+                response_id: "REAL_INTERFACE_NOT_FOUND"
             );
         }
 
         return $if;
+    }
+
+    /**
+     * Populates the `descr` field as the interface's ID in uppercase if no value exists. This is necessary because
+     * some default pfSense interfaces are created without a description assigned.
+     */
+    public function override_descr(mixed $descr) : string {
+        # Check if descr has no value, if so, assign it this object's ID in uppercase
+        if (empty($descr)) {
+            return strtoupper($this->id);
+        }
+
+        # Otherwise, just return the existing value
+        return $descr;
     }
 
     /**
@@ -429,9 +493,6 @@ class NetworkInterface extends Model
      * @throws ValidationError When the `ipaddr` value is invalid.
      */
     public function validate_ipaddr(string $ipaddr) : string {
-        # Force `ipaddr` to be `dhcp` if `typev4` is `dhcp`. Otherwise, retain original value.
-        $ipaddr = ($this->typev4->value === "dhcp") ? "dhcp" : $ipaddr;
-
         # Only allow `dhcp` as a value if the type is also `dhcp`
         if ($ipaddr === "dhcp" and $this->typev4->value !== "dhcp") {
             throw new ValidationError(
@@ -459,6 +520,9 @@ class NetworkInterface extends Model
             elseif ($this->ipaddrv6->value === "dhcp6") {
                 return "dhcp6";
             }
+            elseif ($this->ipaddrv6->value === "slaac") {
+                return "slaac";
+            }
             elseif ($this->ipaddrv6->value === "6rd") {
                 return "6rd";
             }
@@ -483,14 +547,39 @@ class NetworkInterface extends Model
      * @throws ValidationError When the `ipaddrv6` value is invalid.
      */
     public function validate_ipaddrv6(string $ipaddrv6) : string {
-        # Force `ipaddrv6` to be `dhcp6` if `typev6` is `dhcp6`. Otherwise, retain original value.
-        $ipaddrv6 = ($this->typev6->value === "dhcp6") ? "dhcp6" : $ipaddrv6;
-
         # Only allow `dhcp6` as a value if the type is also `dhcp6`
         if ($ipaddrv6 === "dhcp6" and $this->typev6->value !== "dhcp6") {
             throw new ValidationError(
                 message: "Interface `ipaddrv6` cannot be `dhcp6` unless `typev6` is also `dhcp`",
                 response_id: "INTERFACE_IPADDRV6_IS_DHCP6_WITH_NON_DHCP6_TYPEV6"
+            );
+        }
+        # Only allow `slaac` as a value if the type is also `slaac`
+        if ($ipaddrv6 === "slaac" and $this->typev6->value !== "slaac") {
+            throw new ValidationError(
+                message: "Interface `ipaddrv6` cannot be `slaac` unless `typev6` is also `slaac`",
+                response_id: "INTERFACE_IPADDRV6_IS_SLAAC_WITH_NON_SLAAC_TYPEV6"
+            );
+        }
+        # Only allow `6rd` as a value if the type is also `6rd`
+        if ($ipaddrv6 === "6rd" and $this->typev6->value !== "6rd") {
+            throw new ValidationError(
+                message: "Interface `ipaddrv6` cannot be `6rd` unless `typev6` is also `6rd`",
+                response_id: "INTERFACE_IPADDRV6_IS_6RD_WITH_NON_6RD_TYPEV6"
+            );
+        }
+        # Only allow `6to4` as a value if the type is also `6to4`
+        if ($ipaddrv6 === "6to4" and $this->typev6->value !== "6to4") {
+            throw new ValidationError(
+                message: "Interface `ipaddrv6` cannot be `6to4` unless `typev6` is also `6to4`",
+                response_id: "INTERFACE_IPADDRV6_IS_6TO4_WITH_NON_6TO4_TYPEV6"
+            );
+        }
+        # Only allow `track6` as a value if the type is also `track6`
+        if ($ipaddrv6 === "track6" and $this->typev6->value !== "track6") {
+            throw new ValidationError(
+                message: "Interface `ipaddrv6` cannot be `track6` unless `typev6` is also `track6`",
+                response_id: "INTERFACE_IPADDRV6_IS_TRACK6_WITH_NON_TRACK6_TYPEV6"
             );
         }
 
@@ -574,98 +663,166 @@ class NetworkInterface extends Model
         file_put_contents($g['tmp_path']."/.interfaces.apply", serialize($pending_ifs));
     }
 
+
+    public function pre_apply() {
+        $this->serialize_changes();
+    }
+
+    public function _delete() {
+        # Do not allow deletion of WAN interface
+        if ($this->id === "wan") {
+            throw new ValidationError(
+                message: "Interface `wan` cannot be deleted.",
+                response_id: "NETWORK_INTERFACE_WAN_CANNOT_BE_DELETED"
+            );
+        }
+        # Do not allow deletion if interface is in group
+        elseif (link_interface_to_group($this->id)) {
+            throw new ValidationError(
+                message: "Interface `$this->id` cannot be deleted because it is in use by an interface group.",
+                response_id: "NETWORK_INTERFACE_IN_USE_BY_INTERFACE_GROUP"
+            );
+        }
+        # Do not allow deletion if interface is in bridge
+        elseif (link_interface_to_bridge($this->id)) {
+            throw new ValidationError(
+                message: "Interface `$this->id` cannot be deleted because it is in use by an interface bridge.",
+                response_id: "NETWORK_INTERFACE_IN_USE_BY_INTERFACE_BRIDGE"
+            );
+        }
+        # Do not allow interface to be deleted if it is assigned GRE interface
+        elseif (link_interface_to_tunnelif($this->id, 'gre')) {
+            throw new ValidationError(
+                message: "Interface `$this->id` cannot be deleted because it is in use by an GRE tunnel.",
+                response_id: "NETWORK_INTERFACE_IN_USE_BY_INTERFACE_GRE"
+            );
+        }
+        # Do not allow interface to be deleted if it is assigned GIF interface
+        elseif (link_interface_to_tunnelif($this->id, 'gif')) {
+            throw new ValidationError(
+                message: "Interface `$this->id` cannot be deleted because it is in use by an GIF interface.",
+                response_id: "NETWORK_INTERFACE_IN_USE_BY_INTERFACE_GIF"
+            );
+        }
+        # Do not allow interface to be deleted if it has a traffic queue assigned
+        elseif (interface_has_queue($this->id)) {
+            throw new ValidationError(
+                message: "Interface `$this->id` cannot be deleted because it is in use by a traffic shaper queue.",
+                response_id: "NETWORK_INTERFACE_IN_USE_BY_TRAFFIC_SHAPER_QUEUE"
+            );
+        }
+        # Otherwise, run through the steps to delete the interface
+        else {
+            # Remove the 'enable' value first, then bring down the interface and delete it from config
+            $this->del_config("interfaces/{$this->id}/enable");
+            $realid = get_real_interface($this->id);
+            interface_bring_down($this->id);
+            $this->del_config("interfaces/{$this->id}");
+
+            # Remove DHCP config for interface
+            if (is_array($this->get_config("dhcpd/{$this->id}"))) {
+                $this->del_config("dhcpd/{$this->id}");
+                services_dhcpd_configure('inet');
+            }
+            # Remove interface config for dhcp6
+            if (is_array($this->get_config("dhcpdv6/{$this->id}"))) {
+                $this->del_config("dhcpdv6/{$this->id}");
+                services_dhcpd_configure('inet6');
+            }
+            # Remove ACL for interface
+            foreach ($this->get_config('filter/rule', []) as $x => $rule) {
+                if ($rule['interface'] == $this->id) {
+                    $this->del_config("filter/rule/{$x}");
+                }
+            }
+            # Remove NAT config for interface
+            foreach ($this->get_config('nat/rule', []) as $x => $rule) {
+                if ($rule['interface'] == $this->id) {
+                    $this->del_config("nat/rule/{$x}");
+                }
+            }
+
+            # Disable DHCP if last interface
+            if (count($this->get_config('interfaces', [])) <= 1 && $this->get_config('dhcpd/wan')) {
+                $this->del_config('dhcpd/wan');
+            }
+
+            # Update VLAN assignments
+            link_interface_to_vlans($realid, "update");
+        }
+    }
+
     public function apply() {
         # Local variables
         global $g;
-        $mtu_redo = array();
+        unlink_if_exists("{$g['tmp_path']}/config.cache");
+        $vlan_redo = [];
 
-        # Remove configuration cache if it exists
-        unlink_if_exists($g['tmp_path']."/config.cache");
-
-        # Check that there are even pending interface changes to apply
+        # Only apply interfaces changes if the cache of interface changes is present
         if (file_exists("{$g['tmp_path']}/.interfaces.apply")) {
-            # Load our pending interface file
-            $pending_ifs = unserialize(file_get_contents($g['tmp_path']."/.interfaces.apply"));
+            # Unserialize the file to determine which interfaces need to be applied
+            $interfaces = unserialize(file_get_contents("{$g['tmp_path']}/.interfaces.apply"));
 
-            # Loop through each pending interface configuration and apply it accordingly
-            foreach ($pending_ifs as $if_to_apply => $if_conf) {
-                # Check this interface's MTU value
-                $if_mtu = get_interface_mtu(get_real_interface($if_to_apply));
+            # Loop through each interface to configure and restart services
+            foreach ($interfaces as $id => $interface) {
+                # Determine the real interface name and it's current MTU
+                $real_interface = get_real_interface($id);
+                $real_interface_mtu = get_interface_mtu($real_interface);
 
-                # Only apply changes to interfaces that are enabled
-                if ($this->is_config_enabled("interfaces/{$if_to_apply}")) {
-                    # Bring down existing interface and configure the new one
-                    interface_bring_down($if_to_apply, false, $if_conf);
-                    interface_configure($if_to_apply, true);
+                # Configure the interface if it's enabled
+                if (config_path_enabled("interfaces/{$id}")) {
+                    interface_bring_down($id, false, $interface);
+                    interface_configure($id, true);
 
-                    # Call track6 specific configuration steps
-                    if ($this->get_config("interfaces/{$if_to_apply}/ipaddrv6") == "track6") {
-                        $wancfg = $this->get_config("interfaces/{$if_to_apply}");
-                        interface_track6_configure($if_to_apply, $wancfg, true);
+                    # Reconfigure track6 if this is a track6 enabled interface
+                    if (config_get_path("interfaces/{$id}/ipaddrv6") == "track6") {
+                        interface_track6_configure($id, $interface, true);
                     }
                 }
-                # If interface was not enabled (or was disabled) remove any existing configurations utilizing interface
+                # Otherwise, tear down this interface
                 else {
-                    # Bring down the existing interface on the system if it exists
-                    interface_bring_down($if_to_apply, true, $if_conf);
-
-                    # Restart DHCP services to remove DHCP server(s) on this interface
-                    if ($this->is_config_enabled("dhcpd/{$if_to_apply}") or $this->is_config_enabled("dhcpdv6/{$if_to_apply}")) {
-                        services_dhcpd_configure();
-                    }
+                    interface_bring_down($id, true, $interface);
                 }
 
-                # Interfaces with sub-interfaces (e.g. VLANs) need their MTU reconfigured if changed
-                if (interface_has_clones(get_real_interface($if_to_apply))) {
-                    # When static MTU is set
-                    if ($this->is_config_enabled("interfaces/{$if_to_apply}", "mtu")) {
-                        # Interface must be redone if MTU has changed
-                        if ($this->get_config("interfaces/{$if_to_apply}/mtu") != $if_mtu) {
-                            $mtu_redo[] = get_real_interface($if_to_apply);
-                        }
-                    }
-                    # When default (unspecified) MTU is set
-                    else {
-                        # Interface must be redone if MTU has changed
-                        if (get_interface_default_mtu() != $if_mtu) {
-                            $mtu_redo[] = get_real_interface($if_to_apply);
-                        }
-                    }
+                restart_interface_services($id, $interface['ipaddrv6']);
+                $mtu = config_get_path("interfaces/{$id}/mtu");
+
+                # Check if VLANs need to be redone
+                if (interface_has_clones($real_interface) &&
+                    ($mtu && ($mtu != $real_interface_mtu)) ||
+                    (!$mtu && (get_interface_default_mtu() != $real_interface_mtu))) {
+                    $vlan_redo[] = $real_interface;
                 }
             }
         }
 
-        # Reconfigure interface MTU if MTU changes were present
-        if (!empty($mtu_redo)) {
-            foreach ($mtu_redo as $vlredo) {
+        # Reconfigure VLANs if any VLANs needed to be redone
+        if (!empty($vlan_redo)) {
+            foreach ($vlan_redo as $vlredo) {
                 interfaces_vlan_configure_mtu($vlredo);
             }
         }
 
-        # Restart associated/dependent services
-        services_snmpd_configure();
+        # Reload monitoring, filter and graphing services
         setup_gateways_monitor();
-        clear_subsystem_dirty('interfaces');
         filter_configure();
         enable_rrd_graphing();
 
-        # Restart routing services to accommodate interface changes. Clear routing subsystem if it was successful.
-        if (is_subsystem_dirty('staticroutes') and system_routing_configure() === 0) {
+        # Reload routing services
+        if (is_subsystem_dirty('staticroutes') && (system_routing_configure() == 0)) {
             clear_subsystem_dirty('staticroutes');
         }
 
-        # Initialize syslog configuration and restart the syslog service
-        if ($this->is_config_enabled("syslog") and $if_to_apply == $this->get_config("syslog/sourceip")) {
-            system_syslogd_start();
-        }
+        # Reload packages
+        send_event("service reload packages");
 
-        # After all is said and done, clear the interface subsystem status and remove the pending interface change file
+        # Clear the pending changes now that they're applied
         clear_subsystem_dirty('interfaces');
-        @unlink($g['tmp_path']."/.interfaces.apply");
+        @unlink("{$g['tmp_path']}/.interfaces.apply");
     }
 
     /**
-     * Gathers information about all physical (real) interfaces and returns them in an array.
+     * Gathers information about all real interfaces and returns them in an array.
      * @return array a list of all interfaces along with their attributes
      */
     public static function get_all_avail_interfaces() : array {

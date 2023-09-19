@@ -32,7 +32,7 @@ class InterfaceVLAN extends Model {
             required: true,
             editable: false,
             maximum_length: 32,
-            help_text: "The physical parent interface this VLAN will be applied to."
+            help_text: "The real parent interface this VLAN will be applied to."
         );
         $this->tag = new IntegerField(
             required: true,

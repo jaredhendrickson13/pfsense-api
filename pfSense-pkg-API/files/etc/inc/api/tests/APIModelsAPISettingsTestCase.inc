@@ -205,7 +205,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     public function test_allowed_interfaces()
     {
         # Ensure interfaces are represented as their internal values
-        $api_settings = new APISettings(representation_data: ["represent_interfaces_as" => "internal"]);
+        $api_settings = new APISettings(representation_data: ["represent_interfaces_as" => "id"]);
         $api_settings->update();
 
         # Ensure value must be array
@@ -296,11 +296,11 @@ class APIModelsAPISettingsTestCase extends TestCase
         # Ensure valid values are accepted
         $this->assert_does_not_throw(
             callable: function () {
-                $api_settings = new APISettings(representation_data: ["represent_interfaces_as" => "internal"]);
+                $api_settings = new APISettings(representation_data: ["represent_interfaces_as" => "id"]);
                 $api_settings->validate();
-                $api_settings = new APISettings(representation_data: ["represent_interfaces_as" => "description"]);
+                $api_settings = new APISettings(representation_data: ["represent_interfaces_as" => "descr"]);
                 $api_settings->validate();
-                $api_settings = new APISettings(representation_data: ["represent_interfaces_as" => "physical"]);
+                $api_settings = new APISettings(representation_data: ["represent_interfaces_as" => "if"]);
                 $api_settings->validate();
             }
         );

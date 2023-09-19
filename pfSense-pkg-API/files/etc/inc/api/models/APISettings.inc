@@ -104,12 +104,12 @@ class APISettings extends Model {
             help_text: "Sets the interfaces allowed to accept incoming API calls."
         );
         $this->represent_interfaces_as = new StringField(
-            default: "description",
-            choices: ["description", "internal", "physical"],
-            help_text: "Specifies how the API should represent interface names. Use `description` to represent 
-            interface objects by their description name, use `internal` to represent interface objects by their
-            internal pfSense ID (e.g. wan, lan, opt1), or use `physical` to represent interface objects by their
-            physical interface ID (e.g. em0, igb1, bxe3)."
+            default: "descr",
+            choices: ["descr" => "Description", "id" => "Internal ID", "if" => "Real interface"],
+            help_text: "Specifies how the API should represent interface names. Use `descr` to represent 
+            interface objects by their description name, use `id` to represent interface objects by their
+            internal pfSense ID (e.g. wan, lan, opt1), or use `if` to represent interface objects by their
+            real interface name (e.g. em0, igb1, bxe3)."
         );
         $this->auth_mode = new StringField(
             default: "local",
