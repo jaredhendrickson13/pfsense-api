@@ -46,7 +46,7 @@ class APIModelsFirewallAliasTestCase extends TestCase {
     public function test_reject_prohibited_alias_names() {
         # Ensure aliases starting with `pkg_` are rejected
         $this->assert_throws_response(
-            response_id: "FIREWALL_ALIAS_WITH_PKG_NAME",
+            response_id: "FILTER_NAME_VALIDATOR_CANNOT_START_WITH_PKG",
             code: 400,
             callable: function() {
                 $test_alias = new FirewallAlias(
@@ -58,7 +58,7 @@ class APIModelsFirewallAliasTestCase extends TestCase {
 
         # Ensure reserved table names cannot be used
         $this->assert_throws_response(
-            response_id: "CANNOT_USE_RESERVED_FIREWALL_ALIAS_NAME",
+            response_id: "FILTER_NAME_VALIDATOR_RESERVED_NAME_USED",
             code: 400,
             callable: function() {
                 $test_alias = new FirewallAlias(
@@ -70,7 +70,7 @@ class APIModelsFirewallAliasTestCase extends TestCase {
 
         # Ensure reserved table names cannot be used
         $this->assert_throws_response(
-            response_id: "CANNOT_USE_RESERVED_FIREWALL_ALIAS_NAME",
+            response_id: "FILTER_NAME_VALIDATOR_RESERVED_NAME_USED",
             code: 400,
             callable: function() {
                 $test_alias = new FirewallAlias(

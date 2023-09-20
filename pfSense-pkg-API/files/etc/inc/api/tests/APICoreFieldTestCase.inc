@@ -419,7 +419,7 @@ class APICoreFieldTestCase extends API\Core\TestCase
      * Check that null values are allowed if `allow_null` is set.
      */
     public function test_allow_null_values_with_allow_null() {
-        $test_field = new API\Core\Field(type: "string", allow_null: true, required: false);
+        $test_field = new API\Core\Field(type: "string", required: false, allow_null: true);
         $test_field->name = "test_field";
         $test_field->value = null;
         $test_field->validate();
