@@ -38,7 +38,7 @@ class Model {
     public bool $many = false;
     public mixed $id = null;
     public API\Core\Auth $client;
-    public Model $initial_object;
+    public Model|null $initial_object = null;
     public array $packages = [];
     public array $package_includes = [];
     public array $unique_together_fields = [];
@@ -153,7 +153,7 @@ class Model {
      * @param $path string path with '/' separators
      * @returns array copy of the removed value or null
      */
-    protected static function del_config(string $path) : array {
+    protected static function del_config(string $path) : mixed {
         global $config;
         return (array_del_path($config, $path));
     }
@@ -253,6 +253,15 @@ class Model {
     }
 
     /**
+     * Logs an error to the syslog.
+     * @param string $message The error message to write to the syslog
+     */
+    public function log_error(string $message) {
+        # Call the pfSense `log_error` function
+        log_error($message);
+    }
+
+    /**
      * Converts this Model object into it's internal pfSense configuration form.
      * @return array The internal value suitable for writing to the pfSense configuration.
      */
@@ -337,8 +346,9 @@ class Model {
             );
         }
 
-        # Get the internal object(s) from config
+        # Get the internal object(s) from config and keep track of fields with custom from internal methods
         $internal_objects = $this->get_internal_objects();
+        $custom_from_internal_fields = [];
 
         # Require there to be an internal object with this ID, throw a not found error otherwise
         if ($this->many and !array_key_exists($this->id, $internal_objects)) {
@@ -353,6 +363,12 @@ class Model {
 
         # Loop through each of this Model's fields and convert the internal value to the representation value
         foreach ($this->get_fields() as $field) {
+            # Check if a custom from internal method was implemented for this model field.
+            if (method_exists($this, "from_internal_$field")) {
+                # Capture fields with custom from internal methods. We will run them after this loop completes.
+                $custom_from_internal_fields[] = $field;
+            }
+
             # Check the internal object for this field directly and convert it's value from internal to representation
             if (!$this->$field->internal_namespace) {
                 $this->$field->from_internal($internal_object[$this->$field->internal_name]);
@@ -367,13 +383,12 @@ class Model {
                     );
                 }
             }
+        }
 
-            # Check if a custom override method was implemented for this model field.
-            $custom_override_method = "override_$field";
-            if (method_exists($this, $custom_override_method)) {
-                # Run the custom override method and reassign the field's value to its return value.
-                $this->$field->value = $this->$custom_override_method($this->$field->value);
-            }
+        # Run any custom from internal methods found during the loop.
+        foreach ($custom_from_internal_fields as $field) {
+            $custom_from_internal_method = "from_internal_$field";
+            $this->$field->value = $this->$custom_from_internal_method($this->$field->value);
         }
     }
 

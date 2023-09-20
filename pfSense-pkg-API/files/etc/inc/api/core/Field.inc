@@ -345,8 +345,15 @@ class Field
             # Ensure this value is an available choice (if `choices` are defined for this field)
             $this->check_value_choice($value);
 
-            # Ensure this value is not empty unless empty values are allowed by this field
-            $this->check_value_empty($value);
+            # Ensure value is unique if set
+            $this->check_field_unique();
+
+            # Ensure this value is not empty unless empty values are allowed by this field. If value is empty and
+            # empty values are allowed (returns `true`, skip remaining validation as the empty value itself is
+            # considered a valid value.
+            if ($this->check_value_empty($value)) {
+                return true;
+            }
 
             # Loop through each validator and run it's `validate` method against the current value.
             foreach ($this->validators as $validator) {
@@ -354,9 +361,6 @@ class Field
                 $validator->context = $this->context;
                 $validator->validate(value: $value, field_name: $this->name);
             }
-
-            # Ensure value is unique if set
-            $this->check_field_unique();
         }
         return true;
     }
@@ -669,9 +673,10 @@ class Field
     /**
      * Checks if a given `value` is an empty array or string and checks if empty values are allowed.
      * @param mixed $value The value to check for emptiness.
-     * @returns ValidationError When the $value is not a supported type.
+     * @return bool Returns `true` if value is empty and empty values are allowed. Returns `false` otherwise.
+     * @@throws  ValidationError When the $value is empty but empty empty values are not allowed
      */
-    private function check_value_empty(mixed $value) {
+    private function check_value_empty(mixed $value) : bool {
         # Check if value is an empty string or array. These are the only two types we consider possible to be empty
         # to avoid having to enable `allow_empty` for booleans, 0 integers, and null values
         # (which are checked separately).
@@ -681,6 +686,12 @@ class Field
                 response_id: "FIELD_EMPTY_NOT_ALLOWED"
             );
         }
+        # Return true if empty values are allowed and the value was empty
+        elseif ($this->allow_empty and ($value === "" or $value === [])) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

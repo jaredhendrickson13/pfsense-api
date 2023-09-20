@@ -20,8 +20,9 @@ class NetworkInterfaceApply extends Model
 
     public function __construct(mixed $id = null, mixed $representation_data = [], Auth $client = null)
     {
-        # Use an internal callable to populate the internal values
+        # Set model attributes
         $this->internal_callable = "get_applied_status";
+        $this->always_apply = true;
 
         # Set model fields
         $this->applied = new BooleanField(
@@ -66,6 +67,10 @@ class NetworkInterfaceApply extends Model
         ];
     }
 
+    public function _create() {
+        # Override this method but don't do anything. We only want to apply the changes.
+    }
+
     public function apply() {
         # Local variables
         global $g;
@@ -78,43 +83,42 @@ class NetworkInterfaceApply extends Model
             $interfaces = unserialize(file_get_contents("{$g['tmp_path']}/.interfaces.apply"));
 
             # Loop through each interface to configure and restart services
-            foreach ($interfaces as $id => $interface) {
+            foreach ($interfaces as $id => $old_interface) {
                 # Determine the real interface name and it's current MTU
+                $new_interface = config_get_path("interfaces/{$id}");
                 $real_interface = get_real_interface($id);
                 $real_interface_mtu = get_interface_mtu($real_interface);
 
                 # Configure the interface if it's enabled
                 if (config_path_enabled("interfaces/{$id}")) {
-                    interface_bring_down($id, false, $interface);
+                    interface_bring_down($id, false, $old_interface);
                     interface_configure($id, true);
 
                     # Reconfigure track6 if this is a track6 enabled interface
-                    if (config_get_path("interfaces/{$id}/ipaddrv6") == "track6") {
-                        interface_track6_configure($id, $interface, true);
+                    if ($new_interface["ipaddrv6"] == "track6") {
+                        interface_track6_configure($id, $new_interface, true);
                     }
                 }
                 # Otherwise, tear down this interface
                 else {
-                    interface_bring_down($id, true, $interface);
+                    interface_bring_down($id, true, $old_interface);
                 }
 
-                restart_interface_services($id, $interface['ipaddrv6']);
-                $mtu = config_get_path("interfaces/{$id}/mtu");
-
+                restart_interface_services($id, $new_interface['ipaddrv6']);
+                $new_interface["mtu"] = config_get_path("interfaces/{$id}/mtu");
+                
                 # Check if VLANs need to be redone
                 if (interface_has_clones($real_interface) &&
-                    ($mtu && ($mtu != $real_interface_mtu)) ||
-                    (!$mtu && (get_interface_default_mtu() != $real_interface_mtu))) {
+                    ($new_interface["mtu"] && ($new_interface["mtu"] != $real_interface_mtu)) ||
+                    (!$new_interface["mtu"] && (get_interface_default_mtu() != $real_interface_mtu))) {
                     $vlan_redo[] = $real_interface;
                 }
             }
         }
 
         # Reconfigure VLANs if any VLANs needed to be redone
-        if (!empty($vlan_redo)) {
-            foreach ($vlan_redo as $vlredo) {
-                interfaces_vlan_configure_mtu($vlredo);
-            }
+        foreach ($vlan_redo as $vlredo) {
+            interfaces_vlan_configure_mtu($vlredo);
         }
 
         # Reload monitoring, filter and graphing services

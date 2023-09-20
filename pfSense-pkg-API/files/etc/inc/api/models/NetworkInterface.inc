@@ -77,6 +77,7 @@ class NetworkInterface extends Model
         $this->if = new StringField(
             required: true,
             unique: true,
+            choices: get_interface_ports(),
             maximum_length: 128,
             help_text: "The real interface this configuration will be applied to."
         );
@@ -97,7 +98,7 @@ class NetworkInterface extends Model
             default: "",
             allow_empty: true,
             maximum_length: 17,
-            validators: [new MACAddressValidator(allow_keywords: [""])],
+            validators: [new MACAddressValidator()],
             help_text: "Assigns (spoofs) the MAC address for this interface instead of using the interface's real MAC."
         );
         $this->mtu = new IntegerField(
@@ -139,8 +140,8 @@ class NetworkInterface extends Model
             help_text: "Enable or disable automatically blocking bogon networks on this interface."
         );
         $this->typev4 = new StringField(
+            required: true,
             choices: ["static", "dhcp", "none"],
-            allow_null: true,
             representation_only: true,
             help_text: "Selects the IPv4 address type to assign this interface."
         );
@@ -164,13 +165,17 @@ class NetworkInterface extends Model
             help_text: "Sets the upstream gateway this interface will use. This is only applicable for WAN-type interfaces."
         );
         $this->dhcphostname = new StringField(
-            allow_null: true,
+            default: "",
+            allow_empty: true,
             conditions: ["typev4" => "dhcp"],
-            validators: [new IPAddressValidator(allow_ipv4: false, allow_ipv6: false, allow_fqdn: true)],
+            validators: [
+                new IPAddressValidator(allow_ipv4: false, allow_ipv6: false, allow_fqdn: true)
+            ],
             help_text: "Sets the DHCP hostname this interface will advertise via DHCP."
         );
         $this->alias_address = new StringField(
-            allow_null: true,
+            default: "",
+            allow_empty: true,
             internal_name: "alias-address",
             conditions: ["typev4" => "dhcp"],
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_fqdn: false)],
@@ -360,28 +365,10 @@ class NetworkInterface extends Model
     }
 
     /**
-     * Adds custom validation to the `if` field.
-     * @param string $if The interface value to validate.
-     * @returns string The validated $if to set.
-     * @throws ValidationError When the `if` value is invalid.
-     */
-    public function validate_if(string $if) : string {
-        # Throw a validation error if the requested real interface does not exist
-        if (!does_interface_exist($if)) {
-            throw new ValidationError(
-                message: "Real interface `$if` does not exist.",
-                response_id: "REAL_INTERFACE_NOT_FOUND"
-            );
-        }
-
-        return $if;
-    }
-
-    /**
      * Populates the `descr` field as the interface's ID in uppercase if no value exists. This is necessary because
      * some default pfSense interfaces are created without a description assigned.
      */
-    public function override_descr(mixed $descr) : string {
+    public function from_internal_descr(mixed $descr) : string {
         # Check if descr has no value, if so, assign it this object's ID in uppercase
         if (empty($descr)) {
             return strtoupper($this->id);
@@ -468,7 +455,7 @@ class NetworkInterface extends Model
      * @returns string The overridden $typev4 value to set.
      * @throws ValidationError When the `$typev4` value is invalid.
      */
-    public function override_typev4(mixed $typev4) : string {
+    public function from_internal_typev4(mixed $typev4) : string {
         # Only populate this value if a value was not already set
         if (is_null($typev4)) {
             # Set the type to static if an IP address is set
@@ -510,7 +497,7 @@ class NetworkInterface extends Model
      * @returns string The overridden $typev6 value to set.
      * @throws ValidationError When the `$typev6` value is invalid.
      */
-    public function override_typev6(mixed $typev6) : string {
+    public function from_internal_typev6(mixed $typev6) : string {
         # Only populate this value if a value was not already set
         if (is_null($typev6)) {
             # Set the type to static if an IP address is set
@@ -659,16 +646,60 @@ class NetworkInterface extends Model
 
         # Set the current validated interface as a pending interface change
         $pending_ifs[$this->id] = [];
-        $pending_ifs[$this->id]['ifcfg'] = $this->to_internal();
+
+        # When we are updating an existing interface, store the original interface
+        if ($this->initial_object) {
+            $pending_ifs[$this->id]['ifcfg'] = $this->initial_object->to_internal();
+            $pending_ifs[$this->id]['ifcfg']["realif"] = $this->initial_object->if->value;
+        }
+        # Otherwise, for new interface creations, store this interface
+        else {
+            $pending_ifs[$this->id]['ifcfg'] = $this->to_internal();
+            $pending_ifs[$this->id]['ifcfg']["realif"] = $this->if->value;
+        }
+
         file_put_contents($g['tmp_path']."/.interfaces.apply", serialize($pending_ifs));
+        configure_cron();
     }
 
 
-    public function pre_apply() {
+    /**
+     * Ensures pending interfaces are serialized and stored in the pending interfaces file before they are applied.
+     * This method is automatically called after interface creations but before they are applied.
+     */
+    public function pre_apply_create() : void {
         $this->serialize_changes();
     }
 
-    public function _delete() {
+    /**
+     * Defines how interfaces should be applied after they are create. This method is automatically called after
+     * interfaces are created if immediate application is requested.
+     */
+    public function apply_create() : void {
+        (new NetworkInterfaceApply())->apply();
+    }
+
+    /**
+     * Ensures pending interfaces are serialized and stored in the pending interfaces file before they are applied.
+     * This method is automatically called after interface updates but before they are applied.
+     */
+    public function pre_apply_update() : void {
+        $this->serialize_changes();
+    }
+
+    /**
+     * Defines how interfaces should be applied after they are updated. This method is automatically called after
+     * interfaces are updated if immediate application is requested.
+     */
+    public function apply_update() : void {
+        (new NetworkInterfaceApply())->apply();
+    }
+
+    /**
+     * Defines how interfaces should be deleted. This method should not be called directly, instead it should be
+     * called using the delete() method.
+     */
+    public function _delete() : void {
         # Do not allow deletion of WAN interface
         if ($this->id === "wan") {
             throw new ValidationError(
@@ -713,11 +744,10 @@ class NetworkInterface extends Model
         }
         # Otherwise, run through the steps to delete the interface
         else {
-            # Remove the 'enable' value first, then bring down the interface and delete it from config
-            $this->del_config("interfaces/{$this->id}/enable");
-            $realid = get_real_interface($this->id);
+            # Bring down this interface and remove it from config
+            $real_interface = get_real_interface($this->id);
             interface_bring_down($this->id);
-            $this->del_config("interfaces/{$this->id}");
+            $this->del_config("$this->config_path/$this->id");
 
             # Remove DHCP config for interface
             if (is_array($this->get_config("dhcpd/{$this->id}"))) {
@@ -748,77 +778,11 @@ class NetworkInterface extends Model
             }
 
             # Update VLAN assignments
-            link_interface_to_vlans($realid, "update");
+            link_interface_to_vlans($real_interface, "update");
+
+            # Write the changes to config
+            $this->write_config("Deleted $this->verbose_name via API");
         }
-    }
-
-    public function apply() {
-        # Local variables
-        global $g;
-        unlink_if_exists("{$g['tmp_path']}/config.cache");
-        $vlan_redo = [];
-
-        # Only apply interfaces changes if the cache of interface changes is present
-        if (file_exists("{$g['tmp_path']}/.interfaces.apply")) {
-            # Unserialize the file to determine which interfaces need to be applied
-            $interfaces = unserialize(file_get_contents("{$g['tmp_path']}/.interfaces.apply"));
-
-            # Loop through each interface to configure and restart services
-            foreach ($interfaces as $id => $interface) {
-                # Determine the real interface name and it's current MTU
-                $real_interface = get_real_interface($id);
-                $real_interface_mtu = get_interface_mtu($real_interface);
-
-                # Configure the interface if it's enabled
-                if (config_path_enabled("interfaces/{$id}")) {
-                    interface_bring_down($id, false, $interface);
-                    interface_configure($id, true);
-
-                    # Reconfigure track6 if this is a track6 enabled interface
-                    if (config_get_path("interfaces/{$id}/ipaddrv6") == "track6") {
-                        interface_track6_configure($id, $interface, true);
-                    }
-                }
-                # Otherwise, tear down this interface
-                else {
-                    interface_bring_down($id, true, $interface);
-                }
-
-                restart_interface_services($id, $interface['ipaddrv6']);
-                $mtu = config_get_path("interfaces/{$id}/mtu");
-
-                # Check if VLANs need to be redone
-                if (interface_has_clones($real_interface) &&
-                    ($mtu && ($mtu != $real_interface_mtu)) ||
-                    (!$mtu && (get_interface_default_mtu() != $real_interface_mtu))) {
-                    $vlan_redo[] = $real_interface;
-                }
-            }
-        }
-
-        # Reconfigure VLANs if any VLANs needed to be redone
-        if (!empty($vlan_redo)) {
-            foreach ($vlan_redo as $vlredo) {
-                interfaces_vlan_configure_mtu($vlredo);
-            }
-        }
-
-        # Reload monitoring, filter and graphing services
-        setup_gateways_monitor();
-        filter_configure();
-        enable_rrd_graphing();
-
-        # Reload routing services
-        if (is_subsystem_dirty('staticroutes') && (system_routing_configure() == 0)) {
-            clear_subsystem_dirty('staticroutes');
-        }
-
-        # Reload packages
-        send_event("service reload packages");
-
-        # Clear the pending changes now that they're applied
-        clear_subsystem_dirty('interfaces');
-        @unlink("{$g['tmp_path']}/.interfaces.apply");
     }
 
     /**

@@ -14,8 +14,11 @@ class NetworkInterfaceApply extends Endpoint
         $this->model_name = "NetworkInterfaceApply";
 
         # Assign allowed request methods along with the privileges required for each
-        $this->request_method_options = ["GET"];
+        $this->request_method_options = ["GET", "POST"];
         $this->get_privileges = ["page-all", "page-interfaces-assignnetworkports"];
+        $this->post_privileges = ["page-all", "page-interfaces-assignnetworkports"];
+        $this->get_help_text = "Read pending interfaces status.";
+        $this->post_help_text = "Apply pending interface changes.";
 
         # Construct the parent Endpoint object
         parent::__construct();
