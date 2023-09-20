@@ -22,6 +22,7 @@ class APIFieldsInterfaceFieldTestCase extends TestCase
         $api_settings->represent_interfaces_as->value = "id";
         $api_settings->update();
         $test_field = new InterfaceField();
+        $test_field->set_choices_from_callable();
         $this->assert_is_true(in_array("wan", $test_field->choices));
         $this->assert_is_true(in_array("lan", $test_field->choices));
 
@@ -29,6 +30,7 @@ class APIFieldsInterfaceFieldTestCase extends TestCase
         $api_settings->represent_interfaces_as->value = "descr";
         $api_settings->update();
         $test_field = new InterfaceField();
+        $test_field->set_choices_from_callable();
         $this->assert_is_true(in_array("WAN", $test_field->choices));
         $this->assert_is_true(in_array("LAN", $test_field->choices));
 
@@ -36,6 +38,7 @@ class APIFieldsInterfaceFieldTestCase extends TestCase
         $api_settings->represent_interfaces_as->value = "if";
         $api_settings->update();
         $test_field = new InterfaceField();
+        $test_field->set_choices_from_callable();
         $this->assert_is_true(in_array("em0", $test_field->choices));
         $this->assert_is_true(in_array("em1", $test_field->choices));
     }
@@ -51,6 +54,7 @@ class APIFieldsInterfaceFieldTestCase extends TestCase
 
         # Ensure `enc0` becomes a valid choice when `allow_ipsec_interface` is enabled
         $test_field = new InterfaceField(allow_ipsec_interface: true);
+        $test_field->set_choices_from_callable();
         $this->assert_is_true(in_array("enc0", $test_field->choices));
     }
 
@@ -61,10 +65,12 @@ class APIFieldsInterfaceFieldTestCase extends TestCase
     public function test_get_interface_choices_with_allow_openvpn_interface() {
         # First ensure it is not a valid choice by default
         $test_field = new InterfaceField();
+        $test_field->set_choices_from_callable();
         $this->assert_is_false(in_array("openvpn", $test_field->choices));
 
         # Ensure `openvpn` becomes a valid choice when `allow_ipsec_interface` is enabled
         $test_field = new InterfaceField(allow_openvpn_interface: true);
+        $test_field->set_choices_from_callable();
         $this->assert_is_true(in_array("openvpn", $test_field->choices));
     }
 

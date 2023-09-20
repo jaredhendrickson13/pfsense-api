@@ -103,7 +103,7 @@ class InterfaceField extends API\Fields\StringField {
         $this->allow_ipsec_interface = $allow_ipsec_interface;
         $this->allow_openvpn_interface = $allow_openvpn_interface;
         $this->allow_carp_interface = $allow_carp_interface;
-        $this->represented_as = "descr";
+        $this->represented_as = API\Models\APISettings::get_api_config()["config"]["represent_interfaces_as"];
 
         # Construct the parent Field object
         parent::__construct(

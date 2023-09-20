@@ -57,7 +57,6 @@ class Field
      *  parent Model object that returns an array of valid choices in the same format as $choices. This is helpful when
      *  choices are dynamic and must be populate at runtime instead of pre-determined sets of values.
      * @param bool $allow_empty If `true`, empty strings will be allowed by this field.
-     * @param bool $allow_empty Set to `true` if empty values (blank strings, 0, etc) should be allowed.
      * @param bool $allow_null Set to `true` if `null` values should be supported for this field. When `null` values
      * are supported, the underlying pfSense configuration field will be removed entirely when receiving a null value.
      * @param bool $editable Set to `false` to prevent this field's value from being changed after its initial creation.
@@ -128,7 +127,6 @@ class Field
         $this->type = $type;
         $this->validators = $validators;
         $this->unique = $unique;
-        $this->choices = $choices;
         $this->choices_callable = $choices_callable;
         $this->allow_empty = $allow_empty;
         $this->allow_null = ($read_only) ? true : $allow_null;
@@ -156,7 +154,7 @@ class Field
         }
 
         # Assign choices
-        $this->set_choices($this->choices);
+        $this->set_choices($choices);
 
         # Ensure values do not conflict
         $this->check_construct();
@@ -252,22 +250,41 @@ class Field
 
     /**
      * Accepts a given array of choices and sets the `choices` and `verbose_choices` properties accordingly.
-     * @param array $choices The choices as provided by the __construct() method.
-     * @param bool $from_callable Allow or disallow fetching choices from the `choices_callable` before setting choices.
+     * @param array $choices An array of incoming choices to set
      */
-    private function set_choices(array $choices, bool $from_callable = false) {
+    public function set_choices(array $choices): void
+    {
+        # Format choices accordingly when they are provided as an associative array
+        if (is_assoc_array($choices)) {
+            $this->verbose_choices = $choices;
+            $this->choices = array_keys($choices);
+        }
+        # Otherwise, format choices accordingly for indexed arrays
+        else {
+            # Default verbose choice to the value, replace underscores with spaces and capitalize first letter
+            $this->choices = $choices;
+            foreach($choices as $choice) {
+                $this->verbose_choices[$choice] = ucfirst(str_replace("_", " ", $choice));
+            }
+        }
+    }
+
+    /**
+     * Sets choices by calling the `choices_callable` method if present.
+     */
+    public function set_choices_from_callable() : void {
         # If a choices callable is assigned, run the callable to populate the choices if allowed
-        if ($from_callable and $this->choices_callable) {
+        if ($this->choices_callable) {
             # Set a variable we can use to dynamic invoke the callable
             $callable = $this->choices_callable;
 
             # First check if the parent Model context has a callable with this name. If so, run it and assign choices
-            if (in_array($callable, get_class_methods($this->context))) {
-                $choices = $this->context->$callable();
+            if ($this->context and in_array($callable, get_class_methods($this->context))) {
+                $this->set_choices($this->context->$callable());
             }
             # Next, check if this Field object has a callable with this name. If so, run it and assign choices
             elseif (in_array($callable, get_class_methods($this))) {
-                $choices = $this->$callable();
+                $this->set_choices($this->$callable());
             }
             # Otherwise, throw an error because we could not find a callable with this name
             else {
@@ -277,23 +294,7 @@ class Field
                 );
             }
         }
-
-        # Format choices accordingly when they are provided as an associative array
-        if (is_assoc_array($choices)) {
-            $this->choices = array_keys($choices);
-            $this->verbose_choices = $choices;
-        }
-        # Otherwise, format choices accordingly for indexed arrays
-        else {
-            $this->choices = $choices;
-
-            # Default verbose choice to the value, replace underscores with spaces and capitalize first letter
-            foreach($choices as $choice) {
-                $this->verbose_choices[$choice] = ucfirst(str_replace("_", " ", $choice));
-            }
-        }
     }
-
 
     /**
      * Runs all validations for this field.
@@ -657,7 +658,7 @@ class Field
         }
 
         # Assign choices
-        $this->set_choices($this->choices, from_callable: true);
+        $this->set_choices_from_callable();
 
         # If choices are set, ensure this value is one of the choices
         if ($this->choices and !in_array($value, $this->choices)) {
@@ -846,7 +847,7 @@ class Field
 
         # Return a select input for fields with `choices`
         if ($this->choices or $this->choices_callable) {
-            $this->set_choices($this->choices, from_callable: true);
+            $this->set_choices_from_callable();
             $input = new \Form_Select(
                 name: $this->name,
                 title: $title,
