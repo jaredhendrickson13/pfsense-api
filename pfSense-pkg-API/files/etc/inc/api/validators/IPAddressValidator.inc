@@ -10,20 +10,28 @@ use API\Responses\ValidationError;
 class IPAddressValidator extends API\Core\Validator {
     public bool $allow_ipv4;
     public bool $allow_ipv6;
+    public bool $allow_ipv6_link_local;
     public bool $allow_fqdn;
     public array $allow_keywords;
 
     /**
-     * @param bool $allow_ipv4 Allow value to be an IPv4 address
-     * @param bool $allow_ipv6 Allow value to be an IPv6 address
-     * @param bool $allow_fqdn Allow value to be an FQDN
-     * @param array $allow_keywords An array of non IP/FQDN values to allow
+     * @param bool $allow_ipv4 Allow value to be an IPv4 address.
+     * @param bool $allow_ipv6 Allow value to be an IPv6 address.
+     * @param bool $allow_ipv6_link_local Allow value to be an IPv6 link local address. Only applies if $allow_ipv6
+     * is `true`.
+     * @param bool $allow_fqdn Allow value to be an FQDN.
+     * @param array $allow_keywords An array of non IP/FQDN values to allow.
      */
     public function __construct(
-        bool $allow_ipv4 = true, bool $allow_ipv6 = true, bool $allow_fqdn = false, array $allow_keywords = []
+        bool $allow_ipv4 = true,
+        bool $allow_ipv6 = true,
+        bool $allow_ipv6_link_local = true,
+        bool $allow_fqdn = false,
+        array $allow_keywords = []
     ) {
         $this->allow_ipv4 = $allow_ipv4;
         $this->allow_ipv6 = $allow_ipv6;
+        $this->allow_ipv6_link_local = $allow_ipv6_link_local;
         $this->allow_fqdn = $allow_fqdn;
         $this->allow_keywords = $allow_keywords;
     }
@@ -39,6 +47,13 @@ class IPAddressValidator extends API\Core\Validator {
         if ($this->allow_ipv4 and is_ipaddrv4($value)) {
             return;
         }
+        # Throw an error if the IPv6 address given is a link local address, but link local addresses are not allowed
+        if ($this->allow_ipv6 and !$this->allow_ipv6_link_local and ip_in_subnet($value, "fe80::/10")) {
+            throw new ValidationError(
+                message: "Field `$field_name` cannot be an IPv6 link-local address, received `$value`.",
+                response_id: "IP_ADDRESS_VALIDATOR_IPV6_LINK_LOCAL_NOT_ALLOWED"
+            );
+        }
         # IPv6 values are valid if allowed
         if ($this->allow_ipv6 and is_ipaddrv6($value)) {
             return;
@@ -52,9 +67,15 @@ class IPAddressValidator extends API\Core\Validator {
             return;
         }
 
+        # Format the error message to include what options are allowed
+        $allowed_options = ($this->allow_ipv4) ? ["IPv4 address"] : [];
+        $allowed_options = ($this->allow_ipv6) ? $allowed_options + ["IPv6 address"] : $allowed_options;
+        $allowed_options = ($this->allow_fqdn) ? $allowed_options + ["FQDN"] : $allowed_options;
+        $allowed_options_str = implode(", ", $allowed_options);
+
         # If the value was not allowed from an earlier statement, throw a validation error
         throw new ValidationError(
-            message: "Field `$field_name` must be a valid IP address, received `$value`.",
+            message: "Field `$field_name` must be a valid $allowed_options_str, received `$value`.",
             response_id: "IP_ADDRESS_VALIDATOR_FAILED"
         );
     }

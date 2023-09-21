@@ -297,6 +297,7 @@ class NetworkInterface extends Model
                 new IPAddressValidator(
                     allow_ipv4: false,
                     allow_ipv6: true,
+                    allow_ipv6_link_local: false,
                     allow_keywords: ["dhcp6", "slaac", "6rd", "track6", "6to4"]
                 )
             ],
@@ -617,7 +618,7 @@ class NetworkInterface extends Model
 
         # Do not allow this IP if it conflicts with an existing static route
         # TODO: replace this with a query when a StaticRoute model is developed
-        foreach ($this->get_config(path: "staticroutes", default: []) as $static_route_id => $static_route) {
+        foreach ($this->get_config(path: "staticroutes/route", default: []) as $static_route_id => $static_route) {
             $if_cidr = gen_subnet($ipaddr, $this->subnet->value)."/".$this->subnet->value;
             if ($static_route["network"] === $if_cidr) {
                 throw new ValidationError(
@@ -783,6 +784,27 @@ class NetworkInterface extends Model
                 message: "Interface `ipaddrv6` cannot be `track6` unless `typev6` is also `track6`",
                 response_id: "INTERFACE_IPADDRV6_IS_TRACK6_WITH_NON_TRACK6_TYPEV6"
             );
+        }
+
+        # Ensure this IPv6 address is not in use anywhere else
+        if (where_is_ipaddr_configured($ipaddrv6, $this->id, true, true, $this->subnetv6->value)) {
+            throw new ValidationError(
+                message: "Interface `ipaddrv6` cannot use '$ipaddrv6' because it is currently in use",
+                response_id: "INTERFACE_IPADDRV6_ALREADY_IN_USE"
+            );
+        }
+
+        # Do not allow this IP if it conflicts with an existing static route
+        # TODO: replace this with a query when a StaticRoute model is developed
+        foreach ($this->get_config(path: "staticroutes/route", default: []) as $static_route_id => $static_route) {
+            $if_cidr = gen_subnetv6($ipaddrv6, $this->subnetv6->value)."/".$this->subnetv6->value;
+            if ($static_route["network"] === $if_cidr) {
+                throw new ValidationError(
+                    message: "Interface 'ipaddrv6' cannot be used because it conflicts with a static route ".
+                    "with ID '$static_route_id'",
+                    response_id: "NETWORK_INTERFACE_IPADDRV6_CONFLICTS_WITH_STATIC_ROUTE"
+                );
+            }
         }
 
         return $ipaddrv6;
