@@ -584,11 +584,16 @@ class NetworkInterface extends Model
      * @throws ValidationError When the `ipaddr` value is invalid.
      */
     public function validate_ipaddr(string $ipaddr) : string {
-        # Only allow `dhcp` as a value if the type is also `dhcp`
-        if ($ipaddr === "dhcp" and $this->typev4->value !== "dhcp") {
+        # For non static values, force `ipaddr` to match `typev4`
+        if ($this->typev4->value !== "static") {
+            $ipaddr = $this->typev4->value;
+        }
+
+        # Do not allow static values to use keywords
+        if (!is_ipaddrv4($ipaddr) and $this->typev4->value === "static") {
             throw new ValidationError(
-                message: "Interface `ipaddr` cannot be `dhcp` unless `typev4` is also `dhcp`",
-                response_id: "INTERFACE_IPADDR_IS_DHCP_WITH_NON_DHCP_TYPEV4"
+                message: "Interface `ipaddr` must be an IPv4 address when `typev4` is set to `static`",
+                response_id: "INTERFACE_IPADDR_NOT_IPV4_WHEN_STATIC"
             );
         }
 
@@ -634,11 +639,11 @@ class NetworkInterface extends Model
 
     /**
      * Adds custom validation to the `subnet` field.
-     * @param string $subnet The subnet value to validate
+     * @param int $subnet The subnet value to validate
      * @returns string The validated $subnet to set.
      * @throws ValidationError When the `subnet` value is invalid.
      */
-    public function validate_subnet(string $subnet) : string {
+    public function validate_subnet(int $subnet) : int {
         # Require the subnet to be 30 or less when a DHCP server is enabled on this interface
         if ($subnet > 30 and $this->is_config_enabled(path: "dhcpd/$this->id")) {
             throw new ValidationError(
@@ -853,7 +858,7 @@ class NetworkInterface extends Model
 
             # Check if there is speed AND duplex
             if (preg_match("/(.*) mediaopt (.*)/", $media_line[1], $matches)) {
-                $media_options[$matches[1]] = [$matches[2]];
+                $media_options[$matches[1]][] = $matches[2];
             }
             # Otherwise only include the speed
             else {

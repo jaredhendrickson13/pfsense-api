@@ -168,7 +168,7 @@ class Model {
      * @returns bool true if $enable_key exists in the array at $path, and has a
      * non-null value, otherwise false.
      */
-    protected static function is_config_enabled(string $path, string $enable_key="enable") : bool {
+    public static function is_config_enabled(string $path, string $enable_key="enable") : bool {
         global $config;
         return (array_path_enabled($config, $path, $enable_key));
     }
@@ -696,7 +696,7 @@ class Model {
      * Initializes the default 'apply' method. This method is intended to be overridden by a child model class and is
      * responsible for reloading/restarting services after changes occur.
      */
-    protected function apply() {
+    public function apply() {
     }
 
     /**
