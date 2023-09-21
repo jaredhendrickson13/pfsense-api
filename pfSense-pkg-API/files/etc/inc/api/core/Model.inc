@@ -144,7 +144,7 @@ class Model {
      * @param $default mixed value to return if the path is not found
      * @returns mixed $val or $default if the path prefix does not exist
      */
-    protected static function set_config(string $path, mixed $value, mixed $default=null) {
+    public static function set_config(string $path, mixed $value, mixed $default=null) {
         global $config;
         return (array_set_path($config, $path, $value, $default));
     }
@@ -154,7 +154,7 @@ class Model {
      * @param $path string path with '/' separators
      * @returns array copy of the removed value or null
      */
-    protected static function del_config(string $path) : mixed {
+    public static function del_config(string $path) : mixed {
         global $config;
         return (array_del_path($config, $path));
     }

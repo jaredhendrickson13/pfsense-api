@@ -414,7 +414,7 @@ class NetworkInterface extends Model
         }
 
         # Ensure GRE interfaces are 22 characters or less
-        if (str_starts_with($this->if->value, "gif") and strlen($descr) > 22) {
+        if (str_starts_with($this->if->value, "gre") and strlen($descr) > 22) {
             throw new ValidationError(
                 message: "Field 'descr' must be 22 characters or less when 'if' is a GRE interface",
                 response_id: "NETWORK_INTERFACE_DESCR_GRE_MAX_LENGTH_EXCEEDED"
@@ -816,14 +816,14 @@ class NetworkInterface extends Model
      */
     public function get_next_id() : string {
         # Use `lan` if it doesn't already exist
-        if (!$this->read_all()->query(["id" => "lan"])->model_objects) {
+        if (!$this->read_all()->query(["id" => "lan"])->exists()) {
             return "lan";
         }
 
         # Otherwise, loop until we find an available opt interface ID
         foreach (range(1, 65535) as $count) {
             # Use this opt if it doesn't already exist
-            if (!$this->read_all()->query(["id" => "opt$count"])->model_objects) {
+            if (!$this->read_all()->query(["id" => "opt$count"])->exists()) {
                 return "opt$count";
             }
         }
