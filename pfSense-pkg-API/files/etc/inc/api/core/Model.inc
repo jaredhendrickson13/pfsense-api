@@ -569,6 +569,9 @@ class Model {
 
         # Loop through each of this object's assigned fields and validate them.
         foreach ($this->get_fields() as $field) {
+            # Assign this object as the Fields parent Model context
+            $this->$field->context = $this;
+
             # Ensure this field's internal name is unique to its namespace
             $this->is_fields_internal_name_unique($field);
 

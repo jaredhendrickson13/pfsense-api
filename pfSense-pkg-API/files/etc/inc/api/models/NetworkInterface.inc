@@ -15,6 +15,7 @@ use API\Validators\GatewayValidator;
 use API\Validators\IPAddressValidator;
 use API\Validators\MACAddressValidator;
 use API\Validators\SubnetValidator;
+use API\Validators\UniqueFromForeignModelValidator;
 
 /**
  * A Model that allows us to read, create, update and delete network interfaces. Note: PHP does not allow us to name a
@@ -90,7 +91,10 @@ class NetworkInterface extends Model
             required: true,
             unique: true,
             maximum_length: 128,
-            validators: [new FilterNameValidator()],
+            validators: [
+                new FilterNameValidator(),
+                new UniqueFromForeignModelValidator(model: "FirewallAlias", field: "name")
+            ],
             help_text: "The descriptive name for this interface."
         );
         $this->spoofmac = new StringField(
@@ -379,6 +383,47 @@ class NetworkInterface extends Model
     }
 
     /**
+     * Adds custom validation to the `descr` field.
+     * @param string $descr The descr value to validate.
+     * @returns string The validated $descr to set.
+     * @throws ValidationError When the `$descr` value is invalid.     */
+    public function validate_descr(string $descr) : string {
+        # Ensure OpenVPN interfaces are 22 characters or less
+        if (str_starts_with($this->if->value, "ovpn") and strlen($descr) > 22) {
+            throw new ValidationError(
+                message: "Field 'descr' must be 22 characters or less when 'if' is an OpenVPN interface",
+                response_id: "NETWORK_INTERFACE_DESCR_OPENVPN_MAX_LENGTH_EXCEEDED"
+            );
+        }
+
+        # Ensure IPsec interfaces are 22 characters or less
+        if (str_starts_with($this->if->value, "ipsec") and strlen($descr) > 22) {
+            throw new ValidationError(
+                message: "Field 'descr' must be 22 characters or less when 'if' is an IPsec interface",
+                response_id: "NETWORK_INTERFACE_DESCR_IPSEC_MAX_LENGTH_EXCEEDED"
+            );
+        }
+
+        # Ensure GIF interfaces are 22 characters or less
+        if (str_starts_with($this->if->value, "gif") and strlen($descr) > 22) {
+            throw new ValidationError(
+                message: "Field 'descr' must be 22 characters or less when 'if' is a GIF interface",
+                response_id: "NETWORK_INTERFACE_DESCR_GIF_MAX_LENGTH_EXCEEDED"
+            );
+        }
+
+        # Ensure GRE interfaces are 22 characters or less
+        if (str_starts_with($this->if->value, "gif") and strlen($descr) > 22) {
+            throw new ValidationError(
+                message: "Field 'descr' must be 22 characters or less when 'if' is a GRE interface",
+                response_id: "NETWORK_INTERFACE_DESCR_GRE_MAX_LENGTH_EXCEEDED"
+            );
+        }
+
+        return $descr;
+    }
+
+    /**
      * Adds custom validation to the `mtu` field.
      * @param int $mtu The MTU value to validate.
      * @returns string The validated $mtu to set.
@@ -450,6 +495,30 @@ class NetworkInterface extends Model
     }
 
     /**
+     * Adds custom validation to the `blockbogons` field.
+     * @param bool $blockbogons The blockbogons value to validate
+     * @returns bool The validated $blockbogons to set.
+     * @throws ValidationError When the `blockbogons` value is invalid.
+     */
+    public function validate_blockbogons(bool $blockbogons) : bool {
+        # Gather applicable configuration values
+        $ipv6_allowed = $this->is_config_enabled(path: "system", enable_key: "ipv6allow");
+        $max_table_entries = $this->get_config(path: "system/maximumtableentries", default: 0);
+        $min_bogonv6_entries = g_get("minimumtableentries_bogonsv6");
+
+        # Do not allow block bogons if IPv6 is enabled, but maximum table entries are less than the bogon minimum
+        if ($blockbogons and $ipv6_allowed and $max_table_entries < $min_bogonv6_entries) {
+            throw new ValidationError(
+                message: "Field 'blockbogons' cannot be enabled until the maximum table entries value is increased ".
+                 "to at least $min_bogonv6_entries",
+                response_id: "NETWORK_INTERFACE_BLOCKBOGONS_ENABLED_WITH_INSUFFICIENT_TABLE_ENTRY_LIMIT"
+            );
+        }
+
+        return $blockbogons;
+    }
+
+    /**
      * Populates the `typev4` field if a value is not present
      * @param string $typev4 The typev4 value to override
      * @returns string The overridden $typev4 value to set.
@@ -474,6 +543,40 @@ class NetworkInterface extends Model
     }
 
     /**
+     * Adds custom validation to the `typev4` field.
+     * @param string $typev4 The ipaddr value to validate
+     * @returns string The validated $typev4 to set.
+     * @throws ValidationError When the `typev4` value is invalid.
+     */
+    public function validate_typev4(string $typev4) : string {
+        # Do not allow the type to change from 'static' if the DHCP server is enabled on this interface
+        # TODO: Change this to use a query when the DHCPServer model is developed
+        if ($typev4 !== "static" and $this->is_config_enabled(path: "dhcpd/$this->id")) {
+            throw new ValidationError(
+                message: "Field 'typev4' cannot be changed from 'static' while a DHCP server is enabled on this ".
+                    "interface. Disable the DHCP server on this interface before changing 'typev4'.",
+                response_id: "NETWORK_INTERFACE_CANNOT_CHANGE_TYPEV4_WHILE_DHCP_SERVER_ENABLED"
+            );
+        }
+
+        # Do not allow typev4 to be set to 'none' if there are existing virtual IPs on this interface
+        # TODO: Change this to a query when the VirtualIP model is developed
+        if ($typev4 === "none") {
+            foreach ($this->get_config('virtualip/vip', []) as $vip) {
+                if (is_ipaddrv4($vip['subnet']) and $vip['interface'] === $this->id) {
+                    throw new ValidationError(
+                        message: "Field 'typev4' cannot be changed to 'none' because there are existing virtual IPs ".
+                            "on this interface.",
+                        response_id: "NETWORK_INTERFACE_NO_TYPEV4_NONE_WITH_EXISTING_VIRTUAL_IPS"
+                    );
+                }
+            }
+        }
+
+        return $typev4;
+    }
+
+    /**
      * Adds custom validation to the `ipaddr` field.
      * @param string $ipaddr The ipaddr value to validate
      * @returns string The validated $ipaddr to set.
@@ -488,7 +591,63 @@ class NetworkInterface extends Model
             );
         }
 
+        # Ensure this IP address is not in use anywhere else
+        if (where_is_ipaddr_configured($ipaddr, $this->id, true, true, $this->subnet->value)) {
+            throw new ValidationError(
+                message: "Interface `ipaddr` cannot use '$ipaddr' because it is currently in use",
+                response_id: "INTERFACE_IPADDR_ALREADY_IN_USE"
+            );
+        }
+
+        # When this interfaces 'subnet' is less than 31, ensure the IP is not the network or broadcast address
+        if ($this->subnet->value < 31) {
+            if ($ipaddr === gen_subnet($ipaddr, $this->subnet->value)) {
+                throw new ValidationError(
+                    message: "Interface 'ipaddr' cannot use '$ipaddr' because it is the network address",
+                    response_id: "NETWORK_INTERFACE_IPADDR_CANNOT_USE_NETWORK_ADDRESS"
+                );
+            }
+            if ($ipaddr === gen_subnet_max($ipaddr, $this->subnet->value)) {
+                throw new ValidationError(
+                    message: "Interface 'ipaddr' cannot use '$ipaddr' because it is the broadcast address",
+                    response_id: "NETWORK_INTERFACE_IPADDR_CANNOT_USE_BROADCAST_ADDRESS"
+                );
+            }
+        }
+
+        # Do not allow this IP if it conflicts with an existing static route
+        # TODO: replace this with a query when a StaticRoute model is developed
+        foreach ($this->get_config(path: "staticroutes", default: []) as $static_route_id => $static_route) {
+            $if_cidr = gen_subnet($ipaddr, $this->subnet->value)."/".$this->subnet->value;
+            if ($static_route["network"] === $if_cidr) {
+                throw new ValidationError(
+                    message: "Interface 'ipaddr' cannot be used because it conflicts with a static route ".
+                        "with ID '$static_route_id'",
+                    response_id: "NETWORK_INTERFACE_IPADDR_CONFLICTS_WITH_STATIC_ROUTE"
+                );
+            }
+        }
+
         return $ipaddr;
+    }
+
+    /**
+     * Adds custom validation to the `subnet` field.
+     * @param string $subnet The subnet value to validate
+     * @returns string The validated $subnet to set.
+     * @throws ValidationError When the `subnet` value is invalid.
+     */
+    public function validate_subnet(string $subnet) : string {
+        # Require the subnet to be 30 or less when a DHCP server is enabled on this interface
+        if ($subnet > 30 and $this->is_config_enabled(path: "dhcpd/$this->id")) {
+            throw new ValidationError(
+                message: "Field 'subnet' cannot be greater than 30 while a DHCP server is enabled on this interface'. ".
+                    "Disable the DHCP server on this interface before changing the 'subnet' value.",
+                response_id: "NETWORK_INTERFACE_SUBNET_MAXIMUM_EXCEEDED_WHILE_DHCP_SERVER_ENABLED"
+            );
+        }
+
+        return $subnet;
     }
 
     /**
@@ -521,6 +680,62 @@ class NetworkInterface extends Model
             }
             else {
                 return "none";
+            }
+        }
+
+        return $typev6;
+    }
+
+    /**
+     * Adds custom validation to the `typev6` field.
+     * @param string $typev6 The ipaddr value to validate
+     * @returns string The validated $typev6 to set.
+     * @throws ValidationError When the `typev6` value is invalid.
+     */
+    public function validate_typev6(string $typev6) : string {
+        # Do not allow the type to change from 'staticv6' or 'track6' if the DHCPv6 server is enabled on this interface
+        if (!in_array($typev6, ["staticv6", "track6"])) {
+            # TODO: Change this to use a query when the DHCPServer6 model is developed
+            if ($this->is_config_enabled(path: "dhcpdv6/$this->id")) {
+                throw new ValidationError(
+                    message: "Field 'typev6' cannot be changed while a DHCPv6 server is enabled on this ".
+                    "interface. Disable the DHCPv6 server on this interface before changing 'typev6'.",
+                    response_id: "NETWORK_INTERFACE_CANNOT_CHANGE_TYPEV6_WHILE_DHCP_SERVER_ENABLED"
+                );
+            }
+
+            # Do not allow the type to change from 'staticv6' or 'track6' if the DHCPv6 RA server is enabled
+            # TODO: Change this to use a query when the DHCPServer6 model is developed
+            if ($this->get_config(path: "dhcpdv6/$this->id/ramode", default: "disabled") !== "disabled") {
+                throw new ValidationError(
+                    message: "Field 'typev6' cannot be changed while DHCPv6 RAs are enabled on this ".
+                    "interface. Disable the DHCPv6 RAs on this interface before changing 'typev6'.",
+                    response_id: "NETWORK_INTERFACE_CANNOT_CHANGE_TYPEV6_WHILE_DHCP_RAS_ENABLED"
+                );
+            }
+        }
+
+        # Only allow one interface's typev6 value to be 6to4
+        $if_6to4_query = $this->read_all()->query(["id__except" => $this->id, "typev6" => "6to4"]);
+        if ($if_6to4_query->exists()) {
+            throw new ValidationError(
+                message: "Field 'typev6' cannot use '6to4' because it is already in use by ".
+                    "interface with ID '{$if_6to4_query->first()->id}'",
+                response_id: "NETWORK_INTERFACE_TYPEV6_6TO4_ALREADY_IN_USE"
+            );
+        }
+
+        # Do not allow typev6 to be set to 'none' if there are existing virtual IPs on this interface
+        # TODO: Change this to a query when the VirtualIP model is developed
+        if ($typev6 === "none") {
+            foreach ($this->get_config('virtualip/vip', []) as $vip) {
+                if (is_ipaddrv6($vip['subnet']) and $vip['interface'] === $this->id) {
+                    throw new ValidationError(
+                        message: "Field 'typev6' cannot be changed to 'none' because there are existing virtual IPs ".
+                            "on this interface.",
+                        response_id: "NETWORK_INTERFACE_NO_TYPEV6_NONE_WITH_EXISTING_VIRTUAL_IPS"
+                    );
+                }
             }
         }
 
