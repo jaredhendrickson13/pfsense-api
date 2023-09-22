@@ -950,6 +950,7 @@ class NetworkInterface extends Model
             );
         }
         # Do not allow deletion if interface is in group
+        # TODO: replace this with a Model query when the InterfaceGroup Model is developed
         elseif (link_interface_to_group($this->id)) {
             throw new ValidationError(
                 message: "Interface `$this->id` cannot be deleted because it is in use by an interface group.",
@@ -957,6 +958,7 @@ class NetworkInterface extends Model
             );
         }
         # Do not allow deletion if interface is in bridge
+        # TODO: replace this with a Model query when the InterfaceBridge Model is developed
         elseif (link_interface_to_bridge($this->id)) {
             throw new ValidationError(
                 message: "Interface `$this->id` cannot be deleted because it is in use by an interface bridge.",
@@ -964,6 +966,7 @@ class NetworkInterface extends Model
             );
         }
         # Do not allow interface to be deleted if it is assigned GRE interface
+        # TODO: replace this with a Model query when the InterfaceGRE Model is developed
         elseif (link_interface_to_tunnelif($this->id, 'gre')) {
             throw new ValidationError(
                 message: "Interface `$this->id` cannot be deleted because it is in use by an GRE tunnel.",
@@ -971,6 +974,7 @@ class NetworkInterface extends Model
             );
         }
         # Do not allow interface to be deleted if it is assigned GIF interface
+        # TODO: replace this with a Model query when the InterfaceGIF Model is developed
         elseif (link_interface_to_tunnelif($this->id, 'gif')) {
             throw new ValidationError(
                 message: "Interface `$this->id` cannot be deleted because it is in use by an GIF interface.",
@@ -978,6 +982,7 @@ class NetworkInterface extends Model
             );
         }
         # Do not allow interface to be deleted if it has a traffic queue assigned
+        # TODO: replace this with a Model query when the TrafficShaperQueue Model is developed
         elseif (interface_has_queue($this->id)) {
             throw new ValidationError(
                 message: "Interface `$this->id` cannot be deleted because it is in use by a traffic shaper queue.",

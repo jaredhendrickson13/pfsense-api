@@ -731,4 +731,186 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
         # Discard the pending interface changes
         unlink("/tmp/.interfaces.apply");
     }
+
+    /**
+     * Checks that NetworkInterface objects cannot be deleted if the ID is `wan`
+     */
+    public function test_cannot_delete_wan_interface() {
+        $this->assert_throws_response(
+            response_id: "NETWORK_INTERFACE_WAN_CANNOT_BE_DELETED",
+            code: 400,
+            callable: function() {
+                $wan_if = new NetworkInterface(id: "wan");
+                $wan_if->delete();
+            }
+        );
+    }
+
+    # TODO: Need test to ensure interface can't be deleted while its in an if group
+
+    # TODO: Need test to ensure interface can't be dleted while its in an if bridge
+
+    # TODO Need test to ensure interface can't be deleted while its in an if gre
+
+    # TODO: Need test to ensure interface can't be deleted while its in an if gif
+
+    # TODO: Need test to ensure interface can't be deleted while it has a traffic shaper queue
+
+    /**
+     * Checks that the `get_all_avail_interfaces()` method correctly gathers available interfaces.
+     */
+    public function test_get_all_avail_interfaces() {
+        # Create a model to test with
+        $test_model = new NetworkInterface();
+
+        # Ensure the wan interface is found
+        $this->assert_is_true(array_key_exists("em0", $test_model->get_all_avail_interfaces()));
+
+        # Ensure the lan interface is found
+        $this->assert_is_true(array_key_exists("em1", $test_model->get_all_avail_interfaces()));
+    }
+
+    /**
+     * Checks that static NetworkInterfaces are accurately configured on the backend whenever they are created, updated,
+     * and/or deleted.
+     */
+    public function test_static_interfaces_match_ifconfig() {
+        # Create a new static NetworkInterface
+        $static_if = new NetworkInterface(
+            representation_data: [
+                "if" => "em2",
+                "descr" => "teststatic",
+                "enable" => true,
+                "spoofmac" => "00:00:00:00:00:00",
+                "mtu" => 1501,
+                "typev4" => "static",
+                "ipaddr" => "192.168.100.1",
+                "subnet" => 24,
+                "typev6" => "staticv6",
+                "ipaddrv6" => "1234::1",
+                "subnetv6" => 64
+            ]
+        );
+        $static_if->create(apply: true);
+
+        # Run ifconfig to check the configured interface's values
+        exec("ifconfig em2", $ifconfig_output);
+        $ifconfig_output = implode(PHP_EOL, $ifconfig_output);
+
+        # Ensure the interface's mtu is shown by ifconfig
+        $this->assert_is_true(
+            str_contains(
+                $ifconfig_output,
+                "mtu 1501"
+            )
+        );
+        # Ensure the interface's description is shown by ifconfig
+        $this->assert_is_true(
+            str_contains(
+                $ifconfig_output,
+                "description: teststatic"
+            )
+        );
+        # Ensure the interface's spoofmac is shown by ifconfig
+        $this->assert_is_true(
+            str_contains(
+                $ifconfig_output,
+                "ether 00:00:00:00:00:00"
+            )
+        );
+        # Ensure the static IPv4 address is shown by ifconfig
+        $this->assert_is_true(
+            str_contains(
+                $ifconfig_output,
+                "inet 192.168.100.1 netmask 0xffffff00 broadcast 192.168.100.255"
+            )
+        );
+        # Ensure the static IPv6 address is shown by ifconfig
+        $this->assert_is_true(
+            str_contains(
+                $ifconfig_output,
+                "inet6 1234::1 prefixlen 64"
+            )
+        );
+
+        # Update the static interface configuration and ensure the updated values are correctly shown by ifconfig
+        $static_if->from_representation(
+            [
+                "descr" => "teststaticupdated",
+                "spoofmac" => "11:11:11:11:11:11",
+                "mtu" => 1500,
+                "typev4" => "static",
+                "ipaddr" => "192.168.200.1",
+                "subnet" => 25,
+                "typev6" => "staticv6",
+                "ipaddrv6" => "4321::1",
+                "subnetv6" => 96
+            ]
+        );
+        $static_if->update(apply: true);
+
+        # Run ifconfig to check the configured interface's new values
+        exec("ifconfig em2", $ifconfig_output);
+        $ifconfig_output = implode(PHP_EOL, $ifconfig_output);
+
+        # Ensure the interface's new mtu is shown by ifconfig
+        $this->assert_is_true(
+            str_contains(
+                $ifconfig_output,
+                "mtu 1500"
+            )
+        );
+        # Ensure the interface's new description is shown by ifconfig
+        $this->assert_is_true(
+            str_contains(
+                $ifconfig_output,
+                "description: teststaticupdated"
+            )
+        );
+        # Ensure the interface's new spoofmac is shown by ifconfig
+        $this->assert_is_true(
+            str_contains(
+                $ifconfig_output,
+                "ether 11:11:11:11:11:11"
+            )
+        );
+        # Ensure the new static IPv4 address is shown by ifconfig
+        $this->assert_is_true(
+            str_contains(
+                $ifconfig_output,
+                "inet 192.168.200.1 netmask 0xffffff80 broadcast 192.168.200.127"
+            )
+        );
+        # Ensure the new static IPv6 address is shown by ifconfig
+        $this->assert_is_true(
+            str_contains(
+                $ifconfig_output,
+                "inet6 4321::1 prefixlen 96"
+            )
+        );
+
+        # Delete the static interface and ensure it is no longer present in ifconfig
+        $static_if->delete();
+
+        # Run ifconfig to check the configured interface's deleted values
+        exec("ifconfig em2", $ifconfig_output);
+        $ifconfig_output = implode(PHP_EOL, $ifconfig_output);
+
+        # Ensure the new static IPv4 address is not shown by ifconfig
+        $this->assert_is_false(
+            str_contains(
+                $ifconfig_output,
+                "inet 192.168.200.1 netmask 0xffffff80 broadcast 192.168.200.127"
+            )
+        );
+        # Ensure the new static IPv6 address isnot  shown by ifconfig
+        $this->assert_is_false(
+            str_contains(
+                $ifconfig_output,
+                "inet6 4321::1 prefixlen 96"
+            )
+        );
+    }
+
+    # TODO: Needs tests to ensure other interface types are correctly configured on the backend
 }
