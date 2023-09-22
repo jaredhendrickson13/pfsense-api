@@ -157,6 +157,22 @@ class APICoreFieldTestCase extends API\Core\TestCase
     }
 
     /**
+     * Checks that Field names cannot contain double underscores. Double underscores are reserved for queries.
+     */
+    public function test_field_name_cannot_contain_double_underscore() {
+        # Ensure an error is thrown for a Field name with double underscoress
+        $this->assert_throws_response(
+            response_id: "FIELD_NAME_WITH_DOUBLE_UNDERSCORE_NOT_ALLOWED",
+            code: 500,
+            callable: function () {
+                $test_field = new API\Core\Field(required: true);
+                $test_field->name = "name__with__double__underscores";
+                $test_field->validate();
+            }
+        );
+    }
+
+    /**
      * Checks that a Field actually requires a value when the Field is `required`.
      */
     public function test_require_value_when_field_is_required() {

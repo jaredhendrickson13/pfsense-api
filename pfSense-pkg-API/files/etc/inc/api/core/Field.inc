@@ -573,6 +573,14 @@ class Field
                 response_id: "FIELD_UNNAMED"
             );
         }
+        # Throw an error if the name contains double underscores (`__`) as this can conflict with queries
+        if (str_contains($this->name, "__")) {
+            throw new ServerError(
+                message: "Field name '$this->name' is invalid because it contains double underscores. Double ".
+                    "underscores are reserved for queries only.",
+                response_id: "FIELD_NAME_WITH_DOUBLE_UNDERSCORE_NOT_ALLOWED"
+            );
+        }
     }
 
     /**
@@ -721,8 +729,15 @@ class Field
     public function from_internal(string|null $internal_value) {
         # Keep null values for non boolean values and representation only values
         if ($this->representation_only or (is_null($internal_value) and $this->type !== "boolean")) {
-            $this->value = null;
-            return;
+            # Check if this field has a default, if so, use the default value
+            if ($this->default and $this->are_conditions_met()) {
+                $internal_value = $this->default;
+            }
+            # Otherwise, just assume the value is null
+            else {
+                $this->value = null;
+                return;
+            }
         }
 
         # For `many` type fields, convert all values to representation.
