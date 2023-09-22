@@ -6,6 +6,8 @@ require_once("api/auto_loader.inc");
 require_once("api/fields/StringField.inc");
 
 use API;
+use API\Core\Model;
+use API\Models\NetworkInterface;
 
 /**
  * Defines an InterfaceField class that extends the core Field method. This Field adds validation and representation for
@@ -139,7 +141,7 @@ class InterfaceField extends API\Fields\StringField {
      */
     protected function _from_internal(mixed $internal_value) : string {
         # Variables
-        $interfaces = API\Core\Model::get_config("interfaces", []);
+        $interfaces = Model::get_config("interfaces", []);
 
         # Check if this value is an existing interface ID
         if (array_key_exists($internal_value, $interfaces)) {
@@ -162,7 +164,7 @@ class InterfaceField extends API\Fields\StringField {
      */
     protected function _to_internal(mixed $representation_value): string {
         # Query to find this interface using the interfaces representation field and value
-        $interface_query = API\Models\NetworkInterface::read_all()->query(
+        $interface_query = NetworkInterface::read_all()->query(
             query_params: [$this->represented_as => $representation_value]
         );
 
@@ -176,9 +178,9 @@ class InterfaceField extends API\Fields\StringField {
     public function get_interface_choices() : array {
         # Variables
         $choices = [];
-        $interface_query = API\Models\NetworkInterface::read_all()->query($this->interface_query);
-        $interface_groups = API\Core\Model::get_config("ifgroups/ifgroupentry", []);
-        $virtual_ips = API\Core\Model::get_config("virtualip/vip", []);
+        $interface_query = NetworkInterface::read_all()->query($this->interface_query);
+        $interface_groups = Model::get_config("ifgroups/ifgroupentry", []);
+        $virtual_ips = Model::get_config("virtualip/vip", []);
 
         # Loop through each configured interface and check for a match
         foreach ($interface_query->model_objects as $interface) {
@@ -242,4 +244,11 @@ class InterfaceField extends API\Fields\StringField {
         return $this->to_internal();
     }
 
+    /**
+     * Fetches the NetworkInterface Model object associated with this field's current value
+     * @return Model|NetworkInterface The NetworkInterface Model object associated with this Field's current value.
+     */
+    public function get_interface_obj() : Model|NetworkInterface {
+        return NetworkInterface::read_all()->query(["id" => $this->to_internal()])->first();
+    }
 }
