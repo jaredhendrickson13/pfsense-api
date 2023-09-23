@@ -46,6 +46,7 @@ class RoutingGateway extends Model
     {
         # Define Model attributes
         $this->config_path = "gateways/gateway_item";
+        $this->subsystem = "staticroutes";
         $this->many = true;
         $this->unique_together_fields = ["interface", "ipprotocol", "gateway"];
 
@@ -65,7 +66,6 @@ class RoutingGateway extends Model
         );
         $this->disabled = new BooleanField(
             default: false,
-            indicates_true: "yes",
             help_text: "Disable this gateway."
         );
         $this->ipprotocol = new StringField(
@@ -84,7 +84,6 @@ class RoutingGateway extends Model
         );
         $this->monitor_disable = new BooleanField(
             default: false,
-            indicates_true: "yes",
             help_text: "Disable gateway monitoring for this gateway."
         );
         $this->monitor =  new StringField(
@@ -97,18 +96,15 @@ class RoutingGateway extends Model
         );
         $this->action_disable = new BooleanField(
             default: false,
-            indicates_true: "yes",
             help_text: "Disable actions from taking place when gateway events occur. The gateway will always be
                 considered up."
         );
         $this->force_down = new BooleanField(
             default: false,
-            indicates_true: "yes",
             help_text: "Always consider this gateway to be up."
         );
         $this->dpinger_dont_add_static_route = new BooleanField(
             default: false,
-            indicates_true: "",
             help_text: "Prevents gateway monitoring from adding a static route for this gateway's monitor IP."
         );
         $this->gw_down_kill_states = new StringField(
@@ -122,8 +118,6 @@ class RoutingGateway extends Model
         );
         $this->nonlocalgateway = new BooleanField(
             default: true,
-            read_only: true,
-            indicates_true: "yes",
             help_text: "Allows or disallows gateway IPs that are not a part of the parent interface's subnet(s)."
         );
         $this->weight = new IntegerField(
@@ -148,7 +142,7 @@ class RoutingGateway extends Model
             help_text: "Sets the threshold to consider latency as high. This value must be greater than `latencylow`."
         );
         $this->losslow = new IntegerField(
-            default: 200,
+            default: 10,
             minimum: 1,
             maximum: 99,
             help_text: "Sets the threshold to consider packet loss as low."
@@ -249,7 +243,7 @@ class RoutingGateway extends Model
         $if_id = $this->interface->get_interface_obj()->id;
 
         # Ensure the configured `interface` has an IPv4 address if `protocol` is set to `inet`
-        if ($this->ipprotocol->value === "inet" and !get_interface_ip($if_id) or !get_interface_subnet($if_id)) {
+        if ($this->ipprotocol->value === "inet" and (!get_interface_ip($if_id) or !get_interface_subnet($if_id))) {
             throw new ValidationError(
                 message: "Field `interface` must be an interface with an existing IPv4 address when `ipprotocol` ".
                     "is set to `inet`",
@@ -258,9 +252,9 @@ class RoutingGateway extends Model
         }
 
         # Ensure the configured `interface` has an IPv6 address if `protocol` is set to `inet6`
-        if ($this->ipprotocol->value === "inet6" and !get_interface_ipv6($if_id) or !get_interface_subnetv6($if_id)) {
+        if ($this->ipprotocol->value === "inet6" and (!get_interface_ipv6($if_id) or !get_interface_subnetv6($if_id))) {
             throw new ValidationError(
-                message: "Field `interface` must be an interface with an existing IPv4 address when `ipprotocol` ".
+                message: "Field `interface` must be an interface with an existing IPv6 address when `ipprotocol` ".
                 "is set to `inet6`",
                 response_id: "ROUTING_GATEWAY_INTERFACE_HAS_NO_IPV6"
             );
@@ -290,19 +284,6 @@ class RoutingGateway extends Model
                 response_id: "ROUTING_GATEWAY_NO_IPV4_WITH_INET6"
             );
         }
-
-        # For non-dynamic IPv4 gateways, format the $gateway value's subnet to use the network address
-        if ($this->ipprotocol->value === "inet" and $gateway !== "dynamic") {
-            $cidr_components = explode("/", $gateway);
-            $gateway = gen_subnet($cidr_components[0])."/".$cidr_components[1];
-        }
-
-        # For non-dynamic IPv6 gateways, format the $gateway value's subnet to use the network address
-        if ($this->ipprotocol->value === "inet" and $gateway !== "dynamic") {
-            $cidr_components = explode("/", $gateway);
-            $gateway = gen_subnetv6($cidr_components[0])."/".$cidr_components[1];
-        }
-
 
         return $gateway;
     }
@@ -383,7 +364,7 @@ class RoutingGateway extends Model
      */
     public function validate_alert_interval(int $alert_interval) : int {
         # Require `alert_interval` to be greater than or equal to the `interval`
-        if ($alert_interval >= $this->interval->value) {
+        if ($alert_interval <= $this->interval->value) {
             throw new ValidationError(
                 message: "Routing gateway `alert_interval` must be greater than or equal to the `interval`.",
                 response_id: "ROUTING_GATEWAY_ALERT_INTERVAL_UNDER_MINIMUM"
@@ -394,25 +375,16 @@ class RoutingGateway extends Model
     }
 
     /**
-     * Define steps to create this RoutingGateway object internally.
+     * Defines how gateways should be applied after creation and updates.
      */
-    public function _create() {
-        # Call the pfSense `save_gateway()` function with the internal data of the gateway to create.
-        save_gateway($this->to_internal());
+    public function apply() {
+        (new RoutingApply())->apply();
     }
 
     /**
-     * Define steps to update this RoutingGateway object internally.
+     * Overrides the `apply()` method for RoutingGateway deletions.
      */
-    public function _update() {
-        # Call the pfSense `save_gateway()` function with the internal data of the gateway to update and its ID.
-        save_gateway($this->to_internal(), $this->id);
-    }
-
-    /**
-     * Define steps to delete this RoutingGateway object internally.
-     */
-    public function _delete() {
+    public function apply_delete() {
         # Local variables
         $gw_data = return_gateways_array(true, false, true, true);
 
@@ -430,8 +402,45 @@ class RoutingGateway extends Model
                 }
             }
         }
+    }
 
-        # Remove this gateway from config
-        $this->del_config("gateways/gateway_item/{$this->id}");
+    /**
+     * Define steps to create this RoutingGateway object internally.
+     */
+    public function _create() {
+        # Variables
+        $internal_values = $this->to_internal();
+
+        # There's an inconsistency where `save_gateway()` expects bool values as `yes` but stores them as empty
+        # strings. To accommodate this, change true bool values to `yes` beforehand.
+        foreach ($internal_values as $internal_name => $internal_value) {
+            # Check if this is a BooleanField
+            if ($this->$internal_name->type === "boolean" and $internal_value === $this->$internal_name->indicates_true) {
+                $internal_values[$internal_name] = "yes";
+            }
+        }
+
+        # Call the pfSense `save_gateway()` function with the internal data of the gateway to create.
+        save_gateway($internal_values);
+    }
+
+    /**
+     * Define steps to update this RoutingGateway object internally.
+     */
+    public function _update() {
+        # Variables
+        $internal_values = $this->to_internal();
+
+        # There's an inconsistency where `save_gateway()` expects bool values as `yes` but stores them as empty
+        # strings. To accommodate this, change true bool values to `yes` beforehand.
+        foreach ($internal_values as $internal_name => $internal_value) {
+            # Check if this is a BooleanField
+            if ($this->$internal_name->type === "boolean" and $internal_value === $this->$internal_name->indicates_true) {
+                $internal_values[$internal_name] = "yes";
+            }
+        }
+
+        # Call the pfSense `save_gateway()` function with the internal data of the gateway to update and its ID.
+        save_gateway($internal_values, $this->id);
     }
 }
