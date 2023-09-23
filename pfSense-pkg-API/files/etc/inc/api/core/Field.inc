@@ -814,10 +814,11 @@ class Field
     public function to_openapi_property() : array {
         # Assign primitive property attributes
         $openapi_property = [];
-        $openapi_property["description"] = $this->help_text;
+        $openapi_property["description"] = $this->help_text."<br>".$this->get_conditions_text();
         $openapi_property["nullable"] = $this->allow_null;
         $openapi_property["readOnly"] = $this->read_only;
         $openapi_property["writeOnly"] = $this->write_only;
+        $openapi_property["editable"] = $this->editable;
 
         # Set the default if defined
         if ($this->default) {
@@ -840,12 +841,57 @@ class Field
             $openapi_property["type"] = $this->type;
 
             # Assign choices if defined
-            if ($this->choices) {
+            if ($this->choices and !$this->choices_callable) {
                 $openapi_property["enum"] = $this->choices;
             }
         }
 
         return $openapi_property;
+    }
+
+    /**
+     * Formats a descriptive string to explain the `conditions` for this Field. This is intended to be used for
+     * OpenAPI documentation generation.
+     * @return string A descriptive string explaining the `conditions` for this Field.
+     */
+    private function get_conditions_text() : string {
+        # Variables
+        $conditions_text = "";
+
+        # Only proceed when this field has conditions
+        if ($this->conditions) {
+            $conditions_text = "<br>This field is only available when the following conditions are met:<br>";
+
+            # Loop through required conditions
+            foreach ($this->conditions as $field => $value) {
+                # Stored a string representation of the $value
+                $value_str = var_export($value, true);
+
+                # Determine if the context of the condition is inverted
+                $inverted = str_starts_with($field, "!");
+
+                # Add descriptive text for field value equals conditions
+                if (!$inverted and !is_array($value)) {
+                    $conditions_text .= "- `$field` must be equal to `$value_str`<br>";
+                }
+                # Add descriptive text for field value does not equal conditions
+                elseif ($inverted and !is_array($value)) {
+                    $conditions_text .= "- `$field` must not equal to `$value_str`<br>";
+                }
+                # Add descriptive text for field value in array conditions
+                elseif (!$inverted and is_array($value)) {
+                    $options = implode(", ", $value);
+                    $conditions_text .= "- `$field` must be one of [ $options ]<br>";
+                }
+                # Add descriptive text for field value not in array conditions
+                elseif ($inverted and is_array($value)) {
+                    $options = implode(", ", $value);
+                    $conditions_text .= "- `$field` must not be one of [ $options ]<br>";
+                }
+            }
+        }
+
+        return $conditions_text;
     }
 
     /**
