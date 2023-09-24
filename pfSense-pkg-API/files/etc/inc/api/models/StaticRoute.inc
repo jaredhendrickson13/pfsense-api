@@ -65,7 +65,7 @@ class StaticRoute extends Model
         $gateway_obj = RoutingGateway::read_all()->query(["name" => $gateway])->first();
 
         # Ensure the upstream gateways IP version matches the `network` assigned
-        if ($gateway_obj->ipprotocol->value === "inet" and !is_subnetv4($this->network->value)) {
+        if ($gateway_obj->ipprotocol->value === "inet" and !$this->network->has_label("is_subnetv4")) {
             throw new ValidationError(
                 message: "Cannot assign non-IPv4 `network` to IPv4 `gateway`.",
                 response_id: "STATIC_ROUTE_NON_IPV4_NETWORK_WITH_IPV4_GATEWAY"
@@ -73,7 +73,7 @@ class StaticRoute extends Model
         }
 
         # Ensure the upstream gateways IP version matches the `network` assigned
-        if ($gateway_obj->ipprotocol->value === "inet6" and !is_subnetv6($this->network->value)) {
+        if ($gateway_obj->ipprotocol->value === "inet6" and !$this->network->has_label("is_subnetv6")) {
             throw new ValidationError(
                 message: "Cannot assign non-IPv6 `network` to IPv6 `gateway`.",
                 response_id: "STATIC_ROUTE_NON_IPV6_NETWORK_WITH_IPV6_GATEWAY"
@@ -111,10 +111,112 @@ class StaticRoute extends Model
     }
 
     /**
+     * Ensure routing changes are serialized and store at /tmp/.system_routes.apply before applying.
+     */
+    public function pre_apply_update()
+    {
+        $this->serialize_route();
+    }
+
+    /**
      * Ensures the static route deletion is performed before removing it from config
      */
     public function _delete() {
         delete_static_route($this->id, true);
         parent::_delete();
     }
+
+    /**
+     * Expands `network` values that are aliases in an array of subnets to apply static routes for.
+     */
+    public function get_networks() {
+        global $aliastable;
+        # Keep track of networks that can be applied to a static route
+        $networks = [];
+
+        # Check if the current network value is an alias
+        if (is_alias($this->network->value)) {
+            foreach (explode(" ", $aliastable[$this->network->value]) as $alias_network) {
+                # Set CIDR if this is an IPv4 address
+                if (is_ipaddrv4($alias_network)) {
+                    $alias_network .= "/32";
+                }
+                # Set CIDR if this is an IPv6 address
+                if (is_ipaddrv6($alias_network)) {
+                    $alias_network .= "/128";
+                }
+                # Don't include this newtork if it is not a subnet
+                if (!is_subnet($alias_network)) {
+                    continue;
+                }
+                # Add this network to the return array
+                $networks[] = $alias_network;
+            }
+        }
+        # Otherwise, we already know it is a subnet, simply add it to the networks list
+        else {
+            $networks[] = $this->network->value;
+        }
+
+        return $networks;
+    }
+
+    /**
+     * Serializes pending routing changes and stores them at /tmp/.system_routes.apply to apply later.
+     */
+    private function serialize_route(): void
+    {
+        global $g;
+
+        # Include pending route changes that haven't been applied yet, or simply initialize our pending change var
+        if (file_exists("{$g['tmp_path']}/.system_routes.apply")) {
+            $to_apply_list = unserialize(file_get_contents("{$g['tmp_path']}/.system_routes.apply"));
+        }
+        else {
+            $to_apply_list = array();
+        }
+
+        # Check for the static route that is currently operating
+        if (file_exists("{$g['tmp_path']}/staticroute_{$this->id}")) {
+            $old_network = unserialize(file_get_contents("{$g['tmp_path']}/staticroute_{$this->id}"));
+        }
+        # Check for the static route gateway that is currently operating
+        if (file_exists("{$g['tmp_path']}/staticroute_{$this->id}_gw")) {
+            $old_gateway = unserialize(file_get_contents("{$g['tmp_path']}/staticroute_{$this->id}_gw"));
+        }
+
+        # If was set previously, and has changed, ensure we delete the old route and recreate it.
+        if (!empty($old_gateway) && ($this->gateway->value != $old_gateway)) {
+            $delete_networks = $old_network;
+            $delete_gateway = lookup_gateway_ip_by_name($old_gateway);
+        }
+        # Otherwise, check for routes that are no longer relevant to this entry
+        else {
+            $delete_networks = array_diff($old_network, $this->get_networks());
+            $delete_gateway = lookup_gateway_ip_by_name($this->gateway->value);
+        }
+
+        # Assign routes to be deleted when changes are applied
+        if (count($delete_networks)) {
+            foreach ($delete_networks as $del_net) {
+                # Set the IP address family correctly when this is an IPv6 route
+                if (is_ipaddrv6($del_net)) {
+                    $ip_family = "-inet6";
+                }
+                # Fetch the route to be deleted
+                $route = route_get($del_net, '', true);
+
+                # Skip this route if we failed to fetch the route in the previous call
+                if (!count($route)) {
+                    continue;
+                }
+
+                # Mark this route for deletion during the next change
+                $to_apply_list[] = "/sbin/route delete {$ip_family} {$del_net} {$delete_gateway}";
+            }
+        }
+
+        file_put_contents("{$g['tmp_path']}/.system_routes.apply", serialize($to_apply_list));
+    }
+
 }

@@ -48,7 +48,7 @@ class FilterNameValidator extends API\Core\Validator {
         }
 
         # Throw an exception if any existing NetworkInterface object is using this name
-        if (NetworkInterface::read_all()->query(["id__except" => $this->context->id, "id" => $value])->exists()) {
+        if (NetworkInterface::read_all()->query(["id__except" => $this->model_context->id, "id" => $value])->exists()) {
             throw new ValidationError(
                 message: "Field '$field_name' cannot be '$value' because it is in use by an existing interface.",
                 response_id: "FILTER_NAME_VALIDATOR_NAME_IN_USE_BY_INTERFACE"
@@ -58,7 +58,7 @@ class FilterNameValidator extends API\Core\Validator {
         # TODO: Change this to use a ModelSet query when an interface group model is developed
         # Throw an exception if value is an existing InterfaceGroup
         foreach (config_get_path('ifgroups/ifgroupentry', []) as $id => $if_group_ent) {
-            if ($if_group_ent["ifname"] === $value and $id !== $this->context->id) {
+            if ($if_group_ent["ifname"] === $value and $id !== $this->model_context->id) {
                 throw new ValidationError(
                     message: "Field '$field_name' cannot be '$value' because it is in use by an existing interface.",
                     response_id: "FILTER_NAME_VALIDATOR_NAME_IN_USE_BY_INTERFACE"

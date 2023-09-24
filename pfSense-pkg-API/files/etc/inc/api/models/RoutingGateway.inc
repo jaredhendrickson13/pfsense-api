@@ -201,18 +201,14 @@ class RoutingGateway extends Model
                 }
             }
 
-            # Ensure the gateway cannot be disabled while it is in use by a static route
-            # TODO: replace with a Model query when the StaticRoute Model is developed
-            foreach ($this->get_config('staticroutes/route', []) as $route_id => $route) {
-                if ($route['gateway'] == $this->name->value) {
-                    if (!$route['disabled']) {
-                        throw new ValidationError(
-                            message: "Gateway cannot be disabled because it is in use by gateway " .
-                            "route with ID `$route_id`",
-                            response_id: "ROUTING_GATEWAY_DISABLED_NOT_ALLOWED_WITH_EXISTING_ROUTE"
-                        );
-                    }
-                }
+            # Ensure the gateway cannot be disabled while it is in use by a non-disabled static route
+            $routes_in_use = StaticRoute::read_all()->query(["gateway" => $this->name->value, "disabled" => false]);
+            if ($routes_in_use->exists()) {
+                throw new ValidationError(
+                    message: "Gateway cannot be disabled because it is in use by gateway " .
+                    "route with ID `{$routes_in_use->first()->id}`",
+                    response_id: "ROUTING_GATEWAY_DISABLED_NOT_ALLOWED_WITH_EXISTING_ROUTE"
+                );
             }
 
             # Ensure the gateway cannot be disabled while it is in use by a system DNS server
@@ -239,11 +235,11 @@ class RoutingGateway extends Model
      * @return string The validated interface value to set.
      */
     public function validate_interface(string $interface) : string {
-        # Obtain the ID of the interface
-        $if_id = $this->interface->get_interface_obj()->id;
+        # Obtain the NetworkInterface Model object associated with our current interface value
+        $if_obj = $this->interface->get_interface_obj();
 
         # Ensure the configured `interface` has an IPv4 address if `protocol` is set to `inet`
-        if ($this->ipprotocol->value === "inet" and (!get_interface_ip($if_id) or !get_interface_subnet($if_id))) {
+        if ($this->ipprotocol->value === "inet" and (!$if_obj->get_current_ipv4() or !$if_obj->get_current_subnetv4())) {
             throw new ValidationError(
                 message: "Field `interface` must be an interface with an existing IPv4 address when `ipprotocol` ".
                     "is set to `inet`",
@@ -252,7 +248,7 @@ class RoutingGateway extends Model
         }
 
         # Ensure the configured `interface` has an IPv6 address if `protocol` is set to `inet6`
-        if ($this->ipprotocol->value === "inet6" and (!get_interface_ipv6($if_id) or !get_interface_subnetv6($if_id))) {
+        if ($this->ipprotocol->value === "inet6" and (!$if_obj->get_current_ipv6() or !$if_obj->get_current_subnetv6())) {
             throw new ValidationError(
                 message: "Field `interface` must be an interface with an existing IPv6 address when `ipprotocol` ".
                 "is set to `inet6`",
@@ -270,7 +266,7 @@ class RoutingGateway extends Model
      */
     public function validate_gateway(string $gateway) : string {
         # Only allow IPv4 addresses if `ipprotocol` is `inet`
-        if ($this->ipprotocol->value === "inet" and !is_ipaddrv4($gateway) and $gateway !== "dynamic") {
+        if ($this->ipprotocol->value === "inet" and !$this->gateway->has_label("is_ipaddrv4") and $gateway !== "dynamic") {
             throw new ValidationError(
                 message: "Field `gateway` must be an IPv4 address when `ipprotocol` is set to `inet`",
                 response_id: "ROUTING_GATEWAY_NO_IPV6_WITH_INET"
@@ -278,7 +274,7 @@ class RoutingGateway extends Model
         }
 
         # Only allow IPv4 addresses if `ipprotocol` is `inet6`
-        if ($this->ipprotocol->value === "inet6" and !is_ipaddrv6($gateway) and $gateway !== "dynamic") {
+        if ($this->ipprotocol->value === "inet6" and !$this->gateway->has_label("is_ipaddrv6") and $gateway !== "dynamic") {
             throw new ValidationError(
                 message: "Field `gateway` must be an IPv6 address when `ipprotocol` is set to `inet6`",
                 response_id: "ROUTING_GATEWAY_NO_IPV4_WITH_INET6"
@@ -425,26 +421,35 @@ class RoutingGateway extends Model
      * Overrides the `apply()` method for RoutingGateway deletions.
      */
     public function _delete() {
-        # Local variables
-        $gw_data = return_gateways_array(true, false, true, true);
+        # Remove the static routes for this gateway and it's monitor IP
+        route_del($this->gateway->value, $this->ipprotocol->value);
+        route_del($this->monitor->value, $this->ipprotocol->value);
 
-        # Loop through the gateway days until we find the gateway to delete
-        foreach ($gw_data as $gw) {
-            # Check if this gateways 'attribute' matches the ID of the gateway we're deleting
-            if ($this->id === $gw["attribute"]) {
-                # Remove the gateway and monitor IPs
-                route_del($gw["gateway"], $gw["ipprotocol"]);
-                route_del($gw["monitor"], $gw["ipprotocol"]);
-
-                # Delete the default route if this gateway is the default gateway
-                if ($gw["isdefaultgw"]) {
-                    route_del("default", $gw["ipprotocol"]);
-                }
-            }
+        # Remove the default route if this is a default gateway
+        if ($this->is_default_gateway()) {
+            route_del("default", $this->ipprotocol->value);
         }
 
         # Remove the gateway from config
         $this->del_config("$this->config_path/$this->id");
         $this->write_config("Deleted $this->verbose_name via API");
+    }
+
+    /**
+     * Checks if this RoutingGateway is the current default route.
+     * @return bool Returns `true` if this RoutingGateway is a default route, `false` if not.
+     */
+    public function is_default_gateway() : bool {
+        # Loop through the gateway days until we find the gateway to delete
+        foreach (return_gateways_array(true, false, true, true) as $gw) {
+            # Check if this gateways 'attribute' matches the ID of this RoutingGateway
+            if ($this->id === $gw["attribute"]) {
+                if ($gw["isdefaultgw"]) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

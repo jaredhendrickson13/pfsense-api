@@ -10,7 +10,8 @@ require_once("api/auto_loader.inc");
  * Defines a Validator object which Field objects can use to quickly validate its value.
  */
 class Validator {
-    public Model|null $context = null;
+    public Model|null $model_context = null;
+    public Field|null $field_context = null;
 
     /**
      * Runs the necessary validation against a specified value. This method is intended to be overridden by a child

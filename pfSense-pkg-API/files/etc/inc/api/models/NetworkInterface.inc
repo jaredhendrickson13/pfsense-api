@@ -1156,4 +1156,32 @@ class NetworkInterface extends Model
 
         return $base_ifs;
     }
+
+    /**
+     * Checks the current IPv4 address of this interface. This works for both static and dynimcally assigned IPs.
+     */
+    public function get_current_ipv4() : string|null {
+        return get_interface_ip($this->id);
+    }
+
+    /**
+     * Checks the current subnet (v4) of this interface. This works for both static and dynimcally assigned IPs.
+     */
+    public function get_current_subnetv4() : int|null {
+        return get_interface_subnet($this->id);
+    }
+
+    /**
+     * Checks the current IPv6 address of this interface. This works for both static and dynimcally assigned IPs.
+     */
+    public function get_current_ipv6() : string|null {
+        return get_interface_ipv6($this->id);
+    }
+
+    /**
+     * Checks the current subnet (v6) of this interface. This works for both static and dynimcally assigned IPs.
+     */
+    public function get_current_subnetv6() : int|null {
+        return get_interface_subnetv6($this->id);
+    }
 }

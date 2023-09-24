@@ -14,6 +14,7 @@ class Field
     public mixed $value = null;
     public string $type = "";
     public array $validators = [];
+    public array $labels = [];
     public bool $unique = false;
     public bool $many = false;
     public int $many_minimum = 1;
@@ -297,6 +298,16 @@ class Field
     }
 
     /**
+     * Checks if this Field object has a specific label assigned. Labels are specific attributes that assigned
+     * Validator objects found during validation that may need to be referenced again after validation.
+     * @param string $label_name The name of the label to check for (e.g. `is_ipaddrv4`)
+     * @return bool Returns `true` if this Field object is assigned the $label_name, `false` if it is not.
+     */
+    public function has_label(string $label_name) : bool {
+        return in_array($label_name, $this->labels);
+    }
+
+    /**
      * Runs all validations for this field.
      * @return bool `true` if all validation succeeded.
      * @throws ValidationError If any validations failed.
@@ -356,10 +367,14 @@ class Field
                 return true;
             }
 
+            # Reset Field labels before running validators so they can be repopulated if needed
+            $this->labels = [];
+
             # Loop through each validator and run it's `validate` method against the current value.
             foreach ($this->validators as $validator) {
-                # Provide the Validator context to this Field's parent Model
-                $validator->context = $this->context;
+                # Provide the Validator context to this Field and it's parent Model
+                $validator->model_context = $this->context;
+                $validator->field_context = $this;
                 $validator->validate(value: $value, field_name: $this->name);
             }
         }
