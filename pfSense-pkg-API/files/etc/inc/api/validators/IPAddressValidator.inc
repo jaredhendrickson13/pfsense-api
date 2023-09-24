@@ -45,7 +45,7 @@ class IPAddressValidator extends API\Core\Validator {
     public function validate(mixed $value, string $field_name = "") {
         # IPv4 values are valid if allowed
         if ($this->allow_ipv4 and is_ipaddrv4($value)) {
-            $this->field_context->labels[] = "is_ipaddrv4";
+            $this->set_label("is_ipaddrv4");
             return;
         }
         # Throw an error if the IPv6 address given is a link local address, but link local addresses are not allowed
@@ -57,12 +57,12 @@ class IPAddressValidator extends API\Core\Validator {
         }
         # IPv6 values are valid if allowed
         if ($this->allow_ipv6 and is_ipaddrv6($value)) {
-            $this->field_context->labels[] = "is_ipaddrv6";
+            $this->set_label("is_ipaddrv6");
             return;
         }
         # FQDN values are valid if allowed
         if ($this->allow_fqdn and is_fqdn($value)) {
-            $this->field_context->labels[] = "is_fqdn";
+            $this->set_label("is_fqdn");
             return;
         }
         # Special keywords are valid if defined

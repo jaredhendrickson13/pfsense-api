@@ -869,7 +869,7 @@ class Field
      * OpenAPI documentation generation.
      * @return string A descriptive string explaining the `conditions` for this Field.
      */
-    private function get_conditions_text() : string {
+    public function get_conditions_text() : string {
         # Variables
         $conditions_text = "";
 

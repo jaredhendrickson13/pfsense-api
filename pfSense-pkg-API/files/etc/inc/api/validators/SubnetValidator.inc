@@ -35,12 +35,12 @@ class SubnetValidator extends API\Core\Validator {
     public function validate(mixed $value, string $field_name = "") {
         # IPv4 values are valid if allowed
         if ($this->allow_ipv4 and is_subnetv4($value)) {
-            $this->field_context->labels[] = "is_subnetv4";
+            $this->set_label("is_subnetv4");
             return;
         }
         # IPv6 values are valid if allowed
         if ($this->allow_ipv6 and is_subnetv6($value)) {
-            $this->field_context->labels[] = "is_subnetv6";
+            $this->set_label("is_subnetv6");
             return;
         }
         # Special keywords are valid if defined

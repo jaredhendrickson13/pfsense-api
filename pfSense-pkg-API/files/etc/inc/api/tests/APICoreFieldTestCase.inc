@@ -529,7 +529,8 @@ class APICoreFieldTestCase extends API\Core\TestCase
     public function test_field_to_openapi_property() {
         # Ensure the `help_text` value is added as the OpenAPI property's `description`
         $test_field = new API\Core\Field(type: "string", help_text: "test");
-        $this->assert_is_true($test_field->to_openapi_property()["description"] === "test");
+        $this->assert_is_true(
+            $test_field->to_openapi_property()["description"] === "test<br>".$test_field->get_conditions_text());
 
         # Ensure the `allow_null` value is added as the OpenAPI property's `nullable`
         $test_field = new API\Core\Field(type: "string", allow_null: true);
@@ -538,6 +539,10 @@ class APICoreFieldTestCase extends API\Core\TestCase
         # Ensure the `read_only` value is added as the OpenAPI property's `readOnly`
         $test_field = new API\Core\Field(type: "string", read_only: true);
         $this->assert_is_true($test_field->to_openapi_property()["readOnly"] === true);
+
+        # Ensure the `editable` value is added as the OpenAPI property's `editable`
+        $test_field = new API\Core\Field(type: "string", read_only: true);
+        $this->assert_is_true($test_field->to_openapi_property()["editable"] === true);
 
         # Ensure the `write_only` value is added as the OpenAPI property's `writeOnly`
         $test_field = new API\Core\Field(type: "string", write_only: true);

@@ -25,4 +25,15 @@ class Validator {
             response_id: "VALIDATOR_INCOMPLETE"
         );
     }
+
+    /**
+     * Sets a label on the assigned $field_context if present.
+     * @param string $label_name The label to assign to the Field context object
+     */
+    protected function set_label(string $label_name) {
+        # Only assign the label if a $field_context was assigned
+        if ($this->field_context) {
+            $this->field_context->labels[] = $label_name;
+        }
+    }
 }
