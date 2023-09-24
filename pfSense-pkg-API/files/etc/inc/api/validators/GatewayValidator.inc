@@ -42,7 +42,7 @@ class GatewayValidator extends API\Core\Validator {
         }
 
         # Gather details about configured gateways
-        $gateways = return_gateways_array();
+        $gateways = return_gateways_array(true);
 
         # Loop through each gateway and see if name matches
         foreach ($gateways as $gateway) {

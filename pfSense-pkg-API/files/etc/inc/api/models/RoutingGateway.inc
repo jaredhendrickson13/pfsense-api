@@ -382,29 +382,6 @@ class RoutingGateway extends Model
     }
 
     /**
-     * Overrides the `apply()` method for RoutingGateway deletions.
-     */
-    public function apply_delete() {
-        # Local variables
-        $gw_data = return_gateways_array(true, false, true, true);
-
-        # Loop through the gateway days until we find the gateway to delete
-        foreach ($gw_data as $gw) {
-            # Check if this gateways 'attribute' matches the ID of the gateway we're deleting
-            if ($this->id === $gw["attribute"]) {
-                # Remove the gateway and monitor IPs
-                route_del($gw["gateway"], $gw["ipprotocol"]);
-                route_del($gw["monitor"], $gw["ipprotocol"]);
-
-                # Delete the default route if this gateway is the default gateway
-                if ($gw["isdefaultgw"]) {
-                    route_del("default", $gw["ipprotocol"]);
-                }
-            }
-        }
-    }
-
-    /**
      * Define steps to create this RoutingGateway object internally.
      */
     public function _create() {
@@ -442,5 +419,32 @@ class RoutingGateway extends Model
 
         # Call the pfSense `save_gateway()` function with the internal data of the gateway to update and its ID.
         save_gateway($internal_values, $this->id);
+    }
+
+    /**
+     * Overrides the `apply()` method for RoutingGateway deletions.
+     */
+    public function _delete() {
+        # Local variables
+        $gw_data = return_gateways_array(true, false, true, true);
+
+        # Loop through the gateway days until we find the gateway to delete
+        foreach ($gw_data as $gw) {
+            # Check if this gateways 'attribute' matches the ID of the gateway we're deleting
+            if ($this->id === $gw["attribute"]) {
+                # Remove the gateway and monitor IPs
+                route_del($gw["gateway"], $gw["ipprotocol"]);
+                route_del($gw["monitor"], $gw["ipprotocol"]);
+
+                # Delete the default route if this gateway is the default gateway
+                if ($gw["isdefaultgw"]) {
+                    route_del("default", $gw["ipprotocol"]);
+                }
+            }
+        }
+
+        # Remove the gateway from config
+        $this->del_config("$this->config_path/$this->id");
+        $this->write_config("Deleted $this->verbose_name via API");
     }
 }
