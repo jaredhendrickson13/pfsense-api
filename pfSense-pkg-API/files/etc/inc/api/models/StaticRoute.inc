@@ -56,6 +56,53 @@ class StaticRoute extends Model
     }
 
     /**
+     * Adds custom validation for the `network` field.
+     * @param string $network The incoming `network` value to be validated.
+     * @return string The validated `network` value to set.
+     */
+    public function validate_network(string $network): string {
+        # Extract the address and subnet from the CIDR
+        $addr = explode("/", $network)[0];
+        $subnet = explode("/", $network)[1];
+
+        # Format the CIDR using the network address
+        if ($this->network->has_label("is_subnetv4")) {
+            $network = gen_subnet($addr, $subnet);
+        }
+        else {
+            $network = gen_subnetv6($addr, $subnet);
+        }
+
+        # Ensure this network is not used by an existing NetworkInterface
+        foreach (NetworkInterface::read_all()->model_objects as $interface) {
+            # Check if this is an IPv4 address and this interface has a static IPv4 address
+            if ($this->network->has_label("is_subnetv4") and $interface->typev4->value === "static") {
+                # Ensure this route doesn't conflict with this interface's subnet
+                if ($network === gen_subnet($interface->ipaddr->value, $interface->subnet->value)) {
+                    throw new ValidationError(
+                        message: "Destination network `$network` conflicts with the IP address of interface with ".
+                            "ID `$interface->id`",
+                        response_id: "STATIC_ROUTE_CONFLICTs_WITH_IPV4_INTERFACE"
+                    );
+                }
+            }
+            # Check if this is an IPv4 address and this interface has a static IPv6 address
+            if ($this->network->has_label("is_subnetv6") and $interface->typev6->value === "staticv6") {
+                # Ensure this route doesn't conflict with this interface's subnet
+                if ($network === gen_subnetv6($interface->ipaddrv6->value, $interface->subnetv6->value)) {
+                    throw new ValidationError(
+                        message: "Destination network `$network` conflicts with the IP address of interface with ".
+                        "ID `$interface->id`",
+                        response_id: "STATIC_ROUTE_CONFLICTs_WITH_IPV4_INTERFACE"
+                    );
+                }
+            }
+        }
+
+        return $network;
+    }
+
+    /**
      * Adds custom validation for the `gateway` field.
      * @param string $gateway The incoming `gateway` value to be validated.
      * @return string The validated `gateway` value to set.
