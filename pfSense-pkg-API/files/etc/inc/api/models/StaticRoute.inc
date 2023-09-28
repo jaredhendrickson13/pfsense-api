@@ -67,10 +67,10 @@ class StaticRoute extends Model
 
         # Format the CIDR using the network address
         if ($this->network->has_label("is_subnetv4")) {
-            $network = gen_subnet($addr, $subnet);
+            $network = gen_subnet($addr, $subnet) . "/$subnet";
         }
         else {
-            $network = gen_subnetv6($addr, $subnet);
+            $network = gen_subnetv6($addr, $subnet) . "/$subnet";
         }
 
         # Ensure this network is not used by an existing NetworkInterface
@@ -265,5 +265,4 @@ class StaticRoute extends Model
 
         file_put_contents("{$g['tmp_path']}/.system_routes.apply", serialize($to_apply_list));
     }
-
 }

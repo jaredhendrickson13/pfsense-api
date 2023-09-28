@@ -818,9 +818,6 @@ class Model {
     protected function _create() {
         # Check if this model has a `config_path` and `many` set, we will apply a default behavior for these models
         if ($this->config_path and $this->many) {
-            # Get the next available internal ID and assign it to this object
-            $this->id = $this->get_next_id();
-
             # Write the new object to the internal config
             $this->set_config(path: "$this->config_path/$this->id", value: $this->to_internal());
             $this->write_config("Added $this->verbose_name via API");
@@ -842,6 +839,11 @@ class Model {
     final public function create(bool $apply = false) : Model {
         # Ensure all object fields and validations succeed for proceeding.
         if ($this->validate()) {
+            # Get the next available internal ID and assign it to this object for `many` models with a config path
+            if ($this->config_path and $this->many) {
+                $this->id = $this->get_next_id();
+            }
+
             # Run the _create method
             $this->_create();
 
