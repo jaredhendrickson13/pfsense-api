@@ -3,6 +3,7 @@
 namespace API\Tests;
 
 use API\Core\TestCase;
+use API\Models\FirewallAlias;
 use API\Validators\IPAddressValidator;
 use API\Validators\NumericRangeValidator;
 use API\Validators\SubnetValidator;
@@ -72,6 +73,105 @@ class APIValidatorsSubnetValidatorTestCase extends TestCase {
                 $test_validator->validate("1234::/128");
             }
         );
+    }
+
+    /**
+     * Checks that host type aliases are valid when alias values are allowed.
+     */
+    public function test_host_alias_subnet_validator() {
+        # Create a firewall host alias to test with
+        $test_alias = new FirewallAlias(
+            representation_data: [
+                "name" => "TEST_ALIAS",
+                "type" => "host",
+                "address" => ["1.2.3.4"]
+            ]
+        );
+        $test_alias->create();
+
+        # Ensure the host alias is not accepted by the SubnetValidator when `allow_alias` is not enabled
+        $this->assert_throws_response(
+            response_id: "SUBNET_VALIDATOR_FAILED",
+            code: 400,
+            callable: function () {
+                (new SubnetValidator(allow_alias: false))->validate(value: "TEST_ALIAS");
+            }
+        );
+
+        # Ensure the host alias is accepted by the SubnetValidator when `allow_alias` is enabled
+        $this->assert_does_not_throw(
+            function () {
+                (new SubnetValidator(allow_alias: true))->validate(value: "TEST_ALIAS");
+            }
+        );
+
+        $test_alias->delete(apply: true);
+    }
+
+    /**
+     * Checks that host type aliases are valid when alias values are allowed.
+     */
+    public function test_network_alias_subnet_validator() {
+        # Create a firewall host alias to test with
+        $test_alias = new FirewallAlias(
+            representation_data: [
+                "name" => "TEST_ALIAS",
+                "type" => "network",
+                "address" => ["1.2.3.4/32"]
+            ]
+        );
+        $test_alias->create();
+
+        # Ensure the host alias is not accepted by the SubnetValidator when `allow_alias` is not enabled
+        $this->assert_throws_response(
+            response_id: "SUBNET_VALIDATOR_FAILED",
+            code: 400,
+            callable: function () {
+                (new SubnetValidator(allow_alias: false))->validate(value: "TEST_ALIAS");
+            }
+        );
+
+        # Ensure the host alias is accepted by the SubnetValidator when `allow_alias` is enabled
+        $this->assert_does_not_throw(
+            function () {
+                (new SubnetValidator(allow_alias: true))->validate(value: "TEST_ALIAS");
+            }
+        );
+
+        $test_alias->delete(apply: true);
+    }
+
+    /**
+     * Checks that port type aliases are always invalid.
+     */
+    public function test_port_alias_subnet_validator() {
+        # Create a firewall host alias to test with
+        $test_alias = new FirewallAlias(
+            representation_data: [
+                "name" => "TEST_ALIAS",
+                "type" => "port",
+                "address" => ["443"]
+            ]
+        );
+        $test_alias->create();
+
+        # Ensure the host alias is never accepted even if `allow_alias` is enabled.
+        $this->assert_throws_response(
+            response_id: "SUBNET_VALIDATOR_FAILED",
+            code: 400,
+            callable: function () {
+                (new SubnetValidator(allow_alias: false))->validate(value: "TEST_ALIAS");
+            }
+        );
+        $this->assert_throws_response(
+            response_id: "SUBNET_VALIDATOR_FAILED",
+            code: 400,
+            callable: function () {
+                (new SubnetValidator(allow_alias: true))->validate(value: "TEST_ALIAS");
+            }
+        );
+
+        $test_alias->delete(apply: true);
     }
 
     /**

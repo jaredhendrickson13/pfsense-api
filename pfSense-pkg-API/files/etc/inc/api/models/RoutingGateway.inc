@@ -247,7 +247,6 @@ class RoutingGateway extends Model
                 response_id: "ROUTING_GATEWAY_INTERFACE_HAS_NO_IPV4"
             );
         }
-
         # Ensure the configured `interface` has an IPv6 address if `protocol` is set to `inet6`
         if ($this->ipprotocol->value === "inet6" and (!$if_obj->get_current_ipv6() or !$if_obj->get_current_subnetv6())) {
             throw new ValidationError(

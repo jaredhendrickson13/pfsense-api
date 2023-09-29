@@ -5,6 +5,7 @@ namespace API\Validators;
 require_once("api/auto_loader.inc");
 
 use API;
+use API\Models\FirewallAlias;
 use API\Responses\ValidationError;
 
 /**
@@ -13,6 +14,7 @@ use API\Responses\ValidationError;
 class SubnetValidator extends API\Core\Validator {
     public bool $allow_ipv4;
     public bool $allow_ipv6;
+    public bool $allow_alias;
     public array $allow_keywords;
 
     /**
@@ -20,9 +22,15 @@ class SubnetValidator extends API\Core\Validator {
      * @param bool $allow_ipv6 Allow value to be an IPv6 subnet CIDR
      * @param array $allow_keywords An array of non subnet CIDR values to allow
      */
-    public function __construct(bool $allow_ipv4 = true, bool $allow_ipv6 = true, array $allow_keywords = []) {
+    public function __construct(
+        bool $allow_ipv4 = true,
+        bool $allow_ipv6 = true,
+        bool $allow_alias = false,
+        array $allow_keywords = []
+    ) {
         $this->allow_ipv4 = $allow_ipv4;
         $this->allow_ipv6 = $allow_ipv6;
+        $this->allow_alias = $allow_alias;
         $this->allow_keywords = $allow_keywords;
     }
 
@@ -33,6 +41,12 @@ class SubnetValidator extends API\Core\Validator {
      * @throws API\Responses\ValidationError When the value is not a valid subnet CIDR.
      */
     public function validate(mixed $value, string $field_name = "") {
+        # Non-port alias values are valid if allowed
+        $alias_query = FirewallAlias::read_all()->query(["name" => $value, "type__except" => "port"]);
+        if ($this->allow_alias and $alias_query->exists()) {
+            $this->set_label("is_alias");
+            return;
+        }
         # IPv4 values are valid if allowed
         if ($this->allow_ipv4 and is_subnetv4($value)) {
             $this->set_label("is_subnetv4");
