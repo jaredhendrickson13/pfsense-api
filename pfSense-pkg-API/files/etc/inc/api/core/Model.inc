@@ -567,6 +567,9 @@ class Model {
         # Check for required packages
         $this->check_packages();
 
+        # Use a variable to keep track of fields with custom validate methods
+        $custom_validate_fields = [];
+
         # Loop through each of this object's assigned fields and validate them.
         foreach ($this->get_fields() as $field) {
             # Assign this object as the Fields parent Model context
@@ -579,11 +582,17 @@ class Model {
             $this->$field->validate();
 
             # Check if a custom validation method was implemented for this model field. Skip if null.
-            $custom_validate_method = "validate_$field";
-            if (method_exists($this, $custom_validate_method) and !is_null($this->$field->value)) {
-                # Run the custom validation method and reassign the fields value to its return value.
-                $this->$field->value = $this->$custom_validate_method($this->$field->value);
+            if (method_exists($this, "validate_$field") and !is_null($this->$field->value)) {
+                # Store the custom validation field so we can call it afterward
+                $custom_validate_fields[] = $field;
             }
+        }
+
+        # Loop through fields that had custom validation methods and call those methods.
+        # Running these after the initial validation loop above allows all fields to be available to these methods.
+        foreach ($custom_validate_fields as $field) {
+            $custom_validate_method = "validate_$field";
+            $this->$field->value = $this->$custom_validate_method($this->$field->value);
         }
 
         # Validate unique together fields
@@ -785,6 +794,17 @@ class Model {
         # Unwrap the array for non `many` models, otherwise return all objects
         return ($model->many) ? new ModelSet($model_objects) : $model_objects[0];
     }
+
+    /**
+     * Performs a query on all Model objects for this Model. This is essentially a shorthand way of calling
+     * `read_all()->query()`. This method is only applicable to `many` models.
+     * @param array $query_params An array of query parameters.
+     * @return ModelSet The queried ModelSet containing only Model objects that matched the query.
+     */
+    public static function query(array $query_params) : ModelSet {
+        return self::read_all()->query($query_params);
+    }
+
 
     /**
      * Initializes the default 'read' method. By default, this method loads the Model object from its internal
