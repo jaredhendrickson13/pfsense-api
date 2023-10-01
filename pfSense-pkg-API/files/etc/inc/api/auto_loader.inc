@@ -6,6 +6,7 @@ require_once("firebase/php-jwt/src/SignatureInvalidException.php");
 require_once("firebase/php-jwt/src/BeforeValidException.php");
 require_once("firebase/php-jwt/src/Key.php");
 require_once("config.inc");
+require_once('diag_arp.inc');
 require_once("util.inc");
 require_once("interfaces.inc");
 require_once("interfaces_fast.inc");

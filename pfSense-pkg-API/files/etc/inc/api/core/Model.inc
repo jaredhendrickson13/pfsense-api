@@ -77,9 +77,12 @@ class Model {
 
         # Obtain the current object from internal if an ID was given or this is not a `many` model.
         if (isset($id) or !$this->many) {
-            $this->id = $id;
-            $this->from_internal();
-            $this->initial_object = unserialize(serialize($this));
+            # Don't pull internal values unless there is a `config_path` or `internal_callable` defined.
+            if ($this->config_path or $this->internal_callable) {
+                $this->id = $id;
+                $this->from_internal();
+                $this->initial_object = unserialize(serialize($this));
+            }
         }
 
         # Use the representation to obtain or construct this object if present.

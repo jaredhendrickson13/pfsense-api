@@ -701,6 +701,11 @@ class Field
      * @@throws  ValidationError When the $value is empty but empty empty values are not allowed
      */
     private function check_value_empty(mixed $value) : bool {
+        # Skip this validation for read_only fields
+        if ($this->read_only) {
+            return true;
+        }
+
         # Check if value is an empty string or array. These are the only two types we consider possible to be empty
         # to avoid having to enable `allow_empty` for booleans, 0 integers, and null values
         # (which are checked separately).

@@ -5,12 +5,14 @@ namespace API\Validators;
 require_once("api/auto_loader.inc");
 
 use API;
+use API\Models\FirewallAlias;
 use API\Responses\ValidationError;
 
 class IPAddressValidator extends API\Core\Validator {
     public bool $allow_ipv4;
     public bool $allow_ipv6;
     public bool $allow_ipv6_link_local;
+    public bool $allow_alias;
     public bool $allow_fqdn;
     public array $allow_keywords;
 
@@ -26,12 +28,14 @@ class IPAddressValidator extends API\Core\Validator {
         bool $allow_ipv4 = true,
         bool $allow_ipv6 = true,
         bool $allow_ipv6_link_local = true,
+        bool $allow_alias = false,
         bool $allow_fqdn = false,
         array $allow_keywords = []
     ) {
         $this->allow_ipv4 = $allow_ipv4;
         $this->allow_ipv6 = $allow_ipv6;
         $this->allow_ipv6_link_local = $allow_ipv6_link_local;
+        $this->allow_alias = $allow_alias;
         $this->allow_fqdn = $allow_fqdn;
         $this->allow_keywords = $allow_keywords;
     }
@@ -43,6 +47,12 @@ class IPAddressValidator extends API\Core\Validator {
      * @throws API\Responses\ValidationError When the value is not a valid IPv4 address.
      */
     public function validate(mixed $value, string $field_name = "") {
+        # Non-port alias values are valid if allowed
+        $alias_query = FirewallAlias::read_all()->query(["name" => $value, "type__except" => "port"]);
+        if ($this->allow_alias and $alias_query->exists()) {
+            $this->set_label("is_alias");
+            return;
+        }
         # IPv4 values are valid if allowed
         if ($this->allow_ipv4 and is_ipaddrv4($value)) {
             $this->set_label("is_ipaddrv4");
@@ -73,6 +83,7 @@ class IPAddressValidator extends API\Core\Validator {
         # Format the error message to include what options are allowed
         $allowed_options = ($this->allow_ipv4) ? ["IPv4 address"] : [];
         $allowed_options = ($this->allow_ipv6) ? $allowed_options + ["IPv6 address"] : $allowed_options;
+        $allowed_options = ($this->allow_alias) ? $allowed_options + ["alias"] : $allowed_options;
         $allowed_options = ($this->allow_fqdn) ? $allowed_options + ["FQDN"] : $allowed_options;
         $allowed_options_str = implode(", ", $allowed_options);
 
