@@ -102,7 +102,7 @@ function revert($version) {
     if($headers && strpos($headers[0], '302')) {
         echo "done.".PHP_EOL;
         echo shell_exec("/usr/sbin/pkg delete -y pfSense-pkg-API");
-        echo shell_exec("/usr/sbin/pkg -C /dev/null add ".$url);
+        echo shell_exec("/usr/sbin/pkg -C /dev/null add " . escapeshellarg($url));
         echo shell_exec("/etc/rc.restart_webgui");
     } else {
         echo "no package found.".PHP_EOL;
