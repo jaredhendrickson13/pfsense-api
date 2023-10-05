@@ -59,7 +59,7 @@ $curr_ver_msg = (APISystemAPIVersionRead::is_update_available()) ? " - Update av
 # On update POST, start the update process
 if ($_POST["update"] and !empty($_POST["version"])) {
     # Start the update process in the background and print notice
-    shell_exec("nohup pfsense-api revert ".$_POST["version"]." > /dev/null &");
+    shell_exec("nohup pfsense-api revert ".escapeshellarg($_POST["version"])." > /dev/null &");
     print_apply_result_box(0, "\nAPI update process has started and is running in the background. Check back in a few minutes.");
 }
 
