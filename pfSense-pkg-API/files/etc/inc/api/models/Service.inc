@@ -57,13 +57,15 @@ class Service extends Model
     /**
      * Obtains all available services and their operating status. This method is the internal callable that populates
      * the internal field values for this Model.
+     * @return array An array of available pfSense services and their current statuses.
      */
-    public function get_services() : array {
+    public static function get_services() : array {
         return get_services();
     }
 
     /**
      * Obtains all internal service choices for the `name` field.
+     * @return array An array of available service names.
      */
     public function get_service_name_choices() : array {
         $choices = [];
