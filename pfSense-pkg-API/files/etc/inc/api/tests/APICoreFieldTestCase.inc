@@ -205,21 +205,6 @@ class APICoreFieldTestCase extends API\Core\TestCase
     }
 
     /**
-     * Checks that the field cannot contain a `default` value when it is `read_only`.
-     */
-    public function test_no_default_when_field_is_read_only() {
-        $this->assert_throws_response(
-            response_id: "FIELD_NO_DEFAULT_WITH_READ_ONLY",
-            code: 500,
-            callable: function () {
-                $test_field = new API\Core\Field(type: "string", default: "test", read_only: true);
-                $test_field->name = "test_field";
-                $test_field->validate();
-            }
-        );
-    }
-
-    /**
      * Checks that the field cannot contain `choices` when it is `read_only`.
      */
     public function test_no_choices_when_field_is_read_only() {

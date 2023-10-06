@@ -513,14 +513,6 @@ class Field
      * @throws ValidationError When `read_only` is set and a non-null value was requested.
      */
     private function check_field_read_only() {
-        # Throw an error if the field is read only, but a default value was set
-        if ($this->read_only and isset($this->default)) {
-            throw new ServerError(
-                message: "Read-only field `$this->name` cannot have a default value.",
-                response_id: "FIELD_NO_DEFAULT_WITH_READ_ONLY"
-            );
-        }
-
         # Throw an error if the field is read only, but choices were defined
         if ($this->read_only and $this->choices) {
             throw new ServerError(

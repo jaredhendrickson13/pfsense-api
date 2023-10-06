@@ -17,7 +17,7 @@
             <log_successful_auth>disabled</log_successful_auth>
             <allow_pre_releases>disabled</allow_pre_releases>
             <allowed_interfaces></allowed_interfaces>
-            <represent_interfaces_as>description</represent_interfaces_as>
+            <represent_interfaces_as>descr</represent_interfaces_as>
             <auth_mode>local</auth_mode>
             <ha_sync>disabled</ha_sync>
             <ha_sync_hosts></ha_sync_hosts>
