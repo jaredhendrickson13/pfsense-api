@@ -34,6 +34,7 @@ require_once("firewall_virtual_ip.inc");
 require_once("firebase/php-jwt/src/ExpiredException.php");
 require_once("firebase/php-jwt/src/SignatureInvalidException.php");
 require_once("firebase/php-jwt/src/BeforeValidException.php");
+require_once("firebase/php-jwt/src/JWTExceptionWithPayloadInterface.php");
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
