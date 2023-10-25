@@ -1,10 +1,14 @@
 <?php
 
 require_once("firebase/php-jwt/src/JWT.php");
+require_once("firebase/php-jwt/src/JWK.php");
+require_once("firebase/php-jwt/src/Key.php");
+require_once("firebase/php-jwt/src/CachedKeySet.php");
+require_once("firebase/php-jwt/src/JWTExceptionWithPayloadInterface.php");
 require_once("firebase/php-jwt/src/ExpiredException.php");
 require_once("firebase/php-jwt/src/SignatureInvalidException.php");
 require_once("firebase/php-jwt/src/BeforeValidException.php");
-require_once("firebase/php-jwt/src/Key.php");
+require_once("firebase/php-jwt/src/JWTExceptionWithPayloadInterface.php");
 require_once("config.inc");
 require_once('diag_arp.inc');
 require_once("util.inc");
