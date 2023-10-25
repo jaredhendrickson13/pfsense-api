@@ -1,8 +1,12 @@
 {
   "require": {
+<<<<<<< HEAD
     "firebase/php-jwt": "v6.8.*"
   },
   "require-dev": {
     "phpunit/phpunit": "^10"
+=======
+    "firebase/php-jwt": "v6.9.*"
+>>>>>>> 5d2e42ea6cc689ed8316c7b268f0f5a88430685e
   }
 }
