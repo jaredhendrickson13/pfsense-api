@@ -2150,7 +2150,7 @@ function get($id, $data=[], $all=false) {
         2257 => [
             "status" => "bad request",
             "code" => 400,
-            "return" => $id
+            "return" => $id,
             "message" => "IPsec phase 2 unique ID is required"
         ],
         2258 => [
