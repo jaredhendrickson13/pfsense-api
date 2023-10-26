@@ -1,0 +1,12 @@
+name: OpenAPI
+on: [push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Lint OpenAPI spec
+        uses: vaibhav-jain/spectral-action/@v2.6
+        with:
+          file_path: pfSense-pkg-API/files/usr/local/www/api/documentation/openapi.yml
