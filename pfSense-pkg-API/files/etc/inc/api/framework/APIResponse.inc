@@ -2177,6 +2177,72 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Duplicate Service Watchdog services are not allowed"
         ],
+        2262 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Pool name must contain only alphanumeric characters, periods, hyphens, or underscores."
+        ],
+        2263 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "This pool name has already been used.  Pool names must be unique."
+        ],
+        2264 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "The 'persist_sticky_type' setting must be one of: 'ip', cookie."
+        ],
+        2265 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "The 'balance' setting must be one of: 'roundrobin', 'leastconn'"
+        ],
+        2266 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Health check types must be one of: 'HTTP', 'Basic'."
+        ],
+        2267 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Backend server names must contain only alphanumeric characters, periods, hyphens, or underscores."
+        ],
+        2268 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Backend server names must contain a minimum of 2 characters."
+        ],
+        2269 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "The address for this server is not a valid IP address."
+        ],
+        2270 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "The port for this server is not numeric."
+        ],
+        2271 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Servers must include an 'ssl' parameter that is one of: 'yes', 'no'."
+        ],
+        2272 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Unexpected HAProxy error after backend validation. Config reverted. Initial POST data and HAProxy error included."
+        ],
 
         // 3000-3999 reserved for /api/v1/interfaces API calls
         3000 => [
