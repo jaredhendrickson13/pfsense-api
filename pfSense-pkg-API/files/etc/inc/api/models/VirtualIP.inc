@@ -3,6 +3,7 @@
 namespace API\Models;
 
 use API;
+use API\Core\Auth;
 use API\Core\Model;
 use API\Fields\BooleanField;
 use API\Fields\IntegerField;
@@ -161,7 +162,7 @@ class VirtualIP extends Model
     /**
      * Serializes changes to virtual IPs before applying them.
      */
-    public function serialize_changes() {
+    private function serialize_changes() {
         global $g;
 
         # Retain existing serialized virtual IPs if present
@@ -205,6 +206,9 @@ class VirtualIP extends Model
      * Brings down and removes this virtual IP from the configuration.
      */
     public function _delete() {
+        # Call the parent _delete() method to remove the entry from config
+        parent::_delete();
+
         # Safely remove and bring proxyarp virtual IPs
         if ($this->mode->value == "proxyarp") {
             interface_proxyarp_configure($this->interface->value);
@@ -213,8 +217,5 @@ class VirtualIP extends Model
         else {
             interface_vip_bring_down($this->to_internal());
         }
-
-        # Call the parent _delete() method to remove the entry from config
-        parent::_delete();
     }
 }
