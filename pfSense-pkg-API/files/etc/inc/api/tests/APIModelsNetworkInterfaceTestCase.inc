@@ -308,7 +308,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
             code: 400,
             callable: function() {
                 # Ensure the DHCP server is enabled on the lan interface, then try to change the interface to DHCP
-                # TODO: change this to a DHCPServer model call when developed
+                # TODO: change this to a ServicesDHCPServer model call when developed
                 Model::set_config(path: "dhcpd/lan/enable", value: "");
                 $test_model = new NetworkInterface(id: "lan");
                 $test_model->validate_typev4("dhcp");

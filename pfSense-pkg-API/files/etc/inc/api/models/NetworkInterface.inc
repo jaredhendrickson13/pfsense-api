@@ -551,7 +551,6 @@ class NetworkInterface extends Model
      */
     public function validate_typev4(string $typev4) : string {
         # Do not allow the type to change from 'static' if the DHCP server is enabled on this interface
-        # TODO: Change this to use a query when the DHCPServer model is developed
         if ($typev4 !== "static" and $this->is_config_enabled(path: "dhcpd/$this->id")) {
             throw new ValidationError(
                 message: "Field 'typev4' cannot be changed from 'static' while a DHCP server is enabled on this ".
@@ -1179,9 +1178,29 @@ class NetworkInterface extends Model
     }
 
     /**
-     * Checks the current subnet (v6) of this interface. This works for both static and dynimcally assigned IPs.
+     * Checks the current subnet (v6) of this interface. This works for both static and dynamically assigned IPs.
      */
     public function get_current_subnetv6() : int|null {
         return get_interface_subnetv6($this->id);
+    }
+
+    /**
+     * Obtains the current network address of the subnet assigned to this interface.
+     */
+    public function get_network_ipv4() : string|null {
+        $subnet = explode("/", $this->get_current_subnetv4());
+        $ip = $subnet[0];
+        $subnet = $subnet[1];
+        return gen_subnetv4($ip, $subnet);
+    }
+
+    /**
+     * Obtains the current broadcast address of the subnet assigned to this interface.
+     */
+    public function get_broadcast_ipv4() : string|null {
+        $subnet = explode("/", $this->get_current_subnetv4());
+        $ip = $subnet[0];
+        $subnet = $subnet[1];
+        return gen_subnetv4_max($ip, $subnet);
     }
 }
