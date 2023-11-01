@@ -22,19 +22,15 @@ class APIServicesHAProxyPoolRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
-	    $this->packages = ["pfSense-pkg-haproxy"];
+        $this->packages = ["pfSense-pkg-haproxy"];
         $this->privileges = ["page-all", "page-service-haproxy"];
     }
 
     public function action() {
         $backends = $this->get_config('installedpackages/haproxy/ha_pools/item');
-        foreach ($backends as $config_id => $settings) {
-            $backends[$config_id]['config_id'] = $config_id;
+        foreach ($backends as $id => $settings) {
+            $backends[$id]['config_id'] = $id;
         }
-        if (array_key_exists('filter', $this->initial_data)) {
-            return APIResponse\get(0, $this->initial_data['filter']);
-        } else {
-            return APIResponse\get(0, $backends);
-        }
+        return APIResponse\get(0, $backends);
     }
 }

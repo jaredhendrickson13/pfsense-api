@@ -21,10 +21,19 @@ class APIServicesHAProxyRead extends APIModel {
     # Create our method constructor
     public function __construct() {
         parent::__construct();
+        $this->packages = ["pfSense-pkg-haproxy"];
         $this->privileges = ["page-all", "page-service-haproxy"];
     }
 
     public function action() {
-        return APIResponse\get(0, $this->get_config("haproxy", []));
+	$haproxy_all = $this->get_config("installedpackages/haproxy", []);
+        $haproxy_main = [];
+	// We only want global settings returned here
+	foreach ($haproxy_all as $setting => $value) {
+	    if ($setting != "ha_backends" and $setting != "ha_pools") {
+		$haproxy_main[$setting] = $value;
+	    }
+	}
+        return APIResponse\get(0, $haproxy_main);
     }
 }
