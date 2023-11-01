@@ -15,24 +15,17 @@
 
 require_once("api/framework/APIEndpoint.inc");
 
-class APIServicesHAProxyPool extends APIEndpoint {
+class APIServicesHAProxyPoolServers extends APIEndpoint {
     public function __construct() {
         parent::__construct();
-        $this->url = "/api/v1/services/haproxy/pool";
-    }
-
-    protected function get() {
-        return (new APIServicesHAProxyPoolRead())->call();
-    }
-    protected function post() {
-        return (new APIServicesHAProxyPoolCreate())->call();
+        $this->url = "/api/v1/services/haproxy/pool/servers";
     }
 
     protected function put() {
-        return (new APIServicesHAProxyPoolUpdate())->call();
+        return (new APIServicesHAProxyPoolServersUpdate())->call();
     }
 
     protected function delete() {
-        return (new APIServicesHAProxyPoolDelete())->call();
+        return (new APIServicesHAProxyPoolServersDelete())->call();
     }
 }
