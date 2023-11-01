@@ -18,7 +18,7 @@ require_once("api/framework/APIResponse.inc");
 require_once("haproxy/haproxy.inc");
 require_once("haproxy/haproxy_utils.inc");
 
-class APIServicesHAProxyPoolUpdate extends APIModel {
+class APIServicesHAProxyPoolDelete extends APIModel {
 
     private $current_backend;
 
