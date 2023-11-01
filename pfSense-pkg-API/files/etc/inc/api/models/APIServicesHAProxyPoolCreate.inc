@@ -30,7 +30,7 @@ class APIServicesHAProxyPoolCreate extends APIModel {
         parent::__construct();
         $this->privileges = ["page-all", "page-service-haproxy"];
         $this->packages = ["pfSense-pkg-haproxy"];
-        $this->change_note = "Created HAProxy backend via API."
+        $this->change_note = "Created HAProxy backend via API.";
         $this->requires_auth = false;
         $this->allowed_server_ssl = ['yes', 'no'];
         $this->allowed_algorithms = ['roundrobin', 'leastconn'];
