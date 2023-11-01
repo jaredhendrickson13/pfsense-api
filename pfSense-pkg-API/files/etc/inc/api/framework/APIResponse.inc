@@ -2193,7 +2193,7 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "The 'persist_sticky_type' setting must be one of: 'ip', cookie."
+            "message" => "The 'persist_sticky_type' setting must be one of: 'stick_sourceipv4', 'stick_cookie_value'."
         ],
         2265 => [
             "status" => "bad request",
@@ -2242,6 +2242,30 @@ function get($id, $data=[], $all=false) {
             "code" => 400,
             "return" => $id,
             "message" => "Unexpected HAProxy error after backend validation. Config reverted. Initial POST data and HAProxy error included."
+        ],
+        2273 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "LiquidWeb subaccount is either missing or malformed."
+        ],
+        2274 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "A numeric pool ID or alphanumeric pool name must be provided."
+        ],
+        2275 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "HAProxy pool ID does not exist."
+        ],
+        2276 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "HAProxy pool name does not exist."
         ],
 
         // 3000-3999 reserved for /api/v1/interfaces API calls
