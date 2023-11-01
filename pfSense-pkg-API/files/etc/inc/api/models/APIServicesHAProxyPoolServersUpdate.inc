@@ -28,7 +28,7 @@ class APIServicesHAProxyPoolServersUpdate extends APIModel {
         $this->privileges = ["page-all", "page-service-haproxy"];
         $this->packages = ["pfSense-pkg-haproxy"];
         $this->requires_auth = false;
-        $this->change_note = "Updated HAProxy backend server pool via API."
+        $this->change_note = "Updated HAProxy backend server pool via API.";
         $this->allowed_server_ssl = ['yes', 'no'];
         $this->current_servers = [];
     }
@@ -41,7 +41,7 @@ class APIServicesHAProxyPoolServersUpdate extends APIModel {
 
     private function __validate_target_backend() {
         if (isset($this->initial_data["name"])) {
-            $backend_id = get_backend_id($this->initial_data["name"]))
+            $backend_id = get_backend_id($this->initial_data["name"]);
             if ($this->get_config("installedpackages/haproxy/ha_pools/item/{$backend_id}", false)) {
                 $this->id = $backend_id;
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}");
@@ -64,7 +64,7 @@ class APIServicesHAProxyPoolServersUpdate extends APIModel {
 
     private function __validate_servers($servers) {
 
-        $this->validated_data['ha_servers']['item'] = []
+        $this->validated_data['ha_servers']['item'] = [];
         foreach ($servers as $server) {
             $server_bad_name = false;
             $server_bad_address = false;

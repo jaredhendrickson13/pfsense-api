@@ -30,7 +30,7 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
         $this->privileges = ["page-all", "page-service-haproxy"];
         $this->packages = ["pfSense-pkg-haproxy"];
         $this->requires_auth = false;
-        $this->change_note = "Updated HAProxy backend via API."
+        $this->change_note = "Updated HAProxy backend via API.";
         $this->allowed_server_ssl = ['yes', 'no'];
         $this->allowed_algorithms = ['roundrobin', 'leastconn'];
         $this->allowed_persistence = ['stick_sourceipv4', 'stick_cookie_value', 'none'];
@@ -46,7 +46,7 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
 
     private function __validate_target_backend() {
         if (isset($this->initial_data["name"])) {
-            $backend_id = get_backend_id($this->initial_data["name"]))
+            $backend_id = get_backend_id($this->initial_data["name"]);
             if ($this->get_config("installedpackages/haproxy/ha_pools/item/{$backend_id}", false)) {
                 $this->id = $backend_id;
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}");
@@ -73,7 +73,7 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
             }
         }
 
-        if (isset($this->initial_data['lw_subacct']) {
+        if (isset($this->initial_data['lw_subacct'])) {
             if (strlen($this->initial_data['lw_subacct']) == 6 && ctype_alnum($this->initial_data['lw_subacct'])) {
                 $this->validated_data['lw_subacct'] = $this->initial_data['lw_subacct'];
             } else {

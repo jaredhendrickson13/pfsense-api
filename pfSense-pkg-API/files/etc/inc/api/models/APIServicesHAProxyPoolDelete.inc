@@ -27,7 +27,7 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
         $this->privileges = ["page-all", "page-service-haproxy"];
         $this->packages = ["pfSense-pkg-haproxy"];
         $this->requires_auth = false;
-        $this->change_note = "Deleted HAProxy backend via API."
+        $this->change_note = "Deleted HAProxy backend via API.";
         $this->current_backend = [];
 
     }
@@ -38,11 +38,11 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
 
     private function __validate_target_backend() {
         if (isset($this->initial_data["name"])) {
-            $backend_id = get_backend_id($this->initial_data["name"]))
+            $backend_id = get_backend_id($this->initial_data["name"]);
             if ($this->get_config("installedpackages/haproxy/ha_pools/item/{$backend_id}", false)) {
                 $this->id = $backend_id;
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}");
-                $this->current_backend= $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}", [])
+                $this->current_backend= $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}", []);
             } else {
                 $this->errors[] = APIResponse\get(2276);
             }   
@@ -50,7 +50,7 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
             if ($this->get_config("installedpackages/haproxy/ha_pools/item/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}");
-                $this->current_backend= $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}", [])
+                $this->current_backend= $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}", []);
             } else {
                 $this->errors[] = APIResponse\get(2275);
             }   
