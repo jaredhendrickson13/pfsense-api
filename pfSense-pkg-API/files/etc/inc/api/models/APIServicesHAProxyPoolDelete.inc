@@ -79,7 +79,7 @@ class APIServicesHAProxyPoolDelete extends APIModel {
             return APIResponse\get(2272, $this->initial_data);
         } else {
             clear_subsystem_dirty('haproxy.conf');
-            return APIResponse\get(0, 'Backend successfully created!');
+            return APIResponse\get(0, 'Backend successfully deleted');
         }
     }
 }

@@ -73,24 +73,21 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
             }
         }
 
-        if (isset($this->initial_data['lw_subacct'])) {
-            if (strlen($this->initial_data['lw_subacct']) == 6 && ctype_alnum($this->initial_data['lw_subacct'])) {
-                $this->validated_data['lw_subacct'] = $this->initial_data['lw_subacct'];
-            } else {
-                $this->errors[] = APIResponse\get(2273, $this->initial_data['lw_subacct']);
-            }
-        }
-
         if (isset($this->initial_data['persist_sticky_type'])) {
             if (!in_array($this->initial_data['persist_sticky_type'], $this->allowed_persistence)) {
                 $this->errors[] = APIResponse\get(2264, $this->initial_data['persist_sticky_type']);
             } else {
                 $this->validated_data['persist_sticky_type'] = $this->initial_data['persist_sticky_type'];
                 if ($this->validated_data['persist_sticky_type'] == 'stick_cookie_value') {
+                    if (!isset($this->initial_data['lw_subacct'])) {
+                        $this->errors[] = APIResponse\get(2273, 'lw_subacct not found in request body');
+                    }
                     $this->validated_data['persist_cookie_enabled'] = 'yes';
                     $cookie_uniq_str = substr(md5($this->validated_data['name'].$this->validated_data['lw_subacct'].gethostname()), 0, 10);
                     $this->validated_data['persist_stick_cookiename'] = 'X-HAProxy-Session-'.$cookie_uniq_str;
                     $this->validated_data['persist_cookie_name'] = 'X-HAProxy-Session-'.$cookie_uniq_str;
+                } else {
+                    $this->validated_data['persist_cookie_enabled'] = 'no';
                 }
             }
         }
@@ -158,7 +155,7 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
             return APIResponse\get(2272, $this->initial_data);
         } else {
             clear_subsystem_dirty('haproxy.conf');
-            return APIResponse\get(0, 'Backend successfully created!');
+            return APIResponse\get(0, 'Backend successfully updated');
         }
     }
 }
