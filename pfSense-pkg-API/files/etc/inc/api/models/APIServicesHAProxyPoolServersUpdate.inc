@@ -36,7 +36,6 @@ class APIServicesHAProxyPoolServersUpdate extends APIModel {
     public function validate_payload() {
         $this->__validate_target_backend();
         $this->__validate_servers($this->initial_data['servers']);
-        $this->__set_server_backend_ids();
     }
 
     private function __validate_target_backend() {
@@ -110,19 +109,6 @@ class APIServicesHAProxyPoolServersUpdate extends APIModel {
 
     }
 
-    private function __set_server_backend_ids() {
-        $id = 100;
-        foreach($this->validated_data['ha_servers']['item'] as &$server) {
-            if (!is_numeric($server['id'])) {
-                while(find_server_by_id($id) || find_backend_by_id($id)) {
-                    // find unused id..
-                    $id++;
-                }   
-                $server['id'] = $id;
-            }   
-        }   
-    }   
-
     # Tell our API model what to do after successfully validating the client's request
     public function action(){
 
@@ -143,7 +129,7 @@ class APIServicesHAProxyPoolServersUpdate extends APIModel {
             return APIResponse\get(2272, $this->initial_data);
         } else {
             clear_subsystem_dirty('haproxy.conf');
-            return APIResponse\get(0, 'Backend successfully created!');
+            return APIResponse\get(0, 'Backend servers successfully updated');
         }
     }
 }

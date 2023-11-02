@@ -105,7 +105,6 @@ class APIServicesHAProxyPoolCreate extends APIModel {
     public function validate_payload() {
         $this->__validate_backend();
         $this->__validate_servers($this->initial_data['servers']);
-        $this->__set_server_backend_ids();
         $this->__populate_defaults();
     }
 
@@ -217,26 +216,6 @@ class APIServicesHAProxyPoolCreate extends APIModel {
             }
         }
 
-    }
-
-    private function __set_server_backend_ids() {
-        $id = 100;
-        if (!is_numeric($this->validated_data['id'])) {
-            while(find_server_by_id($id) || find_backend_by_id($id)) {
-                // find unused id..
-                $id++;
-            }
-            $this->validated_data['id'] = $id;
-        }
-        foreach($this->validated_data['ha_servers']['item'] as &$server) {
-            if (!is_numeric($server['id'])) {
-                while(find_server_by_id($id) || find_backend_by_id($id)) {
-                    // find unused id..
-                    $id++;
-                }
-                $server['id'] = $id;
-            }
-        }
     }
 
     # Tell our API model what to do after successfully validating the client's request
