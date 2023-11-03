@@ -153,6 +153,39 @@ class Model {
     }
 
     /**
+     * Merges changed Model field values into the config. This is similar to `set_config()` but instead of replacing
+     * the entire config path with a set value, it only sets Field's known to this Model. Any fields in the stored
+     * object that are not defined in a Field assigned to this Model will be left unchanged.
+     * @param $path string The Model config path including any Model ID
+     */
+    public function merge_config(string $path) {
+        # Loop through each field known to this Model
+        foreach ($this->get_fields() as $field) {
+            # Determine the field path
+            if ($this->$field->internal_namespace) {
+                $field_path = "$path/{$this->$field->internal_namespace}/{$this->$field->internal_name}";
+            }
+            else {
+                $field_path = "$path/{$this->$field->internal_name}";
+            }
+
+            # Do not merge `representation_only` fields
+            if ($this->$field->representation_only) {
+                continue;
+            }
+
+            # Remove config values to fields that are `null`
+            if ($this->$field->to_internal() === null) {
+                $this->del_config(path: $field_path);
+                continue;
+            }
+
+            # Otherwise, set the value normally
+            $this->set_config(path: $field_path, value: $this->$field->to_internal());
+        }
+    }
+
+    /**
      * Delete a key from the configuration
      * @param $path string path with '/' separators
      * @returns array copy of the removed value or null
@@ -907,12 +940,12 @@ class Model {
 
             # Merge differences between the stored object and updated internal object when update strategy is 'merge'
             if ($this->update_strategy === "merge") {
-                $stored_object = $this->get_config($update_config_path, []);
-                $updated_object = array_merge($stored_object, $this->to_internal());
+                $this->merge_config($update_config_path);
             }
             # Replace the internal object entirely when update strategy is 'replace'
             elseif ($this->update_strategy === "replace") {
-                $updated_object = $this->to_internal();
+                $this->set_config(path: $update_config_path, value: $this->to_internal());
+
             }
             # Throw an error if the update strategy is unknown
             else {
@@ -923,7 +956,6 @@ class Model {
             }
 
             # Write the changes to the object in config.
-            $this->set_config(path: $update_config_path, value: $updated_object);
             $this->write_config("Modified $this->verbose_name via API");
             return;
         }

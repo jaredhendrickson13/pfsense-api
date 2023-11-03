@@ -46,8 +46,9 @@ class InterfaceField extends API\Fields\StringField {
      * @param bool $many If `true`, the value must be an array of many strings.
      * @param int $many_minimum When $many is set to `true`, this sets the minimum number of array entries required.
      * @param int $many_maximum When $many is set to `true`, this sets the maximum number of array entries allowed.
-     * @param string $delimiter Assign the delimiter used to join the value array back to its internal string form when
-     * $many is enabled.
+     * @param string|null $delimiter Assigns the string delimiter to use when writing array values to config.
+     *  Use `null` if this field is stored as an actual array in config. This is only available if $many is set to
+     *  `true`. Defaults to `,` to store as comma-separated string.
      * @param string $verbose_name The detailed name for this Field. This name will be used in non-programmatic areas
      * like web pages and help text. This Field will default to property name assigned to the parent Model with
      * underscores converted to spaces.
@@ -88,7 +89,7 @@ class InterfaceField extends API\Fields\StringField {
         bool $many = false,
         int $many_minimum = 1,
         int $many_maximum = 128,
-        string $delimiter = ",",
+        string|null $delimiter = ",",
         string $verbose_name = "",
         string $verbose_name_plural = "",
         string $internal_name = "",

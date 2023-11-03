@@ -739,7 +739,7 @@ class Field
      * `value` property for this object.
      * @param string|null $internal_value The raw internal config value to convert to a representation value.
      */
-    public function from_internal(string|null $internal_value) {
+    public function from_internal(mixed $internal_value) {
         # Keep null values for non boolean values and representation only values
         if ($this->representation_only or (is_null($internal_value) and $this->type !== "boolean")) {
             # Check if this field has a default, if so, use the default value

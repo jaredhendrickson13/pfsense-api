@@ -206,7 +206,8 @@ class DHCPServer extends Model
         );
         $this->denyunknown = new StringField(
             default: null,
-            choices: ["enabled", "class"],
+            choices: ["", "enabled", "class"],
+            allow_empty: true,
             allow_null: true,
             help_text: "Define how to handle unknown clients requesting DHCP leases. When set to `null`, any DHCP ".
             "client will get an IP address within this scope/range on this interface. If set to `enabled`, ".
