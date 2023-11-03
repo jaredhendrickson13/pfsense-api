@@ -12,6 +12,7 @@ class ServicesDHCPServers extends Endpoint
         # Assign the URL for this endpoint along with the Model it corresponds to.
         $this->url = "/api/v2/services/dhcp_servers";
         $this->model_name = "DHCPServer";
+        $this->
         $this->many = true;
 
         # Assign allowed request methods along with the privileges required for each

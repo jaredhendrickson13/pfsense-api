@@ -19,7 +19,7 @@ class Field
     public bool $many = false;
     public int $many_minimum = 1;
     public int $many_maximum = 128;
-    public string $delimiter = ",";
+    public string|null $delimiter = ",";
     public array $choices = [];
     public string $choices_callable = "";
     public array $verbose_choices = [];
@@ -73,8 +73,9 @@ class Field
      * should be allowed. If `true`, validation will run against each value in the value array individual.
      * @param int $many_minimum When $many is set to `true`, this sets the minimum number of array entries required.
      * @param int $many_maximum When $many is set to `true`, this sets the maximum number of array entries allowed.
-     * @param string $delimiter Assigns the string delimiter to use when writing array values to config. This is only
-     * available if $many is set to `true`. Defaults to `,` to store as comma-separated string.
+     * @param string|null $delimiter Assigns the string delimiter to use when writing array values to config.
+     * Use `null` if this field is stored as an actual array in config. This is only available if $many is set to
+     * `true`. Defaults to `,` to store as comma-separated string.
      * @param string $verbose_name The detailed name for this Field. This name will be used in non-programmatic areas
      * like web pages and help text. This Field will default to property name assigned to the parent Model with
      * underscores converted to spaces.
@@ -114,7 +115,7 @@ class Field
         bool   $many = false,
         int    $many_minimum = 1,
         int    $many_maximum = 128,
-        string $delimiter = ",",
+        string|null $delimiter = ",",
         string $verbose_name = "",
         string $verbose_name_plural = "",
         string $internal_name = "",
@@ -754,11 +755,21 @@ class Field
 
         # For `many` type fields, convert all values to representation.
         if ($this->many) {
-            # Expand the value into it's array form.
-            $values = ($internal_value === "") ? [] : explode($this->delimiter, $internal_value);
-            $representation = [];
+            # Assume the internal value is already an array if the delimiter is `null`
+            if ($this->delimiter === null and !empty($internal_value)) {
+                $values = $internal_value;
+            }
+            # Assume an empty array if the internal value is empty
+            elseif (empty($internal_value)) {
+                $values = [];
+            }
+            # Otherwise, split the internal value into it's array representation
+            else {
+                $values = explode($this->delimiter, $internal_value);
+            }
 
             # Run the field's `to_representation()` method for value to represent
+            $representation = [];
             foreach ($values as $value) {
                 $representation[] = $this->_from_internal($value);
             }
@@ -807,8 +818,8 @@ class Field
                 $internal_values[] = $this->_to_internal($value);
             }
 
-            # Join the array back into it's internal string format.
-            return implode($this->delimiter, $internal_values);
+            # Return the values as an array if the delimiter is null, otherwise piece the array back into a string
+            return ($this->delimiter === null) ? $internal_values : implode($this->delimiter, $internal_values);
         }
         # Otherwise, just convert the individual value to it's internal value
         else {

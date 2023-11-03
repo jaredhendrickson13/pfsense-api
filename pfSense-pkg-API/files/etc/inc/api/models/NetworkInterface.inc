@@ -1188,9 +1188,8 @@ class NetworkInterface extends Model
      * Obtains the current network address of the subnet assigned to this interface.
      */
     public function get_network_ipv4() : string|null {
-        $subnet = explode("/", $this->get_current_subnetv4());
-        $ip = $subnet[0];
-        $subnet = $subnet[1];
+        $ip = $this->get_current_ipv4();
+        $subnet = $this->get_current_subnetv4();
         return gen_subnetv4($ip, $subnet);
     }
 
@@ -1198,9 +1197,8 @@ class NetworkInterface extends Model
      * Obtains the current broadcast address of the subnet assigned to this interface.
      */
     public function get_broadcast_ipv4() : string|null {
-        $subnet = explode("/", $this->get_current_subnetv4());
-        $ip = $subnet[0];
-        $subnet = $subnet[1];
+        $ip = $this->get_current_ipv4();
+        $subnet = $this->get_current_subnetv4();
         return gen_subnetv4_max($ip, $subnet);
     }
 }

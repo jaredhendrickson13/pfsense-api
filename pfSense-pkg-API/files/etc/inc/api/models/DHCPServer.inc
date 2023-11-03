@@ -51,6 +51,7 @@ class DHCPServer extends Model
         $this->many = true;
         $this->always_apply = true;
         $this->update_strategy = "merge";
+        $this->verbose_name = "DHCP Server";
 
         # Define Model fields
         $this->enable = new BooleanField(
@@ -124,7 +125,7 @@ class DHCPServer extends Model
             "for a specific expiration time."
         );
         $this->maxleasetime = new IntegerField(
-            default: 7200,
+            default: 86400,
             allow_null: true,
             minimum: 60,
             help_text: "The maximum DHCP lease validity period (in seconds) a client can request."
@@ -140,24 +141,30 @@ class DHCPServer extends Model
         $this->dnsserver = new StringField(
             default: [],
             allow_empty: true,
-            many_maximum: 1,    # TODO: allow `many` fields to save internally as array to allow more than 1 here
+            many: true,
+            many_maximum: 4,    # TODO: allow `many` fields to save internally as array to allow more than 1 here
             maximum_length: 15,
+            delimiter: null,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
             help_text: "The DNS servers to provide via DHCP. Leave empty to default to system nameservers."
         );
         $this->winsserver = new StringField(
             default: [],
             allow_empty: true,
-            many_maximum: 1,    # TODO: allow `many` fields to save internally as array to allow more than 1 here
+            many: true,
+            many_maximum: 4,    # TODO: allow `many` fields to save internally as array to allow more than 1 here
             maximum_length: 15,
+            delimiter: null,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
             help_text: "The WINS servers to provide via DHCP."
         );
         $this->ntpserver = new StringField(
             default: [],
             allow_empty: true,
+            many: true,
             many_maximum: 1,    # TODO: allow `many` fields to save internally as array to allow more than 1 here
             maximum_length: 15,
+            delimiter: null,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_fqdn: true)],
             help_text: "The NTP servers to provide via DHCP."
         );
@@ -233,7 +240,7 @@ class DHCPServer extends Model
 
         # Do not allow the DHCP server to be enabled if this interface is already running a DHCP relay
         # TODO: Replace this with a Model query when the DHCPRelay Model is developed
-        foreach ($this->config_path("dhcrelay") as $dhcp_relay) {
+        foreach ($this->get_config("dhcrelay", []) as $dhcp_relay) {
             if ($this->id === $dhcp_relay["interface"]) {
                 throw new ValidationError(
                     message: "DHCP server cannot be enabled because a DHCP relay is already running.",
@@ -255,7 +262,7 @@ class DHCPServer extends Model
      */
     public function validate_range_from(string $range_from) : string {
         # Get the parent interface for this DHCP server
-        $interface = NetworkInterface::query(["id" => $this->id]);
+        $interface = NetworkInterface::query(["id" => $this->id])->first();
 
         # Do not allow this IP to be the network address
         if ($interface->get_network_ipv4() == $range_from) {
@@ -294,7 +301,7 @@ class DHCPServer extends Model
      */
     public function validate_range_to(string $range_to) : string {
         # Get the parent interface for this DHCP server
-        $interface = NetworkInterface::query(["id" => $this->id]);
+        $interface = NetworkInterface::query(["id" => $this->id])->first();
 
         # Do not allow this IP to be the network address
         if ($interface->get_broadcast_ipv4() == $range_to) {
@@ -361,10 +368,10 @@ class DHCPServer extends Model
      */
     public function validate_gateway(string $gateway) : string {
         # Get the parent interface for this DHCP server
-        $interface = NetworkInterface::query(["id" => $this->id]);
+        $interface = NetworkInterface::query(["id" => $this->id])->first();
 
         # Do not allow non-empty gateway values that are not within the interface's subnet
-        if ($gateway and !ip_in_subnet($gateway, $interface->get_current_subnetv4())) {
+        if ($gateway and !ip_in_subnet($gateway, $interface->get_current_ipv4()."/".$interface->get_current_subnetv4())) {
             throw new ValidationError(
                 message: "DHCP server `gateway` must be within interface's subnet.",
                 response_id: "DHCP_SERVER_GATEWAY_NOT_WITHIN_SUBNET"
