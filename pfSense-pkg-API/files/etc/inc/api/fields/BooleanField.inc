@@ -11,8 +11,8 @@ use API;
  * boolean Model fields.
  */
 class BooleanField extends API\Core\Field {
-    public string $indicates_true;
-    public string|null $indicates_false;
+    public mixed $indicates_true;
+    public mixed $indicates_false;
 
     /**
      * Defines the StringField object and sets its options.
@@ -31,8 +31,8 @@ class BooleanField extends API\Core\Field {
      * @param bool $representation_only Set to `true` to make this field only present in its representation form. This
      * effectively prevents the Field from being converted to an internal value which is saved to the pfSense config.
      * This should only be used for fields that do not relate directly to a configuration value.
-     * @param string $indicates_true The internal string that indicates whether a value is `true`.
-     * @param string|null $indicates_false The internal value that indicates whether a value is `false`. Use `null`
+     * @param mixed $indicates_true The internal string that indicates whether a value is `true`.
+     * @param mixed $indicates_false The internal value that indicates whether a value is `false`. Use `null`
      * if the lack of a value for this field indicates `false` internally.
      * @param string $verbose_name The detailed name for this Field. This name will be used in non-programmatic areas
      * like web pages and help text. This Field will default to property name assigned to the parent Model with
@@ -66,8 +66,8 @@ class BooleanField extends API\Core\Field {
         bool $read_only = false,
         bool $write_only = false,
         bool $representation_only = false,
-        string $indicates_true = "",
-        string $indicates_false = null,
+        mixed $indicates_true = "",
+        mixed $indicates_false = null,
         string $verbose_name = "",
         string $verbose_name_plural = "",
         string $internal_name = "",

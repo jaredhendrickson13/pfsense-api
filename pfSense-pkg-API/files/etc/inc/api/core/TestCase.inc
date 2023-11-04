@@ -21,8 +21,12 @@ class TestCase {
     /**
      * Runs this TestCase when the object is created. Any method that starts with `test` will automatically be run.
      * @throws ReflectionException When ReflectionMethod could not find a test method.
+     * @throws Error|Exception The exception thrown by failed tests, typically an AssertionError.
      */
     public function run() {
+        # Need direct config access to revert any changes made by tests
+        global $config;
+        
         # use a property to keep track of the method that is currently running
         $this->method = "unknown";
 
@@ -30,13 +34,27 @@ class TestCase {
         foreach (get_class_methods($this) as $method) {
             # If this method starts with `test`, run the function.
             if (str_starts_with($method, "test")) {
+                # Backup the current config so we can undo any changes made during the test
+                $original_config = unserialize(serialize($config));
+                
                 # Set the current method undergoing testing
                 $this->method = $method;
 
                 # Gather the description for this test method from its doc comment
                 $this->method_docstring = (new ReflectionMethod($this, $method))->getDocComment();
                 $this->method_docstring = str_replace([PHP_EOL, "/**", "*/", "*", "  "], "", $this->method_docstring);
-                $this->$method();
+                
+                # Try to run the test. On failure, restore the original config and throw the exception
+                try {
+                    $this->$method();
+                }
+                catch (Error|Exception $e) {
+                    $config = $original_config;
+                    throw $e;
+                }
+                
+                # Restore the config as it was when the test began.
+                $config = $original_config;
             }
         }
     }

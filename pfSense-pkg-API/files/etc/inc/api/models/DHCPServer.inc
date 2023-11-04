@@ -231,7 +231,7 @@ class DHCPServer extends Model
         $interface = NetworkInterface::query(["id" => $this->id])->first();
 
         # Do not allow the DHCP server to be enabled if the interface does not have a static IP address assigned
-        if ($this->enable->value and $interface->typev4->value !== "static") {
+        if ($enable and $interface->typev4->value !== "static") {
             throw new ValidationError(
                 message: "DHCP server cannot be enabled because interface `{$this->id}` does not have a static IPv4 ".
                     "address assigned.",
@@ -305,7 +305,7 @@ class DHCPServer extends Model
         $interface = NetworkInterface::query(["id" => $this->id])->first();
 
         # Do not allow this IP to be the network address
-        if ($interface->get_broadcast_ipv4() == $range_to) {
+        if ($interface->get_broadcast_ipv4() === $range_to) {
             throw new ValidationError(
                 message: "DHCP server `range_to` cannot be the interface subnet's broadcast address.",
                 response_id: "DHCP_SERVER_RANGE_FROM_CANNOT_BE_BROADCAST_ADDRESS"
