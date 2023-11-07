@@ -147,7 +147,7 @@ class APIModelsDHCPServerTestCase extends TestCase
         );
         $vip->create();
         
-        # Ensure an error is thrown when we try to changed the DHCP server pool to conflict with the vip
+        # Ensure an error is thrown when we try to change the DHCP server pool to conflict with the vip
         $this->assert_throws_response(
             response_id: "DHCP_SERVER_POOL_OVERLAPS_VIP",
             code: 400,
