@@ -207,13 +207,16 @@ class Endpoint {
         $this->client = new API\Core\Auth($this->get_required_privs(), $this->enforce_auth_mode, $read_only);
 
         # Obtain the auth credentials from client according to the current API auth mode
-        switch ($this->api_config["auth_mode"]) {
+        switch ($this->client->mode) {
             case "local":
                 $this->client->username = ($_SERVER["PHP_AUTH_USER"]) ?: "";
                 $secret = ($_SERVER["PHP_AUTH_PW"]) ?: "";
                 break;
-            case "jwt" or "key":
+            case "jwt":
                 $secret = $this->get_bearer_token();
+                break;
+            case "key":
+                $secret = ($_SERVER["HTTP_AUTHORIZATION"]) ?: "";
                 break;
             default:
                 throw new ServerError(

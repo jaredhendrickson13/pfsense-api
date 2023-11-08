@@ -18,6 +18,7 @@ namespace API\Core;
 require_once("api/auto_loader.inc");
 
 use API;
+use API\Models\APIKey;
 use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -102,15 +103,11 @@ class Auth {
      */
     private function authenticate_key(string $key) : bool {
         # Loop through the existing keys for this user and check the key hashes for a match
-        foreach ($this->get_existing_keys() as $key_from_config) {
-            # Hash the incoming key according to the algorithm of this stored key
-            $hash = hash($key_from_config["algo"], $key);
-
-            # Authentication is success when incoming client key matches the hashed key stored in config
-            if ($hash === $key_from_config["hash"]) {
-                $this->username = $key_from_config["username"];
+        foreach (APIKey::read_all()->model_objects as $api_key_obj) {
+            if ($api_key_obj->authenticate($key)) {
+                $this->username = $api_key_obj->username->value;
                 unset($_SESSION["Username"]);
-                $_SESSION["Username"] = $key_from_config["username"];
+                $_SESSION["Username"] = $this->username;
                 return true;
             }
         }
@@ -226,54 +223,6 @@ class Auth {
         catch (Exception) {
             return [];
         }
-    }
-
-
-    /**
-     * Generates a new persistent API key.
-     * @param string $username The username to assign this API key to.
-     * @return string The real (unhashed)
-     * @throws Exception
-     */
-    public static function generate_key(string $username) : string {
-        # Variables
-        $pkg_id = API\Models\APISettings::get_api_config()["id"];
-        $api_config = API\Models\APISettings::get_api_config()["config"];
-        $hash_algo = $api_config["key_hash_algo"];
-        $key_bit_strength = $api_config["key_length_bytes"];
-        $key_new = bin2hex(random_bytes(intval($key_bit_strength)));
-        $hash = hash($hash_algo, $key_new);
-
-        # Initialize keys config and add this key
-        $api_config["keys"] = !is_array($api_config["keys"]) ? array("key" => []) : $api_config["keys"];
-        $api_config["keys"]["key"][] = ["username" => $username, "hash" => $hash, "algo" => $hash_algo];
-
-        # Write the new key to config
-        config_set_path("installedpackages/package/$pkg_id/conf", $api_config);
-        write_config(sprintf(gettext(" Generated API key")));
-        return $key_new;
-    }
-
-    /**
-     * Obtain the API keys that belong to a provided username.
-     * @param string $username The username to obtain API keys for.
-     * @return array An array of API keys that belong to the $username
-     */
-    public static function get_existing_keys(string $username = "", $all = true) : array {
-        # Variables
-        $api_config = API\Models\APISettings::get_api_config()["config"];
-        $user_keys = [];
-
-        # Only loop through if we have configured keys
-        if (is_array($api_config["keys"]) and is_array($api_config["keys"]["key"])) {
-            foreach ($api_config["keys"]["key"] as $id=>$key) {
-                if ($key["username"] === $username or $all) {
-                    $user_keys[$id] = $key;
-                }
-            }
-        }
-
-        return $user_keys;
     }
 
     /**

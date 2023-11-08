@@ -26,8 +26,6 @@
             <ha_sync_validate_certs></ha_sync_validate_certs>
             <server_key></server_key>
             <jwt_exp>3600</jwt_exp>
-            <key_hash_algo>sha256</key_hash_algo>
-            <key_length_bytes>16</key_length_bytes>
             <keys></keys>
         </conf>
     </package>

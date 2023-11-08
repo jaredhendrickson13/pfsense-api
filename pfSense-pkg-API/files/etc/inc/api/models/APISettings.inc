@@ -32,8 +32,6 @@ class APISettings extends Model {
     public StringField $represent_interfaces_as;
     public StringField $auth_mode;
     public IntegerField $jwt_exp;
-    public IntegerField $key_length_bytes;
-    public StringField $key_hash_algo;
     public BooleanField $ha_sync;
     public BooleanField $ha_sync_validate_certs;
     public StringField $ha_sync_hosts;
@@ -124,19 +122,6 @@ class APISettings extends Model {
             verbose_name: "JWT expiration",
             help_text: "Sets the amount of time (in seconds) JWTs are valid for. This field is only applicable when
             `auth_mode` is set to `jwt`."
-        );
-        $this->key_hash_algo = new StringField(
-            default: "sha256",
-            choices: ["sha256" => "SHA256", "sha384" => "SHA384", "sha512" => "SHA512"],
-            verbose_name: "key hashing algorithm",
-            help_text: "Sets the hash algorithm used for API keys. This field is only applicable when `auth_mode` is
-            set to `key`."
-        );
-        $this->key_length_bytes = new IntegerField(
-            default: 24,
-            choices: [16, 24, 32, 64],
-            help_text: "Sets the length of the API key (in bytes). Greater key lengths provide greater security, but 
-            also increase the number of characters used in the key string."
         );
         $this->ha_sync = new BooleanField(
             default: false,
