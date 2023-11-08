@@ -794,7 +794,7 @@ class Field
      * @return array|string|null The internal value(s) suitable for writing to the pfSense configuration.
      */
     protected function _to_internal(mixed $representation_value) : array|string|null {
-        return strval($representation_value);
+        return (is_null($representation_value)) ? null : strval($representation_value);
     }
 
     /**

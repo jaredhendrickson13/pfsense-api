@@ -142,7 +142,7 @@ class DHCPServer extends Model
             default: [],
             allow_empty: true,
             many: true,
-            many_maximum: 4,    # TODO: allow `many` fields to save internally as array to allow more than 1 here
+            many_maximum: 4,
             maximum_length: 15,
             delimiter: null,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
@@ -152,7 +152,7 @@ class DHCPServer extends Model
             default: [],
             allow_empty: true,
             many: true,
-            many_maximum: 4,    # TODO: allow `many` fields to save internally as array to allow more than 1 here
+            many_maximum: 2,
             maximum_length: 15,
             delimiter: null,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
@@ -162,8 +162,8 @@ class DHCPServer extends Model
             default: [],
             allow_empty: true,
             many: true,
-            many_maximum: 1,    # TODO: allow `many` fields to save internally as array to allow more than 1 here
-            maximum_length: 15,
+            many_maximum: 3,
+            maximum_length: 256,
             delimiter: null,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_fqdn: true)],
             help_text: "The NTP servers to provide via DHCP."
@@ -206,7 +206,7 @@ class DHCPServer extends Model
         );
         $this->denyunknown = new StringField(
             default: null,
-            choices: ["", "enabled", "class"],
+            choices: ["enabled", "class"],
             allow_empty: true,
             allow_null: true,
             help_text: "Define how to handle unknown clients requesting DHCP leases. When set to `null`, any DHCP ".

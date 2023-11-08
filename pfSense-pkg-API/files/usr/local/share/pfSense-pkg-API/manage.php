@@ -40,11 +40,12 @@ function build_forms() {
     }
 }
 
-function run_tests() {
+function run_tests($contains = "") {
     # Variables
     $test_cases = glob("/etc/inc/api/tests/*.inc");
     $exit_code = 0;
     $test_count = count($test_cases);
+    $skipped_count = 0;
     $succeed_count = 0;
 
     # Import each test class and run the test
@@ -55,6 +56,13 @@ function run_tests() {
 
         # Print that we're starting this test
         echo "Running test case $test_case... ";
+
+        # Only run this test case if the test name contains the $contains string
+        if (!str_contains($test_case, $contains)) {
+            echo "skipped.".PHP_EOL;
+            $skipped_count++;
+            continue;
+        }
 
         # Try to run the test case.
         $test_obj = new $test_case();
@@ -85,8 +93,14 @@ function run_tests() {
             echo "---------------------------------------------------------".PHP_EOL;
         }
     }
+
+    # Adjust the total test count if tests were skipped.
+    if ($skipped_count > 0) {
+        $test_count = $test_count - $skipped_count;
+    }
+
     echo "---------------------------------------------------------".PHP_EOL;
-    echo "Ran all tests: $succeed_count/$test_count tests passed.".PHP_EOL;
+    echo "Ran all tests: $succeed_count/$test_count tests passed. $skipped_count tests skipped.".PHP_EOL;
     exit($exit_code);
 }
 
@@ -198,7 +212,7 @@ elseif (in_array($argv[1], ["generatedocs"])) {
 }
 # RUNTESTS COMMAND
 elseif (in_array($argv[1], ["runtests"])) {
-    run_tests();
+    run_tests(contains: $argv[2]);
 }
 # BACKUP COMMAND
 elseif (in_array($argv[1], ["backup"])) {
