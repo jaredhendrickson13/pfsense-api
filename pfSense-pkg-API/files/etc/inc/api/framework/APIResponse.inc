@@ -2181,13 +2181,13 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Pool name must contain only alphanumeric characters, periods, hyphens, or underscores."
+            "message" => "Frontend/pool name must contain only alphanumeric characters, periods, hyphens, or underscores."
         ],
         2263 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "This pool name has already been used.  Pool names must be unique."
+            "message" => "Frontend/pool name has already been used.  Pool names must be unique."
         ],
         2264 => [
             "status" => "bad request",
@@ -2223,25 +2223,25 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "The address for this server is not a valid IP address."
+            "message" => "Provided address is not a valid IP address."
         ],
         2270 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "The port for this server is not numeric."
+            "message" => "Provided TCP port is not numeric."
         ],
         2271 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Servers must include an 'ssl' parameter that is one of: 'yes', 'no'."
+            "message" => "The 'ssl' parameter on bind addresses/servers must be one of: 'yes', 'no'."
         ],
         2272 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "Unexpected HAProxy error after backend validation. Config reverted. Initial POST data and HAProxy error included."
+            "message" => "Unexpected HAProxy error after input validation. Config reverted. Initial POST data and HAProxy error included."
         ],
         2273 => [
             "status" => "bad request",
@@ -2253,19 +2253,43 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "A numeric pool ID or alphanumeric pool name must be provided."
+            "message" => "A numeric ID or alphanumeric name for the target frontend/pool must be provided."
         ],
         2275 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "HAProxy pool ID does not exist."
+            "message" => "HAProxy frontend/pool ID does not exist."
         ],
         2276 => [
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "HAProxy pool name does not exist."
+            "message" => "HAProxy frontend/pool name does not exist."
+        ],
+        2277 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "SSL is enabled for an external address, but certificate not provided."
+        ],
+        2278 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Provided certificate reference not found in pfSense certificate store."
+        ],
+        2279 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "A default backend server pool is required, but not provided."
+        ],
+        2280 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Provided default backend server pool does not exist."
         ],
 
         // 3000-3999 reserved for /api/v1/interfaces API calls
