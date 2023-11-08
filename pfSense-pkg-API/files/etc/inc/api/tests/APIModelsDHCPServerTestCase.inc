@@ -162,4 +162,92 @@ class APIModelsDHCPServerTestCase extends TestCase
         # Delete the virtual IP
         $vip->delete();
     }
+
+    /**
+     * Ensures that the primary DHCP pool cannot conflict with an existing DHCP static mapping.
+     */
+    public function test_dhcp_pool_cannot_conflict_with_static_mapping() {
+        # Add a DHCP static mapping
+        # TODO: Change this to use the DHCPServerStaticMapping Model when developed
+        Model::set_config("dhcpd/lan/staticmap", [["ipaddr" => "192.168.1.2"]]);
+
+        # Ensure an error is thrown when we try to change the DHCP server pool to conflict with the static mapping
+        $this->assert_throws_response(
+            response_id: "DHCP_SERVER_POOL_OVERLAPS_STATIC_MAPPING",
+            code: 400,
+            callable: function() {
+                # Use the `lan` DHCP server for this test
+                $dhcp_server = new DHCPServer(id: "lan");
+                $dhcp_server->range_from->value = "192.168.1.2";
+                $dhcp_server->validate_range_to(range_to: "192.168.1.3");
+            }
+        );
+    }
+
+    /**
+     * Ensures that the `maxleasetime` cannot be set to a value lower than the `defaultleasttime`.
+     */
+    public function test_maxleasetime_cannot_be_lower_than_defaultleasetime() {
+        $this->assert_throws_response(
+            response_id: "DHCP_SERVER_MAX_LEASE_TIME_LESS_THAN_DEFAULT",
+            code: 400,
+            callable: function() {
+                # Use the `lan` DHCP server for this test
+                $dhcp_server = new DHCPServer(id: "lan");
+                $dhcp_server->defaultleasetime->value = 25000;
+                $dhcp_server->validate_maxleasetime(maxleasetime: 24000);
+            }
+        );
+    }
+
+    /**
+     * Ensures the DHCP server `gateway` value is a value within the interface's subnet.
+     */
+    public function test_dhcp_server_gateway_in_interface_subnet() {
+        $this->assert_throws_response(
+            response_id: "DHCP_SERVER_GATEWAY_NOT_WITHIN_SUBNET",
+            code: 400,
+            callable: function() {
+                # Use the `lan` DHCP server for this test
+                $dhcp_server = new DHCPServer(id: "lan");
+                $dhcp_server->validate_gateway(gateway: "1.2.3.4");
+            }
+        );
+    }
+
+    /**
+     * Ensures `nonak` cannot be enabled when a `failover_peerip` is set
+     */
+    public function test_no_nonak_with_failover_peerip() {
+        $this->assert_throws_response(
+            response_id: "DHCP_SERVER_NONAK_WITH_FAILOVER_PEERIP_NOT_ALLOWED",
+            code: 400,
+            callable: function() {
+                # Use the `lan` DHCP server for this test
+                $dhcp_server = new DHCPServer(id: "lan");
+                $dhcp_server->failover_peerip->value = "192.168.1.2";
+                $dhcp_server->validate_nonak(nonak: true);
+            }
+        );
+    }
+
+    /**
+     * Ensures `staticarp` cannot be enabled if there are any static mappings without IPs.
+     */
+    public function test_no_staticarp_with_no_ip_static_mappings() {
+        # Add a DHCP static mapping
+        # TODO: Change this to use the DHCPServerStaticMapping Model when developed
+        Model::set_config("dhcpd/lan/staticmap", [["mac" => "00:00:00:00:00:00"]]);
+
+        # Ensure an error is thrown when we try to change the DHCP server pool to conflict with the static mapping
+        $this->assert_throws_response(
+            response_id: "DHCP_SERVER_STATICARP_WITH_NO_IP_STATIC_MAPPINGS",
+            code: 400,
+            callable: function() {
+                # Use the `lan` DHCP server for this test
+                $dhcp_server = new DHCPServer(id: "lan");
+                $dhcp_server->validate_staticarp(staticarp: true);
+            }
+        );
+    }
 }

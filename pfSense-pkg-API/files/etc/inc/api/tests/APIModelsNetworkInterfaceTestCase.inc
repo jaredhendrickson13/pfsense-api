@@ -4,8 +4,10 @@ namespace API\Tests;
 
 use API\Core\Model;
 use API\Core\TestCase;
+use API\Models\DHCPServer;
 use API\Models\InterfaceVLAN;
 use API\Models\NetworkInterface;
+use API\Models\VirtualIP;
 
 class APIModelsNetworkInterfaceTestCase extends TestCase
 {
@@ -308,7 +310,6 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
             code: 400,
             callable: function() {
                 # Ensure the DHCP server is enabled on the lan interface, then try to change the interface to DHCP
-                # TODO: change this to a ServicesDHCPServer model call when developed
                 Model::set_config(path: "dhcpd/lan/enable", value: "");
                 $test_model = new NetworkInterface(id: "lan");
                 $test_model->validate_typev4("dhcp");
@@ -328,22 +329,29 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
             "NETWORK_INTERFACE_NO_TYPEV4_NONE_WITH_EXISTING_VIRTUAL_IPS",
             code: 400,
             callable: function() {
+                # Disable the DHCP server for this lan interface so it does not throw an error
+                $dhcp_server = new DHCPServer(id: "lan");
+                $dhcp_server_original_enable = $dhcp_server->enable->value;
+                $dhcp_server->enable->value = false;
+                $dhcp_server->update();
+
                 # Add a virtual IP for the LAN interface
-                # TODO: replace this with a VirtualIP model call when the VirtualIP model is developed
-                $test_vip = [
+                $test_vip = new VirtualIP(representation_data: [
                     "mode" => "ipalias",
                     "interface" => "lan",
                     "subnet" => "192.168.1.5",
-                    "subnet_bits" => "24",
-                    "type" => "single",
-                    "uniqid" => uniqid(),
-                    "descr" => "test"
-                ];
-                Model::set_config(path: "virtualip/vip/0", value: $test_vip);
+                    "subnet_bits" => 24,
+                ]);
+                $test_vip->create();
 
                 # Ensure the `lan` interface's `typev4` value cannot change to `none` now.
                 $test_model = new NetworkInterface(id: "lan");
                 $test_model->validate_typev4("none");
+
+                # Remove the test vip and restore the DHCP server to it's original value
+                $test_vip->delete();
+                $dhcp_server->enable->value = $dhcp_server_original_enable;
+                $dhcp_server->update();
             }
         );
 

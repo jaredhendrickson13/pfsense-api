@@ -321,7 +321,7 @@ class DHCPServer extends Model
         }
 
         # Do not allow the primary DHCP pool to overlap with an existing virtual IP
-        foreach (VirtualIP::read_all() as $vip) {
+        foreach (VirtualIP::read_all()->model_objects as $vip) {
             if (is_inrange_v4($vip->subnet->value, $this->range_from->value, $range_to)) {
                 throw new ValidationError(
                     message: "DHCP server primary pool overlaps virtual IP with ID `$vip->id`.",
@@ -354,7 +354,7 @@ class DHCPServer extends Model
         if ($maxleasetime < $this->defaultleasetime->value) {
             throw new ValidationError(
                 message: "DHCP server `maxleasetime` cannot be less than the `defaultleasetime`",
-                response_id: "DHCP_SERVER_POOL_OVERLAPS_STATIC_MAPPING"
+                response_id: "DHCP_SERVER_MAX_LEASE_TIME_LESS_THAN_DEFAULT"
             );
         }
 
@@ -390,7 +390,7 @@ class DHCPServer extends Model
      */
     public function validate_nonak(bool $nonak) : bool {
         # Do not allow `nonak` to be enabled if a `failover_peerip` is set.
-        if ($this->nonak->value and $this->failover_peerip->value) {
+        if ($nonak and $this->failover_peerip->value) {
             throw new ValidationError(
                 "DHCP server `nonak` cannot be enabled while a `failover_peerip` is assigned.",
                 response_id: "DHCP_SERVER_NONAK_WITH_FAILOVER_PEERIP_NOT_ALLOWED"
