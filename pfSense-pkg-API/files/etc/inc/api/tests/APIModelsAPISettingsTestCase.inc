@@ -27,7 +27,7 @@ class APIModelsAPISettingsTestCase extends TestCase
         $this->assert_is_true(array_key_exists("id", $test_api_config));
         $this->assert_type($test_api_config["id"], "integer");
 
-        # Ensure the API config was returned and return all expected fields are present
+        # Ensure the API config was returned and all expected fields are present
         $this->assert_is_true(array_key_exists("config", $test_api_config));
 
         foreach ($test_api_settings->get_fields() as $field) {

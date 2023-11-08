@@ -23,6 +23,7 @@
             <ha_sync_hosts></ha_sync_hosts>
             <ha_sync_username></ha_sync_username>
             <ha_sync_password></ha_sync_password>
+            <ha_sync_validate_certs></ha_sync_validate_certs>
             <server_key></server_key>
             <jwt_exp>3600</jwt_exp>
             <key_hash_algo>sha256</key_hash_algo>
