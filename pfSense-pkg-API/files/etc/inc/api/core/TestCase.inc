@@ -43,7 +43,7 @@ class TestCase {
                 # Gather the description for this test method from its doc comment
                 $this->method_docstring = (new ReflectionMethod($this, $method))->getDocComment();
                 $this->method_docstring = str_replace([PHP_EOL, "/**", "*/", "*", "  "], "", $this->method_docstring);
-                
+
                 # Try to run the test. On failure, restore the original config and throw the exception
                 try {
                     $this->$method();
@@ -52,9 +52,10 @@ class TestCase {
                     $config = $original_config;
                     throw $e;
                 }
-                
+
                 # Restore the config as it was when the test began.
                 $config = $original_config;
+                write_config("Restored config after API test '$method'");
             }
         }
     }

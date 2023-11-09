@@ -9,6 +9,7 @@ use API\Core\Auth;
 use API\Core\Model;
 use API\Fields\IntegerField;
 use API\Fields\StringField;
+use API\Responses\ValidationError;
 
 class APIKey extends Model
 {
@@ -27,50 +28,65 @@ class APIKey extends Model
         # Set Model attributes
         $this->config_path = "installedpackages/package/$api_pkg_id/conf/keys/key";
         $this->many = true;
+        $this->verbose_name = "API Key";
         
         # Set Model fields
         $this->name = new StringField(
             required: true,
             unique: true,
-            editable: false,
             maximum_length: 128,
             help_text: "Sets a unique name for this API key. This is used to identify the key's purpose and cannot be ".
                 "changed once created."
         );
         $this->username = new StringField(
             required: true,
-            editable: false,
             help_text: "The username this API key is issued to."
         );
         $this->length_bytes = new IntegerField(
             default: 24,
             choices: [16, 24, 32, 64],
-            editable: false,
             help_text: "The length of the API key (in bytes). Greater key lengths provide greater security, but ".
             "also increase the number of characters used in the key string."
         );
         $this->hash_algo = new StringField(
             default: "sha256",
             choices: ["sha256" => "SHA256", "sha384" => "SHA384", "sha512" => "SHA512"],
-            editable: false,
             verbose_name: "key hashing algorithm",
             help_text: "The hash algorithm used for this API key. It is recommended to increase the strength of the ".
                 "algorithm for keys assigned to privileged users."
         );
         $this->key = new StringField(
             allow_null: true,
-            editable: false,
             representation_only: true,    # Don't store the actual API key internally
             help_text: "The real API key. This value is not stored internally and cannot be recovered if lost."
         );
         $this->hash = new StringField(
             allow_null: true,
-            editable: false,
             write_only: true,    # Don't allow the hash to be read via API
             help_text: "The hash of the generated API key"
         );
         
         parent::__construct($id, $representation_data, $client);
+    }
+
+    /**
+     * Adds custom validation to the `username` field.
+     * @param string $username The incoming username value to be validated.
+     * @return string The validated username value to be assigned.
+     */
+    public function validate_username(string $username) : string {
+        # Require this username to match an existing user
+        # TODO: Replace this loop with a User model query when developed
+        foreach ($this->get_config("system/user", []) as $user) {
+            if ($username === $user["name"]) {
+                return $username;
+            }
+        }
+
+        throw new ValidationError(
+            message: "Field `username` must be an existing user's username, received `$username`",
+            response_id: "API_KEY_USERNAME_MUST_EXIST"
+        );
     }
 
     /**
@@ -84,6 +100,17 @@ class APIKey extends Model
         
         # Call the parent _create() method to save the Model object to config
         parent::_create();
+    }
+
+    /**
+     * Override the default _update() method to prevent APIKeys from being updated.
+     */
+    public function _update() {
+        # Do not allow APIKey objects to be updated.
+        throw new API\Responses\ServerError(
+            message: "APIKey model objects cannot be updated.",
+            response_id: "API_KEY_CANNOT_BE_UPDATED"
+        );
     }
 
     /**
