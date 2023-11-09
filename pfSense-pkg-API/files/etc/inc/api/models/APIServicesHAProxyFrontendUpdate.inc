@@ -37,10 +37,11 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
     }
 
     public function validate_payload() {
+        $this->__validate_target_frontend();
         if (isset($this->initial_data['new_name']) && $this->__validate_name()) {
             $this->validated_data['name'] = $this->initial_data['name'];
         }
-        if (isset($this->intitial_data['a_extaddrs'])) {
+        if (isset($this->intitial_data['bind_addrs'])) {
             $this->__validate_extaddrs();
         }
         if (isset($this->initial_data['backend_serverpool'])) {
@@ -100,37 +101,58 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
     private function __validate_extaddrs() {
 
         $this->validated_data['a_extaddr']['item'] = [];
-        foreach ($this->initial_data['a_extaddr']['item'] as $extaddr) {
+        foreach ($this->initial_data['bind_addrs'] as $extaddr) {
+            $bind_address = [];
             $extaddr_bad_ssl = false;
             $extaddr_bad_address = false;
             $extaddr_bad_port = false;
 
             if (!is_ipaddr($extaddr['address'])) {
-                $this->errors[] = APIResponse\get(2269, [$extaddr['name'] => $extaddr['address']]);
+                $this->errors[] = APIResponse\get(2269, ['extaddr' => $extaddr]);
                 $extaddr_bad_address = true;
+            } elseif (!$this->__validate_vip($extaddr['address'])) {
+                $this->errors[] = APIResponse\get(2281, ['extaddr' => $extaddr]);
+            } else {
+                $bind_address['extaddr'] = "{$extaddr['address']}_ipv4";
             }
             if (!is_numeric($extaddr['port'])) {
-                $this->errors[] = APIResponse\get(2270, [$extaddr['name'] => $extaddr['port']]);
+                $this->errors[] = APIResponse\get(2270, ['extaddr' => $extaddr]);
                 $extaddr_bad_port = true;
+            } else {
+                $bind_address['extaddr_port'] = $extaddr['port'];
             }
             if (isset($extaddr['ssl'])) {
                 if (!in_array($extaddr['ssl'], $this->allowed_server_ssl)) {
-                    $this->errors[] = APIResponse\get(2271, [$extaddr['name'] => $extaddr['ssl']]);
+                    $this->errors[] = APIResponse\get(2271, ['extaddr' => $extaddr]);
                     $extaddr_bad_ssl = true;
                 } elseif ($extaddr['ssl'] === 'no') {
                     unset($extaddr['ssl']);
+                } else {
+                    $this->__validate_crt = true;
+                    $bind_address['extaddr_ssl'] = $extaddr['ssl'];
                 }
             }
 
             if(!$extaddr_bad_address && !$extaddr_bad_port && !$extaddr_bad_ssl) {
-                $this->__validate_crt = true;
-                $this->validated_data['a_extaddr']['item'][] = $extaddr;
-            }        
+                $bind_address['_index'] = '';
+                $this->validated_data['a_extaddr']['item'][] = $bind_address;
+            }
+            unset $bind_address;
         }
     }
 
+    private function __validate_vip($address) {
+        $all_vips = get_configured_vip_list('all', VIP_IPALIAS);
+        foreach ($all_vips as $id => $vip) {
+            if ($vip == $address) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private function __validate_certificate() {
-        $current_certs = get_config('cert', []);
+        $current_certs = $this->get_config('cert', []);
         $cert_valid = false;
 
         if (!isset($this->initial_data['ssloffloadcert'])) {
