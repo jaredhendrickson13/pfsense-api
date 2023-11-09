@@ -2291,6 +2291,18 @@ function get($id, $data=[], $all=false) {
             "return" => $id,
             "message" => "Provided default backend server pool does not exist."
         ],
+        2281 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Provided VIP does not exist on the system."
+        ],
+        2282 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "Load balancing type is missing or invalid. Muse be one of: tcp, http"
+        ],
 
         // 3000-3999 reserved for /api/v1/interfaces API calls
         3000 => [
