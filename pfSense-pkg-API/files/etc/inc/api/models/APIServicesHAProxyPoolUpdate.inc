@@ -51,17 +51,17 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
                 $this->id = $backend_id;
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}");
             } else {
-                $this->errors[] = APIResponse\get(2276);
+                $this->errors[] = APIResponse\get(2276, ['name' => $this->initial_data['name']]);
             }   
         } elseif (isset($this->initial_data["id"])) {
             if ($this->get_config("installedpackages/haproxy/ha_pools/item/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}");
             } else {
-                $this->errors[] = APIResponse\get(2275);
+                $this->errors[] = APIResponse\get(2275, ['id' => $this->initial_data['id']]);
             }   
         } else {
-            $this->errors[] = APIResponse\get(2274);
+            $this->errors[] = APIResponse\get(2274, ['request_data' => $this->initial_data]);
         }   
     }
 
@@ -75,12 +75,12 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
 
         if (isset($this->initial_data['persist_sticky_type'])) {
             if (!in_array($this->initial_data['persist_sticky_type'], $this->allowed_persistence)) {
-                $this->errors[] = APIResponse\get(2264, $this->initial_data['persist_sticky_type']);
+                $this->errors[] = APIResponse\get(2264, ['persist_sticky_type' => $this->initial_data['persist_sticky_type']]);
             } else {
                 $this->validated_data['persist_sticky_type'] = $this->initial_data['persist_sticky_type'];
                 if ($this->validated_data['persist_sticky_type'] == 'stick_cookie_value') {
                     if (!isset($this->initial_data['lw_subacct'])) {
-                        $this->errors[] = APIResponse\get(2273, 'lw_subacct not found in request body');
+                        $this->errors[] = APIResponse\get(2273, ['request_data' => $this->initial_data]);
                     }
                     $this->validated_data['persist_cookie_enabled'] = 'yes';
                     $cookie_uniq_str = substr(md5($this->validated_data['name'].$this->validated_data['lw_subacct'].gethostname()), 0, 10);
@@ -94,7 +94,7 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
 
         if (isset($this->initial_data['balance'])) {
             if (!in_array($this->initial_data['balance'], $this->allowed_algorithms)) {
-                $this->errors[] = APIResponse\get(2265, $this->initial_data['balance']);
+                $this->errors[] = APIResponse\get(2265, ['balance' => $this->initial_data['balance']]);
             } else {
                 $this->validated_data['balance'] = $this->initial_data['balance'];
             }
@@ -102,7 +102,7 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
 
         if (isset($this->initial_data['check_type'])) {
             if (!in_array($this->initial_data['check_type'], $this->allowed_checks)) {
-                $this->errors[] = APIResponse\get(2266, $this->initial_data['check_type']);
+                $this->errors[] = APIResponse\get(2266, ['check_type' => $this->initial_data['check_type']]);
             } else {
                 $this->validated_data['check_type'] = $this->initial_data['check_type'];
             }
@@ -114,7 +114,7 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
         $bad_pool_name = false;
         /* Ensure only valid characters are in use*/
         if (preg_match("/[^a-zA-Z0-9_\.\-]/", $this->initial_data['new_name']) || str_contains($this->initial_data['new_name'], ' ')) {
-            $this->errors[] = APIResponse\get(2262, $this->initial_data['new_name']);
+            $this->errors[] = APIResponse\get(2262, ['new_name' => $this->initial_data['new_name']]);
             $name_bad_chars = true;
         }
 
@@ -122,7 +122,7 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
         $current_backends = get_haproxy_backends();
         foreach ($current_backends as $name => $settings) {
             if ($this->initial_data['new_name'] == $name) {
-                $this->errors[] = APIResponse\get(2263, $this->initial_data['new_name']);
+                $this->errors[] = APIResponse\get(2263, ['new_name', $this->initial_data['new_name']]);
                 $name_already_used = true;
             }
         }

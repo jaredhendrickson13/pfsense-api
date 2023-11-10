@@ -144,14 +144,14 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
 
         /* Ensure only valid characters are in use*/
         if (preg_match("/[^a-zA-Z0-9_\.\-]/", $this->initial_data['name']) || str_contains($this->initial_data['name'], ' ')) {
-            $this->errors[] = APIResponse\get(2262, $this->initial_data['name']);
+            $this->errors[] = APIResponse\get(2262, ['name' => $this->initial_data['name']]);
             $name_bad_chars = true;
         }   
 
         /* Ensure that our frontend names are unique */
         foreach ($this->current_frontends as $frontend) {
             if ($this->initial_data['name'] == $frontend['name']) {
-                $this->errors[] = APIResponse\get(2263, $this->initial_data['name']);
+                $this->errors[] = APIResponse\get(2263, ['name' => $this->initial_data['name']]);
                 $name_already_used = true;
             }   
         }   
@@ -220,7 +220,7 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
         $cert_valid = false;
 
         if (!isset($this->initial_data['ssloffloadcert'])) {
-            $this->errors[] = APIResponse\get(2277, $this->initial_data);
+            $this->errors[] = APIResponse\get(2277, ['request_data' => $this->initial_data]);
         }
 
         foreach ($current_certs as $cert) {
@@ -238,7 +238,7 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
 
     private function __validate_default_backend() {
         if(!isset($this->initial_data['backend_serverpool'])) {
-            $this->errors[] = APIResponse\get(2279, $this->initial_data);
+            $this->errors[] = APIResponse\get(2279, ['request_data' => $this->initial_data]);
         }
         $valid_backend = false;
         $current_backends = get_haproxy_backends();
