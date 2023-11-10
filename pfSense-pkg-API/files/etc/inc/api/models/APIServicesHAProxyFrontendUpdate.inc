@@ -137,7 +137,7 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
                 $bind_address['_index'] = '';
                 $this->validated_data['a_extaddr']['item'][] = $bind_address;
             }
-            unset $bind_address;
+            unset($bind_address);
         }
     }
 
