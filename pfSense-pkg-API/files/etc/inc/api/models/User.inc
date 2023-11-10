@@ -102,11 +102,14 @@ class User extends Model
      * @return string The validated value to be assigned.
      */
     public function validate_password(string $password) : string {
-        # Assign a placeholder
-        $hash = [];
-        local_user_set_password($hash, $password);
+        # Hash the password if the password has changed
+        if ($this->initial_object->password->value !== $password) {
+            $hash = [];
+            local_user_set_password($hash, $password);
+            return $hash[$this->password->internal_name];
+        }
 
-        return $hash[$this->password->internal_name];
+        return $password;
     }
 
     /**
