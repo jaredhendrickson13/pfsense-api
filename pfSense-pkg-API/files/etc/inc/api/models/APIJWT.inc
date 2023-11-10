@@ -1,0 +1,111 @@
+<?php
+
+namespace API\Models;
+
+require_once("api/auto_loader.inc");
+
+use API;
+use API\Core\Auth;
+use API\Core\Model;
+use API\Fields\IntegerField;
+use API\Fields\StringField;
+use API\Responses\ServerError;
+use API\Responses\ValidationError;
+use Exception;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
+class APIJWT extends Model
+{
+    public StringField $token;
+    
+    public function __construct(mixed $id = null, mixed $representation_data = [], Auth $client = null)
+    {
+        # Set Model attributes
+        $this->verbose_name = "API JWT";
+        
+        # Set Model fields
+        $this->token = new StringField(
+            allow_null: true,
+            read_only: true,
+            help_text: "The generated JWT that can be used for JWT authentication."
+        );
+        
+        parent::__construct($id, $representation_data, $client);
+    }
+
+    /**
+     * Initializes the JWT server key if none is present. Optionally allows the existing JWT server key to be rotated.
+     * @param bool $rotate Force the JWT server key to be rotated.
+     * @throws Exception When a sufficient source of randomness is not found for `random_bytes`.
+     * @return string The API's current JWT server key
+     */
+    public static function init_server_key(bool $rotate = false) : string {
+        # Obtain the API package's ID and configuration
+        $pkg_id = API\Models\APISettings::get_api_config()["id"];
+        $api_config = API\Models\APISettings::get_api_config()["config"];
+
+        # Create a new server key if one is not set
+        if (empty($api_config["server_key"]) or $rotate === true) {
+            # Try to generate the server key, throw a ServerError if we cannot
+            try {
+                config_set_path("installedpackages/package/$pkg_id/conf/server_key", bin2hex(random_bytes(32)));
+                write_config("API server key created");
+            }
+            catch (Exception) {
+                throw new ServerError(
+                    message: "Server failed to initialize the JWT server key.",
+                    response_id: "API_JWT_INIT_SERVER_KEY_FAILED"
+                );
+            }
+        }
+        
+        # Refresh the API config in case the server key changed
+        $api_config = API\Models\APISettings::get_api_config()["config"];
+
+        # Return the server key
+        return $api_config["server_key"];
+    }
+
+    /**
+     * Decodes a provided JWT string using the current server key and extracts its attributes.
+     * @param string $jwt The incoming JWT string to decode.
+     * @return array An array of decoded JWT attributes. If the JWT could not be decoded, this array will be empty.
+     */
+    public static function decode(string $jwt) : array {
+        # Obtain the current JWT server key
+        $jwt_server_key = self::init_server_key();
+
+        # Attempt to decode the JWT, if decoding fails return empty array.
+        try {
+            return (array) JWT::decode($jwt, new Key($jwt_server_key, "HS256"));
+        }
+        catch (Exception) {
+            return [];
+        }
+    }
+    
+    /**
+     * Generates the JWT and assigns the `token` field.
+     */
+    public function _create()
+    {
+        # Initialize the JWT server key in case it is not present
+        $server_key = $this->init_server_key();
+
+        # Pull the API configuration from config
+        $api_settings = new APISettings();
+
+        # Assign the JWT payload values. Assign the configured JWT expiration from the API configuration
+        $payload = array(
+            "iss" => config_get_path("system/hostname"),    # TODO: Replace with Model call when developed
+            "aud" => config_get_path("system/hostname"),    # TODO: Replace with Model call when developed
+            "exp" => time() + $api_settings->jwt_exp->value,
+            "nbf" => time(),
+            "data" => $this->client->username
+        );
+
+        # Assign the JWT string to `token`
+        $this->token->value = JWT::encode($payload, $server_key, "HS256");
+    }
+}

@@ -18,6 +18,7 @@ namespace API\Core;
 require_once("api/auto_loader.inc");
 
 use API;
+use API\Models\APIJWT;
 use API\Models\APIKey;
 use Exception;
 use Firebase\JWT\JWT;
@@ -83,7 +84,7 @@ class Auth {
      */
     private function authenticate_jwt(string $jwt) : bool {
         # Decode the JWT
-        $decoded_jwt = $this->decode_jwt($jwt);
+        $decoded_jwt = APIJWT::decode($jwt);
 
         # Check that the JWT from our Authorization header is valid
         if ($decoded_jwt) {
@@ -162,67 +163,6 @@ class Auth {
         # Return the authorization results
         $this->is_authorized = !$is_not_authorized;
         return $this->is_authorized;
-    }
-
-    /**
-     * Initializes the JWT server key if none is present. Optionally allows the existing JWT server key to be rotated.
-     * @param bool $rotate Force the JWT server key to be rotated.
-     * @throws Exception When insufficient source of randomness is not found for `random_bytes`.
-     */
-    public static function init_jwt_server_key(bool $rotate = false) {
-        # Obtain the API package's ID and configuration
-        $pkg_id = API\Models\APISettings::get_api_config()["id"];
-        $api_config = API\Models\APISettings::get_api_config()["config"];
-
-        # Create a new server key if one is not set
-        if (empty($api_config["server_key"]) or $rotate === true) {
-            config_set_path("installedpackages/package/$pkg_id/conf/server_key", bin2hex(random_bytes(32)));
-            write_config("API server key created");
-        }
-    }
-
-    /**
-     * @param mixed $username The username the JWT is to be issued for.
-     * @return string The JWT string clients will use for JWT authentication.
-     * @throws Exception When the JWT server key could not be created.
-     */
-    public static function generate_jwt(string $username) : string {
-        # Initialize the JWT server key in case it is not present
-        self::init_jwt_server_key();
-
-        # Pull the API configuration from config
-        $api_config = API\Models\APISettings::get_api_config()["config"];
-
-        # Assign the JWT payload values. Assign the configured JWT expiration from the API configuration
-        $payload = array(
-            "iss" => config_get_path("system/hostname"),
-            "aud" => config_get_path("system/hostname"),
-            "exp" => time() + $api_config["jwt_exp"],
-            "nbf" => time(),
-            "data" => $username
-        );
-
-        # Return the encoded JWT
-        return JWT::encode($payload, $api_config["server_key"], "HS256");
-    }
-
-
-    /**
-     * Decodes a provided JWT string and extracts its attributes.
-     * @param string $jwt The incoming JWT string to decode.
-     * @return array An array of decoded JWT attributes. If the JWT could not be decoded, this array will be empty.
-     */
-    public static function decode_jwt(string $jwt) : array {
-        # Obtain the JWT server key from config
-        $jwt_server_key = API\Models\APISettings::get_api_config()["config"]["server_key"];
-
-        # Attempt to decode the JWT, if decoding fails return empty array.
-        try {
-            return (array) JWT::decode($jwt, new Key($jwt_server_key, "HS256"));
-        }
-        catch (Exception) {
-            return [];
-        }
     }
 
     /**

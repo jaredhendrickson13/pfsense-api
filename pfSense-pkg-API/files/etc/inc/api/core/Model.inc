@@ -587,9 +587,9 @@ class Model {
     /**
      * Performs a full validation on the API mode. This includes checking that required packages are installed and
      * validating all assigned fields. Note: Fields are validated in the order they are defined in the class.
+     * @param bool $requires_id Whether the `id` field should be validated in this request. This is typically only
+     * necessary for update and delete actions.
      * @return bool `true` if the model's data is valid.
-     * @throws ServerError When a server or programming error is detected.
-     * @throws ValidationError When model validation fails.
      */
     final public function validate(bool $requires_id = false) : bool {
         # When an ID is required and this is a `many` model, check that an ID is set.

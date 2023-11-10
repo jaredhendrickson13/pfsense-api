@@ -13,7 +13,7 @@ use API\Responses\ValidationError;
 
 class APIKey extends Model
 {
-    public StringField $name;
+    public StringField $descr;
     public StringField $username;
     public StringField $hash_algo;
     public IntegerField $length_bytes;
@@ -31,15 +31,10 @@ class APIKey extends Model
         $this->verbose_name = "API Key";
         
         # Set Model fields
-        $this->name = new StringField(
-            required: true,
-            unique: true,
-            maximum_length: 128,
-            help_text: "Sets a unique name for this API key. This is used to identify the key's purpose and cannot be ".
-                "changed once created."
-        );
         $this->username = new StringField(
-            required: true,
+            default: "",
+            allow_empty: true,    # We will force this field to be populated in validate_username()
+            read_only: true,
             help_text: "The username this API key is issued to."
         );
         $this->length_bytes = new IntegerField(
@@ -54,6 +49,14 @@ class APIKey extends Model
             verbose_name: "key hashing algorithm",
             help_text: "The hash algorithm used for this API key. It is recommended to increase the strength of the ".
                 "algorithm for keys assigned to privileged users."
+        );
+        $this->descr = new StringField(
+            default: "",
+            allow_empty: true,
+            maximum_length: 128,
+            verbose_name: "description",
+            help_text: "Sets a description for this API key. This is used to identify the key's purpose and cannot be ".
+            "changed once created."
         );
         $this->key = new StringField(
             allow_null: true,
@@ -75,6 +78,9 @@ class APIKey extends Model
      * @return string The validated username value to be assigned.
      */
     public function validate_username(string $username) : string {
+        # Force username to match the authenticating user's name
+        $username = ($_SESSION["Username"]) ?: $this->client->username;
+        
         # Require this username to match an existing user
         # TODO: Replace this loop with a User model query when developed
         foreach ($this->get_config("system/user", []) as $user) {

@@ -2,6 +2,8 @@
 
 namespace API\Core;
 
+use API\Responses\ServerError;
+
 require_once("api/auto_loader.inc");
 
 /**
@@ -10,6 +12,10 @@ require_once("api/auto_loader.inc");
  */
 class Form {
     public string $url;
+    public bool $many = false;
+    public bool $editable = true;
+    public bool $deletable = true;
+    public string $many_sub_url = "";
     public mixed $id = null;
     public array $title_path = [];
     public array $tabs;
@@ -17,6 +23,7 @@ class Form {
     public string $custom_css = "";
     public string $custom_js = "";
     public array $sections = ["General" => ["fields" => [], "classes" => []]];
+    public array $table_fields = [];
     public array $buttons = [];
     public array $form_data = [];
     protected Model $model;
@@ -91,6 +98,68 @@ class Form {
     }
 
     /**
+     * Obtains a PHP table that contains all current Model objects for `many` forms.
+     */
+    public function get_table() {
+        # Setup the table structure
+        $tb = "<div class='panel panel-default'>";
+        $tb .= "<div class='panel-heading'><h2 class='panel-title'>".gettext($this->model->verbose_name_plural)."</h2></div>";
+        $tb .= "<div class='panel-body table-responsive'>";
+        $tb .= "<table class='table table-striped table-hover table-condensed table-rowdblclickedit sortable-theme-bootstrap' data-sortable>";
+        $tb .= "<thead>";
+        $tb .= "<tr>";
+        
+        # Include table header fields for each `table_field` requested.
+        foreach ($this->table_fields as $table_field) {
+            $tb .= "<th>".gettext(ucwords($this->model->$table_field->verbose_name))."</th>";
+        }
+
+        # Close the table header
+        $tb .= "</tr>";
+        $tb .= "</thead>";
+        
+        # Add table entries for each existing model object
+        foreach ($this->model->read_all()->model_objects as $model_object) {
+            # Add a row for this object
+            $tb .= "<tr>";
+            
+            # Add table data for each `table_field` this object has
+            foreach ($this->table_fields as $table_field) {
+                # Determine the value of this field
+                $value = $model_object->$table_field->value;
+                
+                # Use the choice verbose value if present
+                if ($model_object->$table_field->verbose_choices and array_key_exists($value, $model_object->$table_field->verbose_choices)) {
+                    $value = $model_object->$table_field->verbose_choices[$value];
+                }
+                
+                $tb .= "<td>".$value."</td>";
+            }
+            
+            # Add the edit and delete buttons to this row if allowed
+            $tb .= "<td>";
+            if ($this->editable) {
+                $tb .= "<a class='fa fa-pencil' title='Edit ".gettext($model_object->verbose_name)."' href='".$this->many_sub_url."?id=".$model_object->id."'></a>";
+            }
+            if ($this->deletable) {
+                $tb .= "<a class='fa fa-trash' title='Delete ".gettext($model_object->verbose_name)."' href='".$this->url."?act=del&amp;id=".$model_object->id."' usepost></a>";
+            }
+            $tb .= "</td>";
+            $tb .= "</tr>";
+        }
+        
+        # Close remaining tags
+        $tb .= "</table>";
+        $tb .= "</div>";
+        $tb .= "</div>";
+        # Place 'Add' button
+        $tb .= "<nav class='action-buttons'><a href='".$this->many_sub_url."' class='btn btn-sm btn-success'><i class='fa fa-plus icon-embed-btn'></i>".gettext('Add')."</a></nav>";
+        $tb .= "</div>";
+        
+        return $tb;
+    }
+
+    /**
      * Prints this form as a web page. This method is intended to be called by a PHP endpoint somewhere in the pfSense
      * web root.
      */
@@ -107,6 +176,11 @@ class Form {
         if ($this->form_data["save"]) {
             $this->on_save();
         }
+        
+        # Delete the associated model object when requested
+        if ($this->form_data["act"] === "del") {
+            $this->on_delete($this->form_data["id"]);
+        }
 
         # Check if a button press was submitted that is assigned a specific callable
         foreach ($this->buttons as $button_name => $button_params) {
@@ -117,7 +191,11 @@ class Form {
         }
 
         # Print the auto-generated form
-        print($this->get_form());
+        if ($this->many) {
+            print($this->get_table());
+        } else {
+            print($this->get_form());
+        }
 
         include('foot.inc');
     }
@@ -144,13 +222,33 @@ class Form {
     }
 
     /**
+     * Tries to delete the Model object when requested.
+     * @param int|string $id The ID of the Model object to delete.
+     */
+    public function on_delete(int|string $id) {
+        # Convert the ID to an integer if it is numeric
+        if (is_numeric($id)) {
+            $id = (int)$id;
+        }
+        
+        try {
+            (new $this->model(id: $id))->delete();
+            $this->print_success_banner("Deleted {$this->model->verbose_name} with ID $id.");
+        }
+        catch (Response $resp_error) {
+            $error_message = $resp_error->getMessage();
+            $this->print_input_error_banner(message: $error_message);
+        }
+    }
+
+    /**
      * Converts POST form data submitted by the pfSense webConfigurator to a valid representation of a provided Model object
      * return array The POST form data in an acceptable representation for the provided Model object.
      * @param array $form_data The incoming $_POST or $_GET form data from the pfSense webConfigurator.
      * @param Model $model The Model object to represent.
      * @return array The representation of the Model object from the form data.
      */
-    private function form_data_to_model_representation(array $form_data, Model $model) : array {
+    protected function form_data_to_model_representation(array $form_data, Model $model) : array {
         # Variables
         $representation = [];
 
@@ -216,18 +314,16 @@ class Form {
         # Assign the absolute path to the file. Assume index.php filename if not specified.
         $filename = "/usr/local/www/$this->url";
         $filename = (str_ends_with($filename, ".php")) ? $filename : "$filename/index.php";
+        echo "Building ".$fq_class_name." at URL \"".$this->url."\"... ";
         mkdir(dirname($filename), 0755, true);
-        file_put_contents(
-            $filename,
-            $code
-        );
+        file_put_contents($filename, $code);
 
         # Print success output if file now exists, otherwise output error and exit on non-zero code
         if (is_file($filename)) {
-            echo "Building ".$fq_class_name." at URL \"".$this->url."\"... done.".PHP_EOL;
+            echo "done.".PHP_EOL;
         }
         else {
-            echo "Building ".$fq_class_name." at URL \"".$this->url."\"... failed.".PHP_EOL;
+            echo "failed.".PHP_EOL;
             exit(1);
         }
     }

@@ -6,14 +6,19 @@ require_once("api/auto_loader.inc");
 
 use API\Core\Auth;
 use API\Core\Form;
+use API\Models\APIJWT;
 
-class APISettings extends Form {
+class SystemAPISettings extends Form {
     public string $url = "/system_api_settings.php";
     public string $model_name = "\API\Models\APISettings";
     public array $title_path = ["System", "API", "Settings"];
     public string $custom_css = "/css/api/api.css";
     public array $tabs = [
-        ["Settings", true, "/api/settings/"], ["Documentation", false, "/api/documentation/"], ["Updates", false, "/api/update/"]];
+        ["Settings", true, "/system_api_settings.php"],
+        ["Keys", false, "/system_api_keys.php"],
+        ["Updates", false, "/api/update/"],
+        ["Documentation", false, "/api/documentation/"]
+    ];
     public array $sections = [
         "General" => [
             "fields" => ["enabled", "keep_backup", "represent_interfaces_as"]
@@ -24,8 +29,6 @@ class APISettings extends Form {
                 "read_only",
                 "auth_mode",
                 "jwt_exp",
-                "key_hash_algo",
-                "key_length_bytes",
                 "login_protection",
                 "log_successful_auth",
             ]
@@ -62,7 +65,7 @@ class APISettings extends Form {
      * @throws \Exception When the JWT server key fails to be generated.
      */
     public function rotate_server_key() {
-        Auth::init_jwt_server_key(rotate: true);
+        APIJWT::init_server_key(rotate: true);
         $this->print_success_banner(message: "The JWT server key has been rotated.");
     }
 }
