@@ -18,6 +18,7 @@ class APIModelsAPIKeyTestCase extends TestCase
             code: 400,
             callable: function () {
                 $key = new APIKey();
+                $key->client->username = "not_an_existing_user";
                 $key->validate_username("not_an_existing_user");
             }
         );
@@ -25,6 +26,7 @@ class APIModelsAPIKeyTestCase extends TestCase
         $this->assert_does_not_throw(
             callable: function () {
                 $key = new APIKey();
+                $key->client->username = "admin";
                 $key->validate_username("admin");
             }
         );
@@ -35,7 +37,10 @@ class APIModelsAPIKeyTestCase extends TestCase
      */
     public function test_key_and_hash_populated_after_creation() {
         # Construct an APIKey model object to test with
-        $key = new APIKey(representation_data: ["name" => "test", "username" => "admin"]);
+        $key = new APIKey();
+        
+        # Assign the client an actual username since it's required 
+        $key->client->username = "admin";
 
         # Ensure there is no `key` or `hash` value set before creation.
         $this->assert_is_empty($key->key->value);
@@ -65,7 +70,8 @@ class APIModelsAPIKeyTestCase extends TestCase
      */
     public function test_authenticate() {
         # Construct an APIKey model object to test with
-        $key = new APIKey(representation_data: ["name" => "test", "username" => "admin"]);
+        $key = new APIKey();
+        $key->client->username = "admin";
         $key->create();
 
         # Ensure we can authenticate using the actual `key`
@@ -84,7 +90,8 @@ class APIModelsAPIKeyTestCase extends TestCase
             response_id: "API_KEY_CANNOT_BE_UPDATED",
             code: 500,
             callable: function () {
-                $key = new APIKey(representation_data: ["name" => "test", "username" => "admin"]);
+                $key = new APIKey();
+                $key->client->username = "admin";
                 $key->create();
                 $key->update();
             }
