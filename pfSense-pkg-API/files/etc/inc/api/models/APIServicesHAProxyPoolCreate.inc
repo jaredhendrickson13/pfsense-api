@@ -117,11 +117,11 @@ class APIServicesHAProxyPoolCreate extends APIModel {
         if (array_key_exists('lw_subacct', $this->initial_data) && strlen($this->initial_data['lw_subacct']) == 6 && ctype_alnum($this->initial_data['lw_subacct'])) {
             $this->validated_data['lw_subacct'] = $this->initial_data['lw_subacct'];
         } else {
-            $this->errors[] = APIResponse\get(2273, $this->initial_data['lw_subacct']);
+            $this->errors[] = APIResponse\get(2273, ['lw_subacct' => $this->initial_data['lw_subacct']]);
         }
 
         if (!in_array($this->initial_data['persist_sticky_type'], $this->allowed_persistence)) {
-            $this->errors[] = APIResponse\get(2264, $this->initial_data['persist_sticky_type']);
+            $this->errors[] = APIResponse\get(2264, ['lw_subacct' => $this->initial_data['persist_sticky_type']]);
         } else {
             $this->validated_data['persist_sticky_type'] = $this->initial_data['persist_sticky_type'];
             if ($this->validated_data['persist_sticky_type'] == 'stick_cookie_value') {
@@ -133,13 +133,13 @@ class APIServicesHAProxyPoolCreate extends APIModel {
         }
 
         if (!in_array($this->initial_data['balance'], $this->allowed_algorithms)) {
-            $this->errors[] = APIResponse\get(2265, $this->initial_data['balance']);
+            $this->errors[] = APIResponse\get(2265, ['balance' => $this->initial_data['balance']]);
         } else {
             $this->validated_data['balance'] = $this->initial_data['balance'];
         }
 
         if (!in_array($this->initial_data['check_type'], $this->allowed_checks)) {
-            $this->errors[] = APIResponse\get(2266, $this->initial_data['check_type']);
+            $this->errors[] = APIResponse\get(2266, ['check_type' => $this->initial_data['check_type']]);
         } else {
             $this->validated_data['check_type'] = $this->initial_data['check_type'];
         }
@@ -155,23 +155,23 @@ class APIServicesHAProxyPoolCreate extends APIModel {
             $server_bad_ssl = false;
 
             if (preg_match("/[^a-zA-Z0-9\.\-_]/", $server['name'])) {
-                $this->errors[] = APIResponse\get(2267, $server['name']);
+                $this->errors[] = APIResponse\get(2267, ['name' => $server['name']]);
                 $server_bad_name = true;
             }
             if (!preg_match("/.{2,}/", $server['name'])) {
-                $this->errors[] = APIResponse\get(2268, $server['name']);
+                $this->errors[] = APIResponse\get(2268, ['name' => $server['name']]);
                 $server_bad_name = true;
             }
             if (!is_ipaddr($server['address'])) {
-                $this->errors[] = APIResponse\get(2269, [$server['name'] => $server['address']]);
+                $this->errors[] = APIResponse\get(2269, [$server['name'] => $server]);
                 $server_bad_address = true;
             }
             if (!is_numeric($server['port'])) {
-                $this->errors[] = APIResponse\get(2270, [$server['name'] => $server['port']]);
+                $this->errors[] = APIResponse\get(2270, [$server['name'] => $server]);
                 $server_bad_address = true;
             }
             if (!array_key_exists('ssl', $server) || !in_array($server['ssl'], $this->allowed_server_ssl)) {
-                $this->errors[] = APIResponse\get(2271, [$server['name'] => $server['ssl']]);
+                $this->errors[] = APIResponse\get(2271, [$server['name'] => $server]);
                 $server_bad_ssl = true;
             } elseif ($server['ssl'] === 'no') {
                 unset($server['ssl']);
@@ -187,7 +187,7 @@ class APIServicesHAProxyPoolCreate extends APIModel {
         $bad_pool_name = false;
         /* Ensure only valid characters are in use*/
         if (preg_match("/[^a-zA-Z0-9_\.\-]/", $this->initial_data['name']) || str_contains($this->initial_data['name'], ' ')) {
-            $this->errors[] = APIResponse\get(2262, $this->initial_data['name']);
+            $this->errors[] = APIResponse\get(2262, ['name' => $this->initial_data['name']]);
             $name_bad_chars = true;
         }
 
@@ -195,7 +195,7 @@ class APIServicesHAProxyPoolCreate extends APIModel {
         $current_backends = get_haproxy_backends();
         foreach ($current_backends as $name => $settings) {
             if ($this->initial_data['name'] == $name) {
-                $this->errors[] = APIResponse\get(2263, $this->initial_data['name']);
+                $this->errors[] = APIResponse\get(2263, ['name' => $this->initial_data['name']]);
                 $name_already_used = true;
             }
         }

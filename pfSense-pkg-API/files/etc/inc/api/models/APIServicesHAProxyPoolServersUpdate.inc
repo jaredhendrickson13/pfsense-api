@@ -46,7 +46,7 @@ class APIServicesHAProxyPoolServersUpdate extends APIModel {
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}");
                 $this->current_servers = $this->validated_data['ha_servers']['item'];
             } else {
-                $this->errors[] = APIResponse\get(2276);
+                $this->errors[] = APIResponse\get(2276, ['name' => $this->initial_data['name']]);
             }
         } elseif (isset($this->initial_data["id"])) {
             if ($this->get_config("installedpackages/haproxy/ha_pools/item/{$this->initial_data["id"]}", false)) {
@@ -54,10 +54,10 @@ class APIServicesHAProxyPoolServersUpdate extends APIModel {
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}");
                 $this->current_servers = $this->validated_data['ha_servers']['item'];
             } else {
-                $this->errors[] = APIResponse\get(2275);
+                $this->errors[] = APIResponse\get(2275, ['id' => $this->initial_data['id']]);
             }   
         } else {
-            $this->errors[] = APIResponse\get(2274);
+            $this->errors[] = APIResponse\get(2274, ['request_data' => $this->initial_data]);
         }   
     }
 
@@ -71,23 +71,23 @@ class APIServicesHAProxyPoolServersUpdate extends APIModel {
             $server_bad_ssl = false;
 
             if (preg_match("/[^a-zA-Z0-9\.\-_]/", $server['name'])) {
-                $this->errors[] = APIResponse\get(2267, $server['name']);
+                $this->errors[] = APIResponse\get(2267, [$server['name'] => $server]);
                 $server_bad_name = true;
             }
             if (!preg_match("/.{2,}/", $server['name'])) {
-                $this->errors[] = APIResponse\get(2268, $server['name']);
+                $this->errors[] = APIResponse\get(2268, [$server['name'] => $server]);
                 $server_bad_name = true;
             }
             if (!is_ipaddr($server['address'])) {
-                $this->errors[] = APIResponse\get(2269, [$server['name'] => $server['address']]);
+                $this->errors[] = APIResponse\get(2269, [$server['name'] => $server]);
                 $server_bad_address = true;
             }
             if (!is_numeric($server['port'])) {
-                $this->errors[] = APIResponse\get(2270, [$server['name'] => $server['port']]);
+                $this->errors[] = APIResponse\get(2270, [$server['name'] => $server]);
                 $server_bad_address = true;
             }
             if (!array_key_exists('ssl', $server) || !in_array($server['ssl'], $this->allowed_server_ssl)) {
-                $this->errors[] = APIResponse\get(2271, [$server['name'] => $server['ssl']]);
+                $this->errors[] = APIResponse\get(2271, [$server['name'] => $server]);
                 $server_bad_ssl = true;
             } elseif ($server['ssl'] === 'no') {
                 unset($server['ssl']);

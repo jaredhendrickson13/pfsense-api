@@ -44,7 +44,7 @@ class APIServicesHAProxyFrontendDelete extends APIModel {
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_backends/item/{$this->id}");
                 $this->current_frontend= $this->get_config("installedpackages/haproxy/ha_backends/item/{$this->id}", []);
             } else {
-                $this->errors[] = APIResponse\get(2276);
+                $this->errors[] = APIResponse\get(2276, ['name' => $this->initial_data['name']]);
             }   
         } elseif (isset($this->initial_data["id"])) {
             if ($this->get_config("installedpackages/haproxy/ha_backends/item/{$this->initial_data["id"]}", false)) {
@@ -52,10 +52,10 @@ class APIServicesHAProxyFrontendDelete extends APIModel {
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_backends/item/{$this->id}");
                 $this->current_frontend= $this->get_config("installedpackages/haproxy/ha_backends/item/{$this->id}", []);
             } else {
-                $this->errors[] = APIResponse\get(2275);
+                $this->errors[] = APIResponse\get(2275, ['id' => $this->initial_data['id']]);
             }   
         } else {
-            $this->errors[] = APIResponse\get(2274);
+            $this->errors[] = APIResponse\get(2274, ['request_data' => $this->initial_data]);
         }   
     }
 

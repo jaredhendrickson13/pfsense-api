@@ -39,7 +39,7 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
     public function validate_payload() {
         $this->__validate_target_frontend();
         if (isset($this->initial_data['new_name']) && $this->__validate_name()) {
-            $this->validated_data['name'] = $this->initial_data['name'];
+            $this->validated_data['name'] = $this->initial_data['new_name'];
         }
         if (isset($this->intitial_data['bind_addrs'])) {
             $this->__validate_extaddrs();
@@ -59,17 +59,17 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
                 $this->id = $frontend_id;
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_backends/item/{$this->id}");
             } else {
-                $this->errors[] = APIResponse\get(2276);
+                $this->errors[] = APIResponse\get(2276, ['name' => $this->initial_data["name"]]);
             }   
         } elseif (isset($this->initial_data["id"])) {
             if ($this->get_config("installedpackages/haproxy/ha_backends/item/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_backends/item/{$this->id}");
             } else {
-                $this->errors[] = APIResponse\get(2275);
+                $this->errors[] = APIResponse\get(2275, ['id' => $this->initial_data["id"]]);
             }   
         } else {
-            $this->errors[] = APIResponse\get(2274);
+            $this->errors[] = APIResponse\get(2274, ['request_data' => $this->initial_data]);
         }   
     } 
 
@@ -78,15 +78,15 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
         $name_already_used = false;
 
         /* Ensure only valid characters are in use*/
-        if (preg_match("/[^a-zA-Z0-9_\.\-]/", $this->initial_data['name']) || str_contains($this->initial_data['name'], ' ')) {
-            $this->errors[] = APIResponse\get(2262, $this->initial_data['name']);
+        if (preg_match("/[^a-zA-Z0-9_\.\-]/", $this->initial_data['new_name']) || str_contains($this->initial_data['new_name'], ' ')) {
+            $this->errors[] = APIResponse\get(2262, ['new_name' => $this->initial_data['new_name']]);
             $name_bad_chars = true;
         }   
 
         /* Ensure that our frontend names are unique */
         foreach ($this->current_frontends as $frontend) {
-            if ($this->initial_data['name'] == $frontend['name']) {
-                $this->errors[] = APIResponse\get(2263, $this->initial_data['name']);
+            if ($this->initial_data['new_name'] == $frontend['name']) {
+                $this->errors[] = APIResponse\get(2263, ['new_name' => $this->initial_data['new_name']]);
                 $name_already_used = true;
             }   
         }   
@@ -156,7 +156,7 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
         $cert_valid = false;
 
         if (!isset($this->initial_data['ssloffloadcert'])) {
-            $this->errors[] = APIResponse\get(2277, $this->initial_data);
+            $this->errors[] = APIResponse\get(2277, ['request_data' => $this->initial_data]);
         }
 
         foreach ($current_certs as $cert) {
@@ -174,7 +174,7 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
 
     private function __validate_default_backend() {
         if(!isset($this->initial_data['backend_serverpool'])) {
-            $this->errors[] = APIResponse\get(2279, $this->initial_data);
+            $this->errors[] = APIResponse\get(2279, ['request_data' => $this->initial_data]);
         }
         $valid_backend = false;
         $current_backends = get_haproxy_backends();
