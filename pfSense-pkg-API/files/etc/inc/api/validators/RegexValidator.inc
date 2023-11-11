@@ -13,7 +13,7 @@ class RegexValidator extends Validator
     /**
      * Constructs the Validator object.
      * @param string $pattern The regex pattern to validate the value against.
-     * @param string $error_msg An optional error message to included when validation fails. This helps provide context
+     * @param string $error_msg An optional error message to include when validation fails. This helps provide context
      * to the regex pattern.
      */
     public function __construct(string $pattern, string $error_msg = "")

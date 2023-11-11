@@ -6,6 +6,7 @@ use API;
 use API\Core\Auth;
 use API\Core\Model;
 use API\Fields\BooleanField;
+use API\Fields\DateTimeField;
 use API\Fields\IntegerField;
 use API\Fields\StringField;
 use API\Responses\ValidationError;
@@ -20,7 +21,7 @@ class User extends Model
     public StringField $priv;
     public BooleanField $disabled;
     public StringField $descr;
-    public StringField $expires;
+    public DateTimeField $expires;
     public StringField $cert;
     public StringField $authorizedkeys;
     public StringField $ipsecpsk;
@@ -75,6 +76,13 @@ class User extends Model
             default: "",
             allow_empty: true,
             help_text: "The full descriptive name for this local user."
+        );
+        $this->expires = new DateTimeField(
+            default: "",
+            datetime_format: "m/d/Y",
+            allow_empty: true,
+            help_text: "The expiration date for this user in mm/dd/YYYY format. Use empty string for no ".
+                "expiration"
         );
         parent::__construct($id, $representation_data, $client);
     }
