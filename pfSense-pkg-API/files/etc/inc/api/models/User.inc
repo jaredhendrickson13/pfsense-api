@@ -5,6 +5,7 @@ namespace api\models;
 use API;
 use API\Core\Auth;
 use API\Core\Model;
+use API\Fields\Base64Field;
 use API\Fields\BooleanField;
 use API\Fields\DateTimeField;
 use API\Fields\IntegerField;
@@ -23,7 +24,7 @@ class User extends Model
     public StringField $descr;
     public DateTimeField $expires;
     public StringField $cert;
-    public StringField $authorizedkeys;
+    public Base64Field $authorizedkeys;
     public StringField $ipsecpsk;
 
     public function __construct(mixed $id = null, mixed $representation_data = [], Auth $client = null)
@@ -83,6 +84,11 @@ class User extends Model
             allow_empty: true,
             help_text: "The expiration date for this user in mm/dd/YYYY format. Use empty string for no ".
                 "expiration"
+        );
+        $this->authorizedkeys = new Base64Field(
+            default: "",
+            allow_empty: true,
+            help_text: "The SSH authorized keys to assign this user."
         );
         parent::__construct($id, $representation_data, $client);
     }
