@@ -323,7 +323,7 @@ class Field
             $this->value = null;
             return true;
         }
-
+        
         # Ensure this field object has a name set
         $this->check_field_names();
 
@@ -642,7 +642,7 @@ class Field
      * @param mixed $value The value to check against assigned `type`.
      * @throws ValidationError If the specified value is not a supported type.
      */
-    private function check_value_type(mixed $value) {
+    protected function check_value_type(mixed $value) {
         # Don't validate type for `read_only` fields
         if ($this->read_only) {
             return;
