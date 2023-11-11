@@ -6,6 +6,7 @@ require_once("api/auto_loader.inc");
 
 use API;
 use API\Core\Field;
+use API\Responses\ServerError;
 use API\Responses\ValidationError;
 use DateTime;
 
@@ -15,6 +16,8 @@ use DateTime;
  */
 class DateTimeField extends Field {
     public string $datetime_format;
+    public bool $auto_add_now;
+    public bool $auto_update_now;
 
     /**
      * Defines the StringField object and sets its options.
@@ -32,6 +35,10 @@ class DateTimeField extends Field {
      * choices are dynamic and must be populated at runtime instead of pre-determined sets of values.
      * @param string $datetime_format the PHP DateTime format this value should be formatted as.
      * https://www.php.net/manual/en/datetime.format.php
+     * @param bool $auto_add_now Automatically set the value of this field to the current DateTime during initial
+     * creation. This field can be manually updated when this value is set.
+     * @param bool $auto_update_now Automatically update the value of this field to the current DateTime whenever the
+     * field is first created and whenever it is updated. This field will become read-only whenever this field is set.
      * @param bool $allow_empty If `true`, empty strings will be allowed by this field.
      * @param bool $allow_null If `true`, null values will be allowed by this field.
      * @param bool $editable Set to `false` to prevent this field's value from being changed after its initial creation.
@@ -77,6 +84,8 @@ class DateTimeField extends Field {
         array $choices = [],
         string $choices_callable = "",
         string $datetime_format = "m/d/Y",
+        bool $auto_add_now = false,
+        bool $auto_update_now = false,
         bool $allow_empty = false,
         bool $allow_null = false,
         bool $editable = true,
@@ -97,7 +106,20 @@ class DateTimeField extends Field {
         string $help_text = ""
     )
     {
+        # Assign properties unique to this field
         $this->datetime_format = $datetime_format;
+        $this->auto_add_now = $auto_add_now;
+        $this->auto_update_now = $auto_update_now;
+        
+        # Do not allow $auto_update_now and $many at the same time. The resulting array would just be redundant values.
+        if ($auto_update_now and $many) {
+            throw new ServerError(
+                message: "DateTimeField cannot set `auto_update_now` and `many` at the same time",
+                response_id: "DATETIME_FIELD_CANNOT_AUTO_UPDATE_NOW_WITH_MANY"
+            );
+        }
+        
+        # Construct the parent object for this field
         parent::__construct(
             type: "string",
             required: $required,
@@ -124,6 +146,12 @@ class DateTimeField extends Field {
             validators: $validators,
             help_text: $help_text
         );
+        
+        # Set the fields value to now if $auto_add_now is enabled
+        if ($this->auto_add_now) {
+            $current_time = (new DateTime())->format($this->datetime_format);
+            $this->value = ($this->many) ? [$current_time] : $current_time;
+        }
     }
 
     /**
@@ -143,7 +171,31 @@ class DateTimeField extends Field {
         
         return $datetime_obj !== false;
     }
-    
+
+    /**
+     * Converts the represented value into the internal pfSense value. In the event that `auto_update_now` is set, this
+     * method will automatically update the current value to the current datetime before converting the value to internal.
+     * @param mixed $representation_value The value to convert into it's internal form.
+     * @return array|string|null The internal value(s) suitable for writing to the pfSense configuration.
+     */
+    public function _to_internal(mixed $representation_value): array|string|null
+    {
+        # When `auto_update_now` is set, set the value to the current datetime.
+        if ($this->auto_update_now) {
+            $this->value = (new DateTime())->format($this->datetime_format);
+            return parent::_to_internal($this->value);
+        }
+        
+        # Otherwise, just return the value as usual
+        return parent::_to_internal($representation_value);
+    }
+
+    /**
+     * Checks if a given value's type matches this Field object's primary `type` and ensures the value matches
+     * the current `datetime_format`.
+     * @param mixed $value The value to check against assigned `type` and `datetime_format`.
+     * @throws ValidationError If the specified value is not a supported type or datetime format.
+     */
     protected function check_value_type(mixed $value)
     {
         # Run the parent check_value_type() method to check primitive date type (i.e. string, boolean, integer)
