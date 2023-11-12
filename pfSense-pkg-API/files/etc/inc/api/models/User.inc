@@ -85,10 +85,24 @@ class User extends Model
             help_text: "The expiration date for this user in mm/dd/YYYY format. Use empty string for no ".
                 "expiration"
         );
+        # TODO: Use a ForeignModelField for this field when the Certificate model is developed
+        $this->cert = new StringField(
+            default: [],
+            many: true,
+            help_text: "The user certificates to assign this user. Items must be existing certificate `refid`s."
+        );
         $this->authorizedkeys = new Base64Field(
             default: "",
             allow_empty: true,
             help_text: "The SSH authorized keys to assign this user."
+        );
+        $this->ipsecpsk = new StringField(
+            default: "",
+            allow_empty: true,
+            validators: [
+                new RegexValidator(pattern: "/^[[:ascii:]]*$/", error_msg: "Value contains invalid characters.")
+            ],
+            help_text: "The IPsec pre-shared key to assign this user." 
         );
         parent::__construct($id, $representation_data, $client);
     }
