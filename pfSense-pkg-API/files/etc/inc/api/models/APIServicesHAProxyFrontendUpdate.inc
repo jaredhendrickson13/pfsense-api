@@ -23,6 +23,7 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
     private $allowed_modes;
     private $allowed_ssl;
     private $validate_crt;
+    private $current_frontends;
 
     public function __construct() {
         parent::__construct();
@@ -33,7 +34,7 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
         $this->allowed_ssl = ["yes", "no"];
         $this->allowed_modes = ["http", "tcp"];
         $this->validate_crt = false;
-        $this->current_frontends = $this->get_config("installedpackaged/haproxy/ha_backends/item", []);
+        $this->current_frontends = $this->get_config("installedpackages/haproxy/ha_backends/item", []);
     }
 
     public function validate_payload() {
@@ -122,13 +123,13 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
                 $bind_address['extaddr_port'] = $extaddr['port'];
             }
             if (isset($extaddr['ssl'])) {
-                if (!in_array($extaddr['ssl'], $this->allowed_server_ssl)) {
+                if (!in_array($extaddr['ssl'], $this->allowed_ssl)) {
                     $this->errors[] = APIResponse\get(2271, ['extaddr' => $extaddr]);
                     $extaddr_bad_ssl = true;
                 } elseif ($extaddr['ssl'] === 'no') {
                     unset($extaddr['ssl']);
                 } else {
-                    $this->__validate_crt = true;
+                    $this->validate_crt = true;
                     $bind_address['extaddr_ssl'] = $extaddr['ssl'];
                 }
             }
@@ -192,7 +193,7 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
 
     }
 
-    public function action(){
+    public function action() {
 
         $this->set_config("installedpackages/haproxy/ha_backends/item/{$this->id}", $this->validated_data);
         mark_subsystem_dirty('haproxy.conf');
@@ -207,7 +208,6 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
             $revert_msg = 'Reverting back to original configuration.';
             $result = haproxy_check_and_run($revert_msg, true);
             clear_subsystem_dirty('haproxy.conf');
-            $this->initial_data['haproxy_result'] = $result;
             return APIResponse\get(2272, $this->initial_data);
         } else {
             clear_subsystem_dirty('haproxy.conf');
