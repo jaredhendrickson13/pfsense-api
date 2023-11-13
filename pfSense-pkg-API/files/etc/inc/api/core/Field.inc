@@ -378,8 +378,20 @@ class Field
                 $validator->field_context = $this;
                 $validator->validate(value: $value, field_name: $this->name);
             }
+            
+            # Run any extra validation this Field may have
+            $this->validate_extra($value);
         }
         return true;
+    }
+
+    /**
+     * This method can be overridden by a child Field class to added extra validation for the Field. This method is
+     * executed at the end of the `validate()` method. 
+     * @param mixed $value The value being validated. In the event that this is a `many` field, this method will
+     * receive each value of the array individually, not the array value itself.
+     */
+    public function validate_extra(mixed $value) {
     }
 
     /**

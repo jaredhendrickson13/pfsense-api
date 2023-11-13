@@ -153,7 +153,7 @@ class TestCase {
         }
         catch (Error | Exception $exc) {
             $class_name = $exc::class;
-            throw new AssertionError("Expected callable to not throw an exception. Received $class_name.");
+            throw new AssertionError("Expected callable to not throw an exception. Received $class_name: {$exc->getMessage()}");
         }
     }
 

@@ -7,6 +7,7 @@ require_once("api/auto_loader.inc");
 use API;
 use API\Core\Field;
 use API\Core\Model;
+use API\Responses\NotFoundError;
 use API\Responses\ServerError;
 
 /**
@@ -22,7 +23,7 @@ class ForeignModelField extends Field {
     public string $model_field_internal;
 
     /**
-     * Defines the StringField object and sets its options.
+     * Defines the ForeignModelField object and sets its options.
      * @param string $model_name The name of the foreign Model class this field relates to. This should be the name of an
      * existing Model class in the \API\Models namespace, but should not include the \API\Models namespace prefix. 
      * @param string $model_field The field on the assigned $model_name class that this field's value relates to. For
@@ -128,7 +129,7 @@ class ForeignModelField extends Field {
 
         # Construct the parent Field object
         parent::__construct(
-            type: $this->model->$model_name->type,
+            type: ($model_field === "id") ? "integer" : $this->model->$model_field->type,
             required: $required,
             unique: $unique,
             default: $default,
@@ -171,6 +172,14 @@ class ForeignModelField extends Field {
         
         # Create a new object using the assigned foreign Model class
         $this->model = new $model_name();
+        
+        # Ensure the foreign Model class is a `many` Model
+        if (!$this->model->many) {
+            throw new ServerError(
+                message: "ForeignModelField `model_name` must be a Model class with `many` enabled.",
+                response_id: "FOREIGN_MODEL_FIELD_ASSIGNED_NON_MANY_MODEL"
+            );
+        }
         
         # Ensure the `model_field` exists on this Model class
         if (!in_array($this->model_field, $this->model->get_fields()) and $this->model_field !== "id") {
@@ -245,5 +254,28 @@ class ForeignModelField extends Field {
 
         # As a failsafe, return the existing representation value if we could not find the related object
         return (string)$representation_value;
+    }
+
+    /**
+     * Checks that the value assigned to this Field corresponds to an existing foreign model object during validation.
+     * @param mixed $value The value being validated. In the event that this is a `many` field, this method will
+     * receive each value of the array individually, not the array value itself.
+     */
+    public function validate_extra(mixed $value) {
+        # Add the query parameters needed to locate the related Model object
+        $query_params = array_merge($this->model_query, [$this->model_field => $value]);
+
+        # Query for the Model object this value relates to.
+        $query_modelset = $this->model->query($query_params);
+        
+        # If the model object exists, return the existing `model_field_internal` value.
+        if (!$query_modelset->exists()) {
+            throw new NotFoundError(
+                message: "Field `$this->name` could not locate `{$this->model->verbose_name}` object with ".
+                    "`$this->model_field` set to `$value`",
+                response_id: "FOREIGN_MODEL_FIELD_VALUE_NOT_FOUND"
+            );
+        }
+        
     }
 }
