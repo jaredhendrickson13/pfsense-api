@@ -98,7 +98,7 @@ class APIServicesHAProxyPoolCreate extends APIModel {
             "email_level" => "",
             "email_to" => ""
         ];
-        $this->current_backends = $this->get_config("installedpackaged/haproxy/ha_pools/item", []);
+        $this->current_backends = $this->get_config("installedpackages/haproxy/ha_pools/item", []);
 
     }
 
