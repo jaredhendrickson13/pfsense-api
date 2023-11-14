@@ -37,7 +37,7 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
         $this->validate_crt = false;
         $this->current_frontends = $this->get_config("installedpackages/haproxy/ha_backends/item", []);
         $this->frontend_defaults = [
-            "name" => "template-frontend",
+            "name" => "",
             "status" => "active",
             "type" => "http",
             "httpclose" => "http-keep-alive",
@@ -124,6 +124,8 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
         if (isset($this->initial_data['lw_subacct'])) {
             if (strlen($this->initial_data['lw_subacct']) == 6 && ctype_alnum($this->initial_data['lw_subacct'])) {
                 $this->validated_data['lw_subacct'] = $this->initial_data['lw_subacct'];
+            } else {
+                $this->errors[] = APIResponse\get(2273, ['lw_subacct' => $this->initial_data['lw_subacct']]);
             }
         } else {
             $this->errors[] = APIResponse\get(2273, ['lw_subacct' => $this->initial_data['lw_subacct']]);
@@ -180,6 +182,9 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
             } else {
                 $bind_address['extaddr'] = "{$extaddr['address']}_ipv4";
             }
+
+            $this->__check_ip_in_use($extaddr['address']);
+
             if (!is_numeric($extaddr['port'])) {
                 $this->errors[] = APIResponse\get(2270, ['extaddr' => $extaddr]);
                 $extaddr_bad_port = true;
@@ -203,6 +208,17 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
                 $this->validated_data['a_extaddr']['item'][] = $bind_address;
             } 
             unset($bind_address);
+        }
+    }
+
+    private function __check_ip_in_use($address) {
+        foreach ($this->current_frontends as $frontend) {
+            foreach ($frontend['a_extaddr']['item'] as $front_addr) {
+                $used_address = substr($front_addr['address'], 0, -5);
+                if ($address == $used_address) {
+                    $this->errors[] = APIResponse\get(2283, ['provided_address' => $address, 'existing_frontend' => $frontend['name']]);
+                }
+            }
         }
     }
 

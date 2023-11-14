@@ -116,6 +116,9 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
             } else {
                 $bind_address['extaddr'] = "{$extaddr['address']}_ipv4";
             }
+
+            $this->__check_ip_in_use($extaddr['address']);
+
             if (!is_numeric($extaddr['port'])) {
                 $this->errors[] = APIResponse\get(2270, ['extaddr' => $extaddr]);
                 $extaddr_bad_port = true;
@@ -150,6 +153,17 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
             }
         }
         return false;
+    }
+
+    private function __check_ip_in_use($address) {
+        foreach ($this->current_frontends as $frontend) {
+            foreach ($frontend['a_extaddr']['item'] as $front_addr) {
+                $used_address = substr($front_addr['address'], 0, -5);
+                if ($address == $used_address) {
+                    $this->errors[] = APIResponse\get(2283, ['provided_address' => $address, 'existing_frontend' => $frontend['name']]);
+                }
+            }
+        }
     }
 
     private function __validate_certificate() {
