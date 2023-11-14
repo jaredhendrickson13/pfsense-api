@@ -32,6 +32,7 @@ class User extends Model
         # Set model attributes
         $this->config_path = "system/user";
         $this->many = true;
+        $this->always_apply = true;
 
         # Set model fields
         $this->username = new StringField(
@@ -58,13 +59,13 @@ class User extends Model
         );
         $this->scope = new StringField(
             default: "user",
-            choices: ["user", "system"],
             editable: false,
             read_only: true,
             help_text: "The scope of this local user. This value is automatically assigned and cannot be changed."
         );
         $this->priv = new StringField(
             default: [],
+            allow_empty: true,
             many: true,
             delimiter: null,
             help_text: "The privileges assigned to this local user."
@@ -88,6 +89,7 @@ class User extends Model
         # TODO: Use a ForeignModelField for this field when the Certificate model is developed
         $this->cert = new StringField(
             default: [],
+            allow_empty: true,
             many: true,
             help_text: "The user certificates to assign this user. Items must be existing certificate `refid`s."
         );
@@ -157,6 +159,36 @@ class User extends Model
         }
 
         return $priv;
+    }
+
+    /**
+     * Adds additional validation to the `cert` field.
+     * @param string $cert The incoming value to be validated
+     * @return string The validated value to be assigned.
+     */
+    public function validate_cert(string $cert) : string {
+        # TODO: Remove this function once the Certificate model is developed and this field is converted to a 
+        # TODO: ForeignModelField 
+        # Loop through all certificates and check for matches
+        foreach ($this->get_config("cert", []) as $cert_config) {
+            # Check if this certificate matches the specified ref id
+            if ($cert_config["refid"] === $cert) {
+                return $cert;
+            }
+        }
+
+        throw new ValidationError(
+            message: "Field `cert` contains non-existing certificate `refid` value `$cert`",
+            response_id: "USER_CERT_IS_UNKNOWN"
+        );
+    }
+
+    /**
+     * Apply the changes to this user.
+     */
+    public function apply() {
+        $this->set_config("system/nextuid", $this->uid->value++);
+        local_user_set($this->to_internal());
     }
 
     /**

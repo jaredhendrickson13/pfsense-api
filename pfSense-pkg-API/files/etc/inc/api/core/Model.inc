@@ -627,8 +627,21 @@ class Model {
         # Loop through fields that had custom validation methods and call those methods.
         # Running these after the initial validation loop above allows all fields to be available to these methods.
         foreach ($custom_validate_fields as $field) {
+            # Format the name of the validate method for this field so we can call the function by variable
             $custom_validate_method = "validate_$field";
-            $this->$field->value = $this->$custom_validate_method($this->$field->value);
+            
+            # Validate each value individually for `many` Fields
+            if ($this->$field->many) {
+                $value_array = [];
+                foreach ($this->$field->value as $value) {
+                    $value_array[] = $this->$custom_validate_method($value);
+                }
+                $this->$field->value = $value_array;
+            }
+            # Otherwise, just validate the primitive value
+            else {
+                $this->$field->value = $this->$custom_validate_method($this->$field->value);
+            }
         }
 
         # Validate unique together fields

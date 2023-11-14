@@ -191,17 +191,21 @@ class DateTimeField extends Field {
     }
 
     /**
-     * Checks if a given value's type matches this Field object's primary `type` and ensures the value matches
-     * the current `datetime_format`.
-     * @param mixed $value The value to check against assigned `type` and `datetime_format`.
-     * @throws ValidationError If the specified value is not a supported type or datetime format.
+     * Converts the field value to its representation form from it's internal pfSense configuration value.
+     * @param mixed $internal_value The internal value from the pfSense configuration.
+     * @return string The field value in its representation form.
      */
-    protected function check_value_type(mixed $value)
+    protected function _from_internal(mixed $internal_value) : string {
+        return strval($internal_value);
+    }
+
+    /**
+     * Add extra validation to DateTimeFields to ensure the value matches the DateTime format.
+     * @param mixed $value The incoming 
+     */
+    public function validate_extra(mixed $value)
     {
-        # Run the parent check_value_type() method to check primitive date type (i.e. string, boolean, integer)
-        parent::check_value_type($value);
-        
-        # Also check to ensure that the datetime value matches this Field's DateTime format.
+        # Check to ensure that the datetime value matches this Field's DateTime format.
         if (!$this->is_valid_datetime($value, $this->datetime_format)) {
             throw new ValidationError(
                 message: "Field `$this->name` must be a DateTime in format `$this->datetime_format`. Received `$value`",
