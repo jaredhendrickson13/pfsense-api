@@ -10,12 +10,13 @@ use API\Fields\BooleanField;
 use API\Fields\DateTimeField;
 use API\Fields\IntegerField;
 use API\Fields\StringField;
+use API\Responses\NotFoundError;
 use API\Responses\ValidationError;
 use api\validators\RegexValidator;
 
 class User extends Model
 {
-    public StringField $username;
+    public StringField $name;
     public StringField $password;
     public IntegerField $uid;
     public StringField $scope;
@@ -35,11 +36,10 @@ class User extends Model
         $this->always_apply = true;
 
         # Set model fields
-        $this->username = new StringField(
+        $this->name = new StringField(
             required: true,
             unique: true,
             maximum_length: 32,
-            internal_name: "name",
             validators: [
                 new RegexValidator(pattern: "/^[a-zA-Z0-9\.\-_]+$/", error_msg: "Value contains invalid characters.")
             ],
@@ -110,20 +110,20 @@ class User extends Model
     }
 
     /**
-     * Adds additional validation to the `username` field.
-     * @param string $username The incoming value to be validated
+     * Adds additional validation to the `name` field.
+     * @param string $name The incoming value to be validated
      * @return string The validated value to be assigned.
      */
-    public function validate_username(string $username) : string {
+    public function validate_name(string $name) : string {
         # Do not allow users to use usernames that are reserved by the system
-        if ($this->is_username_reserved($username)) {
+        if ($this->is_username_reserved($name) and $name !== $this->initial_object->name->value) {
             throw new ValidationError(
-                message: "Field `username` cannot use system reserved username `$username`.",
+                message: "Field `username` cannot use system reserved username `$name`.",
                 response_id: "USER_CANNOT_USE_RESERVED_USERNAME"
             );
         }
 
-        return $username;
+        return $name;
     }
 
     /**
@@ -152,9 +152,9 @@ class User extends Model
 
         # Ensure requested privileges are valid privilege names
         if (!array_key_exists($priv, $priv_list)) {
-            throw new ValidationError(
+            throw new NotFoundError(
                 message: "Field `priv` contains unknown privilege `$priv`",
-                response_id: "USER_PRIV_IS_UNKNOWN"
+                response_id: "USER_PRIV_NOT_FOUND"
             );
         }
 
@@ -177,18 +177,43 @@ class User extends Model
             }
         }
 
-        throw new ValidationError(
+        throw new NotFoundError(
             message: "Field `cert` contains non-existing certificate `refid` value `$cert`",
-            response_id: "USER_CERT_IS_UNKNOWN"
+            response_id: "USER_CERT_NOT_FOUND"
         );
     }
 
     /**
-     * Apply the changes to this user.
+     * Extend the _create() method is it bumps the next UID before creating the object
      */
-    public function apply() {
+    public function _create()
+    {
+        # Bump the nextuid in config to one greater than this UID
         $this->set_config("system/nextuid", $this->uid->value++);
+        parent::_create();
+    }
+
+    /**
+     * Apply the creation of this User.
+     */
+    public function apply_create() {
         local_user_set($this->to_internal());
+    }
+
+    /**
+     * Apply the update of this User.
+     */
+    public function apply_update() {
+        local_user_del($this->initial_object->to_internal());
+        local_user_set($this->to_internal());
+    }
+
+    /**
+     * Apply the deletion of this User.
+     */
+    protected function apply_delete()
+    {
+        local_user_del($this->to_internal());
     }
 
     /**

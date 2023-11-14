@@ -66,9 +66,10 @@ class Auth {
      * @return bool `true` if authentication was successful, `false` if authentication was unsuccessful.
      */
     private function authenticate_local_database(string $username, string $password) : bool {
+        $this->username = $username;
+
         # Authenticate against the local user database
         if (authenticate_user($username, $password)) {
-            $this->username = $username;
             unset($_SESSION["Username"]);
             $_SESSION["Username"] = $username;
             return true;
