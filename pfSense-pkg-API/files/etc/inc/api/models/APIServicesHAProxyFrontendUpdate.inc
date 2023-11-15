@@ -42,13 +42,13 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
         if (isset($this->initial_data['new_name']) && $this->__validate_name()) {
             $this->validated_data['name'] = $this->initial_data['new_name'];
         }
-        if (isset($this->intitial_data['bind_addrs'])) {
+        if (isset($this->initial_data['bind_addrs'])) {
             $this->__validate_extaddrs();
         }
         if (isset($this->initial_data['backend_serverpool'])) {
             $this->__validate_default_backend();
         }
-        if ($this->validate_crt) {
+        if ($this->validate_crt && isset($this->initial_data['ssloffloadcert'])) {
             $this->__validate_certificate();
         }
     }
@@ -194,8 +194,8 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
         $valid_backend = false;
         $current_backends = get_haproxy_backends();
         foreach ($current_backends as $name => $backend) {
-            if ($this->initial_data['name'] == $name) {
-                $this->validated_data['name'] = $this->initial_data['name'];
+            if ($this->initial_data['backend_serverpool'] == $name) {
+                $this->validated_data['backend_serverpool'] = $this->initial_data['backend_serverpool'];
                 $valid_backend = true;
                 break;
             }
