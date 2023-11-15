@@ -189,8 +189,23 @@ class User extends Model
     public function _create()
     {
         # Bump the nextuid in config to one greater than this UID
-        $this->set_config("system/nextuid", $this->uid->value++);
+        $this->set_config("system/nextuid", $this->uid->value + 1);
         parent::_create();
+    }
+
+    /**
+     * Extends the _delete() method to ensure system users cannot be deleted.
+     */
+    public function _delete()
+    {
+        # Do not allow system users to be deleted
+        if ($this->scope->value !== "user") {
+            throw new ValidationError(
+                message: "System user `{$this->name->value} cannot be deleted.",
+                response_id: "USER_WITH_SYSTEM_SCOPE_CANNOT_BE_DELETED"
+            );
+        }
+        parent::_delete();
     }
 
     /**

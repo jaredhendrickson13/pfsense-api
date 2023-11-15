@@ -4,6 +4,7 @@ namespace api\tests;
 
 use API\Core\Auth;
 use API\Core\Command;
+use API\Core\Model;
 use API\Core\TestCase;
 use api\models\User;
 
@@ -66,6 +67,26 @@ class APIModelsUserTestCase extends TestCase
                 $user->validate_priv("page-all");
             }
         );
+    }
+
+    /**
+     * Checks the `nextuid` config value is updated after user creation.
+     */
+    public function test_next_uid_is_incremented() {
+        # Read the current `nextuid`
+        $original_next_uid = (int)Model::get_config("system/nextuid");
+
+        # Create a new user and ensure it's UID matches the original next UID
+        $user = new User(representation_data: ["name" => "test", "password" => "test"]);
+        $user->create();
+        $this->assert_equals($original_next_uid, $user->uid->value);
+
+        # Ensure the `nextuid` was incremented
+        $new_next_uid = (int)Model::get_config("system/nextuid");
+        $this->assert_equals($original_next_uid + 1, $new_next_uid);
+
+        # Delete the user
+        $user->delete();
     }
 
     /**
@@ -132,5 +153,21 @@ class APIModelsUserTestCase extends TestCase
             )
         );
     }
+
+    /**
+     * Checks that system users cannot be deleted.
+     */
+    public function test_system_users_cannot_be_deleted() {
+        $this->assert_throws_response(
+            response_id: "USER_WITH_SYSTEM_SCOPE_CANNOT_BE_DELETED",
+            code: 400,
+            callable: function () {
+                # Obtain the `admin` User object and try to delete it
+                $admin_user = new User(id: 0);
+                $admin_user->delete();
+            }
+        );
+    }
+
 
 }
