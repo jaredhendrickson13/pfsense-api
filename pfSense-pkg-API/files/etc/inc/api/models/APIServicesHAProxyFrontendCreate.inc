@@ -133,8 +133,8 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
     }
 
     private function __validate_descr() {
-        if (!isset($this->initial_data['descr'])) {
-            $this->errors[] = APIResponse\get(2281, ['request_data' => $this->initial_data]);
+        if (!isset($this->initial_data['descr']) || empty($this->initial_data['descr'])) {
+            $this->errors[] = APIResponse\get(2284, ['request_data' => $this->initial_data]);
         } else {
             $this->validated_data['descr'] = $this->initial_data['descr'];
         }
@@ -214,7 +214,7 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
     private function __check_ip_in_use($address) {
         foreach ($this->current_frontends as $frontend) {
             foreach ($frontend['a_extaddr']['item'] as $front_addr) {
-                $used_address = substr($front_addr['address'], 0, -5);
+                $used_address = substr($front_addr['extaddr'], 0, -5);
                 if ($address == $used_address) {
                     $this->errors[] = APIResponse\get(2283, ['provided_address' => $address, 'existing_frontend' => $frontend['name']]);
                 }

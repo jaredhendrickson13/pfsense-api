@@ -158,7 +158,7 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
     private function __check_ip_in_use($address) {
         foreach ($this->current_frontends as $frontend) {
             foreach ($frontend['a_extaddr']['item'] as $front_addr) {
-                $used_address = substr($front_addr['address'], 0, -5);
+                $used_address = substr($front_addr['extaddr'], 0, -5);
                 if ($address == $used_address) {
                     $this->errors[] = APIResponse\get(2283, ['provided_address' => $address, 'existing_frontend' => $frontend['name']]);
                 }
