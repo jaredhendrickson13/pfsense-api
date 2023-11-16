@@ -163,13 +163,19 @@ class InterfaceField extends API\Fields\StringField {
     /**
      * Converts the field's representation value into it's internal pfSense value.
      */
-    protected function _to_internal(mixed $representation_value): string {
+    protected function _to_internal(mixed $representation_value): array|null|string {
         # Query to find this interface using the interfaces representation field and value
         $interface_query = NetworkInterface::read_all()->query(
             query_params: [$this->represented_as => $representation_value]
         );
 
-        return $interface_query->first()->id;
+        # Return the first matches' ID if found
+        if ($interface_query->exists()) {
+            return $interface_query->first()->id;
+        }
+
+        # As a failsafe, return the representation value if the internal value could not be found
+        return $representation_value;
     }
 
     /**
