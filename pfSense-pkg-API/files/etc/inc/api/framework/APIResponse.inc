@@ -2235,13 +2235,13 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "The 'ssl' parameter on bind addresses/servers must be one of: 'yes', 'no'."
+            "message" => "The 'ssl' parameter on bind addresses/servers must be a boolean value."
         ],
         2272 => [
-            "status" => "bad request",
-            "code" => 400,
+            "status" => "internal server error",
+            "code" => 500,
             "return" => $id,
-            "message" => "Unexpected HAProxy error after input validation. Config reverted. Initial POST data and HAProxy error included."
+            "message" => "Unexpected HAProxy error after input validation. Config reverted. Initial POST data and recent HAProxy errors included."
         ],
         2273 => [
             "status" => "bad request",
@@ -2314,6 +2314,12 @@ function get($id, $data=[], $all=false) {
             "code" => 400,
             "return" => $id,
             "message" => "Frontend must have a description, none provided."
+        ],
+        2285 => [
+            "status" => "internal server error",
+            "code" => 500,
+            "return" => $id,
+            "message" => "Unexpected HAProxy error after config test. Recent HAProxy errors included in response."
         ],
 
         // 3000-3999 reserved for /api/v1/interfaces API calls

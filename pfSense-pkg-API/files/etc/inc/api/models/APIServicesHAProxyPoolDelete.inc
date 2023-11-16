@@ -59,7 +59,6 @@ class APIServicesHAProxyPoolDelete extends APIModel {
         }   
     }
 
-    # Tell our API model what to do after successfully validating the client's request
     public function action(){
 
         $this->del_config("installedpackages/haproxy/ha_pools/item/{$this->id}");

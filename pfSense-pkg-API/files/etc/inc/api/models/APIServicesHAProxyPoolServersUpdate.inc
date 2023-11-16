@@ -20,7 +20,6 @@ require_once("haproxy/haproxy_utils.inc");
 
 class APIServicesHAProxyPoolServersUpdate extends APIModel {
 
-    private $allowed_server_ssl;
     private $current_servers;
 
     public function __construct() {
@@ -29,7 +28,6 @@ class APIServicesHAProxyPoolServersUpdate extends APIModel {
         $this->packages = ["pfSense-pkg-haproxy"];
         $this->requires_auth = false;
         $this->change_note = "Updated HAProxy backend server pool via API.";
-        $this->allowed_server_ssl = ['yes', 'no'];
         $this->current_servers = [];
     }
 
@@ -86,7 +84,7 @@ class APIServicesHAProxyPoolServersUpdate extends APIModel {
                 $this->errors[] = APIResponse\get(2270, [$server['name'] => $server]);
                 $server_bad_address = true;
             }
-            if (!array_key_exists('ssl', $server) || !in_array($server['ssl'], $this->allowed_server_ssl)) {
+            if (!array_key_exists('ssl', $server) || !is_bool($server['ssl'])) {
                 $this->errors[] = APIResponse\get(2271, [$server['name'] => $server]);
                 $server_bad_ssl = true;
             } elseif ($server['ssl'] === 'no') {
@@ -109,13 +107,7 @@ class APIServicesHAProxyPoolServersUpdate extends APIModel {
 
     }
 
-    # Tell our API model what to do after successfully validating the client's request
-    public function action(){
-
-        $this->set_config("installedpackages/haproxy/ha_pools/item/{$this->id}/ha_servers/item", $this->validated_data['ha_servers']['item']);
-        mark_subsystem_dirty('haproxy.conf');
-        $this->write_config();
-
+    private function __apply() {
         $apply_msg = 'Applying backend changes via API.';
         $result = haproxy_check_and_run($apply_msg, true);
         if (!$result) {
@@ -130,6 +122,17 @@ class APIServicesHAProxyPoolServersUpdate extends APIModel {
         } else {
             clear_subsystem_dirty('haproxy.conf');
             return APIResponse\get(0, 'Backend servers successfully updated');
+        }
+    }
+
+    public function action(){
+
+        $this->set_config("installedpackages/haproxy/ha_pools/item/{$this->id}/ha_servers/item", $this->validated_data['ha_servers']['item']);
+        mark_subsystem_dirty('haproxy.conf');
+        $this->write_config();
+
+        if ($this->initial_data['apply']) {
+            $this->__apply();
         }
     }
 }
