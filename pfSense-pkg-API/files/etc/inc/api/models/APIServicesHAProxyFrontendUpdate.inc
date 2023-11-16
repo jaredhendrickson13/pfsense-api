@@ -21,7 +21,6 @@ require_once("haproxy/haproxy_utils.inc");
 class APIServicesHAProxyFrontendUpdate extends APIModel {
 
     private $allowed_modes;
-    private $allowed_ssl;
     private $validate_crt;
     private $current_frontends;
 
@@ -31,7 +30,6 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
         $this->packages = ["pfSense-pkg-haproxy"];
         $this->change_note = "Created HAProxy backend via API.";
         $this->requires_auth = false;
-        $this->allowed_ssl = ["yes", "no"];
         $this->allowed_modes = ["http", "tcp"];
         $this->validate_crt = false;
         $this->current_frontends = $this->get_config("installedpackages/haproxy/ha_backends/item", []);
@@ -126,7 +124,7 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
                 $bind_address['extaddr_port'] = $extaddr['port'];
             }
             if (isset($extaddr['ssl'])) {
-                if (!in_array($extaddr['ssl'], $this->allowed_ssl)) {
+                if (!is_bool($extaddr['ssl'])) {
                     $this->errors[] = APIResponse\get(2271, ['extaddr' => $extaddr]);
                     $extaddr_bad_ssl = true;
                 } elseif ($extaddr['ssl'] === 'no') {
@@ -207,25 +205,44 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
 
     }
 
-    public function action() {
+    private function __parse_syslog() {
+        $syslog_file_handle = fopen('/var/log/system.log', 'r');
+        $error_matches = []; 
+        while (!feof($syslog_file_handle)) {
+            $log_line = fgets($syslog_file_handle, 4096);
+            if (preg_match('/haproxy.*Fatal errors/', $line)) {
+                $error_matches[] = $line;
+            }   
+        }   
+        return array_slice($error_matches,-3);
+    }
 
-        $this->set_config("installedpackages/haproxy/ha_backends/item/{$this->id}", $this->validated_data);
-        mark_subsystem_dirty('haproxy.conf');
-        $this->write_config();
-
+    private function __apply() {
         $apply_msg = 'Applying frontend changes via API.';
         $result = haproxy_check_and_run($apply_msg, true);
         if (!$result) {
+            $haproxy_errors = $this->__parse_syslog();
             // If it fails, reset config back to original and apply.
             $this->set_config("installedpackages/haproxy/ha_backends/item", $this->current_frontends);
             $this->write_config();
             $revert_msg = 'Reverting back to original configuration.';
             $result = haproxy_check_and_run($revert_msg, true);
             clear_subsystem_dirty('haproxy.conf');
-            return APIResponse\get(2272, $this->initial_data);
+            return APIResponse\get(2272, ['request_data' => $this->initial_data, 'haproxy_errors' => $haproxy_errors]);
         } else {
             clear_subsystem_dirty('haproxy.conf');
             return APIResponse\get(0, 'Frontend successfully updated!');
+        }
+    }
+
+    public function action() {
+
+        $this->set_config("installedpackages/haproxy/ha_backends/item/{$this->id}", $this->validated_data);
+        mark_subsystem_dirty('haproxy.conf');
+        $this->write_config();
+
+        if ($this->initial_data['apply'] === true) {
+            $this->__apply();
         }
     }
 }

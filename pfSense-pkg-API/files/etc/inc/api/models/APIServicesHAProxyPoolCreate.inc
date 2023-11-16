@@ -21,7 +21,6 @@ require_once("haproxy/haproxy_utils.inc");
 class APIServicesHAProxyPoolCreate extends APIModel {
 
     private $backend_defaults;
-    private $allowed_server_ssl;
     private $allowed_algorithms;
     private $allowed_persistence;
     private $allowed_checks;
@@ -32,7 +31,6 @@ class APIServicesHAProxyPoolCreate extends APIModel {
         $this->packages = ["pfSense-pkg-haproxy"];
         $this->change_note = "Created HAProxy backend via API.";
         $this->requires_auth = false;
-        $this->allowed_server_ssl = ['yes', 'no'];
         $this->allowed_algorithms = ['roundrobin', 'leastconn'];
         $this->allowed_persistence = ['stick_sourceipv4', 'stick_cookie_value', 'none'];
         $this->allowed_checks = ['HTTP', 'Basic'];
@@ -170,7 +168,7 @@ class APIServicesHAProxyPoolCreate extends APIModel {
                 $this->errors[] = APIResponse\get(2270, [$server['name'] => $server]);
                 $server_bad_address = true;
             }
-            if (!array_key_exists('ssl', $server) || !in_array($server['ssl'], $this->allowed_server_ssl)) {
+            if (!array_key_exists('ssl', $server) || !is_bool($server['ssl'])) {
                 $this->errors[] = APIResponse\get(2271, [$server['name'] => $server]);
                 $server_bad_ssl = true;
             } elseif ($server['ssl'] === 'no') {
@@ -218,17 +216,23 @@ class APIServicesHAProxyPoolCreate extends APIModel {
 
     }
 
-    # Tell our API model what to do after successfully validating the client's request
-    public function action(){
+    private function __parse_syslog() {
+        $syslog_file_handle = fopen('/var/log/system.log', 'r');
+        $error_matches = []; 
+        while (!feof($syslog_file_handle)) {
+            $log_line = fgets($syslog_file_handle, 4096);
+            if (preg_match('/haproxy.*Fatal errors/', $line)) {
+                $error_matches[] = $line;
+            }   
+        }   
+        return array_slice($error_matches,-3);
+    }
 
-        $this->id = $this->get_next_id("installedpackages/haproxy/ha_pools/item");
-        $this->set_config("installedpackages/haproxy/ha_pools/item/{$this->id}", $this->validated_data);
-        mark_subsystem_dirty('haproxy.conf');
-        $this->write_config();
-
+    private function __apply() {
         $apply_msg = 'Applying backend changes via API.';
         $result = haproxy_check_and_run($apply_msg, true);
         if (!$result) {
+            $haproxy_errors = $this->__parse_syslog();
             // If it fails, reset config back to original and apply.
             $this->set_config("installedpackages/haproxy/ha_pools/item", $this->current_backends);
             $this->write_config();
@@ -236,10 +240,22 @@ class APIServicesHAProxyPoolCreate extends APIModel {
             $result = haproxy_check_and_run($revert_msg, true);
             clear_subsystem_dirty('haproxy.conf');
             $this->initial_data['haproxy_result'] = $result;
-            return APIResponse\get(2272, $this->initial_data);
+            return APIResponse\get(2272, ['request_data' => $this->initial_data, 'haproxy_errors' => $haproxy_errors]);
         } else {
             clear_subsystem_dirty('haproxy.conf');
             return APIResponse\get(0, 'Backend successfully created!');
+        }
+    }
+
+    public function action(){
+
+        $this->id = $this->get_next_id("installedpackages/haproxy/ha_pools/item");
+        $this->set_config("installedpackages/haproxy/ha_pools/item/{$this->id}", $this->validated_data);
+        mark_subsystem_dirty('haproxy.conf');
+        $this->write_config();
+
+        if ($this->initial_data['apply']) {
+            $this->__apply();
         }
     }
 }
