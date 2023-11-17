@@ -904,6 +904,11 @@ class Field
 
                 # Determine if the context of the condition is inverted
                 $inverted = str_starts_with($field, "!");
+                
+                # Remove the invert prefix if this condition is inverted
+                if ($inverted) {
+                    $field = substr($field, 1);
+                }
 
                 # Add descriptive text for field value equals conditions
                 if (!$inverted and !is_array($value)) {
@@ -911,7 +916,7 @@ class Field
                 }
                 # Add descriptive text for field value does not equal conditions
                 elseif ($inverted and !is_array($value)) {
-                    $conditions_text .= "- `$field` must not equal to `$value_str`<br>";
+                    $conditions_text .= "- `$field` must not be equal to `$value_str`<br>";
                 }
                 # Add descriptive text for field value in array conditions
                 elseif (!$inverted and is_array($value)) {

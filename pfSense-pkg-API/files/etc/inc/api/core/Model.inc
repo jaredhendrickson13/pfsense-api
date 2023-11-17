@@ -589,9 +589,10 @@ class Model {
      * validating all assigned fields. Note: Fields are validated in the order they are defined in the class.
      * @param bool $requires_id Whether the `id` field should be validated in this request. This is typically only
      * necessary for update and delete actions.
+     * @param bool $only_id Only validate the `id` field. This is primarily used for deletions.
      * @return bool `true` if the model's data is valid.
      */
-    final public function validate(bool $requires_id = false) : bool {
+    final public function validate(bool $requires_id = false, bool $only_id = false) : bool {
         # When an ID is required and this is a `many` model, check that an ID is set.
         if ($requires_id and $this->many and !isset($this->id)) {
             throw new ValidationError(
@@ -602,6 +603,11 @@ class Model {
 
         # Check for required packages
         $this->check_packages();
+        
+        # Don't validate field values if `only_id` is enabled
+        if ($only_id) {
+            return true;
+        }
 
         # Use a variable to keep track of fields with custom validate methods
         $custom_validate_fields = [];
@@ -1102,7 +1108,7 @@ class Model {
      */
     final public function delete(bool $apply = false) : Model {
         # Ensure all object fields and validations succeed for proceeding.
-        if ($this->validate(requires_id: true)) {
+        if ($this->validate(requires_id: true, only_id: true)) {
             # Block the deletion if this Model is still referenced by other Model objects
             $referenced_by = $this->get_model_references();
             if ($referenced_by->model_objects) {

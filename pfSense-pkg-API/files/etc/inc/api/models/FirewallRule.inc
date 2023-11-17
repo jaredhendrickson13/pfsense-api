@@ -9,7 +9,9 @@ use API\Fields\BooleanField;
 use API\Fields\FilterAddressField;
 use API\Fields\ForeignModelField;
 use API\Fields\InterfaceField;
+use api\fields\PortField;
 use API\Fields\StringField;
+use API\Fields\UnixTimeField;
 use API\Responses\ValidationError;
 
 class FirewallRule extends Model
@@ -20,7 +22,9 @@ class FirewallRule extends Model
     public StringField $protocol;
     public StringField $icmptype;
     public FilterAddressField $source;
+    public PortField $source_port;
     public FilterAddressField $destination;
+    public PortField $destination_port;
     public ForeignModelField $gateway;
     public StringField $descr;
     public BooleanField $disabled;
@@ -32,13 +36,18 @@ class FirewallRule extends Model
     public BooleanField $floating;
     public BooleanField $quick;
     public StringField $direction;
-
+    public UnixTimeField $tracker;
+    public UnixTimeField $created_time;
+    public StringField $created_by;
+    public UnixTimeField $updated_time;
+    public StringField $updated_by;
 
     public function __construct(mixed $id = null, mixed $representation_data = [], Auth $client = null)
     {
         # Set model attributes
         $this->config_path = "filter/rule";
         $this->many = true;
+        $this->client = ($client) ?: new Auth();
 
         # Set model fields
         $this->type = new StringField(
@@ -85,9 +94,29 @@ class FirewallRule extends Model
             required: true,
             help_text: "The source address this rule applies to."
         );
+        $this->source_port = new PortField(
+            default: null,
+            allow_alias: true,
+            allow_range: true,
+            allow_null: true,
+            internal_name: "port",
+            internal_namespace: "source",
+            conditions: ["protocol" => ["tcp", "udp", "tcp/udp"]],
+            help_text: "The source port this rule applies to. Set to `null` to allow any source port."
+        );
         $this->destination = new FilterAddressField(
             required: true,
             help_text: "The destination address this rule applies to."
+        );
+        $this->destination_port = new PortField(
+            default: null,
+            allow_alias: true,
+            allow_range: true,
+            allow_null: true,
+            internal_name: "port",
+            internal_namespace: "destination",
+            conditions: ["protocol" => ["tcp", "udp", "tcp/udp"]],
+            help_text: "The destination port this rule applies to. Set to `null` to allow any destination port."
         );
         $this->gateway = new ForeignModelField(
             model_name: "RoutingGateway",
@@ -157,6 +186,50 @@ class FirewallRule extends Model
             help_text: "The direction of traffic this firewall rule applies to. This field only applies to ".
                 "floating firewall rules."
         );
+        $this->tracker = new UnixTimeField(
+            editable: false,
+            read_only: true,
+            auto_add_now: true,
+            help_text: "The internal tracking ID for this firewall rule."
+        );
+        $this->created_time = new UnixTimeField(
+            editable: false,
+            read_only: true,
+            auto_add_now: true,
+            internal_name: "time",
+            internal_namespace: "created",
+            help_text: "The unix timestamp of when this firewall rule was original created."
+        );
+        $this->created_by = new StringField(
+            default: "{$this->client->username}@{$this->client->ip_address} (API)",
+            editable: false,
+            read_only: true,
+            internal_name: "username",
+            internal_namespace: "created",
+            help_text: "The username and IP of the user who originally created this firewall rule."
+        );
+        $this->updated_time = new UnixTimeField(
+            read_only: true,
+            auto_add_now: true,
+            auto_update_now: true,
+            internal_name: "time",
+            internal_namespace: "updated",
+            help_text: "The unix timestamp of when this firewall rule was original created."
+        );
+        $this->updated_by = new StringField(
+            default: "{$this->client->username}@{$this->client->ip_address} (API)",
+            read_only: true,
+            internal_name: "username",
+            internal_namespace: "updated",
+            help_text: "The username and IP of the user who last updated this firewall rule."
+        );
+        # TODO: Add ForeignModelField for `sched` when the FirewallSchedule model is developed
+        # TODO: Add ForeignModelField for `dnpipe` when the traffic shaper models are developed
+        # TODO: Add ForeignModelField for `pdnpipe` when the traffic shaper models are developed
+        # TODO: Add ForeignModelField for `defaultqueue` when the traffic shaper models are developed
+        # TODO: Add ForeignModelField for `ackqueue` when the traffic shaper models are developed
+
+
         parent::__construct($id, $representation_data, $client);
     }
 
@@ -217,5 +290,15 @@ class FirewallRule extends Model
         }
 
         return $tcp_flags_set;
+    }
+
+    /**
+     * Adds extra validation to the `updated_by` field.
+     * @param string $updated_by The incoming value to be validated.
+     * @return string The validated value to be set.
+     */
+    public function validate_updated_by(string $updated_by) : string {
+        # Auto update this value to the current username and IP
+        return "{$this->client->username}@{$this->client->ip_address} (API)";
     }
 }

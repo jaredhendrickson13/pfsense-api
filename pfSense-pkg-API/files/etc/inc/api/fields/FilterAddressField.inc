@@ -33,11 +33,6 @@ class FilterAddressField extends InterfaceField
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
      * @param mixed|null $default Assign a default string value to assign this Field if no value is present.
-     * @param array $choices An array of value choices this Field can be assigned. This can either be an indexed array
-     * of the exact choice values, or an associative array where the array key is the exact choice value and the array
-     * value is a verbose name for the choice. Verbose choice name are used by ModelForms when generating web pages
-     * for a given Model.
-     * @param string $choices_callable Assign a callable method from this Field object OR the parent Model context to
      * execute to populate choices for this field. This callable must be a method assigned on this Field object OR the
      * parent Model object that returns an array of valid choices in the same format as $choices. This is helpful when
      * choices are dynamic and must be populated at runtime instead of pre-determined sets of values.
@@ -101,8 +96,6 @@ class FilterAddressField extends InterfaceField
         bool $required = false,
         bool $unique = false,
         mixed $default = null,
-        array $choices = [],
-        string $choices_callable = "",
         bool $allow_ipaddr = true,
         bool $allow_subnet = true,
         bool $allow_alias = true,
@@ -192,20 +185,31 @@ class FilterAddressField extends InterfaceField
         # Remove the invert character (!) if invert is allowed and present, so we can continue validating.
         if ($this->allow_invert and str_starts_with($value, self::INVERT_PREFIX)){
             $value = substr($value, 1);
+            
+            # Throw an error if the resulting value is `any`
+            if ($value === "any") {
+                throw new ValidationError(
+                    message: "Field `$this->name` cannot use invert prefix (".self::INVERT_PREFIX.") with value `any`.",
+                    response_id: "FILTER_RULE_ADDRESS_FIELD_WITH_INVERT_ANY"
+                );
+            }
         }
 
         # Allow this value if it is an IP address and this Field allows IP address values
         if ($this->allow_ipaddr and is_ipaddr($value)) {
+            $this->labels[] = "is_ipaddr";
             return;
         }
 
         # Allow this value if it is a subnet and this Field allows subnet values
-        if ($this->allow_ipaddr and is_subnet($value)) {
+        if ($this->allow_subnet and is_subnet($value)) {
+            $this->labels[] = "is_subnet";
             return;
         }
 
         # Allow this value if it is a network or host alias and this Field allows alias values
         if ($this->allow_alias and FirewallAlias::query(["type__except" => "port", "name" => $value])->exists()) {
+            $this->labels[] = "is_alias";
             return;
         }
 
@@ -221,7 +225,7 @@ class FilterAddressField extends InterfaceField
         }
 
         # Allow this value if it is literal `l2tp` and L2TP values are allowed
-        if($this->allow_l2tp and $value === "lt2p") {
+        if($this->allow_l2tp and $value === "l2tp") {
             return;
         }
 
@@ -254,8 +258,7 @@ class FilterAddressField extends InterfaceField
      */
     private function get_valid_opts_str() : string {
         # Piece together our options in string format using this Field's current settings
-        $opts_str = "";
-        $opts_str .= ($this->allow_interface) ? "an existing interface, " : "";
+        $opts_str = ($this->allow_interface) ? "an existing interface, " : "";
         $opts_str .= ($this->allow_ipaddr) ? "an IP address, " : "";
         $opts_str .= ($this->allow_subnet) ? "a subnet CIDR, " : "";
         $opts_str .= ($this->allow_alias) ? "an existing alias, " : "";
@@ -296,8 +299,8 @@ class FilterAddressField extends InterfaceField
             $if_ip_modifier_set = true;
         }
 
-        # Assign the `address` internal value for individual IP values, aliases
-        if (is_ipaddr($representation_value) or is_subnet($representation_value) or is_alias($representation_value)) {
+        # Assign the `address` internal value for individual IP values, subnets, and aliases
+        if ($this->has_label("is_ipaddr") or $this->has_label("is_subnet") or $this->has_label("is_alias")) {
             $internal_value["address"] = $representation_value;
         }
         # Otherwise, assign the `network` internal value
