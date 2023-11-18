@@ -40,6 +40,25 @@ function build_forms() {
     }
 }
 
+function notify_dispatcher(string $dispatcher_name) {
+    # Format the fully qualified class name
+    $class = "\\API\\Dispatchers\\$dispatcher_name";
+
+    # Ensure this Dispatcher class exists
+    if (class_exists($class)) {
+        # Start the Dispatcher process
+        echo "Running $class process... ";
+        $dispatcher = new $class();
+        $dispatcher->process();
+        echo "done.".PHP_EOL;
+        exit(0);
+    }
+    else {
+        echo "No dispatcher exists at $class".PHP_EOL;
+        exit(1);
+    }
+}
+
 function run_tests($contains = "") {
     # Variables
     $test_cases = glob("/etc/inc/api/tests/*.inc");
@@ -130,8 +149,8 @@ function sync() {
 
 function update() {
     $pf_version = API\Core\Tools\get_pfsense_version()["base"];
-    echo shell_exec("/usr/sbin/pkg delete -y pfSense-pkg-API");
-    echo shell_exec("/usr/sbin/pkg -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-".$pf_version."-pkg-API.pkg");
+    echo shell_exec("/usr/local/sbin/pkg-static delete -y pfSense-pkg-API");
+    echo shell_exec("/usr/local/sbin/pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-".$pf_version."-pkg-API.pkg");
     echo shell_exec("/etc/rc.restart_webgui");
 }
 
@@ -147,8 +166,8 @@ function revert($version) {
     # If this release exists, remove the existing package and install the requested one. Otherwise return error
     if($headers && strpos($headers[0], '302')) {
         echo "done.".PHP_EOL;
-        echo shell_exec("/usr/sbin/pkg delete -y pfSense-pkg-API");
-        echo shell_exec("/usr/sbin/pkg -C /dev/null add " . escapeshellarg($url));
+        echo shell_exec("/usr/local/sbin/pkg-static delete -y pfSense-pkg-API");
+        echo shell_exec("/usr/local/sbin/pkg-static -C /dev/null add " . escapeshellarg($url));
         echo shell_exec("/etc/rc.restart_webgui");
     } else {
         echo "no package found.".PHP_EOL;
@@ -157,7 +176,7 @@ function revert($version) {
 }
 
 function delete() {
-    echo shell_exec("/usr/sbin/pkg delete -y pfSense-pkg-API");
+    echo shell_exec("/usr/local/sbin/pkg-static delete -y pfSense-pkg-API");
     echo shell_exec("/etc/rc.restart_webgui");
 }
 
@@ -171,7 +190,7 @@ function rotate_server_key() {
 }
 
 function version() {
-    echo shell_exec("/usr/sbin/pkg info pfSense-pkg-API");
+    echo shell_exec("/usr/local/sbin/pkg-static info pfSense-pkg-API");
 }
 
 function help() {
@@ -182,9 +201,10 @@ function help() {
     echo "COMMANDS:".PHP_EOL;
     echo "  version          : Display the current package version and build information".PHP_EOL;
     echo "  help             : Display the help page (this page)".PHP_EOL;
-    echo "  buildendpoints       : Build all API endpoints included in this package".PHP_EOL;
+    echo "  buildendpoints   : Build all API endpoints included in this package".PHP_EOL;
     echo "  buildforms       : Build all API forms included in this package".PHP_EOL;
     echo "  generatedocs     : Regenerates the OpenAPI documentation".PHP_EOL;
+    echo "  notifydispatcher : Start a dispatcher process".PHP_EOL;
     echo "  runtests         : Run all API unit tests. Warning: this may be disruptive!".PHP_EOL;
     echo "  update           : Update package to the latest stable version available".PHP_EOL;
     echo "  revert           : Revert package to a specified version".PHP_EOL;
@@ -209,6 +229,10 @@ elseif (in_array($argv[1], ["generatedocs"])) {
     echo "Generating OpenAPI documentation... ";
     API\Core\Tools\generate_documentation();
     echo "done.".PHP_EOL;
+}
+# NOTIFY_DISPATCHER COMMAND
+elseif (in_array($argv[1], ["notifydispatcher"])) {
+    notify_dispatcher(dispatcher_name: $argv[2]);
 }
 # RUNTESTS COMMAND
 elseif (in_array($argv[1], ["runtests"])) {

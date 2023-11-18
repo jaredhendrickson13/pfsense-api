@@ -4,6 +4,7 @@ namespace API\Core;
 
 use API\Responses\ServerError;
 use API\Responses\ServiceUnavailableResponse;
+use ReflectionClass;
 
 /**
  * The Dispatcher object is used to define functions that are intended to be run in the background. The Dispatcher
@@ -12,54 +13,26 @@ use API\Responses\ServiceUnavailableResponse;
  */
 abstract class Dispatcher
 {
-    private string $name;
+    const DISPATCH_SCRIPT = "/usr/local/share/pfSense-pkg-API/scripts/dispatch.sh";
+    private string $full_name;
+    private string $short_name;
     private string $pid_dir;
     private string $pid_file;
     private string $pid_file_prefix;
-    private string $script_file;
     public int $timeout = 600;
     public int $delay = 0;
     public int $max_concurrency = 0;
 
     public function __construct()
     {
-        # Get the current class name including namespace, remove slashes
-        $this->name = str_replace("\\", "", get_called_class());
+        # Get the current full and short class names
+        $this->full_name = str_replace("\\", "", get_called_class());
+        $this->short_name = (new ReflectionClass($this))->getShortName();
         
         # Set the Dispatcher PID file directory and name. This cannot be changed by child classes.
         $this->pid_dir = "/tmp/";
-        $this->pid_file_prefix = $this->name."-";
+        $this->pid_file_prefix = $this->full_name."-";
         $this->pid_file = $this->pid_dir.uniqid(prefix: $this->pid_file_prefix).".pid";
-
-        # Set the path of the Dispatcher script. This will be used when building the Dispatcher and spawning processes
-        $this->script_file = "/usr/local/share/pfSense-pkg-API/dispatchers/".$this->name.".php";
-    }
-
-    /**
-     * Builds the Dispatcher PHP script at the assigned filepath.
-     */
-    public function build_dispatcher_script() {
-        # Get the fully qualified class name for this object
-        $fq_class_name = get_class($this);
-
-        # Specify the PHP code to write to the Dispatcher script file
-        $code = "<?php
-        require_once('api/auto_loader.inc');
-        (new ".$fq_class_name."())->process();";
-
-        # Assign the absolute path to the file. Assume index.php filename if not specified.
-        echo "Building ".$fq_class_name." at path $this->script_file... ";
-        mkdir(dirname($this->script_file), 0755, true);
-        file_put_contents($this->script_file, $code);
-
-        # Print success output if file now exists, otherwise output error and exit on non-zero code
-        if (is_file($this->script_file)) {
-            echo "done.".PHP_EOL;
-        }
-        else {
-            echo "failed.".PHP_EOL;
-            exit(1);
-        }
     }
 
     /**
@@ -110,7 +83,7 @@ abstract class Dispatcher
         
         # Spawn the process
         $spawn_process = new Command(
-            command: "nohup timeout $this->timeout php -f $this->script_file",
+            command: "nohup sh ".self::DISPATCH_SCRIPT." $this->short_name $this->pid_file $this->timeout",
             redirect: ">/dev/null & echo $!"
         );
         $pid = (is_numeric($spawn_process->output)) ? (int)$spawn_process->output : null;
@@ -124,7 +97,7 @@ abstract class Dispatcher
         
         # Throw an error if we failed to spawn the Dispatcher process
         throw new ServerError(
-            message: "Dispatcher `$this->name` failed to spawn new process. Received: $spawn_process->output",
+            message: "Dispatcher `$this->full_name` failed to spawn new process. Received: $spawn_process->output",
             response_id: "DISPATCHER_FAILED_TO_SPAWN_PROCESS"
         );
     }
