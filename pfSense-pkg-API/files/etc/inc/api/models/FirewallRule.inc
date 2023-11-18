@@ -228,8 +228,7 @@ class FirewallRule extends Model
         # TODO: Add ForeignModelField for `pdnpipe` when the traffic shaper models are developed
         # TODO: Add ForeignModelField for `defaultqueue` when the traffic shaper models are developed
         # TODO: Add ForeignModelField for `ackqueue` when the traffic shaper models are developed
-
-
+        
         parent::__construct($id, $representation_data, $client);
     }
 
@@ -237,6 +236,7 @@ class FirewallRule extends Model
      * Adds extra validation to the `interface` field.
      * @param string $interface The incoming value to be validated.
      * @return string The validated value to be set.
+     * @throws ValidationError When multiple `interface` values are assigned but `floating` is not enabled
      */
     public function validate_interface(string $interface) : string {
         # Do not allow more than one interface to be assigned if this is not a floating rule

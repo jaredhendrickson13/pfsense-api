@@ -26,10 +26,9 @@ require_once("certs.inc");
 require_once("pkg-utils.inc");
 require_once("firewall_virtual_ip.inc");
 
-global $config;
-
 const API_LIBRARIES = [
     "/etc/inc/api/core/",
+    "/etc/inc/api/dispatchers/",
     "/etc/inc/api/responses/",
     "/etc/inc/api/validators/",
     "/etc/inc/api/fields/",

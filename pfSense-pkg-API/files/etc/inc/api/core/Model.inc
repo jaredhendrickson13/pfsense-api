@@ -43,6 +43,8 @@ class Model {
     public array $package_includes = [];
     public array $unique_together_fields = [];
     public string $internal_callable = "";
+    public int|null $sort_option = null;
+    public int|null $sort_by_field = null;
     public string $subsystem = "";
     public bool $always_apply = false;
     public string $update_strategy = "merge";
@@ -851,6 +853,61 @@ class Model {
     }
 
     /**
+     * Sorts `many` Model entries internally before writing the changes to config. This is useful for Model's whose
+     * internal objects must be written in a specific order.
+     */
+    protected function sort() {
+        # Do not allow non `many` models to be sorted
+        if (!$this->many) {
+            throw new ServerError(
+                message: "Only `many` Models can be sorted.",
+                response_id: "MODEL_CANNOT_BE_SORTED_WITHOUT_MANY"
+            );
+        }
+        
+        # Do not sort if there is no `sort_option` or `sort_by_field` set
+        if (!$this->sort_option or !$this->sort_by_field) {
+            return;
+        }
+        
+        $internal_objects = $this->get_config($this->config_path, []);
+        $criteria = [];
+
+        # Loop through each rule and map its sort field value to our sort criteria array
+        foreach ($internal_objects as $id=>$internal_object) {
+            # Store the internal object's existing ID so we can locate new IDs after sorting
+            $internal_objects[$id]["original_id"] = $id;
+            
+            # Use the `internal_name` of the assigned `sort_by_field` since we are dealing with internal objects
+            $sort_by_field_internal_name = $this->{$this->sort_by_field}->internal_name;
+            
+            # Map the real field if it's not empty, otherwise assume an empty string
+            if (!empty($internal_object[$sort_by_field_internal_name])) {
+                $criteria[$id] = $internal_object[$sort_by_field_internal_name];
+            } else {
+                $criteria[$id] = "";
+            }
+        }
+        
+        # Sort the internal objects using the previously determined criteria
+        array_multisort($criteria, $this->sort_option, $internal_objects);
+        
+        # Loop through the sorted internal objects and find $this object's new ID
+        foreach ($internal_objects as $new_id => $sorted_internal_object) {
+            # Check if this sorted internal object contains $this objects original ID
+            if ($this->id == $sorted_internal_object["original_id"]) {
+                $this->id = $new_id;
+            }
+            
+            # Remove the `original_id` value so we don't save it to config
+            unset($internal_objects[$new_id]["original_id"]);
+        }
+        
+        # Sets the sorted internal objects to the pfSense config
+        $this->set_config($this->config_path, array_values($internal_objects));
+    }
+
+    /**
      * Performs a query on all Model objects for this Model. This is essentially a shorthand way of calling
      * `read_all()->query()`. This method is only applicable to `many` models.
      * @param array $query_params An array of query parameters.
@@ -895,6 +952,7 @@ class Model {
         if ($this->config_path and $this->many) {
             # Write the new object to the internal config
             $this->set_config(path: "$this->config_path/$this->id", value: $this->to_internal());
+            $this->sort();
             $this->write_config("Added $this->verbose_name via API");
             return;
         }
@@ -974,7 +1032,8 @@ class Model {
                 );
             }
 
-            # Write the changes to the object in config.
+            # Sort an write the changes to the object in config.
+            $this->sort();
             $this->write_config("Modified $this->verbose_name via API");
             return;
         }
@@ -1060,7 +1119,8 @@ class Model {
             $this->set_config("$this->config_path/$model_object->id", $model_object->to_internal());
         }
 
-        # Write the changes to config
+        # Sort and write the changes to config
+        $this->sort();
         $this->write_config("Replaced all $this->verbose_name_plural via API");
 
         # Mark the subsystem as dirty if set
