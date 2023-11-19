@@ -87,8 +87,8 @@ class UnixTimeField extends IntegerField {
         int     $many_maximum = 128,
         int     $minimum = 0,
         int     $maximum = 99999999999999, 
-        bool $auto_add_now = true, 
-        bool $auto_update_now = false,
+        bool    $auto_add_now = true,
+        bool    $auto_update_now = false,
         ?string $delimiter = ",",
         string  $verbose_name = "",
         string  $verbose_name_plural = "",
@@ -116,7 +116,7 @@ class UnixTimeField extends IntegerField {
         parent::__construct(
             required: $required,
             unique: $unique,
-            default: ($this->auto_add_now) ? [time()] : time(),
+            default: $default,
             choices: $choices,
             choices_callable: $choices_callable,
             allow_null: $allow_null,
@@ -139,6 +139,11 @@ class UnixTimeField extends IntegerField {
             validators: $validators,
             help_text: $help_text
         );
+
+        # Initilize this object with the current time if `auto_add_now` is set
+        if ($this->auto_add_now) {
+            $this->value = ($this->many) ? [time()] : time();
+        }
     }
 
     /**

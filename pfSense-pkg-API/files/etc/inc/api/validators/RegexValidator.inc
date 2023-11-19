@@ -29,7 +29,7 @@ class RegexValidator extends Validator
      */
     public function validate(mixed $value, string $field_name = "")
     {
-        if (preg_match(pattern: $this->pattern, subject: $value)) {
+        if (!preg_match(pattern: $this->pattern, subject: $value)) {
             throw new ValidationError(
                 message: "Field `$field_name` failed regex validation. $this->error_msg.",
                 response_id: "REGEX_VALIDATOR_FAILED"

@@ -89,37 +89,34 @@ class FirewallAlias extends Model {
 
     /**
      * Adds custom validation to the `address` field.
-     * @param array $addresses The array of `address` items to validate.
-     * @returns array The validated $addresses to set.
+     * @param string The incoming value to be validated.
+     * @returns string The validated value to set.
      * @throws ValidationError When the `address` value is invalid.
      */
-    public function validate_address(array $addresses) : array {
-        # Loop through each address item to validate.
-        foreach ($addresses as $address) {
-            # Ensure value is a port, port range or port alias when `type` is `port`
-            if ($this->type->value === "port" and !is_port_or_range_or_alias($address)) {
-                throw new ValidationError(
-                    message: "Port alias 'address' value '$address' is not a valid port, range, or alias.",
-                    response_id: "INVALID_PORT_ALIAS_ADDRESS"
-                );
-            }
+    public function validate_address(string $addresses) : string {
+        # Ensure value is a port, port range or port alias when `type` is `port`
+        if ($this->type->value === "port" and !is_port_or_range_or_alias($addresses)) {
+            throw new ValidationError(
+                message: "Port alias 'address' value '$addresses' is not a valid port, range, or alias.",
+                response_id: "INVALID_PORT_ALIAS_ADDRESS"
+            );
+        }
 
-            # Ensure value is an IP, FQDN or alias when `type` is `host`
-            if ($this->type->value === "host" and !is_ipaddroralias($address) and !is_fqdn($address)) {
-                throw new ValidationError(
-                    message: "Host alias 'address' value '$address' is not a valid IP, FQDN, or alias.",
-                    response_id: "INVALID_HOST_ALIAS_ADDRESS"
-                );
-            }
+        # Ensure value is an IP, FQDN or alias when `type` is `host`
+        if ($this->type->value === "host" and !is_ipaddroralias($addresses) and !is_fqdn($addresses)) {
+            throw new ValidationError(
+                message: "Host alias 'address' value '$addresses' is not a valid IP, FQDN, or alias.",
+                response_id: "INVALID_HOST_ALIAS_ADDRESS"
+            );
+        }
 
-            # Ensure value is a CIDR, FQDN or alias when `type` is `network`
-            if ($this->type->value === "network") {
-                if (!is_subnet($address) and alias_get_type($address) != "network" and !is_fqdn($address)) {
-                    throw new ValidationError(
-                        message: "Host alias 'address' value '$address' is not a valid CIDR, FQDN, or alias.",
-                        response_id: "INVALID_NETWORK_ALIAS_ADDRESS"
-                    );
-                }
+        # Ensure value is a CIDR, FQDN or alias when `type` is `network`
+        if ($this->type->value === "network") {
+            if (!is_subnet($addresses) and alias_get_type($addresses) != "network" and !is_fqdn($addresses)) {
+                throw new ValidationError(
+                    message: "Host alias 'address' value '$addresses' is not a valid CIDR, FQDN, or alias.",
+                    response_id: "INVALID_NETWORK_ALIAS_ADDRESS"
+                );
             }
         }
 
@@ -128,13 +125,13 @@ class FirewallAlias extends Model {
 
     /**
      * Adds custom validation to `detail` field
-     * @param array $detail The array of `detail` fields to validate.
-     * @returns array The validated $detail to set.
+     * @param string $detail The incoming value to be validated.
+     * @returns string The validated value to be set.
      * @throws ValidationError When the `detail` value is invalid.
      */
-    public function validate_detail(array $detail) : array {
+    public function validate_detail(string $detail) : array {
         # Throw an error if there are more `detail` items than `address` items
-        if (count($detail) > count($this->address->value)) {
+        if (count($this->detail->value) > count($this->address->value)) {
             throw new ValidationError(
                 message: "Aliases cannot contain more 'detail' items than 'address' items.",
                 response_id: "TOO_MANY_ALIAS_DETAILS"
@@ -142,8 +139,8 @@ class FirewallAlias extends Model {
         }
 
         # Automatically generate detail items if there are less details than addresses
-        while (count($detail) < count($this->address->value)) {
-            $detail[] = "Entry added " . date('r');
+        while (count($this->detail->value) < count($this->address->value)) {
+            $this->detail->value[] = "Entry added " . date('r');
         }
 
         return $detail;

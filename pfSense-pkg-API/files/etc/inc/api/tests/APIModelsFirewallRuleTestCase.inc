@@ -3,7 +3,7 @@
 namespace API\Tests;
 
 use API\Core\TestCase;
-use api\models\FirewallRule;
+use API\Models\FirewallRule;
 
 class APIModelsFirewallRuleTestCase extends TestCase
 {

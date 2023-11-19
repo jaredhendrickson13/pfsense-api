@@ -15,7 +15,7 @@ class SystemAPISettings extends Form {
     public string $custom_css = "/css/api/api.css";
     public array $tabs = [
         ["Settings", true, "/system_api_settings.php"],
-        ["Keys", false, "/system_api_keys.php"],
+        ["Keys", false, "/system_api_key.php"],
         ["Updates", false, "/api/update/"],
         ["Documentation", false, "/api/documentation/"]
     ];

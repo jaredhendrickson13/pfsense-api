@@ -857,17 +857,17 @@ class Model {
      * internal objects must be written in a specific order.
      */
     protected function sort() {
+        # Do not sort if there is no `sort_option` or `sort_by_field` set
+        if (!$this->sort_option or !$this->sort_by_field) {
+            return;
+        }
+
         # Do not allow non `many` models to be sorted
         if (!$this->many) {
             throw new ServerError(
                 message: "Only `many` Models can be sorted.",
                 response_id: "MODEL_CANNOT_BE_SORTED_WITHOUT_MANY"
             );
-        }
-        
-        # Do not sort if there is no `sort_option` or `sort_by_field` set
-        if (!$this->sort_option or !$this->sort_by_field) {
-            return;
         }
         
         $internal_objects = $this->get_config($this->config_path, []);

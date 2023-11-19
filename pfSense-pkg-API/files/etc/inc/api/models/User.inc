@@ -1,6 +1,6 @@
 <?php
 
-namespace api\models;
+namespace API\Models;
 
 use API;
 use API\Core\Auth;

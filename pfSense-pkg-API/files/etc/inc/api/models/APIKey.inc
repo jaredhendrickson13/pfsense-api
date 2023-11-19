@@ -79,14 +79,12 @@ class APIKey extends Model
      */
     public function validate_username(string $username) : string {
         # Force username to match the authenticating user's name
-        $username = ($_SESSION["Username"]) ?: $this->client->username;
+        $username = $this->client->username;
         
         # Require this username to match an existing user
         # TODO: Replace this loop with a User model query when developed
-        foreach ($this->get_config("system/user", []) as $user) {
-            if ($username === $user["name"]) {
-                return $username;
-            }
+        if (User::query(["name" => $username])->exists()) {
+            return $username;
         }
 
         throw new ValidationError(

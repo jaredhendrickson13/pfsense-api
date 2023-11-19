@@ -4,6 +4,7 @@ namespace API\Tests;
 
 use API\Core\Auth;
 use API\Core\TestCase;
+use API\Models\APIJWT;
 use API\Models\APIKey;
 use API\Models\APISettings;
 
@@ -47,7 +48,9 @@ class APICoreAuthTestCase extends TestCase
      */
     public function test_authenticate_key() {
         # Create an API key to test with
-        $key = (new APIKey(representation_data: ["name" => "test", "username" => "admin"]))->create();
+        $key = new APIKey(representation_data: ["name" => "test", "username" => "admin"]);
+        $key->client->username = $key->username->value;
+        $key->create();
 
         # Create an Auth object that uses key authentication
         $test_auth = new Auth(mode: "key");
@@ -63,15 +66,19 @@ class APICoreAuthTestCase extends TestCase
      * Checks that JWT authentication is successful with a good JWT, and fails with a bad JWT.
      */
     public function test_authenticate_jwt() {
-        # Create an Auth object that uses JWT authentication and generate a new JWT
-        $test_auth = new Auth(mode: "jwt");
-        $jwt = $test_auth->generate_jwt("admin");
+        # Create an auth object to test with
+        $auth = new Auth(mode: "jwt");
+
+        # Create a JWT object and issue a new token
+        $jwt = new APIJWT();
+        $jwt->client->ip_address = "admin";
+        $jwt->create();
 
         # Ensure bad credentials result in authentication failure
-        $this->assert_is_false($test_auth->authenticate(secret: "bad jwt"));
+        $this->assert_is_false($auth->authenticate(secret: "bad jwt"));
 
         # Ensure good credentials result in authentication success
-        $this->assert_is_true($test_auth->authenticate(secret: $jwt));
+        $this->assert_is_true($auth->authenticate(secret: $jwt->token->value));
 
         # Remove the JWT server key created by generate_jwt()
         $api_pkg_id = APISettings::get_api_config()["id"];

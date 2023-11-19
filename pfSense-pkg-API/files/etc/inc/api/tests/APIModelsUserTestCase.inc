@@ -6,7 +6,7 @@ use API\Core\Auth;
 use API\Core\Command;
 use API\Core\Model;
 use API\Core\TestCase;
-use api\models\User;
+use API\Models\User;
 
 class APIModelsUserTestCase extends TestCase
 {
