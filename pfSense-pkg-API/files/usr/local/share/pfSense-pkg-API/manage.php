@@ -16,6 +16,7 @@
 require_once("api/core/Tools.inc");
 require_once("api/core/TestCase.inc");
 
+use API\Dispatchers\WebGUIRestartDispatcher;
 use API\Models\APISettings;
 
 function build_endpoints() {
@@ -123,6 +124,13 @@ function run_tests($contains = "") {
     exit($exit_code);
 }
 
+function restart_webgui() {
+    echo "Scheduling webConfigurator restart... ";
+    (new WebGUIRestartDispatcher())->spawn_process();
+    echo "done.".PHP_EOL;
+    exit(0);
+}
+
 function backup() {
     echo "Backing up API configuration... ";
     echo match (APISettings::backup_to_file()) {
@@ -206,6 +214,7 @@ function help() {
     echo "  generatedocs     : Regenerates the OpenAPI documentation".PHP_EOL;
     echo "  notifydispatcher : Start a dispatcher process".PHP_EOL;
     echo "  runtests         : Run all API unit tests. Warning: this may be disruptive!".PHP_EOL;
+    echo "  restartwebgui    : Restart the webConfigurator in the background".PHP_EOL;
     echo "  update           : Update package to the latest stable version available".PHP_EOL;
     echo "  revert           : Revert package to a specified version".PHP_EOL;
     echo "  delete           : Delete package from this system".PHP_EOL;
@@ -237,6 +246,10 @@ elseif (in_array($argv[1], ["notifydispatcher"])) {
 # RUNTESTS COMMAND
 elseif (in_array($argv[1], ["runtests"])) {
     run_tests(contains: $argv[2]);
+}
+# RESTART_WEBGUI COMMAND
+elseif (in_array($argv[1], ["restartwebgui"])) {
+    restart_webgui();
 }
 # BACKUP COMMAND
 elseif (in_array($argv[1], ["backup"])) {
