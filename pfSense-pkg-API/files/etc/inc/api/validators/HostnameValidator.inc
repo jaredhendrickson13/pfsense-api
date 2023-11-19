@@ -1,6 +1,6 @@
 <?php
 
-namespace api\validators;
+namespace API\Validators;
 
 require_once("api/auto_loader.inc");
 

@@ -44,7 +44,7 @@ class Model {
     public array $unique_together_fields = [];
     public string $internal_callable = "";
     public int|null $sort_option = null;
-    public int|null $sort_by_field = null;
+    public string|null $sort_by_field = null;
     public string $subsystem = "";
     public bool $always_apply = false;
     public string $update_strategy = "merge";
@@ -891,11 +891,13 @@ class Model {
         
         # Sort the internal objects using the previously determined criteria
         array_multisort($criteria, $this->sort_option, $internal_objects);
-        
+
         # Loop through the sorted internal objects and find $this object's new ID
+        $id_found = false;
         foreach ($internal_objects as $new_id => $sorted_internal_object) {
             # Check if this sorted internal object contains $this objects original ID
-            if ($this->id == $sorted_internal_object["original_id"]) {
+            if (!$id_found and $this->id === $sorted_internal_object["original_id"]) {
+                $id_found = true;
                 $this->id = $new_id;
             }
             

@@ -4,8 +4,9 @@ namespace API\Models;
 
 use API;
 use API\Core\Model;
+use API\Dispatchers\DNSResolverApplyDispatcher;
 use API\Fields\StringField;
-use api\validators\HostnameValidator;
+use API\Validators\HostnameValidator;
 use API\Validators\IPAddressValidator;
 
 class DNSResolverHostOverride extends Model
@@ -22,6 +23,7 @@ class DNSResolverHostOverride extends Model
         $this->many = true;
         $this->sort_option = SORT_ASC;
         $this->sort_by_field = "host";
+        $this->unique_together_fields = ["host", "domain"];
         
         # Set model fields
         $this->host = new StringField(
@@ -50,6 +52,12 @@ class DNSResolverHostOverride extends Model
         );
         parent::__construct($id, $representation_data, $client);
     }
-    
 
+    /**
+     * Applies pending DNS Resolver changes.
+     */
+    public function apply()
+    {
+        (new DNSResolverApplyDispatcher())->spawn_process();
+    }
 }

@@ -7,7 +7,7 @@
 # $3: The number of seconds the Dispatcher process can run before timing out.
 
 # Start the Dispatcher process using manage.php (pfsense-api CLI), enforce timeout
-timeout $3 php -f /usr/local/share/pfSense-pkg-API/manage.php notifydispatcher $1;
+timeout --foreground $3 php -f /usr/local/share/pfSense-pkg-API/manage.php notifydispatcher $1;
 
 # Remove the PID file associated with this Dispatcher process
 rm $2;

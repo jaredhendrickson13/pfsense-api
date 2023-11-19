@@ -51,7 +51,7 @@ function notify_dispatcher(string $dispatcher_name) {
         $dispatcher = new $class();
         $dispatcher->process();
         echo "done.".PHP_EOL;
-        exit(0);
+        exit(1);
     }
     else {
         echo "No dispatcher exists at $class".PHP_EOL;
@@ -281,3 +281,5 @@ else {
     echo "Error: Unknown command".PHP_EOL.PHP_EOL;
     help();
 }
+
+exit;

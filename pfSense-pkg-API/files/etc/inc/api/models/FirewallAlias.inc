@@ -6,6 +6,7 @@ require_once("api/auto_loader.inc");
 
 use API\Core\Model;
 use API\Core\Auth;
+use API\Dispatchers\FirewallApplyDispatcher;
 use API\Fields\StringField;
 use API\Responses\ValidationError;
 use API\Validators\FilterNameValidator;
@@ -153,6 +154,6 @@ class FirewallAlias extends Model {
      * changes to config.
      */
     public function apply() {
-        filter_configure();
+        (new FirewallApplyDispatcher())->spawn_process();
     }
 }

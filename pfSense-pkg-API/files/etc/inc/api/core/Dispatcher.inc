@@ -11,7 +11,7 @@ use ReflectionClass;
  * objects allows us to dynamically create a private PHP script that can be called in the background, manages the
  * process spawn queue, and enforces background process timeouts.
  */
-abstract class Dispatcher
+class Dispatcher
 {
     const DISPATCH_SCRIPT = "/usr/local/share/pfSense-pkg-API/scripts/dispatch.sh";
     private string $full_name;
@@ -20,7 +20,6 @@ abstract class Dispatcher
     private string $pid_file;
     private string $pid_file_prefix;
     public int $timeout = 600;
-    public int $delay = 0;
     public int $max_concurrency = 0;
 
     public function __construct()
@@ -33,6 +32,13 @@ abstract class Dispatcher
         $this->pid_dir = "/tmp/";
         $this->pid_file_prefix = $this->full_name."-";
         $this->pid_file = $this->pid_dir.uniqid(prefix: $this->pid_file_prefix).".pid";
+    }
+
+    /**
+     * Reads the PID file path that will be used for the next spawned process.
+     */
+    public function get_pid_file() {
+        return $this->pid_file;
     }
 
     /**
@@ -61,6 +67,21 @@ abstract class Dispatcher
     }
 
     /**
+     * Kills any running Dispatcher processes.
+     */
+    public function kill_running_processes() {
+        # Terminate this Dispatcher's running processes
+        foreach ($this->get_running_processes() as $pid) {
+            posix_kill($pid, SIGKILL);
+        }
+
+        # Remove any leftover PID files
+        foreach (glob($this->pid_dir.$this->pid_file_prefix."*.pid") as $pid_file) {
+            unlink($pid_file);
+        }
+    }
+
+    /**
      * Spawns a new process for this Dispatcher.
      * @param mixed ...$arguments Optional arguments to pass to the `process()` method.
      * @return int The PID of the spawned process.
@@ -76,11 +97,6 @@ abstract class Dispatcher
             );
         }
         
-        # Delay spawning the process if a delay was requested.
-        if ($this->delay) {
-            sleep($this->delay);
-        }
-        
         # Spawn the process
         $spawn_process = new Command(
             command: "nohup sh ".self::DISPATCH_SCRIPT." $this->short_name $this->pid_file $this->timeout",
@@ -90,8 +106,9 @@ abstract class Dispatcher
         
         # Ensure the spawn process output is a numeric PID and that the PID is actively running
         if (!is_null($pid) and posix_getpgid($pid)) {
-            # Write this Dispatcher run's PID file and return the PID.
+            # Write this process's PID file, set the PID file name for the next process and return the PID.
             file_put_contents($this->pid_file, $pid);
+            $this->pid_file = $this->pid_dir.uniqid(prefix: $this->pid_file_prefix).".pid";
             return $pid;
         }
         
@@ -107,5 +124,8 @@ abstract class Dispatcher
      * or perform computations that may take a long time. It is up to the child Dispatcher class to decide what is
      * done here.
      */
-    public static abstract function process(mixed ...$arguments);
+    public static function process(mixed ...$arguments) {
+        # Emulate a long running process for testing purposes
+        sleep(30);
+    }
 }
