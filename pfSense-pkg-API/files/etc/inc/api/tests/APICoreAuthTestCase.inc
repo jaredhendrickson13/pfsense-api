@@ -48,7 +48,7 @@ class APICoreAuthTestCase extends TestCase
      */
     public function test_authenticate_key() {
         # Create an API key to test with
-        $key = new APIKey(representation_data: ["name" => "test", "username" => "admin"]);
+        $key = new APIKey(data: ["name" => "test", "username" => "admin"]);
         $key->client->username = $key->username->value;
         $key->create();
 

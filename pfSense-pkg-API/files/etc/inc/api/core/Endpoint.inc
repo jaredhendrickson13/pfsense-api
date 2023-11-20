@@ -365,7 +365,7 @@ class Endpoint {
 
             # For GET requests on non-many Endpoints, obtain a single object from the assigned Model.
             if ($this->request_method === "GET" and !$this->many) {
-                $this->model->from_representation(representation_data: $this->request_data);
+                $this->model->from_representation(data: $this->request_data);
                 $resp_data = $this->model->read();
             }
             # For GET requests on many Endpoints, obtain all objects from the assigned Model.
@@ -377,24 +377,24 @@ class Endpoint {
                 # POST request cannot include an ID, strip the if present
                 unset($this->request_data["id"]);
 
-                $this->model->from_representation(representation_data: $this->request_data);
+                $this->model->from_representation(data: $this->request_data);
                 $resp_data = $this->model->create(apply: ($this->request_data["apply"] === true));
             }
             # For PUT requests on many Endpoints, replace all existing objects for the assigned Model
             elseif ($this->request_method === "PUT" and $this->many) {
                 $resp_data = $this->model->replace_all(
-                    representation_data: $this->request_data,
+                    data: $this->request_data,
                     apply: ($this->request_data["apply"] === true)
                 );
             }
             # For PATCH requests on non-many Endpoints, update a single object for the assigned Model
             elseif ($this->request_method === "PATCH" and !$this->many) {
-                $this->model->from_representation(representation_data: $this->request_data);
+                $this->model->from_representation(data: $this->request_data);
                 $resp_data = $this->model->update(apply: ($this->request_data["apply"] === true));
             }
             # For DELETE requests on non-many Endpoints, delete a single object for the assigned Model
             elseif ($this->request_method === "DELETE" and !$this->many) {
-                $this->model->from_representation(representation_data: $this->request_data);
+                $this->model->from_representation(data: $this->request_data);
                 $resp_data = $this->model->delete(apply: ($this->request_data["apply"] === true));
             }
             # Return the available request methods in a response header

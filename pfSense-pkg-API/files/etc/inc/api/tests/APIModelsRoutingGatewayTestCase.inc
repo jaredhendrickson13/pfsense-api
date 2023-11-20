@@ -20,7 +20,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
         # TODO: Need tests to ensure gateway cannot be disabled while in use by gw groups and dns servers
         # Create a routing gateway to test with
         $test_gateway = new RoutingGateway(
-            representation_data: [
+            data: [
                 "name" => "TEST_GW",
                 "ipprotocol" => "inet",
                 "interface" => "lan",
@@ -31,7 +31,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
 
         # Create a StaticRoute for this gateway
         $test_route = new StaticRoute(
-            representation_data: [
+            data: [
                 "network" => "1.2.3.4/32",
                 "gateway" => "TEST_GW"
             ]
@@ -69,7 +69,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
     public function test_gateway_interface_must_match_gateway_ip_protocol() {
         # Create a parent interface to test with
         $test_if = new NetworkInterface(
-            representation_data: [
+            data: [
                 "enable" => true,
                 "if" => "em2",
                 "descr" => "TEST_IFACE",
@@ -85,7 +85,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
             code: 400,
             callable: function () use ($test_if) {
                 $test_gw = new RoutingGateway(
-                    representation_data: [
+                    data: [
                         "name" => "TEST_GW",
                         "interface" => $test_if->id,
                         "ipprotocol" => "inet",
@@ -101,7 +101,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
             code: 400,
             callable: function () use ($test_if) {
                 $test_gw = new RoutingGateway(
-                    representation_data: [
+                    data: [
                         "name" => "TEST_GW",
                         "interface" => $test_if->id,
                         "ipprotocol" => "inet6",
@@ -114,7 +114,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
 
         # Give the interface an IPv4 and IPv6 address
         $test_if->from_representation(
-            representation_data: [
+            data: [
                 "enabled" => true,
                 "descr" => "TEST_IFACE",
                 "typev4" => "static",
@@ -131,7 +131,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
         $this->assert_does_not_throw(
             callable: function () use ($test_if) {
                 $test_gw = new RoutingGateway(
-                    representation_data: [
+                    data: [
                         "name" => "TEST_GW",
                         "interface" => $test_if->id,
                         "ipprotocol" => "inet",
@@ -145,7 +145,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
         $this->assert_does_not_throw(
             callable: function () use ($test_if) {
                 $test_gw = new RoutingGateway(
-                    representation_data: [
+                    data: [
                         "name" => "TEST_GW",
                         "interface" => $test_if->id,
                         "ipprotocol" => "inet6",
@@ -169,7 +169,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
             code: 400,
             callable: function () {
                 $test_gw = new RoutingGateway(
-                    representation_data: [
+                    data: [
                         "name" => "TEST_GW",
                         "interface" => "wan",
                         "ipprotocol" => "inet6",
@@ -186,7 +186,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
             code: 400,
             callable: function () {
                 $test_gw = new RoutingGateway(
-                    representation_data: [
+                    data: [
                         "name" => "TEST_GW",
                         "interface" => "wan",
                         "ipprotocol" => "inet",
@@ -201,7 +201,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
         $this->assert_does_not_throw(
             callable: function () {
                 $test_gw = new RoutingGateway(
-                    representation_data: [
+                    data: [
                         "name" => "TEST_GW",
                         "interface" => "wan",
                         "ipprotocol" => "inet6",
@@ -216,7 +216,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
         $this->assert_does_not_throw(
             callable: function () {
                 $test_gw = new RoutingGateway(
-                    representation_data: [
+                    data: [
                         "name" => "TEST_GW",
                         "interface" => "wan",
                         "ipprotocol" => "inet",
@@ -237,7 +237,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
             code: 400,
             callable: function () {
                 $test_gw = new RoutingGateway(
-                    representation_data: [
+                    data: [
                         "name" => "TEST_GW",
                         "interface" => "wan",
                         "ipprotocol" => "inet",
@@ -260,7 +260,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
             code: 400,
             callable: function () {
                 $test_gw = new RoutingGateway(
-                    representation_data: [
+                    data: [
                         "name" => "TEST_GW",
                         "interface" => "wan",
                         "ipprotocol" => "inet",
@@ -283,7 +283,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
             code: 400,
             callable: function () {
                 $test_gw = new RoutingGateway(
-                    representation_data: [
+                    data: [
                         "name" => "TEST_GW",
                         "interface" => "wan",
                         "ipprotocol" => "inet",
@@ -312,7 +312,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
             code: 400,
             callable: function () use ($minimum, $interval, $loss_interval) {
                 $test_gw = new RoutingGateway(
-                    representation_data: [
+                    data: [
                         "name" => "TEST_GW",
                         "interface" => "wan",
                         "ipprotocol" => "inet",
@@ -330,7 +330,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
         $this->assert_does_not_throw(
             callable: function () use ($minimum, $interval, $loss_interval) {
                 $test_gw = new RoutingGateway(
-                    representation_data: [
+                    data: [
                         "name" => "TEST_GW",
                         "interface" => "wan",
                         "ipprotocol" => "inet",
@@ -354,7 +354,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
             code: 400,
             callable: function () {
                 $test_gw = new RoutingGateway(
-                    representation_data: [
+                    data: [
                         "name" => "TEST_GW",
                         "interface" => "wan",
                         "ipprotocol" => "inet",
@@ -374,7 +374,7 @@ class APIModelsRoutingGatewayTestCase extends TestCase
     public function test_gateway_route_found_in_netstat() {
         # Create a new RoutingGateway
         $test_gw = new RoutingGateway(
-            representation_data: [
+            data: [
                 "name" => "TEST_GW",
                 "interface" => "lan",
                 "ipprotocol" => "inet",

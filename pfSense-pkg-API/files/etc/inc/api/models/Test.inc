@@ -24,7 +24,7 @@ class Test extends Model {
     public Field $test_string_many;
     public Field $test_string_namespace;
 
-    public function __construct(mixed $id = null, array $representation_data = [], Auth $client = null) {
+    public function __construct(mixed $id = null, array $data = [], Auth $client = null) {
         # Mark this model as a `many` model indicating multiple Test model objects can be created. This is also
         # required for the `unique` field to work.
         $this->many = true;
@@ -76,7 +76,7 @@ class Test extends Model {
         );
 
         # Parent base 'Model' object must be constructed very last to ensure the Model has all configured attributes.
-        parent::__construct($id, $representation_data, $client);
+        parent::__construct(id: $id, data: $data, client: $client);
     }
 
     /**

@@ -33,7 +33,7 @@ class SystemAPIKey extends Form {
         # Update settings with the newly provided values
         $representation_data = ($this->id) ? ["id" => $this->id] : [];
         $representation_data += $this->form_data_to_model_representation(form_data: $_POST, model: $this->model);
-        $this->model->from_representation(representation_data: $representation_data);
+        $this->model->from_representation(data: $representation_data);
 
         # When an ID was found or the assigned model is not a `many` model, update the object. Otherwise create it.
         try {

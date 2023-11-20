@@ -51,7 +51,7 @@ class APIModelsServiceTestCase extends TestCase
      */
     public function test_can_perform_service_actions() {
         # Define a Service to test with
-        $test_service = new Service(representation_data: ["name" => "ntpd"]);
+        $test_service = new Service(data: ["name" => "ntpd"]);
 
         # Ensure the service can be stopped
         $test_service->action->value = "stop";

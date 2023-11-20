@@ -21,7 +21,7 @@ class FirewallAlias extends Model {
     public StringField $address;
     public StringField $detail;
 
-    public function __construct(mixed $id=null, mixed $representation_data=[], Auth $client=null) {
+    public function __construct(mixed $id=null, mixed $data=[], Auth $client=null) {
         $this->config_path = "aliases/alias";
         $this->subsystem = "aliases";
         $this->many = true;
@@ -66,7 +66,7 @@ class FirewallAlias extends Model {
         );
 
         # Needs to be constructed after fields are defined
-        parent::__construct($id, $representation_data, $client);
+        parent::__construct(id: $id, data: $data, client: $client);
     }
 
     /**

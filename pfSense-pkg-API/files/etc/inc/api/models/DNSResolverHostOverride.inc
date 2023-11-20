@@ -16,7 +16,7 @@ class DNSResolverHostOverride extends Model
     public StringField $ip;
     public StringField $descr;
     
-    public function __construct(mixed $id = null, mixed $representation_data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
     {
         # Set model attributes
         $this->config_path = "unbound/hosts";
@@ -50,7 +50,7 @@ class DNSResolverHostOverride extends Model
             allow_empty: true,
             help_text: "A detailed description for this host override."
         );
-        parent::__construct($id, $representation_data, $client);
+        parent::__construct(id: $id, data: $data, client: $client);
     }
 
     /**

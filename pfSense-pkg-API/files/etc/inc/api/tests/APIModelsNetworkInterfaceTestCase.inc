@@ -153,7 +153,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     public function test_vlan_interface_cannot_have_higher_mtu_than_parent() {
         # Create a new interface VLAN
         $vlan = new InterfaceVLAN(
-            representation_data: [
+            data: [
                 "if" => "em2",
                 "tag" => 2
             ]
@@ -162,7 +162,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
 
         # Configure the MTU on the VLANs parent interface
         $parent_if = new NetworkInterface(
-            representation_data: [
+            data: [
                 "if" => "em2",
                 "enable" => true,
                 "descr" => "test_parent",
@@ -180,7 +180,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
             callable: function () {
                 # Try to configure the VLAN interface with an MTU higher than the parent's
                 $vlan_if = new NetworkInterface(
-                    representation_data: [
+                    data: [
                         "if" => "em2.2",
                         "descr" => "test_vlan_if",
                         "mtu" => 1500,
@@ -336,7 +336,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
                 $dhcp_server->update();
 
                 # Add a virtual IP for the LAN interface
-                $test_vip = new VirtualIP(representation_data: [
+                $test_vip = new VirtualIP(data: [
                     "mode" => "ipalias",
                     "interface" => "lan",
                     "subnet" => "192.168.1.5",
@@ -590,7 +590,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     public function test_only_one_interface_with_6to4_typev6() {
         # Create a new 6to4 typev6 interface
         $if_6to4 = new NetworkInterface(
-            representation_data: [
+            data: [
                 "if" => "em2",
                 "descr" => "test_6to4",
                 "typev4" => "none",
@@ -620,7 +620,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     public function test_no_none_typev6_when_vips_exist() {
         # Create a static IPv6 interface to test with
         $test_model = new NetworkInterface(
-            representation_data: [
+            data: [
                 "if" => "em2",
                 "descr" => "testv6",
                 "typev4" => "none",
@@ -701,7 +701,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     public function test_serialize_changes() {
         # Create a NetworkInterface object to test with
         $test_model = new NetworkInterface(
-            representation_data: [
+            data: [
                 "if" => "em2",
                 "enable" => true,
                 "descr" => "testif",
@@ -785,7 +785,7 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
     public function test_static_interfaces_match_ifconfig() {
         # Create a new static NetworkInterface
         $static_if = new NetworkInterface(
-            representation_data: [
+            data: [
                 "if" => "em2",
                 "descr" => "teststatic",
                 "enable" => true,

@@ -12,7 +12,7 @@ class APIModelsInterfaceVLANTestCase extends TestCase {
     public function test_vlan_configured_in_ifconfig() {
         # Create a new VLAN interface
         $test_vlan = new InterfaceVLAN(
-            representation_data: [
+            data: [
                 "if" => "em1",
                 "tag" => 2,
                 "pcp" => 4
@@ -53,7 +53,7 @@ class APIModelsInterfaceVLANTestCase extends TestCase {
     public function test_vlan_if_and_tag_unique_requirement() {
         # Create a new VLAN interface
         $test_vlan = new InterfaceVLAN(
-            representation_data: [
+            data: [
                 "if" => "em1",
                 "tag" => 5
             ]
@@ -67,7 +67,7 @@ class APIModelsInterfaceVLANTestCase extends TestCase {
             callable: function() {
                 # Create a new VLAN interface
                 $bad_vlan = new InterfaceVLAN(
-                    representation_data: [
+                    data: [
                         "if" => "em1",
                         "tag" => 5
                     ]
@@ -91,7 +91,7 @@ class APIModelsInterfaceVLANTestCase extends TestCase {
             callable: function() {
                 # Create a new VLAN interface
                 $bad_vlan = new InterfaceVLAN(
-                    representation_data: [
+                    data: [
                         "if" => "not an known interface",
                         "tag" => 5
                     ]

@@ -3,6 +3,7 @@
 namespace api\models;
 
 use API;
+use API\Core\Auth;
 use API\Core\Model;
 use API\Dispatchers\DNSResolverApplyDispatcher;
 use API\Fields\StringField;
@@ -15,10 +16,11 @@ class DNSResolverHostOverrideAlias extends Model
     public StringField $domain;
     public StringField $descr;
     
-    public function __construct(mixed $id = null, mixed $representation_data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], Auth $client = null)
     {
         # Set model attributes
-        $this->config_path = "unbound/hosts";
+        $this->parent_model_class = "DNSResolverHostOverride";
+        $this->config_path = "aliases/item";
         $this->many = true;
         $this->sort_option = SORT_ASC;
         $this->sort_by_field = "host";
@@ -50,7 +52,7 @@ class DNSResolverHostOverrideAlias extends Model
             internal_name: "description",
             help_text: "A detailed description for this host override alias."
         );
-        parent::__construct($id, $representation_data, $client);
+        parent::__construct(id: $id, parent_id: $parent_id, data: $data, client: $client);
     }
 
     /**

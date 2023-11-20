@@ -145,7 +145,7 @@ class APIValidatorsIPAddressValidatorTestCase extends TestCase {
     public function test_host_alias_ip_address_validator() {
         # Create a firewall host alias to test with
         $test_alias = new FirewallAlias(
-            representation_data: [
+            data: [
                 "name" => "TEST_ALIAS",
                 "type" => "host",
                 "address" => ["1.2.3.4"]
@@ -178,7 +178,7 @@ class APIValidatorsIPAddressValidatorTestCase extends TestCase {
     public function test_network_alias_ip_address_validator() {
         # Create a firewall host alias to test with
         $test_alias = new FirewallAlias(
-            representation_data: [
+            data: [
                 "name" => "TEST_ALIAS",
                 "type" => "network",
                 "address" => ["1.2.3.4/32"]
@@ -211,7 +211,7 @@ class APIValidatorsIPAddressValidatorTestCase extends TestCase {
     public function test_port_alias_ip_address_validator() {
         # Create a firewall host alias to test with
         $test_alias = new FirewallAlias(
-            representation_data: [
+            data: [
                 "name" => "TEST_ALIAS",
                 "type" => "port",
                 "address" => ["443"]

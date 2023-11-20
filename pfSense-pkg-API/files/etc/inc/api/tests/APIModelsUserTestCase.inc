@@ -30,7 +30,7 @@ class APIModelsUserTestCase extends TestCase
      */
     public function test_password_is_hashed() {
         # Create a new user to test with
-        $user = new User(representation_data: ["name" => "testuser", "password" => "testpasswd"]);
+        $user = new User(data: ["name" => "testuser", "password" => "testpasswd"]);
         $user->create();
 
         # Ensure the User's `password` field has been hashed and is no longer the raw password.
@@ -77,7 +77,7 @@ class APIModelsUserTestCase extends TestCase
         $original_next_uid = (int)Model::get_config("system/nextuid");
 
         # Create a new user and ensure it's UID matches the original next UID
-        $user = new User(representation_data: ["name" => "test", "password" => "test"]);
+        $user = new User(data: ["name" => "test", "password" => "test"]);
         $user->create();
         $this->assert_equals($original_next_uid, $user->uid->value);
 
@@ -94,7 +94,7 @@ class APIModelsUserTestCase extends TestCase
      */
     public function test_etc_passwd() {
         # Create a new user to test with
-        $user = new User(representation_data: [
+        $user = new User(data: [
             "name" => "testuser", "password" => "testpasswd", "descr" => "Test User", "authorizedkeys" => "testkeys"]
         );
         $user->create();
@@ -117,7 +117,7 @@ class APIModelsUserTestCase extends TestCase
 
         # Update the user
         $user->from_representation(
-            representation_data: [
+            data: [
                 "name" => "testuserupdate",
                 "password" => "testpasswdupdate",
                 "descr" => "Test User Update",

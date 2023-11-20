@@ -28,7 +28,7 @@ class User extends Model
     public Base64Field $authorizedkeys;
     public StringField $ipsecpsk;
 
-    public function __construct(mixed $id = null, mixed $representation_data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
     {
         # Set model attributes
         $this->config_path = "system/user";
@@ -106,7 +106,7 @@ class User extends Model
             ],
             help_text: "The IPsec pre-shared key to assign this user." 
         );
-        parent::__construct($id, $representation_data, $client);
+        parent::__construct(id: $id, data: $data, client: $client);
     }
 
     /**

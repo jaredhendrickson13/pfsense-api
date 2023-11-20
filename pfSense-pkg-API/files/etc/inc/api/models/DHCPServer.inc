@@ -44,7 +44,7 @@ class DHCPServer extends Model
     /**
      * Constructs the Model object.
      */
-    public function __construct(mixed $id = null, mixed $representation_data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
     {
         # Define Model attributes
         $this->config_path = "dhcpd";
@@ -216,7 +216,7 @@ class DHCPServer extends Model
             "will get an IP address within this scope/range."
         );
 
-        parent::__construct($id, $representation_data, $client);
+        parent::__construct(id: $id, data: $data, client: $client);
     }
 
     /**

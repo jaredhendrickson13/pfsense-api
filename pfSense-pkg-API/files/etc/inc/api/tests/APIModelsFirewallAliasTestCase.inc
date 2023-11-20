@@ -12,7 +12,7 @@ class APIModelsFirewallAliasTestCase extends TestCase {
     public function test_vlan_configured_in_ifconfig() {
         # Create an alias that includes dns.google as an alias item
         $test_alias = new FirewallAlias(
-            representation_data: [
+            data: [
                 "name" => "TEST_GOOGLE_DNS",
                 "type" => "host",
                 "address" => ["dns.google"]
@@ -50,7 +50,7 @@ class APIModelsFirewallAliasTestCase extends TestCase {
             code: 400,
             callable: function() {
                 $test_alias = new FirewallAlias(
-                    representation_data: ["name" => "pkg_anything", "type" => "host"]
+                    data: ["name" => "pkg_anything", "type" => "host"]
                 );
                 $test_alias->validate();
             }
@@ -62,7 +62,7 @@ class APIModelsFirewallAliasTestCase extends TestCase {
             code: 400,
             callable: function() {
                 $test_alias = new FirewallAlias(
-                    representation_data: ["name" => "sshguard", "type" => "host"]
+                    data: ["name" => "sshguard", "type" => "host"]
                 );
                 $test_alias->validate();
             }
@@ -74,7 +74,7 @@ class APIModelsFirewallAliasTestCase extends TestCase {
             code: 400,
             callable: function() {
                 $test_alias = new FirewallAlias(
-                    representation_data: ["name" => "IPsec", "type" => "host"]
+                    data: ["name" => "IPsec", "type" => "host"]
                 );
                 $test_alias->validate();
             }
@@ -91,7 +91,7 @@ class APIModelsFirewallAliasTestCase extends TestCase {
             code: 400,
             callable: function() {
                 $test_alias = new FirewallAlias(
-                    representation_data: ["name" => "test_alias", "type" => "host", "address" => ["!@# Not a host!"]]
+                    data: ["name" => "test_alias", "type" => "host", "address" => ["!@# Not a host!"]]
                 );
                 $test_alias->validate();
             }
@@ -107,7 +107,7 @@ class APIModelsFirewallAliasTestCase extends TestCase {
             code: 400,
             callable: function() {
                 $test_alias = new FirewallAlias(
-                    representation_data: ["name" => "test_alias", "type" => "network", "address" => ["!@# Not a network!"]]
+                    data: ["name" => "test_alias", "type" => "network", "address" => ["!@# Not a network!"]]
                 );
                 $test_alias->validate();
             }
@@ -123,7 +123,7 @@ class APIModelsFirewallAliasTestCase extends TestCase {
             code: 400,
             callable: function() {
                 $test_alias = new FirewallAlias(
-                    representation_data: ["name" => "test_alias", "type" => "port", "address" => ["!@# Not a port!"]]
+                    data: ["name" => "test_alias", "type" => "port", "address" => ["!@# Not a port!"]]
                 );
                 $test_alias->validate();
             }
@@ -139,7 +139,7 @@ class APIModelsFirewallAliasTestCase extends TestCase {
             code: 400,
             callable: function() {
                 $test_alias = new FirewallAlias(
-                    representation_data: [
+                    data: [
                         "name" => "test_alias",
                         "type" => "port",
                         "address" => ["1", "2", "3", "4"],

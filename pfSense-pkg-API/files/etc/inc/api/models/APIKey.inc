@@ -20,7 +20,7 @@ class APIKey extends Model
     public StringField $hash;
     public StringField $key;
     
-    public function __construct(mixed $id = null, mixed $representation_data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
     {
         # Gather information about current API settings
         $api_pkg_id = APISettings::get_api_config()["id"];
@@ -68,8 +68,8 @@ class APIKey extends Model
             write_only: true,    # Don't allow the hash to be read via API
             help_text: "The hash of the generated API key"
         );
-        
-        parent::__construct($id, $representation_data, $client);
+
+        parent::__construct(id: $id, data: $data, client: $client);
     }
 
     /**

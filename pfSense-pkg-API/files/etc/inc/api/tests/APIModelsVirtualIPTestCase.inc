@@ -45,7 +45,7 @@ class APIModelsVirtualIPTestCase extends TestCase
             code: 400,
             callable: function () {
                 $test_model = new VirtualIP(
-                    representation_data: [
+                    data: [
                         "mode" => "ipalias",
                         "interface" => "wan",
                         "subnet" => "1.2.3.4",
@@ -59,7 +59,7 @@ class APIModelsVirtualIPTestCase extends TestCase
         $this->assert_does_not_throw(
             callable: function () {
                 $test_model = new VirtualIP(
-                    representation_data: [
+                    data: [
                         "mode" => "ipalias",
                         "interface" => "wan",
                         "subnet" => "1.2.3.4",
@@ -77,7 +77,7 @@ class APIModelsVirtualIPTestCase extends TestCase
     public function test_serialize_changes() {
         # Create a vip but don't apply it so we can check the serialized changes file
         $test_model_1 = new VirtualIP(
-            representation_data: [
+            data: [
                 "mode" => "ipalias",
                 "interface" => "wan",
                 "subnet" => "1.2.3.4",
@@ -102,7 +102,7 @@ class APIModelsVirtualIPTestCase extends TestCase
     public function test_ipalias_virtual_ip() {
         # Create a new ipalias virtual IP and ensure it is present in ifconfig afterward
         $test_model = new VirtualIP(
-            representation_data: [
+            data: [
                 "mode" => "ipalias",
                 "interface" => "wan",
                 "subnet" => "1.2.3.4",
@@ -141,7 +141,7 @@ class APIModelsVirtualIPTestCase extends TestCase
     public function test_carp_virtual_ip() {
         # Create a new virtual IP and ensure it is present in ifconfig afterward
         $test_model = new VirtualIP(
-            representation_data: [
+            data: [
                 "mode" => "carp",
                 "interface" => "wan",
                 "subnet" => "4.5.6.7",
@@ -196,7 +196,7 @@ class APIModelsVirtualIPTestCase extends TestCase
     public function test_proxyarp_virtual_ip() {
         # Create a new proxyarp virtual IP and ensure it is present in ifconfig afterward
         $test_model = new VirtualIP(
-            representation_data: [
+            data: [
                 "mode" => "proxyarp",
                 "interface" => "wan",
                 "subnet" => "1.2.3.4",

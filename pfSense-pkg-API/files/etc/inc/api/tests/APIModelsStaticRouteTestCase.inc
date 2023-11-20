@@ -16,7 +16,7 @@ class APIModelsStaticRouteTestCase extends TestCase
     public function test_static_route_cannot_conflict_with_interface_subnet() {
         # Create an interface to use for testing
         $test_if = new NetworkInterface(
-            representation_data: [
+            data: [
                 "if" => "em2",
                 "enable" => true,
                 "descr" => "TESTIF",
@@ -32,7 +32,7 @@ class APIModelsStaticRouteTestCase extends TestCase
 
         # Create gateways to use for testing
         $test_gw4 = new RoutingGateway(
-            representation_data: [
+            data: [
                 "name" => "TESTGW4",
                 "interface" => $test_if->id,
                 "ipprotocol" => "inet",
@@ -40,7 +40,7 @@ class APIModelsStaticRouteTestCase extends TestCase
             ]
         );
         $test_gw6 = new RoutingGateway(
-            representation_data: [
+            data: [
                 "name" => "TESTGW6",
                 "interface" => $test_if->id,
                 "ipprotocol" => "inet6",
@@ -56,7 +56,7 @@ class APIModelsStaticRouteTestCase extends TestCase
             code: 400,
             callable: function () use ($test_if, $test_gw4) {
                 $test_route = new StaticRoute(
-                    representation_data: [
+                    data: [
                         "gateway" => $test_gw4->name->value,
                         "network" => $test_if->ipaddr->value."/".$test_if->subnet->value,
                     ]
@@ -70,7 +70,7 @@ class APIModelsStaticRouteTestCase extends TestCase
             code: 400,
             callable: function () use ($test_if, $test_gw6) {
                 $test_route = new StaticRoute(
-                    representation_data: [
+                    data: [
                         "gateway" => $test_gw6->name->value,
                         "network" => $test_if->ipaddrv6->value."/".$test_if->subnetv6->value,
                     ]
@@ -83,7 +83,7 @@ class APIModelsStaticRouteTestCase extends TestCase
         $this->assert_does_not_throw(
             callable: function () use ($test_gw4) {
                 $test_route = new StaticRoute(
-                    representation_data: [
+                    data: [
                         "gateway" => $test_gw4->name->value,
                         "network" => "4.3.2.1/24",
                     ]
@@ -94,7 +94,7 @@ class APIModelsStaticRouteTestCase extends TestCase
         $this->assert_does_not_throw(
             callable: function () use ($test_gw6) {
                 $test_route = new StaticRoute(
-                    representation_data: [
+                    data: [
                         "gateway" => $test_gw6->name->value,
                         "network" => "4321::/64",
                     ]
@@ -115,7 +115,7 @@ class APIModelsStaticRouteTestCase extends TestCase
     public function test_static_route_network_must_match_gateway_ip_type() {
         # Create an interface to use for testing
         $test_if = new NetworkInterface(
-            representation_data: [
+            data: [
                 "if" => "em2",
                 "enable" => true,
                 "descr" => "TESTIF",
@@ -131,7 +131,7 @@ class APIModelsStaticRouteTestCase extends TestCase
 
         # Create gateways to use for testing
         $test_gw4 = new RoutingGateway(
-            representation_data: [
+            data: [
                 "name" => "TESTGW4",
                 "interface" => $test_if->id,
                 "ipprotocol" => "inet",
@@ -139,7 +139,7 @@ class APIModelsStaticRouteTestCase extends TestCase
             ]
         );
         $test_gw6 = new RoutingGateway(
-            representation_data: [
+            data: [
                 "name" => "TESTGW6",
                 "interface" => $test_if->id,
                 "ipprotocol" => "inet6",
@@ -155,7 +155,7 @@ class APIModelsStaticRouteTestCase extends TestCase
             code: 400,
             callable: function () use ($test_if, $test_gw4) {
                 $test_route = new StaticRoute(
-                    representation_data: [
+                    data: [
                         "gateway" => $test_gw4->name->value,
                         "network" => "1111::1/64",
                     ]
@@ -169,7 +169,7 @@ class APIModelsStaticRouteTestCase extends TestCase
             code: 400,
             callable: function () use ($test_if, $test_gw6) {
                 $test_route = new StaticRoute(
-                    representation_data: [
+                    data: [
                         "gateway" => $test_gw6->name->value,
                         "network" => "1.1.1.1/24",
                     ]
@@ -190,7 +190,7 @@ class APIModelsStaticRouteTestCase extends TestCase
     public function test_static_route_must_be_disabled_when_gateway_is_disabled() {
         # Create gateways to use for testing
         $test_gw4 = new RoutingGateway(
-            representation_data: [
+            data: [
                 "name" => "TESTGW4",
                 "interface" => "lan",
                 "ipprotocol" => "inet",
@@ -206,7 +206,7 @@ class APIModelsStaticRouteTestCase extends TestCase
             code: 400,
             callable: function () use ($test_gw4) {
                 $test_route = new StaticRoute(
-                    representation_data: [
+                    data: [
                         "gateway" => $test_gw4->name->value,
                         "network" => "4.3.2.1/24",
                         "disabled" => false
@@ -225,7 +225,7 @@ class APIModelsStaticRouteTestCase extends TestCase
     public function test_get_networks() {
         # Create an alias to use for testing
         $test_alias = new FirewallAlias(
-            representation_data: [
+            data: [
                 "name" => "TESTALIAS",
                 "type" => "network",
                 "address" => ["192.168.10.1/24", "192.168.20.1/25", "192.168.30.0/29"]
@@ -235,7 +235,7 @@ class APIModelsStaticRouteTestCase extends TestCase
 
         # Create a gateway to use for testing
         $test_gw = new RoutingGateway(
-            representation_data: [
+            data: [
                 "name" => "TESTGW",
                 "interface" => "lan",
                 "ipprotocol" => "inet",
@@ -246,7 +246,7 @@ class APIModelsStaticRouteTestCase extends TestCase
 
         # Create a static route to test with
         $test_route = new StaticRoute(
-            representation_data: [
+            data: [
                 "gateway" => $test_gw->name->value,
                 "network" => $test_alias->name->value
             ]
@@ -278,7 +278,7 @@ class APIModelsStaticRouteTestCase extends TestCase
     public function test_static_route_configured_in_routing_table() {
         # Create a gateway to use for testing
         $test_gw = new RoutingGateway(
-            representation_data: [
+            data: [
                 "name" => "TESTGW",
                 "interface" => "lan",
                 "ipprotocol" => "inet",
@@ -288,7 +288,7 @@ class APIModelsStaticRouteTestCase extends TestCase
         $test_gw->create();
 
         # Create a static route using the gateway above
-        $test_route = new StaticRoute(representation_data:
+        $test_route = new StaticRoute(data:
             ["network" => "1.2.3.0/24", "gateway" => $test_gw->name->value]
         );
         $test_route->create(apply: true);

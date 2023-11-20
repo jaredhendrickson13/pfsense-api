@@ -139,7 +139,7 @@ class APIModelsDHCPServerTestCase extends TestCase
     public function test_primary_dhcp_pool_cannot_conflict_with_vip() {
         # Create a virtual IP to use for testing
         $vip = new VirtualIP(
-            representation_data: [
+            data: [
                 "interface" => "lan", 
                 "mode" => "ipalias",
                 "subnet" => "192.168.1.2", 

@@ -81,7 +81,7 @@ class APIValidatorsSubnetValidatorTestCase extends TestCase {
     public function test_host_alias_subnet_validator() {
         # Create a firewall host alias to test with
         $test_alias = new FirewallAlias(
-            representation_data: [
+            data: [
                 "name" => "TEST_ALIAS",
                 "type" => "host",
                 "address" => ["1.2.3.4"]
@@ -114,7 +114,7 @@ class APIValidatorsSubnetValidatorTestCase extends TestCase {
     public function test_network_alias_subnet_validator() {
         # Create a firewall host alias to test with
         $test_alias = new FirewallAlias(
-            representation_data: [
+            data: [
                 "name" => "TEST_ALIAS",
                 "type" => "network",
                 "address" => ["1.2.3.4/32"]
@@ -147,7 +147,7 @@ class APIValidatorsSubnetValidatorTestCase extends TestCase {
     public function test_port_alias_subnet_validator() {
         # Create a firewall host alias to test with
         $test_alias = new FirewallAlias(
-            representation_data: [
+            data: [
                 "name" => "TEST_ALIAS",
                 "type" => "port",
                 "address" => ["443"]

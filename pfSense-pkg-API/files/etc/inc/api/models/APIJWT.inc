@@ -19,7 +19,7 @@ class APIJWT extends Model
 {
     public StringField $token;
     
-    public function __construct(mixed $id = null, mixed $representation_data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
     {
         # Set Model attributes
         $this->verbose_name = "API JWT";
@@ -30,8 +30,8 @@ class APIJWT extends Model
             read_only: true,
             help_text: "The generated JWT that can be used for JWT authentication."
         );
-        
-        parent::__construct($id, $representation_data, $client);
+
+        parent::__construct(id: $id, data: $data, client: $client);
     }
 
     /**

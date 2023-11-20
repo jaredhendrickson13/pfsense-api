@@ -126,11 +126,11 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
      */
     public function test_from_internal() {
         # Create FirewallAlias objects to use for testing purposes
-        $host_alias = new FirewallAlias(representation_data: ["name" => "HOST_ALIAS", "type" => "host", "address" => []]);
+        $host_alias = new FirewallAlias(data: ["name" => "HOST_ALIAS", "type" => "host", "address" => []]);
         $host_alias->create();
-        $net_alias = new FirewallAlias(representation_data: ["name" => "NET_ALIAS", "type" => "network", "address" => []]);
+        $net_alias = new FirewallAlias(data: ["name" => "NET_ALIAS", "type" => "network", "address" => []]);
         $net_alias->create();
-        $port_alias = new FirewallAlias(representation_data: ["name" => "PORT_ALIAS", "type" => "port", "address" => []]);
+        $port_alias = new FirewallAlias(data: ["name" => "PORT_ALIAS", "type" => "port", "address" => []]);
         $port_alias->create();
         
         # Create a ForeignModelField object for testing
@@ -144,11 +144,11 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
      */
     public function test_to_internal() {
         # Create FirewallAlias objects to use for testing purposes
-        $host_alias = new FirewallAlias(representation_data: ["name" => "HOST_ALIAS", "type" => "host", "address" => []]);
+        $host_alias = new FirewallAlias(data: ["name" => "HOST_ALIAS", "type" => "host", "address" => []]);
         $host_alias->create();
-        $net_alias = new FirewallAlias(representation_data: ["name" => "NET_ALIAS", "type" => "network", "address" => []]);
+        $net_alias = new FirewallAlias(data: ["name" => "NET_ALIAS", "type" => "network", "address" => []]);
         $net_alias->create();
-        $port_alias = new FirewallAlias(representation_data: ["name" => "PORT_ALIAS", "type" => "port", "address" => []]);
+        $port_alias = new FirewallAlias(data: ["name" => "PORT_ALIAS", "type" => "port", "address" => []]);
         $port_alias->create();
 
         # Create a ForeignModelField object for testing
@@ -179,11 +179,11 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
      */
     public function test_model_query_limits_objects() {
         # Create FirewallAlias objects to use for testing purposes
-        $host_alias = new FirewallAlias(representation_data: ["name" => "HOST_ALIAS", "type" => "host", "address" => []]);
+        $host_alias = new FirewallAlias(data: ["name" => "HOST_ALIAS", "type" => "host", "address" => []]);
         $host_alias->create();
-        $net_alias = new FirewallAlias(representation_data: ["name" => "NET_ALIAS", "type" => "network", "address" => []]);
+        $net_alias = new FirewallAlias(data: ["name" => "NET_ALIAS", "type" => "network", "address" => []]);
         $net_alias->create();
-        $port_alias = new FirewallAlias(representation_data: ["name" => "PORT_ALIAS", "type" => "port", "address" => []]);
+        $port_alias = new FirewallAlias(data: ["name" => "PORT_ALIAS", "type" => "port", "address" => []]);
         $port_alias->create();
 
         # Create a ForeignModelField object that can only relate to FirewallAlias objects that are of `type` netowrk

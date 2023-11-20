@@ -38,7 +38,7 @@ class APISettings extends Model {
     public StringField $ha_sync_username;
     public StringField $ha_sync_password;
 
-    public function __construct(mixed $id = null, mixed $representation_data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
     {
         # Obtain the API config index and set the config path to the API configuration
         $this->id = $this->get_api_config()["id"];
@@ -168,7 +168,7 @@ class APISettings extends Model {
             for the user defined in `ha_sync_username` and must be the same on all hosts defined in `ha_sync_hosts`."
         );
 
-        parent::__construct($id, $representation_data, $client);
+        parent::__construct(id: $id, data: $data, client: $client);
     }
 
     /**

@@ -37,7 +37,10 @@ class Model {
     public string|null $config_path = null;
     public bool $many = false;
     public mixed $id = null;
-    public API\Core\Auth $client;
+    public mixed $parent_id = null;
+    public Model|null $parent_model = null;
+    public string $parent_model_class = "";
+    public Auth $client;
     public Model|null $initial_object = null;
     public array $packages = [];
     public array $package_includes = [];
@@ -54,15 +57,17 @@ class Model {
     /**
      * Values to assign when a Model object is first constructed.
      * @param mixed $id If specified, the internal object with this ID will be obtained as the Model object.
-     * @param mixed $representation_data Allows objects to be obtained, created and/or updated using an array of
+     * @param mixed|null $parent_id The ID of the parent object this object is nested under. This is only applicable
+     * to Models with a `parent_model_class` assigned that is also a `many` Model.
+     * @param mixed $data Allows objects to be obtained, created and/or updated using an array of
      * field-value pairs. If this array contains an `id` field, the internal object with this ID will be obtained as
      * the Model object first. Any additional fields will be used to set the Model object's values.
      * @param Auth|null $client Optionally assign an API client's `Auth` object. Required for tying users to
      * changes made through Models.
      */
-    public function __construct(mixed $id=null, mixed $representation_data=[], API\Core\Auth $client=null) {
-        # Throw an error if both $id and $representation_data are set.
-        if (isset($id) and $representation_data) {
+    public function __construct(mixed $id=null, mixed $parent_id=null, mixed $data=[], Auth $client=null) {
+        # Throw an error if both $id and data are set.
+        if (isset($id) and $data) {
             throw new ServerError(
                 message: "Model objects cannot be constructed with both an ID and representation data.",
                 response_id: "MODEL_WITH_ID_AND_REPRESENTATION"
@@ -70,7 +75,7 @@ class Model {
         }
 
         # Ensure the representation data is an array
-        if (!is_array($representation_data)) {
+        if (!is_array($data)) {
             throw new ValidationError(
                 message: "Representation data must be of type `array`.",
                 response_id: "MODEL_NON_ARRAY_REPRESENTATION_DATA"
@@ -88,8 +93,8 @@ class Model {
         }
 
         # Use the representation to obtain or construct this object if present.
-        if ($representation_data) {
-            $this->from_representation($representation_data);
+        if ($data) {
+            $this->from_representation($data);
         }
 
         # Allow an Auth object to be assigned the model. Allows models to view a client's IP address and username.
@@ -98,7 +103,7 @@ class Model {
         }
         # Otherwise, define a default system client if one was not specified.
         else {
-            $this->client = new API\Core\Auth();
+            $this->client = new Auth();
             $this->client->username = DEFAULT_CLIENT_USERNAME;
             $this->client->ip_address = DEFAULT_CLIENT_IP_ADDRESS;
         }
@@ -118,6 +123,68 @@ class Model {
             $this->$field->set_names($field);
             $this->$field->context = $this;
         }
+        
+        # Set the full config path for this Model including any parent Model paths
+        $this->config_path = $this->get_full_config_path();
+    }
+
+    /**
+     * Retrieves the full config path including any assigned parent Model paths.
+     */
+    private function get_full_config_path() : string {
+        # Format the config path accordingly when a `parent_model_class` is assigned
+        if ($this->parent_model_class) {
+            # Create the parent model
+            $parent_model_class = "\\API\\Models\\$this->parent_model_class";
+            $this->parent_model = new $parent_model_class();
+
+            # Do not allow a parent Model to be set if this Model has an `internal_callable` assigned
+            if ($this->internal_callable) {
+                throw new ServerError(
+                    message: "Model ".get_called_class()." cannot assign `parent_model_class` $this->parent_model_class ".
+                        "while also having an `internal_callable` assigned.",
+                    response_id: "MODEL_CANNOT_HAVE_PARENT_MODEL_CLASS_AND_INTERNAL_CALLABLE"
+                );
+            }
+            
+            # Do not allow the parent Model to be a child of any other model
+            if ($this->parent_model->parent_model_class) {
+                throw new ServerError(
+                    message: "Model ".get_called_class()." cannot assign `parent_model_class` $this->parent_model_class ".
+                    "because itself has a `parent_model_class` {$this->parent_model->parent_model_class}",
+                    response_id: "MODEL_PARENT_MODEL_CLASS_CANNOT_HAVE_PARENT"
+                );
+            }
+
+            # Do not allow the parent Model to be assigned if itself does not have a config path
+            if (!$this->parent_model->config_path) {
+                throw new ServerError(
+                    message: "Model ".get_called_class()." cannot assign `parent_model_class` $this->parent_model_class ".
+                    "because it does not have a `config_path` set.",
+                    response_id: "MODEL_PARENT_MODEL_CLASS_MUST_HAVE_CONFIG_PATH"
+                );
+            }
+
+            # Require a parent ID if the parent model if a `many` model
+            if ($this->parent_model->many and !$this->parent_id) {
+                throw new ValidationError(
+                    message: "Field `parent_id` is required.",
+                    response_id: "MODEL_PARENT_ID_REQUIRED"
+                );
+            }
+            
+            # Return a config path including the parent ID if the parent Model is a `many` model
+            if ($this->parent_model->many) {
+                return "{$this->parent_model->config_path}/$this->parent_id/$this->config_path";
+            }
+            
+            # Otherwise, just prefix the parent Model's config path to this Model's config path
+            return "{$this->parent_model->config_path}/$this->config_path";
+
+        }
+        
+        # Just use this Model's config path if no parent Model is assigned
+        return $this->config_path;
     }
 
     /**
@@ -458,13 +525,13 @@ class Model {
 
     /**
      * Loads the Model object using an array representation of the object.
-     * @param array $representation_data The array of key-value pairs to use when loading the Model object from
+     * @param array $data The array of key-value pairs to use when loading the Model object from
      * representation.
      */
-    final public function from_representation(array $representation_data) {
+    final public function from_representation(array $data) {
         # When an ID is provided, fetch this objects from the internal configuration using the ID.
-        if (array_key_exists("id", $representation_data)) {
-            $this->id = $representation_data["id"];
+        if (array_key_exists("id", $data)) {
+            $this->id = $data["id"];
             $this->from_internal();
             $this->initial_object = unserialize(serialize($this));
         }
@@ -472,8 +539,8 @@ class Model {
         # Loop through each field in this Model and assign their values using the `representation_data`.
         foreach ($this->get_fields() as $field) {
             # Ensure a value for this field is in the representation data before continuing.
-            if (array_key_exists($field, $representation_data)) {
-                $this->$field->value = $representation_data[$field];
+            if (array_key_exists($field, $data)) {
+                $this->$field->value = $data[$field];
             }
         }
     }
@@ -1083,11 +1150,11 @@ class Model {
     /**
      * Perform validation and replace all existing objects for this Model with a specified set of Model representations.
      * This method is only available for `many` models.
-     * @param mixed $representation_data An array of many Model representations to set. Any existing Model objects will
+     * @param mixed $data An array of many Model representations to set. Any existing Model objects will
      * be replaced with the objects defined in this array.
      * @return ModelSet A ModelSet containing all the Model objects found in config after replacement.
      */
-    final public function replace_all(mixed $representation_data, bool $apply = false) : ModelSet {
+    final public function replace_all(mixed $data, bool $apply = false) : ModelSet {
         # Ensure this is a `many` model before continuing
         if (!$this->many) {
             throw new ServerError(
@@ -1097,7 +1164,7 @@ class Model {
         }
 
         # Ensure the representation data is an array
-        if (!is_array($representation_data)) {
+        if (!is_array($data)) {
             throw new ValidationError(
                 message: "Representation data must be of type `array`.",
                 response_id: "MODEL_NON_ARRAY_REPRESENTATION_DATA"
@@ -1108,12 +1175,12 @@ class Model {
         $this->set_config($this->config_path, []);
 
         # Loop through each Model representation included in the array
-        foreach ($representation_data as $representation_object) {
+        foreach ($data as $representation_object) {
             # Remove any ID for this object if it was passed in
             unset($representation_object["id"]);
 
             # Define a new Model object using this representation and validate
-            $model_object = new $this(representation_data: $representation_object);
+            $model_object = new $this(data: $representation_object);
             $model_object->validate();
 
             # If an error was not thrown during Model object creation or validation, give it an ID and set the config

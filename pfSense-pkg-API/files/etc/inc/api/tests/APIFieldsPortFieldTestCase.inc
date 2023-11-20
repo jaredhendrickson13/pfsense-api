@@ -16,8 +16,8 @@ class APIFieldsPortFieldTestCase extends TestCase
         $field = new PortField(allow_alias: true);
         
         # Create a port and host alias to test with
-        $port_alias = new FirewallAlias(representation_data: ["name" => "PORTALIAS", "type" => "port"]);
-        $host_alias = new FirewallAlias(representation_data: ["name" => "HOSTALIAS", "type" => "host"]);
+        $port_alias = new FirewallAlias(data: ["name" => "PORTALIAS", "type" => "port"]);
+        $host_alias = new FirewallAlias(data: ["name" => "HOSTALIAS", "type" => "host"]);
         $port_alias->create();
         $host_alias->create();
         

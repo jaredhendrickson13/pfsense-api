@@ -20,7 +20,7 @@ class ARPTable extends Model
     public StringField $dnsresolve;
     public StringField $expires;
 
-    public function __construct(mixed $id = null, mixed $representation_data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
     {
         # Define model attributes
         $this->many = true;
@@ -68,7 +68,7 @@ class ARPTable extends Model
         );
 
 
-        parent::__construct($id, $representation_data, $client);
+        parent::__construct(id: $id, data: $data, client: $client);
     }
 
     /**

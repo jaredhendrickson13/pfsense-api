@@ -31,7 +31,7 @@ class VirtualIP extends Model
     public IntegerField $advskew;
     public StringField $password;
 
-    public function __construct(mixed $id = null, mixed $representation_data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
     {
         # Define model attributes
         $this->config_path = "virtualip/vip";
@@ -120,7 +120,7 @@ class VirtualIP extends Model
             help_text: "The VHID group password shared by all CARP members."
         );
 
-        parent::__construct($id, $representation_data, $client);
+        parent::__construct(id: $id, data: $data, client: $client);
     }
 
     /**

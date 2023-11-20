@@ -14,7 +14,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
             response_id: "MODEL_WITH_ID_AND_REPRESENTATION",
             code: 500,
             callable: function () {
-                new API\Core\Model(id: 0, representation_data: ["id" => 0]);
+                new API\Core\Model(id: 0, data: ["id" => 0]);
             }
         );
     }
@@ -540,7 +540,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
     public function test_unique_together_validation() {
         # Create a Model object that uses the unique fields
         $original_model_obj = new API\Models\Test(
-            representation_data: [
+            data: [
                 "test_bool" => false,
                 "test_string_namespace" => "This must be unique with `test_bool` being `false`",
                 "test_integer" => 30
@@ -554,7 +554,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
             code: 400,
             callable: function () {
                 $non_unique_model_obj = new API\Models\Test(
-                    representation_data: [
+                    data: [
                         "test_bool" => false,
                         "test_string_namespace" => "This must be unique with `test_bool` being `false`",
                         "test_integer" => 30
@@ -575,7 +575,7 @@ class APICoreModelTestCase extends API\Core\TestCase {
     public function test_model_constructs_from_representation() {
         # Construct a new test model object using representation data
         $test_model = new API\Models\Test(
-            representation_data: [
+            data: [
                 "test_bool" => true,
                 "test_string_unique" => "test_model_constructs_from_representation",
                 "test_string_many" => ["a", "b", "c"]

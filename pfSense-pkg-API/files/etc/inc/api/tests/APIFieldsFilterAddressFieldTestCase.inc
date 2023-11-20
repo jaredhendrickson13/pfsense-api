@@ -63,11 +63,11 @@ class APIFieldsFilterAddressFieldTestCase extends TestCase
      */
     public function test_allow_alias() {
         # Create a host, network and port alias
-        $host_alias = new FirewallAlias(representation_data: ["name" => "HOSTALIAS", "type" => "host"]);
+        $host_alias = new FirewallAlias(data: ["name" => "HOSTALIAS", "type" => "host"]);
         $host_alias->create();
-        $net_alias = new FirewallAlias(representation_data: ["name" => "NETALIAS", "type" => "network"]);
+        $net_alias = new FirewallAlias(data: ["name" => "NETALIAS", "type" => "network"]);
         $net_alias->create();
-        $port_alias = new FirewallAlias(representation_data: ["name" => "PORTALIAS", "type" => "port"]);
+        $port_alias = new FirewallAlias(data: ["name" => "PORTALIAS", "type" => "port"]);
         $port_alias->create();
 
         # Create field object to test with
@@ -336,7 +336,7 @@ class APIFieldsFilterAddressFieldTestCase extends TestCase
         $this->assert_equals($field->to_internal(), ["network" => "wanip"]);
         
         # Ensure alias values are nested under the internal `address` key
-        $host_alias = new FirewallAlias(representation_data: ["name" => "HOSTALIAS", "type" => "host"]);
+        $host_alias = new FirewallAlias(data: ["name" => "HOSTALIAS", "type" => "host"]);
         $host_alias->create(apply: true);
         $field->value = "HOSTALIAS";
         $field->validate();

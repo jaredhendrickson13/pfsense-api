@@ -107,7 +107,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["enabled" => "not a bool"]
+                    data: ["enabled" => "not a bool"]
                 );
                 $api_settings->validate();
             }
@@ -124,7 +124,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["read_only" => "not a bool"]
+                    data: ["read_only" => "not a bool"]
                 );
                 $api_settings->validate();
             }
@@ -141,7 +141,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["keep_backup" => "not a bool"]
+                    data: ["keep_backup" => "not a bool"]
                 );
                 $api_settings->validate();
             }
@@ -158,7 +158,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["login_protection" => "not a bool"]
+                    data: ["login_protection" => "not a bool"]
                 );
                 $api_settings->validate();
             }
@@ -175,7 +175,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["log_successful_auth" => "not a bool"]
+                    data: ["log_successful_auth" => "not a bool"]
                 );
                 $api_settings->validate();
             }
@@ -192,7 +192,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["allow_pre_releases" => "not a bool"]
+                    data: ["allow_pre_releases" => "not a bool"]
                 );
                 $api_settings->validate();
             }
@@ -205,7 +205,7 @@ class APIModelsAPISettingsTestCase extends TestCase
     public function test_allowed_interfaces()
     {
         # Ensure interfaces are represented as their internal values
-        $api_settings = new APISettings(representation_data: ["represent_interfaces_as" => "id"]);
+        $api_settings = new APISettings(data: ["represent_interfaces_as" => "id"]);
         $api_settings->update();
 
         # Ensure value must be array
@@ -214,7 +214,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["allowed_interfaces" => "not an array"]
+                    data: ["allowed_interfaces" => "not an array"]
                 );
                 $api_settings->validate();
             }
@@ -226,7 +226,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["allowed_interfaces" => [0, 1, 2]]
+                    data: ["allowed_interfaces" => [0, 1, 2]]
                 );
                 $api_settings->validate();
             }
@@ -238,7 +238,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["allowed_interfaces" => ["not a real interface"]]
+                    data: ["allowed_interfaces" => ["not a real interface"]]
                 );
                 $api_settings->validate();
             }
@@ -248,7 +248,7 @@ class APIModelsAPISettingsTestCase extends TestCase
         $this->assert_does_not_throw(
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["allowed_interfaces" => []]
+                    data: ["allowed_interfaces" => []]
                 );
                 $api_settings->validate();
             }
@@ -258,7 +258,7 @@ class APIModelsAPISettingsTestCase extends TestCase
         $this->assert_does_not_throw(
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["allowed_interfaces" => ["wan"]]
+                    data: ["allowed_interfaces" => ["wan"]]
                 );
                 $api_settings->validate();
             }
@@ -275,7 +275,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["represent_interfaces_as" => 0]
+                    data: ["represent_interfaces_as" => 0]
                 );
                 $api_settings->validate();
             }
@@ -287,7 +287,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["represent_interfaces_as" => "not a valid choice"]
+                    data: ["represent_interfaces_as" => "not a valid choice"]
                 );
                 $api_settings->validate();
             }
@@ -296,11 +296,11 @@ class APIModelsAPISettingsTestCase extends TestCase
         # Ensure valid values are accepted
         $this->assert_does_not_throw(
             callable: function () {
-                $api_settings = new APISettings(representation_data: ["represent_interfaces_as" => "id"]);
+                $api_settings = new APISettings(data: ["represent_interfaces_as" => "id"]);
                 $api_settings->validate();
-                $api_settings = new APISettings(representation_data: ["represent_interfaces_as" => "descr"]);
+                $api_settings = new APISettings(data: ["represent_interfaces_as" => "descr"]);
                 $api_settings->validate();
-                $api_settings = new APISettings(representation_data: ["represent_interfaces_as" => "if"]);
+                $api_settings = new APISettings(data: ["represent_interfaces_as" => "if"]);
                 $api_settings->validate();
             }
         );
@@ -316,7 +316,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["auth_mode" => 0]
+                    data: ["auth_mode" => 0]
                 );
                 $api_settings->validate();
             }
@@ -328,7 +328,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["auth_mode" => "not a valid choice"]
+                    data: ["auth_mode" => "not a valid choice"]
                 );
                 $api_settings->validate();
             }
@@ -337,11 +337,11 @@ class APIModelsAPISettingsTestCase extends TestCase
         # Ensure valid values are accepted
         $this->assert_does_not_throw(
             callable: function () {
-                $api_settings = new APISettings(representation_data: ["auth_mode" => "local"]);
+                $api_settings = new APISettings(data: ["auth_mode" => "local"]);
                 $api_settings->validate();
-                $api_settings = new APISettings(representation_data: ["auth_mode" => "jwt"]);
+                $api_settings = new APISettings(data: ["auth_mode" => "jwt"]);
                 $api_settings->validate();
-                $api_settings = new APISettings(representation_data: ["auth_mode" => "key"]);
+                $api_settings = new APISettings(data: ["auth_mode" => "key"]);
                 $api_settings->validate();
             }
         );
@@ -357,7 +357,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["jwt_exp" => "not an integer"]
+                    data: ["jwt_exp" => "not an integer"]
                 );
                 $api_settings->validate();
             }
@@ -369,7 +369,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["jwt_exp" => 299]
+                    data: ["jwt_exp" => 299]
                 );
                 $api_settings->validate();
             }
@@ -381,7 +381,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["jwt_exp" => 86401]
+                    data: ["jwt_exp" => 86401]
                 );
                 $api_settings->validate();
             }
@@ -390,11 +390,11 @@ class APIModelsAPISettingsTestCase extends TestCase
         # Ensure valid values are accepted
         $this->assert_does_not_throw(
             callable: function () {
-                $api_settings = new APISettings(representation_data: ["jwt_exp" => 300]);
+                $api_settings = new APISettings(data: ["jwt_exp" => 300]);
                 $api_settings->validate();
-                $api_settings = new APISettings(representation_data: ["jwt_exp" => 5000]);
+                $api_settings = new APISettings(data: ["jwt_exp" => 5000]);
                 $api_settings->validate();
-                $api_settings = new APISettings(representation_data: ["jwt_exp" => 86400]);
+                $api_settings = new APISettings(data: ["jwt_exp" => 86400]);
                 $api_settings->validate();
             }
         );
@@ -410,7 +410,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["ha_sync" => "not a bool"]
+                    data: ["ha_sync" => "not a bool"]
                 );
                 $api_settings->validate();
             }
@@ -427,7 +427,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["ha_sync_validate_certs" => "not a bool"]
+                    data: ["ha_sync_validate_certs" => "not a bool"]
                 );
                 $api_settings->validate();
             }
@@ -444,7 +444,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["ha_sync_hosts" => "not an array"]
+                    data: ["ha_sync_hosts" => "not an array"]
                 );
                 $api_settings->validate();
             }
@@ -456,7 +456,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["ha_sync_hosts" => [0, 1, 2]]
+                    data: ["ha_sync_hosts" => [0, 1, 2]]
                 );
                 $api_settings->validate();
             }
@@ -468,7 +468,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: ["ha_sync_hosts" => ["not an IP address or FQDN!"]]
+                    data: ["ha_sync_hosts" => ["not an IP address or FQDN!"]]
                 );
                 $api_settings->validate();
             }
@@ -480,7 +480,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             code: 400,
             callable: function () {
                 $api_settings = new APISettings(
-                    representation_data: [
+                    data: [
                         "ha_sync_hosts" => [
                             "127.0.0.1",
                             "127.0.0.2",
@@ -504,7 +504,7 @@ class APIModelsAPISettingsTestCase extends TestCase
         $this->assert_does_not_throw(
             function () {
                 $api_settings = new APISettings(
-                    representation_data: ["ha_sync_hosts" => []]
+                    data: ["ha_sync_hosts" => []]
                 );
                 $api_settings->validate();
             }
@@ -514,7 +514,7 @@ class APIModelsAPISettingsTestCase extends TestCase
         $this->assert_does_not_throw(
             function () {
                 $api_settings = new APISettings(
-                    representation_data: [
+                    data: [
                         "ha_sync_hosts" => [
                             "127.0.0.1",
                             "1::",
@@ -536,7 +536,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             "FIELD_INVALID_TYPE",
             code: 400,
             callable: function () {
-                $api_settings = new APISettings(representation_data: ["ha_sync_username" => 0]);
+                $api_settings = new APISettings(data: ["ha_sync_username" => 0]);
                 $api_settings->validate();
             }
         );
@@ -544,7 +544,7 @@ class APIModelsAPISettingsTestCase extends TestCase
         # Ensure empty values are allowed
         $this->assert_does_not_throw(
             function () {
-                $api_settings = new APISettings(representation_data: ["ha_sync_username" => ""]);
+                $api_settings = new APISettings(data: ["ha_sync_username" => ""]);
                 $api_settings->validate();
             }
         );
@@ -552,7 +552,7 @@ class APIModelsAPISettingsTestCase extends TestCase
         # Ensure valid values are accepted
         $this->assert_does_not_throw(
             function () {
-                $api_settings = new APISettings(representation_data: ["ha_sync_username" => "admin"]);
+                $api_settings = new APISettings(data: ["ha_sync_username" => "admin"]);
                 $api_settings->validate();
             }
         );
@@ -567,7 +567,7 @@ class APIModelsAPISettingsTestCase extends TestCase
             "FIELD_INVALID_TYPE",
             code: 400,
             callable: function () {
-                $api_settings = new APISettings(representation_data: ["ha_sync_password" => 0]);
+                $api_settings = new APISettings(data: ["ha_sync_password" => 0]);
                 $api_settings->validate();
             }
         );
@@ -575,7 +575,7 @@ class APIModelsAPISettingsTestCase extends TestCase
         # Ensure empty values are allowed
         $this->assert_does_not_throw(
             function () {
-                $api_settings = new APISettings(representation_data: ["ha_sync_password" => ""]);
+                $api_settings = new APISettings(data: ["ha_sync_password" => ""]);
                 $api_settings->validate();
             }
         );
@@ -583,13 +583,13 @@ class APIModelsAPISettingsTestCase extends TestCase
         # Ensure valid values are accepted
         $this->assert_does_not_throw(
             function () {
-                $api_settings = new APISettings(representation_data: ["ha_sync_password" => "example password"]);
+                $api_settings = new APISettings(data: ["ha_sync_password" => "example password"]);
                 $api_settings->validate();
             }
         );
 
         # Ensure this field is write only and does not appear when reading representation data
-        $api_settings = new APISettings(representation_data: ["ha_sync_password" => "example password"]);
+        $api_settings = new APISettings(data: ["ha_sync_password" => "example password"]);
         $this->assert_is_false(array_key_exists("ha_sync_password", $api_settings->to_representation()));
     }
 }
