@@ -40,12 +40,6 @@ class DNSResolverHostOverrideAlias extends Model
             validators: [new HostnameValidator()],
             help_text: "The hostname portion of the host override alias."
         );
-        $this->ip = new StringField(
-            required: true,
-            many: true,
-            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true)],
-            help_text: "The IP addresses this host override will resolve."
-        );
         $this->descr = new StringField(
             default: "",
             allow_empty: true,

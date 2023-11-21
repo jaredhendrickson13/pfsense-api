@@ -91,10 +91,16 @@ class ModelSet {
      * target and the array value will be the query value.
      * @param array $excluded An array of field names to exclude from the query. This is helpful when
      * query data may have extra values that you do not want to include in the query.
+     * @param mixed ...$vl_query_params Qyery parameters that are passed in using variable-length arguments
+     * https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list
      * @return ModelSet The filtered ModelSet object containing only Model objects that matched the query.
      */
-    public function query(array $query_params=[], array $excluded=[]) : ModelSet {
+    public function query(array $query_params=[], array $excluded=[], ...$vl_query_params) : ModelSet {
+        # Variables
         $queried_model_set = [];
+        
+        # Merge the $query_params and any provided variable-length arguments into a single variable
+        $query_params = array_merge($query_params, $vl_query_params);
 
         # Loop through each model object in the provided model set and check it against the query parameters
         foreach ($this->model_objects as $model_object) {

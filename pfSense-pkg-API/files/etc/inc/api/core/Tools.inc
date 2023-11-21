@@ -240,6 +240,7 @@ function generate_documentation() {
 
             # Assign endpoint details to variables
             $help_text = $endpoint->$help_text_property;
+            $parent_model_class = ($model->parent_model_class) ?: "None";
             $priv_options_str = implode(", ", $endpoint->$privilege_property);
             $required_packages_str = ($model->packages) ? implode(", ", $model->packages) : "None";
             $requires_auth_str = ($endpoint->requires_auth) ? "Yes" : "No";
@@ -253,6 +254,7 @@ function generate_documentation() {
                     "$help_text<br>".
                     "<h3>Details:</h3>".
                     "**Assigned model**: $endpoint->model_name<br>".
+                    "**Parent model**: $parent_model_class<br>".
                     "**Requires authentication**: $requires_auth_str<br>".
                     "**Supported authentication modes:** [ $auth_modes_str ]<br>".
                     "**Allowed privileges**: [ $priv_options_str ]<br>".
@@ -315,6 +317,20 @@ function generate_documentation() {
                         ]
                     ];
                 }
+                
+                # Add the `parent_id` field to Models with a `many` parent
+                if ($model->parent_model_class and $model->parent_model->many) {
+                    array_unshift($schema["schema"]["allOf"],  [
+                        "type" => "object",
+                        "required" => ["parent_id"],
+                        "properties" => [
+                            "parent_id" => [
+                                "type" => "integer",
+                                "description" => "The ID of the parent this object is nested under."
+                            ]
+                        ]
+                    ]);
+                }
 
                 $openapi_config["paths"][$endpoint->url][$request_method]["requestBody"] = [
                     "content" => [
@@ -340,6 +356,23 @@ function generate_documentation() {
                         ]
                     ]
                 ];
+                
+                # Add the `parent_id` parameter if this model has a parent model assigned
+                if ($model->parent_model_class and $model->parent_model->many) {
+                    $openapi_config["paths"][$endpoint->url][$request_method]["parameters"][] = [
+                        "in" => "query",
+                        "name" => "parent_id",
+                        "description" => "The ID of the parent this object is nested under.",
+                        "required" => true,
+                        "schema" => [
+                            "oneOf" => [
+                                ["type" => "integer"],
+                                ["type" => "string"]
+                            ]
+                        ]
+                    ];
+                }
+                
             }
 
             # Assign this request method responses for each Response class defined.

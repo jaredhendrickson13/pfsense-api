@@ -81,6 +81,9 @@ class Model {
                 response_id: "MODEL_NON_ARRAY_REPRESENTATION_DATA"
             );
         }
+        
+        # Set the parent ID if given
+        $this->parent_id = $parent_id;
 
         # Obtain the current object from internal if an ID was given or this is not a `many` model.
         if (isset($id) or !$this->many) {
@@ -123,21 +126,14 @@ class Model {
             $this->$field->set_names($field);
             $this->$field->context = $this;
         }
-        
-        # Set the full config path for this Model including any parent Model paths
-        $this->config_path = $this->get_full_config_path();
     }
 
     /**
      * Retrieves the full config path including any assigned parent Model paths.
      */
-    private function get_full_config_path() : string {
+    public function get_config_path() : string|null {
         # Format the config path accordingly when a `parent_model_class` is assigned
-        if ($this->parent_model_class) {
-            # Create the parent model
-            $parent_model_class = "\\API\\Models\\$this->parent_model_class";
-            $this->parent_model = new $parent_model_class();
-
+        if ($this->parent_model) {
             # Do not allow a parent Model to be set if this Model has an `internal_callable` assigned
             if ($this->internal_callable) {
                 throw new ServerError(
@@ -162,14 +158,6 @@ class Model {
                     message: "Model ".get_called_class()." cannot assign `parent_model_class` $this->parent_model_class ".
                     "because it does not have a `config_path` set.",
                     response_id: "MODEL_PARENT_MODEL_CLASS_MUST_HAVE_CONFIG_PATH"
-                );
-            }
-
-            # Require a parent ID if the parent model if a `many` model
-            if ($this->parent_model->many and !$this->parent_id) {
-                throw new ValidationError(
-                    message: "Field `parent_id` is required.",
-                    response_id: "MODEL_PARENT_ID_REQUIRED"
                 );
             }
             
@@ -304,7 +292,7 @@ class Model {
         }
 
         # First, get the configuration at the specific path
-        $conf = $this->get_config($this->config_path);
+        $conf = $this->get_config($this->get_config_path());
 
         # Ensure config is an array
         if (is_array($conf) and array_key_exists(0, $conf)) {
@@ -418,7 +406,7 @@ class Model {
         }
         # Obtain the internal objects from the config path if specified
         elseif ($this->config_path) {
-            $internal_objects = $this->get_config($this->config_path, []);
+            $internal_objects = $this->get_config($this->get_config_path(), []);
         }
         # Obtain the internal objects by calling the `internal_callable` if specified
         elseif ($this->internal_callable) {
@@ -444,6 +432,14 @@ class Model {
      * @throws NotFoundError When an object with the specified $id does not exist.
      */
     public function from_internal() {
+        # Require a `parent_id` if a `many` parent Model is assigned
+        if ($this->parent_model_class and $this->parent_model->many and !isset($this->parent_id)) {
+            throw new ServerError(
+                message: "A parent ID is required when refreshing objects from config on model with a 'many' parent.",
+                response_id: "MODEL_PARENT_ID_REQUIRED_FOR_REFRESH"
+            );
+        }
+        
         # Require an $id if `many` is set
         if ($this->many and !isset($this->id)) {
             throw new ServerError(
@@ -507,6 +503,11 @@ class Model {
         # Variables
         $representation = [];
 
+        # Embed this object's parent ID if set
+        if (isset($this->parent_id)) {
+            $representation["parent_id"] = $this->parent_id;
+        }
+        
         # Embed this object's ID if set
         if (isset($this->id)) {
             $representation["id"] = $this->id;
@@ -529,12 +530,23 @@ class Model {
      * representation.
      */
     final public function from_representation(array $data) {
+        # Set the parent ID if provided
+        if (array_key_exists("parent_id", $data)) {
+            $this->parent_id = $data["parent_id"];
+        }
+        
         # When an ID is provided, fetch this objects from the internal configuration using the ID.
         if (array_key_exists("id", $data)) {
+            # Extract the ID from the data and obtain the parent model object if applicable
             $this->id = $data["id"];
+            $this->get_parent_model();
+            
+            # Obtain the object from its internal form
             $this->from_internal();
             $this->initial_object = unserialize(serialize($this));
         }
+        
+        
 
         # Loop through each field in this Model and assign their values using the `representation_data`.
         foreach ($this->get_fields() as $field) {
@@ -564,6 +576,39 @@ class Model {
 
         return $openapi_schema;
     }
+
+    /**
+     * Obtains the parent of this Model object if a parent Model is assigned.
+     * @return Model|null The parent Model object with the provided `parent_id` or `null` if no parent Model is set.
+     * @throws NotFoundError If the parent Model object does not exist.
+     */
+    public function get_parent_model() : Model|null
+    {
+        # If a parent Model is assigned, create the parent object
+        if ($this->parent_model_class) {
+            # Set the FQN parent class name
+            $parent_model_class = "\\API\\Models\\$this->parent_model_class";
+            
+            # Throw an error if the given parent ID does not exist
+            try {
+                $this->parent_model = new $parent_model_class(id: $this->parent_id);
+            }
+            catch (NotFoundError) {
+                # Throw a NotFoundError but change some of the verbage
+                throw new NotFoundError(
+                    message: "Parent object with ID '$this->id' does not exist.",
+                    response_id: "MODEL_PARENT_OBJECT_NOT_FOUND"
+                );
+            }
+            
+            # Set the parent Model object and return it
+            return $this->parent_model;
+        }
+        
+        return null;
+    }
+        
+       
 
     /**
      * Populates an array of field names for this model.
@@ -659,9 +704,12 @@ class Model {
      * @param bool $requires_id Whether the `id` field should be validated in this request. This is typically only
      * necessary for update and delete actions.
      * @param bool $only_id Only validate the `id` field. This is primarily used for deletions.
+     * @param bool $skip_parent Skip validating the assigned parent ID. This only applies to Models that have a
+     * `parent_model_class` value assigned. In most cases, this should not be changed from the default. This is
+     * only intended for nested Model validation.
      * @return bool `true` if the model's data is valid.
      */
-    final public function validate(bool $requires_id = false, bool $only_id = false) : bool {
+    final public function validate(bool $requires_id = false, bool $only_id = false, bool $skip_parent = false) : bool {
         # When an ID is required and this is a `many` model, check that an ID is set.
         if ($requires_id and $this->many and !isset($this->id)) {
             throw new ValidationError(
@@ -669,6 +717,21 @@ class Model {
                 response_id: "MODEL_REQUIRES_ID"
             );
         }
+        
+        # Validate the `parent_id` field if it was not requested we skip this step.
+        if (!$skip_parent) {
+            # Require a parent ID if the parent model is a `many` model
+            if ($this->parent_model_class and $this->parent_model->many and !isset($this->parent_id)) {
+                throw new ValidationError(
+                    message: "Field `parent_id` is required.",
+                    response_id: "MODEL_PARENT_ID_REQUIRED"
+                );
+            }
+
+            # Ensure the parent Model exists if configured
+            $this->get_parent_model();
+        }
+        
 
         # Check for required packages
         $this->check_packages();
@@ -937,7 +1000,7 @@ class Model {
             );
         }
         
-        $internal_objects = $this->get_config($this->config_path, []);
+        $internal_objects = $this->get_config($this->get_config_path(), []);
         $criteria = [];
 
         # Loop through each rule and map its sort field value to our sort criteria array
@@ -973,17 +1036,24 @@ class Model {
         }
         
         # Sets the sorted internal objects to the pfSense config
-        $this->set_config($this->config_path, array_values($internal_objects));
+        $this->set_config($this->get_config_path(), array_values($internal_objects));
     }
 
     /**
      * Performs a query on all Model objects for this Model. This is essentially a shorthand way of calling
      * `read_all()->query()`. This method is only applicable to `many` models.
      * @param array $query_params An array of query parameters.
+     * @param array $excluded An array of field names to exclude from the query. This is helpful when
+     * query data may have extra values that you do not want to include in the query.
+     * @param mixed ...$vl_query_params Qyery parameters that are passed in using variable-length arguments
+     * https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list
      * @return ModelSet The queried ModelSet containing only Model objects that matched the query.
      */
-    public static function query(array $query_params) : ModelSet {
-        return self::read_all()->query($query_params);
+    public static function query(array $query_params=[], array $excluded=[], ...$vl_query_params) : ModelSet {
+        # Merge the $query_params and any provided variable-length arguments into a single variable
+        $query_params = array_merge($query_params, $vl_query_params);
+        
+        return self::read_all()->query(query_params: $query_params, excluded: $excluded);
     }
 
 
@@ -1002,6 +1072,9 @@ class Model {
                 response_id: "MODEL_REQUIRES_ID"
             );
         }
+        
+        # Ensure the parent Model exists if configured
+        $this->get_parent_model();
 
         # Obtain the requested Model object from config by ID
         $this->from_internal();
@@ -1020,7 +1093,7 @@ class Model {
         # Check if this model has a `config_path` and `many` set, we will apply a default behavior for these models
         if ($this->config_path and $this->many) {
             # Write the new object to the internal config
-            $this->set_config(path: "$this->config_path/$this->id", value: $this->to_internal());
+            $this->set_config(path: "{$this->get_config_path()}/$this->id", value: $this->to_internal());
             $this->sort();
             $this->write_config("Added $this->verbose_name via API");
             return;
@@ -1082,15 +1155,15 @@ class Model {
         # Check if this model has a `config_path`, we will apply a default behavior for these models
         if ($this->config_path) {
             # Only use the ID in the config path if 'many' is enabled. Otherwise, just use the base config path.
-            $update_config_path = ($this->many) ? "$this->config_path/$this->id" : $this->config_path;
+            $config_path = ($this->many) ? "{$this->get_config_path()}/$this->id" : $this->get_config_path();
 
             # Merge differences between the stored object and updated internal object when update strategy is 'merge'
             if ($this->update_strategy === "merge") {
-                $this->merge_config($update_config_path);
+                $this->merge_config($config_path);
             }
             # Replace the internal object entirely when update strategy is 'replace'
             elseif ($this->update_strategy === "replace") {
-                $this->set_config(path: $update_config_path, value: $this->to_internal());
+                $this->set_config(path: $config_path, value: $this->to_internal());
 
             }
             # Throw an error if the update strategy is unknown
@@ -1172,7 +1245,7 @@ class Model {
         }
 
         # Empty the config array for this Model
-        $this->set_config($this->config_path, []);
+        $this->set_config($this->get_config_path(), []);
 
         # Loop through each Model representation included in the array
         foreach ($data as $representation_object) {
@@ -1185,7 +1258,7 @@ class Model {
 
             # If an error was not thrown during Model object creation or validation, give it an ID and set the config
             $model_object->id = $this->get_next_id();
-            $this->set_config("$this->config_path/$model_object->id", $model_object->to_internal());
+            $this->set_config("{$this->get_config_path()}/$model_object->id", $model_object->to_internal());
         }
 
         # Sort and write the changes to config
@@ -1217,7 +1290,7 @@ class Model {
         # Check if this model has a `config_path`, we will apply a default behavior for these models
         if ($this->config_path and $this->many) {
             # Write the changes to the object in config.
-            $this->del_config(path: "$this->config_path/$this->id");
+            $this->del_config(path: "{$this->get_config_path()}/$this->id");
             $this->write_config("Deleted $this->verbose_name via API");
             return;
         }
