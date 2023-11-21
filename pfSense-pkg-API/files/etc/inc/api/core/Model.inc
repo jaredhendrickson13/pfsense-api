@@ -292,7 +292,10 @@ class Model {
         }
 
         # First, get the configuration at the specific path
-        $conf = $this->get_config($this->get_config_path());
+        $conf = $this->get_config($this->get_config_path(), []);
+
+        var_dump($this->get_config_path());
+        var_dump($conf);
 
         # Ensure config is an array
         if (is_array($conf) and array_key_exists(0, $conf)) {
@@ -396,7 +399,7 @@ class Model {
      * `config_path` and a `internal_callable` are assigned to this model
      * @return array The array of internal objects without any additional processing performed.
      */
-    private function get_internal_objects() : array {
+    public function get_internal_objects() : array {
         # Throw an error if both `config_path` and `internal_callable` are set.
         if ($this->config_path and $this->internal_callable) {
             throw new ServerError(
@@ -425,6 +428,7 @@ class Model {
         return $internal_objects;
     }
 
+    # TODO: Rename this `refresh_from_internal()`
     /**
      * Obtain this Model object from the internal pfSense configuration by object ID. If the specified ID exists in
      * config, this Model object will be overwritten with the contents of that object.
@@ -450,7 +454,6 @@ class Model {
 
         # Get the internal object(s) from config and keep track of fields with custom from internal methods
         $internal_objects = $this->get_internal_objects();
-        $custom_from_internal_fields = [];
 
         # Require there to be an internal object with this ID, throw a not found error otherwise
         if ($this->many and !array_key_exists($this->id, $internal_objects)) {
@@ -462,6 +465,13 @@ class Model {
 
         # When `many` is enabled, obtain the object with our ID. Otherwise, just assign the direct object
         $internal_object = ($this->many) ? $internal_objects[$this->id] : $internal_objects;
+
+        $this->from_internal_object($internal_object);
+    }
+
+    public function from_internal_object(array $internal_object) {
+        # Variables
+        $custom_from_internal_fields = [];
 
         # Loop through each of this Model's fields and convert the internal value to the representation value
         foreach ($this->get_fields() as $field) {
@@ -478,6 +488,11 @@ class Model {
 
             # Check if this field has a namespace and check if the internal object has the namespace
             if ($this->$field->internal_namespace and array_key_exists($this->$field->internal_namespace, $internal_object)) {
+                # Ensure the internal namespace is an array if the namespace is empty
+                if (!$internal_object[$this->$field->internal_namespace]) {
+                    $internal_object[$this->$field->internal_namespace] = [];
+                }
+
                 # Check the namespace for the field and convert it's value from internal to representation
                 if (array_key_exists($this->$field->internal_name, $internal_object[$this->$field->internal_namespace])) {
                     $this->$field->from_internal(
@@ -545,8 +560,6 @@ class Model {
             $this->from_internal();
             $this->initial_object = unserialize(serialize($this));
         }
-        
-        
 
         # Loop through each field in this Model and assign their values using the `representation_data`.
         foreach ($this->get_fields() as $field) {

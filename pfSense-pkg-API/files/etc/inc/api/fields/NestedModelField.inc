@@ -4,10 +4,13 @@ namespace API\Fields;
 
 use API\Core\Field;
 use API\Core\Model;
+use API\Core\Response;
+use API\Responses\ValidationError;
 
 class NestedModelField extends Field
 {
     public string $model_class;
+    public Model $model;
     
     /**
      * @param bool $required Set to `true` if this field is required to be explicitly set. $required and $default are
@@ -23,9 +26,6 @@ class NestedModelField extends Field
      * @param bool $write_only Set to `true` to make this field write-only. This will prevent the field's current value
      * from being displayed in the representation data. This is ideal for potentially sensitive fields like passwords,
      * keys, and hashes.
-     * @param bool $representation_only Set to `true` to make this field only present in its representation form. This
-     * effectively prevents the Field from being converted to an internal value which is saved to the pfSense config.
-     * This should only be used for fields that do not relate directly to a configuration value.
      * @param string $verbose_name The detailed name for this Field. This name will be used in non-programmatic areas
      * like web pages and help text. This Field will default to property name assigned to the parent Model with
      * underscores converted to spaces.
@@ -40,15 +40,14 @@ class NestedModelField extends Field
      */
     public function __construct(
         string $model_class,
-        bool $required = false, 
+        bool $required = false,
         mixed $default = null,
         bool $allow_empty = false, 
         bool $allow_null = false, 
         bool $editable = true, 
         bool $read_only = false, 
         bool $write_only = false, 
-        bool $representation_only = false,
-        string $verbose_name = "", 
+        string $verbose_name = "",
         string $verbose_name_plural = "",
         array $conditions = [], 
         string $help_text = ""
@@ -67,13 +66,18 @@ class NestedModelField extends Field
             editable: $editable, 
             read_only: $read_only, 
             write_only: $write_only, 
-            representation_only: $representation_only,
-            delimiter: null, 
-            verbose_name: $verbose_name, 
+            verbose_name: $verbose_name,
             verbose_name_plural: $verbose_name_plural,
             conditions: $conditions, 
             help_text: $help_text
         );
+
+        # Assign the internal name and namespace to match the nested model
+        $this->model = new $this->model_class();
+        $config_path = explode("/", $this->model->config_path);
+        $this->internal_name = array_pop($config_path);
+        $this->internal_namespace = implode("/", $config_path);
+        $this->many = $this->model->many;
     }
     
     /**
@@ -81,34 +85,120 @@ class NestedModelField extends Field
      */
     public function validate_extra(mixed $value)
     {
+        # Remove any existing objects nested under this model
+        $full_config_path = "{$this->context->config_path}/{$this->context->id}/{$this->model->config_path}";
+        $this->context->del_config($full_config_path);
+
         # Create a new Model object for this value and validate it
-        $model = new $this->model_class(data: $value);
-        $model->validate(skip_parent: true);
-        
+        $model = new $this->model_class(parent_id: $this->context->id, data: $value);
+
+        # Try to validate the nested Model object
+        try {
+            $model->validate(skip_parent: true);
+        }
+        catch (Response $resp) {
+            throw new ValidationError(
+                message: "Field `$this->name` encountered a nested validation error: $resp->message",
+                response_id: $resp->response_id
+            );
+        }
+
         return $value;
     }
 
     /**
      * Converts the value from its representation value to its internal value.
-     * @param mixed $representation_value The representation value to be converted to its internal equivalent
      * @return array|string|null The internal value to be stored in the pfSense config
      */
-    public function _to_internal(mixed $representation_value): array|string|null
+    public function to_internal(): array|string|null
     {
-        # Create a new Model object for this value and validate it
-        $model = new $this->model_class(data: $representation_value);
-        return $model->to_internal();
+        # Create the nested Model object
+        $model = new $this->model_class();
+
+        # For `many` Models, loop through each value and convert it to its internal value
+        if ($model->many) {
+            $internal_objects = [];
+            foreach ($this->value as $representation_data) {
+                $representation_object = new $this->model_class(data: $representation_data);
+                $internal_objects[] = $representation_object->to_internal();
+            }
+            return $internal_objects;
+        }
+        # Otherwise, just convert the one object
+        else {
+            $representation_object = new $this->model_class(data: $this->value);
+            return $representation_object->to_internal();
+        }
     }
 
     /**
-     * Converts the value from its internal value to its representation value.     
-     * @param string $internal_value The internal value to be converted to its representation value
+     * Converts any nested Model objects from their internal values to their representation values.
+     * @param string|null $internal_value The raw internal config value to convert to a representation value.
      */
-    public function _from_internal(string $internal_value)
-    {
-        # Create a new Model object for this value and validate it
+    public function from_internal(mixed $internal_value) {
+        # Create the nested Model object
         $model = new $this->model_class();
-        $model->from_internal
-        return $model->to_internal();
+
+        # For `many` Models, loop through each value and convert it to its representation value
+        if ($model->many) {
+            $representations = [];
+            foreach ($internal_value as $id => $internal_data) {
+                $object = new $this->model_class();
+                $object->from_internal_object($internal_data);
+                $representation = ["id" => $id] + $object->to_representation();
+                $representations[] = $representation;
+            }
+            $this->value = $representations;
+        }
+        # Otherwise, just convert the one object
+        else {
+            $object = new $this->model_class();
+            $this->value = $object->to_representation();
+        }
+    }
+
+    /**
+     * Converts this Field object to a PHP array representation of an OpenAPI schema property configuration. This is
+     * used when auto-generating API documentation. This method can be extended to add additional options to the OpenAPI
+     * schema property.
+     * @link https://swagger.io/docs/specification/data-models/
+     * @return array A PHP array containing this field as an OpenAPI schema property configuration.
+     */
+    public function to_openapi_property() : array {
+        # Assign primitive property attributes
+        $openapi_property = [];
+        $openapi_property["description"] = $this->help_text."<br>".$this->get_conditions_text();
+        $openapi_property["nullable"] = $this->allow_null;
+        $openapi_property["readOnly"] = $this->read_only;
+        $openapi_property["writeOnly"] = $this->write_only;
+        $openapi_property["editable"] = $this->editable;
+
+        # Set the default if defined
+        if ($this->default) {
+            $openapi_property["default"] = $this->default;
+        }
+
+        # Set values that are unique to `many` Fields.
+        if ($this->many) {
+            $openapi_property["type"] = "array";
+            $openapi_property["minItems"] = $this->many_minimum;
+            $openapi_property["maxItems"] = $this->many_maximum;
+            $openapi_property["items"] = ["type" => $this->type];
+
+            # Assign choices if defined
+            if ($this->choices) {
+                $openapi_property["items"]["enum"] = $this->choices;
+            }
+        }
+        else {
+            $openapi_property["type"] = $this->type;
+
+            # Assign choices if defined
+            if ($this->choices and !$this->choices_callable) {
+                $openapi_property["enum"] = $this->choices;
+            }
+        }
+
+        return $openapi_property;
     }
 }

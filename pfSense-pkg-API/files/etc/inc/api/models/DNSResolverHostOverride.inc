@@ -5,6 +5,7 @@ namespace API\Models;
 use API;
 use API\Core\Model;
 use API\Dispatchers\DNSResolverApplyDispatcher;
+use API\Fields\NestedModelField;
 use API\Fields\StringField;
 use API\Validators\HostnameValidator;
 use API\Validators\IPAddressValidator;
@@ -15,6 +16,7 @@ class DNSResolverHostOverride extends Model
     public StringField $domain;
     public StringField $ip;
     public StringField $descr;
+    public NestedModelField $aliases;
     
     public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
     {
@@ -50,6 +52,11 @@ class DNSResolverHostOverride extends Model
             allow_empty: true,
             help_text: "A detailed description for this host override."
         );
+        $this->aliases = new NestedModelField(
+            model_class: "DNSResolverHostOverrideAlias",
+            default: []
+        );
+
         parent::__construct(id: $id, data: $data, client: $client);
     }
 

@@ -629,22 +629,14 @@ class Field
                 );
             }
 
-            # Fetch model objects for each internal object stored in config for this model
-            $modelset = $this->context->read_all();
-            $field_name = $this->name;
-
-            foreach ($modelset->model_objects as $model_object) {
-                # Move onto the next model object if this model object's field value does not match our objects value.
-                if ($model_object->$field_name->value != $this->value or $model_object->id === $this->context->id) {
-                    continue;
-                }
-                # When neither of previous conditions are met, we've found a unique conflict. Throw an error.
-                else {
-                    throw new ValidationError(
-                        message: "Field '$this->name' must be unique. Value is in use by object with ID '$model_object->id'.",
-                        response_id: "FIELD_MUST_BE_UNIQUE"
-                    );
-                }
+            # Query for any other of the parent context's Model objects with the same field value
+            $model_query = $this->context->query(["id__except" => $this->context->id, $this->name => $this->value]);
+            if ($model_query->exists()) {
+                $model_object = $model_query->first();
+                throw new ValidationError(
+                    message: "Field '$this->name' must be unique. Value is in use by object with ID '$model_object->id'.",
+                    response_id: "FIELD_MUST_BE_UNIQUE"
+                );
             }
         }
     }
