@@ -56,6 +56,7 @@ class DNSResolverHostOverride extends Model
         $this->aliases = new NestedModelField(
             model_class: "DNSResolverHostOverrideAlias",
             default: [],
+            allow_empty: true,
             help_text: "Additional alias hostnames that should resolve the same IP(s)."
         );
 

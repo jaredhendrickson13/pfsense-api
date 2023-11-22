@@ -15,8 +15,9 @@ class NestedModelField extends Field
     private string $model_class_short;
     public Model $model;
     private ModelSet $validation_modelset;
-    
+
     /**
+     * @param string $model_class The Model class that is nested within this Field.
      * @param bool $required Set to `true` if this field is required to be explicitly set. $required and $default are
      * mutually exclusive.
      * @param mixed|null $default The default value to assign this field if no value was found. If not set, it assumed
