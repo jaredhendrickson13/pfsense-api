@@ -4,6 +4,7 @@ namespace API\Tests;
 
 use API\Core\TestCase;
 use API\Fields\NestedModelField;
+use API\Models\FirewallAlias;
 
 class APIFieldsNestedModelFieldTestCase extends TestCase
 {
@@ -92,6 +93,89 @@ class APIFieldsNestedModelFieldTestCase extends TestCase
                 ];
                 $field->validate();
             }
+        );
+    }
+    
+    /**
+     * Ensures nested model objects are correctly converted to their internal forms.
+     */
+    public function test_to_internal() {
+        # Create a NestedModelObject to test with.
+        $field = new NestedModelField("FirewallAlias", required: true);
+        $field->name = "test";
+        
+        # Create a direct FirewallAlias object to compare with
+        $alias = new FirewallAlias(data: ["name" => "testalias", "type" => "host", "address" => ["127.0.0.1"]]);
+        
+        # Add the $alias representation to the $field values and ensure they match when `to_internal()` runs.
+        $field->value = [$alias->to_representation()];
+        $field->validate();
+        $this->assert_equals([$alias->to_internal()], $field->to_internal());
+    }
+
+    /**
+     * Ensures nested model objects are correctly converted from their internal forms.
+     */
+    public function test_from_internal() {
+        # Create a NestedModelObject to test with.
+        $field = new NestedModelField("FirewallAlias", required: true);
+        $field->name = "test";
+
+        # Create a direct FirewallAlias object to compare with
+        $alias = new FirewallAlias(data: ["name" => "testalias", "type" => "host", "address" => ["127.0.0.1"]]);
+        $alias->create();
+
+        # Set the value from the internal value of $alias and ensure it matches the representation value afterward
+        $field->from_internal([$alias->to_internal()]);
+        $this->assert_equals([$alias->to_representation()], $field->value);
+        
+        # Delete the FirewallAlias used for testing
+        $alias->delete();
+    }
+    
+    /**
+     * Ensures the `sort()` method correctly sorts values based on the nested Model's sort criteria.
+     */
+    public function test_sort() {
+        # Create a NestedModelObject to test with.
+        $field = new NestedModelField("FirewallAlias", required: true);
+        $field->name = "test";
+        
+        # Assign the nested Model sort criteria for testing - by field `name` in alphabetical order
+        $field->model->sort_by_field = "name";
+        $field->model->sort_option = SORT_ASC;
+        
+        # Set the value to an array of alias objects that are out of order
+        $field->value = [
+            ["name" => "ccc", "type" => "host"],
+            ["name" => "aaa", "type" => "port"],
+            ["name" => "ddd", "type" => "host"],
+            ["name" => "bbb", "type" => "network"]
+        ];
+        
+        # Sort the values and ensure they are now placed in alphabetical order
+        $field->sort();
+        $this->assert_equals(
+            $field->value,
+            [
+                ["name" => "aaa", "type" => "port"],
+                ["name" => "bbb", "type" => "network"],
+                ["name" => "ccc", "type" => "host"],
+                ["name" => "ddd", "type" => "host"]
+            ]
+        );
+        
+        # Sort again but this time in descending order
+        $field->model->sort_option = SORT_DESC;
+        $field->sort();
+        $this->assert_equals(
+            $field->value,
+            [
+                ["name" => "ddd", "type" => "host"],
+                ["name" => "ccc", "type" => "host"],
+                ["name" => "bbb", "type" => "network"],
+                ["name" => "aaa", "type" => "port"],
+            ]
         );
     }
 }

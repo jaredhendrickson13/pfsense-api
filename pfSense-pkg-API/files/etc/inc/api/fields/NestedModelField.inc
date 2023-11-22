@@ -14,7 +14,7 @@ class NestedModelField extends Field
     public string $model_class;
     private string $model_class_short;
     public Model $model;
-    private ModelSet $validation_modelset;
+    public readonly ModelSet $validation_modelset;
 
     /**
      * @param string $model_class The Model class that is nested within this Field.
@@ -160,16 +160,6 @@ class NestedModelField extends Field
         # Skip this validation for non `many` Models or Models without unique together fields
         if (!$model->many or !$model->unique_together_fields) {
             return;
-        }
-
-        # Throw an error if Fields were provided that are not known to the Model
-        foreach ($model->unique_together_fields as $unique_together_field) {
-            if (!in_array($unique_together_field, $model->get_fields())) {
-                throw new ServerError(
-                    message: "Unknown Model field `$unique_together_field` specified in `unique_together_fields`",
-                    response_id: "MODEL_UNIQUE_TOGETHER_FIELDS_WITH_UNKNOWN_FIELD"
-                );
-            }
         }
 
         # Use this variable to keep track of query parameters to use when checking uniqueness
