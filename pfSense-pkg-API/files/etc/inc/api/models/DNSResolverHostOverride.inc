@@ -3,6 +3,7 @@
 namespace API\Models;
 
 use API;
+use API\Core\Auth;
 use API\Core\Model;
 use API\Dispatchers\DNSResolverApplyDispatcher;
 use API\Fields\NestedModelField;
@@ -54,7 +55,8 @@ class DNSResolverHostOverride extends Model
         );
         $this->aliases = new NestedModelField(
             model_class: "DNSResolverHostOverrideAlias",
-            default: []
+            default: [],
+            help_text: "Additional alias hostnames that should resolve the same IP(s)."
         );
 
         parent::__construct(id: $id, data: $data, client: $client);

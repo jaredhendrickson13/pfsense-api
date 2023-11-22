@@ -222,9 +222,10 @@ function generate_documentation() {
         # Initialize this endpoint's OpenAPI tag
         $openapi_config["tags"][] = ["name" => $endpoint->tag];
 
-        # Obtain the Model assigned to the Endpoint
+        # Obtain the Model assigned to the Endpoint and create any assigned parent Model's
         $model = "API\\Models\\$endpoint->model_name";
         $model = new $model();
+        $model->get_parent_model();
 
         # Obtain the OpenAPI schema for this Model.
         $openapi_config["components"]["schemas"][$endpoint->model_name] = $model->to_openapi_schema();
@@ -359,20 +360,22 @@ function generate_documentation() {
                 
                 # Add the `parent_id` parameter if this model has a parent model assigned
                 if ($model->parent_model_class and $model->parent_model->many) {
-                    $openapi_config["paths"][$endpoint->url][$request_method]["parameters"][] = [
-                        "in" => "query",
-                        "name" => "parent_id",
-                        "description" => "The ID of the parent this object is nested under.",
-                        "required" => true,
-                        "schema" => [
-                            "oneOf" => [
-                                ["type" => "integer"],
-                                ["type" => "string"]
+                    array_unshift(
+                        $openapi_config["paths"][$endpoint->url][$request_method]["parameters"],
+                        [
+                            "in" => "query",
+                            "name" => "parent_id",
+                            "description" => "The ID of the parent this object is nested under.",
+                            "required" => true,
+                            "schema" => [
+                                "oneOf" => [
+                                    ["type" => "integer"],
+                                    ["type" => "string"]
+                                ]
                             ]
                         ]
-                    ];
+                    );
                 }
-                
             }
 
             # Assign this request method responses for each Response class defined.

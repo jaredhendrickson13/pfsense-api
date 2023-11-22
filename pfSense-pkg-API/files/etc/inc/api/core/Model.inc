@@ -294,9 +294,6 @@ class Model {
         # First, get the configuration at the specific path
         $conf = $this->get_config($this->get_config_path(), []);
 
-        var_dump($this->get_config_path());
-        var_dump($conf);
-
         # Ensure config is an array
         if (is_array($conf) and array_key_exists(0, $conf)) {
             return count($conf);

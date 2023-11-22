@@ -4,13 +4,17 @@ namespace API\Fields;
 
 use API\Core\Field;
 use API\Core\Model;
+use API\Core\ModelSet;
 use API\Core\Response;
+use API\Responses\ServerError;
 use API\Responses\ValidationError;
 
 class NestedModelField extends Field
 {
     public string $model_class;
+    private string $model_class_short;
     public Model $model;
+    private ModelSet $validation_modelset;
     
     /**
      * @param bool $required Set to `true` if this field is required to be explicitly set. $required and $default are
@@ -55,6 +59,7 @@ class NestedModelField extends Field
     {
         # Assign attributes specific to this Field
         $this->model_class = "\\API\\Models\\$model_class";
+        $this->model_class_short = $model_class;
         
         # Construct the parent Field object with desired parameters.
         parent::__construct(
@@ -78,23 +83,27 @@ class NestedModelField extends Field
         $this->internal_name = array_pop($config_path);
         $this->internal_namespace = implode("/", $config_path);
         $this->many = $this->model->many;
+        
+        # Initialize the validation ModelSet. This is used to keep track of nested Model objects that have already
+        # been validated.
+        $this->validation_modelset = new ModelSet([]);
     }
     
     /**
      * Validates the incoming value using the assigned Model's `validate()` method.
+     * @throws ValidationError If any Response error occurred when validating the nested Model object
      */
     public function validate_extra(mixed $value)
     {
-        # Remove any existing objects nested under this model
-        $full_config_path = "{$this->context->config_path}/{$this->context->id}/{$this->model->config_path}";
-        $this->context->del_config($full_config_path);
-
         # Create a new Model object for this value and validate it
-        $model = new $this->model_class(parent_id: $this->context->id, data: $value);
+        $model = new $this->model_class(data: $value);
 
         # Try to validate the nested Model object
         try {
             $model->validate(skip_parent: true);
+            $this->check_unique_fields($model);
+            $this->check_unique_together_fields($model);
+            $this->validation_modelset->model_objects[] = $model;
         }
         catch (Response $resp) {
             throw new ValidationError(
@@ -107,26 +116,103 @@ class NestedModelField extends Field
     }
 
     /**
+     * Extends the default Field validation method to clear the validation_modelset before starting validation
+     */
+    public function validate(): bool
+    {
+        # Empty any existing ModelSet entries in the event this is a subsequent `validate()` call.
+        $this->validation_modelset->model_objects = [];
+        return parent::validate();
+    }
+
+    /**
+     * Checks that any of the nested Model's `unique` fields are unique from any other value being assigned.
+     * @param Model $model The Model to check fields for uniqueness.
+     * @throws ValidationError When a `unique` field value is not unique
+     */
+    private function check_unique_fields(Model $model) {
+        # Only validate `unique` if this is a `many` model
+        if ($model->many) {
+            # Loop through each of this Model's Fields and check for `unique` fields.
+            foreach ($model->get_fields() as $field) {
+                if ($model->$field->unique) {
+                    # Query for other validated Models with the same field value
+                    $model_query = $this->validation_modelset->query([$field => $model->$field->value]);
+                    if ($model_query->exists()) {
+                        throw new ValidationError(
+                            message: "Field '$field' must be unique.",
+                            response_id: "MODEL_FIELD_MUST_BE_UNIQUE"
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks that any fields which must be unique together are unique from all other existing objects for this Model.
+     * @throws ServerError When the fields specified in `unique_together_fields` are not Field objects known to this
+     * Model.
+     * @throws ValidationError When the unique together fields are not unique and are present in another Model object.
+     */
+    private function check_unique_together_fields(Model $model) {
+        # Skip this validation for non `many` Models or Models without unique together fields
+        if (!$model->many or !$model->unique_together_fields) {
+            return;
+        }
+
+        # Throw an error if Fields were provided that are not known to the Model
+        foreach ($model->unique_together_fields as $unique_together_field) {
+            if (!in_array($unique_together_field, $model->get_fields())) {
+                throw new ServerError(
+                    message: "Unknown Model field `$unique_together_field` specified in `unique_together_fields`",
+                    response_id: "MODEL_UNIQUE_TOGETHER_FIELDS_WITH_UNKNOWN_FIELD"
+                );
+            }
+        }
+
+        # Use this variable to keep track of query parameters to use when checking uniqueness
+        $query_params = [];
+
+        # Format the query parameters as an associative array
+        foreach ($model->unique_together_fields as $field) {
+            $query_params[$field] = $model->$field->value;
+        }
+
+        # Query for existing objects with the same Field values
+        $model_query = $this->validation_modelset->query(query_params: $query_params);
+
+        # If any existing Models were found matching the query, fields are not unique together, throw an error
+        if ($model_query->exists()) {
+            $unique_fields_string = implode(", ", $model->unique_together_fields);
+            throw new ValidationError(
+                message: "Fields [$unique_fields_string] together must be unique from all other objects of its kind.",
+                response_id: "MODEL_FIELDS_NOT_UNIQUE_TOGETHER"
+            );
+        }
+    }
+
+    /**
      * Converts the value from its representation value to its internal value.
      * @return array|string|null The internal value to be stored in the pfSense config
      */
     public function to_internal(): array|string|null
     {
-        # Create the nested Model object
-        $model = new $this->model_class();
+        # Sort values before convert them to their internal form
+        $this->sort();
 
         # For `many` Models, loop through each value and convert it to its internal value
-        if ($model->many) {
+        if ($this->model->many) {
             $internal_objects = [];
             foreach ($this->value as $representation_data) {
-                $representation_object = new $this->model_class(data: $representation_data);
+                $representation_object = new $this->model(data: $representation_data);
                 $internal_objects[] = $representation_object->to_internal();
             }
             return $internal_objects;
         }
         # Otherwise, just convert the one object
         else {
-            $representation_object = new $this->model_class(data: $this->value);
+            $representation_object = new $this->model(data: $this->value);
             return $representation_object->to_internal();
         }
     }
@@ -158,9 +244,37 @@ class NestedModelField extends Field
     }
 
     /**
-     * Converts this Field object to a PHP array representation of an OpenAPI schema property configuration. This is
-     * used when auto-generating API documentation. This method can be extended to add additional options to the OpenAPI
-     * schema property.
+     * Sorts the nested Model data use the nested Model's `sort_option` and `sort_by_field` setting. This method
+     * closely resembles the Model->sort() method, but does not require values to be set in config beforehand. 
+     */
+    public function sort() {
+        # Only sort this Field's values if this is a `many` field
+        if ($this->many) {
+            # Do not sort if there is no `sort_option` or `sort_by_field` set for this nested Model
+            if (!$this->model->sort_option or !$this->model->sort_by_field) {
+                return;
+            }
+
+            # Loop through each rule and map its sort field value to our sort criteria array
+            foreach ($this->value as $id => $object) {
+                # Map the real field if it's not empty, otherwise assume an empty string
+                if (!empty($object[$this->model->sort_by_field])) {
+                    $criteria[$id] = $object[$this->model->sort_by_field];
+                } else {
+                    $criteria[$id] = "";
+                }
+            }
+
+            # Sort the internal objects using the previously determined criteria
+            array_multisort($criteria, $this->model->sort_option, $this->value);
+
+            $this->value = array_values($this->value);
+        }
+    }
+
+    /**
+     * Converts this NestedModelField object to a PHP array representation of an OpenAPI schema property configuration. 
+     * This is used when auto-generating API documentation.
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this field as an OpenAPI schema property configuration.
      */
@@ -173,30 +287,21 @@ class NestedModelField extends Field
         $openapi_property["writeOnly"] = $this->write_only;
         $openapi_property["editable"] = $this->editable;
 
-        # Set the default if defined
-        if ($this->default) {
-            $openapi_property["default"] = $this->default;
-        }
-
-        # Set values that are unique to `many` Fields.
+        # Reference the nested Model schema as the items of this property for `many` fields
         if ($this->many) {
-            $openapi_property["type"] = "array";
-            $openapi_property["minItems"] = $this->many_minimum;
-            $openapi_property["maxItems"] = $this->many_maximum;
-            $openapi_property["items"] = ["type" => $this->type];
-
-            # Assign choices if defined
-            if ($this->choices) {
-                $openapi_property["items"]["enum"] = $this->choices;
-            }
+            $openapi_property["type"] = $this->type;
+            $openapi_property["items"] = [
+                "allOf" => [
+                    ['$ref' => "#/components/schemas/$this->model_class_short"],
+                    ["type" => "object", "required" => $this->model->get_fields(required_only: true)]
+                ]
+            ];
         }
         else {
-            $openapi_property["type"] = $this->type;
-
-            # Assign choices if defined
-            if ($this->choices and !$this->choices_callable) {
-                $openapi_property["enum"] = $this->choices;
-            }
+            $openapi_property["allOf"] = [
+                ['$ref' => "#/components/schemas/$this->model_class_short"],
+                ["type" => "object", "required" => $this->model->get_fields(required_only: true)]
+            ];
         }
 
         return $openapi_property;
