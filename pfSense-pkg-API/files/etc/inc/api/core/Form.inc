@@ -35,11 +35,15 @@ class Form {
         # Obtain submitted form data
         $this->form_data = $_POST;
 
+        # Gather information about the authenticated user
+        $client = new Auth();
+        $client->username = $_SESSION["Username"];
+
         # Obtain the `id` from URL parameters
         $this->id = (is_numeric($_GET["id"])) ? intval($_GET["id"]) : null;
 
         # Create a new object for the assigned Model
-        $this->model = new $this->model_name(id: $this->id);
+        $this->model = new $this->model_name(id: $this->id, client: $client);
 
         foreach ($this->title_path as &$path) {
             $path = gettext($path);
