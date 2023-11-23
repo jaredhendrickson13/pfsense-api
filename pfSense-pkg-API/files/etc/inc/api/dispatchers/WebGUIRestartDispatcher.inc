@@ -16,7 +16,7 @@ class WebGUIRestartDispatcher extends Dispatcher
     public static function process(...$arguments)
     {
         # Wait a second to prevent prematurely killing API calls
-        sleep(3);
+        sleep(5);
         new Command("/etc/rc.restart_webgui");
     }
 
