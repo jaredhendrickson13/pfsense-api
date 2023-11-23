@@ -14,7 +14,7 @@ class NestedModelField extends Field
     public string $model_class;
     private string $model_class_short;
     public Model $model;
-    public readonly ModelSet $validation_modelset;
+    private ModelSet $validation_modelset;
 
     /**
      * @param string $model_class The Model class that is nested within this Field.
@@ -61,33 +61,31 @@ class NestedModelField extends Field
         # Assign attributes specific to this Field
         $this->model_class = "\\API\\Models\\$model_class";
         $this->model_class_short = $model_class;
-        
+        $this->model = new $this->model_class();
+        $config_path = explode("/", $this->model->config_path);
+
+        # Initialize the validation ModelSet. This is used to keep track of nested Model objects that have already
+        # been validated.
+        $this->validation_modelset = new ModelSet([]);
+
         # Construct the parent Field object with desired parameters.
         parent::__construct(
             type: "array",
             required: $required,
             default: $default,
-            allow_empty: $allow_empty, 
-            allow_null: $allow_null, 
-            editable: $editable, 
-            read_only: $read_only, 
-            write_only: $write_only, 
+            allow_empty: $allow_empty,
+            allow_null: $allow_null,
+            editable: $editable,
+            read_only: $read_only,
+            write_only: $write_only,
+            many: $this->model->many,
             verbose_name: $verbose_name,
             verbose_name_plural: $verbose_name_plural,
-            conditions: $conditions, 
+            internal_name: array_pop($config_path),
+            internal_namespace: implode("/", $config_path),
+            conditions: $conditions,
             help_text: $help_text
         );
-
-        # Assign the internal name and namespace to match the nested model
-        $this->model = new $this->model_class();
-        $config_path = explode("/", $this->model->config_path);
-        $this->internal_name = array_pop($config_path);
-        $this->internal_namespace = implode("/", $config_path);
-        $this->many = $this->model->many;
-        
-        # Initialize the validation ModelSet. This is used to keep track of nested Model objects that have already
-        # been validated.
-        $this->validation_modelset = new ModelSet([]);
     }
     
     /**
@@ -239,8 +237,8 @@ class NestedModelField extends Field
      * closely resembles the Model->sort() method, but does not require values to be set in config beforehand. 
      */
     public function sort() {
-        # Only sort this Field's values if this is a `many` field
-        if ($this->many) {
+        # Only sort this Field's values if this is a `many` field and it has a value
+        if ($this->many and $this->value) {
             # Do not sort if there is no `sort_option` or `sort_by_field` set for this nested Model
             if (!$this->model->sort_option or !$this->model->sort_by_field) {
                 return;

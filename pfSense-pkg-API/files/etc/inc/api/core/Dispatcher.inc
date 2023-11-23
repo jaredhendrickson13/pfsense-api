@@ -21,8 +21,13 @@ class Dispatcher
     private string $pid_file_prefix;
     public int $timeout = 600;
     public int $max_concurrency = 0;
+    public bool $async = true;
 
-    public function __construct()
+    /**
+     * Constructs the Dispatcher object.
+     * @param bool $async Set to `false` to prevent this Dispatcher from running the process in the background.
+     */
+    public function __construct(bool $async = true)
     {
         # Get the current full and short class names
         $this->full_name = str_replace("\\", "", get_called_class());
@@ -32,6 +37,9 @@ class Dispatcher
         $this->pid_dir = "/tmp/";
         $this->pid_file_prefix = $this->full_name."-";
         $this->pid_file = $this->pid_dir.uniqid(prefix: $this->pid_file_prefix).".pid";
+
+        # Set the Dispatcher async property
+        $this->async = $async;
     }
 
     /**
@@ -97,26 +105,41 @@ class Dispatcher
             );
         }
         
-        # Spawn the process
-        $spawn_process = new Command(
-            command: "nohup sh ".self::DISPATCH_SCRIPT." $this->short_name $this->pid_file $this->timeout",
-            redirect: ">/dev/null & echo $!"
-        );
-        $pid = (is_numeric($spawn_process->output)) ? (int)$spawn_process->output : null;
-        
-        # Ensure the spawn process output is a numeric PID and that the PID is actively running
-        if (!is_null($pid) and posix_getpgid($pid)) {
-            # Write this process's PID file, set the PID file name for the next process and return the PID.
-            file_put_contents($this->pid_file, $pid);
-            $this->pid_file = $this->pid_dir.uniqid(prefix: $this->pid_file_prefix).".pid";
-            return $pid;
+        # Spawn the process in the background if this Dispatcher is asynchronous
+        if ($this->async) {
+            $spawn_process = new Command(
+                command: "nohup sh ".self::DISPATCH_SCRIPT." $this->short_name $this->pid_file $this->timeout",
+                redirect: ">/dev/null & echo $!"
+            );
+            $pid = (is_numeric($spawn_process->output)) ? (int)$spawn_process->output : null;
+
+            # Ensure the spawn process output is a numeric PID and that the PID is actively running
+            if (!is_null($pid) and posix_getpgid($pid)) {
+                # Write this process's PID file, set the PID file name for the next process and return the PID.
+                file_put_contents($this->pid_file, $pid);
+                $this->pid_file = $this->pid_dir.uniqid(prefix: $this->pid_file_prefix).".pid";
+                return $pid;
+            }
+
+            # Throw an error if we failed to spawn the Dispatcher process
+            throw new ServerError(
+                message: "Dispatcher `$this->full_name` failed to spawn new process. Received: $spawn_process->output",
+                response_id: "DISPATCHER_FAILED_TO_SPAWN_PROCESS"
+            );
         }
-        
-        # Throw an error if we failed to spawn the Dispatcher process
-        throw new ServerError(
-            message: "Dispatcher `$this->full_name` failed to spawn new process. Received: $spawn_process->output",
-            response_id: "DISPATCHER_FAILED_TO_SPAWN_PROCESS"
-        );
+
+        # Otherwise, call the `process()` directly and wait for it to complete
+        # Since we are running this process synchronously, use this PHP fork's PID
+        $pid = getmypid();
+        file_put_contents($this->pid_file, $pid);
+
+        # Call the process directly and remove the PID file after its done
+        $this->process();
+        unlink($this->pid_file);
+
+        # Set the PID file name for the next process and return the PID.
+        $this->pid_file = $this->pid_dir.uniqid(prefix: $this->pid_file_prefix).".pid";
+        return $pid;
     }
 
     /**

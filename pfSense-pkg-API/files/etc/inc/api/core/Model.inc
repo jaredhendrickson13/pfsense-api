@@ -40,6 +40,7 @@ class Model {
     public mixed $parent_id = null;
     public Model|null $parent_model = null;
     public string $parent_model_class = "";
+    public bool $async;
     public Auth $client;
     public Model|null $initial_object = null;
     public array $packages = [];
@@ -64,8 +65,11 @@ class Model {
      * the Model object first. Any additional fields will be used to set the Model object's values.
      * @param Auth|null $client Optionally assign an API client's `Auth` object. Required for tying users to
      * changes made through Models.
+     * @param bool $async Set to `true` to request this Model's apply methods to run in the background and return a
+     * response immediately. Set to `false` to wait for the apply methods to complete before returning a response. Note:
+     * Some Models' apply methods may not support asynchronous execution and therefor may ignore this setting.
      */
-    public function __construct(mixed $id=null, mixed $parent_id=null, mixed $data=[], Auth $client=null) {
+    public function __construct(mixed $id=null, mixed $parent_id=null, mixed $data=[], Auth $client=null, bool $async = true) {
         # Throw an error if both $id and data are set.
         if (isset($id) and $data) {
             throw new ServerError(
@@ -84,6 +88,9 @@ class Model {
         
         # Set the parent ID if given
         $this->parent_id = $parent_id;
+
+        # Set the asynchronous flag if given
+        $this->async = $async;
 
         # Obtain the current object from internal if an ID was given or this is not a `many` model.
         if (isset($id) or !$this->many) {
