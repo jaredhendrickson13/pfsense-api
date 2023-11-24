@@ -1,6 +1,6 @@
 <?php
 
-namespace api\models;
+namespace API\Models;
 
 use API;
 use API\Core\Auth;
@@ -16,7 +16,7 @@ class DNSResolverHostOverrideAlias extends Model
     public StringField $domain;
     public StringField $descr;
     
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], Auth $client = null, bool $async = true)
     {
         # Set model attributes
         $this->parent_model_class = "DNSResolverHostOverride";
@@ -46,7 +46,7 @@ class DNSResolverHostOverrideAlias extends Model
             internal_name: "description",
             help_text: "A detailed description for this host override alias."
         );
-        parent::__construct(id: $id, parent_id: $parent_id, data: $data, client: $client);
+        parent::__construct(id: $id, parent_id: $parent_id, data: $data, client: $client, async: $async);
     }
 
     /**
@@ -54,6 +54,6 @@ class DNSResolverHostOverrideAlias extends Model
      */
     public function apply()
     {
-        (new DNSResolverApplyDispatcher())->spawn_process();
+        (new DNSResolverApplyDispatcher(async: $this->async))->spawn_process();
     }
 }
