@@ -1,6 +1,6 @@
 <?php
 
-namespace api\endpoints;
+namespace API\Endpointss;
 
 require_once("api/auto_loader.inc");
 
