@@ -21,6 +21,7 @@ class DNSResolverHostOverrideAlias extends Model
         # Set model attributes
         $this->parent_model_class = "DNSResolverHostOverride";
         $this->config_path = "aliases/item";
+        $this->subsystem = "unbound";
         $this->many = true;
         $this->sort_option = SORT_ASC;
         $this->sort_by_field = "host";
