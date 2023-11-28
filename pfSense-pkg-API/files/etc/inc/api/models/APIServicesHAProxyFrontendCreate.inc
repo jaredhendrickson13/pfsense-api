@@ -47,7 +47,7 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
                         "name" => "acme_validation",
                         "expression" => "path_starts_with",
                         "value" => "/.well-known/acme-challenge",
-                        "backendservercountbackend" => "acme-validation",
+                        "backendservercountbackend" => "",
                         "_index" => "",
                     ],
                     [
