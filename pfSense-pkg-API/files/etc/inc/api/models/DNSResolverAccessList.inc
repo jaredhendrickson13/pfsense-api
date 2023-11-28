@@ -4,6 +4,7 @@ namespace API\Models;
 
 use API\Core\Auth;
 use API\Core\Model;
+use API\Dispatchers\DNSResolverApplyDispatcher;
 use API\Fields\NestedModelField;
 use API\Fields\StringField;
 

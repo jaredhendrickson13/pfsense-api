@@ -4,6 +4,7 @@ namespace API\Models;
 
 use API\Core\Auth;
 use API\Core\Model;
+use API\Dispatchers\DNSResolverApplyDispatcher;
 use API\Fields\IntegerField;
 use API\Fields\StringField;
 use API\Responses\ValidationError;
