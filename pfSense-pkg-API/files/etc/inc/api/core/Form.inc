@@ -37,7 +37,7 @@ class Form {
 
         # Gather information about the authenticated user
         $client = new Auth();
-        $client->username = $_SESSION["Username"];
+        $client->username = ($_SESSION["Username"]) ?: DEFAULT_CLIENT_USERNAME;
 
         # Obtain the `id` from URL parameters
         $this->id = (is_numeric($_GET["id"])) ? intval($_GET["id"]) : null;
