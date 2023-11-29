@@ -9,6 +9,11 @@ use API\Fields\StringField;
 
 class APIVersion extends Model
 {
+    const RELEASES_API_URL = "https://api.github.com/repos/jaredhendrickson13/pfsense-api/releases";
+    const RELEASES_API_MAX_TIME = 10;
+    const RELEASES_CACHE_FILE = "/usr/local/share/pfSense-pkg-API/releases.json";
+    const RELEASES_CACHE_EXPIRATION_SECONDS = 120;
+    
     public StringField $current_version;
     public StringField $latest_version;
     public StringField $latest_version_release_date;
@@ -118,17 +123,17 @@ class APIVersion extends Model
      */
     public static function get_github_releases() : array {
         # Variables
-        $releases_file = "/usr/local/share/pfSense-pkg-API/releases.json";
-        $releases = json_decode(file_get_contents($releases_file), true);
-        $fetch_releases_cmd = "curl -s https://api.github.com/repos/jaredhendrickson13/pfsense-api/releases -m 10";
+        $releases = json_decode(file_get_contents(self::RELEASES_CACHE_FILE), true);
+        $fetch_releases_cmd = "curl -s ".self::RELEASES_API_URL." -m ".self::RELEASES_API_MAX_TIME;
+        $current_time = time();
 
         # Check if our previous releases data is older than 120 seconds
-        if ($releases["last_updated"] + 120 < time()) {
+        if ($releases["last_updated"] + self::RELEASES_CACHE_EXPIRATION_SECONDS < $current_time) {
             # Pull the releases data from Github and rewrite the releases file
             $api_resp = shell_exec($fetch_releases_cmd);
             $api_resp = json_decode($api_resp, true);
-            $releases = ["last_updated" => time(), "releases" => $api_resp];
-            file_put_contents($releases_file, json_encode($releases));
+            $releases = ["last_updated" => $current_time, "releases" => $api_resp];
+            file_put_contents(self::RELEASES_CACHE_FILE, json_encode($releases));
         }
         return $releases;
     }

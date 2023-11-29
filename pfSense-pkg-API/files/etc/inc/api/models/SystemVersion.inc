@@ -8,6 +8,10 @@ use API\Fields\StringField;
 
 class SystemVersion extends Model
 {
+    const VERSION_PATH = "/etc/version";
+    const VERSION_PATCH_PATH = "/etc/version.patch";
+    const VERSION_BUILDTIME_PATH = "/etc/version.buildtime";
+    
     public StringField $version;
     public StringField $base;
     public StringField $patch;
@@ -44,17 +48,14 @@ class SystemVersion extends Model
      * Obtains details about the current running version of pfSense.
      * @return array An array of the running pfSense version details
      */
-    public static function get_pfsense_version() : array {
+    protected static function get_pfsense_version() : array {
         # VARIABLES
-        $ver_path = "/etc/version";
-        $ver_patch_path = "/etc/version.patch";
-        $ver_bt_path = "/etc/version.buildtime";
-        $ver_data = array();
+        $ver_data = [];
 
         # Ensure each file exists, then read it's contents and save it to our version data.
-        if (file_exists($ver_path)) {
+        if (file_exists(self::VERSION_PATH)) {
             # Read full release version
-            $version = file_get_contents($ver_path);
+            $version = file_get_contents(self::VERSION_PATH);
             $version = str_replace(PHP_EOL, "", $version);
             $ver_data["version"] = $version;
 
@@ -67,13 +68,13 @@ class SystemVersion extends Model
             $minor_ver = $version[1];
             $ver_data["base"] = $major_ver.".".$minor_ver;
         }
-        if (file_exists($ver_patch_path)) {
-            $ver_patch_file = file_get_contents($ver_patch_path);
+        if (file_exists(self::VERSION_PATCH_PATH)) {
+            $ver_patch_file = file_get_contents(self::VERSION_PATCH_PATH);
             $ver_patch = str_replace(PHP_EOL, "", $ver_patch_file);
             $ver_data["patch"] = $ver_patch;
         }
-        if (file_exists($ver_bt_path)) {
-            $ver_bt_file = file_get_contents($ver_bt_path);
+        if (file_exists(self::VERSION_BUILDTIME_PATH)) {
+            $ver_bt_file = file_get_contents(self::VERSION_BUILDTIME_PATH);
             $ver_bt = str_replace(PHP_EOL, "", $ver_bt_file);
             $ver_data["buildtime"] = $ver_bt;
         }
