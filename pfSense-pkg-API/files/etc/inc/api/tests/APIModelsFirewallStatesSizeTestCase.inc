@@ -27,6 +27,7 @@ class APIModelsFirewallStatesSizeTestCase extends TestCase
         $states_size = new FirewallStatesSize(async: true);
         $states_size->maximumstates->value = 500;
         $states_size->update();
+        sleep(1);
 
         # Check the hard states limit in pfctl and ensure it matches the value we set
         $pfctl_sm = new Command("pfctl -sm", trim_whitespace: true);
