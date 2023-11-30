@@ -43,15 +43,7 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
     }
 
     private function __validate_target_backend() {
-        if (isset($this->initial_data["name"])) {
-            $backend_id = get_backend_id($this->initial_data["name"]);
-            if ($this->get_config("installedpackages/haproxy/ha_pools/item/{$backend_id}", false)) {
-                $this->id = $backend_id;
-                $this->validated_data = $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}");
-            } else {
-                $this->errors[] = APIResponse\get(2276, ['name' => $this->initial_data['name']]);
-            }   
-        } elseif (isset($this->initial_data["id"])) {
+        if (isset($this->initial_data["id"])) {
             if ($this->get_config("installedpackages/haproxy/ha_pools/item/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}");
@@ -65,9 +57,9 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
 
     private function __validate_backend() {
 
-        if (isset($this->initial_data['new_name'])) {
+        if (isset($this->initial_data['name'])) {
             if ($this->__validate_backend_name()) {
-                $this->validated_data['new_name'] = $this->initial_data['new_name'];
+                $this->validated_data['name'] = $this->initial_data['name'];
             }
         }
 
@@ -111,16 +103,16 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
     private function __validate_backend_name() {
         $bad_pool_name = false;
         /* Ensure only valid characters are in use*/
-        if (preg_match("/[^a-zA-Z0-9_\.\-]/", $this->initial_data['new_name']) || str_contains($this->initial_data['new_name'], ' ')) {
-            $this->errors[] = APIResponse\get(2262, ['new_name' => $this->initial_data['new_name']]);
+        if (preg_match("/[^a-zA-Z0-9_\.\-]/", $this->initial_data['name']) || str_contains($this->initial_data['name'], ' ')) {
+            $this->errors[] = APIResponse\get(2262, ['name' => $this->initial_data['name']]);
             $name_bad_chars = true;
         }
 
         /* Ensure that our pool names are unique */
         $current_backends = get_haproxy_backends();
         foreach ($current_backends as $name => $settings) {
-            if ($this->initial_data['new_name'] == $name) {
-                $this->errors[] = APIResponse\get(2263, ['new_name', $this->initial_data['new_name']]);
+            if ($this->initial_data['name'] == $name) {
+                $this->errors[] = APIResponse\get(2263, ['name', $this->initial_data['name']]);
                 $name_already_used = true;
             }
         }

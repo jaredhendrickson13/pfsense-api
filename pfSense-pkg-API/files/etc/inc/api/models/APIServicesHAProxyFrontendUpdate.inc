@@ -37,8 +37,8 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
 
     public function validate_payload() {
         $this->__validate_target_frontend();
-        if (isset($this->initial_data['new_name']) && $this->__validate_name()) {
-            $this->validated_data['name'] = $this->initial_data['new_name'];
+        if (isset($this->initial_data['name']) && $this->__validate_name()) {
+            $this->validated_data['name'] = $this->initial_data['name'];
         }
         if (isset($this->initial_data['bind_addrs'])) {
             $this->__validate_extaddrs();
@@ -52,15 +52,7 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
     }
 
     private function __validate_target_frontend() {
-        if (isset($this->initial_data["name"])) {
-            $frontend_id = get_frontend_id($this->initial_data["name"]);
-            if ($this->get_config("installedpackages/haproxy/ha_backends/item/{$frontend_id}", false)) {
-                $this->id = $frontend_id;
-                $this->validated_data = $this->get_config("installedpackages/haproxy/ha_backends/item/{$this->id}");
-            } else {
-                $this->errors[] = APIResponse\get(2276, ['name' => $this->initial_data["name"]]);
-            }   
-        } elseif (isset($this->initial_data["id"])) {
+        if (isset($this->initial_data["id"])) {
             if ($this->get_config("installedpackages/haproxy/ha_backends/item/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_backends/item/{$this->id}");
@@ -77,15 +69,15 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
         $name_already_used = false;
 
         /* Ensure only valid characters are in use*/
-        if (preg_match("/[^a-zA-Z0-9_\.\-]/", $this->initial_data['new_name']) || str_contains($this->initial_data['new_name'], ' ')) {
-            $this->errors[] = APIResponse\get(2262, ['new_name' => $this->initial_data['new_name']]);
+        if (preg_match("/[^a-zA-Z0-9_\.\-]/", $this->initial_data['name']) || str_contains($this->initial_data['name'], ' ')) {
+            $this->errors[] = APIResponse\get(2262, ['name' => $this->initial_data['name']]);
             $name_bad_chars = true;
         }   
 
         /* Ensure that our frontend names are unique */
         foreach ($this->current_frontends as $frontend) {
-            if ($this->initial_data['new_name'] == $frontend['name']) {
-                $this->errors[] = APIResponse\get(2263, ['new_name' => $this->initial_data['new_name']]);
+            if ($this->initial_data['name'] == $frontend['name']) {
+                $this->errors[] = APIResponse\get(2263, ['name' => $this->initial_data['name']]);
                 $name_already_used = true;
             }   
         }   
