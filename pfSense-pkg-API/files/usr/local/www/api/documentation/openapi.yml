@@ -6604,6 +6604,474 @@ paths:
       summary: Stop Gateway Monitoring (dpinger) service
       tags:
         - Services > DPINGER
+  /api/v1/services/haproxy/apply:
+    post:
+      operationId: APIServicesHAProxyApplyCreate
+      description: 'Apply pending HAProxy changes.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-services-dnsforwarder`]'
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Apply pending HAProxy changes
+      tags:
+        - Services > HAProxy
+  /api/v1/services/haproxy/frontend:
+    delete:
+      operationId: APIServicesHAProxyFrontendDelete
+      description: 'Delete and existing frontend configuration from HAProxy.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-service-haproxy`]'
+      parameters:
+        - description: ID of the HAProxy frontend to delete. Refer to the 'Obtaining Object
+            IDs' section in the documentation intro for help obtaining this ID. Additionally,
+            the ID can be obtained via GET request to the `/api/v1/services/haproxy/frontend`
+            endpoint. The response body will include the `config_id` item, which contains the 
+            object ID for the frontend in question.
+          in: query
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Specify whether or not you would like this frontend change
+            to be applied immediately, or simply written to the configuration
+            to be applied later. Typically, if you are making multiple HAProxy
+            changes at once, it is best to set this to false and apply
+            the changes afterwards using the `/api/v1/services/haproxy/apply`
+            endpoint.
+          in: query
+          name: apply
+          schema:
+            type: boolean
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Delete HAProxy frontend
+      tags:
+        - Services > HAProxy > Frontend
+    get:
+      operationId: APIServicesHAProxyFrontendRead
+      description: 'Read frontend configurations from HAProxy.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-service-haproxy`]'
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read HAProxy frontend configurations
+      tags:
+        - Services > HAProxy > Frontend
+    post:
+      operationId: APIServicesHAProxyFrontendCreate
+      description: 'Add a new frontend to HAProxy.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-service-haproxy`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                apply:
+                  default: false
+                  description: Specify whether or not you would like this frontend change
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later. Typically, if you are creating multiple
+                    frontends at once (or making other changes as well), it is best to set this to false and apply
+                    the changes afterwards using the `/api/v1/services/haproxy/apply`
+                    endpoint.
+                  type: boolean
+                bind_addrs:
+                  default: [ ]
+                  description: Array of IP address/port definitions, along with whether or not to offload SSL for that IP/port. 
+                  items:
+                    type: object
+                    properties:
+                      address:
+                        description: The IP address to bind. Must be an available VIP on the load balancer.
+                        type: string
+                      port:
+                        description: The TCP port to bind.
+                        type: string
+                      ssl:
+                        description: Whether or not to offload SSL encryption for the IP/port.
+                        type: boolean
+                  type: array
+                name:
+                  description: The name of the newly-created frontend.
+                  type: string
+                type:
+                  description: Load balancing mode, either `tcp` or `http`, depending
+                    on whether you need layer 4 or layer 7 functions.
+                  type: string
+                  enum:
+                    - http
+                    - tcp
+                descr:
+                  description: Description of the created frontend.
+                  type: string
+                lw_subacct:
+                  description: Customer subaccount, used for filtering results.
+                  type: string
+                ssloffloadcert:
+                  description: Reference ID of the certificate to use for SSL termination. Use a GET
+                    request to `/api/v1/system/certificate` to obtain a list of available certs
+                    including their reference IDs.
+                  type: string
+                backend_serverpool:
+                  description: Default backend server pool to which traffic will be sent. A GET request to
+                    `/api/v1/services/haproxy/pool` will provide a list of available backend pools.
+                  type: string
+              required:
+                - bind_addrs
+                - name
+                - type
+                - descr
+                - lw_subacct
+                - backend_serverpool
+              type: object
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Create HAProxy frontend
+      tags:
+        - Services > HAProxy > Frontend
+    put:
+      operationId: APIServicesHAProxyFrontendUpdate
+      description: 'Modify an existing HAProxy frontend.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-service-haproxy`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                apply:
+                  default: false
+                  description: Specify whether or not you would like this frontend change
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later. Typically, if you are modifying multiple
+                    frontends at once, it is best to set this to false and apply
+                    the changes afterwards using the `/api/v1/services/haproxy/apply`
+                    endpoint.
+                  type: boolean
+                bind_addrs:
+                  default: [ ]
+                  description: Array of IP address/port definitions, along with whether or not to offload SSL for that IP/port. 
+                  items:
+                    type: object
+                    properties:
+                      address:
+                        description: The IP address to bind. Must be an available VIP on the load balancer.
+                        type: string
+                      port:
+                        description: The TCP port to bind.
+                        type: string
+                      ssl:
+                        description: Whether or not to offload SSL encryption for the IP/port.
+                        type: boolean
+                  type: array
+                id:
+                  description: ID of the HAProxy frontend to modify. Refer to the 'Obtaining Object
+                    IDs' section in the documentation intro for help obtaining this ID. Additionally,
+                    the ID can be obtained via GET request to the `/api/v1/services/haproxy/frontend`
+                    endpoint. The response body will include the `config_id` item, which contains the 
+                    object ID for the frontend in question.
+                  type: integer
+                name:
+                  description: The new name of the frontend.
+                  type: string
+                type:
+                  description: Load balancing mode
+                  type: string
+                  enum:
+                    - http
+                    - tcp
+                descr:
+                  description: Description of the created frontend.
+                  type: string
+                lw_subacct:
+                  description: Customer subaccount, used for filtering results.
+                  type: string
+                ssloffloadcert:
+                  description: Reference ID of the certificate to use for SSL termination. Use a GET
+                    request to `/api/v1/system/certificate` to obtain a list of available certs
+                    including their reference IDs.
+                  type: string
+                backend_serverpool:
+                  description: Default backend server pool to which traffic will be sent. A GET request to
+                    `/api/v1/services/haproxy/pool` will provide a list of available backend pools.
+                  type: string
+              required:
+                - id
+              type: object
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update HAProxy frontend configuration
+      tags:
+        - Services > HAProxy > Frontend
+  /api/v1/services/haproxy/pool:
+    delete:
+      operationId: APIServicesHAProxyPoolDelete
+      description: 'Delete and existing backend pool configuration from HAProxy.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-service-haproxy`]'
+      parameters:
+        - description: ID of the HAProxy backend pool to delete. Refer to the 'Obtaining Object
+            IDs' section in the documentation intro for help obtaining this ID. Additionally,
+            the ID can be obtained via GET request to the `/api/v1/services/haproxy/pool`
+            endpoint. The response body will include the `config_id` item, which contains the 
+            object ID for the backend pool in question.
+          in: query
+          name: id
+          required: true
+          schema:
+            type: integer
+        - description: Specify whether or not you would like this backend pool change
+            to be applied immediately, or simply written to the configuration
+            to be applied later. Typically, if you are modifying multiple
+            HAProxy settings at once, it is best to set this to false and apply
+            the changes afterwards using the `/api/v1/services/haproxy/apply`
+            endpoint.
+          in: query
+          required: false
+          name: apply
+          schema:
+            type: integer
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Delete HAProxy backend pool
+      tags:
+        - Services > HAProxy > Backend
+    get:
+      operationId: APIServicesHAProxyPoolRead
+      description: 'Read backend pool configurations from HAProxy.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-service-haproxy`]'
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Read HAProxy backend pool configurations
+      tags:
+        - Services > HAProxy > Backend
+    post:
+      operationId: APIServicesHAProxyPoolCreate
+      description: 'Add a new backend pool to HAProxy.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-service-haproxy`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                apply:
+                  default: false
+                  description: Specify whether or not you would like this backend pool change
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later. Typically, if you are modifying multiple
+                    backend pools at once, it is best to set this to false and apply
+                    the changes afterwards using the `/api/v1/services/haproxy/apply`
+                    endpoint.
+                  type: boolean
+                servers:
+                  default: [ ]
+                  description: Array of server definitions, including a name, IP/port, and whether
+                    or not to initiate an encrypted connection with the backend server.
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        description: The name of the backend server. The name is arbitrary, but
+                          be unique per backend.
+                        type: string
+                      address:
+                        description: The IP address of the backend server.
+                        type: string
+                      port:
+                        description: The TCP port on the backend server to which traffic will be sent.
+                        type: string
+                      ssl:
+                        description: Whether or not to encrypt traffic sent to the backend server pool. Requires
+                          a TLS certificate on the backend server IP/port to be effective.
+                        type: boolean
+                  type: array
+                name:
+                  description: The name of the newly-created backend pool.
+                  type: string
+                balance:
+                  description: Load balancing algorithm
+                  type: string
+                  enum:
+                    - roundrobin
+                    - leastconn
+                check_type:
+                  description: The type of health check to implement. Supports HTTP and TCP port check.
+                  type: string
+                  enum:
+                    - http
+                    - basic
+                lw_subacct:
+                  description: Customer subaccount, used for filtering results and also to set a deterministic
+                    cookie name if cookie persistence is enabled.
+                  type: string
+                persist_sticky_type:
+                  description: The type of persistence to enable, if any. Supports source IPv4 address and
+                    cookies for persistence.
+                  type: string
+                  enum:
+                    - stick_sourceipv4
+                    - stick_cookie
+              required:
+                - name
+                - balance
+                - lw_subacct
+                - servers
+              type: object
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Create HAProxy backend pool
+      tags:
+        - Services > HAProxy > Backend
+    put:
+      operationId: APIServicesHAProxyPoolUpdate
+      description: 'Modify an existing HAProxy backend pool. The following options can be changed with this endpoint:
+        load balancing algorithm, health check type, persistence type. To make changes to backend servers, use the
+        `/api/v1/services/haproxy/pool/servers` endpoint.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-service-haproxy`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                apply:
+                  default: false
+                  description: Specify whether or not you would like this backend pool change
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later. Typically, if you are modifying multiple
+                    backend pools at once, it is best to set this to false and apply
+                    the changes afterwards using the `/api/v1/services/haproxy/apply`
+                    endpoint.
+                  type: boolean
+                id:
+                  description: The ID of the backend pool to be modified. Refer to the 'Obtaining Object
+                    IDs' section in the documentation intro for help obtaining this ID. Additionally,
+                    the ID can be obtained via GET request to the `/api/v1/services/haproxy/pool`
+                    endpoint. The response body will include the `config_id` item, which contains the 
+                    object ID for the backend pool in question.
+                  type: string
+                name:
+                  description: The new name of the modified backend pool.
+                  type: string
+                balance:
+                  description: Load balancing algorithm
+                  type: string
+                  enum:
+                    - roundrobin
+                    - leastconn
+                check_type:
+                  description: The type of health check to implement. Supports HTTP and TCP port check.
+                  type: string
+                  enum:
+                    - http
+                    - basic
+                persist_sticky_type:
+                  description: The type of persistence to enable, if any. Supports source IPv4 address and
+                    cookies for persistence.
+                  type: string
+                  enum:
+                    - stick_sourceipv4
+                    - stick_cookie
+              required:
+                - id
+              type: object
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update HAProxy backend pool configuration
+      tags:
+        - Services > HAProxy > Backend
+  /api/v1/services/haproxy/pool/servers:
+    put:
+      operationId: APIServicesHAProxyPoolUpdate
+      description: 'Modify the list of backend servers on an existing HAProxy backend pool. This endpoint is
+        declarative, and the end result will match the list of servers provided.<br><br>
+
+        _Requires at least one of the following privileges:_ [`page-all`, `page-service-haproxy`]'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                apply:
+                  default: false
+                  description: Specify whether or not you would like this backend pool change
+                    to be applied immediately, or simply written to the configuration
+                    to be applied later. Typically, if you are modifying multiple
+                    backend pools at once, it is best to set this to false and apply
+                    the changes afterwards using the `/api/v1/services/haproxy/apply`
+                    endpoint.
+                  type: boolean
+                id:
+                  description: The ID of the backend pool to be modified. Refer to the 'Obtaining Object
+                    IDs' section in the documentation intro for help obtaining this ID. Additionally,
+                    the ID can be obtained via GET request to the `/api/v1/services/haproxy/pool`
+                    endpoint. The response body will include the `config_id` item, which contains the 
+                    object ID for the backend pool in question.
+                  type: string
+                servers:
+                  default: [ ]
+                  description: Array of server definitions, including a name, IP/port, and whether
+                    or not to initiate an encrypted connection with the backend server.
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        description: The name of the backend server. The name is arbitrary, but
+                          be unique per backend.
+                        type: string
+                      address:
+                        description: The IP address of the backend server.
+                        type: string
+                      port:
+                        description: The TCP port on the backend server to which traffic will be sent.
+                        type: string
+                      ssl:
+                        description: Whether or not to encrypt traffic sent to the backend server pool. Requires
+                          a TLS certificate on the backend server IP/port to be effective.
+                        type: boolean
+                  type: array
+              required:
+                - servers
+                - id
+              type: object
+      responses:
+        "200":
+          $ref: '#/components/responses/Success'
+        "401":
+          $ref: '#/components/responses/AuthenticationFailed'
+      summary: Update HAProxy backend pool configuration
+      tags:
+        - Services > HAProxy > Backend
   /api/v1/services/ipsec/apply:
     post:
       operationId: APIServicesIPsecApplyCreate
@@ -14059,6 +14527,8 @@ tags:
   - name: Services > DNSMASQ > Host Override
   - name: Services > DNSMASQ > Host Override > Alias
   - name: Services > DPINGER
+  - name: Services > HAProxy > Backend
+  - name: Services > HAProxy > Frontend
   - name: Services > IPsec > Apply
   - name: Services > IPsec > Phase 1
   - name: Services > IPsec > Phase 2
