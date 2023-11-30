@@ -14,7 +14,7 @@ class FirewallStatesSize extends Model
     public IntegerField $defaultmaximumstates;
     public IntegerField $currentstates;
     
-    public function __construct(mixed $data = [], Auth $client = null, bool $async = true, ...$vl_data)
+    public function __construct(mixed $data = [], Auth $client = null, bool $async = true)
     {
         # Set model attributes
         $this->config_path = "system";
@@ -35,7 +35,7 @@ class FirewallStatesSize extends Model
             read_only: true,
             help_text: "The number of firewall state entries currently registered in the states table."
         );
-        parent::__construct(data: $data, client: $client, async: $async, vl_data: $vl_data);
+        parent::__construct(data: $data, client: $client, async: $async);
     }
     
     /**

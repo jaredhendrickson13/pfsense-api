@@ -7,7 +7,9 @@ require_once("api/fields/StringField.inc");
 
 use API;
 use API\Core\Model;
+use API\Core\ModelSet;
 use API\Models\NetworkInterface;
+use API\Responses\NotFoundError;
 
 /**
  * Defines an InterfaceField class that extends the core Field method. This Field adds validation and representation for
@@ -19,7 +21,7 @@ class InterfaceField extends API\Fields\StringField {
     public bool $allow_ipsec_interface;
     public bool $allow_openvpn_interface;
     public bool $allow_carp_interface;
-    private string $represented_as;
+    public string $represented_as;
 
     /**
      * Defines the StringField object and sets its options.
@@ -253,9 +255,51 @@ class InterfaceField extends API\Fields\StringField {
 
     /**
      * Fetches the NetworkInterface Model object associated with this field's current value
-     * @return Model|NetworkInterface The NetworkInterface Model object associated with this Field's current value.
+     * @return NetworkInterface|ModelSet The NetworkInterface Model object associated with this Field's current value for
+     * non-many fields, or a ModelSet of NetworkInterface objects for many fields.
+     * @throws NotFoundError when a NetworkInterface object could not be found using one or more of this Field's
+     * assigned values.
      */
-    public function get_interface_obj() : Model|NetworkInterface {
-        return NetworkInterface::read_all()->query(["id" => $this->to_internal()])->first();
+    public function get_interface_obj() : NetworkInterface|ModelSet {
+        # Return the single NetworkInterface object for non-many fields
+        if (!$this->many) {
+            # Query for the NetworkInterface object that matches our current value
+            $query = NetworkInterface::query([$this->represented_as => $this->value]);
+
+            # If no match was found, throw an error
+            if (!$query->exists()) {
+                throw new NotFoundError(
+                    message: "No interface could be found with representation value `$this->value`",
+                    response_id: "INTERFACE_FIELD_OBJECT_NOT_FOUND"
+                );
+            }
+
+            # Otherwise return the NetworkInterface object
+            return NetworkInterface::query([$this->represented_as => $this->value])->first();
+        }
+        # For many fields, create a ModelSet and add the NetworkInterface objects for each value
+        else {
+            # Create a ModelSet object to store our located NetworkInterface objects in
+            $modelset = new ModelSet(model_objects: []);
+
+            # Loop through each of our current values
+            foreach ($this->value as $value) {
+                # Query for the NetworkInterface object that matches the current value
+                $query = NetworkInterface::query([$this->represented_as => $value]);
+
+                # If no match was found, throw an error
+                if (!$query->exists()) {
+                    throw new NotFoundError(
+                        message: "No interface could be found with representation value `$this->value`",
+                        response_id: "INTERFACE_FIELD_OBJECT_NOT_FOUND"
+                    );
+                }
+
+                # Add the model object to the ModelSet
+                $modelset->model_objects[] = $query->first();
+            }
+
+            return $modelset;
+        }
     }
 }

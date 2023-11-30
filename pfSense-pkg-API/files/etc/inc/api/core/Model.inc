@@ -69,10 +69,7 @@ class Model {
      * response immediately. Set to `false` to wait for the apply methods to complete before returning a response. Note:
      * Some Models' apply methods may not support asynchronous execution and therefor may ignore this setting.
      */
-    public function __construct(mixed $id=null, mixed $parent_id=null, mixed $data=[], Auth $client=null, bool $async = true, ...$vl_data) {
-        # Merge values specified in $data with values specific in $vl_data 
-        $data = array_merge($data, $vl_data);
-        
+    public function __construct(mixed $id=null, mixed $parent_id=null, mixed $data=[], Auth $client=null, bool $async=true) {
         # Throw an error if both $id and data are set.
         if (isset($id) and $data) {
             throw new ServerError(

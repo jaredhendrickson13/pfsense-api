@@ -20,7 +20,7 @@ class APIVersion extends Model
     public BooleanField $update_available;
     public StringField $install_version;
 
-    public function __construct(mixed $data = [], Auth $client = null, ...$vl_data)
+    public function __construct(mixed $data = [], Auth $client = null)
     {
         # Set model attributes
         $this->internal_callable = "get_api_version_details";
@@ -50,7 +50,7 @@ class APIVersion extends Model
             help_text: "Set the API version to update or rollback to."
         );
 
-        parent::__construct(data: $data, client: $client, vl_data: $vl_data);
+        parent::__construct(data: $data, client: $client);
     }
 
     /**

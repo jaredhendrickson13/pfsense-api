@@ -5,6 +5,7 @@ namespace API\Validators;
 require_once("api/auto_loader.inc");
 
 use API;
+use API\Models\FirewallAlias;
 use API\Models\NetworkInterface;
 use API\Responses\ValidationError;
 
@@ -52,6 +53,14 @@ class FilterNameValidator extends API\Core\Validator {
             throw new ValidationError(
                 message: "Field '$field_name' cannot be '$value' because it is in use by an existing interface.",
                 response_id: "FILTER_NAME_VALIDATOR_NAME_IN_USE_BY_INTERFACE"
+            );
+        }
+
+        # Throw an exception if any existing FirewallAlias object is using this name
+        if (FirewallAlias::read_all()->query(["id__except" => $this->model_context->id, "id" => $value])->exists()) {
+            throw new ValidationError(
+                message: "Field '$field_name' cannot be '$value' because it is in use by an existing interface.",
+                response_id: "FILTER_NAME_VALIDATOR_NAME_IN_USE_BY_ALIAS"
             );
         }
 
