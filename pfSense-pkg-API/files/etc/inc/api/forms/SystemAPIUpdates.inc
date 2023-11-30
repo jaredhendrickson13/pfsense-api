@@ -1,6 +1,6 @@
 <?php
 
-namespace api\forms;
+namespace API\Forms;
 
 require_once("api/auto_loader.inc");
 
