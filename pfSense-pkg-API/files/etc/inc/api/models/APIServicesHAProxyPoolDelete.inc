@@ -37,16 +37,7 @@ class APIServicesHAProxyPoolDelete extends APIModel {
     }
 
     private function __validate_target_backend() {
-        if (isset($this->initial_data["name"])) {
-            $backend_id = get_backend_id($this->initial_data["name"]);
-            if ($this->get_config("installedpackages/haproxy/ha_pools/item/{$backend_id}", false)) {
-                $this->id = $backend_id;
-                $this->validated_data = $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}");
-                $this->current_backend= $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}", []);
-            } else {
-                $this->errors[] = APIResponse\get(2276, ['name' => $this->initial_data['name']]);
-            }   
-        } elseif (isset($this->initial_data["id"])) {
+        if (isset($this->initial_data["id"])) {
             if ($this->get_config("installedpackages/haproxy/ha_pools/item/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_pools/item/{$this->id}");

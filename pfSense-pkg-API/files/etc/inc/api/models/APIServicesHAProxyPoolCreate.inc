@@ -102,7 +102,11 @@ class APIServicesHAProxyPoolCreate extends APIModel {
 
     public function validate_payload() {
         $this->__validate_backend();
-        $this->__validate_servers($this->initial_data['servers']);
+        if (!empty($this->initial_data['servers'])) {
+            $this->__validate_servers($this->initial_data['servers']);
+        } else {
+            $this->errors[] = APIResponse\get(2286, ['request_data' => $this->initial_data]);
+        }
         $this->__populate_defaults();
     }
 
