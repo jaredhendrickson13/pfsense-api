@@ -163,6 +163,7 @@ class APISettings extends Model {
             default: "",
             allow_empty: true,
             write_only: true,
+            sensitive: true,
             verbose_name: "HA sync password",
             help_text: "Sets the password to use when authenticating for HA sync processes. This must be the password
             for the user defined in `ha_sync_username` and must be the same on all hosts defined in `ha_sync_hosts`."

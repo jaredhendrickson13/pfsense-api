@@ -30,6 +30,7 @@ class Field
     public mixed $default = null;
     public bool $read_only = false;
     public bool $write_only = false;
+    public bool $sensitive = false;
     public bool $representation_only = false;
     public string $help_text = "";
     public string $name = "";
@@ -66,6 +67,7 @@ class Field
      * @param bool $write_only Set to `true` to make this field write-only. This will prevent the field's current value
      * from being displayed in the representation data. This is ideal for potentially sensitive fields like passwords,
      * keys, and hashes.
+     * @param bool $sensitive Mask this field when displayed in a Form.
      * @param bool $representation_only Set to `true` to make this field only present in its representation form. This
      * effectively prevents the Field from being converted to an internal value which is saved to the pfSense config.
      * This should only be used for fields that do not relate directly to a configuration value.
@@ -111,6 +113,7 @@ class Field
         bool   $editable = true,
         bool   $read_only = false,
         bool   $write_only = false,
+        bool   $sensitive = false,
         bool   $representation_only = false,
         bool   $many = false,
         int    $many_minimum = 1,
@@ -137,6 +140,7 @@ class Field
         $this->editable = $editable;
         $this->read_only = $read_only;
         $this->write_only = $write_only;
+        $this->sensitive = $sensitive;
         $this->representation_only = $representation_only;
         $this->many = $many;
         $this->many_minimum = $many_minimum;
@@ -938,8 +942,15 @@ class Field
         # Format the title to include an asterisk (*) if it is required.
         $title = ($this->required) ? ucwords($this->verbose_name)."*" : ucwords($this->verbose_name);
 
+        # Return a static text class if this is a read-only field
+        if ($this->read_only) {
+            $input = new \Form_StaticText(
+                title: $title,
+                text: $this->value
+            );
+        }
         # Return a select input for fields with `choices`
-        if ($this->choices or $this->choices_callable) {
+        elseif ($this->choices or $this->choices_callable) {
             $this->set_choices_from_callable();
             $input = new \Form_Select(
                 name: $this->name,

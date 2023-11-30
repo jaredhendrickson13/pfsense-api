@@ -68,8 +68,8 @@ class Form {
 
             # Add any defined Fields to this section
             foreach ($section_params["fields"] as $section_field) {
-                # Make this a password field if it is write only
-                if ($this->model->$section_field->write_only) {
+                # Make this a password field if it is a sensitive field
+                if ($this->model->$section_field->sensitive) {
                     $section->addPassword($this->model->$section_field->to_form_input());
                 }
                 # Otherwise, just add it as a normal input

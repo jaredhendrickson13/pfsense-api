@@ -16,7 +16,7 @@ class SystemAPISettings extends Form {
     public array $tabs = [
         ["Settings", true, "/system_api_settings.php"],
         ["Keys", false, "/system_api_key.php"],
-        ["Updates", false, "/api/update/"],
+        ["Updates", false, "/system_api_updates.php"],
         ["Documentation", false, "/api/documentation/"]
     ];
     public array $sections = [

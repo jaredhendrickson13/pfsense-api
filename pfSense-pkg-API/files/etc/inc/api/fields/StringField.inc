@@ -35,6 +35,7 @@ class StringField extends API\Core\Field {
      * @param bool $write_only Set the `true` to make this field write-only. This will prevent the field's current value
      * from being displayed in the representation data. This is ideal for potentially sensitive fields like passwords,
      * keys, and hashes.
+     * @param bool $sensitive Mask this field when displayed in a Form.
      * @param bool $representation_only Set to `true` to make this field only present in its representation form. This
      * effectively prevents the Field from being converted to an internal value which is saved to the pfSense config.
      * This should only be used for fields that do not relate directly to a configuration value.
@@ -79,6 +80,7 @@ class StringField extends API\Core\Field {
         bool $editable = true,
         bool $read_only = false,
         bool $write_only = false,
+        bool $sensitive = false,
         bool $representation_only = false,
         bool $many = false,
         int $many_minimum = 1,
@@ -110,6 +112,7 @@ class StringField extends API\Core\Field {
             editable: $editable,
             read_only: $read_only,
             write_only: $write_only,
+            sensitive: $sensitive,
             representation_only: $representation_only,
             many: $many,
             many_minimum: $many_minimum,

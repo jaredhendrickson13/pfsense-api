@@ -18,8 +18,9 @@ class APIVersion extends Model
     public StringField $latest_version;
     public StringField $latest_version_release_date;
     public BooleanField $update_available;
+    public StringField $install_version;
 
-    public function __construct(mixed $data = [], Auth $client = null)
+    public function __construct(mixed $data = [], Auth $client = null, ...$vl_data)
     {
         # Set model attributes
         $this->internal_callable = "get_api_version_details";
@@ -35,14 +36,21 @@ class APIVersion extends Model
         );
         $this->latest_version_release_date = new StringField(
             read_only: true,
+            verbose_name: "Release date",
             help_text: "The latest API version's release date."
         );
         $this->update_available = new BooleanField(
             read_only: true,
             help_text: "Indicates if an API update is available for this system."
         );
+        $this->install_version = new StringField(
+            choices_callable: "get_all_available_versions",
+            allow_null: true,
+            write_only: true,
+            help_text: "Set the API version to update or rollback to."
+        );
 
-        parent::__construct(data: $data, client: $client);
+        parent::__construct(data: $data, client: $client, vl_data: $vl_data);
     }
 
     /**
@@ -54,7 +62,8 @@ class APIVersion extends Model
             "current_version" => $this->get_api_version(),
             "latest_version" => $this->get_latest_api_version(),
             "latest_version_release_date" => $this->get_latest_api_release_date(),
-            "update_available" => $this->is_update_available()
+            "update_available" => $this->is_update_available(),
+            "install_version" => array_keys($this->get_all_available_versions())
         ];
     }
 

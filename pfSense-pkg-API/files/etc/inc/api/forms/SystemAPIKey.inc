@@ -15,9 +15,9 @@ class SystemAPIKey extends Form {
     public array $title_path = ["System", "API", "Keys"];
     public string $custom_css = "/css/api/api.css";
     public array $tabs = [
-        ["Settings", false, "/system_api_settings.php"], 
+        ["Settings", false, "/system_api_settings.php"],
         ["Keys", true, "/system_api_key.php"],
-        ["Updates", false, "/api/update/"],
+        ["Updates", false, "/system_api_updates.php"],
         ["Documentation", false, "/api/documentation/"]
     ];
     public array $sections = [
