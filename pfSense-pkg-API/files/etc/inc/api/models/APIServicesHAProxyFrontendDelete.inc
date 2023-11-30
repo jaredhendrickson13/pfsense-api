@@ -37,16 +37,7 @@ class APIServicesHAProxyFrontendDelete extends APIModel {
     }
 
     private function __validate_target_frontend() {
-        if (isset($this->initial_data["name"])) {
-            $backend_id = get_frontend_id($this->initial_data["name"]);
-            if ($this->get_config("installedpackages/haproxy/ha_backends/item/{$backend_id}", false)) {
-                $this->id = $backend_id;
-                $this->validated_data = $this->get_config("installedpackages/haproxy/ha_backends/item/{$this->id}");
-                $this->current_frontend= $this->get_config("installedpackages/haproxy/ha_backends/item/{$this->id}", []);
-            } else {
-                $this->errors[] = APIResponse\get(2276, ['name' => $this->initial_data['name']]);
-            }   
-        } elseif (isset($this->initial_data["id"])) {
+        if (isset($this->initial_data["id"])) {
             if ($this->get_config("installedpackages/haproxy/ha_backends/item/{$this->initial_data["id"]}", false)) {
                 $this->id = $this->initial_data["id"];
                 $this->validated_data = $this->get_config("installedpackages/haproxy/ha_backends/item/{$this->id}");

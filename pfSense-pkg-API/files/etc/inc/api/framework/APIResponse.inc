@@ -2253,7 +2253,7 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "A numeric ID or alphanumeric name for the target frontend/pool must be provided."
+            "message" => "A numeric ID for the target frontend/pool must be provided."
         ],
         2275 => [
             "status" => "bad request",
@@ -2320,6 +2320,12 @@ function get($id, $data=[], $all=false) {
             "code" => 500,
             "return" => $id,
             "message" => "Unexpected HAProxy error after config test. Recent HAProxy errors included in response."
+        ],
+        2286 => [
+            "status" => "bad request",
+            "code" => 400,
+            "return" => $id,
+            "message" => "A list of backend servers must be specified. None provided."
         ],
 
         // 3000-3999 reserved for /api/v1/interfaces API calls
