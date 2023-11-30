@@ -59,26 +59,44 @@ class APIServicesHAProxyPoolDelete extends APIModel {
         }   
     }
 
-    public function action(){
+    private function __parse_syslog() {
+        $syslog_file_handle = fopen('/var/log/system.log', 'r');
+        $error_matches = []; 
+        while (!feof($syslog_file_handle)) {
+            $log_line = fgets($syslog_file_handle, 4096);
+            if (preg_match('/haproxy.*Fatal errors/', $line)) {
+                $error_matches[] = $line;
+            }   
+        }   
+        return array_slice($error_matches,-3);
+    }   
 
-        $this->del_config("installedpackages/haproxy/ha_pools/item/{$this->id}");
-        mark_subsystem_dirty('haproxy.conf');
-        $this->write_config();
-
-        $apply_msg = 'Applying backend changes via API.';
+    private function __apply() {
+        $apply_msg = 'Applying frontend changes via API.';
         $result = haproxy_check_and_run($apply_msg, true);
         if (!$result) {
+            $haproxy_errors = $this->__parse_syslog();
             // If it fails, reset config back to original and apply.
             $this->set_config("installedpackages/haproxy/ha_pools/item/{$this->id}", $this->current_backend);
             $this->write_config();
             $revert_msg = 'Reverting back to original configuration.';
             $result = haproxy_check_and_run($revert_msg, true);
             clear_subsystem_dirty('haproxy.conf');
-            $this->initial_data['haproxy_result'] = $result;
-            return APIResponse\get(2272, $this->initial_data);
+            return APIResponse\get(2272, ['request_data' => $this->initial_data, 'haproxy_errors' => $haproxy_errors]);
         } else {
             clear_subsystem_dirty('haproxy.conf');
-            return APIResponse\get(0, 'Backend successfully deleted');
-        }
+            return APIResponse\get(0, 'Frontend successfully created!');
+        }   
+    }   
+
+    public function action() {
+
+        $this->del_config("installedpackages/haproxy/ha_pools/item/{$this->id}", $this->validated_data);
+        mark_subsystem_dirty('haproxy.conf');
+        $this->write_config();
+
+        if ($this-initial_data['apply'] === true) {
+            $this->__apply();
+        }   
     }
 }
