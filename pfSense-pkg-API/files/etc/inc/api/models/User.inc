@@ -52,6 +52,7 @@ class User extends Model
             help_text: "The password of this local user."
         );
         $this->uid = new IntegerField(
+            unique: true,
             default: (int)$this->get_config("system/nextuid"),
             editable: false,
             read_only: true,
@@ -184,7 +185,7 @@ class User extends Model
     }
 
     /**
-     * Extend the _create() method is it bumps the next UID before creating the object
+     * Extend the _create() method so it bumps the next UID before creating the object
      */
     public function _create()
     {

@@ -7,6 +7,7 @@ require_once("api/auto_loader.inc");
 use API;
 use API\Core\Field;
 use API\Core\Model;
+use API\Core\ModelSet;
 use API\Responses\NotFoundError;
 use API\Responses\ServerError;
 
@@ -276,6 +277,62 @@ class ForeignModelField extends Field {
                 response_id: "FOREIGN_MODEL_FIELD_VALUE_NOT_FOUND"
             );
         }
-        
+    }
+
+    /**
+     * Obtains the Model objects associated with this field's current value(s).
+     * @returns Model|ModelSet If this field is not a `many` field, this method will return the direct Model object
+     * associated with this field's current value. If this field is a `many` field, this method will return a ModelSet
+     * containing all model objects associated with this fields current values.
+     */
+    public function get_model_obj() : Model|ModelSet {
+        # For `many` fields, obtain all associated model objects in a ModelSet
+        if ($this->many) {
+            # Create a ModelSet we can use to store matching objects
+            $modelset = new ModelSet();
+
+            # Loop through each current value and query for model objects that match them
+            foreach ($this->value as $value) {
+                # Add the query parameters needed to locate the related Model object
+                $query_params = array_merge($this->model_query, [$this->model_field => $value]);
+
+                # Query for the Model object this value relates to.
+                $query_modelset = $this->model->query($query_params);
+
+                # Throw a not found error if no match was found
+                if ($query_modelset->exists()) {
+                    throw new NotFoundError(
+                        message: "Field `$this->name` could not locate `{$this->model->verbose_name}` object with ".
+                        "`$this->model_field` set to `$value`",
+                        response_id: "FOREIGN_MODEL_FIELD_VALUE_NOT_FOUND"
+                    );
+                }
+
+                # Otherwise, add it to the ModelSet
+                $modelset->model_objects[] = $query_modelset->first();
+            }
+
+            return $modelset;
+        }
+        # For non `many` fields, obtain the singular model object associate with the current value
+        else {
+            # Add the query parameters needed to locate the related Model object
+            $query_params = array_merge($this->model_query, [$this->model_field => $value]);
+
+            # Query for the Model object this value relates to.
+            $query_modelset = $this->model->query($query_params);
+
+            # Throw a not found error if no match was found
+            if ($query_modelset->exists()) {
+                throw new NotFoundError(
+                    message: "Field `$this->name` could not locate `{$this->model->verbose_name}` object with ".
+                    "`$this->model_field` set to `$value`",
+                    response_id: "FOREIGN_MODEL_FIELD_VALUE_NOT_FOUND"
+                );
+            }
+
+            # Otherwise, add it to the ModelSet
+            return $query_modelset->first();
+        }
     }
 }
