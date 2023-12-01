@@ -6686,7 +6686,6 @@ paths:
                     endpoint.
                   type: boolean
                 bind_addrs:
-                  default: [ ]
                   description: Array of IP address/port definitions, along with whether or not to offload SSL for that IP/port. 
                   items:
                     type: object
@@ -6726,6 +6725,18 @@ paths:
                   description: Default backend server pool to which traffic will be sent. A GET request to
                     `/api/v1/services/haproxy/pool` will provide a list of available backend pools.
                   type: string
+              example:
+                name: ABC123_http_443
+                bind_addrs:
+                  - address: 1.2.3.4
+                    port: 443
+                    ssl: true
+                descr: ABC123_http_443
+                type: http
+                lw_subacct: ABC123
+                ssloffloadcert: 65529826c2d24
+                backend_serverpool: ABC123_pool_443
+                apply: true
               required:
                 - bind_addrs
                 - name
@@ -6808,6 +6819,19 @@ paths:
                   description: Default backend server pool to which traffic will be sent. A GET request to
                     `/api/v1/services/haproxy/pool` will provide a list of available backend pools.
                   type: string
+              example:
+                id: 4
+                name: ABC123_http_443
+                bind_addrs:
+                  - address: 1.2.3.4
+                    port: 443
+                    ssl: true
+                descr: ABC123_http_443
+                type: http
+                lw_subacct: ABC123
+                ssloffloadcert: 65529826c2d24
+                backend_serverpool: ABC123_pool_443
+                apply: true
               required:
                 - id
               type: object
@@ -6935,6 +6959,20 @@ paths:
                   enum:
                     - stick_sourceipv4
                     - stick_cookie
+              example:
+                name: ABC123_pool_443
+                servers:
+                  - name: s1
+                    address: 5.6.7.8
+                    port: 443
+                    ssl: true
+                  - name: s2
+                    address: 9.10.11.12
+                    port: 443
+                    ssl: true
+                balance: leastconn
+                check_type: http
+                persist_sticky_type: stick_cookie
               required:
                 - name
                 - balance
@@ -6999,6 +7037,12 @@ paths:
                   enum:
                     - stick_sourceipv4
                     - stick_cookie
+              example:
+                id: 4
+                name: ABC123_pool_443
+                balance: leastconn
+                check_type: http
+                persist_sticky_type: stick_cookie
               required:
                 - id
               type: object
@@ -7060,6 +7104,17 @@ paths:
                           a TLS certificate on the backend server IP/port to be effective.
                         type: boolean
                   type: array
+              example:
+                id: 4
+                servers:
+                  - name: s1
+                    address: 5.6.7.8
+                    port: 443
+                    ssl: true
+                  - name: s2
+                    address: 9.10.11.12
+                    port: 443
+                    ssl: true
               required:
                 - servers
                 - id
@@ -14527,6 +14582,7 @@ tags:
   - name: Services > DNSMASQ > Host Override
   - name: Services > DNSMASQ > Host Override > Alias
   - name: Services > DPINGER
+  - name: Services > HAProxy
   - name: Services > HAProxy > Backend
   - name: Services > HAProxy > Frontend
   - name: Services > IPsec > Apply
