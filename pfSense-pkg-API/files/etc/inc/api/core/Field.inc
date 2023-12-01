@@ -634,6 +634,7 @@ class Field
             }
 
             # Query for any other of the parent context's Model objects with the same field value
+            var_dump($this->context->id);
             $model_query = $this->context->query(["id__except" => $this->context->id, $this->name => $this->value]);
             if ($model_query->exists()) {
                 $model_object = $model_query->first();

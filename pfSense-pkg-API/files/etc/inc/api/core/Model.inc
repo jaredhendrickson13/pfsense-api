@@ -1135,13 +1135,13 @@ class Model {
      * @return Model Returns the created Model object (this object).
      */
     final public function create(bool $apply = false) : Model {
+        # Get the next available internal ID and assign it to this object for `many` models with a config path
+        if ($this->config_path and $this->many) {
+            $this->id = $this->get_next_id();
+        }
+        
         # Ensure all object fields and validations succeed for proceeding.
         if ($this->validate()) {
-            # Get the next available internal ID and assign it to this object for `many` models with a config path
-            if ($this->config_path and $this->many) {
-                $this->id = $this->get_next_id();
-            }
-
             # Run the _create method
             $this->_create();
 
@@ -1282,6 +1282,7 @@ class Model {
 
             # Define a new Model object using this representation and validate
             $model_object = new $this(data: $representation_object);
+            $model_object->id = $model_object->get_next_id();
             $model_object->validate();
 
             # If an error was not thrown during Model object creation or validation, give it an ID and set the config

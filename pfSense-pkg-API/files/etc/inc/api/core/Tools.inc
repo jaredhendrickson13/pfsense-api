@@ -376,6 +376,20 @@ function generate_documentation() {
                         ]
                     );
                 }
+
+                # Add the `apply` parameter if this is a DELETE request
+                if ($request_method == "delete" and $model->subsystem) {
+                    $openapi_config["paths"][$endpoint->url][$request_method]["parameters"][] = [
+                        "in" => "query",
+                        "name" => "apply",
+                        "description" => "Apply this deletion immediately.",
+                        "required" => false,
+                        "schema" => [
+                            "type" => "bool",
+                            "default" => false
+                        ]
+                    ];
+                }
             }
 
             # Assign this request method responses for each Response class defined.

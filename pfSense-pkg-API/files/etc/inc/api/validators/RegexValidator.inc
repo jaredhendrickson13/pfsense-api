@@ -8,18 +8,22 @@ use API\Responses\ValidationError;
 class RegexValidator extends Validator
 {
     public string $pattern;
+    public bool $invert;
     public string $error_msg;
 
     /**
      * Constructs the Validator object.
      * @param string $pattern The regex pattern to validate the value against.
+     * @param bool $invert Invert the context of the pattern. If `true`, any value that does NOT match the pattern
+     * will be considered valid.
      * @param string $error_msg An optional error message to include when validation fails. This helps provide context
      * to the regex pattern.
      */
-    public function __construct(string $pattern, string $error_msg = "")
+    public function __construct(string $pattern, bool $invert = false, string $error_msg = "")
     {
         $this->pattern = $pattern;
-        $this->error_msg = $error_msg;
+        $this->invert = $invert;
+        $this->error_msg = ($error_msg) ?: "Value must match pattern: `$pattern`.";
     }
 
     /**
@@ -29,9 +33,17 @@ class RegexValidator extends Validator
      */
     public function validate(mixed $value, string $field_name = "")
     {
-        if (!preg_match(pattern: $this->pattern, subject: $value)) {
+        # Consider this value invalid if the context is not inverted and the value does not match the pattern
+        if (!$this->invert and !preg_match(pattern: $this->pattern, subject: $value)) {
             throw new ValidationError(
-                message: "Field `$field_name` failed regex validation. $this->error_msg.",
+                message: "Field `$field_name` failed regex validation. $this->error_msg",
+                response_id: "REGEX_VALIDATOR_FAILED"
+            );
+        }
+        # Consider this value invalid if the context is inverted and the value does match the pattern
+        if ($this->invert and preg_match(pattern: $this->pattern, subject: $value)) {
+            throw new ValidationError(
+                message: "Field `$field_name` failed regex validation. $this->error_msg",
                 response_id: "REGEX_VALIDATOR_FAILED"
             );
         }
