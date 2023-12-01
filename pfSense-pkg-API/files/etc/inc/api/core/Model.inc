@@ -966,8 +966,14 @@ class Model {
     /**
      * Performs steps and processes required to apply changes after the `replace_all()` method runs. This can be
      * overridden to add custom steps to apply after replace all actions only. Defaults to simply calling `apply()`.
+     * @param ModelSet $initial_objects A ModelSet containing each existing object for this Model as they were when
+     * the `replace_all()` method was initially called. This is useful when a function or service needs to be restarted
+     * for each object before replacing the set.
+     * @param ModelSet $new_objects A ModelSet containing each of the new objects for this Model. Note: at this
+     * point, each Model object within this ModelSet has already been written to config. This method is responsible
+     * for ensuring it is applied to any backend services.
      */
-    protected function apply_replace_all() {
+    protected function apply_replace_all(ModelSet $initial_objects, ModelSet $new_objects) {
         $this->apply();
     }
 
@@ -1260,6 +1266,11 @@ class Model {
                 response_id: "MODEL_NON_ARRAY_REPRESENTATION_DATA"
             );
         }
+        
+        # Keep track of all existing objects for this Model before anything is changed. This will be passed back
+        # into `apply_replace_all()` so that method can gracefully bring down these objects before replacing them
+        # if needed.
+        $initial_objects = $this->read_all();
 
         # Empty the config array for this Model
         $this->set_config($this->get_config_path(), []);
@@ -1281,6 +1292,9 @@ class Model {
         # Sort and write the changes to config
         $this->sort();
         $this->write_config("Replaced all $this->verbose_name_plural via API");
+        
+        # Read all new objects for this Model so it can be passed into `apply_replace_all()`.
+        $new_objects = $this->read_all();
 
         # Mark the subsystem as dirty if set
         if ($this->subsystem) {
@@ -1289,7 +1303,7 @@ class Model {
 
         # Apply if requested
         if ($apply or $this->always_apply) {
-            $this->apply_replace_all();
+            $this->apply_replace_all($initial_objects, $new_objects);
             clear_subsystem_dirty($this->subsystem);
         }
 

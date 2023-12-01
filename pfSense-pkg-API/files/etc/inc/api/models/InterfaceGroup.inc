@@ -5,6 +5,7 @@ namespace API\Models;
 use API\Core\Auth;
 use API\Core\Command;
 use API\Core\Model;
+use API\Core\ModelSet;
 use API\Fields\InterfaceField;
 use API\Fields\StringField;
 use API\Validators\FilterNameValidator;
@@ -38,6 +39,7 @@ class InterfaceGroup extends Model
             default: [],
             allow_empty: true,
             many: true,
+            delimiter: " ",
             help_text: "The member interfaces to assign to this interface group."
         );
         $this->descr = new StringField(
@@ -50,10 +52,24 @@ class InterfaceGroup extends Model
     }
 
     /**
-     * Applies the interface group changes
+     * Applies the initial creation of an InterfaceGroup.
      */
-    public function apply()
+    public function apply_create()
     {
+        interface_group_setup($this->to_internal());
+    }
+
+    /**
+     * Applies updates to an existing InterfaceGroup.
+     */
+    public function apply_update()
+    {
+        # Loop through each initial member interface and remove it from the group
+        foreach ($this->initial_object->members->get_interface_obj()->model_objects as $member) {
+            new Command("/sbin/ifconfig {$member->if->value} -group " . $this->ifname->value);
+        }
+        
+        # Setup the group with the new member interfaces
         interface_group_setup($this->to_internal());
     }
 
@@ -65,6 +81,31 @@ class InterfaceGroup extends Model
         # Loop through each member interface and remove it from the group
         foreach ($this->members->get_interface_obj()->model_objects as $member) {
             new Command("/sbin/ifconfig {$member->if->value} -group " . $this->ifname->value);
+        }
+    }
+    
+    /**
+     * Gracefully brings down the previous (existing) set InterfaceGroup objects and applies the new set.
+     * @param ModelSet $initial_objects A ModelSet containing each existing object for this Model as they were when
+     * the `replace_all()` method was initially called. This is useful when a function or service needs to be restarted
+     * for each object before replacing the set.
+     * @param ModelSet $new_objects A ModelSet containing each of the new objects for this Model. Note: at this
+     * point, each Model object within this ModelSet has already been written to config. This method is responsible
+     * for ensuring it is applied to any backend services.
+     */
+    function apply_replace_all(ModelSet $initial_objects, ModelSet $new_objects)
+    {
+        # Loop through each of the InterfaceGroup objects being replaced and remove the group from its members
+        foreach ($initial_objects->model_objects as $old_if_group) {
+            # Loop through each initial member interface and remove it from the group
+            foreach ($old_if_group->members->get_interface_obj()->model_objects as $member) {
+                new Command("/sbin/ifconfig {$member->if->value} -group " . $old_if_group->ifname->value);
+            }
+        }
+        
+        # Loop through each new InterfaceGroup object and ensure it is applied
+        foreach ($new_objects->model_objects as $new_object) {
+            interface_group_setup($new_object->to_internal());
         }
     }
 }

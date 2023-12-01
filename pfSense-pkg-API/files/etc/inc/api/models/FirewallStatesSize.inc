@@ -3,7 +3,6 @@
 namespace API\Models;
 
 use API\Core\Auth;
-use API\Core\Dispatcher;
 use API\Core\Model;
 use API\Dispatchers\FirewallApplyDispatcher;
 use API\Fields\IntegerField;

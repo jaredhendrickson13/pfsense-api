@@ -42,8 +42,14 @@ class Form {
         # Obtain the `id` from URL parameters
         $this->id = (is_numeric($_GET["id"])) ? intval($_GET["id"]) : null;
 
-        # Create a new object for the assigned Model
-        $this->model = new $this->model_name(id: $this->id, client: $client);
+        # For `many` forms, specify an ID 
+        if ($this->many) {
+            $this->model = new $this->model_name(id: $this->id, client: $client);
+        }
+        # For non `many` forms, don't specify an ID when creating
+        else {
+            $this->model = new $this->model_name(client: $client);
+        }
 
         foreach ($this->title_path as &$path) {
             $path = gettext($path);

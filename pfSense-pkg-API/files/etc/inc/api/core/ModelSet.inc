@@ -18,7 +18,7 @@ class ModelSet {
      * Creates a ModelSet object that contains multiple Model objects.
      * @param array $model_objects An array of model objects to include in this model set
      */
-    public function __construct(array $model_objects) {
+    public function __construct(array $model_objects = []) {
         # Throw an error if any models are not a Model object
         foreach ($model_objects as $model_object) {
             if (!is_object($model_object) or !in_array("API\Core\Model", class_parents($model_object))) {
