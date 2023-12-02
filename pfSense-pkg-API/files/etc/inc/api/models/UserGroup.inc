@@ -30,6 +30,7 @@ class UserGroup extends Model
         $this->always_apply = true;
         $this->sort_option = SORT_ASC;
         $this->sort_by_field = "name";
+        $this->protected_model_query = ["scope" => "system"];
 
         # Set model fields
         $this->name = new StringField(

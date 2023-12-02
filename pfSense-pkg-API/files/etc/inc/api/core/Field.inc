@@ -433,9 +433,17 @@ class Field
             return;
         }
 
-        # Obtain the stored value for this object's from config
+        # Obtain the existing context Model as it is in the config currently
         $field_name = $this->name;
-        $current_value = (new $this->context(id: $this->context->id))->$field_name->value;
+        $current_model = $this->context->query(id: $this->context->id);
+        
+        # Only proceed if the current model exists in config so an error is not thrown during Model `create()`.
+        if (!$current_model->exists()) {
+            return;
+        }
+        
+        # Obtain the current value for this field
+        $current_value = $current_model->first()->$field_name->value;
 
         # Throw an error if this is a non `editable` field but the values changed.
         if ($this->value !== $current_value) {
@@ -634,7 +642,6 @@ class Field
             }
 
             # Query for any other of the parent context's Model objects with the same field value
-            var_dump($this->context->id);
             $model_query = $this->context->query(["id__except" => $this->context->id, $this->name => $this->value]);
             if ($model_query->exists()) {
                 $model_object = $model_query->first();

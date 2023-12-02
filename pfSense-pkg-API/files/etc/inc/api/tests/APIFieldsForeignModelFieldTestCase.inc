@@ -137,6 +137,11 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
         $field = new ForeignModelField(model_name: "FirewallAlias", model_field: "name", model_field_internal: "id");
         $field->from_internal(1);
         $this->assert_equals($field->value, "NET_ALIAS");
+
+        # Delete the firewall aliases used for testing
+        $host_alias->delete(apply: true);
+        $net_alias->delete(apply: true);
+        $port_alias->delete(apply: true);
     }
 
     /**
@@ -155,6 +160,11 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
         $field = new ForeignModelField(model_name: "FirewallAlias", model_field: "id", model_field_internal: "name");
         $field->value = 2;
         $this->assert_equals($field->to_internal(), "PORT_ALIAS");
+
+        # Delete the firewall aliases used for testing
+        $host_alias->delete(apply: true);
+        $net_alias->delete(apply: true);
+        $port_alias->delete(apply: true);
     }
     
     /**
@@ -186,7 +196,7 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
         $port_alias = new FirewallAlias(data: ["name" => "PORT_ALIAS", "type" => "port", "address" => []]);
         $port_alias->create();
 
-        # Create a ForeignModelField object that can only relate to FirewallAlias objects that are of `type` netowrk
+        # Create a ForeignModelField object that can only relate to FirewallAlias objects that are of `type` network
         $field = new ForeignModelField(
             model_name: "FirewallAlias", 
             model_field: "name", 
@@ -212,5 +222,56 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
                 $field->validate();
             }
         );
+
+        # Delete the firewall aliases used for testing
+        $host_alias->delete(apply: true);
+        $net_alias->delete(apply: true);
+        $port_alias->delete(apply: true);
+    }
+
+    /**
+     * Ensure the `get_model_obj` correctly returns the model object(s) associated with this field's current value(s).
+     */
+    public function test_get_model_obj() {
+        # Create FirewallAlias objects to use for testing purposes
+        $host_alias = new FirewallAlias(data: ["name" => "HOST_ALIAS", "type" => "host", "address" => []]);
+        $host_alias->create();
+        $net_alias = new FirewallAlias(data: ["name" => "NET_ALIAS", "type" => "network", "address" => []]);
+        $net_alias->create();
+        $port_alias = new FirewallAlias(data: ["name" => "PORT_ALIAS", "type" => "port", "address" => []]);
+        $port_alias->create();
+
+        # Create a non `many` ForeignModelField object 
+        $field = new ForeignModelField(
+            model_name: "FirewallAlias",
+            model_field: "name",
+            default: "test"
+        );
+        $field->value = "NET_ALIAS";
+
+        # Ensure the object returned by `get_model_obj()` is the FirewallAlias object with the name `NET_ALIAS`
+        $this->assert_equals($field->get_model_obj()->name->value, $field->value);
+
+        # Create a `many` ForeignModelField object  and assign it all of the above firewall aliases by name
+        $field = new ForeignModelField(
+            model_name: "FirewallAlias",
+            model_field: "name",
+            default: "test",
+            many: true
+        );
+        $field->value = ["HOST_ALIAS", "NET_ALIAS", "PORT_ALIAS"];
+
+        # Ensure the object returned by `get_model_obj()` is a ModelSet
+        $this->assert_is_true($field->get_model_obj()->exists());
+        
+        # Ensure each model object within the ModelSet is a FirewallAlias object that corresponds to this fields values
+        foreach ($field->get_model_obj()->model_objects as $alias) {
+            $this->assert_is_true(in_array($alias->name->value, $field->value));
+        }
+        
+        # Delete the firewall aliases used for testing
+        $host_alias->delete(apply: true);
+        $net_alias->delete(apply: true);
+        $port_alias->delete(apply: true);
     }
 }

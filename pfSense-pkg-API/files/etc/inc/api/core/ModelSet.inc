@@ -64,22 +64,33 @@ class ModelSet {
      * @return array A serializable representation of all model objects within this model set.
      */
     public function to_representation() : array {
-        return $this->run_model_method("to_representation");
+        return $this->run_model_method(method_name: "to_representation");
+    }
+
+    /**
+     * Runs the to_internal() method for each model object within the model set and returns them all in an array.
+     * @return array The internal configu values of all model objects within this model set.
+     */
+    public function to_internal() : array {
+        return $this->run_model_method(method_name: "to_internal", use_id_as_key: true);
+
     }
 
     /**
      * Runs a specified Model object method for each model object within this ModelSet.
      * @param string $method_name The name of the Model method to run for each model object in this model set.
+     * @param bool $use_id_as_key Use each Model object's `id` property value as the return array keys. 
      * @return array The return value of method call for each model object. Results are stored in the same order as
      * the model objects were passed in during construction.
      */
-    private function run_model_method(string $method_name) : array {
+    private function run_model_method(string $method_name, bool $use_id_as_key = false) : array {
         # Variables
         $results = [];
 
         # Loop through each model object and call its to_representation() method
-        foreach ($this->model_objects as $model_object) {
-            $results[] = $model_object->$method_name();
+        foreach ($this->model_objects as $loop_count => $model_object) {
+            $id = ($use_id_as_key) ? $model_object->id : $loop_count;
+            $results[$id] = $model_object->$method_name();
         }
 
         return $results;

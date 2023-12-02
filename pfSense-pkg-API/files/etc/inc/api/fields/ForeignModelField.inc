@@ -29,7 +29,7 @@ class ForeignModelField extends Field {
      * existing Model class in the \API\Models namespace, but should not include the \API\Models namespace prefix. 
      * @param string $model_field The field on the assigned $model_name class that this field's value relates to. For
      * example, if this fields value must be an existing Gateway model object's `name`, you would set $model_name to
-     * `Gateway` and $model_field to `name`.
+     * `Gateway` and $model_field to `name`. This field must be a `unique` field on the assigned $model_name.
      * @param string $model_field_internal In the event that you want to store a different field value internally,
      * specify that field name here. Leave empty to use the $model_field for both the internal and representation values.
      * For example, if this field's value must be set in config as an existing Gateway model object's `name`, but you 
@@ -300,7 +300,7 @@ class ForeignModelField extends Field {
                 $query_modelset = $this->model->query($query_params);
 
                 # Throw a not found error if no match was found
-                if ($query_modelset->exists()) {
+                if (!$query_modelset->exists()) {
                     throw new NotFoundError(
                         message: "Field `$this->name` could not locate `{$this->model->verbose_name}` object with ".
                         "`$this->model_field` set to `$value`",
@@ -317,16 +317,16 @@ class ForeignModelField extends Field {
         # For non `many` fields, obtain the singular model object associate with the current value
         else {
             # Add the query parameters needed to locate the related Model object
-            $query_params = array_merge($this->model_query, [$this->model_field => $value]);
+            $query_params = array_merge($this->model_query, [$this->model_field => $this->value]);
 
             # Query for the Model object this value relates to.
             $query_modelset = $this->model->query($query_params);
 
             # Throw a not found error if no match was found
-            if ($query_modelset->exists()) {
+            if (!$query_modelset->exists()) {
                 throw new NotFoundError(
                     message: "Field `$this->name` could not locate `{$this->model->verbose_name}` object with ".
-                    "`$this->model_field` set to `$value`",
+                    "`$this->model_field` set to `$this->value`",
                     response_id: "FOREIGN_MODEL_FIELD_VALUE_NOT_FOUND"
                 );
             }
