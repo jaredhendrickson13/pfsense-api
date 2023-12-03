@@ -5,6 +5,7 @@ namespace API\Models;
 use API;
 use API\Core\Auth;
 use API\Core\Model;
+use API\Dispatchers\FirewallApplyDispatcher;
 use API\Fields\BooleanField;
 use API\Fields\FilterAddressField;
 use API\Fields\ForeignModelField;
@@ -300,5 +301,13 @@ class FirewallRule extends Model
     public function validate_updated_by(string $updated_by) : string {
         # Auto update this value to the current username and IP
         return "{$this->client->username}@{$this->client->ip_address} (API)";
+    }
+
+    /**
+     * Applies firewall rule changes.
+     */
+    public function apply()
+    {
+        (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

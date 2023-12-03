@@ -21,7 +21,7 @@ class FirewallAlias extends Model {
     public StringField $address;
     public StringField $detail;
 
-    public function __construct(mixed $id=null, mixed $data=[], Auth $client=null) {
+    public function __construct(mixed $id=null, mixed $data=[], Auth $client=null, bool $async = true) {
         $this->config_path = "aliases/alias";
         $this->subsystem = "aliases";
         $this->many = true;
@@ -66,7 +66,7 @@ class FirewallAlias extends Model {
         );
 
         # Needs to be constructed after fields are defined
-        parent::__construct(id: $id, data: $data, client: $client);
+        parent::__construct(id: $id, data: $data, client: $client, async: $async);
     }
 
     /**
@@ -129,7 +129,7 @@ class FirewallAlias extends Model {
      * @returns string The validated value to be set.
      * @throws ValidationError When the `detail` value is invalid.
      */
-    public function validate_detail(string $detail) : array {
+    public function validate_detail(string $detail) : string {
         # Throw an error if there are more `detail` items than `address` items
         if (count($this->detail->value) > count($this->address->value)) {
             throw new ValidationError(
@@ -151,6 +151,6 @@ class FirewallAlias extends Model {
      * changes to config.
      */
     public function apply() {
-        (new FirewallApplyDispatcher())->spawn_process();
+        (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

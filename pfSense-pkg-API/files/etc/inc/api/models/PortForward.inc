@@ -4,6 +4,7 @@ namespace API\Models;
 
 use API\Core\Auth;
 use API\Core\Model;
+use API\Dispatchers\FirewallApplyDispatcher;
 use API\Fields\BooleanField;
 use API\Fields\FilterAddressField;
 use API\Fields\InterfaceField;
@@ -167,5 +168,13 @@ class PortForward extends Model
         );
         
         parent::__construct(id: $id, data: $data, client: $client, async: $async);
+    }
+
+    /**
+     * Applies port forward changes.
+     */
+    public function apply()
+    {
+        (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
     }
 }
