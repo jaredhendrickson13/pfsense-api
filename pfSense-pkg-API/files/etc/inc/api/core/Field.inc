@@ -9,150 +9,165 @@ use API\Responses\ValidationError;
 use API\Validators\LengthValidator;
 use function API\Core\Tools\is_assoc_array;
 
+/**
+ * Defines Model Fields and their attributes. Field's define how value should be obtained on pfSense internally, and
+ * converted into its representation form. Fields are also responsible for validation of this Field's value. This
+ * includes strict type validation, choice options, whether the value can be null or empty, etc. Field's can also be 
+ * assigned custom Validator objects to add custom validation to the Field. Field's must be assigned as a properties
+ * Model objects.
+ */
 class Field
 {
+    /**
+     * Represents the current value for this Field.
+     *
+     * @var mixed $value
+     */
     public mixed $value = null;
-    public string $type = "";
-    public array $validators = [];
-    public array $labels = [];
-    public bool $unique = false;
-    public bool $many = false;
-    public int $many_minimum = 1;
-    public int $many_maximum = 128;
-    public string|null $delimiter = ",";
-    public array $choices = [];
-    public string $choices_callable = "";
-    public array $verbose_choices = [];
-    public bool $allow_empty = false;
-    public bool $allow_null = false;
-    public bool $editable = true;
-    public bool $required = false;
-    public mixed $default = null;
-    public bool $read_only = false;
-    public bool $write_only = false;
-    public bool $sensitive = false;
-    public bool $representation_only = false;
-    public string $help_text = "";
-    public string $name = "";
-    public string $verbose_name = "";
-    public string $verbose_name_plural = "";
-    public string $internal_name = "";
-    public string $internal_namespace = "";
-    public array $referenced_by = [];
-    public array $conditions = [];
-    public Model|null $context = null;
 
     /**
-     * @param string $type The primary type supported by this field. This must be a string representation of the type
-     * as it is returned by PHP's gettype() function.
-     * @param bool $required Set to `true` if this field is required to be explicitly set. $required and $default are
-     * mutually exclusive.
-     * @param bool $unique Set to `true` if this value must be unique from all other objects of the same model.
-     * @param mixed|null $default The default value to assign this field if no value was found. If not set, it assumed
-     * this Field requires a value and should fail validation if no value was found.
-     * @param array $choices An array of value choices this Field can be assigned. This can either be an indexed array
-     * of the exact choice values, or an associative array where the array key is the exact choice value and the array
-     * value is a verbose name for the choice. Verbose choice name are used by ModelForms when generating web pages
-     * for a given Model.
-     * @param string $choices_callable Assign a callable method from this Field object OR the parent Model context to
-     *  execute to populate choices for this field. This callable must be a method assigned on this Field object OR the
-     *  parent Model object that returns an array of valid choices in the same format as $choices. This is helpful when
-     *  choices are dynamic and must be populate at runtime instead of pre-determined sets of values.
-     * @param bool $allow_empty If `true`, empty strings will be allowed by this field.
-     * @param bool $allow_null Set to `true` if `null` values should be supported for this field. When `null` values
-     * are supported, the underlying pfSense configuration field will be removed entirely when receiving a null value.
-     * @param bool $editable Set to `false` to prevent this field's value from being changed after its initial creation.
-     * @param bool $read_only Set to `true` to make this field read-only. Attempts to write to a read-only field will
-     * result in a thrown exception.
-     * @param bool $write_only Set to `true` to make this field write-only. This will prevent the field's current value
-     * from being displayed in the representation data. This is ideal for potentially sensitive fields like passwords,
-     * keys, and hashes.
-     * @param bool $sensitive Mask this field when displayed in a Form.
-     * @param bool $representation_only Set to `true` to make this field only present in its representation form. This
-     * effectively prevents the Field from being converted to an internal value which is saved to the pfSense config.
-     * This should only be used for fields that do not relate directly to a configuration value.
-     * @param bool $many Set to `true` if this field should accept an array of many values. `false` if only one value
-     * should be allowed. If `true`, validation will run against each value in the value array individual.
-     * @param int $many_minimum When $many is set to `true`, this sets the minimum number of array entries required.
-     * @param int $many_maximum When $many is set to `true`, this sets the maximum number of array entries allowed.
-     * @param string|null $delimiter Assigns the string delimiter to use when writing array values to config.
-     * Use `null` if this field is stored as an actual array in config. This is only available if $many is set to
-     * `true`. Defaults to `,` to store as comma-separated string.
-     * @param string $verbose_name The detailed name for this Field. This name will be used in non-programmatic areas
-     * like web pages and help text. This Field will default to property name assigned to the parent Model with
-     * underscores converted to spaces.
-     * @param string $verbose_name_plural The plural form of $verbose_name. This defaults to $verbose_name with `s`
-     * suffixed or `es` suffixes to strings already ending with `s`.
-     * @param string $internal_name The name of the field as it is stored in the pfSense configuration. If not set, the
-     * internal name will utilize the $name of the Field object.
-     * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
-     * the field internal value under a specific namespace as an associative array. This only applies to the internal
-     * value, not the representation value.
-     * @param array $referenced_by An array that specifies other Models and Field's that reference this Field's parent
-     * Model using this Field's value. This will prevent the parent Model object from being deleted while it is actively
-     * referenced by another Model object. The array key must be the name of the Model class that references this Field,
-     * and the value must be a Field within that Model. The framework will automatically search for any existing Model
-     * objects that have the referenced Field assigned a value that matches this Field's value.
-     * @param array $conditions An array of conditions the field must meet to be included. This allows you to specify
-     * conditions of other fields within the parent Model context. For example, if the parent Model context has two
-     * fields, one field named `type` and the other being this field; and you only want this field to be included if
-     * `type` is equal to `type1`, you could assign ["type" => "type1"] to this parameter.
-     * @param array $validators An array of API\Core\Validator objects to use when validating this field.
-     * @param string $help_text Sets a description for this field. This description will be used as the description
-     * for this field in the API documentation.
+     * Contains an array of validation labels assigned to this Field. These labels indicate that specific validations have
+     * already been performed and can be referenced, preventing redundant validation in the Model's `validate_*()` methods.
+     *
+     * @var array $labels
      */
+    public array $labels = [];
+
+    /**
+     * Contains the verbose choices originally assigned in the $choices property during object construction.
+     * This array is automatically populated using the $choices value passed in during object creation.
+     *
+     * @var array $verbose_choices
+     *      An associative array where the key is the exact choice value, and the value is the verbose description for the choice.
+     */
+    public array $verbose_choices = [];
+
+    /**
+     * Sets the name of this Field object. Automatically set by the parent Model object to the Model's property name for this Field.
+     * Do not attempt to modify this name outside of the parent Model class.
+     *
+     * @var string $name
+     */
+    public string $name = "";
+
+    /**
+     * Represents the parent Model this Field object is assigned to. Use this to obtain additional context about the Model,
+     * and other fields/attributes assigned to the parent Model.
+     *
+     * @var Model|null $context
+     */
+    public Model|null $context = null;
+
+
+    /**
+     * Defines attributes for a Model Field.
+     *
+     * @param string $type
+     *      The data type representation. Must match the type of the $value property.
+     *      - If $allow_null is true, $value can also be `null`.
+     *      - If $many is true, $value must be an array of the specified type.
+     *      Format must be recognized by the PHP `gettype()` function.
+     *
+     * @param bool $unique
+     *      If true, $value must be unique among all parent Model objects (only for parent Models with $many set to true).
+
+     * @param bool $many
+     *      If true, $value must be an array of the specified type, with individual values validated separately.
+
+     * @param int $many_minimum
+     *      Minimum number of values required for Fields with $many enabled.
+
+     * @param int $many_maximum
+     *      Maximum number of values allowed for Fields with $many enabled.
+
+     * @param string|null $delimiter
+     *      Specifies the delimiter used to store this value in internal pfSense. Set to `null` for array storage.
+
+     * @param array $choices
+     *      Defines explicit value choices for $value. Can be a linear array or associative array with verbose descriptions.
+     *      After construction, verbose choices move to $verbose_choices.
+
+     * @param bool $allow_empty
+     *      If true, accepts empty values in $value (only for string type Fields and empty arrays for $many enabled Fields).
+
+     * @param bool $allow_null
+     *      If true, accepts null values in $value.
+
+     * @param bool $editable
+     *      If false, $value cannot be changed after initial set.
+
+     * @param bool $required
+     *      If false, a valid $default must be set, indicating $value is not required.
+
+     * @param mixed $default
+     *      Default $value if none is assigned.
+
+     * @param bool $read_only
+     *      If true, marks this Field as read-only to remote clients.
+
+     * @param bool $write_only
+     *      If true, marks this Field as write-only, excluding it from API responses.
+
+     * @param bool $sensitive
+     *      If true, marks this Field as 'sensitive', masking its value in web form input fields.
+
+     * @param bool $representation_only
+     *      If true, excludes this Field when writing the parent Model object to configuration.
+
+     * @param string $verbose_name
+     *      Human-friendly name used for input field names in associated \API\Core\Form classes.
+
+     * @param string $verbose_name_plural
+     *      Plural form of $verbose_name. Defaults to appending 's' or 'es' to $verbose_name.
+
+     * @param string $internal_name
+     *      Name of this Field as shown in the pfSense configuration or internal callable.
+
+     * @param string $internal_namespace
+     *      If $internal_value is nested, set to the associative array's key.
+
+     * @param array $referenced_by
+     *      Array specifying Models and Fields referencing this Field's parent Model using this Field's value.
+
+     * @param array $conditions
+     *      Array of conditions for inclusion based on other fields in the parent Model context.
+
+     * @param array $validators
+     *      Array of \API\Core\Validator objects for validating this field.
+
+     * @param string $help_text
+     *      Help text used to describe this Field in OpenAPI documentation and associated \API\Core\Form input fields.
+     */
+
     public function __construct(
-        string $type = "",
-        bool   $required = false,
-        bool   $unique = false,
-        mixed  $default = null,
-        array  $choices = [],
-        string $choices_callable = "",
-        bool   $allow_empty = false,
-        bool   $allow_null = false,
-        bool   $editable = true,
-        bool   $read_only = false,
-        bool   $write_only = false,
-        bool   $sensitive = false,
-        bool   $representation_only = false,
-        bool   $many = false,
-        int    $many_minimum = 1,
-        int    $many_maximum = 128,
-        string|null $delimiter = ",",
-        string $verbose_name = "",
-        string $verbose_name_plural = "",
-        string $internal_name = "",
-        string $internal_namespace = "",
-        array  $referenced_by = [],
-        array  $conditions = [],
-        array  $validators = [],
-        string $help_text = ""
+        public string $type = "",
+        public bool   $required = false,
+        public bool   $unique = false,
+        public mixed  $default = null,
+        public array  $choices = [],
+        public string $choices_callable = "",
+        public bool   $allow_empty = false,
+        public bool   $allow_null = false,
+        public bool   $editable = true,
+        public bool   $read_only = false,
+        public bool   $write_only = false,
+        public bool   $sensitive = false,
+        public bool   $representation_only = false,
+        public bool   $many = false,
+        public int    $many_minimum = 1,
+        public int    $many_maximum = 128,
+        public string|null $delimiter = ",",
+        public string $verbose_name = "",
+        public string $verbose_name_plural = "",
+        public string $internal_name = "",
+        public string $internal_namespace = "",
+        public array  $referenced_by = [],
+        public array  $conditions = [],
+        public array  $validators = [],
+        public string $help_text = ""
     ){
-        # Assign values to object properties
-        $this->type = $type;
-        $this->validators = $validators;
-        $this->unique = $unique;
-        $this->choices_callable = $choices_callable;
-        $this->allow_empty = $allow_empty;
-        $this->allow_null = ($read_only) ? true : $allow_null;
-        $this->required = $required;
-        $this->default = $default;
-        $this->editable = $editable;
-        $this->read_only = $read_only;
-        $this->write_only = $write_only;
-        $this->sensitive = $sensitive;
-        $this->representation_only = $representation_only;
-        $this->many = $many;
-        $this->many_minimum = $many_minimum;
-        $this->many_maximum = $many_maximum;
-        $this->delimiter = $delimiter;
-        $this->help_text = $help_text;
-        $this->verbose_name = $verbose_name;
-        $this->verbose_name_plural = $verbose_name_plural;
-        $this->internal_name = $internal_name;
-        $this->internal_namespace = $internal_namespace;
-        $this->referenced_by = $referenced_by;
-        $this->conditions = $conditions;
+        # Allow null values if this Field is read_only
+        $this->allow_null = ($this->read_only) ? true : $this->allow_null;
 
         # Set the many_minimum value to 0 if allow_empty and many are enabled
         if ($this->many and $this->allow_empty) {
