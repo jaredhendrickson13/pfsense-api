@@ -3,13 +3,31 @@
 namespace API\Core;
 
 use API\Responses\ServerError;
-use API\Responses\ServiceUnavailableResponse;
+use API\Responses\ServiceUnavailableError;
 use ReflectionClass;
 
 /**
  * The Dispatcher object is used to define functions that are intended to be run in the background. The Dispatcher
  * objects allows us to dynamically create a private PHP script that can be called in the background, manages the
  * process spawn queue, and enforces background process timeouts.
+ * @const DISPATCH_SCRIPT The absolute file path to the dispatch.sh helper script.
+ * @property string $full_name The full name of this Dispatcher. This value is automatically populated using the class
+ * FQN, but all slashes are removed. This value is used when reading and writing the Dispatcher's PID file.
+ * @property string $short_name The Dispatcher class's short name. This value is passed to the dispatch.sh helper
+ * script to indicate which Dispatcher class should be run.
+ * @property string $pid_dir Sets the directory where the Dispatcher PID file will be written. This file name must be
+ * unique for each Dispatcher process spawned.
+ * @property string $pid_file_prefix The PID file name prefix. This value should contain this Dispatcher's $full_name.
+ * @property string $pid_file Sets the entire name of the PID file.
+ * @property int $timeout Sets the maximum number of seconds that processes spawned by this Dispatcher can run for.
+ * After this time-frame, the process will be terminated. This ensures Dispatchers cannot spawn processes that run
+ * endlessly and crash the system.
+ * @property int $max_concurrency Sets the maximum number of processes this Dispatcher can have running at one time.
+ * Attempts to spawn process past this limit will result in a ServiceUnavailableError error.
+ * @property bool $async Indicates whether this Dispatcher object should spawn processes asynchronously (in the
+ * background) or synchronously (waits for process to complete). If set to `true`, any `spawn_process()` method calls
+ * will spawn the process in the background and immediately respond. If set to `false`, any `spawn_process()` will
+ * wait until the process finishes to respond.
  */
 class Dispatcher
 {
@@ -93,11 +111,12 @@ class Dispatcher
      * Spawns a new process for this Dispatcher.
      * @param mixed ...$arguments Optional arguments to pass to the `process()` method.
      * @return int The PID of the spawned process.
+     * @throws ServiceUnavailableError When the maximum number of processes allowed by $max_concurrency is exceeded.
      */
     public function spawn_process(mixed ...$arguments) : int {
         # Before we spawn a new process, ensure we don't have too many concurrent processes running now
         if ($this->max_concurrency and count($this->get_running_processes()) >= $this->max_concurrency) {
-            throw new ServiceUnavailableResponse(
+            throw new ServiceUnavailableError(
                 message: "Dispatcher allows for a maximum of `$this->max_concurrency` processes to be running at ".
                     "once, try again after `$this->timeout` seconds.",
                 response_id: "DISPATCHER_TOO_MANY_CONCURRENT_PROCESSES",

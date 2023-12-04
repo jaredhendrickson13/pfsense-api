@@ -4,6 +4,11 @@ namespace API\Core;
 
 /**
  * Defines objects that execute shell commands and keep track of the output.
+ * @property string $command The shell command this object should execute.
+ * @property string $redirect An optional shell redirect to append to the end of the $command.
+ * @property string $output The output of the executed shell command.
+ * @property int $result_code The exit/return code of the executed shell command.
+ * @property bool $trim_whitespace Automatically remove excessive whitespace from the command $output.
  */
 class Command
 {
@@ -18,6 +23,7 @@ class Command
      * the command output will redirect stderr to stdout so error message will be included in the output.
      * @param string $command The shell command to execute.
      * @param bool $trim_whitespace Remove excessive whitespace from the command output.
+     * @param string $redirect An optional shell redirect to append to the end of the $command.
      * @return Command Returns this object containing the results of the executed command. Note: the object returned
      * cannot be used to initiate new commands. A new Command object should be created for any additional commands.
      */

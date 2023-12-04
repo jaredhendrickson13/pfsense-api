@@ -10,7 +10,7 @@ use API\Core\Response;
  * Exception class that indicates the requested services is temporarily unavailable. This exception generally 
  * corresponds with a 503 Service Unavailable error code.
  */
-class ServiceUnavailableResponse extends Response {
+class ServiceUnavailableError extends Response {
     public $code = 503;
     public string $help_text = "The requested service is temporarily unavailable.";
 

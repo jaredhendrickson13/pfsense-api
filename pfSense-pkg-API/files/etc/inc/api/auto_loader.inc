@@ -14,8 +14,6 @@ require_once('diag_arp.inc');
 require_once("util.inc");
 require_once("interfaces.inc");
 require_once("interfaces_fast.inc");
-require_once("priv.defs.inc");
-require_once("priv.inc");
 require_once("service-utils.inc");
 require_once("filter.inc");
 require_once("shaper.inc");
@@ -43,4 +41,8 @@ foreach (API_LIBRARIES as $library) {
         require_once($inc_file);
     }
 }
+
+# Priv includes must be imported after api/core/Endpoint.inc
+require_once("priv.defs.inc");
+require_once("priv.inc");
 
