@@ -7126,7 +7126,7 @@ paths:
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Update HAProxy backend pool configuration
       tags:
-        - Services > HAProxy > Backend
+        - Services > HAProxy > Backend > Servers
   /api/v1/services/ipsec/apply:
     post:
       operationId: APIServicesIPsecApplyCreate
@@ -14582,8 +14582,9 @@ tags:
   - name: Services > DNSMASQ > Host Override
   - name: Services > DNSMASQ > Host Override > Alias
   - name: Services > DPINGER
-  - name: Services > HAProxy
+  - name: Services > HAProxy > Apply
   - name: Services > HAProxy > Backend
+  - name: Services > HAProxy > Backend > Servers
   - name: Services > HAProxy > Frontend
   - name: Services > IPsec > Apply
   - name: Services > IPsec > Phase 1
