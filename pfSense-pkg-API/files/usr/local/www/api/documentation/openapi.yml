@@ -7056,7 +7056,7 @@ paths:
         - Services > HAProxy > Backend
   /api/v1/services/haproxy/pool/servers:
     put:
-      operationId: APIServicesHAProxyPoolUpdate
+      operationId: APIServicesHAProxyPoolServersUpdate
       description: 'Modify the list of backend servers on an existing HAProxy backend pool. This endpoint is
         declarative, and the end result will match the list of servers provided.<br><br>
 
@@ -7124,7 +7124,7 @@ paths:
           $ref: '#/components/responses/Success'
         "401":
           $ref: '#/components/responses/AuthenticationFailed'
-      summary: Update HAProxy backend pool configuration
+      summary: Set backend servers for an existing HAProxy backend pool
       tags:
         - Services > HAProxy > Backend > Servers
   /api/v1/services/ipsec/apply:
