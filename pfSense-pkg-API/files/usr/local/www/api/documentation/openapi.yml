@@ -6617,7 +6617,7 @@ paths:
           $ref: '#/components/responses/AuthenticationFailed'
       summary: Apply pending HAProxy changes
       tags:
-        - Services > HAProxy
+        - Services > HAProxy > Apply
   /api/v1/services/haproxy/frontend:
     delete:
       operationId: APIServicesHAProxyFrontendDelete
