@@ -91,12 +91,9 @@ class APIInterfaceApplyCreate extends APIModel {
                 else {
                     # Bring down the existing interface on the system if it exists
                     interface_bring_down($if_to_apply, true, $if_conf);
-
-                    # Restart DHCP services to remove DHCP server(s) on this interface
-                    if (APIModel::is_config_enabled("dhcpd/{$if_to_apply}") or APIModel::is_config_enabled("dhcpdv6/{$if_to_apply}")) {
-                        services_dhcpd_configure();
-                    }
                 }
+
+                restart_interface_services($if_to_apply, array_get_path($if_conf, 'ifcfg/ipaddrv6'));
 
                 # Interfaces with sub-interfaces (e.g. VLANs) need their MTU reconfigured if changed
                 if (interface_has_clones(get_real_interface($if_to_apply))) {
@@ -126,7 +123,6 @@ class APIInterfaceApplyCreate extends APIModel {
         }
 
         # Restart associated/dependent services
-        services_snmpd_configure();
         setup_gateways_monitor();
         clear_subsystem_dirty('interfaces');
         filter_configure();
@@ -137,14 +133,11 @@ class APIInterfaceApplyCreate extends APIModel {
             clear_subsystem_dirty('staticroutes');
         }
 
-        # Initialize syslog configuration and restart the syslog service
-        if (APIModel::is_config_enabled("syslog") and $if_to_apply == APIModel::get_config("syslog/sourceip")) {
-            system_syslogd_start();
-        }
-
         # After all is said and done, clear the interface subsystem status and remove the pending interface change file
         clear_subsystem_dirty('interfaces');
         @unlink($g['tmp_path']."/.interfaces.apply");
+
+        send_event("service reload packages");
     }
 
     # Apply interfaces asynchronously
