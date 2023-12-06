@@ -608,7 +608,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
         {
             "name": "Disable interface",
             "resp_time": 5,
-            "post_test_callable": "is_if_disabled",
+            "post_test_callable": "is_if_disabled", 
             "req_data": {
                 "id": VLAN_IF,
                 "descr": "IF_DISABLED_TEST",
@@ -804,7 +804,7 @@ class APIE2ETestInterface(e2e_test_framework.APIE2ETest):
 
         # Loop through each line and check if em2.2 is now disabled
         for line in ifconfig_lines:
-            if line.startswith(f"{VLAN_IF}:") and "UP" in line:
+            if line.startswith(f"{VLAN_IF}:") and "<UP" in line:
                 raise AssertionError(f"Expected {VLAN_IF} to be disabled and not UP")
 
 
