@@ -111,28 +111,20 @@ class APIModelsVirtualIPTestCase extends TestCase
         );
         $test_model->create(apply: true);
         $ifconfig = new Command("ifconfig");
-        $this->assert_is_true(
-            str_contains($ifconfig->output, "inet 1.2.3.4 netmask 0xffffff00 broadcast 1.2.3.255")
-        );
+        $this->assert_str_contains($ifconfig->output, "inet 1.2.3.4 netmask 0xffffff00 broadcast 1.2.3.255");
 
         # Update the IP alias vip and ensure the previous vip is no longer present and the new vip is present
         $test_model->subnet->value = "4.3.2.1";
         $test_model->subnet_bits->value = 25;
         $test_model->update(apply: true);
         $ifconfig = new Command("ifconfig");
-        $this->assert_is_false(
-            str_contains($ifconfig->output, "inet 1.2.3.4 netmask 0xffffff00 broadcast 1.2.3.255")
-        );
-        $this->assert_is_true(
-            str_contains($ifconfig->output, "inet 4.3.2.1 netmask 0xffffff80 broadcast 4.3.2.127")
-        );
+        $this->assert_str_does_not_contain($ifconfig->output, "inet 1.2.3.4 netmask 0xffffff00 broadcast 1.2.3.255");
+        $this->assert_str_contains($ifconfig->output, "inet 4.3.2.1 netmask 0xffffff80 broadcast 4.3.2.127");
 
         # Remove the vip and ensure it is no longer present in ifconfig
         $test_model->delete();
         $ifconfig = new Command("ifconfig");
-        $this->assert_is_false(
-            str_contains($ifconfig->output, "inet 4.3.2.1 netmask 0xffffff80 broadcast 4.3.2.127")
-        );
+        $this->assert_str_does_not_contain($ifconfig->output, "inet 4.3.2.1 netmask 0xffffff80 broadcast 4.3.2.127");
     }
 
     /**
@@ -154,12 +146,8 @@ class APIModelsVirtualIPTestCase extends TestCase
         );
         $test_model->create(apply: true);
         $ifconfig = new Command("ifconfig");
-        $this->assert_is_true(
-            str_contains($ifconfig->output, "inet 4.5.6.7 netmask 0xffffff00 broadcast 4.5.6.255 vhid 7")
-        );
-        $this->assert_is_true(
-            str_contains($ifconfig->output, "advbase 10 advskew 11")
-        );
+        $this->assert_str_contains($ifconfig->output, "inet 4.5.6.7 netmask 0xffffff00 broadcast 4.5.6.255 vhid 7");
+        $this->assert_str_contains($ifconfig->output, "advbase 10 advskew 11");
 
         # Update the vip and ensure the previous vip is no longer present and the new vip is present
         $test_model->subnet->value = "7.6.5.4";
@@ -169,25 +157,15 @@ class APIModelsVirtualIPTestCase extends TestCase
         $test_model->advskew->value = 6;
         $test_model->update(apply: true);
         $ifconfig = new Command("ifconfig");
-        $this->assert_is_false(
-            str_contains($ifconfig->output, "inet 4.5.6.7 netmask 0xffffff00 broadcast 4.5.6.255 vhid 7")
-        );
-        $this->assert_is_false(
-            str_contains($ifconfig->output, "advbase 10 advskew 11")
-        );
-        $this->assert_is_true(
-            str_contains($ifconfig->output, "inet 7.6.5.4 netmask 0xffffff80 broadcast 7.6.5.127 vhid 5")
-        );
-        $this->assert_is_true(
-            str_contains($ifconfig->output, "advbase 5 advskew 6")
-        );
+        $this->assert_str_does_not_contain($ifconfig->output, "inet 4.5.6.7 netmask 0xffffff00 broadcast 4.5.6.255 vhid 7");
+        $this->assert_str_does_not_contain($ifconfig->output, "advbase 10 advskew 11");
+        $this->assert_str_contains($ifconfig->output, "inet 7.6.5.4 netmask 0xffffff80 broadcast 7.6.5.127 vhid 5");
+        $this->assert_str_contains($ifconfig->output, "advbase 5 advskew 6");
 
         # Remove the vip and ensure it is no longer present in ifconfig
         $test_model->delete();
         $ifconfig = new Command("ifconfig");
-        $this->assert_is_false(
-            str_contains($ifconfig->output, "inet 7.6.5.4 netmask 0xffffff80 broadcast 7.6.5.127 vhid 5")
-        );
+        $this->assert_str_does_not_contain($ifconfig->output, "inet 7.6.5.4 netmask 0xffffff80 broadcast 7.6.5.127 vhid 5");
     }
 
     /**
@@ -205,26 +183,18 @@ class APIModelsVirtualIPTestCase extends TestCase
         );
         $test_model->create(apply: true);
         $choparp = new Command("/usr/bin/top -baHS 999 | grep choparp");
-        $this->assert_is_true(
-            str_contains($choparp->output, "1.2.3.4")
-        );
+        $this->assert_str_contains($choparp->output, "1.2.3.4");
 
         # Update the IP alias vip and ensure the previous vip is no longer present and the new vip is present
         $test_model->subnet->value = "4.3.2.1";
         $test_model->update(apply: true);
         $choparp = new Command("/usr/bin/top -baHS 999 | grep choparp");
-        $this->assert_is_false(
-            str_contains($choparp->output, "1.2.3.4")
-        );
-        $this->assert_is_true(
-            str_contains($choparp->output, "4.3.2.1")
-        );
+        $this->assert_str_does_not_contain($choparp->output, "1.2.3.4");
+        $this->assert_str_contains($choparp->output, "4.3.2.1");
 
         # Remove the vip and ensure it is no longer present in ifconfig
         $test_model->delete();
         $choparp = new Command("/usr/bin/top -baHS 999 | grep choparp");
-        $this->assert_is_false(
-            str_contains($choparp->output, "4.3.2.1")
-        );
+        $this->assert_str_does_not_contain($choparp->output, "4.3.2.1");
     }
 }

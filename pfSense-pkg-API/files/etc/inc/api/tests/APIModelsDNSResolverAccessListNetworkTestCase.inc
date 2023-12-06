@@ -35,11 +35,9 @@ class APIModelsDNSResolverAccessListNetworkTestCase extends TestCase
 
         # Ensure the access list exists in /var/unbound/access_lists.conf
         $unbound_acls = file_get_contents("/var/unbound/access_lists.conf");
-        $this->assert_is_true(
-            str_contains(
-                $unbound_acls,
-                "#test\naccess-control: 1.2.3.4/32 allow_snoop\naccess-control: 4.3.2.1/24 allow_snoop"
-            )
+        $this->assert_str_contains(
+            $unbound_acls,
+            "#test\naccess-control: 1.2.3.4/32 allow_snoop\naccess-control: 4.3.2.1/24 allow_snoop"
         );
 
         # Update the access list network with new values
@@ -48,27 +46,21 @@ class APIModelsDNSResolverAccessListNetworkTestCase extends TestCase
 
         # Ensure the new access list exists and the previous one doesn't
         $unbound_acls = file_get_contents("/var/unbound/access_lists.conf");
-        $this->assert_is_false(
-            str_contains(
-                $unbound_acls,
-                "#test\naccess-control: 1.2.3.4/32 allow_snoop\naccess-control: 4.3.2.1/24 allow_snoop"
-            )
+        $this->assert_str_does_not_contain(
+            $unbound_acls,
+            "#test\naccess-control: 1.2.3.4/32 allow_snoop\naccess-control: 4.3.2.1/24 allow_snoop"
         );
-        $this->assert_is_true(
-            str_contains(
-                $unbound_acls,
-                "#test\naccess-control: 1.2.3.4/32 allow_snoop\naccess-control: 127.0.0.5/29 allow_snoop"
-            )
+        $this->assert_str_contains(
+            $unbound_acls,
+            "#test\naccess-control: 1.2.3.4/32 allow_snoop\naccess-control: 127.0.0.5/29 allow_snoop"
         );
 
         # Delete the access list and ensure it no longer exists
         $access_list_network->delete(apply: true);
         $unbound_acls = file_get_contents("/var/unbound/access_lists.conf");
-        $this->assert_is_false(
-            str_contains(
-                $unbound_acls,
-                "#test\naccess-control: 1.2.3.4/32 allow_snoop\naccess-control: 127.0.0.5/29 allow_snoop"
-            )
+        $this->assert_str_does_not_contain(
+            $unbound_acls,
+            "#test\naccess-control: 1.2.3.4/32 allow_snoop\naccess-control: 127.0.0.5/29 allow_snoop"
         );
 
         # Delete the parent access list

@@ -88,7 +88,8 @@ class TestCase {
      * @param string $message Set the error message embedded in any AssertionError thrown by this method.
      * @throws AssertionError When $value1 and $value2 are not equal.
      */
-    protected function assert_equals(mixed $value1, mixed $value2, string $message = "Expected values to be equal.") {
+    protected function assert_equals(mixed $value1, mixed $value2, string $message = "") {
+        $message = ($message) ?: "Expected value `$value1` to equal `$value2`.";
         # Throw a TestError if the two values do not match
         if ($value1 !== $value2) {
             throw new AssertionError($message);
@@ -102,10 +103,9 @@ class TestCase {
      * @param string $message Set the error message embedded in any AssertionError thrown by this method.
      * @throws AssertionError When $value1 and $value2 are equal.
      */
-    protected function assert_not_equals(
-        mixed $value1, mixed $value2, string $message = "Expected values to not be equal."
-    )
+    protected function assert_not_equals(mixed $value1, mixed $value2, string $message = "")
     {
+        $message = ($message) ?: "Expected value `$value1` to not equal `$value2`.";
         # Throw a TestError if the two values match
         if ($value1 === $value2) {
             throw new AssertionError($message);
@@ -221,6 +221,32 @@ class TestCase {
         # Check if this value is false
         if ($value !== false ) {
             throw new AssertionError($message);
+        }
+    }
+
+    /**
+     * Checks if a string contains another string.
+     * @param string $haystack The string to check for the $needle in.
+     * @param string $needle The string to check for within the $haystack.
+     * @throws AssertionError When $haystack string did not contain the $needle string.
+     */
+    protected function assert_str_contains(string $haystack, string $needle) {
+        # Fail the test if $needle is not in $haystack
+        if (!str_contains($haystack, $needle)) {
+            throw new AssertionError("Expected string `$haystack` to contain string `$needle`");
+        }
+    }
+
+    /**
+     * Checks if a string does not contains another string.
+     * @param string $haystack The string to check for the $needle in.
+     * @param string $needle The string to check for within the $haystack.
+     * @throws AssertionError When $haystack string did contain the $needle string.
+     */
+    protected function assert_str_does_not_contain(string $haystack, string $needle) {
+        # Fail the test if $needle is found in $haystack
+        if (str_contains($haystack, $needle)) {
+            throw new AssertionError("Expected string `$haystack` to contain string `$needle`");
         }
     }
 

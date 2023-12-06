@@ -33,8 +33,8 @@ class APIModelsFirewallAliasTestCase extends TestCase {
         }
 
         # Ensure expected IPs were resolved and stored in a pfctl with the same name as our alias
-        $this->assert_is_true(str_contains($pfctl_output, "8.8.8.8"));
-        $this->assert_is_true(str_contains($pfctl_output, "8.8.4.4"));
+        $this->assert_str_contains($pfctl_output, "8.8.8.8");
+        $this->assert_str_contains($pfctl_output, "8.8.4.4");
 
         # Delete the alias
         $test_alias->delete(apply: true);

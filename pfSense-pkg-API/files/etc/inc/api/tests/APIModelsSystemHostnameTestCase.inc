@@ -24,13 +24,13 @@ class APIModelsSystemHostnameTestCase extends TestCase
         $hostname->domain->value = "example.com";
         $hostname->update();
         $hostname_cmd = new Command("hostname");
-        $this->assert_is_true(str_contains($hostname_cmd->output, "test.example.com"));
+        $this->assert_str_contains($hostname_cmd->output, "test.example.com");
 
         # Restore the original hostname and domain and ensure it is configured
         $hostname->hostname->value = $original_hostname;
         $hostname->domain->value = $original_domain;
         $hostname->update();
         $hostname_cmd = new Command("hostname");
-        $this->assert_is_true(str_contains($hostname_cmd->output, "$original_hostname.$original_domain"));
+        $this->assert_str_contains($hostname_cmd->output, "$original_hostname.$original_domain");
     }
 }

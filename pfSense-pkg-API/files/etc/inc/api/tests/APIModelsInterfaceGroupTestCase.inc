@@ -27,9 +27,7 @@ class APIModelsInterfaceGroupTestCase extends TestCase
             $ifconfig = new Command("ifconfig ".$member->if->value);
             
             # Ensure the group is correctly assigned
-            $this->assert_is_true(
-                str_contains($ifconfig->output, "groups: test")
-            );
+            $this->assert_str_contains($ifconfig->output, "groups: test");
         }
         
         # Update the interface members
@@ -46,9 +44,7 @@ class APIModelsInterfaceGroupTestCase extends TestCase
             $ifconfig = new Command("ifconfig ".$member->if->value);
 
             # Ensure the group is correctly assigned
-            $this->assert_is_true(
-                str_contains($ifconfig->output, "groups: test")
-            );
+            $this->assert_str_contains($ifconfig->output, "groups: test");
         }
         
         # Ensure the old member interfaces are no longer assigned the group
@@ -57,9 +53,7 @@ class APIModelsInterfaceGroupTestCase extends TestCase
             $ifconfig = new Command("ifconfig ".$member_real);
 
             # Ensure the group is correctly assigned
-            $this->assert_is_false(
-                str_contains($ifconfig->output, "groups: test")
-            );
+            $this->assert_str_does_not_contain($ifconfig->output, "groups: test");
         }
         
         # Delete the interface group
@@ -71,9 +65,7 @@ class APIModelsInterfaceGroupTestCase extends TestCase
             $ifconfig = new Command("ifconfig ".$member_real);
 
             # Ensure the group is correctly assigned
-            $this->assert_is_false(
-                str_contains($ifconfig->output, "groups: test")
-            );
+            $this->assert_str_does_not_contain($ifconfig->output, "groups: test");
         }
     }
 }

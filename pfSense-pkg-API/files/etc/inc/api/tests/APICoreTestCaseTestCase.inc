@@ -4,6 +4,7 @@ namespace API\Tests;
 
 use API\Core\Response;
 use API\Core\TestCase;
+use API\Responses\NotFoundError;
 use AssertionError;
 use Error;
 use Exception;
@@ -185,10 +186,9 @@ class APICoreTestCaseTestCase extends TestCase
                 response_id: "EXAMPLE_ID",
                 code: 500,
                 callable: function () {
-                    throw new Response(
+                    throw new NotFoundError(
                         message: "Test",
-                        response_id: "EXAMPLE_ID",
-                        code: 502
+                        response_id: "EXAMPLE_ID"
                     );
                 }
             );
@@ -328,6 +328,48 @@ class APICoreTestCaseTestCase extends TestCase
         }
 
         throw new AssertionError("Expected AssertionError for receiving value that is empty.");
+    }
+
+    /**
+     * Checks that the TestCase's assert_str_contains() passes test if string contains another string.
+     */
+    public function test_assert_str_contains() {
+        $this->assert_str_contains("this is a test string", "test");
+    }
+
+    /**
+     * Checks that the TestCase's assert_str_contains() fails test if string does not contain another string
+     */
+    public function test_bad_assert_str_contains() {
+        try {
+            $this->assert_str_contains("this is a test string", "not in the string");
+        }
+        catch (AssertionError) {
+            return;
+        }
+
+        throw new AssertionError("Expected AssertionError for not containing a string.");
+    }
+
+    /**
+     * Checks that the TestCase's assert_str_does_not_contain() passes test if string does not contain another string.
+     */
+    public function test_assert_assert_str_does_not_contain() {
+        $this->assert_str_does_not_contain("this is a test string", "not in the string");
+    }
+
+    /**
+     * Checks that the TestCase's assert_str_does_not_contain() fails test if string does not contain another string
+     */
+    public function test_bad_assert_str_does_not_contain() {
+        try {
+            $this->assert_str_does_not_contain("this is a test string", "test");
+        }
+        catch (AssertionError) {
+            return;
+        }
+
+        throw new AssertionError("Expected AssertionError for containing a string.");
     }
 
     /**

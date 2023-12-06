@@ -22,8 +22,8 @@ class APIModelsInterfaceVLANTestCase extends TestCase {
 
         # Ensure the newly created VLAN is correctly configuring by checking ifconfig
         $ifconfig_output = shell_exec("ifconfig em1.2");
-        $this->assert_is_true(str_contains($ifconfig_output, "vlan: 2"));
-        $this->assert_is_true(str_contains($ifconfig_output, "vlanpcp: 4"));
+        $this->assert_str_contains($ifconfig_output, "vlan: 2");
+        $this->assert_str_contains($ifconfig_output, "vlanpcp: 4");
 
         # Update the VLAN interface to change the tag and pcp values
         $test_vlan->tag->value = 55;
@@ -36,8 +36,8 @@ class APIModelsInterfaceVLANTestCase extends TestCase {
 
         # Ensure the new VLAN is present
         $ifconfig_output = shell_exec("ifconfig em1.55");
-        $this->assert_is_true(str_contains($ifconfig_output, "vlan: 55"));
-        $this->assert_is_true(str_contains($ifconfig_output, "vlanpcp: 7"));
+        $this->assert_str_contains($ifconfig_output, "vlan: 55");
+        $this->assert_str_contains($ifconfig_output, "vlanpcp: 7");
 
         # Delete the VLAN interface
         $test_vlan->delete();

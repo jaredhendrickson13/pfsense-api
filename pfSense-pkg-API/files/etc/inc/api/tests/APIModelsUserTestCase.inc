@@ -100,19 +100,15 @@ class APIModelsUserTestCase extends TestCase
         $user->create();
 
         # Ensure the user is correctly created in /etc/passwd
-        $this->assert_is_true(
-            str_contains(
-                file_get_contents("/etc/passwd"),
-                "{$user->name->value}:*:{$user->uid->value}:65534:{$user->descr->value}"
-            )
+        $this->assert_str_contains(
+            file_get_contents("/etc/passwd"),
+            "{$user->name->value}:*:{$user->uid->value}:65534:{$user->descr->value}"
         );
 
         # Ensure the user's `authorizedkeys` are set in ~/.ssh/authorized_keys
-        $this->assert_is_true(
-            str_contains(
-                file_get_contents("/home/{$user->name->value}/.ssh/authorized_keys"),
-                $user->authorizedkeys->value
-            )
+        $this->assert_str_contains(
+            file_get_contents("/home/{$user->name->value}/.ssh/authorized_keys"),
+            $user->authorizedkeys->value
         );
 
         # Update the user
@@ -127,30 +123,24 @@ class APIModelsUserTestCase extends TestCase
         $user->update();
 
         # Ensure the user is correctly updated in /etc/passwd
-        $this->assert_is_true(
-            str_contains(
-                file_get_contents("/etc/passwd"),
-                "{$user->name->value}:*:{$user->uid->value}:65534:{$user->descr->value}"
-            )
+        $this->assert_str_contains(
+            file_get_contents("/etc/passwd"),
+            "{$user->name->value}:*:{$user->uid->value}:65534:{$user->descr->value}"
         );
 
         # Ensure the user's `authorizedkeys` are updated in ~/.ssh/authorized_keys
-        $this->assert_is_true(
-            str_contains(
-                file_get_contents("/home/{$user->name->value}/.ssh/authorized_keys"),
-                $user->authorizedkeys->value
-            )
+        $this->assert_str_contains(
+            file_get_contents("/home/{$user->name->value}/.ssh/authorized_keys"),
+            $user->authorizedkeys->value
         );
 
         # Delete the user
         $user->delete();
 
         # Ensure the user is no longer in /etc/passwd
-        $this->assert_is_false(
-            str_contains(
-                file_get_contents("/etc/passwd"),
-                $user->name->value
-            )
+        $this->assert_str_does_not_contain(
+            file_get_contents("/etc/passwd"),
+            $user->name->value
         );
     }
 
@@ -168,6 +158,4 @@ class APIModelsUserTestCase extends TestCase
             }
         );
     }
-
-
 }

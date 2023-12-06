@@ -22,13 +22,13 @@ class APIModelsSystemTunableTestCase extends TestCase
         $tunable = new SystemTunable(data: ["tunable" => $test_oid, "value" => "30"]);
         $tunable->create(apply: true);
         $oid_value = new Command("sysctl $test_oid");
-        $this->assert_is_true(str_contains($oid_value->output, "$test_oid: 30"));
+        $this->assert_str_contains($oid_value->output, "$test_oid: 30");
 
         # Create the custom system tunable for our OID and ensure its new value set in sysctl
         $tunable->value->value = "10";
         $tunable->update(apply: true);
         $oid_value = new Command("sysctl $test_oid");
-        $this->assert_is_true(str_contains($oid_value->output, "$test_oid: 10"));
+        $this->assert_str_contains($oid_value->output, "$test_oid: 10");
         
         # Delete the custom tunable and ensure the OID value returns to its original value
         $tunable->delete(apply: true);

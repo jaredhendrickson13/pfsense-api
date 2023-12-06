@@ -27,11 +27,9 @@ class APIModelsDNSResolverAccessListTestCase extends TestCase
 
         # Ensure the access list exists in /var/unbound/access_lists.conf
         $unbound_acls = file_get_contents("/var/unbound/access_lists.conf");
-        $this->assert_is_true(
-            str_contains(
-                $unbound_acls,
-                "#test\naccess-control: 1.2.3.4/32 allow\naccess-control: 4.3.2.1/24 allow"
-            )
+        $this->assert_str_contains(
+            $unbound_acls,
+            "#test\naccess-control: 1.2.3.4/32 allow\naccess-control: 4.3.2.1/24 allow"
         );
 
         # Update the access list with new values
@@ -49,27 +47,21 @@ class APIModelsDNSResolverAccessListTestCase extends TestCase
 
         # Ensure the new access list exists and the previous one doesn't
         $unbound_acls = file_get_contents("/var/unbound/access_lists.conf");
-        $this->assert_is_false(
-            str_contains(
-                $unbound_acls,
-                "#test\naccess-control: 1.2.3.4/32 allow\naccess-control: 4.3.2.1/24 allow"
-            )
+        $this->assert_str_contains(
+            $unbound_acls,
+            "#test\naccess-control: 1.2.3.4/32 allow\naccess-control: 4.3.2.1/24 allow"
         );
-        $this->assert_is_true(
-            str_contains(
-                $unbound_acls,
-                "#updated-test\naccess-control: 127.0.0.5/29 deny\naccess-control: 127.0.0.1/25 deny"
-            )
+        $this->assert_str_contains(
+            $unbound_acls,
+            "#updated-test\naccess-control: 127.0.0.5/29 deny\naccess-control: 127.0.0.1/25 deny"
         );
 
         # Delete the access list and ensure it no longer exists
         $access_list->delete(apply: true);
         $unbound_acls = file_get_contents("/var/unbound/access_lists.conf");
-        $this->assert_is_false(
-            str_contains(
-                $unbound_acls,
-                "#updated-test\naccess-control: 127.0.0.5/29 deny\naccess-control: 127.0.0.1/25 deny"
-            )
+        $this->assert_str_does_not_contain(
+            $unbound_acls,
+            "#updated-test\naccess-control: 127.0.0.5/29 deny\naccess-control: 127.0.0.1/25 deny"
         );
     }
 }

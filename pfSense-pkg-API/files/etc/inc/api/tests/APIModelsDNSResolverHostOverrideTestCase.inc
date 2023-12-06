@@ -21,31 +21,23 @@ class APIModelsDNSResolverHostOverrideTestCase extends TestCase
         $unbound_config = file_get_contents("/var/unbound/host_entries.conf");
 
         # Ensure the first IP has correct A and PTR records
-        $this->assert_is_true(
-            str_contains(
-                $unbound_config,
-                'local-data: "test.example.com. A 127.0.0.53'
-            )
+        $this->assert_str_contains(
+            $unbound_config,
+            'local-data: "test.example.com. A 127.0.0.53'
         );
-        $this->assert_is_true(
-            str_contains(
-                $unbound_config,
-                'local-data-ptr: "127.0.0.53 test.example.com"'
-            )
+        $this->assert_str_contains(
+            $unbound_config,
+            'local-data-ptr: "127.0.0.53 test.example.com"'
         );
 
         # Ensure the second IP has correct A and PTR records
-        $this->assert_is_true(
-            str_contains(
-                $unbound_config,
-                'local-data: "test.example.com. A 127.0.0.54'
-            )
+        $this->assert_str_contains(
+            $unbound_config,
+            'local-data: "test.example.com. A 127.0.0.54'
         );
-        $this->assert_is_true(
-            str_contains(
-                $unbound_config,
-                'local-data-ptr: "127.0.0.54 test.example.com"'
-            )
+        $this->assert_str_contains(
+            $unbound_config,
+            'local-data-ptr: "127.0.0.54 test.example.com"'
         );
 
         # Update the host override with new values
@@ -56,55 +48,39 @@ class APIModelsDNSResolverHostOverrideTestCase extends TestCase
         $unbound_config = file_get_contents("/var/unbound/host_entries.conf");
 
         # Ensure the old values are no longer present
-        $this->assert_is_false(
-            str_contains(
-                $unbound_config,
-                'local-data: "test.example.com. A 127.0.0.53'
-            )
+        $this->assert_str_does_not_contain(
+            $unbound_config,
+            'local-data: "test.example.com. A 127.0.0.53'
         );
-        $this->assert_is_false(
-            str_contains(
-                $unbound_config,
-                'local-data-ptr: "127.0.0.53 test.example.com"'
-            )
+        $this->assert_str_does_not_contain(
+            $unbound_config,
+            'local-data-ptr: "127.0.0.53 test.example.com"'
         );
-        $this->assert_is_false(
-            str_contains(
-                $unbound_config,
-                'local-data: "test.example.com. A 127.0.0.54'
-            )
+        $this->assert_str_does_not_contain(
+            $unbound_config,
+            'local-data: "test.example.com. A 127.0.0.54'
         );
-        $this->assert_is_false(
-            str_contains(
-                $unbound_config,
-                'local-data-ptr: "127.0.0.54 test.example.com"'
-            )
+        $this->assert_str_does_not_contain(
+            $unbound_config,
+            'local-data-ptr: "127.0.0.54 test.example.com"'
         );
 
         # Ensure the new values are present
-        $this->assert_is_true(
-            str_contains(
-                $unbound_config,
-                'local-data: "update.example.com. A 127.0.0.5'
-            )
+        $this->assert_str_contains(
+            $unbound_config,
+            'local-data: "update.example.com. A 127.0.0.5'
         );
-        $this->assert_is_true(
-            str_contains(
-                $unbound_config,
-                'local-data-ptr: "127.0.0.5 update.example.com"'
-            )
+        $this->assert_str_contains(
+            $unbound_config,
+            'local-data-ptr: "127.0.0.5 update.example.com"'
         );
-        $this->assert_is_true(
-            str_contains(
-                $unbound_config,
-                'local-data: "update.example.com. A 127.0.0.6'
-            )
+        $this->assert_str_contains(
+            $unbound_config,
+            'local-data: "update.example.com. A 127.0.0.6'
         );
-        $this->assert_is_true(
-            str_contains(
-                $unbound_config,
-                'local-data-ptr: "127.0.0.6 update.example.com"'
-            )
+        $this->assert_str_contains(
+            $unbound_config,
+            'local-data-ptr: "127.0.0.6 update.example.com"'
         );
 
         # Delete the host override and re-read the Unbound config
@@ -112,29 +88,21 @@ class APIModelsDNSResolverHostOverrideTestCase extends TestCase
         $unbound_config = file_get_contents("/var/unbound/host_entries.conf");
 
         # Ensure the deleted entries are no longer present
-        $this->assert_is_false(
-            str_contains(
-                $unbound_config,
-                'local-data: "update.example.com. A 127.0.0.5'
-            )
+        $this->assert_str_does_not_contain(
+            $unbound_config,
+            'local-data: "update.example.com. A 127.0.0.5'
         );
-        $this->assert_is_false(
-            str_contains(
-                $unbound_config,
-                'local-data-ptr: "127.0.0.5 update.example.com"'
-            )
+        $this->assert_str_does_not_contain(
+            $unbound_config,
+            'local-data-ptr: "127.0.0.5 update.example.com"'
         );
-        $this->assert_is_false(
-            str_contains(
-                $unbound_config,
-                'local-data: "update.example.com. A 127.0.0.6'
-            )
+        $this->assert_str_does_not_contain(
+            $unbound_config,
+            'local-data: "update.example.com. A 127.0.0.6'
         );
-        $this->assert_is_false(
-            str_contains(
-                $unbound_config,
-                'local-data-ptr: "127.0.0.6 update.example.com"'
-            )
+        $this->assert_str_does_not_contain(
+            $unbound_config,
+            'local-data-ptr: "127.0.0.6 update.example.com"'
         );
     }
 }

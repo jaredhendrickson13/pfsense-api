@@ -18,7 +18,7 @@ class APIModelsSystemDNSTestCase extends TestCase
         $system_dns->dnslocalhost->value = "local";
         $system_dns->update();
         $resolvconf = file_get_contents("/etc/resolv.conf");
-        $this->assert_is_true(str_contains($resolvconf, "nameserver 127.0.0.1"));
+        $this->assert_str_contains($resolvconf, "nameserver 127.0.0.1");
     }
 
     /**
@@ -33,9 +33,9 @@ class APIModelsSystemDNSTestCase extends TestCase
         $system_dns->dnsserver->value = ["8.8.8.8", "8.8.4.4"];
         $system_dns->update();
         $resolvconf = file_get_contents("/etc/resolv.conf");
-        $this->assert_is_false(str_contains($resolvconf, "nameserver 127.0.0.1"));
-        $this->assert_is_true(str_contains($resolvconf, "nameserver 8.8.8.8"));
-        $this->assert_is_true(str_contains($resolvconf, "nameserver 8.8.4.4"));
+        $this->assert_str_does_not_contain($resolvconf, "nameserver 127.0.0.1");
+        $this->assert_str_contains($resolvconf, "nameserver 8.8.8.8");
+        $this->assert_str_contains($resolvconf, "nameserver 8.8.4.4");
     }
 
     /**
@@ -50,9 +50,9 @@ class APIModelsSystemDNSTestCase extends TestCase
         $system_dns->dnsserver->value = ["8.8.8.8", "8.8.4.4"];
         $system_dns->update();
         $resolvconf = file_get_contents("/etc/resolv.conf");
-        $this->assert_is_true(str_contains($resolvconf, "nameserver 127.0.0.1"));
-        $this->assert_is_true(str_contains($resolvconf, "nameserver 8.8.8.8"));
-        $this->assert_is_true(str_contains($resolvconf, "nameserver 8.8.4.4"));
+        $this->assert_str_contains($resolvconf, "nameserver 127.0.0.1");
+        $this->assert_str_contains($resolvconf, "nameserver 8.8.8.8");
+        $this->assert_str_contains($resolvconf, "nameserver 8.8.4.4");
     }
 
 }

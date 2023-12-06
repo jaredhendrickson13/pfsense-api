@@ -74,11 +74,9 @@ class APIModelsUserGroupTestCase extends TestCase
         $user_group->create();
         
         # Ensure the created user group is present in /etc/group
-        $this->assert_is_true(
-            str_contains(
-                file_get_contents("/etc/group"),
-                "{$user_group->name->value}:*:{$user_group->gid->value}:root"
-            )
+        $this->assert_str_contains(
+            file_get_contents("/etc/group"),
+            "{$user_group->name->value}:*:{$user_group->gid->value}:root"
         );
         
         # Update the user group and ensure it was updated in /etc/group
@@ -87,28 +85,22 @@ class APIModelsUserGroupTestCase extends TestCase
         $user_group->update();
 
         # Ensure the previous user group is no longer present in /etc/group
-        $this->assert_is_false(
-            str_contains(
-                file_get_contents("/etc/group"),
-                "{$user_group->name->value}:*:{$user_group->gid->value}:root"
-            )
+        $this->assert_str_does_not_contain(
+            file_get_contents("/etc/group"),
+            "{$user_group->name->value}:*:{$user_group->gid->value}:root"
         );
 
         # Ensure the updated user group is in /etc/group
-        $this->assert_is_true(
-            str_contains(
-                file_get_contents("/etc/group"),
-                "{$user_group->name->value}:*:{$user_group->gid->value}:"
-            )
+        $this->assert_str_contains(
+            file_get_contents("/etc/group"),
+            "{$user_group->name->value}:*:{$user_group->gid->value}:"
         );
         
         # Delete the user group and ensure it is no longer present in /etc/group
         $user_group->delete();
-        $this->assert_is_false(
-            str_contains(
-                file_get_contents("/etc/group"),
-                $user_group->name->value
-            )
+        $this->assert_str_does_not_contain(
+            file_get_contents("/etc/group"),
+            $user_group->name->value
         );
     }
 

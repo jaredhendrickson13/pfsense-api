@@ -294,11 +294,9 @@ class APIModelsStaticRouteTestCase extends TestCase
         $test_route->create(apply: true);
 
         # Ensure the route is found in the routing table after applying
-        $this->assert_is_true(
-            str_contains(
-                $this->run_command("netstat -rn", trim_whitespace: true)["output"],
-                "{$test_route->network->value} {$test_gw->gateway->value}"
-            )
+        $this->assert_str_contains(
+            $this->run_command("netstat -rn", trim_whitespace: true)["output"],
+            "{$test_route->network->value} {$test_gw->gateway->value}"
         );
 
         # Update the static route to change the static route network
@@ -306,27 +304,21 @@ class APIModelsStaticRouteTestCase extends TestCase
         $test_route->update(apply: true);
 
         # Ensure the new route is found in the routing table and the old one is not after applying
-        $this->assert_is_false(
-            str_contains(
-                $this->run_command("netstat -rn", trim_whitespace: true)["output"],
-                "1.2.3.0/24 {$test_gw->gateway->value}"
-            )
+        $this->assert_str_does_not_contain(
+            $this->run_command("netstat -rn", trim_whitespace: true)["output"],
+            "1.2.3.0/24 {$test_gw->gateway->value}"
         );
-        $this->assert_is_true(
-            str_contains(
-                $this->run_command("netstat -rn", trim_whitespace: true)["output"],
-                "{$test_route->network->value} {$test_gw->gateway->value}"
-            )
+        $this->assert_str_contains(
+            $this->run_command("netstat -rn", trim_whitespace: true)["output"],
+            "{$test_route->network->value} {$test_gw->gateway->value}"
         );
 
         # Remove the static route and ensure it is no longer present in the routing table
         $test_route->delete(apply: true);
 
-        $this->assert_is_false(
-            str_contains(
-                $this->run_command("netstat -rn", trim_whitespace: true)["output"],
-                "{$test_route->network->value} {$test_gw->gateway->value}"
-            )
+        $this->assert_str_does_not_contain(
+            $this->run_command("netstat -rn", trim_whitespace: true)["output"],
+            "{$test_route->network->value} {$test_gw->gateway->value}"
         );
 
         # Delete the gateway used for testing

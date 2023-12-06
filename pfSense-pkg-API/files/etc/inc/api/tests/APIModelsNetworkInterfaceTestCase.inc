@@ -806,39 +806,29 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
         $ifconfig_output = implode(PHP_EOL, $ifconfig_output);
 
         # Ensure the interface's mtu is shown by ifconfig
-        $this->assert_is_true(
-            str_contains(
-                $ifconfig_output,
-                "mtu 1501"
-            )
+        $this->assert_str_contains(
+            $ifconfig_output,
+        "mtu 1501"
         );
         # Ensure the interface's description is shown by ifconfig
-        $this->assert_is_true(
-            str_contains(
+        $this->assert_str_contains(
                 $ifconfig_output,
-                "description: teststatic"
-            )
+            "description: teststatic"
         );
         # Ensure the interface's spoofmac is shown by ifconfig
-        $this->assert_is_true(
-            str_contains(
-                $ifconfig_output,
-                "ether 00:00:00:00:00:00"
-            )
+        $this->assert_str_contains(
+            $ifconfig_output,
+            "ether 00:00:00:00:00:00"
         );
         # Ensure the static IPv4 address is shown by ifconfig
-        $this->assert_is_true(
-            str_contains(
-                $ifconfig_output,
-                "inet 192.168.100.1 netmask 0xffffff00 broadcast 192.168.100.255"
-            )
+        $this->assert_str_contains(
+            $ifconfig_output,
+            "inet 192.168.100.1 netmask 0xffffff00 broadcast 192.168.100.255"
         );
         # Ensure the static IPv6 address is shown by ifconfig
-        $this->assert_is_true(
-            str_contains(
-                $ifconfig_output,
-                "inet6 1234::1 prefixlen 64"
-            )
+        $this->assert_str_contains(
+            $ifconfig_output,
+            "inet6 1234::1 prefixlen 64"
         );
 
         # Update the static interface configuration and ensure the updated values are correctly shown by ifconfig
@@ -862,39 +852,29 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
         $ifconfig_output = implode(PHP_EOL, $ifconfig_output);
 
         # Ensure the interface's new mtu is shown by ifconfig
-        $this->assert_is_true(
-            str_contains(
-                $ifconfig_output,
-                "mtu 1500"
-            )
+        $this->assert_str_contains(
+            $ifconfig_output,
+            "mtu 1500"
         );
         # Ensure the interface's new description is shown by ifconfig
-        $this->assert_is_true(
-            str_contains(
-                $ifconfig_output,
-                "description: teststaticupdated"
-            )
+        $this->assert_str_contains(
+            $ifconfig_output,
+            "description: teststaticupdated"
         );
         # Ensure the interface's new spoofmac is shown by ifconfig
-        $this->assert_is_true(
-            str_contains(
-                $ifconfig_output,
-                "ether 11:11:11:11:11:11"
-            )
+        $this->assert_str_contains(
+            $ifconfig_output,
+            "ether 11:11:11:11:11:11"
         );
         # Ensure the new static IPv4 address is shown by ifconfig
-        $this->assert_is_true(
-            str_contains(
-                $ifconfig_output,
-                "inet 192.168.200.1 netmask 0xffffff80 broadcast 192.168.200.127"
-            )
+        $this->assert_str_contains(
+            $ifconfig_output,
+            "inet 192.168.200.1 netmask 0xffffff80 broadcast 192.168.200.127"
         );
         # Ensure the new static IPv6 address is shown by ifconfig
-        $this->assert_is_true(
-            str_contains(
-                $ifconfig_output,
-                "inet6 4321::1 prefixlen 96"
-            )
+        $this->assert_str_contains(
+            $ifconfig_output,
+            "inet6 4321::1 prefixlen 96"
         );
 
         # Delete the static interface and ensure it is no longer present in ifconfig
@@ -905,18 +885,14 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
         $ifconfig_output = implode(PHP_EOL, $ifconfig_output);
 
         # Ensure the new static IPv4 address is not shown by ifconfig
-        $this->assert_is_false(
-            str_contains(
-                $ifconfig_output,
-                "inet 192.168.200.1 netmask 0xffffff80 broadcast 192.168.200.127"
-            )
+        $this->assert_str_does_not_contain(
+            $ifconfig_output,
+            "inet 192.168.200.1 netmask 0xffffff80 broadcast 192.168.200.127"
         );
         # Ensure the new static IPv6 address isnot  shown by ifconfig
-        $this->assert_is_false(
-            str_contains(
-                $ifconfig_output,
-                "inet6 4321::1 prefixlen 96"
-            )
+        $this->assert_str_does_not_contain(
+            $ifconfig_output,
+            "inet6 4321::1 prefixlen 96"
         );
     }
 
