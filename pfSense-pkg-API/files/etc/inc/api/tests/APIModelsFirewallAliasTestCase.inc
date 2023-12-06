@@ -9,7 +9,7 @@ class APIModelsFirewallAliasTestCase extends TestCase {
     /**
      * Checks that aliases with hostnames correctly populate a pfctl table
      */
-    public function test_vlan_configured_in_ifconfig() {
+    public function test_fqdn_alias_populates_pfctl_table() {
         # Create an alias that includes dns.google as an alias item
         $test_alias = new FirewallAlias(
             data: [

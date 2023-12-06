@@ -20,14 +20,21 @@ use API\Dispatchers\WebGUIRestartDispatcher;
 use API\Models\APISettings;
 
 function build_endpoints() {
-    # Import each view class
+    # Use a variable to keep track of the privileges associated with this endpoint
+    $endpoint_privs = [];
+
+    # Import each endpoint class
     foreach(glob("/etc/inc/api/endpoints/*.inc") as $file) {
         # Import classes files and create object
         require_once($file);
         $endpoint_class = "\\API\\Endpoints\\".str_replace(".inc", "", basename($file));
         $endpoint_obj = new $endpoint_class();
         $endpoint_obj->build_endpoint_url();
+        $endpoint_privs += $endpoint_obj->generate_pfsense_privs();
     }
+
+    # Write the API endpoint privileges to privs.json
+    file_put_contents("/usr/local/share/pfSense-pkg-API/privs.json", json_encode($endpoint_privs));
 }
 
 function build_forms() {

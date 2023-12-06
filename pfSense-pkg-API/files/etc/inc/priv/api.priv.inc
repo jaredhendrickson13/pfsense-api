@@ -13,8 +13,6 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-require_once("api/auto_loader.inc");
-
 global $priv_list;
 
 $priv_list['page-system-api'] = array();
@@ -23,11 +21,9 @@ $priv_list['page-system-api']['descr'] = "Allow access to API package UI";
 $priv_list['page-system-api']['match'] = array();
 $priv_list['page-system-api']['match'][] = "api*";
 
-# Populate privileges for each Endpoint class in \API\Endpoints
-foreach(glob("/etc/inc/api/endpoints/*.inc") as $file) {
-    # Import classes files and create object
-    require_once($file);
-    $endpoint_class = "\\API\\Endpoints\\".str_replace(".inc", "", basename($file));
-    $endpoint_obj = new $endpoint_class();
-    $priv_list += $endpoint_obj->generate_pfsense_privs();
+# Include the privileges that are auto-generated during endpoint build
+if (is_file("/usr/local/share/pfSense-pkg-API/privs.json")) {
+    $endpoint_privs_json = file_get_contents("/usr/local/share/pfSense-pkg-API/privs.json");
+    $endpoint_privs = json_decode($endpoint_privs_json, associative: true);
+    $priv_list += $endpoint_privs;
 }

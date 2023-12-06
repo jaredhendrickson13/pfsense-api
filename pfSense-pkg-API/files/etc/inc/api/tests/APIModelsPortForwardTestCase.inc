@@ -17,7 +17,6 @@ class APIModelsPortForwardTestCase extends TestCase
                 "interface" => "lan",
                 "protocol" => "tcp",
                 "source" => "any",
-                "source_port" => "any",
                 "destination" => "lan:ip",
                 "destination_port" => "8443",
                 "target" => "127.1.2.3"
