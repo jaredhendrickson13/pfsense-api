@@ -18,9 +18,7 @@ are made preventing the need for a reboot. All this results in the fastest, safe
 <details>
     <summary>Supported pfSense Versions</summary>
 
-  - pfSense CE 2.7.0 (amd64)
-  - pfSense Plus 23.01 (amd64)
-  - pfSense Plus 23.05 (amd64)
+  - pfSense CE 2.7.1 (amd64)
   - pfSense Plus 23.09 (community supported)
 
   _This package is not supported on other architectures such as arm64 and aarch64. However, the package should still
