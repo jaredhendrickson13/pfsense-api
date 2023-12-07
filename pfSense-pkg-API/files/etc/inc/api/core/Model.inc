@@ -1095,7 +1095,7 @@ class Model {
         $is_parent_model_many = $model->is_parent_model_many();
         
         # Throw an error if this Model has a $many parent Model, but no parent Model ID was given
-        if ($is_parent_model_many and !$parent_id) {
+        if ($is_parent_model_many and !isset($parent_id)) {
             throw new ValidationError(
                 message: "Field `parent_id` is required to read all.",
                 response_id: "MODEL_PARENT_ID_REQUIRED"
