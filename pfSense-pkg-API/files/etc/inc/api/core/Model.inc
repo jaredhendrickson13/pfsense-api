@@ -1398,7 +1398,9 @@ class Model {
         # Obtain any models that are deemed protected to ensure they do not removed in the next step.
         $protected_models = new ModelSet();
         if ($this->protected_model_query) {
-            $protected_models = $initial_objects->query(query_params: $this->protected_model_query);
+            $protected_models = $initial_objects->query(
+                query_params: $this->protected_model_query
+            );
         }
 
         # Before beginning validation, empty the stored values in the config path. Retain protected models (if any).
@@ -1474,7 +1476,10 @@ class Model {
         if ($this->validate(requires_id: true, only_id: true)) {
             # For $many enabled Models with protected models, ensure the value being deleted is not a protected model 
             if ($this->many and $this->protected_model_query) {
-                $protected_models = $this->query(query_params: $this->protected_model_query);
+                $protected_models = $this->query(
+                    query_params: $this->protected_model_query, 
+                    parent_id: $this->parent_id
+                );
 
                 # Throw an error if this is a protected Model
                 if ($protected_models->query(id: $this->id)->exists()) {
