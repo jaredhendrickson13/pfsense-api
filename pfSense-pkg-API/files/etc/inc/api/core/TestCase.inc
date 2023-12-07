@@ -89,9 +89,12 @@ class TestCase {
      * @throws AssertionError When $value1 and $value2 are not equal.
      */
     protected function assert_equals(mixed $value1, mixed $value2, string $message = "") {
-        $message = ($message) ?: "Expected value `$value1` to equal `$value2`.";
         # Throw a TestError if the two values do not match
         if ($value1 !== $value2) {
+            # Ensure the test failure message includes the values that did not equal. Serialize objects into strings.
+            $value1_str = (is_object($value1)) ? serialize($value1) : $value1;
+            $value2_str = (is_object($value2)) ? serialize($value2) : $value2;
+            $message = ($message) ?: "Expected value `$value1_str` to equal `$value2_str`.";
             throw new AssertionError($message);
         }
     }
@@ -105,9 +108,12 @@ class TestCase {
      */
     protected function assert_not_equals(mixed $value1, mixed $value2, string $message = "")
     {
-        $message = ($message) ?: "Expected value `$value1` to not equal `$value2`.";
         # Throw a TestError if the two values match
         if ($value1 === $value2) {
+            # Ensure the test failure message includes the values that did not equal. Serialize objects into strings.
+            $value1_str = (is_object($value1)) ? serialize($value1) : $value1;
+            $value2_str = (is_object($value2)) ? serialize($value2) : $value2;
+            $message = ($message) ?: "Expected value `$value1_str` to not equal `$value2_str`.";
             throw new AssertionError($message);
         }
     }
@@ -246,7 +252,7 @@ class TestCase {
     protected function assert_str_does_not_contain(string $haystack, string $needle) {
         # Fail the test if $needle is found in $haystack
         if (str_contains($haystack, $needle)) {
-            throw new AssertionError("Expected string `$haystack` to contain string `$needle`");
+            throw new AssertionError("Expected string `$haystack` to not contain string `$needle`");
         }
     }
 

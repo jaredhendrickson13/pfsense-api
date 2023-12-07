@@ -55,7 +55,7 @@ class APICoreModelSetTestCase extends API\Core\TestCase {
         # Ensure the query only returned Models with `test_bool` set to `true`.
         $this->assert_equals(count($queried_modelset->model_objects), 1);
         $this->assert_equals(
-            $queried_modelset->model_objects[0],
+            $queried_modelset->first(),
             $test_model1
         );
 

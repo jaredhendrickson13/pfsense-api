@@ -94,7 +94,9 @@ class NestedModelField extends Field
      */
     public function validate_extra(mixed $value)
     {
-        # Create a new Model object for this value and validate it
+        # Create a new Model object for this value and validate it. Remove any assigned IDs
+        unset($value["id"]);
+        unset($value["parent_id"]);
         $model = new $this->model_class(data: $value);
 
         # Try to validate the nested Model object
@@ -194,6 +196,9 @@ class NestedModelField extends Field
         if ($this->model->many) {
             $internal_objects = [];
             foreach ($this->value as $representation_data) {
+                # Remove any assigned IDs
+                unset($representation_data["id"]);
+                unset($representation_data["parent_id"]);
                 $representation_object = new $this->model(data: $representation_data);
                 $internal_objects[] = $representation_object->to_internal();
             }

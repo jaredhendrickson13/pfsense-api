@@ -198,6 +198,15 @@ class Model {
      * Retrieves the full config path including any assigned parent Model paths.
      */
     public function get_config_path() : string|null {
+        # Do not allow this method to be called if a parent Model class is assigned, but the parent hasn't been obtained
+        if ($this->parent_model_class and !$this->parent_model) {
+            throw new ServerError(
+                message: "Model `get_config_path()` cannot be called until the parent Model has been constructed. ".
+                    "Run the `get_parent_model()` method first.",
+                response_id: "MODEL_CANNOT_GET_CONFIG_PATH_WITHOUT_PARENT_MODEL"
+            );
+        }
+        
         # Format the config path accordingly when a `parent_model_class` is assigned
         if ($this->parent_model) {
             # Do not allow a parent Model to be set if this Model has an `internal_callable` assigned
@@ -234,7 +243,6 @@ class Model {
             
             # Otherwise, just prefix the parent Model's config path to this Model's config path
             return "{$this->parent_model->config_path}/$this->config_path";
-
         }
         
         # Just use this Model's config path if no parent Model is assigned
@@ -355,6 +363,11 @@ class Model {
                 message: "Models cannot obtain next ID when 'many' is not enabled.",
                 response_id: "MODEL_NEXT_ID_WITHOUT_MANY"
             );
+        }
+        
+        # If this Model has a parent Model assigned, get the parent Model object so we can accurately determine the ID
+        if ($this->parent_model_class) {
+            $this->get_parent_model();
         }
 
         # First, get the configuration at the specific path
