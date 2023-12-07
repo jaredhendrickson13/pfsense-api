@@ -1092,7 +1092,6 @@ class Model {
         $model_name = get_called_class();
         $model = new $model_name();
         $model_objects = [];
-        $internal_objects = $model->get_internal_objects();
         $is_parent_model_many = $model->is_parent_model_many();
         
         # Throw an error if this Model has a $many parent Model, but no parent Model ID was given
@@ -1102,6 +1101,10 @@ class Model {
                 response_id: "MODEL_PARENT_ID_REQUIRED"
             );
         }
+        
+        # Obtain the parent Model if applicable and get internal objects
+        $model->get_parent_model();
+        $internal_objects = $model->get_internal_objects();
 
         # For non `many` models, wrap the internal object in an array so we can loop
         $internal_objects = ($model->many) ? $internal_objects : [$internal_objects];
