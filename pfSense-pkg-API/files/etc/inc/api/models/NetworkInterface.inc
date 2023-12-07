@@ -432,7 +432,7 @@ class NetworkInterface extends Model
      */
     public function validate_mtu(int $mtu) : int {
         # Check if this interface is a VLAN interface
-        $vlan_query = InterfaceVLAN::read_all()->query(["vlanif" => $this->if->value]);
+        $vlan_query = InterfaceVLAN::query(["vlanif" => $this->if->value]);
 
         # If this interface is a VLAN interface, ensure the MTU is less than the parent interface
         if ($vlan_query->exists()) {
@@ -721,7 +721,7 @@ class NetworkInterface extends Model
         }
 
         # Only allow one interface's typev6 value to be 6to4
-        $if_6to4_query = $this->read_all()->query(["id__except" => $this->id, "typev6" => "6to4"]);
+        $if_6to4_query = $this->query(["id__except" => $this->id, "typev6" => "6to4"]);
         if ($if_6to4_query->exists()) {
             throw new ValidationError(
                 message: "Field 'typev6' cannot use '6to4' because it is already in use by ".
@@ -820,14 +820,14 @@ class NetworkInterface extends Model
      */
     public function get_next_id() : string {
         # Use `lan` if it doesn't already exist
-        if (!$this->read_all()->query(["id" => "lan"])->exists()) {
+        if (!$this->query(["id" => "lan"])->exists()) {
             return "lan";
         }
 
         # Otherwise, loop until we find an available opt interface ID
         foreach (range(1, 65535) as $count) {
             # Use this opt if it doesn't already exist
-            if (!$this->read_all()->query(["id" => "opt$count"])->exists()) {
+            if (!$this->query(["id" => "opt$count"])->exists()) {
                 return "opt$count";
             }
         }

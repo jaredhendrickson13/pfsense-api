@@ -48,7 +48,7 @@ class UniqueFromForeignModelValidator extends Validator
         # Otherwise, query for matching Model objects and throw an error if found
         elseif ($foreign_model->many) {
             # Query for any object of this Model that has the defined field name set to this value
-            $model_query = $foreign_model->read_all()->query([$foreign_model_field_name => $value]);
+            $model_query = $foreign_model->query([$foreign_model_field_name => $value]);
 
             # Throw an error if a match exists
             if ($model_query->exists()) {

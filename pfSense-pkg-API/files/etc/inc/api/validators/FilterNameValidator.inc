@@ -49,7 +49,7 @@ class FilterNameValidator extends API\Core\Validator {
         }
 
         # Throw an exception if any existing NetworkInterface object is using this name
-        if (NetworkInterface::read_all()->query(["id__except" => $this->model_context->id, "id" => $value])->exists()) {
+        if (NetworkInterface::query(["id__except" => $this->model_context->id, "id" => $value])->exists()) {
             throw new ValidationError(
                 message: "Field '$field_name' cannot be '$value' because it is in use by an existing interface.",
                 response_id: "FILTER_NAME_VALIDATOR_NAME_IN_USE_BY_INTERFACE"
@@ -57,7 +57,7 @@ class FilterNameValidator extends API\Core\Validator {
         }
 
         # Throw an exception if any existing FirewallAlias object is using this name
-        if (FirewallAlias::read_all()->query(["id__except" => $this->model_context->id, "id" => $value])->exists()) {
+        if (FirewallAlias::query(["id__except" => $this->model_context->id, "id" => $value])->exists()) {
             throw new ValidationError(
                 message: "Field '$field_name' cannot be '$value' because it is in use by an existing interface.",
                 response_id: "FILTER_NAME_VALIDATOR_NAME_IN_USE_BY_ALIAS"

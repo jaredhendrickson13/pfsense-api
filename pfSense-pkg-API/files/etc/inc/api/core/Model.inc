@@ -696,8 +696,25 @@ class Model {
         
         return null;
     }
+
+    /**
+     * Checks if the parent Model class assigned to this Model class is a $many enabled Model.
+     * @return bool|null Returns true if a $parent_model_class is assigned to this Model and the parent Model has
+     * $many enabled, false if a $parent_model_class is assigned to this Model and the parent Model does not have
+     * $many enabled, or null if no $parent_model_class is assigned to this Model.
+     */
+    public function is_parent_model_many() : bool|null
+    {
+        # If a parent Model is assigned, create the parent object
+        if ($this->parent_model_class) {
+            # Set the FQN parent class name
+            $parent_model_class = "\\API\\Models\\$this->parent_model_class";
+            $parent_model = new $parent_model_class();
+            return $parent_model->many;
+        }
         
-       
+        return null;
+    }
 
     /**
      * Populates an array of field names for this model.
@@ -773,7 +790,7 @@ class Model {
         }
 
         # Query for existing objects with the same Field values
-        $model_query = $this->read_all()->query(query_params: $query_params);
+        $model_query = $this->query(query_params: $query_params, parent_id: $this->parent_id);
 
         # If any existing Models were found matching the query, fields are not unique together, throw an error
         if ($model_query->model_objects) {
@@ -792,13 +809,20 @@ class Model {
      * validating all assigned fields. Note: Fields are validated in the order they are defined in the class.
      * @param bool $requires_id Whether the `id` field should be validated in this request. This is typically only
      * necessary for update and delete actions.
+     * @param bool $create_id If true, a new ID will be created for this object if this is a $many Model. This is 
+     * primarily used for creations.
      * @param bool $only_id Only validate the `id` field. This is primarily used for deletions.
      * @param bool $skip_parent Skip validating the assigned parent ID. This only applies to Models that have a
      * `parent_model_class` value assigned. In most cases, this should not be changed from the default. This is
      * only intended for nested Model validation.
      * @return bool `true` if the model's data is valid.
      */
-    final public function validate(bool $requires_id = false, bool $only_id = false, bool $skip_parent = false) : bool {
+    final public function validate(
+        bool $requires_id = false, 
+        bool $create_id = false,
+        bool $only_id = false, 
+        bool $skip_parent = false
+    ) : bool {
         # When an ID is required and this is a `many` model, check that an ID is set.
         if ($requires_id and $this->many and !isset($this->id)) {
             throw new ValidationError(
@@ -807,20 +831,24 @@ class Model {
             );
         }
         
-        # Validate the `parent_id` field if it was not requested we skip this step.
-        if (!$skip_parent) {
+        # Validate `parent_id` field if a parent model class is assigned and it was not requested we skip this step.
+        if ($this->parent_model_class and !$skip_parent) {
             # Require a parent ID if the parent model is a `many` model
-            if ($this->parent_model_class and $this->parent_model->many and !isset($this->parent_id)) {
+            if ($this->is_parent_model_many() and !isset($this->parent_id)) {
                 throw new ValidationError(
                     message: "Field `parent_id` is required.",
                     response_id: "MODEL_PARENT_ID_REQUIRED"
                 );
             }
 
-            # Ensure the parent Model exists if configured
+            # Obtain the exact parent Model object
             $this->get_parent_model();
         }
         
+        # Create an ID for this object if requested
+        if ($create_id and $this->config_path and $this->many) {
+            $this->id = $this->get_next_id();
+        }
 
         # Check for required packages
         $this->check_packages();
@@ -930,8 +958,9 @@ class Model {
                 foreach ($reference_fields as $reference_field) {
                     # Query for any referenced Model objects that have this field value assigned to the referenced field
                     $reference_model = new $reference_model();
-                    $reference_query = $reference_model->read_all()->query(
-                        query_params: [$reference_field => $this->$field->value]
+                    $reference_query = $reference_model->query(
+                        query_params: [$reference_field => $this->$field->value],
+                        parent_id: $this->parent_id
                     );
                     $references = $references + $reference_query->model_objects;
                 }
@@ -1053,22 +1082,37 @@ class Model {
      * Fetches Model objects for all objects stored in the internal pfSense values. If `config_path` is set, this will
      * load Model objects for each object stored at the config path. If `internal_callable` is set, this will create
      * Model objects for each object returned by the specified callable.
+     * @param mixed|null $parent_id Specifies the ID of the parent Model to read all objects from. This is required for
+     * $many Models with a $parent_model_class. This value has no affect otherwise.
      * @return ModelSet|Model Returns a ModelSet of Models if `many` is enabled or a single Model object if `many` is
      * not enabled.
      */
-    public static function read_all() : ModelSet|Model {
+    public static function read_all(mixed $parent_id = null) : ModelSet|Model {
         # Variables
         $model_name = get_called_class();
         $model = new $model_name();
         $model_objects = [];
         $internal_objects = $model->get_internal_objects();
+        $is_parent_model_many = $model->is_parent_model_many();
+        
+        # Throw an error if this Model has a $many parent Model, but no parent Model ID was given
+        if ($is_parent_model_many and !$parent_id) {
+            throw new ValidationError(
+                message: "Field `parent_id` is required to read all.",
+                response_id: "MODEL_PARENT_ID_REQUIRED"
+            );
+        }
 
         # For non `many` models, wrap the internal object in an array so we can loop
         $internal_objects = ($model->many) ? $internal_objects : [$internal_objects];
 
         # Loop through each internal object and create a Model object for it
         foreach ($internal_objects as $internal_id=>$internal_object) {
-            $model_object = new $model(id: $internal_id);
+            # Determine which IDs should be used to obtain this object
+            $ids = ($model->is_parent_model_many()) ? ["id" => $internal_id, "parent_id" => $parent_id] : ["id" => $internal_id];
+                
+            # Obtain this Model object from internal
+            $model_object = new $model(data: $ids);
             $model_object->from_internal();
             $model_objects[] = $model_object;
         }
@@ -1136,19 +1180,26 @@ class Model {
 
     /**
      * Performs a query on all Model objects for this Model. This is essentially a shorthand way of calling
-     * `read_all()->query()`. This method is only applicable to `many` models.
+     * `query()`. This method is only applicable to `many` models.
      * @param array $query_params An array of query parameters.
      * @param array $excluded An array of field names to exclude from the query. This is helpful when
      * query data may have extra values that you do not want to include in the query.
+     * @param mixed|null $parent_id Specifies the ID of the parent Model to read all objects from. This is required for
+     * $many Models with a $parent_model_class. This value has no affect otherwise.
      * @param mixed ...$vl_query_params Qyery parameters that are passed in using variable-length arguments
      * https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list
      * @return ModelSet The queried ModelSet containing only Model objects that matched the query.
      */
-    public static function query(array $query_params=[], array $excluded=[], ...$vl_query_params) : ModelSet {
+    public static function query(
+        array $query_params=[], 
+        array $excluded=[], 
+        mixed $parent_id=null,
+        ...$vl_query_params
+    ) : ModelSet {
         # Merge the $query_params and any provided variable-length arguments into a single variable
         $query_params = array_merge($query_params, $vl_query_params);
         
-        return self::read_all()->query(query_params: $query_params, excluded: $excluded);
+        return self::read_all(parent_id: $parent_id)->query(query_params: $query_params, excluded: $excluded);
     }
 
 
@@ -1207,13 +1258,8 @@ class Model {
      * @return Model Returns the created Model object (this object).
      */
     final public function create(bool $apply = false) : Model {
-        # Get the next available internal ID and assign it to this object for `many` models with a config path
-        if ($this->config_path and $this->many) {
-            $this->id = $this->get_next_id();
-        }
-        
         # Ensure all object fields and validations succeed for proceeding.
-        if ($this->validate()) {
+        if ($this->validate(create_id: true)) {
             # Run the _create method
             $this->_create();
 
@@ -1344,7 +1390,7 @@ class Model {
         # Keep track of all existing objects for this Model before anything is changed. This will be passed back
         # into `apply_replace_all()` so that method can gracefully bring down these objects before replacing them
         # if needed.
-        $initial_objects = $this->read_all();
+        $initial_objects = $this->read_all(parent_id: $this->parent_id);
         
         # Obtain any models that are deemed protected to ensure they do not removed in the next step.
         $protected_models = new ModelSet();
@@ -1375,7 +1421,7 @@ class Model {
         $this->write_config("Replaced all $this->verbose_name_plural via API");
         
         # Read all new objects for this Model so it can be passed into `apply_replace_all()`.
-        $new_objects = $this->read_all();
+        $new_objects = $this->read_all(parent_id: $this->parent_id);
 
         # Mark the subsystem as dirty if set
         if ($this->subsystem) {

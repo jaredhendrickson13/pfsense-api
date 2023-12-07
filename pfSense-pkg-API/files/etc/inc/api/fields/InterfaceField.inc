@@ -167,7 +167,7 @@ class InterfaceField extends API\Fields\StringField {
      */
     protected function _to_internal(mixed $representation_value): array|null|string {
         # Query to find this interface using the interfaces representation field and value
-        $interface_query = NetworkInterface::read_all()->query(
+        $interface_query = NetworkInterface::query(
             query_params: [$this->represented_as => $representation_value]
         );
 
@@ -187,7 +187,7 @@ class InterfaceField extends API\Fields\StringField {
     public function get_interface_choices() : array {
         # Variables
         $choices = [];
-        $interface_query = NetworkInterface::read_all()->query($this->interface_query);
+        $interface_query = NetworkInterface::query($this->interface_query);
         $interface_groups = Model::get_config("ifgroups/ifgroupentry", []);
         $virtual_ips = Model::get_config("virtualip/vip", []);
 

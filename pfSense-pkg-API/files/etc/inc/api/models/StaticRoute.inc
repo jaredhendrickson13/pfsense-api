@@ -122,7 +122,7 @@ class StaticRoute extends Model
         }
 
         # Fetch the gateway object of the value assigned
-        $gateway_obj = RoutingGateway::read_all()->query(["name" => $gateway])->first();
+        $gateway_obj = RoutingGateway::query(["name" => $gateway])->first();
 
         # Ensure the upstream gateways IP version matches the `network` assigned
         if ($gateway_obj->ipprotocol->value === "inet" and !$this->network->has_label("is_subnetv4")) {
@@ -150,7 +150,7 @@ class StaticRoute extends Model
      */
     public function validate_disabled(bool $disabled) : bool {
         # Fetch the gateway object of the gateway assigned
-        $gateway_obj = RoutingGateway::read_all()->query(["name" => $this->gateway->value])->first();
+        $gateway_obj = RoutingGateway::query(["name" => $this->gateway->value])->first();
 
         # Force route to be disabled if the parent gateway is disabled
         if ($gateway_obj->disabled->value and !$disabled) {

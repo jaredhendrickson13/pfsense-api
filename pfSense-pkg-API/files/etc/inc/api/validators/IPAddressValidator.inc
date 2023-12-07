@@ -48,7 +48,7 @@ class IPAddressValidator extends API\Core\Validator {
      */
     public function validate(mixed $value, string $field_name = "") {
         # Non-port alias values are valid if allowed
-        $alias_query = FirewallAlias::read_all()->query(["name" => $value, "type__except" => "port"]);
+        $alias_query = FirewallAlias::query(["name" => $value, "type__except" => "port"]);
         if ($this->allow_alias and $alias_query->exists()) {
             $this->set_label("is_alias");
             return;

@@ -203,7 +203,7 @@ class RoutingGateway extends Model
             }
 
             # Ensure the gateway cannot be disabled while it is in use by a non-disabled static route
-            $routes_in_use = StaticRoute::read_all()->query(["gateway" => $this->name->value, "disabled" => false]);
+            $routes_in_use = StaticRoute::query(["gateway" => $this->name->value, "disabled" => false]);
             if ($routes_in_use->exists()) {
                 throw new ValidationError(
                     message: "Gateway cannot be disabled because it is in use by gateway " .
