@@ -12,6 +12,7 @@ class SystemTunable extends Model
     public StringField $tunable;
     public StringField $value;
     public StringField $descr;
+    private array $sysctl_defaults;
     
     public function __construct(mixed $id = null, mixed $data = [], Auth $client = null, bool $async = true)
     {
@@ -37,6 +38,10 @@ class SystemTunable extends Model
             help_text: "A description for this tunable."
         );
         
+        # Keep track of the original sysctl defaults
+        global $sysctls;
+        $this->sysctl_defaults = $sysctls;
+        
         parent::__construct(id: $id, data: $data, client: $client, async: $async);
     }
 
@@ -45,6 +50,13 @@ class SystemTunable extends Model
      */
     public function apply()
     {
+        # Setup all sysctl values
         system_setup_sysctl();
+        
+        # Re-assign the default sysctls so they are accurate for the next `apply()` call.
+        # This addresses an issue where a PHP script that both creates/updates and deletes a SystemTunable object
+        # would not set the correct value after deletion. 
+        global $sysctls;
+        $sysctls = $this->sysctl_defaults;
     }
 }

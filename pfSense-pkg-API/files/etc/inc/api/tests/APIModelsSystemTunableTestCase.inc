@@ -29,7 +29,7 @@ class APIModelsSystemTunableTestCase extends TestCase
         $tunable->update(apply: true);
         $oid_value = new Command("sysctl $test_oid");
         $this->assert_str_contains($oid_value->output, "$test_oid: 10");
-        
+
         # Delete the custom tunable and ensure the OID value returns to its original value
         $tunable->delete(apply: true);
         $oid_value = new Command("sysctl $test_oid");
