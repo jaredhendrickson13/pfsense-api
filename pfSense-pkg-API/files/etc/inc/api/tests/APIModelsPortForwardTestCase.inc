@@ -88,4 +88,83 @@ class APIModelsPortForwardTestCase extends TestCase
     /**
      * Ensures the configured `natreflection` mode is properly set in the pfctl rules 
      */
+    public function test_natreflection()
+    {
+        # Create a port forward to test with
+        $port_forward = new PortForward(
+            data: [
+                "interface" => "wan",
+                "protocol" => "tcp",
+                "source" => "any",
+                "destination" => "127.3.2.1",
+                "destination_port" => "8443",
+                "target" => "127.1.2.3",
+                "local_port" => "8443",
+                "natreflection" => "purenat"
+            ],
+            async: false
+        );
+        $port_forward->create(apply: true);
+
+        # Ensure the pure NAT reflection rule is present
+        $rules_debug = file_get_contents("/tmp/rules.debug");
+        $purenat_rule = "rdr on em1 inet proto tcp from any to 127.3.2.1 port 8443 -> 127.1.2.3";
+        $this->assert_str_contains(
+            $rules_debug,
+            $purenat_rule
+        );
+
+        # Update the NAT reflection mode NAT + proxy (enable)
+        $port_forward->natreflection->value = "enable";
+        $port_forward->update(apply: true);
+
+        # Ensure the pure NAT reflection rule is no longer present and the NAT proxy rule is present
+        $rules_debug = file_get_contents("/tmp/rules.debug");
+        $natproxy_rule = "rdr on em1 proto tcp from any to 127.3.2.1 port 8443 tag PFREFLECT -> 127.0.0.1 port 19000";
+        $this->assert_str_does_not_contain(
+            $rules_debug,
+            $purenat_rule
+        );
+        $this->assert_str_contains(
+            $rules_debug,
+            $natproxy_rule
+        );
+
+        # Delete the port forward and ensure the previous reflection rule is no longer present
+        $port_forward->delete(apply: true);
+        $rules_debug = file_get_contents("/tmp/rules.debug");
+        $this->assert_str_does_not_contain(
+            $rules_debug,
+            $natproxy_rule
+        );
+    }
+
+    public function test_nordr() {
+        # Create a port forward to test with
+        $port_forward = new PortForward(
+            data: [
+                "interface" => "wan",
+                "protocol" => "tcp",
+                "source" => "any",
+                "destination" => "127.3.2.1",
+                "destination_port" => "8443",
+                "target" => "127.1.2.3",
+                "local_port" => "8443",
+                "nordr" => true
+            ],
+            async: false
+        );
+        $port_forward->create(apply: true);
+
+        # Ensure the this rule was created in pfctl with `no` prefixed to the rule
+        $rules_debug = file_get_contents("/tmp/rules.debug");
+        $nordr_rule = "no rdr on em0 inet proto tcp from any to 127.3.2.1 port 8443";
+        $this->assert_str_contains(
+            $rules_debug,
+            $nordr_rule
+        );
+
+        # Delete this port forward
+        $port_forward->delete(apply: true);
+    }
 }

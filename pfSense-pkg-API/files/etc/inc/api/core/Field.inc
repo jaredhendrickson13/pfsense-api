@@ -485,6 +485,12 @@ class Field
 
         # Loop through each condition and check if it is met
         foreach ($this->conditions as $condition_field => $condition_value) {
+            # Check if this field is inverted, strip the invert character if so
+            if (str_starts_with($condition_field, "!")) {
+                $invert = true;
+                $condition_field = substr($condition_field, 1);
+            }
+
             # Safety check to ensure the Model context even has a field with the field name specified in the condition
             if (!in_array($condition_field, $this->context->get_fields())) {
                 $parent_model_class = get_class($this->context);
@@ -495,8 +501,6 @@ class Field
                 );
             }
 
-            # Variables
-            $invert = str_starts_with($condition_field, "!");
             $condition_field_value = $this->context->$condition_field->value;
 
             # For 'value in array' conditions, mark condition as unmet if value is not present in the array

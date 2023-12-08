@@ -4,6 +4,7 @@ namespace API\Tests;
 
 use API\Core\TestCase;
 use API\Models\FirewallRule;
+use API\Models\RoutingGateway;
 
 class APIModelsFirewallRuleTestCase extends TestCase
 {
@@ -102,5 +103,218 @@ class APIModelsFirewallRuleTestCase extends TestCase
             $rule->validate_updated_by("doesn't matter what this value is!"),
             "{$rule->client->username}@{$rule->client->ip_address} (API)"
         );
+    }
+
+    /**
+     * Checks that basic firewall rules are actually configured by pfctl after creation, modification and deletion.
+     */
+    public function test_basic_crud() {
+        # Create a firewall rule to test with
+        $rule = new FirewallRule(
+            data: [
+                "type" => "pass",
+                "interface" => ["lan"],
+                "ipprotocol" => "inet",
+                "protocol" => "tcp",
+                "source" => "127.0.0.1",
+                "source_port" => "80",
+                "destination" => "127.0.0.2",
+                "destination_port" => "443",
+                "descr" => "test description"
+            ],
+            async: false
+        );
+        $rule->create(apply: true);
+
+        # Check that this rule is present in the pfctl rules
+        $pfctl_rules = file_get_contents("/tmp/rules.debug");
+        $type = $rule->type->value;
+        $if = "\${$rule->interface->get_interface_obj()->first()->descr->value}";
+        $iptype = $rule->ipprotocol->value;
+        $proto = $rule->protocol->value;
+        $src = $rule->source->value;
+        $srcport = $rule->source_port->value;
+        $dst = $rule->destination->value;
+        $dstport = $rule->destination_port->value;
+        $descr = $rule->descr->value;
+        $rid = $rule->tracker->value;
+        $pfctl_rule_created = "$type  in  quick  on $if $iptype proto $proto  from $src port $srcport to $dst port ".
+            "$dstport ridentifier $rid flags S/SA keep state label \"USER_RULE: $descr\" label \"id:$rid\"";
+        $this->assert_str_contains($pfctl_rules, $pfctl_rule_created);
+
+        # Update the firewall rule object with new values
+        $rule->from_representation(
+            data: [
+                "type" => "block",
+                "interface" => ["lan"],
+                "ipprotocol" => "inet6",
+                "protocol" => "udp",
+                "source" => "fe80::1",
+                "source_port" => "8080",
+                "destination" => "fe80::2",
+                "destination_port" => "8443",
+                "descr" => "updated test description"
+            ]
+        );
+        $rule->update(apply: true);
+
+        # Check that the previous rule is no longer present in the pfctl rules but the updated rule is
+        $pfctl_rules = file_get_contents("/tmp/rules.debug");
+        $type = $rule->type->value;
+        $if = "\${$rule->interface->get_interface_obj()->first()->descr->value}";
+        $iptype = $rule->ipprotocol->value;
+        $proto = $rule->protocol->value;
+        $src = $rule->source->value;
+        $srcport = $rule->source_port->value;
+        $dst = $rule->destination->value;
+        $dstport = $rule->destination_port->value;
+        $descr = $rule->descr->value;
+        $rid = $rule->tracker->value;
+        $pfctl_rule_updated = "$type  in  quick  on $if $iptype proto $proto  from $src port $srcport to $dst port ".
+            "$dstport ridentifier $rid label \"USER_RULE: $descr\" label \"id:$rid\"";
+        $this->assert_str_does_not_contain($pfctl_rules, $pfctl_rule_created);
+        $this->assert_str_contains($pfctl_rules, $pfctl_rule_updated);
+
+        # Delete the rule and ensure it is no longer present in pfctl
+        $rule->delete(apply: true);
+        $pfctl_rules = file_get_contents("/tmp/rules.debug");
+        $this->assert_str_does_not_contain($pfctl_rules, $pfctl_rule_updated);
+    }
+
+    /**
+     * Checks that firewall rules created with a specific gateway assigned are properly set in pfctl
+     */
+    public function test_rule_with_gateway() {
+        # Create a routing gatewy to test with
+        $gateway = new RoutingGateway(
+            data: [
+                "name" => "TEST_GW",
+                "interface" => "lan",
+                "ipprotocol" => "inet",
+                "gateway" => "192.168.1.50"
+            ]
+        );
+        $gateway->create();
+
+        # Create a firewall rule to test with
+        $rule = new FirewallRule(
+            data: [
+                "type" => "pass",
+                "interface" => ["lan"],
+                "ipprotocol" => "inet",
+                "source" => "any",
+                "destination" => "any",
+                "gateway" => $gateway->name->value
+            ],
+            async: false
+        );
+        $rule->create(apply: true);
+
+        # Check that this rule is present in the pfctl rules
+        $pfctl_rules = file_get_contents("/tmp/rules.debug");
+        $type = $rule->type->value;
+        $if = "\${$rule->interface->get_interface_obj()->first()->descr->value}";
+        $iptype = $rule->ipprotocol->value;
+        $src = $rule->source->value;
+        $dst = $rule->destination->value;
+        $rid = $rule->tracker->value;
+        $gw = $rule->gateway->value;
+        $pfctl_rule_created = "pass  in  quick  on $if  \$GW$gw $iptype from $src to $dst ridentifier $rid keep state label \"USER_RULE\" label \"id:$rid\" label \"gw:$gw\"";
+        $this->assert_str_contains($pfctl_rules, $pfctl_rule_created);
+
+        # Delete the firewall rule and gateway
+        $rule->delete(apply: true);
+        $gateway->delete();
+    }
+
+    /**
+     * Checks that disabled firewall rules are not present in pfctl
+     */
+    public function test_disabled() {
+        # Create a firewall rule to test with
+        $rule = new FirewallRule(
+            data: [
+                "disabled" => true,
+                "type" => "pass",
+                "interface" => ["lan"],
+                "ipprotocol" => "inet",
+                "source" => "any",
+                "destination" => "any"
+            ],
+            async: false
+        );
+        $rule->create(apply: true);
+
+        # Ensure the created rule's tracker ID is not present in the pfctl rules
+        $pfctl_rules = file_get_contents("/tmp/rules.debug");
+        $this->assert_str_does_not_contain(
+            $pfctl_rules,
+            $rule->tracker->value
+        );
+
+        # Delete the firewall rule
+        $rule->delete(apply: true);
+    }
+
+    /**
+     * Checks that the `statetype` is properly set in the pfctl rule
+     */
+    public function test_statetype() {
+        # Create a firewall rule to test with
+        $rule = new FirewallRule(
+            data: [
+                "type" => "pass",
+                "interface" => ["lan"],
+                "ipprotocol" => "inet",
+                "source" => "any",
+                "destination" => "any",
+                "statetype" => "sloppy state"
+            ],
+            async: false
+        );
+        $rule->create(apply: true);
+
+        # Ensure the pfctl rule with this rule object's tracker is set to sloppy
+        $pfctl_rules = file_get_contents("/tmp/rules.debug");
+        $pfctl_rule = "ridentifier {$rule->tracker->value} keep state ( sloppy  )";
+        $this->assert_str_contains($pfctl_rules, $pfctl_rule);
+
+        # Delete the firewall rule
+        $rule->delete(apply: true);
+    }
+
+    /**
+     * Checks the firewall rules with `log` enabled have the log flag set in pfctl
+     */
+    public function test_log() {
+        # Create a firewall rule to test with
+        $rule = new FirewallRule(
+            data: [
+                "type" => "pass",
+                "interface" => ["lan"],
+                "ipprotocol" => "inet",
+                "source" => "any",
+                "destination" => "any",
+                "log" => true
+            ],
+            async: false
+        );
+        $rule->create(apply: true);
+
+        # Ensure the log flag is set in the rule within pfctl
+        $pfctl_rules = file_get_contents("/tmp/rules.debug");
+        $if = $rule->interface->get_interface_obj()->first()->descr->value;
+        $type = $rule->type->value;
+        $iptype = $rule->ipprotocol->value;
+        $src = $rule->source->value;
+        $dst = $rule->destination->value;
+        $rid = $rule->tracker->value;
+        $this->assert_str_contains(
+            $pfctl_rules,
+            "$type  in log  quick  on \$$if $iptype from $src to $dst ridentifier $rid"
+        );
+
+        # Delete the firewall rule
+        $rule->delete(apply: true);
     }
 }

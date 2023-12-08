@@ -43,7 +43,7 @@ class FirewallRule extends Model
     public UnixTimeField $updated_time;
     public StringField $updated_by;
 
-    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null, bool $async = true)
     {
         # Set model attributes
         $this->config_path = "filter/rule";
@@ -72,7 +72,7 @@ class FirewallRule extends Model
         $this->protocol = new StringField(
             default: null,
             choices: [
-                "any", "tcp", "udp", "tcp/udp", "icmp", "esp", "ah",
+                "tcp", "udp", "tcp/udp", "icmp", "esp", "ah",
                 "gre", "ipv6", "igmp", "pim", "ospf", "carp", "pfsync"
             ],
             allow_null: true,
@@ -230,7 +230,7 @@ class FirewallRule extends Model
         # TODO: Add ForeignModelField for `defaultqueue` when the traffic shaper models are developed
         # TODO: Add ForeignModelField for `ackqueue` when the traffic shaper models are developed
 
-        parent::__construct(id: $id, data: $data, client: $client);
+        parent::__construct(id: $id, data: $data, client: $client, async: $async);
     }
 
     /**
