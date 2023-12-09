@@ -596,7 +596,7 @@ class Field
         # Check if many is enabled
         if ($this->many) {
             # Throw an error if the value is not already an array
-            if (!is_array($this->value)) {
+            if (!is_array($this->value) and !is_null($this->value)) {
                 throw new ValidationError(
                     message: "Field `$this->name` must be of type `array`.",
                     response_id: "FIELD_INVALID_MANY_VALUE"
