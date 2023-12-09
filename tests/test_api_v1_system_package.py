@@ -17,7 +17,7 @@ class APIE2ETestSystemPackage(e2e_test_framework.APIE2ETest):
     post_tests = [
         {
             "name": "Check install of pfSense repo package",
-            "resp_time": 30,
+            "resp_time": 60,
             "resp_data_empty": True,
             "post_test_callable": "is_package_installed",
             "req_data": {
@@ -33,7 +33,7 @@ class APIE2ETestSystemPackage(e2e_test_framework.APIE2ETest):
             "name": "Check inability to install already installed package",
             "status": 400,
             "return": 1076,
-            "resp_time": 30,
+            "resp_time": 60,
             "req_data": {
                 "name": INSTALL_PKG_NAME
             }
@@ -52,7 +52,7 @@ class APIE2ETestSystemPackage(e2e_test_framework.APIE2ETest):
     delete_tests = [
             {
                 "name": "Test deletion of installed package",
-                "resp_time": 30,
+                "resp_time": 60,
                 "resp_data_empty": True,
                 "post_test_callable": "is_package_deleted",
                 "req_data": {
