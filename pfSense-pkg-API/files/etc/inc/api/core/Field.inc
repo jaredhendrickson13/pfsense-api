@@ -587,7 +587,7 @@ class Field
      * @returns array An array containing all individual values that need validation.
      * @throws ValidationError When `many` is enabled, but `value` is not an array.
      */
-    private function get_value_as_array() : array {
+    private function get_value_as_array() : array|null {
         # Assume the default value if no value was set and a default was specified
         if (isset($this->default) and is_null($this->value)) {
             $this->value = $this->default;
