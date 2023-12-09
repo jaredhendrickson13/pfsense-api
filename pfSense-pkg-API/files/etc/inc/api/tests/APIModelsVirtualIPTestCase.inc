@@ -6,6 +6,7 @@ require_once("api/auto_loader.inc");
 
 use API\Core\Command;
 use API\Core\TestCase;
+use API\Models\CARP;
 use API\Models\VirtualIP;
 
 class APIModelsVirtualIPTestCase extends TestCase
@@ -196,5 +197,39 @@ class APIModelsVirtualIPTestCase extends TestCase
         $test_model->delete();
         $choparp = new Command("/usr/bin/top -baHS 999 | grep choparp");
         $this->assert_str_does_not_contain($choparp->output, "4.3.2.1");
+    }
+    
+    /**
+     * Checks that the virtual IP `carp_status` is accurately represented.
+     */
+    public function test_carp_status() {
+        # Create CARP status and CARP VIP objects to test with
+        $carp_status = new CARP(async: false);
+        $carp_vip = new VirtualIP(
+            data: [
+                "mode" => "carp",
+                "interface" => "lan",
+                "subnet" => "127.1.2.3",
+                "subnet_bits" => 32,
+                "password" => "testpasswd",
+                "vhid" => 5
+            ]
+        );
+        $carp_vip->create(apply: true);
+        
+        # Ensure the CARP VIP has assumed `master` status
+        $carp_vip->from_internal();
+        $this->assert_is_true(in_array($carp_vip->carp_status->value, ["master", "backup", "init"]));
+        
+        # Disable CARP on the system and ensure the CARP virtual IP has assumed `disabled` status
+        $carp_status->enable->value = false;
+        $carp_status->update();
+        $carp_vip->from_internal();
+        $this->assert_equals($carp_vip->carp_status->value, "disabled");
+        
+        # Re-enable CARP and delete the virtual IP
+        $carp_status->enable->value = true;
+        $carp_status->update();
+        $carp_vip->delete(apply: true);
     }
 }

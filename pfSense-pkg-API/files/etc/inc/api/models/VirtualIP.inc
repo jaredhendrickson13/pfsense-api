@@ -30,6 +30,7 @@ class VirtualIP extends Model
     public IntegerField $advbase;
     public IntegerField $advskew;
     public StringField $password;
+    public StringField $carp_status;
 
     public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
     {
@@ -119,6 +120,14 @@ class VirtualIP extends Model
             conditions: ["mode" => "carp"],
             help_text: "The VHID group password shared by all CARP members."
         );
+        $this->carp_status = new StringField(
+            default: "",
+            allow_empty: true,
+            read_only: true,
+            conditions: ["mode" => "carp"],
+            help_text: "The current CARP status of this virtual IP. This will display show whether this CARP node ".
+                "is the primary or backup peer."
+        );
 
         parent::__construct(id: $id, data: $data, client: $client);
     }
@@ -157,6 +166,27 @@ class VirtualIP extends Model
         }
 
         return $subnet_bits;
+    }
+
+    /**
+     * Obtains the current internal CARP status of this object
+     * @return string|null Returns a string that indicates the current CARP status of this virtual IP, or null
+     * if this is not a virtual IP.
+     */
+    public function from_internal_carp_status() : string|null {
+        # Do not try to obtain this internal value if this is not a CARP virtual IP
+        if ($this->mode->value !== "carp" or !$this->uniqid->value) {
+            return null;
+        }
+        
+        # Return `disabled` if CARP is disabled on this system
+        if (!CARP::is_carp_enabled()) {
+            return "disabled";
+        }
+        
+        # Get and return the active CARP status
+        $carp_status = get_carp_interface_status("_vip".$this->uniqid->value);
+        return strtolower($carp_status);
     }
 
     /**
