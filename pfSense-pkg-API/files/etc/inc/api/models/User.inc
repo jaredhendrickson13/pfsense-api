@@ -200,9 +200,10 @@ class User extends Model
     public function _delete()
     {
         # Do not allow system users to be deleted
+        # TODO: replace this with a protected_model_query
         if ($this->scope->value !== "user") {
             throw new ValidationError(
-                message: "System user `{$this->name->value} cannot be deleted.",
+                message: "System user `{$this->name->value}` cannot be deleted.",
                 response_id: "USER_WITH_SYSTEM_SCOPE_CANNOT_BE_DELETED"
             );
         }
