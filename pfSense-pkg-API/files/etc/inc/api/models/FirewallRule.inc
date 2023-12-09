@@ -31,9 +31,9 @@ class FirewallRule extends Model
     public BooleanField $disabled;
     public BooleanField $log;
     public StringField $statetype;
-    public StringField $tcp_flags_set;
-    public StringField $tcp_flags_out_of;
     public BooleanField $tcp_flags_any;
+    public StringField $tcp_flags_out_of;
+    public StringField $tcp_flags_set;
     public BooleanField $floating;
     public BooleanField $quick;
     public StringField $direction;
@@ -131,14 +131,10 @@ class FirewallRule extends Model
             choices: ["keep state", "sloppy state", "synproxy state", "none"],
             help_text: "The state mechanism to use for this firewall rule."
         );
-        $this->tcp_flags_set = new StringField(
-            default: null,
-            choices: ["fin", "syn", "rst", "psh", "ack", "urg", "ece", "cwr"],
-            allow_null: true,
-            many: true,
-            internal_name: "tcpflags1",
-            conditions: ["tcp_flags_any" => false, "!tcp_flags_out_of" => null],
-            help_text: "The TCP flags that must be set for this rule to match."
+        $this->tcp_flags_any = new BooleanField(
+            default: false,
+            internal_name: "tcpflags_any",
+            help_text: "Allow any TCP flags."
         );
         $this->tcp_flags_out_of = new StringField(
             default: null,
@@ -146,13 +142,17 @@ class FirewallRule extends Model
             allow_null: true,
             many: true,
             internal_name: "tcpflags2",
-            conditions: ["tcp_flags_any" => false, "!tcp_flags_set" => null],
+            conditions: ["tcp_flags_any" => false],
             help_text: "The TCP flags that can be set for this rule to match."
         );
-        $this->tcp_flags_any = new BooleanField(
-            default: false,
-            internal_name: "tcpflags_any",
-            help_text: "Allow any TCP flags."
+        $this->tcp_flags_set = new StringField(
+            default: null,
+            choices: ["fin", "syn", "rst", "psh", "ack", "urg", "ece", "cwr"],
+            allow_null: true,
+            many: true,
+            internal_name: "tcpflags1",
+            conditions: ["tcp_flags_any" => false],
+            help_text: "The TCP flags that must be set for this rule to match."
         );
         $this->descr = new StringField(
             default: "",

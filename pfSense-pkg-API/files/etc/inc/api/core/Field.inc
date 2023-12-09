@@ -358,16 +358,16 @@ class Field
         # Ensure an appropriate number of array entries are specified for `many` fields
         $this->check_many_value_length();
 
+        # Don't validate any further if this field allows null values and the value is null
+        if ($this->allow_null and $this->value === null) {
+            return true;
+        }
+
         # Ensure the value(s) to validate are always in an array, so we can loop.
         $values = $this->get_value_as_array();
 
         # Ensure value is not an empty array before we start the loop unless allowed
         $this->check_value_empty($this->value);
-
-        # Don't validate any further if this field allows null values and the value is null
-        if ($this->allow_null and $this->value === null) {
-            return true;
-        }
 
         # Loop through each value to be validated
         foreach($values as $value) {

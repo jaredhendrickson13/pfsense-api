@@ -284,7 +284,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
     }
 
     /**
-     * Checks the firewall rules with `log` enabled have the log flag set in pfctl
+     * Checks that firewall rules with `log` enabled have the log flag set in pfctl
      */
     public function test_log() {
         # Create a firewall rule to test with
@@ -312,6 +312,101 @@ class APIModelsFirewallRuleTestCase extends TestCase
         $this->assert_str_contains(
             $pfctl_rules,
             "$type  in log  quick  on \$$if $iptype from $src to $dst ridentifier $rid"
+        );
+
+        # Delete the firewall rule
+        $rule->delete(apply: true);
+    }
+
+    /**
+     * Checks that firewall rules with `tcp_flags_any` enabled have the `any` flag set in pfctl
+     */
+    public function test_tcp_flags_any() {
+        # Create a firewall rule to test with
+        $rule = new FirewallRule(
+            data: [
+                "type" => "pass",
+                "interface" => ["lan"],
+                "ipprotocol" => "inet",
+                "protocol" => "tcp",
+                "source" => "any",
+                "destination" => "any",
+                "tcp_flags_any" => true
+            ],
+            async: false
+        );
+        $rule->create(apply: true);
+
+        # Ensure the `any` tcp flag is set in the rule within pfctl
+        $pfctl_rules = file_get_contents("/tmp/rules.debug");
+        $this->assert_str_contains(
+            $pfctl_rules,
+            "ridentifier {$rule->tracker->value} flags any"
+        );
+
+        # Delete the firewall rule
+        $rule->delete(apply: true);
+    }
+
+    /**
+     * Checks that firewall rules with explicit TCP flags set are correctly added in pfctl
+     */
+    public function test_tcp_flags() {
+        # Create a firewall rule to test with
+        $rule = new FirewallRule(
+            data: [
+                "type" => "pass",
+                "interface" => ["lan"],
+                "ipprotocol" => "inet",
+                "protocol" => "tcp",
+                "source" => "any",
+                "destination" => "any",
+                "tcp_flags_set" => ["fin", "syn", "ack"],
+                "tcp_flags_out_of" => ["fin", "syn", "rst", "ack"]
+            ],
+            async: false
+        );
+        $rule->create(apply: true);
+        
+        # Ensure the `any` tcp flag is set in the rule within pfctl
+        $pfctl_rules = file_get_contents("/tmp/rules.debug");
+        $this->assert_str_contains(
+            $pfctl_rules,
+            "ridentifier {$rule->tracker->value} flags FSA/FSRA"
+        );
+
+        # Delete the firewall rule
+        $rule->delete(apply: true);
+    }
+
+    /**
+     * Checks that firewall rules with `floating` enabled are correctly added in pfctl
+     */
+    public function test_floating() {
+        # Create a firewall rule to test with
+        $rule = new FirewallRule(
+            data: [
+                "type" => "pass",
+                "interface" => ["wan", "lan"],
+                "ipprotocol" => "inet",
+                "protocol" => "tcp",
+                "source" => "any",
+                "destination" => "any",
+                "floating" => true,
+                "quick" => false,
+                "direction" => "out"
+            ],
+            async: false
+        );
+        $rule->create(apply: true);
+
+        # Ensure the floating rule is present in pfctl as configured above
+        $pfctl_rules = file_get_contents("/tmp/rules.debug");
+        $rid = $rule->tracker->value;
+        $pfctl_rule = "pass  out  on {  em0  em1  } inet proto tcp  from any to any ridentifier $rid";
+        $this->assert_str_contains(
+            $pfctl_rules,
+            $pfctl_rule
         );
 
         # Delete the firewall rule

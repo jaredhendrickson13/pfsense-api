@@ -139,6 +139,9 @@ class APIModelsPortForwardTestCase extends TestCase
         );
     }
 
+    /**
+     * Checks that port forwards with `nordr` enabled are set as such in pfctl
+     */
     public function test_nordr() {
         # Create a port forward to test with
         $port_forward = new PortForward(
@@ -156,12 +159,43 @@ class APIModelsPortForwardTestCase extends TestCase
         );
         $port_forward->create(apply: true);
 
-        # Ensure the this rule was created in pfctl with `no` prefixed to the rule
+        # Ensure this rule was created in pfctl with `no` prefixed to the rule
         $rules_debug = file_get_contents("/tmp/rules.debug");
         $nordr_rule = "no rdr on em0 inet proto tcp from any to 127.3.2.1 port 8443";
         $this->assert_str_contains(
             $rules_debug,
             $nordr_rule
+        );
+
+        # Delete this port forward
+        $port_forward->delete(apply: true);
+    }
+
+    /**
+     * Checks that disabled port forwards are not present in pfctl
+     */
+    public function test_disabled() {
+        # Create a port forward to test with
+        $port_forward = new PortForward(
+            data: [
+                "interface" => "wan",
+                "protocol" => "tcp",
+                "source" => "any",
+                "destination" => "127.3.2.1",
+                "destination_port" => "8443",
+                "target" => "127.1.2.3",
+                "local_port" => "8443",
+                "disabled" => true
+            ],
+            async: false
+        );
+        $port_forward->create(apply: true);
+
+        # Ensure this rule's tracker ID is not present in pfctl rules
+        $rules_debug = file_get_contents("/tmp/rules.debug");
+        $this->assert_str_does_not_contain(
+            $rules_debug,
+            $port_forward->destination->value
         );
 
         # Delete this port forward
