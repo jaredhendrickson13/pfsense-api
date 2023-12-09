@@ -588,11 +588,6 @@ class Field
      * @throws ValidationError When `many` is enabled, but `value` is not an array.
      */
     private function get_value_as_array() : array {
-        # Don't validate any further if this field allows null values and the value is null
-        if ($this->allow_null and $this->value === null) {
-            return [];
-        }
-        
         # Assume the default value if no value was set and a default was specified
         if (isset($this->default) and is_null($this->value)) {
             $this->value = $this->default;
@@ -601,7 +596,7 @@ class Field
         # Check if many is enabled
         if ($this->many) {
             # Throw an error if the value is not already an array
-            if (!is_array($this->value) and !is_null($this->value)) {
+            if (!is_array($this->value)) {
                 throw new ValidationError(
                     message: "Field `$this->name` must be of type `array`.",
                     response_id: "FIELD_INVALID_MANY_VALUE"
