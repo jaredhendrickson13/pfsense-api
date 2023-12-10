@@ -61,7 +61,7 @@ class APIModelsPortForwardTestCase extends TestCase
         $if = $port_forward->interface->get_interface_obj()->if->value;
         $src = $port_forward->source->value;
         $src_port = $port_forward->source_port->value;
-        $dst = $port_forward->interface->get_interface_obj()->get_network_ipv4()."/".$port_forward->interface->get_interface_obj()->get_current_subnetv4();
+        $dst = "\${$port_forward->interface->get_interface_obj()->descr->value}__NETWORK";
         $dst_port = $port_forward->destination_port->value;
         $target = $port_forward->target->value;
         $rule_updated = "rdr on $if inet proto { tcp udp } from $src port $src_port to $dst port $dst_port -> $target";
