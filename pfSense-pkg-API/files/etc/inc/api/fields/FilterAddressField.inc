@@ -26,6 +26,7 @@ class FilterAddressField extends InterfaceField
     public bool $allow_invert;
     public bool $allow_pppoe;
     public bool $allow_l2tp;
+    public string $internal_value_key;
 
     /**
      * Defines the FilterAddressField object and sets its options.
@@ -55,7 +56,8 @@ class FilterAddressField extends InterfaceField
      * PPPoE client.
      * @param bool $allow_empty If `true`, empty strings will be allowed by this field.
      * @param bool $allow_null If `true`, null values will be allowed by this field.
-     * @param array $interface_query
+     * @param array $interface_query Assigns query parameters to limit which interfaces should be accepted by this
+     * Field. This works for interface values with and without the :ip modifier.
      * @param bool $editable Set to `false` to prevent this field's value from being changed after its initial creation.
      * @param bool $read_only If `true`, this field can only read its value and cannot write its value to config.
      * @param bool $write_only Set the `true` to make this field write-only. This will prevent the field's current value
@@ -80,6 +82,10 @@ class FilterAddressField extends InterfaceField
      * @param string $internal_namespace Sets the namespace this field belongs to internally. This can be used to nest
      * the fields internal value under a specific namespace as an associative array. This only applies to the internal
      * value, not the representation value.
+     * @param string $internal_value_key Sets the array key where this value will be stored. By default, values are
+     * stored under [$internal_name => ["address" => $value]], this allows you to specify the key name for "address".
+     * This only applies to values that are IP addresses, subnets or aliases. This is primarily only needed for
+     * outbound NAT mappings which doesn't follow the same internal structure as firewall rules and port forwards.
      * @param array $referenced_by An array that specifies other Models and Field's that reference this Field's parent
      * Model using this Field's value. This will prevent the parent Model object from being deleted while it is actively
      * referenced by another Model object. The array key must be the name of the Model class that references this Field,
@@ -122,6 +128,7 @@ class FilterAddressField extends InterfaceField
         string $verbose_name_plural = "",
         string $internal_name = "",
         string $internal_namespace = "",
+        string $internal_value_key = "address",
         array $referenced_by = [],
         array $conditions = [],
         array $validators = [],
@@ -139,6 +146,7 @@ class FilterAddressField extends InterfaceField
         $this->allow_self = $allow_self;
         $this->allow_l2tp = $allow_l2tp;
         $this->allow_pppoe = $allow_pppoe;
+        $this->internal_value_key = $internal_value_key;
 
         # Construct the parent object for this field
         parent::__construct(
@@ -301,7 +309,7 @@ class FilterAddressField extends InterfaceField
 
         # Assign the `address` internal value for individual IP values, subnets, and aliases
         if ($this->has_label("is_ipaddr") or $this->has_label("is_subnet") or $this->has_label("is_alias")) {
-            $internal_value["address"] = $representation_value;
+            $internal_value[$this->internal_value_key] = $representation_value;
         }
         # Otherwise, assign the `network` internal value
         else {
@@ -348,8 +356,8 @@ class FilterAddressField extends InterfaceField
         }
 
         # If there is an `address` value set, format and return it
-        if (isset($internal_value["address"])) {
-            $representation_value .= $internal_value["address"];
+        if (isset($internal_value[$this->internal_value_key])) {
+            $representation_value .= $internal_value[$this->internal_value_key];
             return $representation_value;
         }
 
