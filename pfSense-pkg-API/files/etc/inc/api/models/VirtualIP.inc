@@ -124,6 +124,7 @@ class VirtualIP extends Model
             default: "",
             allow_empty: true,
             read_only: true,
+            representation_only: true,
             conditions: ["mode" => "carp"],
             help_text: "The current CARP status of this virtual IP. This will display show whether this CARP node ".
                 "is the primary or backup peer."

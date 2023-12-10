@@ -378,7 +378,7 @@ class Field
             $this->check_value_choice($value);
 
             # Ensure value is unique if set
-            $this->check_field_unique();
+            $this->check_field_unique($value);
 
             # Ensure this value is not empty unless empty values are allowed by this field. If value is empty and
             # empty values are allowed (returns `true`, skip remaining validation as the empty value itself is
@@ -640,8 +640,10 @@ class Field
      * validation.
      * @throws ValidationError When the assigned $context Model does not have a `config_path` set OR the assigned
      * $context Model does not have it's $many value to `true`.
+     * @throws ServerError When $unique is enabled but a $config_path is not assigned to the parent model $context
+     * @throws ServerError When $unique is enabled, but the parent model $context does not have $many enabled
      */
-    private function check_field_unique() {
+    private function check_field_unique(mixed $value) {
         # Only check this if `unique` is enabled
         if ($this->unique) {
             # Throw an error if unique is set but the model context has no config path specified
@@ -660,10 +662,18 @@ class Field
                 );
             }
 
-            # Query for any other of the parent context's Model objects with the same field value
-            $model_query = $this->context->query(["id__except" => $this->context->id, $this->name => $this->value]);
-            if ($model_query->exists()) {
-                $model_object = $model_query->first();
+            # If this is a $many field, query for any other object has this value in the array
+            if ($this->many) {
+                $query = $this->context->query(["id__except" => $this->context->id, "{$this->name}__has" => $value]);
+            }
+            # Otherwise, query for any other of the parent context's Model objects with the same exact field value
+            else {
+                $query = $this->context->query(["id__except" => $this->context->id, $this->name => $value]);
+            }
+
+            # If we found another object with matching fields, throw a validation error
+            if ($query->exists()) {
+                $model_object = $query->first();
                 throw new ValidationError(
                     message: "Field '$this->name' must be unique. Value is in use by object with ID '$model_object->id'.",
                     response_id: "FIELD_MUST_BE_UNIQUE"

@@ -3,6 +3,7 @@
 namespace API\Core;
 
 use API\Responses\ServerError;
+use API\Responses\ValidationError;
 
 require_once("api/auto_loader.inc");
 
@@ -11,7 +12,7 @@ require_once("api/auto_loader.inc");
  * set of Model objects at once. Additionally, ModelSets can be further filtered using queries.
  */
 class ModelSet {
-    const QUERY_FILTERS = ["startswith", "endswith", "contains", "lt", "lte", "gt", "gte", "exact", "except"];
+    const QUERY_FILTERS = ["startswith", "endswith", "contains", "lt", "lte", "gt", "gte", "exact", "except", "has"];
     public array $model_objects;
 
     /**
@@ -218,6 +219,26 @@ class ModelSet {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Checks if a given value is within an array.
+     * @param mixed $haystack The array being evaluated.
+     * @param mixed $needle The value to check for within the $haystack.
+     * @return bool true if the $needle is in the $haystack, false otherwise.
+     * @throws ValidationError When $haystack is not an array
+     */
+    public function has(mixed $haystack, mixed $needle) : bool {
+        # Throw a validation error if the $haystack is not an array
+        if (!is_array($haystack)) {
+            throw new ValidationError(
+                message: "Query filter `has` can only be used on array fields",
+                response_id: "MODELSET_HAS_QUERY_MUST_BE_ARRAY_FIELD"
+            );
+
+        }
+
+        return in_array($needle, $haystack, strict: true);
     }
 
     /**
