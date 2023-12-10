@@ -53,11 +53,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - pfsense_version: pfSense-2.7.0-RELEASE
+          - pfsense_version: pfSense-2.7.1-RELEASE
             freebsd_id: freebsd14
-          - pfsense_version: pfSense-23.01-RELEASE
-            freebsd_id: freebsd14
-          - pfsense_version: pfSense-23.05-RELEASE
+          - pfsense_version: pfSense-2.7.2-RELEASE
             freebsd_id: freebsd14
         
     steps:

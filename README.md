@@ -18,10 +18,12 @@ are made preventing the need for a reboot. All this results in the fastest, safe
 <details>
     <summary>Supported pfSense Versions</summary>
 
-  - pfSense CE 2.7.0 (amd64)
-  - pfSense Plus 23.01 (amd64)
-  - pfSense Plus 23.05 (amd64)
+  - pfSense CE 2.7.1 (amd64)
+  - pfSense CE 2.7.2 (amd64)
   - pfSense Plus 23.09 (community supported)
+
+  Don't see your version listed? Check the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases).
+  Older versions of this package may support older versions of pfSense.
 
   _This package is not supported on other architectures such as arm64 and aarch64. However, the package should still
   install and operate on these systems. Compatibility on unsupported systems is not guaranteed and is at your own risk._
