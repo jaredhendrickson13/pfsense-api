@@ -229,7 +229,7 @@ class RESTAPISettings extends Model {
      */
     public static function get_api_config() : array {
         # Variables
-        $api_pkg_name = "API";
+        $api_pkg_name = "RESTAPI";
         $pkg_conf = self::get_config("installedpackages/package", []);
 
         # Loop through each package and locate the API package

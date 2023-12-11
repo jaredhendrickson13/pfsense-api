@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <pfsensepkgs>
     <package>
-        <name>REST API</name>
+        <name>RESTAPI</name>
         <internal_name>restapi</internal_name>
         <descr><![CDATA[The missing REST API package for pfSense]]></descr>
         <website>https://github.com/jaredhendrickson13/pfsense-api</website>
