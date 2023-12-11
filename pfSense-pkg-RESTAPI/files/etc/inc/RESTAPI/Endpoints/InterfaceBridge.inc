@@ -10,7 +10,7 @@ class InterfaceBridge extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/interface/bridge";
+        $this->url = "/api/v2/interface/bridge";
         $this->model_name = "InterfaceBridge";
         $this->request_method_options = ["GET", "POST", "PATCH", "DELETE"];
 

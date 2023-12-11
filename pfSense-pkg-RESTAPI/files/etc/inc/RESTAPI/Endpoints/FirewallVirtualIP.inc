@@ -10,7 +10,7 @@ class FirewallVirtualIP extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/firewall/virtual_ip";
+        $this->url = "/api/v2/firewall/virtual_ip";
         $this->model_name = "VirtualIP";
         $this->request_method_options = ["GET", "POST", "PATCH", "DELETE"];
 

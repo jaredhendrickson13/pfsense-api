@@ -10,7 +10,7 @@ class ServicesDNSResolverAccessListNetwork extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/services/dns_resolver/access_list/network";
+        $this->url = "/api/v2/services/dns_resolver/access_list/network";
         $this->model_name = "DNSResolverAccessListNetwork";
         $this->request_method_options = ["GET", "POST", "PATCH", "DELETE"];
 

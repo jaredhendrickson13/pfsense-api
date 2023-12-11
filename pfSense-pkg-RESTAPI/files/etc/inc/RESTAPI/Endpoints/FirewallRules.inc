@@ -10,7 +10,7 @@ class FirewallRules extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/firewall/rules";
+        $this->url = "/api/v2/firewall/rules";
         $this->model_name = "FirewallRule";
         $this->many = true;
         $this->request_method_options = ["GET", "PUT"];

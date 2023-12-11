@@ -10,7 +10,7 @@ class SystemDNS extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/system/dns";
+        $this->url = "/api/v2/system/dns";
         $this->model_name = "SystemDNS";
         $this->request_method_options = ["GET", "PATCH"];
         $this->get_help_text = "Reads the current system DNS settings.";

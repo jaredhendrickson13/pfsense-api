@@ -10,7 +10,7 @@ class RoutingGateway extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/system/routing/gateway";
+        $this->url = "/api/v2/system/routing/gateway";
         $this->model_name = "RoutingGateway";
         $this->tag = "ROUTING";
         $this->request_method_options = ["GET", "POST", "PATCH", "DELETE"];

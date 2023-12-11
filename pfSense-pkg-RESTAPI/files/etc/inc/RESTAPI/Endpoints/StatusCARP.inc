@@ -10,7 +10,7 @@ class StatusCARP extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/status/carp";
+        $this->url = "/api/v2/status/carp";
         $this->model_name = "CARP";
         $this->request_method_options = ["GET", "PATCH"];
 

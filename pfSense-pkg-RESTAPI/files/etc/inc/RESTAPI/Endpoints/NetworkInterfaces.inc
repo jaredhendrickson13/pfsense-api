@@ -10,7 +10,7 @@ class NetworkInterfaces extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/interfaces";
+        $this->url = "/api/v2/interfaces";
         $this->model_name = "NetworkInterface";
         $this->tag = "INTERFACE";
         $this->many = true;

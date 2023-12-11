@@ -107,7 +107,7 @@ class RESTAPIKey extends Model
     }
 
     /**
-     * Override the default _update() method to prevent APIKeys from being updated.
+     * Override the default _update() method to prevent RESTAPIKeys from being updated.
      */
     public function _update() {
         # Do not allow RESTAPIKey objects to be updated.

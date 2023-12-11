@@ -10,7 +10,7 @@ class InterfaceVLANs extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/interface/vlans";
+        $this->url = "/api/v2/interface/vlans";
         $this->model_name = "InterfaceVLAN";
         $this->many = true;
         $this->request_method_options = ["GET"];

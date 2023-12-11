@@ -10,7 +10,7 @@ class FirewallAliases extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/firewall/aliases";
+        $this->url = "/api/v2/firewall/aliases";
         $this->model_name = "FirewallAlias";
         $this->many = true;
         $this->request_method_options = ["GET", "PUT"];

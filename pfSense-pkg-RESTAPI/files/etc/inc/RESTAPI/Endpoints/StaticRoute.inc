@@ -10,7 +10,7 @@ class StaticRoute extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/system/routing/static_route";
+        $this->url = "/api/v2/system/routing/static_route";
         $this->model_name = "StaticRoute";
         $this->tag = "ROUTING";
         $this->request_method_options = ["GET", "POST", "PATCH", "DELETE"];

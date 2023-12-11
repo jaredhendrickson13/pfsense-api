@@ -9,7 +9,7 @@ use RESTAPI\Core\Endpoint;
 class NetworkInterface extends Endpoint {
     public function __construct() {
         # Assign the URL for this endpoint along with the Model it corresponds to.
-        $this->url = "/RESTAPI/v2/interface";
+        $this->url = "/api/v2/interface";
         $this->model_name = "NetworkInterface";
         $this->request_method_options = ["GET", "POST", "PATCH", "DELETE"];
 

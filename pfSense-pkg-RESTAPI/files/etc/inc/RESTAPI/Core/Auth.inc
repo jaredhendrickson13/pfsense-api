@@ -48,7 +48,7 @@ class Auth {
      */
     public function __construct(array $required_privileges=[], string $mode="", bool|null $read_only=null){
         # Obtain the internal API package configuration
-        $this->api_config = RESTAPI\Models\APISettings::get_api_config()["config"];
+        $this->api_config = RESTAPI\Models\RESTAPISettings::get_api_config()["config"];
 
         # Allow the auth_mode and read_only settings to be overwritten, otherwise default to their configured values
         $this->mode = (!$mode) ? $this->api_config["auth_mode"] : $mode;

@@ -10,7 +10,7 @@ class User extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/user";
+        $this->url = "/api/v2/user";
         $this->model_name = "User";
         $this->request_method_options = ["GET", "POST", "PATCH", "DELETE"];
 

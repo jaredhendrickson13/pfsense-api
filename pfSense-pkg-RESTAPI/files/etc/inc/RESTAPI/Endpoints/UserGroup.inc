@@ -10,7 +10,7 @@ class UserGroup extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/user/group";
+        $this->url = "/api/v2/user/group";
         $this->model_name = "UserGroup";
         $this->request_method_options = ["GET", "POST", "PATCH", "DELETE"];
 

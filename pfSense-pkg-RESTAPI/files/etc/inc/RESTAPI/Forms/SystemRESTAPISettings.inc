@@ -10,7 +10,7 @@ use RESTAPI\Models\RESTAPIJWT;
 
 class SystemRESTAPISettings extends Form {
     public string $url = "/system_restapi_settings.php";
-    public string $model_name = "\RESTAPI\Models\APISettings";
+    public string $model_name = "\RESTAPI\Models\RESTAPISettings";
     public array $title_path = ["System", "API", "Settings"];
     public string $custom_css = "/css/RESTAPI/RESTAPI.css";
     public array $tabs = [

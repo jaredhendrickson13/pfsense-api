@@ -10,7 +10,7 @@ class ServicesDNSResolverHostOverrideAlias extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/services/dns_resolver/host_override/alias";
+        $this->url = "/api/v2/services/dns_resolver/host_override/alias";
         $this->model_name = "DNSResolverHostOverrideAlias";
         $this->request_method_options = ["GET", "POST", "PATCH", "DELETE"];
 

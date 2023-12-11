@@ -6,13 +6,12 @@ require_once("RESTAPI/autoloader.inc");
 
 use RESTAPI\Core\Endpoint;
 
-class SystemAPIKeys extends Endpoint
+class SystemRESTAPIVersion extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/system/RESTAPI/keys";
-        $this->model_name = "RESTAPIKey";
-        $this->many = true;
+        $this->url = "/api/v2/system/RESTAPI/version";
+        $this->model_name = "RESTAPIVersion";
         $this->request_method_options = ["GET"];
 
         # Construct the parent Endpoint object

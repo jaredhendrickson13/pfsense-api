@@ -10,7 +10,7 @@ class FirewallStatesSize extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/firewall/states/size";
+        $this->url = "/api/v2/firewall/states/size";
         $this->model_name = "FirewallStatesSize";
         $this->request_method_options = ["GET", "PATCH"];
 

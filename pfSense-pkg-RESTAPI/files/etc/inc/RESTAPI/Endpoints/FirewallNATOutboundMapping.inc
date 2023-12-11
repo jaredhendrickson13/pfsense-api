@@ -10,7 +10,7 @@ class FirewallNATOutboundMapping extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/firewall/nat/outbound/mapping";
+        $this->url = "/api/v2/firewall/nat/outbound/mapping";
         $this->model_name = "OutboundNATMapping";
         $this->request_method_options = ["GET", "POST", "PATCH", "DELETE"];
 

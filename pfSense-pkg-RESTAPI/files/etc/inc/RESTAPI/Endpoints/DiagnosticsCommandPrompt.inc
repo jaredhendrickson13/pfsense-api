@@ -10,7 +10,7 @@ class DiagnosticsCommandPrompt extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/diagnostics/command_prompt";
+        $this->url = "/api/v2/diagnostics/command_prompt";
         $this->model_name = "CommandPrompt";
         $this->request_method_options = ["POST"];
         $this->post_help_text = "Executes a shell command.";

@@ -10,7 +10,7 @@ class ServicesSSH extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/services/ssh";
+        $this->url = "/api/v2/services/ssh";
         $this->model_name = "SSH";
         $this->request_method_options = ["GET", "PATCH"];
         $this->get_help_text = "Reads the current SSH server settings.";

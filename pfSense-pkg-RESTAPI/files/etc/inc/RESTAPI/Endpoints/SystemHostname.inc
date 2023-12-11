@@ -10,7 +10,7 @@ class SystemHostname extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/RESTAPI/v2/system/hostname";
+        $this->url = "/api/v2/system/hostname";
         $this->model_name = "SystemHostname";
         $this->request_method_options = ["GET", "PATCH"];
         $this->get_help_text = "Reads the current system hostname.";
