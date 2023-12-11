@@ -13,36 +13,36 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-require_once("api/core/Tools.inc");
-require_once("api/core/TestCase.inc");
+require_once("RESTAPI/Core/Tools.inc");
+require_once("RESTAPI/Core/TestCase.inc");
 
-use API\Dispatchers\WebGUIRestartDispatcher;
-use API\Models\APISettings;
+use RESTAPI\Dispatchers\WebGUIRestartDispatcher;
+use RESTAPI\Models\RESTAPISettings;
 
 function build_endpoints() {
     # Use a variable to keep track of the privileges associated with this endpoint
     $endpoint_privs = [];
 
     # Import each endpoint class
-    foreach(glob("/etc/inc/api/endpoints/*.inc") as $file) {
+    foreach(glob("/etc/inc/RESTAPI/Endpoints/*.inc") as $file) {
         # Import classes files and create object
         require_once($file);
-        $endpoint_class = "\\API\\Endpoints\\".str_replace(".inc", "", basename($file));
+        $endpoint_class = "\\RESTAPI\\Endpoints\\".str_replace(".inc", "", basename($file));
         $endpoint_obj = new $endpoint_class();
         $endpoint_obj->build_endpoint_url();
         $endpoint_privs += $endpoint_obj->generate_pfsense_privs();
     }
 
-    # Write the API endpoint privileges to privs.json
-    file_put_contents("/usr/local/share/pfSense-pkg-API/privs.json", json_encode($endpoint_privs));
+    # Write the REST API endpoint privileges to privs.json
+    file_put_contents("/usr/local/share/pfSense-pkg-RESTAPI/privs.json", json_encode($endpoint_privs));
 }
 
 function build_forms() {
     # Import each form class
-    foreach(glob("/etc/inc/api/forms/*.inc") as $file) {
+    foreach(glob("/etc/inc/RESTAPI/Forms/*.inc") as $file) {
         # Import classes files and create object
         require_once($file);
-        $form_class = "\\API\\Forms\\".str_replace(".inc", "", basename($file));
+        $form_class = "\\RESTAPI\\Forms\\".str_replace(".inc", "", basename($file));
         $form_obj = new $form_class();
         $form_obj->build_form_url();
     }
@@ -50,7 +50,7 @@ function build_forms() {
 
 function notify_dispatcher(string $dispatcher_name) {
     # Format the fully qualified class name
-    $class = "\\API\\Dispatchers\\$dispatcher_name";
+    $class = "\\RESTAPI\\Dispatchers\\$dispatcher_name";
 
     # Ensure this Dispatcher class exists
     if (class_exists($class)) {
@@ -69,7 +69,7 @@ function notify_dispatcher(string $dispatcher_name) {
 
 function run_tests($contains = "") {
     # Variables
-    $test_cases = glob("/etc/inc/api/tests/*.inc");
+    $test_cases = glob("/etc/inc/RESTAPI/Tests/*.inc");
     $exit_code = 0;
     $test_count = count($test_cases);
     $skipped_count = 0;
@@ -79,7 +79,7 @@ function run_tests($contains = "") {
     foreach($test_cases as $test_case_file) {
         # Import classes files and create object
         require_once($test_case_file);
-        $test_case = "\\API\\Tests\\".str_replace(".inc", "", basename($test_case_file));
+        $test_case = "\\RESTAPI\\Tests\\".str_replace(".inc", "", basename($test_case_file));
 
         # Print that we're starting this test
         echo "Running test case $test_case... ";
@@ -121,13 +121,13 @@ function run_tests($contains = "") {
         }
     }
 
-    # Adjust the total test count if tests were skipped.
+    # Adjust the total test count if Tests were skipped.
     if ($skipped_count > 0) {
         $test_count = $test_count - $skipped_count;
     }
 
     echo "---------------------------------------------------------".PHP_EOL;
-    echo "Ran all tests: $succeed_count/$test_count tests passed. $skipped_count tests skipped.".PHP_EOL;
+    echo "Ran all Tests: $succeed_count/$test_count Tests passed. $skipped_count Tests skipped.".PHP_EOL;
     exit($exit_code);
 }
 
@@ -139,41 +139,41 @@ function restart_webgui() {
 }
 
 function backup() {
-    echo "Backing up API configuration... ";
-    echo match (APISettings::backup_to_file()) {
-        API\Models\API_SETTINGS_BACKUP_SUCCESS => "done." . PHP_EOL,
-        API\Models\API_SETTINGS_BACKUP_NOT_CONFIGURED => "not configured." . PHP_EOL,
+    echo "Backing up REST API configuration... ";
+    echo match (RESTAPISettings::backup_to_file()) {
+        RESTAPI\Models\API_SETTINGS_BACKUP_SUCCESS => "done." . PHP_EOL,
+        RESTAPI\Models\API_SETTINGS_BACKUP_NOT_CONFIGURED => "not configured." . PHP_EOL,
         default => "unknown error occurred." . PHP_EOL,
     };
 }
 
 function restore() {
-    echo "Restoring API configuration... ";
-    echo match (APISettings::restore_from_backup()) {
-        API\Models\API_SETTINGS_RESTORE_SUCCESS => "done." . PHP_EOL,
-        API\Models\API_SETTINGS_BACKUP_NOT_CONFIGURED => "not configured." . PHP_EOL,
-        API\Models\API_SETTINGS_RESTORE_NO_CHANGE => "no changes found." . PHP_EOL,
-        API\Models\API_SETTINGS_RESTORE_NO_BACKUP => "no backup found." . PHP_EOL,
+    echo "Restoring REST API configuration... ";
+    echo match (RESTAPISettings::restore_from_backup()) {
+        RESTAPI\Models\API_SETTINGS_RESTORE_SUCCESS => "done." . PHP_EOL,
+        RESTAPI\Models\API_SETTINGS_BACKUP_NOT_CONFIGURED => "not configured." . PHP_EOL,
+        RESTAPI\Models\API_SETTINGS_RESTORE_NO_CHANGE => "no changes found." . PHP_EOL,
+        RESTAPI\Models\API_SETTINGS_RESTORE_NO_BACKUP => "no backup found." . PHP_EOL,
         default => "unknown error occurred." . PHP_EOL,
     };
 }
 
 function sync() {
-    API\Core\Tools\sync();
+    RESTAPI\Core\Tools\sync();
 }
 
 function update() {
-    $pf_version = API\Core\Tools\get_pfsense_version()["base"];
-    echo shell_exec("/usr/local/sbin/pkg-static delete -y pfSense-pkg-API");
-    echo shell_exec("/usr/local/sbin/pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-".$pf_version."-pkg-API.pkg");
+    $pf_version = RESTAPI\Core\Tools\get_pfsense_version()["base"];
+    echo shell_exec("/usr/local/sbin/pkg-static delete -y pfSense-pkg-RESTAPI");
+    echo shell_exec("/usr/local/sbin/pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-RESTAPI/releases/latest/download/pfSense-".$pf_version."-pkg-REST API.pkg");
     echo shell_exec("/etc/rc.restart_webgui");
 }
 
 function revert($version) {
     # Local variables
-    $pf_version = API\Core\Tools\get_pfsense_version()["base"];
-    $url = "https://github.com/jaredhendrickson13/pfsense-api/releases/download/".urlencode($version)."/pfSense-".$pf_version."-pkg-API.pkg";
-    echo "Locating pfSense-pkg-API-".$version." at ".$url."... ";
+    $pf_version = RESTAPI\Core\Tools\get_pfsense_version()["base"];
+    $url = "https://github.com/jaredhendrickson13/pfsense-RESTAPI/releases/download/".urlencode($version)."/pfSense-".$pf_version."-pkg-REST API.pkg";
+    echo "Locating pfSense-pkg-RESTAPI-".$version." at ".$url."... ";
 
     # Check our URL for the existence of this version
     $headers = @get_headers($url);
@@ -181,7 +181,7 @@ function revert($version) {
     # If this release exists, remove the existing package and install the requested one. Otherwise return error
     if($headers && strpos($headers[0], '302')) {
         echo "done.".PHP_EOL;
-        echo shell_exec("/usr/local/sbin/pkg-static delete -y pfSense-pkg-API");
+        echo shell_exec("/usr/local/sbin/pkg-static delete -y pfSense-pkg-RESTAPI");
         echo shell_exec("/usr/local/sbin/pkg-static -C /dev/null add " . escapeshellarg($url));
         echo shell_exec("/etc/rc.restart_webgui");
     } else {
@@ -191,44 +191,44 @@ function revert($version) {
 }
 
 function delete() {
-    echo shell_exec("/usr/local/sbin/pkg-static delete -y pfSense-pkg-API");
+    echo shell_exec("/usr/local/sbin/pkg-static delete -y pfSense-pkg-RESTAPI");
     echo shell_exec("/etc/rc.restart_webgui");
 }
 
 function rotate_server_key() {
-    $pkg_index = API\Core\Tools\get_api_config()[0];
+    $pkg_index = RESTAPI\Core\Tools\get_api_config()[0];
     config_set_path("installedpackages/package/{$pkg_index}/conf/keys", []);
-    echo "Rotating API server key... ";
-    API\Core\Tools\create_jwt_server_key(true);
+    echo "Rotating REST API server key... ";
+    RESTAPI\Core\Tools\create_jwt_server_key(true);
     echo "done.".PHP_EOL;
     sync();
 }
 
 function version() {
-    echo shell_exec("/usr/local/sbin/pkg-static info pfSense-pkg-API");
+    echo shell_exec("/usr/local/sbin/pkg-static info pfSense-pkg-RESTAPI");
 }
 
 function help() {
-    echo "pfsense-api - CLI tool for pfSense API management".PHP_EOL;
+    echo "pfsense-RESTAPI - CLI tool for pfSense REST API management".PHP_EOL;
     echo "Copyright - ".date("Y")."© - Jared Hendrickson".PHP_EOL;
     echo "SYNTAX:".PHP_EOL;
-    echo "  pfsense-api <command> <args>".PHP_EOL;
+    echo "  pfsense-RESTAPI <command> <args>".PHP_EOL;
     echo "COMMANDS:".PHP_EOL;
     echo "  version          : Display the current package version and build information".PHP_EOL;
     echo "  help             : Display the help page (this page)".PHP_EOL;
-    echo "  buildendpoints   : Build all API endpoints included in this package".PHP_EOL;
-    echo "  buildforms       : Build all API forms included in this package".PHP_EOL;
+    echo "  buildendpoints   : Build all REST API Endpoints included in this package".PHP_EOL;
+    echo "  buildforms       : Build all REST API Forms included in this package".PHP_EOL;
     echo "  generatedocs     : Regenerates the OpenAPI documentation".PHP_EOL;
     echo "  notifydispatcher : Start a dispatcher process".PHP_EOL;
-    echo "  runtests         : Run all API unit tests. Warning: this may be disruptive!".PHP_EOL;
+    echo "  runtests         : Run all REST API unit Tests. Warning: this may be disruptive!".PHP_EOL;
     echo "  restartwebgui    : Restart the webConfigurator in the background".PHP_EOL;
     echo "  update           : Update package to the latest stable version available".PHP_EOL;
     echo "  revert           : Revert package to a specified version".PHP_EOL;
     echo "  delete           : Delete package from this system".PHP_EOL;
-    echo "  rotateserverkey  : Rotate the API server key and remove all existing tokens".PHP_EOL;
-    echo "  backup           : Create a backup of the API configuration".PHP_EOL;
-    echo "  restore          : Restore the API configuration from the latest backup".PHP_EOL;
-    echo "  sync             : Sync this system's API configuration to configured HA nodes".PHP_EOL;
+    echo "  rotateserverkey  : Rotate the REST API server key and remove all existing tokens".PHP_EOL;
+    echo "  backup           : Create a backup of the REST API configuration".PHP_EOL;
+    echo "  restore          : Restore the REST API configuration from the latest backup".PHP_EOL;
+    echo "  sync             : Sync this system's REST API configuration to configured HA nodes".PHP_EOL;
     echo PHP_EOL;
 }
 
@@ -243,7 +243,7 @@ elseif (in_array($argv[1], ["buildendpoints"])) {
 # GENERATEDOCUMENTATION COMMAND
 elseif (in_array($argv[1], ["generatedocs"])) {
     echo "Generating OpenAPI documentation... ";
-    API\Core\Tools\generate_documentation();
+    RESTAPI\Core\Tools\generate_documentation();
     echo "done.".PHP_EOL;
 }
 # NOTIFY_DISPATCHER COMMAND

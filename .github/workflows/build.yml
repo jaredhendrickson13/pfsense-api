@@ -30,7 +30,7 @@ jobs:
           /usr/local/bin/VBoxManage startvm ${{ matrix.freebsd_version }} --type headless
           sleep 5
 
-      - name: Build pfSense-pkg-API on FreeBSD
+      - name: Build pfSense-pkg-RESTAPI on FreeBSD
         run: |
           /usr/bin/ssh -o StrictHostKeyChecking=no -o LogLevel=quiet ${{ matrix.freebsd_version }}.jaredhendrickson.com 'sudo pkill ntpd || true && sudo ntpdate pool.ntp.org || true'
           /usr/bin/ssh -o StrictHostKeyChecking=no -o LogLevel=quiet ${{ matrix.freebsd_version }}.jaredhendrickson.com 'sudo pkg-static install -y php81-extensions'
@@ -44,8 +44,8 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: pfSense-pkg-API-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
-          path: pfSense-pkg-API-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
+          name: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
+          path: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
 
   unit_tests:
     runs-on: self-hosted
@@ -62,8 +62,8 @@ jobs:
 
       - uses: actions/download-artifact@v3
         with:
-          name: pfSense-pkg-API-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
-          path: pfSense-pkg-API-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
+          name: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
+          path: pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg
 
       - name: Setup pfSense VM
         run: |
@@ -73,20 +73,20 @@ jobs:
           sleep 5
 
       # This is only necessary until GitHub Actions allows an easier way to get a URL to download the artifact within pfSense
-      - name: Copy pfSense-pkg-API build to pfSense
+      - name: Copy pfSense-pkg-RESTAPI build to pfSense
         run: |
           pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com -u admin -p pfsense -c 'pfSsh.php playback enablesshd' -k
           pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com -u admin -p pfsense -c "mkdir /root/.ssh/ && echo $(cat ~/.ssh/id_rsa.pub) > /root/.ssh/authorized_keys" -k
-          scp -o StrictHostKeyChecking=no pfSense-pkg-API-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg/pfSense-pkg-API-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg admin@${{ matrix.pfsense_version }}.jaredhendrickson.com:/tmp/
+          scp -o StrictHostKeyChecking=no pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg/pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg admin@${{ matrix.pfsense_version }}.jaredhendrickson.com:/tmp/
 
-      - name: Install pfSense-pkg-API on pfSense
+      - name: Install pfSense-pkg-RESTAPI on pfSense
         run: |
-          /usr/local/bin/pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com --no_verify -c "pkg -C /dev/null add /tmp/pfSense-pkg-API-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg" -u admin -p pfsense | true
+          /usr/local/bin/pfsense-vshell --host ${{ matrix.pfsense_version }}.jaredhendrickson.com --no_verify -c "pkg -C /dev/null add /tmp/pfSense-pkg-RESTAPI-${{ env.build_version }}-${{ matrix.freebsd_id }}.pkg" -u admin -p pfsense | true
           sleep 5
 
-      - name: Run pfSense-pkg-API unit tests
+      - name: Run pfSense-pkg-RESTAPI unit Tests
         run: |
-          ssh -o StrictHostKeyChecking=no -o LogLevel=quiet admin@${{ matrix.pfsense_version }}.jaredhendrickson.com 'pfsense-api runtests'
+          ssh -o StrictHostKeyChecking=no -o LogLevel=quiet admin@${{ matrix.pfsense_version }}.jaredhendrickson.com 'pfsense-restapi runtests'
 
       - name: Teardown pfSense VM
         if: "${{ always() }}"

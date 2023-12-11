@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Script that is used to build the pfSense-pkg-API package on FreeBSD."""
+"""Script that is used to build the pfSense-pkg-RESTAPI package on FreeBSD."""
 
 import argparse
 import getpass
@@ -25,7 +25,7 @@ import jinja2
 
 
 class MakePackage:
-    """Class that groups together variables and methods required to build the pfSense-pkg-API FreeBSD package."""
+    """Class that groups together variables and methods required to build the pfSense-pkg-RESTAPI FreeBSD package."""
     def __init__(self):
         self.__start_argparse__()
         self.port_version = self.args.tag.split("_")[0]
@@ -48,7 +48,7 @@ class MakePackage:
 
         # Set filepath and file variables
         root_dir = pathlib.Path(__file__).absolute().parent.parent
-        pkg_dir = root_dir.joinpath("pfSense-pkg-API")
+        pkg_dir = root_dir.joinpath("pfSense-pkg-RESTAPI")
         template_dir = root_dir.joinpath("tools").joinpath("templates")
         files_dir = pkg_dir.joinpath("files")
         file_paths = {"dir": [], "file": [], "port_version": self.port_version, "port_revision": self.port_revision}
@@ -102,13 +102,13 @@ class MakePackage:
         # Automate the process to pull, install dependencies, build and retrieve the package on a remote host
         build_cmds = [
             "mkdir -p ~/build/",
-            "rm -rf ~/build/pfsense-api",
-            "git clone https://github.com/jaredhendrickson13/pfsense-api.git ~/build/pfsense-api/",
-            "git -C ~/build/pfsense-api checkout " + self.args.branch,
-            "composer install --working-dir ~/build/pfsense-api",
-            "rm -rf ~/build/pfsense-api/vendor/composer && rm ~/build/pfsense-api/vendor/autoload.php",
-            "cp -r ~/build/pfsense-api/vendor/* ~/build/pfsense-api/pfSense-pkg-API/files/etc/inc/",
-            f"python3 ~/build/pfsense-api/tools/make_package.py --tag {self.args.tag}"
+            "rm -rf ~/build/pfsense-restapi",
+            "git clone https://github.com/jaredhendrickson13/pfsense-restapi.git ~/build/pfsense-restapi/",
+            "git -C ~/build/pfsense-restapi checkout " + self.args.branch,
+            "composer install --working-dir ~/build/pfsense-restapi",
+            "rm -rf ~/build/pfsense-restapi/vendor/composer && rm ~/build/pfsense-restapi/vendor/autoload.php",
+            "cp -r ~/build/pfsense-restapi/vendor/* ~/build/pfsense-restapi/pfSense-pkg-RESTAPI/files/etc/inc/",
+            f"python3 ~/build/pfsense-restapi/tools/make_package.py --tag {self.args.tag}"
         ]
 
         # Run each command and exit on bad status if failure
@@ -118,7 +118,7 @@ class MakePackage:
                 sys.exit(1)
 
         # Retrieve the built package
-        src = "{u}@{h}:~/build/pfsense-api/pfSense-pkg-API/work/pkg/pfSense-pkg-API-{v}{r}.pkg"
+        src = "{u}@{h}:~/build/pfsense-restapi/pfSense-pkg-RESTAPI/work/pkg/pfSense-pkg-RESTAPI-{v}{r}.pkg"
         src = src.format(
             u=self.args.username,
             h=self.args.host,
@@ -144,7 +144,7 @@ class MakePackage:
             return value_string
 
         parser = argparse.ArgumentParser(
-            description="Build the pfSense API on FreeBSD"
+            description="Build the pfSense REST API on FreeBSD"
         )
         parser.add_argument(
             '--host', '-i',

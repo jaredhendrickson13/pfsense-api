@@ -14,7 +14,7 @@ function api_plugin_nginx($pluginparams) {
             $result = "
 		# This block is required to allow URI's without trailing slash or .php extension.
 		# This block also enables PHP to handle PATCH and DELETE requests for API functionality.
-		location /api/v2/ {
+		location /RESTAPI/v2/ {
 			index index.php index.html index.htm;
 			try_files \$uri/index.php =404; #  This line closes a potential security hole
 			fastcgi_pass   unix:{$g['varrun_path']}/php-fpm.socket;

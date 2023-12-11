@@ -25,9 +25,9 @@ For example:
 ### Output
 Command will output the FreeBSD make command output. Outputs the following files:
 
-- `pfsense-api/pfSense-pkg-API/Makefile` : The rendered Makefile
-- `pfsense-api/pfSense-pkg-API/pkg-plist`: The rendered pkg-plist
-- `pfsense-api/pfSense-pkg-API/work/pkg/pfSense-pkg-API-<VERSION>.pkg` : The built FreeBSD package distribution file.
+- `pfsense-restapi/pfSense-pkg-RESTAPI/Makefile` : The rendered Makefile
+- `pfsense-restapi/pfSense-pkg-RESTAPI/pkg-plist`: The rendered pkg-plist
+- `pfsense-restapi/pfSense-pkg-RESTAPI/work/pkg/pfSense-pkg-RESTAPI-<VERSION>.pkg` : The built FreeBSD package distribution file.
 
 If you have run the script using the `--host` flag, the built package will be copied to your local system using SCP.
 

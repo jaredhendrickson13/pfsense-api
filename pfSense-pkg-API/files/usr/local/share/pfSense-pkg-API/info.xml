@@ -1,13 +1,13 @@
 <?xml version="1.0"?>
 <pfsensepkgs>
     <package>
-        <name>API</name>
-        <internal_name>api</internal_name>
+        <name>REST API</name>
+        <internal_name>restapi</internal_name>
         <descr><![CDATA[The missing REST API package for pfSense]]></descr>
-        <website>https://github.com/jaredhendrickson13/pfsense-api</website>
+        <website>https://github.com/jaredhendrickson13/pfsense-restapi</website>
         <category>System</category>
         <version>%%PKGVERSION%%</version>
-        <configurationfile>api.xml</configurationfile>
+        <configurationfile>restapi.xml</configurationfile>
         <maintainer>github@jaredhendrickson.com</maintainer>
         <conf>
             <enabled>enabled</enabled>
