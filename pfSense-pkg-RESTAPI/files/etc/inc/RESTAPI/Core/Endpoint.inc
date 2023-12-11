@@ -244,7 +244,7 @@ class Endpoint {
         $this->request_method = strtoupper($_SERVER["REQUEST_METHOD"]);
 
         # Initialize the assigned model
-        $model_class = "API\\Models\\".$this->model_name;
+        $model_class = "RESTAPI\\Models\\".$this->model_name;
         $this->model = new $model_class();
 
         # Set the default OpenAPI tag for this endpoint if no tag was explicitly assigned

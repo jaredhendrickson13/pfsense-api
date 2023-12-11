@@ -223,7 +223,7 @@ function generate_documentation() {
         $openapi_config["tags"][] = ["name" => $endpoint->tag];
 
         # Obtain the Model assigned to the Endpoint and create any assigned parent Model's
-        $model = "API\\Models\\$endpoint->model_name";
+        $model = "RESTAPI\\Models\\$endpoint->model_name";
         $model = new $model();
         $model->get_parent_model();
 
