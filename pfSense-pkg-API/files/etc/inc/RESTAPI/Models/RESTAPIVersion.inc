@@ -9,7 +9,7 @@ use RESTAPI\Fields\StringField;
 
 class RESTAPIVersion extends Model
 {
-    const RELEASES_API_URL = "https://api.github.com/repos/jaredhendrickson13/pfsense-restapi/releases";
+    const RELEASES_API_URL = "https://api.github.com/repos/jaredhendrickson13/pfsense-api/releases";
     const RELEASES_API_MAX_TIME = 10;
     const RELEASES_CACHE_FILE = "/usr/local/share/pfSense-pkg-RESTAPI/releases.json";
     const RELEASES_CACHE_EXPIRATION_SECONDS = 120;

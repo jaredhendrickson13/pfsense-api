@@ -55,7 +55,7 @@ class SystemRESTAPISettings extends Form {
         "report_an_issue" => [
             "title" => "Report an Issue",
             "icon" => "fa-question-circle",
-            "link" => "https://github.com/jaredhendrickson13/pfsense-restapi/issues/new/choose",
+            "link" => "https://github.com/jaredhendrickson13/pfsense-api/issues/new/choose",
             "classes" => ["btn-info"]
         ]
     ];

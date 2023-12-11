@@ -1,9 +1,9 @@
 # pfSense-API
 
-[![Build](https://github.com/jaredhendrickson13/pfsense-restapi/actions/workflows/build.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-restapi/actions/workflows/build.yml)
-[![OpenAPI](https://github.com/jaredhendrickson13/pfsense-restapi/actions/workflows/openapi.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-restapi/actions/workflows/openapi.yml)
-[![PHPlint](https://github.com/jaredhendrickson13/pfsense-restapi/actions/workflows/phplint.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-restapi/actions/workflows/phplint.yml)
-[![Pylint](https://github.com/jaredhendrickson13/pfsense-restapi/actions/workflows/pylint.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-restapi/actions/workflows/pylint.yml)
+[![Build](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/build.yml)
+[![OpenAPI](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/openapi.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/openapi.yml)
+[![PHPlint](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/phplint.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/phplint.yml)
+[![Pylint](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/pylint.yml/badge.svg)](https://github.com/jaredhendrickson13/pfsense-api/actions/workflows/pylint.yml)
 
 # Introduction
 
@@ -37,7 +37,7 @@ are made preventing the need for a reboot. All this results in the fastest, safe
 To install pfSense API, simply run the following command from the pfSense shell:<br>
 
 ```
-pkg -C /dev/null add https://github.com/jaredhendrickson13/pfsense-restapi/releases/latest/download/pfSense-2.7-pkg-API.pkg && /etc/rc.restart_webgui
+pkg -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.7-pkg-API.pkg && /etc/rc.restart_webgui
 ```
 
 <br>
@@ -69,7 +69,7 @@ pfsense-restapi revert v1.1.7
 ### Notes:
 
 - While not always necessary, it's recommended to change the installation command to reference the package built for your
-  version of pfSense. You can check the [releases page](https://github.com/jaredhendrickson13/pfsense-restapi/releases)
+  version of pfSense. You can check the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases)
   for available versions.
 - In order for pfSense to apply some required web server changes, it is required to restart the webConfigurator after
   installing the package.

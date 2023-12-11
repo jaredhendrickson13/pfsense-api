@@ -178,11 +178,11 @@ function generate_documentation() {
             "version" => "v2",
             "contact" =>[
                 "name" => "GitHub",
-                "url" => "https://github.com/jaredhendrickson13/pfsense-restapi",
+                "url" => "https://github.com/jaredhendrickson13/pfsense-api",
             ],
             "license" => [
                 "name" => "Apache 2.0",
-                "url" => "https://raw.githubusercontent.com/jaredhendrickson13/pfsense-restapi/master/LICENSE"
+                "url" => "https://raw.githubusercontent.com/jaredhendrickson13/pfsense-api/master/LICENSE"
             ],
             "description" => ""    # TODO: Pull this from the repos README.md
         ],

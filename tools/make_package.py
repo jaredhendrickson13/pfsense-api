@@ -102,12 +102,12 @@ class MakePackage:
         # Automate the process to pull, install dependencies, build and retrieve the package on a remote host
         build_cmds = [
             "mkdir -p ~/build/",
-            "rm -rf ~/build/pfsense-restapi",
-            "git clone https://github.com/jaredhendrickson13/pfsense-restapi.git ~/build/pfsense-restapi/",
+            "rm -rf ~/build/pfsense-api",
+            "git clone https://github.com/jaredhendrickson13/pfsense-api.git ~/build/pfsense-restapi/",
             "git -C ~/build/pfsense-restapi checkout " + self.args.branch,
             "composer install --working-dir ~/build/pfsense-restapi",
-            "rm -rf ~/build/pfsense-restapi/vendor/composer && rm ~/build/pfsense-restapi/vendor/autoload.php",
-            "cp -r ~/build/pfsense-restapi/vendor/* ~/build/pfsense-restapi/pfSense-pkg-RESTAPI/files/etc/inc/",
+            "rm -rf ~/build/pfsense-api/vendor/composer && rm ~/build/pfsense-api/vendor/autoload.php",
+            "cp -r ~/build/pfsense-api/vendor/* ~/build/pfsense-api/pfSense-pkg-RESTAPI/files/etc/inc/",
             f"python3 ~/build/pfsense-restapi/tools/make_package.py --tag {self.args.tag}"
         ]
 
@@ -118,7 +118,7 @@ class MakePackage:
                 sys.exit(1)
 
         # Retrieve the built package
-        src = "{u}@{h}:~/build/pfsense-restapi/pfSense-pkg-RESTAPI/work/pkg/pfSense-pkg-RESTAPI-{v}{r}.pkg"
+        src = "{u}@{h}:~/build/pfsense-api/pfSense-pkg-RESTAPI/work/pkg/pfSense-pkg-RESTAPI-{v}{r}.pkg"
         src = src.format(
             u=self.args.username,
             h=self.args.host,

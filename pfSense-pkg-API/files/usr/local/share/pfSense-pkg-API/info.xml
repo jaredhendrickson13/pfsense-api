@@ -4,7 +4,7 @@
         <name>REST API</name>
         <internal_name>restapi</internal_name>
         <descr><![CDATA[The missing REST API package for pfSense]]></descr>
-        <website>https://github.com/jaredhendrickson13/pfsense-restapi</website>
+        <website>https://github.com/jaredhendrickson13/pfsense-api</website>
         <category>System</category>
         <version>%%PKGVERSION%%</version>
         <configurationfile>restapi.xml</configurationfile>
