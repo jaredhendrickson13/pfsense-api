@@ -124,13 +124,9 @@ class MakePackage:
                 sys.exit(1)
 
         # Retrieve the built package
-        src = f"{u}@{h}:~/build/{REPO_NAME}/{PKG_NAME}/work/pkg/{PKG_NAME}-{v}{r}.pkg"
-        src = src.format(
-            u=self.args.username,
-            h=self.args.host,
-            v=self.port_version,
-            r="_" + self.port_revision if self.port_revision != "0" else ""
-        )
+        revision = "_" + self.port_revision if self.port_revision != "0" else ""
+        src = f"{self.args.username}@{self.args.host}:"
+              f"~/build/{REPO_NAME}/{PKG_NAME}/work/pkg/{PKG_NAME}-{self.port_version}{revision}.pkg"
         self.run_scp_cmd(src, f"{self.args.filename}")
 
     def __start_argparse__(self):
