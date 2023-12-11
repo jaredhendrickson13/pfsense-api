@@ -30,115 +30,205 @@ use JsonException;
 
 /**
  * Represents an API Endpoint, encapsulating attributes essential for generating the API endpoint
- * and facilitating API calls.
- *
- * @property string  $url                    The URL of this endpoint, used to generate a PHP file
- *                                           in the web path pointing back to this Endpoint class.
- * @property string  $model_name             The name of the Model class this Endpoint interacts with
- *                                           (excluding the Model class's namespace).
- * @property Model   $model                  The actual Model object created for the assigned $model_name.
- * @property string  $tag                    The OpenAPI tag applied to this Endpoint, nesting it under
- *                                           a specific name in the OpenAPI documentation. Defaults to the
- *                                           first value in the $url after /api/v2/.
- * @property array   $errors                 An array to store errors encountered during API calls to
- *                                           this Endpoint.
- * @property Auth    $client                 The Auth object created by this Endpoint during API calls,
- *                                           containing client authentication information.
- * @property array   $api_config             The current API configuration.
- * @property array   $request_data           The request body or parameters sent by the remote client.
- * @property bool    $many                   Indicates whether this Endpoint interacts with a single Model
- *                                           object (false) or many Model objects (true).
- * @property string  $request_method         The HTTP request method sent by the remote client.
- * @property array   $request_method_options Sets the allowed HTTP request methods for this Endpoint. For
- *                                           $many=true, only GET and PUT methods can be specified here.
- *                                           GET will use the Model's `read_all()` method, and PUT will use
- *                                           the Model's `replace_all()` method. For endpoints with $many=false,
- *                                           GET, POST, PATCH, and DELETE methods can be specified here.
- *                                           GET will use the Model's `read()` method, POST will use the
- *                                           Model's `create()` method. PATCH will use the Model's `update()`
- *                                           method, and DELETE will use the Model's `delete()` method.
- * @property bool    $requires_auth          Specify whether this Endpoint should require remote clients to
- *                                           authenticate before allowing them to interact with the assigned
- *                                           Model's objects. In almost every situation, this should be set
- *                                           to `true`!
- * @property string  $enforce_auth_mode      Explicitly specify an API authentication mode clients MUST use
- *                                           when making requests to this Endpoint. Leave blank to use the
- *                                           authentication mode specified in the API settings.
- * @property bool    $ignore_read_mode       Allow this Endpoint to ignore the current `read_only` API
- *                                           setting. By default, when the `read_only` API setting is
- *                                           enabled, Endpoints are only allowed to respond to GET requests.
- *                                           Setting this value to `true` will allow requests using any HTTP
- *                                           method even if `read_only` is enabled.
- * @property bool    $ignore_interfaces      Allow this Endpoint to ignore the `allowed_interfaces` API
- *                                           setting. By default, if an Endpoint receives an API call on an
- *                                           interface not specified in the `allowed_interfaces` API setting,
- *                                           a ForbiddenError will be thrown. Setting this value to `true`
- *                                           will allow this Endpoint to respond to requests over any interface
- *                                           regardless of what is specified in `allowed_interfaces`.
- * @property bool    $ignore_enabled         Allow this Endpoint to ignore the `enabled` API setting. By
- *                                           default, Endpoints will not accept API calls when the API's
- *                                           `enabled` setting is disabled. Setting this value to `true` will
- *                                           allow this Endpoint to respond to API calls even if the API is
- *                                           disabled.
- * @property array   $get_privileges         Assigns pfSense privileges that should allow GET requests to this
- *                                           Endpoint.
- * @property array   $post_privileges        Assigns pfSense privileges that should allow POST requests to this
- *                                           Endpoint.
- * @property array   $put_privileges         Assigns pfSense privileges that should allow PUT requests to this
- *                                           Endpoint.
- * @property array   $patch_privileges       Assigns pfSense privileges that should allow PATCH requests to this
- *                                           Endpoint.
- * @property array   $delete_privileges      Assigns pfSense privileges that should allow DELETE requests to this
- *                                           Endpoint.
- * @property string  $get_help_text          Sets the GET request's OpenAPI documentation for this Endpoint.
- *                                           This will be used when generating the OpenAPI documentation for
- *                                           this Endpoint. This is typically only necessary if the default
- *                                           description is not adequate.
- * @property string  $post_help_text         Sets the POST request's OpenAPI documentation for this Endpoint.
- *                                           This will be used when generating the OpenAPI documentation for
- *                                           this Endpoint. This is typically only necessary if the default
- *                                           description is not adequate.
- * @property string  $put_help_text          Sets the PUT request's OpenAPI documentation for this Endpoint.
- *                                           This will be used when generating the OpenAPI documentation for
- *                                           this Endpoint. This is typically only necessary if the default
- *                                           description is not adequate.
- * @property string  $patch_help_text        Sets the PATCH request's OpenAPI documentation for this Endpoint.
- *                                           This will be used when generating the OpenAPI documentation for
- *                                           this Endpoint. This is typically only necessary if the default
- *                                           description is not adequate.
- * @property string  $delete_help_text       Sets the DELETE request's OpenAPI documentation for this Endpoint.
- *                                           This will be used when generating the OpenAPI documentation for
- *                                           this Endpoint. This is typically only necessary if the default
- *                                           description is not adequate.
+ * and facilitating API calls. description is not adequate.
  */
 class Endpoint {
+    /**
+     * @var string $url
+     * The URL of this endpoint, used to generate a PHP file in the web path pointing
+     * back to this Endpoint class.
+     */
     public string $url = "";
-    public string $model_name = "";
-    protected Model $model;
-    public string $tag = "";
-    protected array $errors = [];
-    protected Auth $client;
-    public array $api_config;
-    public array $request_data = [];
-    public bool $many = false;
-    public string $request_method;
-    public array $request_method_options = [];
-    public bool $requires_auth = true;
-    public string $enforce_auth_mode = "";
-    public bool $ignore_read_mode = false;
-    public bool $ignore_interfaces = false;
-    public bool $ignore_enabled = false;
-    public array $get_privileges = [];
-    public array $post_privileges = [];
-    public array $put_privileges = [];
-    public array $patch_privileges = [];
-    public array $delete_privileges = [];
-    public string $get_help_text = "";
-    public string $post_help_text = "";
-    public string $put_help_text = "";
-    public string $patch_help_text = "";
-    public string $delete_help_text = "";
 
+    /**
+     * @var string $model_name
+     * The name of the Model class this Endpoint interacts with (excluding the Model
+     * class's namespace).
+     */
+    public string $model_name = "";
+
+    /**
+     * @var Model $model
+     * The actual Model object created for the assigned $model_name.
+     */
+    protected Model $model;
+
+    /**
+     * @var string $tag
+     * The OpenAPI tag applied to this Endpoint, nesting it under a specific name in
+     * the OpenAPI documentation. Defaults to the first value in the $url after
+     * /api/v2/.
+     */
+    public string $tag = "";
+
+    /**
+     * @var array $errors
+     * An array to store errors encountered during API calls to this Endpoint.
+     */
+    protected array $errors = [];
+
+    /**
+     * @var Auth $client
+     * The \API\Core\Auth object created by this Endpoint during API calls, contains
+     * client authentication information.
+     */
+    protected Auth $client;
+
+    /**
+     * @var array $api_config
+     * Contains the current API configuration.
+     */
+    public array $api_config;
+
+    /**
+     * @var array $request_data
+     * The request body or parameters sent by the remote client.
+     */
+    public array $request_data = [];
+
+    /**
+     * @var bool $many
+     * Indicates whether this Endpoint interacts with a single Model object (false) or
+     * many Model objects (true).
+     */
+    public bool $many = false;
+
+    /**
+     * @var string $request_method
+     * The HTTP request method sent by the remote client.
+     */
+    public string $request_method;
+
+    /**
+     * @var array $request_method_options
+     * Sets the allowed HTTP request methods for this Endpoint. For $many=true, only
+     * GET and PUT methods can be specified here. GET will use the Model's `read_all()`
+     * method, and PUT will use the Model's `replace_all()` method. For endpoints with
+     * $many=false, GET, POST, PATCH, and DELETE methods can be specified here. GET will
+     * use the Model's `read()` method, POST will use the Model's `create()` method.
+     * PATCH will use the Model's `update()` method, and DELETE will use the Model's
+     * `delete()` method.
+     */
+    public array $request_method_options = [];
+
+    /**
+     * @property bool $requires_auth
+     * Specify whether this Endpoint should require remote clients to authenticate
+     * before allowing them to interact with the assigned Model's objects. In almost
+     * every situation, this should be set to `true`!
+     */
+    public bool $requires_auth = true;
+
+    /**
+     * @var string $enforce_auth_mode
+     * Explicitly specify an API authentication mode clients MUST use when making
+     * requests to this Endpoint. Leave blank to use the authentication mode specified
+     * in the API settings.
+     */
+    public string $enforce_auth_mode = "";
+
+    /**
+     * @var bool $ignore_read_mode
+     * Allow this Endpoint to ignore the current `read_only` API setting. By default,
+     * when the `read_only` API setting is enabled, Endpoints are only allowed to
+     * respond to GET requests. Setting this value to `true` will allow requests using
+     * any HTTP method even if `read_only` is enabled.
+     */
+    public bool $ignore_read_mode = false;
+
+    /**
+     * @var bool $ignore_interfaces
+     * Allow this Endpoint to ignore the `allowed_interfaces` API setting. By default,
+     * if an Endpoint receives an API call on an interface not specified in the
+     * `allowed_interfaces` API setting, a ForbiddenError will be thrown. Setting this
+     * value to `true` will allow this Endpoint to respond to requests over any
+     * interface regardless of what is specified in `allowed_interfaces`.
+     */
+    public bool $ignore_interfaces = false;
+
+    /**
+     * @var bool $ignore_enabled
+     * Allow this Endpoint to ignore the `enabled` API setting. By default, Endpoints
+     * will not accept API calls when the API's `enabled` setting is disabled. Setting
+     * this value to `true` will allow this Endpoint to respond to API calls even if
+     * the API is disabled.
+     */
+    public bool $ignore_enabled = false;
+
+    /**
+     * @var array $get_privileges
+     * Assigns pfSense privileges that should allow GET requests to this Endpoint.
+     * This property is dynamically populated.
+     */
+    public array $get_privileges = [];
+
+    /**
+     * @var array $post_privileges
+     * Assigns pfSense privileges that should allow POST requests to this Endpoint.
+     * This property is dynamically populated.
+     */
+    public array $post_privileges = [];
+
+    /**
+     * @var array $patch_privileges
+     * Assigns pfSense privileges that should allow PATCH requests to this Endpoint.
+     * This property is dynamically populated.
+     */
+    public array $patch_privileges = [];
+
+    /**
+     * @var array $put_privileges
+     * Assigns pfSense privileges that should allow PUT requests to this Endpoint.
+     * This property is dynamically populated.
+     */
+    public array $put_privileges = [];
+
+    /**
+     * @var array $delete_privileges
+     * Assigns pfSense privileges that should allow DELETE requests to this Endpoint.
+     * This property is dynamically populated.
+     */
+    public array $delete_privileges = [];
+
+    /**
+     * @var string $get_help_text
+     * Sets the GET request's OpenAPI documentation for this Endpoint. This will be
+     * used when generating the OpenAPI documentation for this Endpoint. This is
+     * typically only necessary if the default description is not adequate.
+     */
+    public string $get_help_text = "";
+
+    /**
+     * @var string $post_help_text
+     * Sets the POST request's OpenAPI documentation for this Endpoint. This will be
+     * used when generating the OpenAPI documentation for this Endpoint. This is
+     * typically only necessary if the default description is not adequate.
+     */
+    public string $post_help_text = "";
+
+    /**
+     * @var string $put_help_text
+     * Sets the PUT request's OpenAPI documentation for this Endpoint. This will be
+     * used when generating the OpenAPI documentation for this Endpoint. This is
+     * typically only necessary if the default description is not adequate.
+     */
+    public string $put_help_text = "";
+
+    /**
+     * @var string $patch_help_text
+     * Sets the PATCH request's OpenAPI documentation for this Endpoint. This will be
+     * used when generating the OpenAPI documentation for this Endpoint. This is
+     * typically only necessary if the default description is not adequate.
+     */
+    public string $patch_help_text = "";
+
+    /**
+     * @var string $delete_help_text
+     * Sets the DELETE request's OpenAPI documentation for this Endpoint. This will be
+     * used when generating the OpenAPI documentation for this Endpoint. This is
+     * typically only necessary if the default description is not adequate.
+     */
+    public string $delete_help_text = "";
 
     /**
      * Sets values whenever the Endpoint object is crated.
@@ -165,6 +255,9 @@ class Endpoint {
 
         # Check for conflicting attributes
         $this->check_construct();
+
+        # Set default endpoint privileges
+        $this->get_default_privs();
     }
 
     /**
@@ -261,8 +354,48 @@ class Endpoint {
     }
 
     /**
-     * Checks the required privileges based on the request method.
-     * @return array an array of privileges required for the API call
+     * Generates the privilege name necessary to execute a specific request method on this Endpoint.
+     * @param string $method The HTTP method for which the resulting privilege name is intended.
+     * @returns string The complete pfSense privilege name needed to authorize API requests to this endpoint using 
+     * the specified $method.
+     */
+    private function get_method_priv_name(string $method) : string {
+        # Convert the URL and request method to a pfSense privilege name
+        $priv_name_prefix = str_replace("/", "-", $this->url)."-";
+        
+        # Replace underscores with hyphens
+        $priv_name_prefix = str_replace("_", "-", $priv_name_prefix);
+        
+        # Remove leading `-` if present, this occurs because the URL starts with a `/` which gets replaced with `-`
+        if (str_starts_with($priv_name_prefix, "-")) {
+            $priv_name_prefix = substr($priv_name_prefix, offset: 1);
+        }
+        
+        return $priv_name_prefix.strtolower($method);
+    }
+
+    /**
+     * Assigns the default privileges required to make API calls to this endpoint. This method will automatically
+     * populate the following properties:
+     * 
+     *      - $this->get_privileges
+     *      - $this->post_privileges
+     *      - $this->patch_privileges
+     *      - $this->put_privileges
+     *      - $this->delete_privileges
+     */
+    private function get_default_privs() : void {
+        $page_all_priv = "page-all";
+        $this->get_privileges = [$page_all_priv, $this->get_method_priv_name("GET")];
+        $this->post_privileges = [$page_all_priv, $this->get_method_priv_name("POST")];
+        $this->patch_privileges = [$page_all_priv, $this->get_method_priv_name("PATCH")];
+        $this->put_privileges = [$page_all_priv, $this->get_method_priv_name("PUT")];
+        $this->delete_privileges = [$page_all_priv, $this->get_method_priv_name("DELETE")];
+    }
+
+    /**
+     * Retrieves the necessary privileges for processing the received API call.
+     * @return array An array of required privileges for the current API call.
      */
     private function get_required_privs() : array {
         # Determine the privileges required for this API call
@@ -287,20 +420,19 @@ class Endpoint {
     }
 
     /**
-     * Uses this Endpoint's $url and $request_method_options properties for generate pfSense privileges for this
-     * Endpoint class.
-     * @returns array The pfSense priv list entry array for this Endpoint's privileges
+     * Utilizes the $url and $request_method_options properties of this Endpoint to generate pfSense privileges
+     * specific to this Endpoint class. The resulting array is then supplied to the pfSense privilege system
+     * located at /etc/inc/priv/.
+     * @returns array The pfSense priv list entry array corresponding to the privileges of this Endpoint.
      */
     public function generate_pfsense_privs() : array  {
         # Set an array to populate pfSense priv entries for this Endpoint
         $privs = [];
 
-        # Convert the URL to a pfSense privilege name
-        $priv_name_prefix = "api-".str_replace("/", "-", $this->url)."-";
-
         # Loop through each support request method and create a pfSense privilege entry for it
         foreach ($this->request_method_options as $method_option) {
-            $privs[$priv_name_prefix.strtolower($method_option)] = [
+            # Set the privilege config to pass to pfSense's privilege system
+            $privs[$this->get_method_priv_name($method_option)] = [
                 "name" => "API - $this->url ".strtoupper($method_option),
                 "descr" => "Allow $method_option request to $this->url"
             ];
