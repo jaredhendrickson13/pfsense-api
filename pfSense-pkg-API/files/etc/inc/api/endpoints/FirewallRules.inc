@@ -9,14 +9,11 @@ use API\Core\Endpoint;
 class FirewallRules extends Endpoint
 {
     public function __construct() {
-        # Assign the URL for this endpoint along with the Model it corresponds to.
+        # Set Endpoint attributes
         $this->url = "/api/v2/firewall/rules";
         $this->model_name = "FirewallRule";
         $this->many = true;
-
-        # Assign allowed request methods along with the privileges required for each
-        $this->request_method_options = ["GET"];
-        $this->get_privileges = ["page-all", "page-firewall-rules"];
+        $this->request_method_options = ["GET", "PUT"];
 
         # Construct the parent Endpoint object
         parent::__construct();
