@@ -128,6 +128,7 @@ class OutboundNATMapping extends Model
             default: "",
             allow_alias: false,
             allow_range: true,
+            internal_range_char: ":",
             allow_empty: true,
             internal_name: "natport",
             conditions: ["static_nat_port" => false],
