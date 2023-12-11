@@ -113,7 +113,7 @@ class MakePackage:
             f"git -C ~/build/{REPO_NAME} checkout " + self.args.branch,
             f"composer install --working-dir ~/build/{REPO_NAME}",
             f"rm -rf ~/build/{REPO_NAME}/vendor/composer && rm ~/build/{REPO_NAME}/vendor/autoload.php",
-            f"cp -r ~/build/{REPO_NAME}/vendor/* ~/build/{REPO_NAME}/{PKG_NAME}/files/etc/inc/",
+            f"cp -r ~/build/{REPO_NAME}/vendor/* ~/build/{REPO_NAME}/files/etc/inc/",
             f"python3 ~/build/{REPO_NAME}/tools/make_package.py --tag {self.args.tag}"
         ]
 
