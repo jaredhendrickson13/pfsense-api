@@ -108,7 +108,6 @@ class SpecialNetworkField extends InterfaceField
         string $verbose_name_plural = "",
         string $internal_name = "",
         string $internal_namespace = "",
-        string $internal_value_key = "address",
         array $referenced_by = [],
         array $conditions = [],
         array $validators = [],
@@ -209,7 +208,7 @@ class SpecialNetworkField extends InterfaceField
         # If we did not match any of the previous conditions, the value is invalid. Throw a ValidationError.
         throw new ValidationError(
             message: "Field `$this->name` value `$value` is invalid. Valid options are: ".$this->get_valid_opts_str(),
-            response_id: "FILTER_ADDRESS_FIELD_INVALID"
+            response_id: "SPECIAL_NETWORK_FIELD_INVALID"
         );
     }
 
@@ -247,9 +246,18 @@ class SpecialNetworkField extends InterfaceField
             $representation_value = substr($representation_value, 0, -3);
             $if_ip_modifier_set = true;
         }
+        
+        # Check if the value is an existing interface, if so, convert it's internal ID
+        $if_query = NetworkInterface::query([$this->represented_as => $representation_value]);
+        if ($if_query->exists()) {
+            $internal_value = $if_query->first()->id;
+        }
+        # Otherwise, just use the representation value as is
+        else {
+            $internal_value = $representation_value;
+        }
 
-        # Set our internal value, append `ip` if the IP modifier was set
-        $internal_value = $representation_value;
+        # Append `ip` if the IP modifier was originally set
         $internal_value .= ($if_ip_modifier_set) ? "ip" : "";
 
         return $internal_value;
