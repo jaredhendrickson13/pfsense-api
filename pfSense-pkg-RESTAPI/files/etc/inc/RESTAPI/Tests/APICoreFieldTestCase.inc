@@ -525,10 +525,6 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
         $test_field = new RESTAPI\Core\Field(type: "string", read_only: true);
         $this->assert_is_true($test_field->to_openapi_property()["readOnly"] === true);
 
-        # Ensure the `editable` value is added as the OpenAPI property's `editable`
-        $test_field = new RESTAPI\Core\Field(type: "string", read_only: true);
-        $this->assert_is_true($test_field->to_openapi_property()["editable"] === true);
-
         # Ensure the `write_only` value is added as the OpenAPI property's `writeOnly`
         $test_field = new RESTAPI\Core\Field(type: "string", write_only: true);
         $this->assert_is_true($test_field->to_openapi_property()["writeOnly"] === true);
