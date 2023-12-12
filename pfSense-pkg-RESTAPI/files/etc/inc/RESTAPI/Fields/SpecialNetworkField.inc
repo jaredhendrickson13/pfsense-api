@@ -78,7 +78,7 @@ class SpecialNetworkField extends InterfaceField
      * Fields, one field named `type` and the other being this field; and you only want this field to be included if
      * `type` is equal to `type1`, you could assign ["type" => "type1"] to this parameter.
      * @param array $validators An array of Validator objects to run against this field.
-     * @param string $help_text Set a description for this field. This description will be used in API documentation.
+     * @param string $help_text Set a description for this field. This description will be used in API openapi.
      */
     public function __construct(
         bool $required = false,
@@ -141,7 +141,7 @@ class SpecialNetworkField extends InterfaceField
             help_text: $help_text
         );
 
-        # To prevent the need to add redundant documentation to the help text, append a standard set of help text.
+        # To prevent the need to add redundant openapi to the help text, append a standard set of help text.
         $this->help_text .= " Valid value options are: ". $this->get_valid_opts_str().". For interface values, the `:ip` ".
             " modifier can be appended to the value to use the interface's IP address instead of its entire subnet.";
 

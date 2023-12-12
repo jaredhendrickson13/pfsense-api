@@ -14,8 +14,3 @@ body {
     margin: 0;
     background: #fafafa;
 }
-
-/* Adjust line height for rendered markdown */
-.renderedMarkdown p, li, summary {
-    line-height: 150% !important;
-}

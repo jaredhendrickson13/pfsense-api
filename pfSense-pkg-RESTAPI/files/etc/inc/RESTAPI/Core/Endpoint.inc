@@ -56,7 +56,7 @@ class Endpoint {
     /**
      * @var string $tag
      * The OpenAPI tag applied to this Endpoint, nesting it under a specific name in
-     * the OpenAPI documentation. Defaults to the first value in the $url after
+     * the OpenAPI openapi. Defaults to the first value in the $url after
      * /api/v2/.
      */
     public string $tag = "";
@@ -192,40 +192,40 @@ class Endpoint {
 
     /**
      * @var string $get_help_text
-     * Sets the GET request's OpenAPI documentation for this Endpoint. This will be
-     * used when generating the OpenAPI documentation for this Endpoint. This is
+     * Sets the GET request's OpenAPI openapi for this Endpoint. This will be
+     * used when generating the OpenAPI openapi for this Endpoint. This is
      * typically only necessary if the default description is not adequate.
      */
     public string $get_help_text = "";
 
     /**
      * @var string $post_help_text
-     * Sets the POST request's OpenAPI documentation for this Endpoint. This will be
-     * used when generating the OpenAPI documentation for this Endpoint. This is
+     * Sets the POST request's OpenAPI openapi for this Endpoint. This will be
+     * used when generating the OpenAPI openapi for this Endpoint. This is
      * typically only necessary if the default description is not adequate.
      */
     public string $post_help_text = "";
 
     /**
      * @var string $put_help_text
-     * Sets the PUT request's OpenAPI documentation for this Endpoint. This will be
-     * used when generating the OpenAPI documentation for this Endpoint. This is
+     * Sets the PUT request's OpenAPI openapi for this Endpoint. This will be
+     * used when generating the OpenAPI openapi for this Endpoint. This is
      * typically only necessary if the default description is not adequate.
      */
     public string $put_help_text = "";
 
     /**
      * @var string $patch_help_text
-     * Sets the PATCH request's OpenAPI documentation for this Endpoint. This will be
-     * used when generating the OpenAPI documentation for this Endpoint. This is
+     * Sets the PATCH request's OpenAPI openapi for this Endpoint. This will be
+     * used when generating the OpenAPI openapi for this Endpoint. This is
      * typically only necessary if the default description is not adequate.
      */
     public string $patch_help_text = "";
 
     /**
      * @var string $delete_help_text
-     * Sets the DELETE request's OpenAPI documentation for this Endpoint. This will be
-     * used when generating the OpenAPI documentation for this Endpoint. This is
+     * Sets the DELETE request's OpenAPI openapi for this Endpoint. This will be
+     * used when generating the OpenAPI openapi for this Endpoint. This is
      * typically only necessary if the default description is not adequate.
      */
     public string $delete_help_text = "";

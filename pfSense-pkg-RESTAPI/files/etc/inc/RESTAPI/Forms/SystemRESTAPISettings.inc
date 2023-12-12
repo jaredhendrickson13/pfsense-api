@@ -12,12 +12,11 @@ class SystemRESTAPISettings extends Form {
     public string $url = "/system_restapi_settings.php";
     public string $model_name = "\RESTAPI\Models\RESTAPISettings";
     public array $title_path = ["System", "API", "Settings"];
-    public string $custom_css = "/css/RESTAPI/RESTAPI.css";
     public array $tabs = [
         ["Settings", true, "/system_restapi_settings.php"],
         ["Keys", false, "/system_restapi_key.php"],
         ["Updates", false, "/system_restapi_updates.php"],
-        ["Documentation", false, "/RESTAPI/documentation/"]
+        ["Documentation", false, "/openapi/"]
     ];
     public array $sections = [
         "General" => [

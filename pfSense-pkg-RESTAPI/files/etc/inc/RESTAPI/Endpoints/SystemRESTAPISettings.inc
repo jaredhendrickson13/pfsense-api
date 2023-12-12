@@ -10,7 +10,7 @@ class SystemRESTAPISettings extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/api/v2/system/RESTAPI/settings";
+        $this->url = "/api/v2/system/restapi/settings";
         $this->model_name = "RESTAPISettings";
         $this->request_method_options = ["GET", "PATCH"];
         $this->get_help_text = "Reads the current API settings.";
