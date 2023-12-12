@@ -57,7 +57,7 @@ class Endpoint {
      * @var string $tag
      * The OpenAPI tag applied to this Endpoint, nesting it under a specific name in
      * the OpenAPI documentation. Defaults to the first value in the $url after
-     * /RESTAPI/v2/.
+     * /api/v2/.
      */
     public string $tag = "";
 
@@ -300,7 +300,7 @@ class Endpoint {
     {
         # Only assume the default if a tag was not set
         if (!$this->tag) {
-            # Set the tag for this URL according to it's root namespace (the section in URL after /RESTAPI/v2/)
+            # Set the tag for this URL according to it's root namespace (the section in URL after /api/v2/)
             $this->tag = strtoupper(explode("/", $this->url)[3]);
         }
     }

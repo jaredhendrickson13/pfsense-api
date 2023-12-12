@@ -95,7 +95,7 @@ function sync() {
             # Make the API request to sync configuration
             echo "Syncing API configuration to node ".$node."... ";
             $resp = http_request(
-                url: $protocol."://".$node.":".$port."/RESTAPI/v2/system/RESTAPI/sync",
+                url: $protocol."://".$node.":".$port."/api/v2/system/restapi/sync",
                 method: "PUT",
                 data: $api_settings->to_representation(),
                 headers: [],
