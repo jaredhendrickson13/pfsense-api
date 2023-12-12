@@ -136,7 +136,7 @@ class Field
      *      Array of \RESTAPI\Core\Validator objects for validating this field.
 
      * @param string $help_text
-     *      Help text used to describe this Field in OpenAPI documentation and associated \RESTAPI\Core\Form input Fields.
+     *      Help text used to describe this Field in OpenAPI openapi and associated \RESTAPI\Core\Form input Fields.
      */
 
     public function __construct(
@@ -874,7 +874,7 @@ class Field
 
     /**
      * Converts this Field object to a PHP array representation of an OpenAPI schema property configuration. This is
-     * used when auto-generating API documentation. This method can be extended to add additional options to the OpenAPI
+     * used when auto-generating API openapi. This method can be extended to add additional options to the OpenAPI
      * schema property.
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this field as an OpenAPI schema property configuration.
@@ -886,7 +886,6 @@ class Field
         $openapi_property["nullable"] = $this->allow_null;
         $openapi_property["readOnly"] = $this->read_only;
         $openapi_property["writeOnly"] = $this->write_only;
-        $openapi_property["editable"] = $this->editable;
 
         # Set the default if defined
         if ($this->default) {

@@ -41,7 +41,7 @@ class NestedModelField extends Field
      * Fields, one field named `type` and the other being this field; and you only want this field to be included if
      * `type` is equal to `type1`, you could assign ["type" => "type1"] to this parameter.
      * @param string $help_text Sets a description for this field. This description will be used as the description
-     * for this field in the API documentation.
+     * for this field in the API openapi.
      */
     public function __construct(
         string $model_class,
@@ -268,7 +268,7 @@ class NestedModelField extends Field
 
     /**
      * Converts this NestedModelField object to a PHP array representation of an OpenAPI schema property configuration. 
-     * This is used when auto-generating API documentation.
+     * This is used when auto-generating API openapi.
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this field as an OpenAPI schema property configuration.
      */
@@ -279,7 +279,6 @@ class NestedModelField extends Field
         $openapi_property["nullable"] = $this->allow_null;
         $openapi_property["readOnly"] = $this->read_only;
         $openapi_property["writeOnly"] = $this->write_only;
-        $openapi_property["editable"] = $this->editable;
 
         # Reference the nested Model schema as the items of this property for `many` Fields
         if ($this->many) {

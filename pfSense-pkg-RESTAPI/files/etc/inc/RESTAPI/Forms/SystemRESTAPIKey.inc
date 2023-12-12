@@ -13,12 +13,11 @@ class SystemRESTAPIKey extends Form {
     public string $url = "/system_restapi_key_edit.php";
     public string $model_name = "\RESTAPI\Models\RESTAPIKey";
     public array $title_path = ["System", "API", "Keys"];
-    public string $custom_css = "/css/RESTAPI/RESTAPI.css";
     public array $tabs = [
         ["Settings", false, "/system_restapi_settings.php"],
         ["Keys", true, "/system_restapi_key.php"],
         ["Updates", false, "/system_restapi_updates.php"],
-        ["Documentation", false, "/api/documentation/"]
+        ["Documentation", false, "/api/v2/documentationopenapi/"]
     ];
     public array $sections = [
         "Key Settings" => [

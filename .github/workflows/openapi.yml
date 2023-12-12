@@ -9,4 +9,4 @@ jobs:
       - name: Lint OpenAPI spec
         uses: vaibhav-jain/spectral-action/@v2.6
         with:
-          file_path: pfSense-pkg-RESTAPI/files/usr/local/www/RESTAPI/documentation/openapi.yml
+          file_path: pfSense-pkg-RESTAPI/files/usr/local/www/RESTAPI/openapi/openapi.yml

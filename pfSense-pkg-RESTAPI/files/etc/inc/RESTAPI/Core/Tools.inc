@@ -95,7 +95,7 @@ function sync() {
             # Make the API request to sync configuration
             echo "Syncing API configuration to node ".$node."... ";
             $resp = http_request(
-                url: $protocol."://".$node.":".$port."/RESTAPI/v2/system/RESTAPI/sync",
+                url: $protocol."://".$node.":".$port."/api/v2/system/restapi/sync",
                 method: "PUT",
                 data: $api_settings->to_representation(),
                 headers: [],
@@ -146,9 +146,7 @@ function sync() {
 function get_classes_from_namespace(string $namespace) : array {
     # Variables
     $classes = [];
-    $namespace_path = strtolower(
-        str_replace(["\\", "//"], "/", "/etc/inc/".$namespace)
-    );
+    $namespace_path = str_replace(["\\", "//"], "/", "/etc/inc/".$namespace);
 
     foreach(glob($namespace_path."*.inc") as $inc_file) {
         # Obtain the class name from the file name
@@ -160,14 +158,15 @@ function get_classes_from_namespace(string $namespace) : array {
 }
 
 /**
- * Auto-generates OpenAPI documentation for all Endpoints and their associated Models.
+ * Auto-generates OpenAPI openapi for all Endpoints and their associated Models.
  */
 function generate_documentation() {
     # Variables
     $endpoint_classes = get_classes_from_namespace("\\RESTAPI\\Endpoints\\");
     $response_classes = get_classes_from_namespace("\\RESTAPI\\Responses\\");
+    $assigned_tags = [];
 
-    # Set static documentation details
+    # Set static openapi details
     $openapi_config = [
         "openapi" => "3.0.0",
         "servers" => [
@@ -187,7 +186,7 @@ function generate_documentation() {
             "description" => ""    # TODO: Pull this from the repos README.md
         ],
         "components" => [
-            "Responses" => [],
+            "responses" => [],
             "schemas" => ["Response" => Response::to_openapi_schema()],
             "securitySchemes" => [
                 "local" => ["type" => "http", "scheme" => "basic"],
@@ -208,10 +207,10 @@ function generate_documentation() {
     foreach($response_classes as $response_class) {
         # Create the Response object
         $response = new $response_class(message: "", response_id: "");
-        $openapi_config["components"]["Responses"][$response->get_shortname()] = $response->to_openapi_component();
+        $openapi_config["components"]["responses"][$response->get_shortname()] = $response->to_openapi_component();
     }
 
-    # Import each Endpoint class and assign documentation for the endpoint according to the options and Model assigned.
+    # Import each Endpoint class and assign openapi for the endpoint according to the options and Model assigned.
     foreach($endpoint_classes as $endpoint_class) {
         # Create the Response object
         $endpoint = new $endpoint_class();
@@ -220,10 +219,13 @@ function generate_documentation() {
         $openapi_config["paths"][$endpoint->url] = [];
 
         # Initialize this endpoint's OpenAPI tag
-        $openapi_config["tags"][] = ["name" => $endpoint->tag];
+        if (!in_array($endpoint->tag, $assigned_tags)) {
+            $openapi_config["tags"][] = ["name" => $endpoint->tag];
+            $assigned_tags[] = $endpoint->tag;
+        }
 
         # Obtain the Model assigned to the Endpoint and create any assigned parent Model's
-        $model = "RESTAPI\\Models\\$endpoint->model_name";
+        $model = "\\RESTAPI\\Models\\$endpoint->model_name";
         $model = new $model();
         $model->get_parent_model();
 
@@ -247,9 +249,9 @@ function generate_documentation() {
             $requires_auth_str = ($endpoint->requires_auth) ? "Yes" : "No";
             $auth_modes_str = ($endpoint->enforce_auth_mode) ? "$endpoint->enforce_auth_mode" : "local, jwt, key";
 
-            # Add documentation for all requests at this path
+            # Add openapi for all requests at this path
             $openapi_config["paths"][$endpoint->url][$request_method] = [
-                "Responses" => [],
+                "responses" => [],
                 "operationId" => $endpoint::class."-$request_method",
                 "description" => "<h3>Description:</h3>".
                     "$help_text<br>".
@@ -298,7 +300,8 @@ function generate_documentation() {
                 elseif ($endpoint->many and $model->many) {
                     $schema = [
                         "schema" => [
-                            "type" => "array", "items" => [
+                            "type" => "array",
+                            "items" => [
                                 "allOf" => [
                                     ['$ref' => "#/components/schemas/$endpoint->model_name"],
                                     ["type" => "object", "required" => $model->get_fields(required_only: true)]
@@ -385,7 +388,7 @@ function generate_documentation() {
                         "description" => "Apply this deletion immediately.",
                         "required" => false,
                         "schema" => [
-                            "type" => "bool",
+                            "type" => "boolean",
                             "default" => false
                         ]
                     ];
@@ -395,15 +398,15 @@ function generate_documentation() {
             # Assign this request method Responses for each Response class defined.
             foreach ($response_classes as $response_class) {
                 $response = new $response_class(message: "", response_id: "");
-                $openapi_config["paths"][$endpoint->url][$request_method]["Responses"][$response->code] = [
-                    '$ref' => "#/components/Responses/".$response->get_shortname()
+                $openapi_config["paths"][$endpoint->url][$request_method]["responses"][$response->code] = [
+                    '$ref' => "#/components/responses/".$response->get_shortname()
                 ];
             }
         }
     }
 
     return file_put_contents(
-        filename: "/usr/local/www/RESTAPI/documentation/openapi.json",
+        filename: "/usr/local/www/openapi/openapi.json",
         data: json_encode($openapi_config).PHP_EOL
     );
 }

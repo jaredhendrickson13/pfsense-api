@@ -10,7 +10,7 @@ class SystemRESTAPIVersion extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/api/v2/system/RESTAPI/version";
+        $this->url = "/api/v2/system/restapi/version";
         $this->model_name = "RESTAPIVersion";
         $this->request_method_options = ["GET"];
 

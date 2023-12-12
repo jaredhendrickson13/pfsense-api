@@ -83,7 +83,7 @@ const DEFAULT_CLIENT_IP_ADDRESS = "127.0.0.1";
  * object in config during updates. In general, `replace` works well for $many enabled Models and `merge` works well
  * for non $many enabled Models or for Models that share a $config_path with other Models.
  * @property string $verbose_name Sets the human-readable name for this Model. This value is primarily used where this Model
- * is referenced in Forms and the API documentation. By default, this property will attempt to be determined using 
+ * is referenced in Forms and the API openapi. By default, this property will attempt to be determined using
  * the Model class name by separating capitalized words in the class name with a space. In some cases this may not be 
  * accurately determined and can be manually set using this property if needed.
  * @property string $verbose_name_plural Manually specifies the plural representation of $verbose_name. By default, 
@@ -648,7 +648,7 @@ class Model {
 
     /**
      * Converts this Model object to a PHP array representation of its OpenAPI schema. This is used when
-     * auto-generating API documentation. This method can be extended to add additional options to the OpenAPI
+     * auto-generating API openapi. This method can be extended to add additional options to the OpenAPI
      * schema when necessary
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this Model as an OpenAPI schema.

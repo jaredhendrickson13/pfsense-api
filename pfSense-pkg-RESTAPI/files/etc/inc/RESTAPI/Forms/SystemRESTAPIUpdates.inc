@@ -14,7 +14,7 @@ class SystemRESTAPIUpdates extends Form {
         ["Settings", false, "/system_restapi_settings.php"],
         ["Keys", false, "/system_restapi_key.php"],
         ["Updates", true, "/system_restapi_updates.php"],
-        ["Documentation", false, "/api/documentation/"]
+        ["Documentation", false, "/openapi/"]
     ];
     public array $sections = [
         "Version" => [
