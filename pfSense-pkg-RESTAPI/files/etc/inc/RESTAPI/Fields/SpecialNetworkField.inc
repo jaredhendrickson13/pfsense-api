@@ -155,8 +155,16 @@ class SpecialNetworkField extends InterfaceField
      * @param mixed $value The incoming value to be validated.
      */
     public function validate_extra(mixed $value) {
-        # Allow this value if it is an IP address and this Field allows IP address values
-        if ($this->allow_ipaddr and is_ipaddr($value)) {
+        # Allow this value if it is an IPv4 address and this Field allows IP address values
+        if ($this->allow_ipaddr and is_ipaddrv4($value)) {
+            $this->labels[] = "is_ipaddrv4";
+            $this->labels[] = "is_ipaddr";
+            return;
+        }
+
+        # Allow this value if it is an IPv6 address and this Field allows IP address values
+        if ($this->allow_ipaddr and is_ipaddrv6($value)) {
+            $this->labels[] = "is_ipaddrv6";
             $this->labels[] = "is_ipaddr";
             return;
         }
