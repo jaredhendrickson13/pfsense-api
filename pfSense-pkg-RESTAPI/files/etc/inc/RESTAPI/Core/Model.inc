@@ -899,8 +899,11 @@ class Model {
             }
         }
 
-        # Validate unique together Fields
-        $this->check_unique_together();
+        # Validate unique together Fields if `$skip_parent` is not set. `$skip_parent` is used by the NestedModelField
+        # which validates unique_together on its own.
+        if (!$skip_parent) {
+            $this->check_unique_together();
+        }
 
         return true;
     }
