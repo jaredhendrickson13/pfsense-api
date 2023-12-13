@@ -3,6 +3,7 @@
 namespace RESTAPI\Fields;
 
 require_once("RESTAPI/autoloader.inc");
+require_once("RESTAPI/Fields/StringField.inc");
 
 use RESTAPI;
 use RESTAPI\Core\Model;
