@@ -6,7 +6,7 @@ require_once("RESTAPI/autoloader.inc");
 
 use RESTAPI\Core\Endpoint;
 
-class SystemRESTAPIKey extends Endpoint
+class AuthKey extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
