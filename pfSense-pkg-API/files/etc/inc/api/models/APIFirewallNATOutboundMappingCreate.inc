@@ -135,28 +135,29 @@ class APIFirewallNATOutboundMappingCreate extends APIModel {
         if (isset($this->initial_data['target'])) {
             # Require the target to be a valid IPv4 subnet, address, alias or empty string for iface address
             if (APITools\is_ip_subnet_or_alias($this->initial_data['target']) === "ipv4_subnet") {
-                $this->validated_data["target"] = "other-subnet";
-                $this->validated_data['targetip'] = explode("/", $this->initial_data["target"])[0];
-                $this->validated_data['targetip_subnet'] = explode("/", $this->initial_data["target"])[1];
-            } elseif (APITools\is_ip_subnet_or_alias($this->initial_data['target']) === "ipv4_addr") {
-                $this->validated_data["target"] = "other-subnet";
-                $this->validated_data["targetip"] = $this->initial_data['target'];
-                $this->validated_data['targetip_subnet'] = 32;
-            } elseif (APITools\is_ip_subnet_or_alias($this->initial_data['target']) === "alias") {
+                $this->validated_data['target'] = explode("/", $this->initial_data["target"])[0];
+                $this->validated_data['target_subnet'] = explode("/", $this->initial_data["target"])[1];
+            } 
+            elseif (APITools\is_ip_subnet_or_alias($this->initial_data['target']) === "ipv4_addr") {
+                $this->validated_data["target"] = $this->initial_data['target'];
+                $this->validated_data['target_subnet'] = 32;
+            } 
+            elseif (APITools\is_ip_subnet_or_alias($this->initial_data['target']) === "alias") {
                 # Only allow an alias if round-robin is chosen as the pool option
                 if (in_array($this->validated_data["poolopts"], ["round-robin", "round-robin sticky-address"])) {
                     $this->validated_data["target"] = $this->initial_data['target'];
                 } else {
                     $this->errors[] = APIResponse\get(4096);
                 }
-            } elseif ($this->initial_data["target"] === "") {
-                $this->validated_data["target"] = "";
-                $this->validated_data['targetip'] = "";
-                $this->validated_data['targetip_subnet'] = "";
-            } else {
+            } 
+            elseif ($this->initial_data["target"] === "" or $this->initial_data["target"] === $this->validated_data["interface"]."ip") {
+                $this->validated_data["target"] = $this->validated_data["interface"]."ip";
+            } 
+            else {
                 $this->errors[] = APIResponse\get(4095);
             }
-        } else {
+        } 
+        else {
             $this->errors[] = APIResponse\get(4094);
         }
     }
