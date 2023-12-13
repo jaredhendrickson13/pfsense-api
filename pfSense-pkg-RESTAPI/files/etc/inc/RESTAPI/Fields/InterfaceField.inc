@@ -3,7 +3,6 @@
 namespace RESTAPI\Fields;
 
 require_once("RESTAPI/autoloader.inc");
-require_once("RESTAPI/Fields/StringField.inc");
 
 use RESTAPI;
 use RESTAPI\Core\Model;
@@ -255,12 +254,12 @@ class InterfaceField extends RESTAPI\Fields\StringField {
 
     /**
      * Fetches the NetworkInterface Model object associated with this field's current value
-     * @return NetworkInterface|Model|ModelSet The NetworkInterface Model object associated with this Field's current 
+     * @return Model|ModelSet The NetworkInterface Model object associated with this Field's current 
      * value for non-many Fields, or a ModelSet of NetworkInterface objects for many Fields.
      * @throws NotFoundError when a NetworkInterface object could not be found using one or more of this Field's
      * assigned values.
      */
-    public function get_related_model() : NetworkInterface|Model|ModelSet {
+    public function get_related_model() : Model|ModelSet {
         # Return the single NetworkInterface object for non-many Fields
         if (!$this->many) {
             # Query for the NetworkInterface object that matches our current value
