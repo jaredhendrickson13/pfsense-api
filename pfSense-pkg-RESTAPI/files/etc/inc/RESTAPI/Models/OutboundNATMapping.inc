@@ -175,6 +175,11 @@ class OutboundNATMapping extends Model
                 "character) hex string prefixed with `0x`. If a value is not provided, one will automatically be ".
                 "generated"
         );
+        $this->descr = new StringField(
+            default: "",
+            allow_empty: true,
+            help_text: "A description for the outbound NAT mapping."
+        );
 
         parent::__construct(id: $id, data: $data, client: $client, async: $async);
     }
@@ -195,6 +200,29 @@ class OutboundNATMapping extends Model
         }
 
         return $poolopts;
+    }
+
+    /**
+     * Adds extra validation to the `target_subnet` field.
+     * @param int $target_subnet The incoming value to be validated.
+     * @returns int|null The validated value to be set. Returns null if `target` is not an IP address or alias.
+     * @throws ValidationError When `target` is an IPv4 address but $target_subnet is greater than 32
+     */
+    public function validate_target_subnet(int $target_subnet) : int|null {
+        # Throw an error if `target` is an IPv4 address, but `target_subnet` is greater than 32.
+        if ($this->target->has_label("is_ipaddrv4") and $target_subnet > 32) {
+            throw new ValidationError(
+                message: "Field `target_subnet` must be 32 or less when `target` is an IPv4 address.",
+                response_id: "OUTBOUND_NAT_MAPPING_TARGET_SUBNET_TOO_LARGE_FOR_IPV4"
+            );
+        }
+
+        # Unset this value if `target` is not an IP address or alias
+        if (!$this->target->has_label("is_alias") and !$this->target->has_label("is_ipaddr")) {
+            return null;
+        }
+
+        return $target_subnet;
     }
 
     /**
