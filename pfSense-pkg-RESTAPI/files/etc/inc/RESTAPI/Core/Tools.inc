@@ -165,7 +165,7 @@ function generate_documentation() {
     $endpoint_classes = get_classes_from_namespace("\\RESTAPI\\Endpoints\\");
     $response_classes = get_classes_from_namespace("\\RESTAPI\\Responses\\");
     $assigned_tags = [];
-
+    
     # Set static openapi details
     $openapi_config = [
         "openapi" => "3.0.0",
@@ -276,6 +276,13 @@ function generate_documentation() {
 
             # Assign request body definitions for POST, PUT and PATCH requests
             if (in_array($request_method, ["post", "put", "patch"])) {
+                # Only include required fields in the $allOf schema if there are required fields for this Model
+                $allof_schema = ["type" => "object"];
+                $required_fields = $model->get_fields(required_only: true);
+                if ($required_fields) {
+                    $allof_schema["required"] = $required_fields;
+                }
+                
                 # For non `many` Endpoints with `many` Models, add the ID to the schema and make it required
                 if (!$endpoint->many and $model->many and $request_method !== "post") {
                     $schema = [
@@ -298,13 +305,14 @@ function generate_documentation() {
                 }
                 # For `many` Endpoints with `many` Models, accept arrays of many schema objects
                 elseif ($endpoint->many and $model->many) {
+                    # Write the schema objects with any required fields
                     $schema = [
                         "schema" => [
                             "type" => "array",
                             "items" => [
                                 "allOf" => [
                                     ['$ref' => "#/components/schemas/$endpoint->model_name"],
-                                    ["type" => "object", "required" => $model->get_fields(required_only: true)]
+                                    $allof_schema
                                 ]
                             ]
                         ]
@@ -316,7 +324,7 @@ function generate_documentation() {
                         "schema" => [
                             "allOf" => [
                                 ['$ref' => "#/components/schemas/$endpoint->model_name"],
-                                ["type" => "object", "required" => $model->get_fields(required_only: true)]
+                                $allof_schema
                             ]
                         ]
                     ];
