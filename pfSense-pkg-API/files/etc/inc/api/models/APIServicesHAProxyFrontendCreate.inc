@@ -307,7 +307,7 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
             return APIResponse\get(2272, ['request_data' => $this->initial_data, 'haproxy_errors' => $haproxy_errors]);
         } else {
             clear_subsystem_dirty('haproxy.conf');
-            return APIResponse\get(0, 'Frontend successfully created!');
+            return APIResponse\get(0, ['msg' => 'Frontend successfully created!', 'request_data' => $this->initial_data]);
         }
     }
 
@@ -318,8 +318,10 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
         mark_subsystem_dirty('haproxy.conf');
         $this->write_config();
 
-        if ($this-initial_data['apply'] === true) {
+        if ($this->initial_data['apply'] === true) {
             $this->__apply();
+        } else {
+            return APIResponse\get(0, ['msg' => 'Frontend successfully created, but not applied. Apply changes using /api/v1/services/haproxy/apply', 'request_data' => $this->initial_data]);
         }
     }
 }

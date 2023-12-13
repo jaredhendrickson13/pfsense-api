@@ -117,7 +117,7 @@ class APIServicesHAProxyPoolServersUpdate extends APIModel {
             return APIResponse\get(2272, $this->initial_data);
         } else {
             clear_subsystem_dirty('haproxy.conf');
-            return APIResponse\get(0, 'Backend servers successfully updated');
+            return APIResponse\get(0, ['msg' => 'Backend servers successfully updated!', 'request_data' => $this->initial_data]);
         }
     }
 
@@ -129,6 +129,8 @@ class APIServicesHAProxyPoolServersUpdate extends APIModel {
 
         if ($this->initial_data['apply']) {
             $this->__apply();
+        } else {
+            return APIResponse\get(0, ['msg' => 'Backend servers updated, but not applied. Apply changes using /api/v1/services/haproxy/apply', 'request_data' => $this->initial_data]);
         }
     }
 }
