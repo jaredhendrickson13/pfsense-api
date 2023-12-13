@@ -179,8 +179,12 @@ class Model {
 
         # Set the verbose and verbose plural names for this object if not specified
         if (!$this->verbose_name) {
+            # Separate the class name's words with spaces, allow consecutive capital characters like 'DNS'
             $model_name = (new ReflectionClass($this))->getShortName();;
-            $this->verbose_name = preg_replace('/([a-z])([A-Z])/s','$1 $2', $model_name);
+            $this->verbose_name = preg_replace(
+                '/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', ' ', 
+                $model_name
+            );
         }
         if (!$this->verbose_name_plural) {
             $plural_suffix = (str_ends_with($this->verbose_name, "s")) ? "es" : "s";

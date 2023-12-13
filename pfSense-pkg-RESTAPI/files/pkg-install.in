@@ -10,7 +10,7 @@ fi
 /bin/chmod +x /usr/local/share/pfSense-pkg-RESTAPI/manage.php
 /bin/ln -s /usr/local/share/pfSense-pkg-RESTAPI/manage.php /usr/local/bin/pfsense-restapi
 
-# Build Endpoints, Forms, openapi and restore an existing configuration if present/configured
+# Build Endpoints, Forms, documentation and restore an existing configuration if present/configured
 /usr/local/bin/php -f /usr/local/share/pfSense-pkg-RESTAPI/manage.php buildendpoints
 /usr/local/bin/php -f /usr/local/share/pfSense-pkg-RESTAPI/manage.php buildforms
 /usr/local/bin/php -f /usr/local/share/pfSense-pkg-RESTAPI/manage.php generatedocs

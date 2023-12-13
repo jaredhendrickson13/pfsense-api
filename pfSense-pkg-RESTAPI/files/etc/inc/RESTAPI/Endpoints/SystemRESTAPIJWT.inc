@@ -10,7 +10,7 @@ class SystemRESTAPIJWT extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/api/v2/system/restapi/jwt";
+        $this->url = "/api/v2/auth/jwt";
         $this->model_name = "RESTAPIJWT";
         $this->enforce_auth_mode = "local";
         $this->request_method_options = ["POST"];

@@ -218,7 +218,7 @@ function help() {
     echo "  help             : Display the help page (this page)".PHP_EOL;
     echo "  buildendpoints   : Build all REST API Endpoints included in this package".PHP_EOL;
     echo "  buildforms       : Build all REST API Forms included in this package".PHP_EOL;
-    echo "  generatedocs     : Regenerates the OpenAPI openapi".PHP_EOL;
+    echo "  generatedocs     : Regenerates the OpenAPI documentation".PHP_EOL;
     echo "  notifydispatcher : Start a dispatcher process".PHP_EOL;
     echo "  runtests         : Run all REST API unit Tests. Warning: this may be disruptive!".PHP_EOL;
     echo "  restartwebgui    : Restart the webConfigurator in the background".PHP_EOL;
@@ -242,7 +242,7 @@ elseif (in_array($argv[1], ["buildendpoints"])) {
 }
 # GENERATEDOCUMENTATION COMMAND
 elseif (in_array($argv[1], ["generatedocs"])) {
-    echo "Generating OpenAPI openapi... ";
+    echo "Generating OpenAPI documentation... ";
     RESTAPI\Core\Tools\generate_documentation();
     echo "done.".PHP_EOL;
 }
