@@ -223,7 +223,7 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
             return APIResponse\get(2272, ['request_data' => $this->initial_data, 'haproxy_errors' => $haproxy_errors]);
         } else {
             clear_subsystem_dirty('haproxy.conf');
-            return APIResponse\get(0, 'Frontend successfully updated!');
+            return APIResponse\get(0, ['msg' => 'Frontend successfully updated!', 'request_data' => $this->initial_data]);
         }
     }
 
@@ -235,6 +235,8 @@ class APIServicesHAProxyFrontendUpdate extends APIModel {
 
         if ($this->initial_data['apply'] === true) {
             $this->__apply();
+        } else {
+            return APIResponse\get(0, ['msg' => 'Frontend successfully updated, but not applied. Apply changes using /api/v1/services/haproxy/apply', 'request_data' => $this->initial_data]);
         }
     }
 }

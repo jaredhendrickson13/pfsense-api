@@ -45,6 +45,9 @@ class APIServicesHAProxyApplyCreate extends APIModel {
         if (!$result) {
             $haproxy_errors = $this->__parse_syslog();
             return APIResponse\get(2285, ['haproxy_errors' => $haproxy_errors]);
+        } else {
+            clear_subsystem_dirty('haproxy.conf');
+            return APIResponse\get(0, 'Changes successfully applied!');
         }
     }
 }
