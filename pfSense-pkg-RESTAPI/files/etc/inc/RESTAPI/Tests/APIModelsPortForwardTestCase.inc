@@ -28,10 +28,10 @@ class APIModelsPortForwardTestCase extends TestCase
 
         # Ensure this rule was configured by pfctl
         $rules_debug = file_get_contents("/tmp/rules.debug");
-        $if = $port_forward->interface->get_interface_obj()->if->value;
+        $if = $port_forward->interface->get_related_model()->if->value;
         $proto = $port_forward->protocol->value;
         $src = $port_forward->source->value;
-        $dst = $port_forward->interface->get_interface_obj()->get_current_ipv4();
+        $dst = $port_forward->interface->get_related_model()->get_current_ipv4();
         $dst_port = $port_forward->destination_port->value;
         $target = $port_forward->target->value;
         $local_port = $port_forward->local_port->value;
@@ -58,10 +58,10 @@ class APIModelsPortForwardTestCase extends TestCase
         
         # Ensure this rule was configured by pfctl
         $rules_debug = file_get_contents("/tmp/rules.debug");
-        $if = $port_forward->interface->get_interface_obj()->if->value;
+        $if = $port_forward->interface->get_related_model()->if->value;
         $src = $port_forward->source->value;
         $src_port = $port_forward->source_port->value;
-        $dst = "\${$port_forward->interface->get_interface_obj()->descr->value}__NETWORK";
+        $dst = "\${$port_forward->interface->get_related_model()->descr->value}__NETWORK";
         $dst_port = $port_forward->destination_port->value;
         $target = $port_forward->target->value;
         $rule_updated = "rdr on $if inet proto { tcp udp } from $src port $src_port to $dst port $dst_port -> $target";

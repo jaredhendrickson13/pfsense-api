@@ -12,7 +12,7 @@ use RESTAPI\Models\RESTAPIJWT;
 class SystemRESTAPIKey extends Form {
     public string $url = "/system_restapi_key_edit.php";
     public string $model_name = "\RESTAPI\Models\RESTAPIKey";
-    public array $title_path = ["System", "API", "Keys"];
+    public array $title_path = ["System", "REST API", "Keys"];
     public array $tabs = [
         ["Settings", false, "/system_restapi_settings.php"],
         ["Keys", true, "/system_restapi_key.php"],

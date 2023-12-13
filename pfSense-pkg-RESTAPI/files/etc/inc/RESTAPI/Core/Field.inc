@@ -136,7 +136,7 @@ class Field
      *      Array of \RESTAPI\Core\Validator objects for validating this field.
 
      * @param string $help_text
-     *      Help text used to describe this Field in OpenAPI openapi and associated \RESTAPI\Core\Form input Fields.
+     *      Help text used to describe this Field in OpenAPI documentation and associated \RESTAPI\Core\Form input Fields.
      */
 
     public function __construct(
@@ -873,8 +873,27 @@ class Field
     }
 
     /**
+     * Retrieves any related Model objects based on this Field's value. Child Field classes must override this method
+     * to define the necessary steps for retrieving related objects.
+     * @returns Model|ModelSet|null Returns the singular related Model object associated with this Field's value if
+     * this Field is not $many enabled, otherwise returns a ModelSet of all related Model objects associated with each
+     * of this Field's values if this is a $many enabled field. 
+     * @throws ServerError When this method is not implemeented 
+     */
+    public function get_related_model() : Model|ModelSet {
+        # Determine the class that called this method
+        $class_name = get_called_class();
+        
+        # This method must be overridden by a child class to be called. Throw an error if it is called otherwise.
+        throw new ServerError(
+            message: "Field class method `get_related_model()` is not implemented for child Field class `$class_name`.",
+            response_id: "FIELD_GET_RELATED_MODEL_NOT_IMPLEMENTED"
+        );
+    }
+
+    /**
      * Converts this Field object to a PHP array representation of an OpenAPI schema property configuration. This is
-     * used when auto-generating API openapi. This method can be extended to add additional options to the OpenAPI
+     * used when auto-generating API documentation. This method can be extended to add additional options to the OpenAPI
      * schema property.
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this field as an OpenAPI schema property configuration.

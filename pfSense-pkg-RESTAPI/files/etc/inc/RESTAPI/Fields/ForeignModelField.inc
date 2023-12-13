@@ -87,7 +87,7 @@ class ForeignModelField extends Field {
      * Fields, one field named `type` and the other being this field; and you only want this field to be included if
      * `type` is equal to `type1`, you could assign ["type" => "type1"] to this parameter.
      * @param array $validators An array of Validator objects to run against this field.
-     * @param string $help_text Set a description for this field. This description will be used in API openapi.
+     * @param string $help_text Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
         string $model_name,
@@ -285,7 +285,7 @@ class ForeignModelField extends Field {
      * associated with this field's current value. If this field is a `many` field, this method will return a ModelSet
      * containing all model objects associated with this Fields current values.
      */
-    public function get_model_obj() : Model|ModelSet {
+    public function get_related_model() : Model|ModelSet {
         # For `many` Fields, obtain all associated model objects in a ModelSet
         if ($this->many) {
             # Create a ModelSet we can use to store matching objects

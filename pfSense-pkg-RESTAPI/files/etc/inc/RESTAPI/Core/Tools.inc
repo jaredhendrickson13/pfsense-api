@@ -44,6 +44,17 @@ function is_assoc_array(array $array) : bool {
     return false;
 }
 
+/**
+ * Makes an HTTP request.
+ * @param string $url The full URL of the resource to submit the request to.
+ * @param string $method The HTTP method to use to submit the request.
+ * @param array $data The data payload to submit to the remote host. Only JSON payloads are supported.
+ * @param array $headers The HTTP headers to submit in the request.
+ * @param string $username The username portion for basic authentication (if applicable)
+ * @param string $password The password portion for basic authentication (if applicable)
+ * @param bool $validate_certs Enables or disables TLS certificate verification.
+ * @return bool|string The response from the remote host.
+ */
 function http_request(
     string $url,
     string $method,
@@ -158,7 +169,7 @@ function get_classes_from_namespace(string $namespace) : array {
 }
 
 /**
- * Auto-generates OpenAPI openapi for all Endpoints and their associated Models.
+ * Auto-generates OpenAPI documentation for all Endpoints and their associated Models.
  */
 function generate_documentation() {
     # Variables

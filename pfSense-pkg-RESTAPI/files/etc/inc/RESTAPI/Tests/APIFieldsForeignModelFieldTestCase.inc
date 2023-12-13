@@ -230,9 +230,9 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
     }
 
     /**
-     * Ensure the `get_model_obj` correctly returns the model object(s) associated with this field's current value(s).
+     * Ensure the `get_related_model` correctly returns the model object(s) associated with this field's current value(s).
      */
-    public function test_get_model_obj() {
+    public function test_get_related_model() {
         # Create FirewallAlias objects to use for testing purposes
         $host_alias = new FirewallAlias(data: ["name" => "HOST_ALIAS", "type" => "host", "address" => []]);
         $host_alias->create();
@@ -249,8 +249,8 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
         );
         $field->value = "NET_ALIAS";
 
-        # Ensure the object returned by `get_model_obj()` is the FirewallAlias object with the name `NET_ALIAS`
-        $this->assert_equals($field->get_model_obj()->name->value, $field->value);
+        # Ensure the object returned by `get_related_model()` is the FirewallAlias object with the name `NET_ALIAS`
+        $this->assert_equals($field->get_related_model()->name->value, $field->value);
 
         # Create a `many` ForeignModelField object  and assign it all of the above firewall aliases by name
         $field = new ForeignModelField(
@@ -261,11 +261,11 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
         );
         $field->value = ["HOST_ALIAS", "NET_ALIAS", "PORT_ALIAS"];
 
-        # Ensure the object returned by `get_model_obj()` is a ModelSet
-        $this->assert_is_true($field->get_model_obj()->exists());
+        # Ensure the object returned by `get_related_model()` is a ModelSet
+        $this->assert_is_true($field->get_related_model()->exists());
         
         # Ensure each model object within the ModelSet is a FirewallAlias object that corresponds to this Fields values
-        foreach ($field->get_model_obj()->model_objects as $alias) {
+        foreach ($field->get_related_model()->model_objects as $alias) {
             $this->assert_is_true(in_array($alias->name->value, $field->value));
         }
         

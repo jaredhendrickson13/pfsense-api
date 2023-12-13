@@ -11,7 +11,7 @@ use RESTAPI\Models\RESTAPIJWT;
 class SystemRESTAPISettings extends Form {
     public string $url = "/system_restapi_settings.php";
     public string $model_name = "\RESTAPI\Models\RESTAPISettings";
-    public array $title_path = ["System", "API", "Settings"];
+    public array $title_path = ["System", "REST API", "Settings"];
     public array $tabs = [
         ["Settings", true, "/system_restapi_settings.php"],
         ["Keys", false, "/system_restapi_key.php"],

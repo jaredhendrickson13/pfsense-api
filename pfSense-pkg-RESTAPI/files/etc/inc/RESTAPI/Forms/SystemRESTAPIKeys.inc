@@ -14,7 +14,7 @@ class SystemRESTAPIKeys extends Form {
     public bool $many = true;
     public bool $editable = false;
     public string $model_name = "\RESTAPI\Models\RESTAPIKey";
-    public array $title_path = ["System", "API", "Keys"];
+    public array $title_path = ["System", "REST API", "Keys"];
     public array $table_fields = ["username", "hash_algo", "length_bytes", "descr"];
     public array $tabs = [
         ["Settings", false, "/system_restapi_settings.php"],

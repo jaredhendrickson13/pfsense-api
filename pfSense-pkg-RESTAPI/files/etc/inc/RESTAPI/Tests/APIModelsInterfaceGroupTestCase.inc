@@ -19,7 +19,7 @@ class APIModelsInterfaceGroupTestCase extends TestCase
         
         # Check ifconfig and ensure the member interfaces are assigned to proper groups
         $real_members_create = [];
-        foreach ($if_group->members->get_interface_obj()->model_objects as $member) {
+        foreach ($if_group->members->get_related_model()->model_objects as $member) {
             # Keep track of the real interface names
             $real_members_create[] = $member->if->value;
             
@@ -36,7 +36,7 @@ class APIModelsInterfaceGroupTestCase extends TestCase
 
         # Check ifconfig and ensure the new member interfaces are assigned to proper groups
         $real_members_update = [];
-        foreach ($if_group->members->get_interface_obj()->model_objects as $member) {
+        foreach ($if_group->members->get_related_model()->model_objects as $member) {
             # Keep track of the real interface names
             $real_members_update[] = $member->if->value;
             

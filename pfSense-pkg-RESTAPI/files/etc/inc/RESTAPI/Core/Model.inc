@@ -33,85 +33,183 @@ const DEFAULT_CLIENT_IP_ADDRESS = "127.0.0.1";
  * Creates a Model object that relates to a pfSense configuration or service. This model defines the necessary steps
  * to validate incoming configuration and create, read, update, and/or delete data from the pfSense configuration this
  * object relates to.
- * @property string|null $config_path The configuration path where this Model's object(s) are stored internally. This
- * property is required unless an $internal_callable is defined.
- * @property bool $many If `true`, this Model will support the creation of many objects of its kind and will enable
- * IDs for this field. If `false`, this Model will only support a single object and does not utilize IDs. 
- * @property mixed $id The ID of the current Model object. This only applies to Model's with $many enabled. New
- * Model objects will not have an ID assigned until the `create()` method is executed.
- * @property mixed $parent_id For Models that are a child of a different Model class, this property will contain the
- * ID of the parent model object. If a $parent_model_class is defined, this value MUST be specified during object
- * construction.
- * @property string $parent_model_class The class name of the parent Model class. This is only necessary if this
- * Model is nested underneath another Model.
- * @property bool $async If `true`, this Model will try to apply objects in the background. If `false`, this Model will
- * will wait for the `apply*()` methods to complete before providing a response. Note: not all Model classes will
- * support or respect this value.
- * @property Auth $client The Auth object that contains the username, IP address and other authentication details of
- * the individual who is interacting with this Model. If no value is assigned, a default Auth object will be defined.
- * @property Model|null $initial_object Contains the current Model object as it is stored in config/internally. This
- * can be used to reference values that may have been changed during creation, modification or deletion.
- * @property array $protected_model_query Defines query parameters for any objects which may be assigned to this Model
- * that should not be replaced or deleted. This can be used to protect built-in objects that should not be deleted. 
- * This property only applies to $many enabled Models.
- * @property array $packages Assigns any add-on packages that are required for this Model to operate. This must
- * be an array of packages full-name (i.e. pfSense-pkg-sudo) or left empty to not require any add-on packages.
- * @property array $package_includes Assigns any PHP files to include that are specific to one or more of the $packages.
- * These files will be imported during Model validation to prevent an error from being thrown if the Model is referenced
- * on a system without these packages installed.
- * @property array $unique_together_fields An array that specifies field names that must be unique together. This is
- * similar to the Field object's $unique property, but requires the combination of each of these field's values to be
- * unique from any other Model object of its kind.
- * @property string $internal_callable For Model's that do not interact with stored pfSense configuration values,
- * you can specify the name of a callable method here to pull the internal values for this Model. This property 
- * cannot be used if a $config_path is already specified.
- * @property int|null $sort_option For $many enabled Models, this property can be used to set the PHP sort option that
- * will be used when writing Model objects to config. This property is only applicable if the $sort_by_field property
- * is also defined. This property only applies to Model's with a $config_path defined. For valid value options for this
- * property, refer to: https://www.php.net/manual/en/function.array-multisort.php
- * @property $subsystem the pfSense subsystem this Model relates to. This is typically only relevant for Models that
- * allow the internal config to be written but applied at a later time. The subsystem specified here will automatically
- * be marked as 'dirty' (in other words has unapplied changes) whenever this Model writes to the config, and will 
- * automatically have the subsystem 'dirty' status cleared after the `apply()` method(s) are called. The name of the
- * pfSense subsystem depends on the pfSense configuration item this Model relates. Refer to the pfSense source files
- * to determine what (if any) subsystem should be set. Typically, it will appear as a parameter value in the
- * mark_subsystem_dirty() or clear_subsystem_dirty() pfSense functions.
- * @property bool $always_apply Do not allow this Model to write to configuration without automatically running the
- * `apply()` method afterward.
- * @property bool $update_strategy Define how this Model should update existing values in configuration. Set to `merge`
- * to only update the values that were actually changed in config, or set to `replace` to replace the entire Model
- * object in config during updates. In general, `replace` works well for $many enabled Models and `merge` works well
- * for non $many enabled Models or for Models that share a $config_path with other Models.
- * @property string $verbose_name Sets the human-readable name for this Model. This value is primarily used where this Model
- * is referenced in Forms and the API openapi. By default, this property will attempt to be determined using
- * the Model class name by separating capitalized words in the class name with a space. In some cases this may not be 
- * accurately determined and can be manually set using this property if needed.
- * @property string $verbose_name_plural Manually specifies the plural representation of $verbose_name. By default, 
- * this property will be set to $verbose_name with `s` appended to the end, unless $verbose_name already ends in an `s`
- * in which `es` will be appended to the end instead. In some cases this may not be accurate, this property can be
- * manually set using this property if needed.
- */
+*/
 class Model {
+    /**
+     * @var string|null $config_path
+     * The configuration path where this Model's object(s) are internally stored. This property is mandatory unless
+     * an $internal_callable is explicitly defined.
+     */
     public string|null $config_path = null;
+
+    /**
+     * @var bool $many
+     * If set to `true`, this Model will facilitate the creation of multiple objects of its kind and enable
+     * IDs for this field. If set to `false`, this Model will exclusively support a single object and abstain from utilizing IDs.
+     */
     public bool $many = false;
+
+    /**
+     * @var mixed $id
+     * The ID of the current Model object. This applies exclusively to Models with $many enabled. New Model objects
+     * will not possess an ID until the `create()` method is executed.
+     */
     public mixed $id = null;
+
+    /**
+     * @var mixed $parent_id
+     * For Models acting as children to a different Model class, this property will contain the ID of the parent model
+     * object. If a $parent_model_class is defined, this value MUST be specified during object construction.
+     */
     public mixed $parent_id = null;
-    public Model|null $parent_model = null;
+
+    /**
+     * @var string $parent_model_class
+     * The class name of the parent Model class. This is necessary only if this Model is nested under another Model.
+     */
     public string $parent_model_class = "";
+
+    /**
+     * @var Model|null
+     * The parent Model object of this Model. This property is relevant only if a $parent_model_class is assigned.
+     * This property is automatically set using the $parent_model_class and $parent_id properties accordingly. If no
+     * parent Model class is found, or the parent object does not exist, this value will be `null`.
+     */
+    public Model|null $parent_model = null;
+
+    /**
+     * @var ModelSet $related_objects
+     * A ModelSet containing foreign Model objects related to this Model. These are primarily populated by
+     * ForeignModelFields assigned to this Model object. If no related Models are found, this ModelSet will not contain
+     * any Model objects. This property is primarily used by Endpoint classes to determine the correct HATEOAS link to
+     * include in REST API responses.
+     */
+    public ModelSet $related_objects;
+
+    /**
+     * @var bool $async
+     * If set to `true`, this Model will attempt to apply objects in the background. If set to `false`, this Model will
+     * wait for the `apply*()` methods to complete before providing a response. In many cases, the `apply*()` methods can
+     * take significant time to complete and, in extreme cases, can cause timeouts. Using $async enables these processes
+     * to run in the background, allowing the client to proceed without waiting. Polling Models should be made available
+     * for Models relying on $async, enabling clients to check the status of the process. Note: Not all Model classes will
+     * support or respect this value. Only Models utilizing Dispatcher objects support $async.
+     */
     public bool $async;
+
+    /**
+     * @var Auth $client
+     * The Auth object containing the username, IP address, and other authentication details of the individual interacting
+     * with this Model. If no value is assigned, a default Auth object will be defined. Note: Some Models require
+     * information from the $client; therefore, this value must always be assigned.
+     */
     public Auth $client;
+
+    /**
+     * @var Model|null $initial_object
+     * Contains the current Model object as stored in config/internally. This can be used to reference values that may
+     * have changed during creation, modification, or deletion.
+     */
     public Model|null $initial_object = null;
+
+    /**
+     * @var array $protected_model_query
+     * Defines query parameters for existing objects of this Model that should never be replaced or deleted. This can be
+     * used to protect built-in objects that should not be deleted. This property only applies to $many enabled Models.
+     */
     public array $protected_model_query = [];
+
+    /**
+     * @var array $packages
+     * Specifies any add-on packages required for this Model to operate. This must be an array of package full-names
+     * (i.e., pfSense-pkg-sudo) or left empty to not require any add-on packages.
+     */
     public array $packages = [];
+
+    /**
+     * @var array $package_includes
+     * Assigns PHP files to include that are specific to one or more of the assigned $packages. These files will be
+     * imported during Model validation to prevent an error from being thrown if the Model is referenced on a system
+     * without these packages installed.
+     */
     public array $package_includes = [];
+
+    /**
+     * @var array $unique_together_fields
+     * An array specifying field names that must be unique together. This is similar to the Field object's $unique
+     * property but requires the combination of each of these field's values to be unique from any other Model object of
+     * its kind. Each value specified here must be an existing property for this Model and must be assigned a Field class.
+     */
     public array $unique_together_fields = [];
+
+    /**
+     * @var string $internal_callable
+     * For Models that do not interact with stored pfSense configuration values, specify the name of a callable method here
+     * to pull the internal values for this Model. This property cannot be used if a $config_path is already specified.
+     * This must be set to an existing method name assigned to this Model class.
+     */
     public string $internal_callable = "";
+
+    /**
+     * @var int|null $sort_option
+     * For $many enabled Models, this property can be used to set the PHP sort option used when writing Model objects to
+     * config. This property is only applicable if the $sort_by_field property is also defined. This property only applies
+     * to Models with a $config_path defined. For valid value options for this property, refer to:
+     * https://www.php.net/manual/en/function.array-multisort.php
+     */
     public int|null $sort_option = null;
+
+    /**
+     * @var string|null $sort_by_field
+     * Sets the field name this Model will use when sorting objects written to the pfSense configuration. This field must
+     * be set to an existing property name from this Model, and that property must be assigned a Field class. Leave empty
+     * to disable sorting for this Model. In most cases, sorting should not be used.
+     */
     public string|null $sort_by_field = null;
+
+    /**
+     * @var string $subsystem
+     * The pfSense subsystem this Model relates to. This is typically only relevant for Models that allow the internal
+     * config to be written but applied at a later time. The subsystem specified here will automatically be marked as
+     * 'dirty' (i.e., has unapplied changes) whenever this Model writes to the config. It will automatically have the
+     * subsystem 'dirty' status cleared after the `apply()` method(s) are called. The name of the pfSense subsystem
+     * depends on the pfSense configuration item this Model relates. Refer to the pfSense source files to determine what
+     * (if any) subsystem should be set. Typically, it will appear as a parameter value in the mark_subsystem_dirty() or
+     * clear_subsystem_dirty() pfSense functions.
+     */
     public string $subsystem = "";
+
+    /**
+     * @var bool $always_apply
+     * Force this Model to always run the `apply()` method after `create()`, `update()`, `delete()`, and `replace_all()`.
+     */
     public bool $always_apply = false;
+
+    /**
+     * @var string $update_strategy
+     * Define how this Model should update existing values in configuration. Set to `merge` to only update the values that
+     * were actually changed in config, or set to `replace` to replace the entire Model object in config during updates.
+     * In general, `replace` works well for $many enabled Models, and `merge` works well for non $many enabled Models or
+     * for Models that share a $config_path with other Models.
+     */
     public string $update_strategy = "merge";
+
+    /**
+     * @var string $verbose_name
+     * Sets the human-readable name for this Model. This value is primarily used where this Model is referenced in Forms
+     * and the API documentation. By default, this property will attempt to be determined using the Model class name by
+     * separating capitalized words in the class name with a space. In some cases, this may not be accurately determined
+     * and can be manually set using this property if needed.
+     */
     public string $verbose_name = "";
+
+    /**
+     * @var string $verbose_name_plural
+     * Manually specifies the plural representation of $verbose_name. By default, this property will be set to $verbose_name
+     * with `s` appended to the end, unless $verbose_name already ends in an `s`, in which `es` will be appended to the end
+     * instead. In some cases, this may not be accurate; this property can be manually set using this property if needed.
+     */
+
     public string $verbose_name_plural = "";
 
     /**
@@ -152,6 +250,34 @@ class Model {
         $this->async = $async;
 
         # Obtain the current object from internal if an ID was given or this is not a `many` model.
+        $this->construct_from_internal(id: $id);
+
+        # Use the representation to obtain or construct this object if present.
+        if ($data) {
+            $this->from_representation($data);
+        }
+
+        # Obtain a default $client Auth object for this Model object to use if one was not provided
+        $this->client = ($client) ?: $this->get_default_client();
+
+        # Auto-set the verbose name and plural verbose name for this object if it was not specified by a parent class
+        $this->verbose_name = ($this->verbose_name) ?: $this->generate_verbose_name();
+        $this->verbose_name_plural = ($this->verbose_name_plural) ?: $this->generate_verbose_name_plural();
+
+        # Setup Field properties assigned to this Model
+        $this->setup_fields();
+        
+        # Set the default $related_objects ModelSet so it can be populated later
+        $this->related_objects = new ModelSet();
+    }
+
+    /**
+     * Attempts to construct this Model object by fetching an existing object from config/internally.
+     * @param mixed $id The ID of the internal object to construct this object from
+     */
+    private function construct_from_internal(mixed $id = null): void
+    {
+        # Only proceed if an ID was provided or this Model is not a $many enabled Model.
         if (isset($id) or !$this->many) {
             # Don't pull internal values unless there is a `config_path` or `internal_callable` defined.
             if ($this->config_path or $this->internal_callable) {
@@ -160,37 +286,57 @@ class Model {
                 $this->initial_object = unserialize(serialize($this));
             }
         }
+    } 
 
-        # Use the representation to obtain or construct this object if present.
-        if ($data) {
-            $this->from_representation($data);
-        }
+    /**
+     * Auto-generates a verbose name for this Model class using its class name.
+     * @returns string The human-readable name for this Model class.
+     */
+    private function generate_verbose_name(): string
+    {
+        # Separate the class name's words with spaces, allow consecutive capital characters like 'DNS'
+        $model_name = (new ReflectionClass($this))->getShortName();;
+        $verbose_name = preg_replace(
+            '/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', ' ',
+            $model_name
+        );
+        
+        return $model_name;
+    }
 
-        # Allow an Auth object to be assigned the model. Allows Models to view a client's IP address and username.
-        if ($client) {
-            $this->client = $client;
-        }
-        # Otherwise, define a default system client if one was not specified.
-        else {
-            $this->client = new Auth();
-            $this->client->username = DEFAULT_CLIENT_USERNAME;
-            $this->client->ip_address = DEFAULT_CLIENT_IP_ADDRESS;
-        }
+    /**
+     * Auto-generates the plural version of this Model's $verbose_name for $many enabled Models
+     * @returns string The human-readable name for this Model class in plural form.
+     */
+    private function generate_verbose_name_plural(): string
+    {
+        # Set a variable to track the best determined plural suffix for this verbose name
+        $plural_suffix = "";
 
-        # Set the verbose and verbose plural names for this object if not specified
-        if (!$this->verbose_name) {
-            # Separate the class name's words with spaces, allow consecutive capital characters like 'DNS'
-            $model_name = (new ReflectionClass($this))->getShortName();;
-            $this->verbose_name = preg_replace(
-                '/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', ' ', 
-                $model_name
-            );
-        }
-        if (!$this->verbose_name_plural) {
+        # Only add a plural suffix to the verbose name if this is a $many enabled Model
+        if ($this->many) {
             $plural_suffix = (str_ends_with($this->verbose_name, "s")) ? "es" : "s";
-            $this->verbose_name_plural = $this->verbose_name.$plural_suffix;
         }
 
+        return $this->verbose_name.$plural_suffix;
+    }
+
+    /**
+     * Obtains a default $client Auth object for this Model object to use.
+     * @returns Auth An Auth object that uses the default client username and IP address.
+     */
+    private function get_default_client() : Auth {
+        $client = new Auth();
+        $client->username = DEFAULT_CLIENT_USERNAME;
+        $client->ip_address = DEFAULT_CLIENT_IP_ADDRESS;
+        return $client;
+    }
+
+    /**
+     * Provides this Model's Field object properties relevant information like its field name and provides this Model
+     * object as this Field's $context Model object.
+     */
+    private function setup_fields() : void {
         # Assign names and model context to each field in this Model
         foreach ($this->get_fields() as $field) {
             $this->$field->set_names($field);
@@ -652,7 +798,7 @@ class Model {
 
     /**
      * Converts this Model object to a PHP array representation of its OpenAPI schema. This is used when
-     * auto-generating API openapi. This method can be extended to add additional options to the OpenAPI
+     * auto-generating API documentation. This method can be extended to add additional options to the OpenAPI
      * schema when necessary
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this Model as an OpenAPI schema.

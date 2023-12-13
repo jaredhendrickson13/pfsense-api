@@ -12,7 +12,7 @@ class RESTAPIVersion extends Model
     const RELEASES_API_URL = "https://api.github.com/repos/jaredhendrickson13/pfsense-api/releases";
     const RELEASES_API_MAX_TIME = 10;
     const RELEASES_CACHE_FILE = "/usr/local/share/pfSense-pkg-RESTAPI/releases.json";
-    const RELEASES_CACHE_EXPIRATION_SECONDS = 120;
+    const RELEASES_CACHE_EXPIRATION_SECONDS = 60 * 60;    // Cache expires hourly
     
     public StringField $current_version;
     public StringField $latest_version;

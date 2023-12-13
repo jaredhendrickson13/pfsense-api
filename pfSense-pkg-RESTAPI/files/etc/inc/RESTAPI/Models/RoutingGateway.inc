@@ -237,7 +237,7 @@ class RoutingGateway extends Model
      */
     public function validate_interface(string $interface) : string {
         # Obtain the NetworkInterface Model object associated with our current interface value
-        $if_obj = $this->interface->get_interface_obj();
+        $if_obj = $this->interface->get_related_model();
 
         # Ensure the configured `interface` has an IPv4 address if `protocol` is set to `inet`
         if ($this->ipprotocol->value === "inet" and (!$if_obj->get_current_ipv4() or !$if_obj->get_current_subnetv4())) {

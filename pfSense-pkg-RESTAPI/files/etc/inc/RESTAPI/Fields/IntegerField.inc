@@ -65,7 +65,7 @@ class IntegerField extends RESTAPI\Core\Field {
      * Fields, one field named `type` and the other being this field; and you only want this field to be included if
      * `type` is equal to `type1`, you could assign ["type" => "type1"] to this parameter.
      * @param array $validators An array of Validator objects to run against this field.
-     * @param string $help_text Set a description for this field. This description will be used in API openapi.
+     * @param string $help_text Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
         bool $required = false,
@@ -149,7 +149,7 @@ class IntegerField extends RESTAPI\Core\Field {
 
     /**
      * Converts this Field object to a PHP array representation of an OpenAPI schema property configuration. This is
-     * used when auto-generating API openapi. This method can be extended to add additional options to the OpenAPI
+     * used when auto-generating API documentation. This method can be extended to add additional options to the OpenAPI
      * schema property.
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this field as a OpenAPI schema property configuration.

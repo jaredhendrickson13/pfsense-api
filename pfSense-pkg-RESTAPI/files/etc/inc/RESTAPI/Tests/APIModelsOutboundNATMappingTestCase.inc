@@ -31,10 +31,10 @@ class APIModelsOutboundNATMappingTestCase extends TestCase
         
         # Ensure this outbound NAT rule is now present in the pfctl rules
         $pfctl_rules = file_get_contents("/tmp/rules.debug");
-        $if = $out_nat->interface->get_interface_obj()->descr->value;
+        $if = $out_nat->interface->get_related_model()->descr->value;
         $src = $out_nat->source->value;
         $dst = $out_nat->destination->value;
-        $target = $out_nat->interface->get_interface_obj()->get_current_ipv4();
+        $target = $out_nat->interface->get_related_model()->get_current_ipv4();
         $nat_rule_created = "nat on \$$if inet from $src to $dst -> $target/32 port 1024:65535";
         $this->assert_str_contains($pfctl_rules, $nat_rule_created);
         
@@ -57,7 +57,7 @@ class APIModelsOutboundNATMappingTestCase extends TestCase
         $this->assert_str_does_not_contain($pfctl_rules, $nat_rule_created);
 
         # Ensure this outbound NAT rule is now present in the pfctl rules
-        $if = $out_nat->interface->get_interface_obj()->descr->value;
+        $if = $out_nat->interface->get_related_model()->descr->value;
         $dst = $out_nat->destination->value;
         $target = $out_nat->target->value."/".$out_nat->target_subnet->value;
         $nat_port = $out_nat->nat_port->value;
@@ -95,7 +95,7 @@ class APIModelsOutboundNATMappingTestCase extends TestCase
 
         # Ensure the rule is correctly set in pfctl
         $pfctl_rules = file_get_contents("/tmp/rules.debug");
-        $if = $out_nat->interface->get_interface_obj()->descr->value;
+        $if = $out_nat->interface->get_related_model()->descr->value;
         $src = $out_nat->source->value;
         $dst = $out_nat->destination->value;
         $this->assert_str_contains(
@@ -131,7 +131,7 @@ class APIModelsOutboundNATMappingTestCase extends TestCase
 
         # Ensure the rule is correctly set in pfctl
         $pfctl_rules = file_get_contents("/tmp/rules.debug");
-        $if = $out_nat->interface->get_interface_obj()->descr->value;
+        $if = $out_nat->interface->get_related_model()->descr->value;
         $src = $out_nat->source->value;
         $dst = $out_nat->destination->value;
         $target = $out_nat->target->value."/".$out_nat->target_subnet->value;
@@ -168,7 +168,7 @@ class APIModelsOutboundNATMappingTestCase extends TestCase
 
         # Ensure the rule is correctly set in pfctl
         $pfctl_rules = file_get_contents("/tmp/rules.debug");
-        $if = $out_nat->interface->get_interface_obj()->descr->value;
+        $if = $out_nat->interface->get_related_model()->descr->value;
         $src = $out_nat->source->value;
         $dst = $out_nat->destination->value;
         $target = $out_nat->target->value."/".$out_nat->target_subnet->value;

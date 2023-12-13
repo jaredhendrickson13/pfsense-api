@@ -9,7 +9,7 @@ use RESTAPI\Core\Form;
 class SystemRESTAPIUpdates extends Form {
     public string $url = "/system_restapi_updates.php";
     public string $model_name = "\RESTAPI\Models\RESTAPIVersion";
-    public array $title_path = ["System", "API", "Updates"];
+    public array $title_path = ["System", "REST API", "Updates"];
     public array $tabs = [
         ["Settings", false, "/system_restapi_settings.php"],
         ["Keys", false, "/system_restapi_key.php"],

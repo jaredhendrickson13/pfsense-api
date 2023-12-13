@@ -75,7 +75,7 @@ class DateTimeField extends Field {
      * Fields, one field named `type` and the other being this field; and you only want this field to be included if
      * `type` is equal to `type1`, you could assign ["type" => "type1"] to this parameter.
      * @param array $validators An array of Validator objects to run against this field.
-     * @param string $help_text Set a description for this field. This description will be used in API openapi.
+     * @param string $help_text Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
         bool $required = false,

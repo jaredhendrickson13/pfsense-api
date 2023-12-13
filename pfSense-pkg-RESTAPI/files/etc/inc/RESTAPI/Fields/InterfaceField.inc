@@ -71,7 +71,7 @@ class InterfaceField extends RESTAPI\Fields\StringField {
      * Fields, one field named `type` and the other being this field; and you only want this field to be included if
      * `type` is equal to `type1`, you could assign ["type" => "type1"] to this parameter.
      * @param array $validators An array of Validator objects to run against this field.
-     * @param string $help_text Set a description for this field. This description will be used in API openapi.
+     * @param string $help_text Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
         bool $required = false,
@@ -243,7 +243,7 @@ class InterfaceField extends RESTAPI\Fields\StringField {
      * @return array|string An array of the internal interfaces assigned to this Field (e.g. ["wan", "lan", "opt1"])
      * when this is a `many` Field, or the internal interface value as a string
      */
-    public function to_internal_interfaces() {
+    public function to_internal_interfaces() : array|string {
         # Return the internal interface values for each interface value when this is a `many` Field
         if ($this->many) {
             return explode($this->delimiter, $this->to_internal());
@@ -255,12 +255,12 @@ class InterfaceField extends RESTAPI\Fields\StringField {
 
     /**
      * Fetches the NetworkInterface Model object associated with this field's current value
-     * @return NetworkInterface|ModelSet The NetworkInterface Model object associated with this Field's current value for
-     * non-many Fields, or a ModelSet of NetworkInterface objects for many Fields.
+     * @return NetworkInterface|Model|ModelSet The NetworkInterface Model object associated with this Field's current 
+     * value for non-many Fields, or a ModelSet of NetworkInterface objects for many Fields.
      * @throws NotFoundError when a NetworkInterface object could not be found using one or more of this Field's
      * assigned values.
      */
-    public function get_interface_obj() : NetworkInterface|ModelSet {
+    public function get_related_model() : NetworkInterface|Model|ModelSet {
         # Return the single NetworkInterface object for non-many Fields
         if (!$this->many) {
             # Query for the NetworkInterface object that matches our current value
