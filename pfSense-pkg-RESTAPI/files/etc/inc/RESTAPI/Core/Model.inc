@@ -301,7 +301,7 @@ class Model {
             $model_name
         );
         
-        return $model_name;
+        return $verbose_name;
     }
 
     /**
