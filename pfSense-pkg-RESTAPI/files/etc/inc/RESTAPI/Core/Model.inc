@@ -25,6 +25,7 @@ use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 use ReflectionClass;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
+use const RESTAPI\Core\Globals\HAL_REL_NAMESPACE;
 
 # Constants
 const DEFAULT_CLIENT_USERNAME = "(system RESTAPI)";
@@ -762,6 +763,9 @@ class Model {
                 $representation[$field] = $this->$field->value;
             }
         }
+        
+        # Append any related HATEOAS links
+        $representation += $this->get_related_links()->to_representation();
 
         return $representation;
     }
@@ -1101,6 +1105,34 @@ class Model {
         }
 
         return $references;
+    }
+    
+    public function get_related_links() : ResourceLinkSet {
+        # Variables
+        $resource_links = new ResourceLinkSet();
+        
+        # Loop through each field and check for any objects related to those fields.
+        foreach ($this->get_fields() as $field) {
+            # Determine the HAL rel value for this Field's Model relation
+            $related_rel = "field:$field:related";
+            $referenced_by_rel = "field:$field:referenced_by";
+            
+            # Obtain any object Model(s) related to this Field's value
+            $model_object = $this->$field->get_related_model();
+            $model_objects = $this->$field->get_related_models();
+
+            # Check if this field has a single related object assigned that $many enabled
+            if ($model_object and $model_object->many) {
+                $related_url = $model_object->get_related_endpoint()->url."?id=".$model_object->id;
+                $resource_links->resource_links[] = new ResourceLink(
+                    rel: $related_rel, 
+                    href: $related_url, 
+                    title:$model_object->verbose_name
+                );
+            }
+        }
+        
+        return $resource_links;
     }
 
     /**
@@ -1658,7 +1690,7 @@ class Model {
                 throw new ConflictError(
                     message: "Object cannot be deleted because it is referenced by another existing object.",
                     response_id: "MODEL_CANNOT_BE_DELETED_WHILE_REFERENCED",
-                    data: $referenced_by->to_representation()
+                    data: $referenced_by
                 );
             }
 
