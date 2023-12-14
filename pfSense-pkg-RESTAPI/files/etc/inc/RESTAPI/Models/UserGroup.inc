@@ -151,7 +151,7 @@ class UserGroup extends Model
         local_group_set($this->to_internal());
 
         # Reconfigure assigned user members to assign any new privileges
-        foreach ($this->member->get_related_model()->model_objects as $member_user) {
+        foreach ($this->member->get_related_models()->model_objects as $member_user) {
             local_user_set($member_user->to_internal());
         }
     }
@@ -180,7 +180,7 @@ class UserGroup extends Model
             local_group_set($new_object->to_internal());
 
             # Reconfigure assigned user members to assign any new privileges
-            foreach ($new_object->member->get_related_model()->model_objects as $member_user) {
+            foreach ($new_object->member->get_related_models()->model_objects as $member_user) {
                 local_user_set($member_user->to_internal());
             }
         }

@@ -65,7 +65,7 @@ class InterfaceGroup extends Model
     public function apply_update()
     {
         # Loop through each initial member interface and remove it from the group
-        foreach ($this->initial_object->members->get_related_model()->model_objects as $member) {
+        foreach ($this->initial_object->members->get_related_models()->model_objects as $member) {
             new Command("/sbin/ifconfig {$member->if->value} -group " . $this->ifname->value);
         }
         
@@ -79,7 +79,7 @@ class InterfaceGroup extends Model
     public function apply_delete()
     {
         # Loop through each member interface and remove it from the group
-        foreach ($this->members->get_related_model()->model_objects as $member) {
+        foreach ($this->members->get_related_models()->model_objects as $member) {
             new Command("/sbin/ifconfig {$member->if->value} -group " . $this->ifname->value);
         }
     }
@@ -98,7 +98,7 @@ class InterfaceGroup extends Model
         # Loop through each of the InterfaceGroup objects being replaced and remove the group from its members
         foreach ($initial_objects->model_objects as $old_if_group) {
             # Loop through each initial member interface and remove it from the group
-            foreach ($old_if_group->members->get_related_model()->model_objects as $member) {
+            foreach ($old_if_group->members->get_related_models()->model_objects as $member) {
                 new Command("/sbin/ifconfig {$member->if->value} -group " . $old_if_group->ifname->value);
             }
         }

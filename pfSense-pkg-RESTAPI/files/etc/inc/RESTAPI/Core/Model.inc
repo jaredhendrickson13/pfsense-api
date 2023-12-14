@@ -24,6 +24,7 @@ use RESTAPI\Responses\NotFoundError;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 use ReflectionClass;
+use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 # Constants
 const DEFAULT_CLIENT_USERNAME = "(system RESTAPI)";
@@ -1092,35 +1093,14 @@ class Model {
      */
     public function get_model_references() : ModelSet {
         # Variables
-        $references = [];
+        $references = new ModelSet();
 
-        # Loop through each field in this Model object and check for Fields with the `referenced_by` property.
+        # Loop through each field in this Model object and obtain any Model objects that reference the field
         foreach ($this->get_fields() as $field) {
-            # Skip this field if it doesn't have any Models specified in its `referenced_by` property
-            if (!$this->$field->referenced_by) {
-                continue;
-            }
-
-            # Loop through each Model specified in `referenced_by`
-            foreach ($this->$field->referenced_by as $reference_model => $reference_fields) {
-                # Ensure the reference Fields are always an array and reference model is FQN
-                $reference_fields = (is_array($reference_fields)) ? $reference_fields : [$reference_fields];
-                $reference_model = "\\RESTAPI\\Models\\$reference_model";
-
-                # Loop through each referenced field and query for matches.
-                foreach ($reference_fields as $reference_field) {
-                    # Query for any referenced Model objects that have this field value assigned to the referenced field
-                    $reference_model = new $reference_model();
-                    $reference_query = $reference_model->query(
-                        query_params: [$reference_field => $this->$field->value],
-                        parent_id: $this->parent_id
-                    );
-                    $references = $references + $reference_query->model_objects;
-                }
-            }
+            $references->model_objects = $references->model_objects + $this->$field->is_referenced_by()->model_objects;
         }
 
-        return new ModelSet(model_objects: $references);
+        return $references;
     }
 
     /**
@@ -1150,6 +1130,35 @@ class Model {
             }
 
         }
+    }
+
+    /**
+     * Obtains the Endpoint this Model class is assigned to.
+     * @param bool $many Set to true to obtain the $many enabled Endpoint for this Model, set to false to obtain the
+     * Endpoint for this Model that does not have $many enabled.
+     * @return Endpoint The Endpoint object that has this Model class assigned.
+     * @throws ServerError When no Endpoint could be found for this Model.
+     */
+    public function get_related_endpoint(bool $many) : Endpoint {
+        # Obtain the shortname for this class
+        $model_name = (new ReflectionClass($this))->getShortName();
+
+        # Loop through each Endpoint class
+        foreach (get_classes_from_namespace("\\RESTAPI\\Endpoints\\") as $endpoint_class) {
+            # Construct the Endpoint object
+            $endpoint = new $endpoint_class();
+
+            # If the $many values and $model_name values match, we've found our endoint. Return the object.
+            if ($many === $endpoint->many and $model_name === $endpoint->model_name) {
+                return $endpoint;
+            }
+        }
+
+        # Throw an error if we could not find an Endpoint associated with this Model
+        throw new ServerError(
+            message: "Could not find a Endpoint class with \$model_name=$model_name and \$many=$many",
+            response_id: "MODEL_COULD_NOT_FIND_RELATED_ENDPOINT"
+        );
     }
 
     /**

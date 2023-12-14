@@ -129,7 +129,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
         # Check that this rule is present in the pfctl rules
         $pfctl_rules = file_get_contents("/tmp/rules.debug");
         $type = $rule->type->value;
-        $if = "\${$rule->interface->get_related_model()->first()->descr->value}";
+        $if = "\${$rule->interface->get_related_models()->first()->descr->value}";
         $iptype = $rule->ipprotocol->value;
         $proto = $rule->protocol->value;
         $src = $rule->source->value;
@@ -161,7 +161,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
         # Check that the previous rule is no longer present in the pfctl rules but the updated rule is
         $pfctl_rules = file_get_contents("/tmp/rules.debug");
         $type = $rule->type->value;
-        $if = "\${$rule->interface->get_related_model()->first()->descr->value}";
+        $if = "\${$rule->interface->get_related_models()->first()->descr->value}";
         $iptype = $rule->ipprotocol->value;
         $proto = $rule->protocol->value;
         $src = $rule->source->value;
@@ -213,7 +213,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
         # Check that this rule is present in the pfctl rules
         $pfctl_rules = file_get_contents("/tmp/rules.debug");
         $type = $rule->type->value;
-        $if = "\${$rule->interface->get_related_model()->first()->descr->value}";
+        $if = "\${$rule->interface->get_related_models()->first()->descr->value}";
         $iptype = $rule->ipprotocol->value;
         $src = $rule->source->value;
         $dst = $rule->destination->value;
@@ -303,7 +303,7 @@ class APIModelsFirewallRuleTestCase extends TestCase
 
         # Ensure the log flag is set in the rule within pfctl
         $pfctl_rules = file_get_contents("/tmp/rules.debug");
-        $if = $rule->interface->get_related_model()->first()->descr->value;
+        $if = $rule->interface->get_related_models()->first()->descr->value;
         $type = $rule->type->value;
         $iptype = $rule->ipprotocol->value;
         $src = $rule->source->value;

@@ -78,14 +78,14 @@ class APIModelsInterfaceBridgeTestCase extends TestCase
 
         # Ensure the bridge if is correctly shown in ifconfig
         $ifconfig = new Command("ifconfig {$if_bridge->bridgeif->value}");
-        $if_create = $if_bridge->members->get_related_model()->first()->if->value;
+        $if_create = $if_bridge->members->get_related_models()->first()->if->value;
         $this->assert_str_contains($ifconfig->output, "member: $if_create");
 
         # Update the bridge and ensure the new values are shown in ifconfig and old ones are not
         $if_bridge->members->value = ["wan"];
         $if_bridge->update();
         $ifconfig = new Command("ifconfig {$if_bridge->bridgeif->value}");
-        $if_update = $if_bridge->members->get_related_model()->first()->if->value;
+        $if_update = $if_bridge->members->get_related_models()->first()->if->value;
         $this->assert_str_does_not_contain($ifconfig->output, "membe: $if_create");
         $this->assert_str_contains($ifconfig->output, "member: $if_update");
 

@@ -873,22 +873,55 @@ class Field
     }
 
     /**
-     * Retrieves any related Model objects based on this Field's value. Child Field classes must override this method
-     * to define the necessary steps for retrieving related objects.
-     * @returns Model|ModelSet|null Returns the singular related Model object associated with this Field's value if
-     * this Field is not $many enabled, otherwise returns a ModelSet of all related Model objects associated with each
-     * of this Field's values if this is a $many enabled field. 
-     * @throws ServerError When this method is not implemeented 
+     * Retrieves the related Model object based on this Field's value. Child Field classes must override this method
+     * to define the necessary steps for retrieving related objects. This method can only be used on Fields with
+     * $many set to false.
+     * @returns Model Returns the single Model object related to this Field's current value or `null` if no related
+     * Model was found.
      */
-    public function get_related_model() : Model|ModelSet {
-        # Determine the class that called this method
-        $class_name = get_called_class();
-        
-        # This method must be overridden by a child class to be called. Throw an error if it is called otherwise.
-        throw new ServerError(
-            message: "Field class method `get_related_model()` is not implemented for child Field class `$class_name`.",
-            response_id: "FIELD_GET_RELATED_MODEL_NOT_IMPLEMENTED"
-        );
+    public function get_related_model() : Model|null {
+        return null;
+    }
+
+    /**
+     * Retrieves all related Model object based on this Field's value. Child Field classes must override this method
+     * to define the necessary steps for retrieving related objects. This method can only be used on Fields with
+     * $many set to true.
+     * @returns ModelSet|null Returns a ModelSet of all related objects associated with this Fields current values or
+     * `null` if no related Models were found.
+     */
+    public function get_related_models() : ModelSet|null {
+        return null;
+    }
+
+    /**
+     * Uses this Field's $referenced_by property to search for existing Model objects that reference this Field's
+     * current value.
+     * @return ModelSet
+     */
+    public function is_referenced_by() : ModelSet {
+        # Use a variable to keep track of Model objects that reference this field
+        $references = new ModelSet();
+
+        # Loop through each Model specified in `referenced_by`
+        foreach ($this->referenced_by as $reference_model => $reference_fields) {
+            # Ensure the reference Fields are always an array and reference model is FQN
+            $reference_fields = (is_array($reference_fields)) ? $reference_fields : [$reference_fields];
+            $reference_model = "\\RESTAPI\\Models\\$reference_model";
+
+            # Loop through each referenced field and query for matches.
+            foreach ($reference_fields as $reference_field) {
+                # Query for any referenced Model objects that have this field value assigned to the referenced field
+                $reference_model = new $reference_model();
+                $reference_query = $reference_model->query(
+                    query_params: [$reference_field => $this->value],
+                    parent_id: $this->context->parent_id
+                );
+                $references->model_objects = $references->model_objects + $reference_query->model_objects;
+            }
+        }
+
+        return $references;
     }
 
     /**

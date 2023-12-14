@@ -56,7 +56,7 @@ class RoutingGateway extends Model
             unique: true,
             editable: false,
             maximum_length: 31,
-            referenced_by: ["StaticRoute" => "name"],
+            referenced_by: ["StaticRoute" => "gateway", "FirewallRule" => "gateway"],
             validators: [new FilterNameValidator()],
             help_text: "Sets a name for the gateway."
         );

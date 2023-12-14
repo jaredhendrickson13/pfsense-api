@@ -262,10 +262,10 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
         $field->value = ["HOST_ALIAS", "NET_ALIAS", "PORT_ALIAS"];
 
         # Ensure the object returned by `get_related_model()` is a ModelSet
-        $this->assert_is_true($field->get_related_model()->exists());
+        $this->assert_is_true($field->get_related_models()->exists());
         
         # Ensure each model object within the ModelSet is a FirewallAlias object that corresponds to this Fields values
-        foreach ($field->get_related_model()->model_objects as $alias) {
+        foreach ($field->get_related_models()->model_objects as $alias) {
             $this->assert_is_true(in_array($alias->name->value, $field->value));
         }
         

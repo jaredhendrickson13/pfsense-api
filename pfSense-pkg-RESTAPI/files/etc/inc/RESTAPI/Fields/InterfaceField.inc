@@ -255,16 +255,43 @@ class InterfaceField extends RESTAPI\Fields\StringField {
 
     /**
      * Fetches the NetworkInterface Model object associated with this field's current value
-     * @return Model|ModelSet The NetworkInterface Model object associated with this Field's current 
-     * value for non-many Fields, or a ModelSet of NetworkInterface objects for many Fields.
+     * @return Model The NetworkInterface Model object associated with this Field's current
+     * value for non-many Fields.
      * @throws NotFoundError when a NetworkInterface object could not be found using one or more of this Field's
      * assigned values.
      */
-    public function get_related_model() : Model|ModelSet {
-        # Return the single NetworkInterface object for non-many Fields
-        if (!$this->many) {
-            # Query for the NetworkInterface object that matches our current value
-            $query = NetworkInterface::query([$this->represented_as => $this->value]);
+    public function get_related_model() : Model
+    {
+        # Query for the NetworkInterface object that matches our current value
+        $query = NetworkInterface::query([$this->represented_as => $this->value]);
+
+        # If no match was found, throw an error
+        if (!$query->exists()) {
+            throw new NotFoundError(
+                message: "No interface could be found with representation value `$this->value`",
+                response_id: "INTERFACE_FIELD_OBJECT_NOT_FOUND"
+            );
+        }
+
+        # Otherwise return the NetworkInterface object
+        return NetworkInterface::query([$this->represented_as => $this->value])->first();
+    }
+
+
+    /**
+     * Fetches all NetworkInterface objects associated with this Field's current values when $many is enabled.
+     * @return ModelSet Returns a ModelSet containing the NetworkInterface Model's associated with this Field's
+     * current values, or `null` if no
+     */
+    public function get_related_models(): ModelSet
+    {
+        # Create a ModelSet object to store our located NetworkInterface objects in
+        $modelset = new ModelSet(model_objects: []);
+
+        # Loop through each of our current values
+        foreach ($this->value as $value) {
+            # Query for the NetworkInterface object that matches the current value
+            $query = NetworkInterface::query([$this->represented_as => $value]);
 
             # If no match was found, throw an error
             if (!$query->exists()) {
@@ -274,32 +301,10 @@ class InterfaceField extends RESTAPI\Fields\StringField {
                 );
             }
 
-            # Otherwise return the NetworkInterface object
-            return NetworkInterface::query([$this->represented_as => $this->value])->first();
+            # Add the model object to the ModelSet
+            $modelset->model_objects[] = $query->first();
         }
-        # For many Fields, create a ModelSet and add the NetworkInterface objects for each value
-        else {
-            # Create a ModelSet object to store our located NetworkInterface objects in
-            $modelset = new ModelSet(model_objects: []);
 
-            # Loop through each of our current values
-            foreach ($this->value as $value) {
-                # Query for the NetworkInterface object that matches the current value
-                $query = NetworkInterface::query([$this->represented_as => $value]);
-
-                # If no match was found, throw an error
-                if (!$query->exists()) {
-                    throw new NotFoundError(
-                        message: "No interface could be found with representation value `$this->value`",
-                        response_id: "INTERFACE_FIELD_OBJECT_NOT_FOUND"
-                    );
-                }
-
-                # Add the model object to the ModelSet
-                $modelset->model_objects[] = $query->first();
-            }
-
-            return $modelset;
-        }
+        return $modelset;
     }
 }
