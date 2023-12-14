@@ -17,12 +17,8 @@ class NotFoundError extends Response {
     public $code = 404;
     public string $help_text = "The client has requested a resource that could not be found.";
 
-    public function __construct(
-        $message,
-        string $response_id,
-        Model|ModelSet $data = new ModelSet(),
-        ResourceLinkSet $links = new ResourceLinkSet())
+    public function __construct($message, string $response_id, Model|ModelSet $data = new ModelSet())
     {
-        parent::__construct($message, $response_id, $data, $links);
+        parent::__construct($message, $response_id, $data);
     }
 }

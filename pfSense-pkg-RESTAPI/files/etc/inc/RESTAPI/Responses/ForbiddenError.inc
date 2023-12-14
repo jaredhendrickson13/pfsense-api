@@ -17,12 +17,8 @@ class ForbiddenError extends Response {
     public $code = 403;
     public string $help_text = "The client does not have sufficient privileges to make this API call.";
 
-    public function __construct(
-        $message,
-        string $response_id,
-        Model|ModelSet $data = new ModelSet(),
-        ResourceLinkSet $links = new ResourceLinkSet())
+    public function __construct($message, string $response_id, Model|ModelSet $data = new ModelSet())
     {
-        parent::__construct($message, $response_id, $data, $links);
+        parent::__construct($message, $response_id, $data);
     }
 }

@@ -25,18 +25,17 @@ class ServiceUnavailableError extends Response {
      * @param int $retry_after The amount of time (in seconds) we expect the service to become available again.
      * @param Model|ModelSet $data A Model or ModelSet this Response relates to. This is typically only included
      * for successful Responses.
-     * @param ResourceLinkSet $links A ResourceLinkSet containing any resource links associated with this response.
      */
     public function __construct(
         $message,
         string $response_id,
         int $retry_after = 5,
-        Model|ModelSet $data = new ModelSet(),
-        ResourceLinkSet $links = new ResourceLinkSet())
+        Model|ModelSet $data = new ModelSet()
+    )
     {
         # Set the Retry-After header with the number of seconds we expect for the services to become available
         # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After
         header("Retry-After: $retry_after");
-        parent::__construct($message, $response_id, $data, $links);
+        parent::__construct($message, $response_id, $data);
     }
 }

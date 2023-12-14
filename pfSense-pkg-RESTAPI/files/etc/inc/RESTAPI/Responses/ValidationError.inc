@@ -17,12 +17,8 @@ class ValidationError extends Response {
     public $code = 400;
     public string $help_text = "The client request data has one or more input validation errors.";
 
-    public function __construct(
-        $message,
-        string $response_id,
-        Model|ModelSet $data = new ModelSet(),
-        ResourceLinkSet $links = new ResourceLinkSet())
+    public function __construct($message, string $response_id, Model|ModelSet $data = new ModelSet())
     {
-        parent::__construct($message, $response_id, $data, $links);
+        parent::__construct($message, $response_id, $data);
     }
 }

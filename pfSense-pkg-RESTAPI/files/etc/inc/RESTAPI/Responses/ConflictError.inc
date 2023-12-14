@@ -17,12 +17,8 @@ class ConflictError extends Response {
     public $code = 409;
     public string $help_text = "The client's request cannot be fulfilled due to one or more conflicts.";
 
-    public function __construct(
-        $message,
-        string $response_id,
-        Model|ModelSet $data = new ModelSet(),
-        ResourceLinkSet $links = new ResourceLinkSet())
+    public function __construct($message, string $response_id, Model|ModelSet $data = new ModelSet())
     {
-        parent::__construct($message, $response_id, $data, $links);
+        parent::__construct($message, $response_id, $data);
     }
 }

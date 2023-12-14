@@ -40,10 +40,12 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase {
      * Checks the Response object is correctly converted a representation form using `to_representation()`.
      */
     public function test_response_to_representation() {
+        # Create FirewallAlias and Response objects to test with
+        $alias = new RESTAPI\Models\FirewallAlias(data: ["name"=>"test", "type"=>"host"]);
         $response = new RESTAPI\Core\Response(
             message: "Test message",
             response_id: "TEST_RESPONSE_ID",
-            data: ["test field" => "test value"]
+            data: $alias
         );
         $this->assert_equals(
             $response->to_representation(),
@@ -52,7 +54,7 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase {
                 "status" => "internal server error",
                 "response_id" => "TEST_RESPONSE_ID",
                 "message" => "Test message",
-                "data" => ["test field" => "test value"]
+                "data" => $alias->to_representation()
             ]
         );
     }

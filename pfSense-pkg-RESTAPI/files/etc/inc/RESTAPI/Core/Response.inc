@@ -96,13 +96,11 @@ class Response extends Error {
      * be unique from any other Response object in the codebase!
      * @param Model|ModelSet $data A Model or ModelSet this Response relates to. This is typically only included
      * for successful Responses.
-     * @param ResourceLinkSet $links A ResourceLinkSet containing any resource links associated with this response.
      */
     public function __construct(
         public $message,
         public string $response_id,
-        public Model|ModelSet $data = new ModelSet(),
-        public ResourceLinkSet $links = new ResourceLinkSet()
+        public Model|ModelSet $data = new ModelSet()
     ) {
         # Normalize values so they are consistent.
         $this->message = str_replace(["\"", "'"], "`", $message);

@@ -17,12 +17,8 @@ class MediaTypeError extends Response {
     public $code = 415;
     public string $help_text = "The client has requested a content-type that is not supported by the server.";
 
-    public function __construct(
-        $message,
-        string $response_id,
-        Model|ModelSet $data = new ModelSet(),
-        ResourceLinkSet $links = new ResourceLinkSet())
+    public function __construct($message, string $response_id, Model|ModelSet $data = new ModelSet())
     {
-        parent::__construct($message, $response_id, $data, $links);
+        parent::__construct($message, $response_id, $data);
     }
 }

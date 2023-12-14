@@ -17,12 +17,8 @@ class MethodNotAllowedError extends Response {
     public $code = 405;
     public string $help_text = "The client has requested an HTTP method that is not supported by the current URL.";
 
-    public function __construct(
-        $message,
-        string $response_id,
-        Model|ModelSet $data = new ModelSet(),
-        ResourceLinkSet $links = new ResourceLinkSet())
+    public function __construct($message, string $response_id, Model|ModelSet $data = new ModelSet())
     {
-        parent::__construct($message, $response_id, $data, $links);
+        parent::__construct($message, $response_id, $data);
     }
 }
