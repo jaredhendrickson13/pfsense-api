@@ -85,22 +85,31 @@ const HTTP_STATUS_MESSAGES = [
  * will originate as Response objects.
  */
 class Response extends Error {
-    public $message;
-    public string $response_id;
-    public string $status;
-    public array $data;
     public $code = 500;
+    public string $status;
     public string $help_text = "";
 
+    /**
+     * Constructs a new Response object.
+     * @param mixed $message The verbose message to include in the Response.
+     * @param string $response_id A unique response ID that can be used to identify this specific response. This should
+     * be unique from any other Response object in the codebase!
+     * @param Model|ModelSet $data A Model or ModelSet this Response relates to. This is typically only included
+     * for successful Responses.
+     * @param ResourceLinkSet $links A ResourceLinkSet containing any resource links associated with this response.
+     */
     public function __construct(
-        string $message,
-        string $response_id,
-        array $data = [],
+        public $message,
+        public string $response_id,
+        public Model|ModelSet $data = new ModelSet(),
+        public ResourceLinkSet $links = new ResourceLinkSet()
     ) {
+        # Normalize values so they are consistent.
         $this->message = str_replace(["\"", "'"], "`", $message);
         $this->status = strtolower($this->get_http_status_message($this->code));
         $this->response_id = strtoupper($response_id);
-        $this->data = $data;
+        
+        # Construct the Parent Error object to allow this object to become throwable.
         parent::__construct($this->message, $this->code);
 
     }
@@ -115,7 +124,7 @@ class Response extends Error {
             "status" => $this->status,
             "response_id" => $this->response_id,
             "message" => $this->message,
-            "data" => $this->data
+            "data" => $this->data->to_representation()
         ];
     }
 

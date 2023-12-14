@@ -4,6 +4,9 @@ namespace RESTAPI\Responses;
 
 require_once("RESTAPI/autoloader.inc");
 
+use RESTAPI\Core\Model;
+use RESTAPI\Core\ModelSet;
+use RESTAPI\Core\ResourceLinkSet;
 use RESTAPI\Core\Response;
 
 /**
@@ -13,8 +16,14 @@ use RESTAPI\Core\Response;
 class AuthenticationError extends Response {
     public $code = 401;
     public string $help_text = "The client has failed to authenticate the API call.";
-
-    public function __construct(string $message, string $response_id, array $data = []) {
-        parent::__construct($message, $response_id, $data);
+    
+    
+    public function __construct(
+        $message, 
+        string $response_id, 
+        Model|ModelSet $data = new ModelSet(), 
+        ResourceLinkSet $links = new ResourceLinkSet())
+    {
+        parent::__construct($message, $response_id, $data, $links);
     }
 }

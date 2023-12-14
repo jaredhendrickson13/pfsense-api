@@ -651,7 +651,7 @@ class Endpoint {
             $response = new Success(
                 message: "",
                 response_id: "SUCCESS",
-                data: ($resp_data) ? $resp_data->to_representation() : []
+                data: $resp_data ?: new ModelSet()
             );
         }
         catch (Response $response) {

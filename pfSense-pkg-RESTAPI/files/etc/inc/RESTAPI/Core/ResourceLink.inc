@@ -53,19 +53,9 @@ class ResourceLink
      * Converts this object to an array representation.
      * @returns array An array representation of this HAL resource link.
      */
-    public function serialize() : array {
+    public function to_representation() : array {
         return [
             $this->rel => ["href" => $this->href] + $this->custom_attributes
         ];
-    }
-
-    /**
-     * Automatically determines ResourceLink objects for any related Model objects related to a given Model
-     * and it's assigned Model class.
-     * @param
-     * @returns array An array of ResourceLink objects associated with this Model object.
-     */
-    public function get_related_model_links() : array {
-
     }
 }
