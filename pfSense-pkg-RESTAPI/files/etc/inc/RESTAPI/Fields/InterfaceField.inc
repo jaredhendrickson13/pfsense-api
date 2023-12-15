@@ -255,26 +255,24 @@ class InterfaceField extends RESTAPI\Fields\StringField {
 
     /**
      * Fetches the NetworkInterface Model object associated with this field's current value
-     * @return Model The NetworkInterface Model object associated with this Field's current
+     * @return Model|null The NetworkInterface Model object associated with this Field's current
      * value for non-many Fields.
      * @throws NotFoundError when a NetworkInterface object could not be found using one or more of this Field's
      * assigned values.
      */
-    public function get_related_model() : Model
+    public function get_related_model() : Model|null
     {
         # Query for the NetworkInterface object that matches our current value
         $query = NetworkInterface::query([$this->represented_as => $this->value]);
 
-        # If no match was found, throw an error
-        if (!$query->exists()) {
-            throw new NotFoundError(
-                message: "No interface could be found with representation value `$this->value`",
-                response_id: "INTERFACE_FIELD_OBJECT_NOT_FOUND"
-            );
+        # Return the Model object if it exists
+        if ($query->exists()) {
+            return NetworkInterface::query([$this->represented_as => $this->value])->first();
         }
 
-        # Otherwise return the NetworkInterface object
-        return NetworkInterface::query([$this->represented_as => $this->value])->first();
+        # Otherwise return null
+        return null;
+        
     }
 
 
@@ -293,16 +291,11 @@ class InterfaceField extends RESTAPI\Fields\StringField {
             # Query for the NetworkInterface object that matches the current value
             $query = NetworkInterface::query([$this->represented_as => $value]);
 
-            # If no match was found, throw an error
-            if (!$query->exists()) {
-                throw new NotFoundError(
-                    message: "No interface could be found with representation value `$this->value`",
-                    response_id: "INTERFACE_FIELD_OBJECT_NOT_FOUND"
-                );
+            # Only add the related Model if it exists
+            if ($query->exists()) {
+                # Add the model object to the ModelSet
+                $modelset->model_objects[] = $query->first();
             }
-
-            # Add the model object to the ModelSet
-            $modelset->model_objects[] = $query->first();
         }
 
         return $modelset;

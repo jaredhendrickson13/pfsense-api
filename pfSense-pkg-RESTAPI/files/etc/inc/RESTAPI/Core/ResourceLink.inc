@@ -2,7 +2,6 @@
 
 namespace RESTAPI\Core;
 
-use RESTAPI\Responses\ServerError;
 use const RESTAPI\Core\Globals\HAL_REL_NAMESPACE;
 
 require_once("RESTAPI/autoloader.inc");

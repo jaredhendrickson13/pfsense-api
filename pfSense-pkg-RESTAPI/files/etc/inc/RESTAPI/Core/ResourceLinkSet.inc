@@ -19,7 +19,7 @@ class ResourceLinkSet
     {
         # Throw an error if any $resource_links value is not a ResourceLink object
         foreach ($this->resource_links as $resource_link) {
-            if (!is_object($resource_link) or !in_array("RESTAPI\Core\ResourceLink", class_parents($resource_link))) {
+            if (!is_object($resource_link) or !$resource_link instanceof ResourceLink) {
                 throw new ServerError(
                     message: "ResourceLinkSets can only contain ResourceLink objects.",
                     response_id: "RESOURCE_LINK_SET_CONTAINS_NON_RESOURCE_LINK"
@@ -38,8 +38,8 @@ class ResourceLinkSet
         $representation = ["_links" => []];
         
         # Loop through each ResourceLink object and add it's representation value
-        foreach ($this->resource_links as $rel => $rel_object) {
-            $representation["_links"][$rel] = $rel_object;
+        foreach ($this->resource_links as $rel_object) {
+            $representation["_links"] = array_merge($representation["_links"], $rel_object->to_representation());
         }
         
         return $representation;

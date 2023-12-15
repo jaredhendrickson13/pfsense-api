@@ -887,11 +887,10 @@ class Field
      * Retrieves all related Model object based on this Field's value. Child Field classes must override this method
      * to define the necessary steps for retrieving related objects. This method can only be used on Fields with
      * $many set to true.
-     * @returns ModelSet|null Returns a ModelSet of all related objects associated with this Fields current values or
-     * `null` if no related Models were found.
+     * @returns ModelSet Returns a ModelSet of all related objects associated with this Fields current values.
      */
-    public function get_related_models() : ModelSet|null {
-        return null;
+    public function get_related_models() : ModelSet {
+        return new ModelSet();
     }
 
     /**

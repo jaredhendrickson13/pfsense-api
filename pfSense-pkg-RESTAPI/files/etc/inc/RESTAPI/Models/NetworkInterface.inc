@@ -78,7 +78,7 @@ class NetworkInterface extends Model
         $this->if = new StringField(
             required: true,
             unique: true,
-            choices: get_interface_ports(),
+            choices_callable: "get_interface_ports",
             maximum_length: 128,
             help_text: "The real interface this configuration will be applied to."
         );
@@ -381,6 +381,16 @@ class NetworkInterface extends Model
 
         # Otherwise, just return the existing value
         return $descr;
+    }
+
+    /**
+     * Obtains an array of the (real) interfaces available to this system. This populates the `choices` available to 
+     * the `if` field.
+     * @returns array An array of the (real) interfaces available to this system where the array key is the real 
+     * interface ID/name and the value is verbose description of the interface including its MAC.
+     */
+    public function get_interface_ports() : array {
+        return get_interface_ports();
     }
 
     /**

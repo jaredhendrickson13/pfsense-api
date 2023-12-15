@@ -1106,32 +1106,76 @@ class Model {
 
         return $references;
     }
+
+    /**
+     * Obtains the Endpoint this Model class is assigned to.
+     * @param bool $many Set to true to obtain the $many enabled Endpoint for this Model, set to false to obtain the
+     * Endpoint for this Model that does not have $many enabled.
+     * @return Endpoint The Endpoint object that has this Model class assigned.
+     * @throws ServerError When no Endpoint could be found for this Model.
+     */
+    public function get_related_endpoint(bool $many) : Endpoint {
+        # Obtain the shortname for this class
+        $model_name = (new ReflectionClass($this))->getShortName();
+
+        # Loop through each Endpoint class
+        foreach (get_classes_from_namespace("\\RESTAPI\\Endpoints\\") as $endpoint_class) {
+            # Construct the Endpoint object
+            $endpoint = new $endpoint_class();
+
+            # If the $many values and $model_name values match, we've found our endoint. Return the object.
+            if ($many === $endpoint->many and $model_name === $endpoint->model_name) {
+                return $endpoint;
+            }
+        }
+
+        # Throw an error if we could not find an Endpoint associated with this Model
+        throw new ServerError(
+            message: "Could not find a Endpoint class with \$model_name=$model_name and \$many=$many",
+            response_id: "MODEL_COULD_NOT_FIND_RELATED_ENDPOINT"
+        );
+    }
     
     public function get_related_links() : ResourceLinkSet {
         # Variables
         $resource_links = new ResourceLinkSet();
+        echo time().PHP_EOL;
         
         # Loop through each field and check for any objects related to those fields.
         foreach ($this->get_fields() as $field) {
             # Determine the HAL rel value for this Field's Model relation
             $related_rel = "field:$field:related";
-            $referenced_by_rel = "field:$field:referenced_by";
             
             # Obtain any object Model(s) related to this Field's value
             $model_object = $this->$field->get_related_model();
             $model_objects = $this->$field->get_related_models();
 
-            # Check if this field has a single related object assigned that $many enabled
+            # Generate a resource link for related Models that are $many enabled
             if ($model_object and $model_object->many) {
-                $related_url = $model_object->get_related_endpoint()->url."?id=".$model_object->id;
+                $related_url = $model_object->get_related_endpoint(many: false)->url."?id=".$model_object->id;
                 $resource_links->resource_links[] = new ResourceLink(
                     rel: $related_rel, 
                     href: $related_url, 
                     title:$model_object->verbose_name
                 );
             }
+
+            # If this field has multiple Model object relations, generate a resource link for each
+            foreach ($model_objects->model_objects as $field_value_index =>$model_object) {
+                # Generate a resource link for related Models that are $many enabled
+                if ($model_object and $model_object->many) {
+                    $many_related_rel = $related_rel.":$field_value_index";
+                    $related_url = $model_object->get_related_endpoint(many: false)->url."?id=".$model_object->id;
+                    $resource_links->resource_links[] = new ResourceLink(
+                        rel: $many_related_rel,
+                        href: $related_url,
+                        title:$model_object->verbose_name
+                    );
+                }
+            }
         }
-        
+        echo time().PHP_EOL;
+
         return $resource_links;
     }
 
@@ -1162,35 +1206,6 @@ class Model {
             }
 
         }
-    }
-
-    /**
-     * Obtains the Endpoint this Model class is assigned to.
-     * @param bool $many Set to true to obtain the $many enabled Endpoint for this Model, set to false to obtain the
-     * Endpoint for this Model that does not have $many enabled.
-     * @return Endpoint The Endpoint object that has this Model class assigned.
-     * @throws ServerError When no Endpoint could be found for this Model.
-     */
-    public function get_related_endpoint(bool $many) : Endpoint {
-        # Obtain the shortname for this class
-        $model_name = (new ReflectionClass($this))->getShortName();
-
-        # Loop through each Endpoint class
-        foreach (get_classes_from_namespace("\\RESTAPI\\Endpoints\\") as $endpoint_class) {
-            # Construct the Endpoint object
-            $endpoint = new $endpoint_class();
-
-            # If the $many values and $model_name values match, we've found our endoint. Return the object.
-            if ($many === $endpoint->many and $model_name === $endpoint->model_name) {
-                return $endpoint;
-            }
-        }
-
-        # Throw an error if we could not find an Endpoint associated with this Model
-        throw new ServerError(
-            message: "Could not find a Endpoint class with \$model_name=$model_name and \$many=$many",
-            response_id: "MODEL_COULD_NOT_FIND_RELATED_ENDPOINT"
-        );
     }
 
     /**

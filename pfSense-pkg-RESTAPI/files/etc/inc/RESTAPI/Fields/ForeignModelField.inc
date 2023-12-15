@@ -282,34 +282,28 @@ class ForeignModelField extends Field {
     /**
      * Obtains the Model object associated with this field's current value. This is only applicable when this is not
      * a $many enabled field.
-     * @returns Model Returns the Model object associated with this Field's current value.
-     * @throws NotFoundError When a Model object could not be found with this Field's current value.
+     * @returns Model|null Returns the Model object associated with this Field's current value.
      */
-    public function get_related_model() : Model {
+    public function get_related_model() : Model|null {
         # Add the query parameters needed to locate the related Model object
         $query_params = array_merge($this->model_query, [$this->model_field => $this->value]);
 
         # Query for the Model object this value relates to.
         $query_modelset = $this->model->query($query_params);
 
-        # Throw a not found error if no match was found
-        if (!$query_modelset->exists()) {
-            throw new NotFoundError(
-                message: "Field `$this->name` could not locate `{$this->model->verbose_name}` object with ".
-                "`$this->model_field` set to `$this->value`",
-                response_id: "FOREIGN_MODEL_FIELD_VALUE_NOT_FOUND"
-            );
+        # Return the related model object if it exists
+        if ($query_modelset->exists()) {
+            return $query_modelset->first();
         }
 
-        # Otherwise, add it to the ModelSet
-        return $query_modelset->first();
+        # Otherwise return null
+        return null;
     }
 
     /**
      * Obtains the Model objects associated with this field's current values. This is only applicable when this is
      * a $many enabled field.
      * @returns ModelSet Returns a ModelSet containing all Models associated with this Field's current values.
-     * @throws NotFoundError When one or more Model objects could not be found using this Field's current values.
      */
     public function get_related_models(): ModelSet
     {
@@ -324,17 +318,10 @@ class ForeignModelField extends Field {
             # Query for the Model object this value relates to.
             $query_modelset = $this->model->query($query_params);
 
-            # Throw a not found error if no match was found
-            if (!$query_modelset->exists()) {
-                throw new NotFoundError(
-                    message: "Field `$this->name` could not locate `{$this->model->verbose_name}` object with ".
-                    "`$this->model_field` set to `$value`",
-                    response_id: "FOREIGN_MODEL_FIELD_VALUE_NOT_FOUND"
-                );
+            # Only add the Model object if it exists
+            if ($query_modelset->exists()) {
+                $modelset->model_objects[] = $query_modelset->first();
             }
-
-            # Otherwise, add it to the ModelSet
-            $modelset->model_objects[] = $query_modelset->first();
         }
 
         return $modelset;
