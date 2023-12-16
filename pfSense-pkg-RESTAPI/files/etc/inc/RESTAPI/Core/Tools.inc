@@ -414,6 +414,26 @@ function generate_documentation() {
                 }
             }
 
+            # Assign the limit and offset to GET endpoints with $many enabled
+            if ($endpoint->many and $request_method === "get") {
+                $openapi_config["paths"][$endpoint->url][$request_method]["parameters"] = [
+                    [
+                        "in" => "query",
+                        "name" => "limit",
+                        "description" => "The number of objects to obtain at once. Set to 0 for no limit.",
+                        "default" => 0,
+                        "schema" => ["type" => "integer"]
+                    ],
+                    [
+                        "in" => "query",
+                        "name" => "offset",
+                        "description" => "The starting point in the dataset to begin fetching objects.",
+                        "default" => 0,
+                        "schema" => ["type" => "integer"]
+                    ]
+                ];
+            }
+
             # Assign this request method Responses for each Response class defined.
             foreach ($response_classes as $response_class) {
                 $response = new $response_class(message: "", response_id: "");
