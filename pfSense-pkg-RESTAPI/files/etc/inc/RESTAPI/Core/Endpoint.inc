@@ -624,7 +624,6 @@ class Endpoint {
             elseif ($this->request_method === "POST" and !$this->many) {
                 # POST request cannot include an ID, strip the ID if present
                 unset($this->request_data["id"]);
-
                 $this->model->from_representation(data: $this->request_data);
                 $resp_data = $this->model->create(apply: ($this->request_data["apply"] === true));
             }

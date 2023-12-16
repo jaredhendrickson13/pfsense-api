@@ -248,15 +248,64 @@ fields.
 
 </details>
 
+### Pagination
+
+Pagination comes built-in for your convenience! It's a fantastic tool to manage the number of objects fetched from the
+API at a time, giving you greater control over your application's performance during integration. To make use of 
+pagination, just toss in the `limit` query parameter to specify how many objects you want in one go, and add the `offset` 
+query parameter to specify where in the dataset you'd like to start fetching objects. Pagination is only performed 
+when one of these query parameters is provided. Make navigating through your data a breeze!
+
 ## HATEOAS
 
-By default, the REST API incorporates HATEOAS, following HAL (Hypertext Application Language) standards. When you 
-receive a response, it includes links to other related resources, serving as shortcuts to additional information of 
-interest. This feature saves you from manually writing specific web addresses (URLs) for these related resources in 
-your application. Instead, the API response conveniently provides the necessary links, ensuring a standardized 
-structure in accordance with HAL standards for streamlined integration.
+The REST API designed to effortlessly incorporate HATEOAS using HAL (Hypertext Application Language) standards, 
+complemented by a few custom enhancements. As you receive a response, you'll find handy links to related resources, 
+making navigation a breeze and granting swift access to additional, relevant information. This prevents the need for
+applications to hardcode URLs for related items. The API responses provide these links conveniently,
+maintaining a friendly and standardized structure aligned with HAL standards.
 
+### Custom links
 
+Below are some links that are not standardized HAL links, rather are specific to this REST API:
+
+#### pfsense:field:FIELD_NAME
+
+Provides links to the object(s) that are related to the current value(s) of a specific field in the API response.
+
+For example, a static route object could contain a link to the assigned parent gateway's object using the
+`gateway` field. This link could be used to make a subsequent API call to obtain the exact parent gateway for the static
+route:
+
+```json
+{
+  "_links": {
+    "pfsense:field:gateway": {
+      "href": "/api/v2/routing/gateways?id=0",
+      "base_href": "/api/v2/routing/gateways",
+      "id": 0,
+      "title": "Routing Gateway: 0"
+    }
+  }
+}
+```
+
+#### pfsense:service:ACTION
+
+Provides links to start, stop, and/or restart services associated with the API response.
+
+```json
+{
+  "_links": {
+    "pfsense:service:stop": {
+      "href": "/api/v2/status/service?id=1",
+      "base_href": "/api/v2/status/service",
+      "id": 1,
+      "action": "stop",
+      "title": "Stop service: sshd"
+    }
+  }
+}
+```
 
 ## Limitations
 
