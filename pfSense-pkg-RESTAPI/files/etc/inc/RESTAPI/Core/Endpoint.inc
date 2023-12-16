@@ -613,7 +613,12 @@ class Endpoint {
             }
             # For GET requests on many Endpoints, obtain all objects from the assigned Model.
             elseif ($this->request_method === "GET" and $this->many) {
-                $resp_data = $this->model->query(query_params: $this->request_data);
+                $resp_data = $this->model->query(
+                    query_params: $this->request_data,
+                    excluded: ["limit", "offset"],
+                    limit: (int)$this->request_data["limit"],
+                    offset: (int)$this->request_data["offset"],
+                );
             }
             # For POST requests on non-many Endpoints, create a single object for the assigned Model
             elseif ($this->request_method === "POST" and !$this->many) {

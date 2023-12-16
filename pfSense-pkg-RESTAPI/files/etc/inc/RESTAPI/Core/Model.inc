@@ -1069,7 +1069,7 @@ class Model {
      * @throws ServerError When this Model contains a Field object with an internal name that is not unique to it's
      * namespace.
      */
-    private function is_fields_internal_name_unique(string $field) {
+    private function is_fields_internal_name_unique(string $field) : void {
         # Loop to compare each field's names against each other to ensure there are no conflicts
         foreach ($this->get_fields() as $eval_field) {
             # Ignore if we are evaluating the same field, they will always have the same names.
@@ -1135,48 +1135,73 @@ class Model {
             response_id: "MODEL_COULD_NOT_FIND_RELATED_ENDPOINT"
         );
     }
-    
+
+    /**
+     * Obtains a HAL resource link to a specific Model object. 
+     * @param Model $model The Model object to obtain a link for. 
+     * @param string $rel The HAL resource link name to assign this ResourceLink object
+     * @param bool $use_namespace Set to true to prefix this $rel with this project's HAL prefix value. This should
+     * be used for non-standard rel values. 
+     * @return ResourceLink The ResourceLink object containing the links and attributes of the given $model.
+     */
+    public static function get_related_link(Model $model, string $rel, bool $use_namespace = true) : ResourceLink {
+        # Get the base endpoint URL and a URL include the ID query string
+        $endpoint_url = $model->get_related_endpoint(many: false)->url;
+        $related_url = ($model->many) ? $endpoint_url."?id=".$model->id : $endpoint_url;
+        $title = ($model->many) ? "$model->verbose_name: $model->id" : $model->verbose_name;
+        return new ResourceLink(
+            rel: $rel,
+            href: $related_url,
+            use_namespace: $use_namespace,
+            base_href: $endpoint_url,
+            id: $model->id,
+            title: $title
+        );
+    }
+
+    /**
+     * Obtains REST API links to resources related to this Model object.
+     * @return ResourceLinkSet A ResourceLinkSet containing REST API links to related Model objects.
+     */
     public function get_related_links() : ResourceLinkSet {
         # Variables
-        $resource_links = new ResourceLinkSet();
-        echo time().PHP_EOL;
+        $linkset = new ResourceLinkSet();
+        
+        # Always include this Model object as 'self'
+        $linkset->resource_links[] = $this->get_related_link($this, "self", use_namespace: false);
         
         # Loop through each field and check for any objects related to those fields.
         foreach ($this->get_fields() as $field) {
             # Determine the HAL rel value for this Field's Model relation
-            $related_rel = "field:$field:related";
-            
-            # Obtain any object Model(s) related to this Field's value
-            $model_object = $this->$field->get_related_model();
-            $model_objects = $this->$field->get_related_models();
+            $related_rel = "field:$field";
+
+            # Obtain all related Models
+            $related_model = $this->$field->get_related_model();
+            $related_models = $this->$field->get_related_models();
 
             # Generate a resource link for related Models that are $many enabled
-            if ($model_object and $model_object->many) {
-                $related_url = $model_object->get_related_endpoint(many: false)->url."?id=".$model_object->id;
-                $resource_links->resource_links[] = new ResourceLink(
-                    rel: $related_rel, 
-                    href: $related_url, 
-                    title:$model_object->verbose_name
-                );
+            if ($related_model and $related_model->many) {
+                $linkset->resource_links[] = $this->get_related_link($related_model, rel: $related_rel);
             }
 
             # If this field has multiple Model object relations, generate a resource link for each
-            foreach ($model_objects->model_objects as $field_value_index =>$model_object) {
-                # Generate a resource link for related Models that are $many enabled
-                if ($model_object and $model_object->many) {
-                    $many_related_rel = $related_rel.":$field_value_index";
-                    $related_url = $model_object->get_related_endpoint(many: false)->url."?id=".$model_object->id;
-                    $resource_links->resource_links[] = new ResourceLink(
-                        rel: $many_related_rel,
-                        href: $related_url,
-                        title:$model_object->verbose_name
-                    );
+            if ($related_models->model_objects and $this->$field->many) {
+                # Generate a nested ResourceLinkSet for related Models that are $many enabled
+                $nested_linkset = new ResourceLinkSet(rel: $related_rel, use_namespace: true);
+
+                # Loop through each Model object related to this Field's values
+                foreach ($related_models->model_objects as $related_model) {
+                    if ($related_model and $related_model->many) {
+                        $nested_linkset->resource_links[] = $this->get_related_link($related_model, rel: $related_rel);
+                    }
                 }
+                
+                # Add this nested ResourceLinkSet in our root ResourceLinkSet
+                $linkset->resource_links[] = $nested_linkset;
             }
         }
-        echo time().PHP_EOL;
 
-        return $resource_links;
+        return $linkset;
     }
 
     /**
@@ -1293,21 +1318,36 @@ class Model {
      * Model objects for each object returned by the specified callable.
      * @param mixed|null $parent_id Specifies the ID of the parent Model to read all objects from. This is required for
      * $many Models with a $parent_model_class. This value has no affect otherwise.
+     * @param int $offset The starting point in the dataset to be used with $limit. This is only applicable to $many 
+     * enabled Models.
+     * @param int $limit The maximum number of Model objects to retrieve. This is only applicable to $many
+     * enabled Models.
      * @return ModelSet|Model Returns a ModelSet of Models if `many` is enabled or a single Model object if `many` is
      * not enabled.
      */
-    public static function read_all(mixed $parent_id = null) : ModelSet|Model {
+    public static function read_all(mixed $parent_id = null, int $limit = 0, int $offset = 0) : ModelSet|Model {
         # Variables
         $model_name = get_called_class();
         $model = new $model_name();
         $model_objects = [];
         $is_parent_model_many = $model->is_parent_model_many();
+        $requests_pagination = ($limit or $offset);
+        $offset_counter = 0;
         
         # Throw an error if this Model has a $many parent Model, but no parent Model ID was given
         if ($is_parent_model_many and !isset($parent_id)) {
             throw new ValidationError(
                 message: "Field `parent_id` is required to read all.",
                 response_id: "MODEL_PARENT_ID_REQUIRED"
+            );
+        }
+        
+        # Throw an error if pagination was requested on a Model without $many enabled
+        if (!$model->many and $requests_pagination) {
+            throw new ValidationError(
+                message: "Model `$model->verbose_name` does not support pagination. Please remove the `limit` and/or. ".
+                    "`offset`parameters and try again.",
+                response_id: "MODEL_DOES_NOT_SUPPORT_PAGINATION"
             );
         }
         
@@ -1320,6 +1360,12 @@ class Model {
 
         # Loop through each internal object and create a Model object for it
         foreach ($internal_objects as $internal_id=>$internal_object) {
+            # Do not include this object if we have not reached our offset
+            if ($offset_counter < $offset) {
+                $offset_counter++;
+                continue;
+            }
+            
             # Determine which IDs should be used to obtain this object
             $ids = ($model->is_parent_model_many()) ? ["id" => $internal_id, "parent_id" => $parent_id] : ["id" => $internal_id];
                 
@@ -1327,6 +1373,14 @@ class Model {
             $model_object = new $model(data: $ids);
             $model_object->from_internal();
             $model_objects[] = $model_object;
+
+            # Break the loop if $limit is set, and we've met our limit of objects to obtain
+            if ($limit and $limit === count($model_objects)) {
+                break;
+            }
+            
+            # Increase the offset counter
+            $offset_counter++;
         }
 
         # Unwrap the array for non `many` Models, otherwise return all objects
@@ -1398,6 +1452,10 @@ class Model {
      * query data may have extra values that you do not want to include in the query.
      * @param mixed|null $parent_id Specifies the ID of the parent Model to read all objects from. This is required for
      * $many Models with a $parent_model_class. This value has no affect otherwise.
+     * @param int $offset The starting point in the dataset to be used with $limit. This is only applicable to $many
+     * enabled Models.
+     * @param int $limit The maximum number of Model objects to retrieve. This is only applicable to $many
+     * enabled Models.
      * @param mixed ...$vl_query_params Qyery parameters that are passed in using variable-length arguments
      * https://www.php.net/manual/en/functions.arguments.php#functions.variable-arg-list
      * @return ModelSet The queried ModelSet containing only Model objects that matched the query.
@@ -1406,12 +1464,21 @@ class Model {
         array $query_params=[], 
         array $excluded=[], 
         mixed $parent_id=null,
+        int $limit = 0,
+        int $offset = 0,
         ...$vl_query_params
     ) : ModelSet {
         # Merge the $query_params and any provided variable-length arguments into a single variable
         $query_params = array_merge($query_params, $vl_query_params);
         
-        return self::read_all(parent_id: $parent_id)->query(query_params: $query_params, excluded: $excluded);
+        return self::read_all(
+            parent_id: $parent_id,
+            limit: $limit,
+            offset: $offset
+        )->query(
+            query_params: $query_params, 
+            excluded: $excluded
+        );
     }
 
 

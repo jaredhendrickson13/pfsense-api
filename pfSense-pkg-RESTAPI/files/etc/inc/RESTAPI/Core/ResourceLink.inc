@@ -53,8 +53,6 @@ class ResourceLink
      * @returns array An array representation of this HAL resource link.
      */
     public function to_representation() : array {
-        return [
-            $this->rel => ["href" => $this->href] + $this->custom_attributes
-        ];
+        return ["href" => $this->href] + $this->custom_attributes;
     }
 }

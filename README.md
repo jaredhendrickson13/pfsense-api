@@ -248,6 +248,16 @@ fields.
 
 </details>
 
+## HATEOAS
+
+By default, the REST API incorporates HATEOAS, following HAL (Hypertext Application Language) standards. When you 
+receive a response, it includes links to other related resources, serving as shortcuts to additional information of 
+interest. This feature saves you from manually writing specific web addresses (URLs) for these related resources in 
+your application. Instead, the API response conveniently provides the necessary links, ensuring a standardized 
+structure in accordance with HAL standards for streamlined integration.
+
+
+
 ## Limitations
 
 Keep the following limitations in mind when using this API:
