@@ -51,8 +51,7 @@ Revert to a previous version of pfSense-pkg-API (e.g., v1.1.7):
 pfsense-restapi revert v1.1.7
 ```
 
-**Notes:**
-
+[!NOTE]
 - Customize the installation command to reference the package built for your pfSense version. Check
   the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) for available versions.
 - If shell access is unavailable, install via the webConfigurator by navigating to 'Diagnostics > Command Prompt.'
@@ -64,9 +63,8 @@ After installation, access the REST API user interface within the pfSense webCon
 The 'Settings' tab allows configuration of API interfaces, authentication modes, and more. The 'Documentation' tab
 provides an embedded tool for viewing the full API documentation within the context of your pfSense instance.
 
-**Notes:**
-
-- Users need `page-all` or `page-system-restapi-settings` privileges to access the API page.
+[!NOTE]
+Users need `page-all` or `page-system-restapi-settings` privileges to access the API page.
 
 ## Authentication & Authorization
 
@@ -166,7 +164,8 @@ is `application/json`, but other supported types include:
 
 </details>
 
-**Note:** `application/x-www-form-urlencoded` is suitable for GET or DELETE requests with string, integer, or boolean
+[!IMPORTANT]
+`application/x-www-form-urlencoded` is suitable for GET or DELETE requests with string, integer, or boolean
 data types.
 
 ## Queries
@@ -176,7 +175,8 @@ can query the return data to retrieve desired information. Add query parameters 
 query filters for more complex queries. Query filters may be specified after the field name separated by a
 double-underscore.
 
-note: Data within the `_links` sections of the API response cannot be queried.
+[!NOTE]
+Data within the `_links` sections of the API response cannot be queried.
 
 <details>
     <summary>Query Filters</summary>
