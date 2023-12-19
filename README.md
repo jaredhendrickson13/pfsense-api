@@ -165,9 +165,9 @@ is `application/json`, but other supported types include:
 
 </details>
 
-[!IMPORTANT]
-`application/x-www-form-urlencoded` is suitable for GET or DELETE requests with string, integer, or boolean
-data types.
+> [!IMPORTANT]
+> `application/x-www-form-urlencoded` is suitable for GET or DELETE requests with string, integer, or boolean
+> data types.
 
 ## Queries
 
