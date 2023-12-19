@@ -54,7 +54,8 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase {
                 "status" => "internal server error",
                 "response_id" => "TEST_RESPONSE_ID",
                 "message" => "Test message",
-                "data" => $alias->to_representation()
+                "data" => $alias->to_representation(),
+                "_links" => []
             ]
         );
     }
@@ -122,6 +123,11 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase {
                             ["type" => "object"]
                         ]
                     ],
+                    "_links" => [
+                        "description" => "An array of links to resources that are related to this API response.",
+                        "example" => [],
+                        "type" => "array"
+                    ]
                 ]
             ]
         );

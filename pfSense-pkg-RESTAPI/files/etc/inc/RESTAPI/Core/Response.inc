@@ -96,11 +96,13 @@ class Response extends Error {
      * be unique from any other Response object in the codebase!
      * @param Model|ModelSet $data A Model or ModelSet this Response relates to. This is typically only included
      * for successful Responses.
+     * @param ResourceLinkSet $_links A ResourceLinkSet containing applicable ResourceLinks for this response.
      */
     public function __construct(
         public $message,
         public string $response_id,
-        public Model|ModelSet $data = new ModelSet()
+        public Model|ModelSet $data = new ModelSet(),
+        public ResourceLinkSet $_links = new ResourceLinkSet()
     ) {
         # Normalize values so they are consistent.
         $this->message = str_replace(["\"", "'"], "`", $message);
@@ -123,7 +125,7 @@ class Response extends Error {
             "response_id" => $this->response_id,
             "message" => $this->message,
             "data" => $this->data->to_representation()
-        ];
+        ] + $this->_links->to_representation();
     }
 
     /**
@@ -200,6 +202,11 @@ class Response extends Error {
                         ["type" => "object"]
                     ]
                 ],
+                "_links" => [
+                    "description" => "An array of links to resources that are related to this API response.",
+                    "example" => [],
+                    "type" => "array"
+                ]
             ]
         ];
     }

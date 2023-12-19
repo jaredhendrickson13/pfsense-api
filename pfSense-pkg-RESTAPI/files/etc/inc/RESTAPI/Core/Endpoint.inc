@@ -354,6 +354,32 @@ class Endpoint {
     }
 
     /**
+     * Obtains the `prev` and `next` HATEOAS resource links for pagination use. These links supply the previous and next
+     * set of objects from the dataset.
+     * @param int $limit The maximum number of Model objects to retrieve. This will be used to determine
+     * the `prev` and `next` link values.
+     * @param int $offset The starting point in the dataset requested for pagination. This will be used to determine
+     * the `prev` and `next` link values.
+     * @returns ResourceLinkSet A ResourceLinkSet containing the `prev` and `next` ResourceLinks.
+     */
+    public function get_pagination_resource_links(int $limit, int $offset) : ResourceLinkSet {
+        # Calculate the offset for the `prev` and `next` resource link values
+        $prev_offset = ($offset - $limit >= 0) ? $offset - $limit : 0;
+        $next_offset = $offset + $limit;
+
+        # Format the URLs using the calculate offsets
+        $prev_url = $this->url."?offset=$prev_offset&limit=$limit";
+        $next_url = $this->url."?offset=$next_offset&limit=$limit";
+
+        # Construct ResourceLinks objects containing the `next` and `prev` links
+        $prev_link = new ResourceLink(rel: "prev", href: $prev_url, use_namespace: false);
+        $next_link = new ResourceLink(rel: "next", href: $next_url, use_namespace: false);
+
+        # Return a ResourceLinkSet with our `next` and `prev` links
+        return new ResourceLinkSet([$prev_link, $next_link]);
+    }
+
+    /**
      * Generates the privilege name necessary to execute a specific request method on this Endpoint.
      * @param string $method The HTTP method for which the resulting privilege name is intended.
      * @returns string The complete pfSense privilege name needed to authorize API requests to this endpoint using 
@@ -589,6 +615,7 @@ class Endpoint {
     public function listen() {
         # Variables
         $resp_data = null;
+        $links = new ResourceLinkSet();
 
         try {
             # Ensure API is enabled and the receiving interface is allowed to answer API calls.
@@ -618,6 +645,10 @@ class Endpoint {
                     excluded: ["limit", "offset"],
                     limit: (int)$this->request_data["limit"],
                     offset: (int)$this->request_data["offset"],
+                );
+                $links = $this->get_pagination_resource_links(
+                    limit: (int)$this->request_data["limit"],
+                    offset: (int)$this->request_data["offset"]
                 );
             }
             # For POST requests on non-many Endpoints, create a single object for the assigned Model
@@ -655,7 +686,8 @@ class Endpoint {
             $response = new Success(
                 message: "",
                 response_id: "SUCCESS",
-                data: $resp_data ?: new ModelSet()
+                data: $resp_data ?: new ModelSet(),
+                _links: $links
             );
         }
         catch (Response $response) {
