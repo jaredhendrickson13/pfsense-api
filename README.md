@@ -23,7 +23,7 @@ Don't see your version listed? Check the releases page. Older versions of this p
 pfSense.
 
 > [!WARNING]
-> This package may work on other architectures such as arm64 and aarch64, but compatibility is untested and not
+> This package may work on other architectures such as arm64 and aarch64, but compatibility is untested and therefor not
 guaranteed.
 
 ## Installation
@@ -53,9 +53,8 @@ pfsense-restapi revert v1.1.7
 ```
 
 > [!NOTE]
-> - Customize the installation command to reference the package built for your pfSense version. Check
+> - You may need to customize the installation command to reference the package built for your pfSense version. Check
 > the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) for available versions.
-> - If shell access is unavailable, install via the webConfigurator by navigating to 'Diagnostics > Command Prompt.'
 > - After updating pfSense, **you must reinstall this package** as pfSense removes non-official packages during updates.
 
 ## webConfigurator Settings & Documentation
@@ -176,9 +175,6 @@ can query the return data to retrieve desired information. Add query parameters 
 query filters for more complex queries. Query filters may be specified after the field name separated by a
 double-underscore.
 
-> [!NOTE]
-> Data within the `_links` sections of the API response cannot be queried.
-
 <details>
     <summary>Query Filters</summary>
 
@@ -258,6 +254,9 @@ API at a time, giving you greater control over your application's performance du
 pagination, just toss in the `limit` query parameter to specify how many objects you want in one go, and add the `offset` 
 query parameter to specify where in the dataset you'd like to start fetching objects. Pagination is only performed 
 when one of these query parameters is provided. Make navigating through your data a breeze!
+
+> [!NOTE]
+> Data within the `_links` sections of the API response cannot be queried.
 
 ## HATEOAS
 
