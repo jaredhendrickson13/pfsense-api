@@ -10,8 +10,9 @@ It is designed to streamline automation by transforming the PHP functions and pr
 webConfigurator into versatile API endpoints. This document aims to provide comprehensive details about installation,
 configuration, authentication, and usage of the pfSense REST API.
 
-_For detailed API endpoint documentation, please refer to embedded OpenAPI documentation made available in the [webConfigurator
-after installation](#webconfigurator-settings--documentation)._
+> [!TIP]
+> For detailed API endpoint documentation, please refer to embedded OpenAPI documentation made available in the [webConfigurator
+> after installation](#webconfigurator-settings--documentation).
 
 ## Requirements
 
