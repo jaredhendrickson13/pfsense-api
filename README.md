@@ -11,8 +11,7 @@ webConfigurator into versatile API endpoints. This document aims to provide comp
 configuration, authentication, and usage of the pfSense REST API.
 
 > [!TIP]
-> For detailed API endpoint documentation, please refer to embedded OpenAPI documentation made available in the [webConfigurator
-> after installation](#webconfigurator-settings--documentation).
+> Detailed API endpoint documentation can be found in the [webConfigurator after installation](#webconfigurator-settings--documentation).
 
 ## Requirements
 
@@ -20,8 +19,9 @@ configuration, authentication, and usage of the pfSense REST API.
 
 - pfSense CE 2.7.2 (amd64)
 
-Don't see your version listed? Check the releases page. Older versions of this package may support older versions of
-pfSense.
+> [!TIP]
+> Don't see your version listed? Check the releases page. Older versions of this package may support older versions of
+> pfSense.
 
 > [!WARNING]
 > This package may work on other architectures such as arm64 and aarch64, but compatibility is untested and therefor not
