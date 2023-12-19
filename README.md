@@ -22,7 +22,8 @@ after installation](#webconfigurator-settings--documentation)._
 Don't see your version listed? Check the releases page. Older versions of this package may support older versions of
 pfSense.
 
-**Note:** This package may work on other architectures such as arm64 and aarch64, but compatibility is untested and not
+> [!WARNING]
+> This package may work on other architectures such as arm64 and aarch64, but compatibility is untested and not
 guaranteed.
 
 ## Installation
@@ -51,11 +52,11 @@ Revert to a previous version of pfSense-pkg-API (e.g., v1.1.7):
 pfsense-restapi revert v1.1.7
 ```
 
-[!NOTE]
-- Customize the installation command to reference the package built for your pfSense version. Check
-  the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) for available versions.
-- If shell access is unavailable, install via the webConfigurator by navigating to 'Diagnostics > Command Prompt.'
-- After updating pfSense, **you must reinstall this package** as pfSense removes non-official packages during updates.
+> [!NOTE]
+> - Customize the installation command to reference the package built for your pfSense version. Check
+> the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) for available versions.
+> - If shell access is unavailable, install via the webConfigurator by navigating to 'Diagnostics > Command Prompt.'
+> - After updating pfSense, **you must reinstall this package** as pfSense removes non-official packages during updates.
 
 ## webConfigurator Settings & Documentation
 
@@ -63,8 +64,8 @@ After installation, access the REST API user interface within the pfSense webCon
 The 'Settings' tab allows configuration of API interfaces, authentication modes, and more. The 'Documentation' tab
 provides an embedded tool for viewing the full API documentation within the context of your pfSense instance.
 
-[!NOTE]
-Users need `page-all` or `page-system-restapi-settings` privileges to access the API page.
+> [!NOTE]
+> Users need `page-all` or `page-system-restapi-settings` privileges to access the API page.
 
 ## Authentication & Authorization
 
@@ -175,8 +176,8 @@ can query the return data to retrieve desired information. Add query parameters 
 query filters for more complex queries. Query filters may be specified after the field name separated by a
 double-underscore.
 
-[!NOTE]
-Data within the `_links` sections of the API response cannot be queried.
+> [!NOTE]
+> Data within the `_links` sections of the API response cannot be queried.
 
 <details>
     <summary>Query Filters</summary>
