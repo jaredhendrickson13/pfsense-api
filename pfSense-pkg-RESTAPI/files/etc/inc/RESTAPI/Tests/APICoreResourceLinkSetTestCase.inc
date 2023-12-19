@@ -48,11 +48,11 @@ class APICoreResourceLinkSetTestCase extends TestCase
             $linkset->to_representation(),
             [
                 "_links" => [
-                    "test1" => ["href" => "test1"],
-                    "test2" => ["href" => "test2"],
+                    "test1" => ["href" => "test1", "method" => "GET"],
+                    "test2" => ["href" => "test2", "method" => "GET"],
                     "nested" => [
-                        ["href" => "test1"],
-                        ["href" => "test2"]
+                        ["href" => "test1", "method" => "GET"],
+                        ["href" => "test2", "method" => "GET"]
                     ]
                 ]
             ]

@@ -1144,16 +1144,23 @@ class Model {
      * be used for non-standard rel values. 
      * @return ResourceLink The ResourceLink object containing the links and attributes of the given $model.
      */
-    public static function get_related_link(Model $model, string $rel, bool $use_namespace = true) : ResourceLink {
-        # Get the base endpoint URL and a URL include the ID query string
+    public static function get_related_link(
+        Model $model,
+        string $rel,
+        string $method = "GET",
+        bool $use_namespace = true
+    ) : ResourceLink {
+        # Get the base endpoint URL
         $endpoint_url = $model->get_related_endpoint(many: false)->url;
-        $related_url = ($model->many) ? $endpoint_url."?id=".$model->id : $endpoint_url;
+        $related_url = ($model->many and in_array($method, ["GET", "DELETE"])) ? $endpoint_url."?id=".$model->id : $endpoint_url;
+
+        # Generate a verbose title that makes sense given the context of this model
         $title = ($model->many) ? "$model->verbose_name: $model->id" : $model->verbose_name;
         return new ResourceLink(
             rel: $rel,
             href: $related_url,
+            method: $method,
             use_namespace: $use_namespace,
-            base_href: $endpoint_url,
             id: $model->id,
             title: $title
         );
@@ -1166,9 +1173,24 @@ class Model {
     public function get_related_links() : ResourceLinkSet {
         # Variables
         $linkset = new ResourceLinkSet();
+        $endpoint = $this->get_related_endpoint(many: false);
         
         # Always include this Model object as 'self'
         $linkset->resource_links[] = $this->get_related_link($this, "self", use_namespace: false);
+
+        # Add a 'delete' link if this Model supports deletions
+        if (in_array("PATCH", $endpoint->request_method_options)) {
+            $linkset->resource_links[] = $this->get_related_link(
+                $this, rel: "update", method: "PATCH", use_namespace: false
+            );
+        }
+
+        # Add a 'delete' link if this Model supports deletions
+        if (in_array("DELETE", $endpoint->request_method_options)) {
+            $linkset->resource_links[] = $this->get_related_link(
+                $this, rel: "delete", method: "DELETE", use_namespace: false
+            );
+        }
         
         # Loop through each field and check for any objects related to those fields.
         foreach ($this->get_fields() as $field) {

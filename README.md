@@ -176,6 +176,8 @@ can query the return data to retrieve desired information. Add query parameters 
 query filters for more complex queries. Query filters may be specified after the field name separated by a
 double-underscore.
 
+note: Data within the `_links` sections of the API response cannot be queried.
+
 <details>
     <summary>Query Filters</summary>
 
@@ -250,7 +252,7 @@ fields.
 
 ### Pagination
 
-Pagination comes built-in for your convenience! It's a fantastic tool to manage the number of objects fetched from the
+Pagination comes built-in and is a fantastic tool to help manage the number of objects fetched from the
 API at a time, giving you greater control over your application's performance during integration. To make use of 
 pagination, just toss in the `limit` query parameter to specify how many objects you want in one go, and add the `offset` 
 query parameter to specify where in the dataset you'd like to start fetching objects. Pagination is only performed 
@@ -260,9 +262,8 @@ when one of these query parameters is provided. Make navigating through your dat
 
 The REST API designed to effortlessly incorporate HATEOAS using HAL (Hypertext Application Language) standards, 
 complemented by a few custom enhancements. As you receive a response, you'll find handy links to related resources, 
-making navigation a breeze and granting swift access to additional, relevant information. This prevents the need for
-applications to hardcode URLs for related items. The API responses provide these links conveniently,
-maintaining a friendly and standardized structure aligned with HAL standards.
+making navigation a breeze and granting swift access to additional, relevant information. This reduces the need for
+applications to hardcode URLs for related items.
 
 ### Custom links
 

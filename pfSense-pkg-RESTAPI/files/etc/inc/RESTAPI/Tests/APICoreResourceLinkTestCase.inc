@@ -33,7 +33,7 @@ class APICoreResourceLinkTestCase extends TestCase
         $link = new ResourceLink(rel: "test", href: "test", use_namespace: false, example_attr: true);
         $this->assert_equals(
             $link->to_representation(),
-            [$link->rel => ["href" => $link->href, "example_attr" => true]]
+            ["href" => $link->href, "method" => $link->method, "example_attr" => true]
         );
     }
 

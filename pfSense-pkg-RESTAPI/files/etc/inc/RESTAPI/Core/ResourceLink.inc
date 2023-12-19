@@ -28,6 +28,7 @@ class ResourceLink
      * should be well documented.
      * @param string $href The URL to the linked resource. This should include any required query/path parameters
      * required to locate the linked resource.
+     * @param string $method The HTTP method that should be used when making requests to the $href for this link
      * @param bool $use_namespace Set to true to prefix the HAL namespace for this package to the $rel value or set to
      * false to use the $rel value directly. Unless $rel is a standard HAL related resource name, this should be set to
      * true.
@@ -37,6 +38,7 @@ class ResourceLink
     public function __construct(
         public string $rel,
         public string $href,
+        public string $method = "GET",
         public bool $use_namespace = true,
         mixed ...$custom_attributes
     )
@@ -53,6 +55,6 @@ class ResourceLink
      * @returns array An array representation of this HAL resource link.
      */
     public function to_representation() : array {
-        return ["href" => $this->href] + $this->custom_attributes;
+        return ["href" => $this->href, "method" => $this->method] + $this->custom_attributes;
     }
 }
