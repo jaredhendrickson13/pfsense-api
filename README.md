@@ -268,9 +268,34 @@ complemented by a few custom enhancements. As you receive a response, you'll fin
 making navigation a breeze and granting swift access to additional, relevant information. This reduces the need for
 applications to hardcode URLs for related items.
 
-### Custom links
+### Link types
 
-Below are some links that are not standardized HAL links, rather are specific to this REST API:
+Below are the different link types that can be returned by the API. These will be found nested under `_links` in the
+API response.
+
+> [!NOTE]
+> These `_links` can be found both in the root of the API response as well as nested under specific objects under the
+> `data` section. When nested under an object in the `data` section, the links will be specific to that object.
+
+#### next
+
+Provides a link to the next set of data when [pagination](#pagination) is used.
+
+#### prev
+
+Provides a link to the previous set of data when [pagination](#pagination) is used.
+
+#### self
+
+Provides a link to read an object's own self.
+
+### update
+
+Provides a link that can be used to update an object.
+
+### delete
+
+Provides a link that can be used to delete an object.
 
 #### pfsense:field:FIELD_NAME
 
@@ -278,38 +303,12 @@ Provides links to the object(s) that are related to the current value(s) of a sp
 
 For example, a static route object could contain a link to the assigned parent gateway's object using the
 `gateway` field. This link could be used to make a subsequent API call to obtain the exact parent gateway for the static
-route:
-
-```json
-{
-  "_links": {
-    "pfsense:field:gateway": {
-      "href": "/api/v2/routing/gateways?id=0",
-      "base_href": "/api/v2/routing/gateways",
-      "id": 0,
-      "title": "Routing Gateway: 0"
-    }
-  }
-}
-```
+route.
 
 #### pfsense:service:ACTION
 
 Provides links to start, stop, and/or restart services associated with the API response.
 
-```json
-{
-  "_links": {
-    "pfsense:service:stop": {
-      "href": "/api/v2/status/service?id=1",
-      "base_href": "/api/v2/status/service",
-      "id": 1,
-      "action": "stop",
-      "title": "Stop service: sshd"
-    }
-  }
-}
-```
 
 ## Limitations
 
