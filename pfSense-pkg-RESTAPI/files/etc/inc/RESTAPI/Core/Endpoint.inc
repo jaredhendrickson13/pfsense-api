@@ -599,6 +599,26 @@ class Endpoint {
             default:
                 $content_type_unknown = true;
         }
+        
+        # Ensure the special async, limit and offset parameters are of the correct type
+        if (isset($this->request_data["async"]) and !is_bool($this->request_data["async"])) {
+            throw new ValidationError(
+                message: "Field `async` must be of type `boolean`.",
+                response_id: "ENDPOINT_ASYNC_FIELD_INVALID_TYPE"
+            );
+        }
+        if (isset($this->request_data["limit"]) and !is_integer($this->request_data["limit"])) {
+            throw new ValidationError(
+                message: "Field `limit` must be of type `integer`.",
+                response_id: "ENDPOINT_LIMIT_FIELD_INVALID_TYPE"
+            );
+        }
+        if (isset($this->request_data["offset"]) and !is_integer($this->request_data["offset"])) {
+            throw new ValidationError(
+                message: "Field `offset` must be of type `integer`.",
+                response_id: "ENDPOINT_OFFSET_FIELD_INVALID_TYPE"
+            );
+        }
 
         # Check if the client requested an unknown content type
         if ($content_type_unknown) {
@@ -632,6 +652,11 @@ class Endpoint {
 
             # Assign the authenticated client object context to the Model
             $this->model->client = $this->client;
+            
+            # Set this Model's async property if specified in the request data
+            if (isset($this->request_data["async"])) {
+                $this->model->async = $this->request_data["async"];
+            }
 
             # For GET requests on non-many Endpoints, obtain a single object from the assigned Model.
             if ($this->request_method === "GET" and !$this->many) {
@@ -643,12 +668,12 @@ class Endpoint {
                 $resp_data = $this->model->query(
                     query_params: $this->request_data,
                     excluded: ["limit", "offset"],
-                    limit: (int)$this->request_data["limit"],
-                    offset: (int)$this->request_data["offset"],
+                    limit: $this->request_data["limit"],
+                    offset: $this->request_data["offset"],
                 );
                 $links = $this->get_pagination_resource_links(
-                    limit: (int)$this->request_data["limit"],
-                    offset: (int)$this->request_data["offset"]
+                    limit: $this->request_data["limit"],
+                    offset: $this->request_data["offset"]
                 );
             }
             # For POST requests on non-many Endpoints, create a single object for the assigned Model

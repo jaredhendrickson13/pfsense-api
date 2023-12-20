@@ -1186,16 +1186,16 @@ class Model {
         $linkset = new ResourceLinkSet();
         $endpoint = $this->get_related_endpoint(many: false);
         
-        # Always include this Model object as 'self'
-        $linkset->resource_links[] = $this->get_related_link($this, "self", use_namespace: false);
-
-        # Add a 'delete' link if this Model supports deletions
+        # Add a 'self' link if this Model supports single reads
+        if (in_array("GET", $endpoint->request_method_options)) {
+            $linkset->resource_links[] = $this->get_related_link($this, "self", use_namespace: false);
+        }
+        # Add a 'delete' link if this Model supports updates
         if (in_array("PATCH", $endpoint->request_method_options)) {
             $linkset->resource_links[] = $this->get_related_link(
                 $this, rel: "update", method: "PATCH", use_namespace: false
             );
         }
-
         # Add a 'delete' link if this Model supports deletions
         if (in_array("DELETE", $endpoint->request_method_options)) {
             $linkset->resource_links[] = $this->get_related_link(

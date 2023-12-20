@@ -927,7 +927,7 @@ class NetworkInterface extends Model
      * interfaces are created if immediate application is requested.
      */
     public function apply_create() : void {
-        (new NetworkInterfaceApply())->apply();
+        (new InterfaceApply())->apply();
     }
 
     /**
@@ -943,7 +943,7 @@ class NetworkInterface extends Model
      * interfaces are updated if immediate application is requested.
      */
     public function apply_update() : void {
-        (new NetworkInterfaceApply())->apply();
+        (new InterfaceApply())->apply();
     }
 
     /**

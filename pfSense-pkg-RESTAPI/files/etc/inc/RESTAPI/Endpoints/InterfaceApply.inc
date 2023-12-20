@@ -6,12 +6,12 @@ require_once("RESTAPI/autoloader.inc");
 
 use RESTAPI\Core\Endpoint;
 
-class NetworkInterfaceApply extends Endpoint
+class InterfaceApply extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
         $this->url = "/api/v2/interface/apply";
-        $this->model_name = "NetworkInterfaceApply";
+        $this->model_name = "InterfaceApply";
         $this->request_method_options = ["GET", "POST"];
         $this->get_help_text = "Read pending interfaces status.";
         $this->post_help_text = "Apply pending interface changes.";

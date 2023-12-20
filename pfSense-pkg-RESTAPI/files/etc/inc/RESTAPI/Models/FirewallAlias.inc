@@ -25,6 +25,7 @@ class FirewallAlias extends Model {
         $this->config_path = "aliases/alias";
         $this->subsystem = "aliases";
         $this->many = true;
+        
         # TODO: Set `referenced_by` for this field once Model dependents like firewall rules are developed
         $this->name = new StringField(
             required: true,

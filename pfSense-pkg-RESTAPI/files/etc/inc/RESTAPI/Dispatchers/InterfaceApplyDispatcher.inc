@@ -1,77 +1,19 @@
 <?php
 
-namespace RESTAPI\Models;
+namespace RESTAPI\Dispatchers;
 
-require_once("RESTAPI/autoloader.inc");
+use RESTAPI\Core\Dispatcher;
 
-use RESTAPI;
-use RESTAPI\Core\Auth;
-use RESTAPI\Core\Model;
-use RESTAPI\Fields\BooleanField;
-use RESTAPI\Fields\InterfaceField;
-
-/**
- * A Model object that gathers details on pending interface changes as well as tools to apply pending interface changes.
- */
-class NetworkInterfaceApply extends Model
+class InterfaceApplyDispatcher extends Dispatcher
 {
-    public BooleanField $applied;
-    public InterfaceField $pending_interfaces;
-
-    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
-    {
-        # Set model attributes
-        $this->internal_callable = "get_applied_status";
-        $this->always_apply = true;
-
-        # Set model Fields
-        $this->applied = new BooleanField(
-            read_only: true,
-            indicates_true: true,
-            indicates_false: false,
-            help_text: "Displays `true` when all interfaces are applied and there are no pending changes left.".
-                "Displays `false` when there are pending interface changes that have not been applied."
-        );
-        $this->pending_interfaces = new InterfaceField(
-            read_only: true,
-            many: true,
-            help_text: "Displays a list of interfaces that have pending changes waiting to be applied."
-        );
-
-
-        parent::__construct(id: $id, data: $data, client: $client);
-    }
+    # Do not limit the number concurrent filter reloads that can run
+    public int $max_concurrency = 1;
 
     /**
-     * The internal callable used to populate the internal values for this Model's Fields. Gathers info on pending
-     * interface changes.
-     * @return array An array of internal values for Field objects in this Model
+     * Applies pending interface changes.
      */
-    public function get_applied_status() : array {
-        global $g;
-
-        # Check if there are pending interface changes
-        $applied = !is_file($g['tmp_path']."/.interfaces.apply");
-        $pending_interfaces = [];
-
-        # Populate pending interfaces if there are pending changes
-        if (!$applied) {
-            # Unserialize the file to determine which interfaces need to be applied
-            $interfaces = unserialize(file_get_contents("{$g['tmp_path']}/.interfaces.apply"));
-            $pending_interfaces = array_keys($interfaces);
-        }
-
-        return [
-            "applied" => $applied,
-            "pending_interfaces" => implode(",", $pending_interfaces)
-        ];
-    }
-
-    public function _create() {
-        # Override this method but don't do anything. We only want to apply the changes.
-    }
-
-    public function apply() {
+    public static function process(...$arguments)
+    {
         # Local variables
         global $g;
         unlink_if_exists("{$g['tmp_path']}/config.cache");
@@ -106,7 +48,7 @@ class NetworkInterfaceApply extends Model
 
                 restart_interface_services($id, $new_interface['ipaddrv6']);
                 $new_interface["mtu"] = config_get_path("interfaces/{$id}/mtu");
-                
+
                 # Check if VLANs need to be redone
                 if (interface_has_clones($real_interface) &&
                     ($new_interface["mtu"] && ($new_interface["mtu"] != $real_interface_mtu)) ||
