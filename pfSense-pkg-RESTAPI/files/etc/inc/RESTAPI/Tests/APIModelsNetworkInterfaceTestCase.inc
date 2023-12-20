@@ -169,7 +169,8 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
                 "mtu" => 1450,
                 "typev4" => "none",
                 "typev6" => "none"
-            ]
+            ],
+            async: false
         );
         $parent_if->create(apply: true);
 
@@ -186,7 +187,8 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
                         "mtu" => 1500,
                         "typev4" => "none",
                         "typev6" => "none"
-                    ]
+                    ],
+                    async: false
                 );
                 $vlan_if->validate();
             }
@@ -711,7 +713,8 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
                 "typev6" => "staticv6",
                 "ipaddrv6" => "1234::1",
                 "subnetv6" => 64
-            ]
+            ],
+            async: false
         );
         $test_model->validate();
 
@@ -797,7 +800,8 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
                 "typev6" => "staticv6",
                 "ipaddrv6" => "1234::1",
                 "subnetv6" => 64
-            ]
+            ],
+            async: false
         );
         $static_if->create(apply: true);
 
