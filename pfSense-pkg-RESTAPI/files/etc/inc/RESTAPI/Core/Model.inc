@@ -740,9 +740,10 @@ class Model {
     /**
      * Creates a serializable array representation of this object. This array is suitable for content
      * serialization such as JSON, YAML, etc.
+     * @param bool $include_links Set to true to include HATEOAS links in the representation.
      * @return array The serializable array representation of this object.
      */
-    final public function to_representation() : array {
+    final public function to_representation(bool $include_links = false) : array {
         # Variables
         $representation = [];
 
@@ -764,7 +765,7 @@ class Model {
             }
         }
         
-        # Append any related HATEOAS links
+        # Append any related HATEOAS links if enabled
         $representation += $this->get_related_links()->to_representation();
 
         return $representation;
@@ -1150,9 +1151,19 @@ class Model {
         string $method = "GET",
         bool $use_namespace = true
     ) : ResourceLink {
-        # Get the base endpoint URL
-        $endpoint_url = $model->get_related_endpoint(many: false)->url;
-        $related_url = ($model->many and in_array($method, ["GET", "DELETE"])) ? $endpoint_url."?id=".$model->id : $endpoint_url;
+        # Get the endpoint associated with this object
+        $related_url = $model->get_related_endpoint(many: false)->url;
+
+        # Determine the URL with associated query for this link if it is a GET or DELETE method link
+        if ($model->many and in_array($method, ["GET", "DELETE"])) {
+            # Add the parent ID to the URL if present
+            if (isset($model->parent_id)) {
+                $related_url .= "?parent_id=$model->parent_id&id=".$model->id;
+            }
+            else {
+                $related_url .= "?id=".$model->id;
+            }
+        }
 
         # Generate a verbose title that makes sense given the context of this model
         $title = ($model->many) ? "$model->verbose_name: $model->id" : $model->verbose_name;
@@ -1162,6 +1173,7 @@ class Model {
             method: $method,
             use_namespace: $use_namespace,
             id: $model->id,
+            parent_id: $model->parent_id,
             title: $title
         );
     }

@@ -225,7 +225,9 @@ class NestedModelField extends Field
             foreach ($internal_value as $id => $internal_data) {
                 $object = new $this->model_class();
                 $object->from_internal_object($internal_data);
-                $representation = ["id" => $id] + $object->to_representation();
+                $object->id = $id;
+                $object->parent_id = $this->context->id;
+                $representation = $object->to_representation();
                 $representations[] = $representation;
             }
             $this->value = $representations;
