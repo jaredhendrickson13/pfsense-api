@@ -5,6 +5,8 @@ namespace RESTAPI\Tests;
 require_once("RESTAPI/autoloader.inc");
 
 use RESTAPI;
+use RESTAPI\Core\ModelSet;
+use RESTAPI\Models\FirewallAlias;
 
 /**
  * Defines test case for testing RESTAPI\Core\ModelSet.
@@ -18,7 +20,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_SET_CONTAINS_NON_MODEL",
             code: 500,
             callable: function () {
-                new RESTAPI\Core\ModelSet(model_objects: ["Not a Model!"]);
+                new ModelSet(model_objects: ["Not a Model!"]);
             }
         );
     }
@@ -28,12 +30,12 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
      * contained Model objects.
      */
     public function test_modelset_to_representation() {
-        # Create Models to add to the test ModelSet
-        $test_model1 = new RESTAPI\Models\Test(data: ["test_bool" => false, "test_integer" => 10]);
-        $test_model2 = new RESTAPI\Models\Test(data: ["test_bool" => true, "test_integer" => 15]);
+        # Use the FirewallAlias model to test with
+        $test_model1 = new FirewallAlias(data: ["name" => "test_model1", "type" => "port", "address" => [80]]);
+        $test_model2 = new FirewallAlias(data: ["name" => "test_model2", "type" => "host", "address" => ["example.com"]]);
 
         # Create a ModelSet using the previously created Models
-        $test_modelset = new RESTAPI\Core\ModelSet(model_objects: [$test_model1, $test_model2]);
+        $test_modelset = new ModelSet(model_objects: [$test_model1, $test_model2]);
 
         # Ensure the representation of the ModelSet contains the representations of both objects
         $this->assert_is_true($test_modelset->to_representation()[0] === $test_model1->to_representation());
@@ -49,7 +51,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
         $test_model2 = new RESTAPI\Models\Test(data: ["test_bool" => false]);
 
         # Add the Models to a ModelSet
-        $test_modelset = new RESTAPI\Core\ModelSet(model_objects: [$test_model1, $test_model2]);
+        $test_modelset = new ModelSet(model_objects: [$test_model1, $test_model2]);
         $queried_modelset = $test_modelset->query(["test_bool__exact" => true]);
 
         # Ensure the query only returned Models with `test_bool` set to `true`.
@@ -75,7 +77,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
         $test_model2 = new RESTAPI\Models\Test(data: ["test_bool" => false]);
 
         # Add the Models to a ModelSet
-        $test_modelset = new RESTAPI\Core\ModelSet(model_objects: [$test_model1, $test_model2]);
+        $test_modelset = new ModelSet(model_objects: [$test_model1, $test_model2]);
         $queried_modelset = $test_modelset->query(["test_bool__except" => true]);
 
         # Ensure the query only returned Models with `test_bool` not set to true
@@ -96,7 +98,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
         $test_model3 = new RESTAPI\Models\Test(data: ["test_string_unique" => "Don't find me!"]);
 
         # Add the Models to a ModelSet and query for Models with `test_string_unique` values starting with 'Find'
-        $test_modelset = new RESTAPI\Core\ModelSet(model_objects: [$test_model1, $test_model2, $test_model3]);
+        $test_modelset = new ModelSet(model_objects: [$test_model1, $test_model2, $test_model3]);
         $queried_modelset = $test_modelset->query(["test_string_unique__startswith" => "Find"]);
 
         # Ensure the query only returned Models with `test_string_unique` values starting with 'Find'.
@@ -117,7 +119,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
         $test_model3 = new RESTAPI\Models\Test(data: ["test_string_unique" => "I match!"]);
 
         # Add the Models to a ModelSet and query for Models with `test_string_unique` values ending with 'match!'
-        $test_modelset = new RESTAPI\Core\ModelSet(model_objects: [$test_model1, $test_model2, $test_model3]);
+        $test_modelset = new ModelSet(model_objects: [$test_model1, $test_model2, $test_model3]);
         $queried_modelset = $test_modelset->query(["test_string_unique__endswith" => "match!"]);
 
         # Ensure the query only returned Models with `test_string_unique` values ending with 'match!'.
@@ -138,7 +140,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
         $test_model3 = new RESTAPI\Models\Test(data: ["test_string_unique" => "I don't!"]);
 
         # Add the Models to a ModelSet and query for Models with `test_string_unique` values containing  'match'
-        $test_modelset = new RESTAPI\Core\ModelSet(model_objects: [$test_model1, $test_model2, $test_model3]);
+        $test_modelset = new ModelSet(model_objects: [$test_model1, $test_model2, $test_model3]);
         $queried_modelset = $test_modelset->query(["test_string_unique__contains" => "match"]);
 
         # Ensure the query only returned Models with `test_string_unique` values containing 'match'.
@@ -159,7 +161,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
         $test_model3 = new RESTAPI\Models\Test(data: ["test_integer" => 20]);
 
         # Add the Models to a ModelSet and query for Models with `test_integer` values less than 30
-        $test_modelset = new RESTAPI\Core\ModelSet(model_objects: [$test_model1, $test_model2, $test_model3]);
+        $test_modelset = new ModelSet(model_objects: [$test_model1, $test_model2, $test_model3]);
         $queried_modelset = $test_modelset->query(["test_integer__lt" => 30]);
 
         # Ensure the query only returned Models with `test_integer` values less than 30
@@ -181,7 +183,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
         $test_model4 = new RESTAPI\Models\Test(data: ["test_integer" => 30]);
 
         # Add the Models to a ModelSet and query for Models with `test_integer` values less than or equal to 30
-        $test_modelset = new RESTAPI\Core\ModelSet(model_objects: [$test_model1, $test_model2, $test_model3, $test_model4]);
+        $test_modelset = new ModelSet(model_objects: [$test_model1, $test_model2, $test_model3, $test_model4]);
         $queried_modelset = $test_modelset->query(["test_integer__lte" => 30]);
 
         # Ensure the query only returned Models with `test_integer` values less than or equal to 30
@@ -202,7 +204,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
         $test_model3 = new RESTAPI\Models\Test(data: ["test_integer" => 20]);
 
         # Add the Models to a ModelSet and query for Models with `test_integer` values greater than 10
-        $test_modelset = new RESTAPI\Core\ModelSet(model_objects: [$test_model1, $test_model2, $test_model3]);
+        $test_modelset = new ModelSet(model_objects: [$test_model1, $test_model2, $test_model3]);
         $queried_modelset = $test_modelset->query(["test_integer__gt" => 10]);
 
         # Ensure the query only returned Models with `test_integer` values greater than 30
@@ -224,7 +226,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
         $test_model4 = new RESTAPI\Models\Test(data: ["test_integer" => 30]);
 
         # Add the Models to a ModelSet and query for Models with `test_integer` values greater than or equal to 10
-        $test_modelset = new RESTAPI\Core\ModelSet(model_objects: [$test_model1, $test_model2, $test_model3, $test_model4]);
+        $test_modelset = new ModelSet(model_objects: [$test_model1, $test_model2, $test_model3, $test_model4]);
         $queried_modelset = $test_modelset->query(["test_integer__gte" => 10]);
 
         # Ensure the query only returned Models with `test_integer` values greater than or equal to 10
@@ -241,13 +243,13 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
      */
     public function test_query_has() {
         # Create firewall alias objects to test with
-        $alias_a = new RESTAPI\Models\FirewallAlias(data: ["name" => "alias_a", "type" => "host", "address" => ["a.co"]]);
-        $alias_b = new RESTAPI\Models\FirewallAlias(data: ["name" => "alias_b", "type" => "host", "address" => ["b.co"]]);
+        $alias_a = new FirewallAlias(data: ["name" => "alias_a", "type" => "host", "address" => ["a.co"]]);
+        $alias_b = new FirewallAlias(data: ["name" => "alias_b", "type" => "host", "address" => ["b.co"]]);
         $alias_a->create();
         $alias_b->create();
 
         # Add the aliases to a ModelSet
-        $modelset = new RESTAPI\Core\ModelSet(model_objects: [$alias_a, $alias_b]);
+        $modelset = new ModelSet(model_objects: [$alias_a, $alias_b]);
 
         # Ensure the `has` query correctly identifies the targetted object(s)
         $this->assert_equals(
@@ -271,11 +273,11 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
         $test_model = new RESTAPI\Models\Test();
 
         # Ensure exists() returns true when at least one Model is assigned
-        $test_modelset = new RESTAPI\Core\ModelSet(model_objects: [$test_model]);
+        $test_modelset = new ModelSet(model_objects: [$test_model]);
         $this->assert_is_true($test_modelset->exists());
 
         # Ensure exists() returns false when no Models are assigned
-        $test_modelset = new RESTAPI\Core\ModelSet(model_objects: []);
+        $test_modelset = new ModelSet(model_objects: []);
         $this->assert_is_false($test_modelset->exists());
     }
 
@@ -287,7 +289,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
         $test_model2 = new RESTAPI\Models\Test();
 
         # Ensure first() returns the first object when at least one Model is assigned
-        $test_modelset = new RESTAPI\Core\ModelSet(model_objects: [$test_model1, $test_model2]);
+        $test_modelset = new ModelSet(model_objects: [$test_model1, $test_model2]);
         $this->assert_equals($test_modelset->first(), $test_model1);
 
         # Ensure an error is thrown if first() is called without any model objects assigned
@@ -295,7 +297,7 @@ class APICoreModelSetTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODELSET_FIRST_REQUESTED_WITH_NO_MODEL_OBJECTS",
             code: 500,
             callable: function () {
-                $test_modelset = new RESTAPI\Core\ModelSet(model_objects: []);
+                $test_modelset = new ModelSet(model_objects: []);
                 $test_modelset->first();
             }
         );
