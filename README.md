@@ -289,11 +289,11 @@ Provides a link to the previous set of data when [pagination](#pagination) is us
 
 Provides a link to read an object's own self.
 
-### update
+#### update
 
 Provides a link that can be used to update an object.
 
-### delete
+#### delete
 
 Provides a link that can be used to delete an object.
 
