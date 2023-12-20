@@ -15,9 +15,7 @@ jobs:
       matrix:
         include:
           - freebsd_version: FreeBSD-14.0-CURRENT
-            pfsense_version: 2.7
-          - freebsd_version: FreeBSD-14.0-CURRENT
-            pfsense_version: 23.05
+            pfsense_version: 2.7.2
         
     steps:
       - uses: actions/checkout@v3
@@ -31,7 +29,7 @@ jobs:
       - name: Build pfSense-pkg-RESTAPI on FreeBSD
         run: |
           /usr/bin/ssh -o StrictHostKeyChecking=no ${{ matrix.freebsd_version }}.jaredhendrickson.com 'sudo pkill ntpd || true && sudo ntpdate pool.ntp.org || true'
-          /usr/local/bin/python3 tools/make_package.py --host ${{ matrix.freebsd_version }}.jaredhendrickson.com --branch ${{ github.sha }} --tag ${{ github.ref_name }} --filename pfSense-${{ matrix.pfsense_version }}-pkg-API.pkg
+          /usr/local/bin/python3 tools/make_package.py --host ${{ matrix.freebsd_version }}.jaredhendrickson.com --branch ${{ github.sha }} --tag ${{ github.ref_name }} --filename pfSense-${{ matrix.pfsense_version }}-pkg-RESTAPI.pkg
 
       - name: Teardown FreeBSD build VM
         if: "${{ always() }}"
@@ -42,4 +40,4 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: pfSense-${{ matrix.pfsense_version }}-pkg-API.pkg
+          files: pfSense-${{ matrix.pfsense_version }}-pkg-RESTAPI.pkg
