@@ -29,34 +29,36 @@ guaranteed.
 
 ## Installation
 
-Install pfSense-pkg-API:
+Install pfSense-pkg-RESTAPI:
 
 ```bash
 pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-api/releases/latest/download/pfSense-2.7-pkg-API.pkg
 ```
 
-Uninstall pfSense-pkg-API:
+Uninstall pfSense-pkg-RESTAPI:
 
 ```bash
 pfsense-restapi delete
 ```
 
-Update pfSense-pkg-API to the latest stable version:
+Update pfSense-pkg-RESTAPI to the latest stable version:
 
 ```bash
 pfsense-restapi update
 ```
 
-Revert to a previous version of pfSense-pkg-API (e.g., v1.1.7):
+Revert to a previous version of pfSense-pkg-RESTAPI (e.g., v1.1.7):
 
 ```bash
 pfsense-restapi revert v1.1.7
 ```
 
 > [!NOTE]
-> - You may need to customize the installation command to reference the package built for your pfSense version. Check
+> You may need to customize the installation command to reference the package built for your pfSense version. Check
 > the [releases page](https://github.com/jaredhendrickson13/pfsense-api/releases) for available versions.
-> - After updating pfSense, **you must reinstall this package** as pfSense removes non-official packages during updates.
+
+> [!IMPORTANT]
+> After updating pfSense, **you must reinstall this package** as pfSense removes unofficial packages during updates.
 
 ## webConfigurator Settings & Documentation
 
@@ -171,7 +173,7 @@ is `application/json`, but other supported types include:
 
 ## Queries
 
-pfSense-pkg-API includes an advanced query engine for specific data retrieval from API calls. For `GET` requests, users
+pfSense-pkg-RESTAPI includes an advanced query engine for specific data retrieval from API calls. For `GET` requests, users
 can query the return data to retrieve desired information. Add query parameters to the payload to match criteria or use
 query filters for more complex queries. Query filters may be specified after the field name separated by a
 double-underscore.
