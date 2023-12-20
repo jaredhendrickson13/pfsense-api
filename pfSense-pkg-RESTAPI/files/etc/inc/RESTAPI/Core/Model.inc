@@ -740,10 +740,9 @@ class Model {
     /**
      * Creates a serializable array representation of this object. This array is suitable for content
      * serialization such as JSON, YAML, etc.
-     * @param bool $include_links Set to true to include HATEOAS links in the representation.
      * @return array The serializable array representation of this object.
      */
-    final public function to_representation(bool $include_links = false) : array {
+    final public function to_representation() : array {
         # Variables
         $representation = [];
 
