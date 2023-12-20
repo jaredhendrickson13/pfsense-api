@@ -8,6 +8,7 @@ use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\LengthValidator;
 use function RESTAPI\Core\Tools\is_assoc_array;
+use const RESTAPI\Core\Globals\RESERVED_FIELD_NAMES;
 
 /**
  * Defines Model Fields and their attributes. Field's define how value should be obtained on pfSense internally, and
@@ -250,6 +251,14 @@ class Field
      * @param string $name The name to assign this Field.
      */
     public function set_names(string $name) {
+        # Throw an error if this Field name is reserved
+        if (in_array($name, RESERVED_FIELD_NAMES)) {
+            throw new ServerError(
+                message: "Field cannot be assigned name `$name` because it is reserved by the system.",
+                response_id: "FIELD_CANNOT_USE_RESERVED_NAME"
+            );
+        }
+        
         # Assign the `name` property using the provided name
         $this->name = $name;
 

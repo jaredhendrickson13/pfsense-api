@@ -3,6 +3,7 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI;
+use RESTAPI\Core\Field;
 
 /**
  * Defines test case for testing RESTAPI\Core\Field.
@@ -17,7 +18,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "FIELD_CANNOT_BE_REQUIRED_WITH_DEFAULT",
             code: 500,
             callable: function () {
-                $test_field = new RESTAPI\Core\Field(required: true, default: "");
+                $test_field = new Field(required: true, default: "");
             }
         );
     }
@@ -30,7 +31,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "FIELD_CANNOT_BE_REQUIRED_WITH_READ_ONLY",
             code: 500,
             callable: function () {
-                $test_field = new RESTAPI\Core\Field(required: true, read_only: true);
+                $test_field = new Field(required: true, read_only: true);
             }
         );
     }
@@ -43,7 +44,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "FIELD_CANNOT_BE_REQUIRED_WITH_ALLOW_NULL",
             code: 500,
             callable: function () {
-                $test_field = new RESTAPI\Core\Field(allow_null: true, required: true);
+                $test_field = new Field(allow_null: true, required: true);
             }
         );
     }
@@ -56,7 +57,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "FIELD_WITH_READ_ONLY_AND_WRITE_ONLY",
             code: 500,
             callable: function () {
-                new RESTAPI\Core\Field(read_only: true, write_only: true);
+                new Field(read_only: true, write_only: true);
             }
         );
     }
@@ -69,7 +70,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "FIELD_MANY_MINIMUM_GREATER_THAN_MANY_MAXIMUM",
             code: 500,
             callable: function () {
-                new RESTAPI\Core\Field(many_minimum: 5, many_maximum: 4);
+                new Field(many_minimum: 5, many_maximum: 4);
             }
         );
     }
@@ -94,7 +95,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
         $internal_name = "test_name";
 
         # Create a Field object and ensure all values were properly set during construction
-        $test_field = new RESTAPI\Core\Field(
+        $test_field = new Field(
             type: $type,
             required: $required,
             unique: $unique,
@@ -135,7 +136,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "FIELD_UNIQUE_WITH_NO_CONTEXT",
             code: 500,
             callable: function () {
-                $test_field = new RESTAPI\Core\Field(unique: true);
+                $test_field = new Field(unique: true);
                 $test_field->validate();
             }
         );
@@ -150,7 +151,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "FIELD_UNNAMED",
             code: 500,
             callable: function () {
-                $test_field = new RESTAPI\Core\Field(required: true);
+                $test_field = new Field(required: true);
                 $test_field->validate();
             }
         );
@@ -165,7 +166,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "FIELD_NAME_WITH_DOUBLE_UNDERSCORE_NOT_ALLOWED",
             code: 500,
             callable: function () {
-                $test_field = new RESTAPI\Core\Field(required: true);
+                $test_field = new Field(required: true);
                 $test_field->name = "name__with__double__underscores";
                 $test_field->validate();
             }
@@ -181,7 +182,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "FIELD_IS_REQUIRED",
             code: 400,
             callable: function () {
-                $test_field = new RESTAPI\Core\Field(required: true);
+                $test_field = new Field(required: true);
                 $test_field->name = "test_field";
                 $test_field->validate();
             }
@@ -197,7 +198,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "FIELD_NEEDS_DEFAULT",
             code: 500,
             callable: function () {
-                $test_field = new RESTAPI\Core\Field(required: false);
+                $test_field = new Field(required: false);
                 $test_field->name = "test_field";
                 $test_field->validate();
             }
@@ -212,7 +213,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "FIELD_NO_CHOICES_WITH_READ_ONLY",
             code: 500,
             callable: function () {
-                $test_field = new RESTAPI\Core\Field(type: "string", choices: ["test"], read_only: true);
+                $test_field = new Field(type: "string", choices: ["test"], read_only: true);
                 $test_field->name = "test_field";
                 $test_field->validate();
             }
@@ -232,7 +233,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
                 $test_model->config_path = null;
 
                 # Create a field to test with and ensure the test model is assigned as its parent context
-                $test_field = new RESTAPI\Core\Field(type: "string", required: true, unique: true);
+                $test_field = new Field(type: "string", required: true, unique: true);
                 $test_field->name = "test_field";
                 $test_field->value = "test_value";
                 $test_field->context = $test_model;
@@ -253,7 +254,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
                 $test_model = new RESTAPI\Models\Test();
 
                 # Create a field to test with and ensure the test model is assigned as its parent context
-                $test_field = new RESTAPI\Core\Field(type: "string", required: true, many: true, many_minimum: 1);
+                $test_field = new Field(type: "string", required: true, many: true, many_minimum: 1);
                 $test_field->name = "test_field";
                 $test_field->value = [];
                 $test_field->context = $test_model;
@@ -274,7 +275,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
                 $test_model = new RESTAPI\Models\Test();
 
                 # Create a field to test with and ensure the test model is assigned as its parent context
-                $test_field = new RESTAPI\Core\Field(type: "string", required: true, many: true, many_maximum: 3);
+                $test_field = new Field(type: "string", required: true, many: true, many_maximum: 3);
                 $test_field->name = "test_field";
                 $test_field->value = ["too", "many", "values", "!"];
                 $test_field->context = $test_model;
@@ -288,7 +289,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
      */
     public function test_field_many_minimum_set_according_to_allow_empty() {
         # Ensure that the `many_minimum` value is automatically changed to 0 when `allow_empty` is enabled
-        $test_field = new RESTAPI\Core\Field(type: "string", required: true, allow_empty: true, many: true, many_minimum: 3);
+        $test_field = new Field(type: "string", required: true, allow_empty: true, many: true, many_minimum: 3);
         $this->assert_equals($test_field->many_minimum, 0);
     }
 
@@ -305,7 +306,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
                 $test_model->many = false;
 
                 # Create a field to test with and ensure the test model is assigned as its parent context
-                $test_field = new RESTAPI\Core\Field(type: "string", required: true, unique: true);
+                $test_field = new Field(type: "string", required: true, unique: true);
                 $test_field->name = "test_field";
                 $test_field->value = "test_value";
                 $test_field->context = $test_model;
@@ -379,7 +380,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "FIELD_INVALID_TYPE",
             code: 400,
             callable: function () {
-                $test_field = new RESTAPI\Core\Field(type: "string", required: true);
+                $test_field = new Field(type: "string", required: true);
                 $test_field->name = "test_field";
                 $test_field->value = 1;
                 $test_field->validate();
@@ -396,7 +397,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "FIELD_EMPTY_NOT_ALLOWED",
             code: 400,
             callable: function () {
-                $test_field = new RESTAPI\Core\Field(type: "string", required: true);
+                $test_field = new Field(type: "string", required: true);
                 $test_field->name = "test_field";
                 $test_field->value = "";
                 $test_field->validate();
@@ -408,7 +409,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "FIELD_EMPTY_NOT_ALLOWED",
             code: 400,
             callable: function () {
-                $test_field = new RESTAPI\Core\Field(type: "string", required: true, many: true, many_minimum: 0);
+                $test_field = new Field(type: "string", required: true, many: true, many_minimum: 0);
                 $test_field->name = "test_field";
                 $test_field->value = [];
                 $test_field->validate();
@@ -420,7 +421,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
      * Check that null values are allowed if `allow_null` is set.
      */
     public function test_allow_null_values_with_allow_null() {
-        $test_field = new RESTAPI\Core\Field(type: "string", required: false, allow_null: true);
+        $test_field = new Field(type: "string", required: false, allow_null: true);
         $test_field->name = "test_field";
         $test_field->value = null;
         $test_field->validate();
@@ -435,7 +436,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT",
             code: 400,
             callable: function () {
-                $test_field = new RESTAPI\Core\Field(
+                $test_field = new Field(
                     type: "string",
                     required: true,
                     validators: [
@@ -453,7 +454,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "LENGTH_VALIDATOR_MAXIMUM_CONSTRAINT",
             code: 400,
             callable: function () {
-                $test_field = new RESTAPI\Core\Field(
+                $test_field = new Field(
                     type: "string",
                     required: true,
                     many: true,
@@ -474,13 +475,13 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
      */
     public function test_default_to_internal_conversion() {
         # Check for single values
-        $test_field = new RESTAPI\Core\Field(type: "integer", required: true);
+        $test_field = new Field(type: "integer", required: true);
         $test_field->name = "test_field";
         $test_field->value = 0;
         $this->assert_equals($test_field->to_internal(), "0");
 
         # Check for many values
-        $test_field = new RESTAPI\Core\Field(type: "integer", required: true, many: true, delimiter: " ");
+        $test_field = new Field(type: "integer", required: true, many: true, delimiter: " ");
         $test_field->name = "test_field";
         $test_field->value = [0, 1, 2, 3, 4, 5];
 
@@ -501,7 +502,7 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
             response_id: "FIELD_CANNOT_REPRESENT_INTERNAL_VALUE",
             code: 500,
             callable: function () {
-                $test_field = new RESTAPI\Core\Field(type: "integer", required: true);
+                $test_field = new Field(type: "integer", required: true);
                 $test_field->name = "test_field";
                 $test_field->from_internal("test");
             }
@@ -513,32 +514,32 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
      */
     public function test_field_to_openapi_property() {
         # Ensure the `help_text` value is added as the OpenAPI property's `description`
-        $test_field = new RESTAPI\Core\Field(type: "string", help_text: "test");
+        $test_field = new Field(type: "string", help_text: "test");
         $this->assert_is_true(
             $test_field->to_openapi_property()["description"] === "test<br>".$test_field->get_conditions_text());
 
         # Ensure the `allow_null` value is added as the OpenAPI property's `nullable`
-        $test_field = new RESTAPI\Core\Field(type: "string", allow_null: true);
+        $test_field = new Field(type: "string", allow_null: true);
         $this->assert_is_true($test_field->to_openapi_property()["nullable"] === true);
 
         # Ensure the `read_only` value is added as the OpenAPI property's `readOnly`
-        $test_field = new RESTAPI\Core\Field(type: "string", read_only: true);
+        $test_field = new Field(type: "string", read_only: true);
         $this->assert_is_true($test_field->to_openapi_property()["readOnly"] === true);
 
         # Ensure the `write_only` value is added as the OpenAPI property's `writeOnly`
-        $test_field = new RESTAPI\Core\Field(type: "string", write_only: true);
+        $test_field = new Field(type: "string", write_only: true);
         $this->assert_is_true($test_field->to_openapi_property()["writeOnly"] === true);
 
         # Ensure the `default` isn't present in the OpenAPI property if no default is assigned
-        $test_field = new RESTAPI\Core\Field(type: "string");
+        $test_field = new Field(type: "string");
         $this->assert_is_false(array_key_exists("default", $test_field->to_openapi_property()));
 
         # Ensure the `default` value is added as the OpenAPI property's `default`
-        $test_field = new RESTAPI\Core\Field(type: "string", default: "test");
+        $test_field = new Field(type: "string", default: "test");
         $this->assert_is_true($test_field->to_openapi_property()["default"] === "test");
 
         # Ensure `many` Fields represent the Field as an array of items in the OpenAPI property
-        $test_field = new RESTAPI\Core\Field(
+        $test_field = new Field(
             type: "string", choices: ["a","b"], many: true, many_minimum: 5, many_maximum: 14
         );
         $this->assert_is_true($test_field->to_openapi_property()["type"] === "array");
@@ -548,8 +549,23 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
         $this->assert_is_true($test_field->to_openapi_property()["items"]["enum"] === ["a", "b"]);
 
         # Ensure the `type` value is added as the OpenAPI property's `type`
-        $test_field = new RESTAPI\Core\Field(type: "string", choices: ["a", "b"]);
+        $test_field = new Field(type: "string", choices: ["a", "b"]);
         $this->assert_is_true($test_field->to_openapi_property()["type"] === "string");
         $this->assert_is_true($test_field->to_openapi_property()["enum"] === ["a", "b"]);
+    }
+    
+    /**
+     * Checks that reserved names cannot be assigned to Field objects.
+     */
+    public function test_field_cannot_use_reserved_name() {
+        
+        $this->assert_throws_response(
+            response_id: "FIELD_CANNOT_USE_RESERVED_NAME",
+            code: 500,
+            callable: function () {
+                $field = new Field();
+                $field->set_names("_links");
+            }
+        );
     }
 }
