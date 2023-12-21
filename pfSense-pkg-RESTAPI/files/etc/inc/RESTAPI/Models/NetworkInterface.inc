@@ -4,6 +4,7 @@ namespace RESTAPI\Models;
 
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\InterfaceApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
@@ -927,7 +928,7 @@ class NetworkInterface extends Model
      * interfaces are created if immediate application is requested.
      */
     public function apply_create() : void {
-        (new InterfaceApply())->apply();
+        (new InterfaceApplyDispatcher(async: $this->async))->spawn_process();
     }
 
     /**
@@ -943,7 +944,7 @@ class NetworkInterface extends Model
      * interfaces are updated if immediate application is requested.
      */
     public function apply_update() : void {
-        (new InterfaceApply())->apply();
+        (new InterfaceApplyDispatcher(async: $this->async))->spawn_process();
     }
 
     /**
