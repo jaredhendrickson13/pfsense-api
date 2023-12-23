@@ -6,6 +6,7 @@ use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\Base64Field;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Responses\ForbiddenError;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\RegexValidator;
 use RESTAPI\Validators\X509Validator;
@@ -50,6 +51,7 @@ class Certificate extends Model
         );
         $this->prv = new Base64Field(
             required: true,
+            write_only: true,
             validators: [new X509Validator(allow_prv: true, allow_ecprv: true)],
             help_text: "The X509 private key string."
         );
@@ -73,5 +75,22 @@ class Certificate extends Model
         }
 
         return $prv;
+    }
+
+    /**
+     * Deletes this Certificate object from configuration.
+     * @throws ForbiddenError When the Certificate cannot be deleted because it is in use.
+     */
+    public function _delete(): void
+    {
+        # Do not allow this Certificate to be deleted if it is in use
+        if (cert_in_use($this->refid->value)){
+            throw new ForbiddenError(
+                message: "Certificate cannot be deleted because it is in use by one or more services.",
+                response_id: "CERTIFICATE_CANNOT_BE_DELETED_WHILE_IN_USE"
+            );
+        }
+
+        parent::_delete();
     }
 }

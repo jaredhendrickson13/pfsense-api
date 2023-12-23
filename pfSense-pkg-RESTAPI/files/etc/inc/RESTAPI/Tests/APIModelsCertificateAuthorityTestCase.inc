@@ -2,10 +2,11 @@
 
 namespace RESTAPI\Tests;
 
+use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
-use RESTAPI\Models\Certificate;
+use RESTAPI\Models\CertificateAuthority;
 
-class APIModelsCertificateTestCase extends TestCase
+class APIModelsCertificateAuthorityTestCase extends TestCase
 {
     const EXAMPLE_CRT = "-----BEGIN CERTIFICATE-----
 MIIDnzCCAoegAwIBAgIUd9R9uoNKE2GoxgJPwzRn67WV4bgwDQYJKoZIhvcNAQEL
@@ -64,16 +65,15 @@ R02Pul8ulWQ8Kl3Q3pou8As7W1mMzA2DxQ==
 -----END EC PRIVATE KEY-----";
 
     /**
-     * Checks that a Certificate cannot be have `crt` and `prv` values that are not a matching key pair.
+     * Checks that a CertificateAuthority cannot have `crt` and `prv` values that are not a matching key pair.
      */
     public function test_crt_and_prv_are_matching_keypair() {
         $this->assert_throws_response(
-            response_id: "CERTIFICATE_CRT_AND_PRV_NOT_KEYPAIR",
+            response_id: "CERTIFICATE_AUTHORITY_CRT_AND_PRV_NOT_KEYPAIR",
             code: 400,
             callable: function () {
-                $cert = new Certificate(data: [
+                $cert = new CertificateAuthority(data: [
                     "descr" => "test",
-                    "type" => "server",
                     "crt" => self::EXAMPLE_CRT,
                     "prv" => self::EXAMPLE_ECPRV
                 ]);
@@ -83,9 +83,8 @@ R02Pul8ulWQ8Kl3Q3pou8As7W1mMzA2DxQ==
 
         $this->assert_does_not_throw(
             callable: function () {
-                $cert = new Certificate(data: [
+                $cert = new CertificateAuthority(data: [
                     "descr" => "test",
-                    "type" => "server",
                     "crt" => self::EXAMPLE_CRT,
                     "prv" => self::EXAMPLE_PRV
                 ]);
@@ -95,16 +94,40 @@ R02Pul8ulWQ8Kl3Q3pou8As7W1mMzA2DxQ==
     }
 
     /**
-     * Checks that Certificates cannot be deleted while they're in use.
+     * Checks that the CA is found in the OS trust store when `trust` is enabled.
      */
-    public function test_certificate_cannot_be_deleted_while_in_use() {
-        $this->assert_throws_response(
-            response_id: "CERTIFICATE_CANNOT_BE_DELETED_WHILE_IN_USE",
-            code: 403,
-            callable: function () {
-                $cert = new Certificate(id: 0);
-                $cert->delete();
-            }
-        );
+    public function test_ca_trust() {
+        # Create a CA to test with
+        $ca = new CertificateAuthority(data: [
+            "descr" => "test",
+            "crt" => self::EXAMPLE_CRT,
+            "prv" => self::EXAMPLE_PRV,
+            "trust" => true
+        ]);
+        $ca->create();
+
+        # Wait a few seconds for the trust store to be rebuilt
+        sleep(3);
+
+        # Ensure the certificate is found in the trust store
+        $certctl_list = new Command("certctl list");
+        $this->assert_str_contains($certctl_list->output, "example.com");
+
+        # Disable `trust`
+        $ca->trust->value = false;
+        $ca->update();
+
+        # Wait a few seconds for the trust store to be rebuilt
+        sleep(3);
+
+        # Ensure the certificate is not found in the trust store
+        $certctl_list = new Command("certctl list");
+        $this->assert_str_does_not_contain($certctl_list->output, "example.com");
+
+        # Delete the CA
+        $ca->delete();
     }
+
+    # TODO: Need test to ensure CA cannot be deleted while in use
+    # TODO: Need test to ensure crt must be CA capable
 }

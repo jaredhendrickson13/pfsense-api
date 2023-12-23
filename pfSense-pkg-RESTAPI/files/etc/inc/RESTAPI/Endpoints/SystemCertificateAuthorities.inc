@@ -6,12 +6,12 @@ require_once("RESTAPI/autoloader.inc");
 
 use RESTAPI\Core\Endpoint;
 
-class SystemCertificates extends Endpoint
+class SystemCertificateAuthorities extends Endpoint
 {
     public function __construct() {
         # Set Endpoint attributes
-        $this->url = "/api/v2/system/certificates";
-        $this->model_name = "Certificate";
+        $this->url = "/api/v2/system/certificate_authorities";
+        $this->model_name = "CertificateAuthority";
         $this->many = true;
         $this->request_method_options = ["GET"];
 
