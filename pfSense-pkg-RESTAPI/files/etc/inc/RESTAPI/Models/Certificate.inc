@@ -32,6 +32,7 @@ class Certificate extends Model
             help_text: "The descriptive name for this certificate."
         );
         $this->refid = new StringField(
+            unique: true,
             default: uniqid(),
             read_only: true,
             help_text: "The unique ID assigned to this certificate for internal system use. This value is generated ".

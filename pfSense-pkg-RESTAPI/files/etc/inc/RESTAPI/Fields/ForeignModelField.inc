@@ -227,9 +227,12 @@ class ForeignModelField extends Field {
         # Query for the Model object this value relates to.
         $query_modelset = $this->model->query($query_params);
         
-        # If the model object exists, return the `model_field` value.
-        if ($query_modelset->exists()) {
+        # If the model object exists and this is not a $many enabled field, return the `model_field` value.
+        if ($query_modelset->exists() and !$this->many) {
             return $query_modelset->first()->{$this->model_field}->value;
+        }
+        elseif ($query_modelset->exists() and $this->many) {
+            return $internal_value;
         }
         
         # As a failsafe, return the existing internal value if we could not find the related object

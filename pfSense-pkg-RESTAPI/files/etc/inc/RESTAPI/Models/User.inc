@@ -8,6 +8,7 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\Base64Field;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\DateTimeField;
+use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\NotFoundError;
@@ -24,7 +25,7 @@ class User extends Model
     public BooleanField $disabled;
     public StringField $descr;
     public DateTimeField $expires;
-    public StringField $cert;
+    public ForeignModelField $cert;
     public Base64Field $authorizedkeys;
     public StringField $ipsecpsk;
 
@@ -87,11 +88,13 @@ class User extends Model
             help_text: "The expiration date for this user in mm/dd/YYYY format. Use empty string for no ".
                 "expiration"
         );
-        # TODO: Use a ForeignModelField for this field when the Certificate model is developed
-        $this->cert = new StringField(
+        $this->cert = new ForeignModelField(
+            model_name: "Certificate",
+            model_field: "refid",
             default: [],
             allow_empty: true,
             many: true,
+            delimiter: null,
             help_text: "The user certificates to assign this user. Items must be existing certificate `refid`s."
         );
         $this->authorizedkeys = new Base64Field(
