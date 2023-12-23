@@ -312,15 +312,24 @@ class Model {
      */
     private function generate_verbose_name_plural(): string
     {
-        # Set a variable to track the best determined plural suffix for this verbose name
-        $plural_suffix = "";
-
         # Only add a plural suffix to the verbose name if this is a $many enabled Model
         if ($this->many) {
-            $plural_suffix = (str_ends_with($this->verbose_name, "s")) ? "es" : "s";
+            # When the verbose name ends with 'y', remove the 'y' and append 'ies'.
+            if (str_ends_with($this->verbose_name, "y")) {
+                return substr($this->verbose_name, 0, -1)."ies";
+            }
+            # When the verbose name ends with 's', append 'es' to the end.
+            elseif (str_ends_with($this->verbose_name, "s")) {
+                return $this->verbose_name."es";
+            }
+            # Otherwise, just append 's'
+            else {
+                return $this->verbose_name."s";
+            }
         }
 
-        return $this->verbose_name.$plural_suffix;
+        # If this is not a $many enabled Model, just use the $verbose_name
+        return $this->verbose_name;
     }
 
     /**
