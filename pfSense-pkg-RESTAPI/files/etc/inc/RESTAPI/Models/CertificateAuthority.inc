@@ -37,6 +37,7 @@ class CertificateAuthority extends Model
             help_text: "The descriptive name for this certificate authority."
         );
         $this->refid = new StringField(
+            unique: true,
             default: uniqid(),
             read_only: true,
             help_text: "The unique ID assigned to this certificate authority for internal system use. This value is ".
