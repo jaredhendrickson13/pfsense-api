@@ -52,7 +52,7 @@ class IPsecPhase1 extends Model
     public BooleanField $dpd_enable;
     public IntegerField $dpd_delay;
     public IntegerField $dpd_maxfail;
-    #public NestedModelField $encryption;
+    public NestedModelField $encryption;
 
     public function __construct(mixed $id = null, mixed $data = [], Auth $client = null, bool $async = true)
     {
@@ -232,6 +232,11 @@ class IPsecPhase1 extends Model
             default: 5,
             conditions: ["dpdenable" => true],
             help_text: "The number of consecutive failures allowed before disconnecting."
+        );
+        $this->encryption = new NestedModelField(
+            model_class: "IPsecPhase1Encryption",
+            required: true,
+            help_text: "The encryption algorithms supported by this P1 encryption."
         );
         parent::__construct(id: $id, data: $data, client: $client, async: $async);
     }
