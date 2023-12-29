@@ -56,6 +56,7 @@ class IPsecPhase1 extends Model
 
     public function __construct(mixed $id = null, mixed $data = [], Auth $client = null, bool $async = true)
     {
+        
         # Define model attributes
         $this->config_path = "ipsec/phase1";
         $this->many = true;
@@ -64,6 +65,7 @@ class IPsecPhase1 extends Model
 
         # Define model fields
         $this->ikeid = new IntegerField(
+            unique: true,
             default: ipsec_ikeid_next(),
             read_only: true,
             help_text: "The unique IKE ID for this phase 1 entry. This value is dynamically set and cannot be set or ".

@@ -40,6 +40,7 @@ class SpecialNetworkField extends InterfaceField
      * L2TP client.
      * @param bool $allow_pppoe Allow this field's value to be `pppoe`. This is used to indicate the address is any
      * PPPoE client.
+     * @param array $allowed_keywords Additional keyword strings that should be considered valid.
      * @param bool $allow_empty If `true`, empty strings will be allowed by this field.
      * @param bool $allow_null If `true`, null values will be allowed by this field.
      * @param array $interface_query Assigns query parameters to limit which interfaces should be accepted by this
@@ -93,6 +94,7 @@ class SpecialNetworkField extends InterfaceField
         public bool $allow_self = true,
         public bool $allow_l2tp = true,
         public bool $allow_pppoe = true,
+        public array $allowed_keywords = [],
         bool $allow_empty = false,
         bool $allow_null = false,
         array $interface_query = [],
@@ -196,6 +198,11 @@ class SpecialNetworkField extends InterfaceField
         if($this->allow_pppoe and $value === "pppoe") {
             return;
         }
+        
+        # Allow this value if it is an allowed keyword
+        if ($this->allowed_keywords and in_array($value, $this->allowed_keywords)) {
+            return;
+        }
 
         # Remove the trailing :ip value if interface IP values are allowed and set, so we can continue validating.
         if ($this->allow_interface_ip and str_ends_with($value, ":ip")) {
@@ -210,6 +217,7 @@ class SpecialNetworkField extends InterfaceField
 
         # Allow this value if it is an existing interface and interface values are allowed
         if ($this->allow_interface and in_array($value, array_keys($this->get_interface_choices()))) {
+            $this->labels[] = "is_interface";
             return;
         }
 
@@ -234,6 +242,11 @@ class SpecialNetworkField extends InterfaceField
         $opts_str .= ($this->allow_self) ? "`(self)`, " : "";
         $opts_str .= ($this->allow_l2tp) ? "`l2tp`, " : "";
         $opts_str .= ($this->allow_pppoe) ? "`pppoe`, " : "";
+        
+        # Add any specified keywords
+        foreach ($this->allowed_keywords as $keyword) {
+            $opts_str .= "`$keyword`, ";
+        }
 
         # Return the value but replace the trailing ", " characters
         return substr($opts_str, 0, -2);

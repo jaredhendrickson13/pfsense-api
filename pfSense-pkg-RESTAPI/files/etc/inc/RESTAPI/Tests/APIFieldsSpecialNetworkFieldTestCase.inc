@@ -36,6 +36,31 @@ class APIFieldsSpecialNetworkFieldTestCase extends TestCase
     }
 
     /**
+     * Checks that the SpecialNetworkField accepts allowed_keywords when configured.
+     */
+    public function test_validate_allowed_keywords() {
+        # Create a SpecialNetworkField to test with
+        $field = new SpecialNetworkField(allowed_keywords: ["allow_this_value", "allow_this_value_too"]);
+
+        # Ensure keywords are accepted
+        $this->assert_does_not_throw(
+            function () use ($field) {
+                $field->validate_extra("allow_this_value");
+                $field->validate_extra("allow_this_value_too");
+            }
+        );
+
+        # Ensure non-keywords are not excepted
+        $this->assert_throws_response(
+            response_id: "SPECIAL_NETWORK_FIELD_INVALID",
+            code: 400,
+            callable: function () use ($field) {
+                $field->validate_extra("not_an_allowed_keyword");
+            }
+        );
+    }
+
+    /**
      * Checks that the SpecialNetworkField accepts subnets when configured.
      */
     public function test_validate_subnet() {
