@@ -220,6 +220,34 @@ class IPsecPhase2 extends Model
             help_text: "The PFS key group this IPsec phase 2 entry should use. Note: Groups 1, 2, 5, 22, 23, and 24 ".
                 "provide weak security and should be avoided."
         );
+        $this->lifetime = new IntegerField(
+            default: 3600,
+            help_text: "The hard IKE SA lifetime (in seconds) after which the IKE SA will be expired."
+        );
+        $this->rekey_time = new IntegerField(
+            default: $this->lifetime->default * 0.9,
+            help_text: "The amount of time (in seconds) before an IKE SA establishes new keys."
+        );
+        $this->rand_time = new IntegerField(
+            default: $this->lifetime->default * 0.1,
+            help_text: "A random value up to this amount will be subtracted from the `rekey_time` and `reauth_time` ".
+            "to avoid simultaneous renegotiation."
+        );
+        $this->pinghost = new StringField(
+            default: "",
+            allow_empty: true,
+            validators: [new IPAddressValidator(allow_fqdn: true)],
+            help_text: "The IP address to send an ICMP echo request to inside the tunnel. Can trigger initiation ".
+                "of a tunnel mode P2, but does not trigger initiation of a VTI mode P2."
+        );
+        $this->keepalive = new BooleanField(
+            default: false,
+            indicates_true: "enabled",
+            indicates_false: "disabled",
+            help_text: "Enables or disables checking this P2 and initiating if disconnected; does not send traffic ".
+                "inside the tunnel. This check ignores the P1 option 'Child SA Start Action' and works for both VTI ".
+                "and tunnel mode P2s. For IKEv2 without split connections, this only needs to be enabled on one P2."
+        );
         
         parent::__construct(id: $id, data: $data, client: $client, async: $async);
     }
@@ -394,5 +422,23 @@ class IPsecPhase2 extends Model
         }
 
         return $remoteid_netbits;
+    }
+
+    /**
+     * Adds extra validation to the `rekey_time` field.
+     * @param int $rekey_time The incoming value to be validated.
+     * @returns int The validated value to be set.
+     * @throws ValidationError When $rekey_time is greater than or equal to the `lifetime` Field's value.
+     */
+    public function validate_rekey_time(int $rekey_time) : int {
+        # Throw a validation error if $rekey_time is greater than or equal to the `lifetime` field's value
+        if ($rekey_time >= $this->lifetime->value) {
+            throw new ValidationError(
+                message: "Field `rekey_time` must be less than the `lifetime` field's current value.",
+                response_id: "IPSEC_PHASE_2_REKEY_TIME_GREATER_THAN_LIFETIME"
+            );
+        }
+
+        return $rekey_time;
     }
 }

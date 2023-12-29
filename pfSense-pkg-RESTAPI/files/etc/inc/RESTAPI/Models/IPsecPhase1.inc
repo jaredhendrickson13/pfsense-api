@@ -158,20 +158,20 @@ class IPsecPhase1 extends Model
         );
         $this->lifetime = new IntegerField(
             default: 28800,
-            help_text: "The hard IKE SA lifetime (in seconds) after which the IKE SA will be expired."
+            help_text: "The hard child SA lifetime (in seconds) after which the child SA will be expired."
         );
         $this->rekey_time = new IntegerField(
             default: $this->lifetime->default * 0.9,
-            help_text: "The amount of time (in seconds) before an IKE SA establishes new keys."
+            help_text: "The amount of time (in seconds) before an child SA establishes new keys."
         );
         $this->reauth_time = new IntegerField(
             default: $this->lifetime->default * 0.9,
-            help_text: "The amount of time (in seconds) before an IKE SA is torn down and recreated from scratch, ".
+            help_text: "The amount of time (in seconds) before an child SA is torn down and recreated from scratch, ".
                 "including authentication."
         );
         $this->rand_time = new IntegerField(
             default: $this->lifetime->default * 0.1,
-            help_text: "A random value up to this amount will be subtracted from the `rekey_time` and `reauth_time` ".
+            help_text: "A random value up to this amount will be subtracted from the `rekey_time` ".
                 "to avoid simultaneous renegotiation."
         );
         $this->startaction = new StringField(
