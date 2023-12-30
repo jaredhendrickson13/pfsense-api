@@ -4,6 +4,7 @@ namespace RESTAPI\Models;
 
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\IPsecApplyDispatcher;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
@@ -140,5 +141,13 @@ class IPsecPhase1Encryption extends Model
         }
 
         return $supports_keylen;
+    }
+
+    /**
+     * Applies pending changes to IPsec.
+     */
+    public function apply(): void
+    {
+        (new IPsecApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

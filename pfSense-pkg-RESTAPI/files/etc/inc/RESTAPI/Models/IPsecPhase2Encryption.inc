@@ -4,6 +4,7 @@ namespace RESTAPI\Models;
 
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\IPsecApplyDispatcher;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
@@ -33,7 +34,6 @@ class IPsecPhase2Encryption extends Model
         $this->keylen = new IntegerField(
             required: true,
             internal_name: "keylen",
-            internal_namespace: "encryption-algorithm",
             conditions: ["name" => $this->get_keylen_enabled_algos()],
             help_text: "The key length for the encryption algorithm."
         );
@@ -117,5 +117,13 @@ class IPsecPhase2Encryption extends Model
         }
 
         return $supports_keylen;
+    }
+
+    /**
+     * Applies pending changes to IPsec.
+     */
+    public function apply(): void
+    {
+        (new IPsecApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

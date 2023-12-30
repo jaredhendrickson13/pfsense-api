@@ -4,6 +4,7 @@ namespace RESTAPI\Models;
 
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\IPsecApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
@@ -440,5 +441,13 @@ class IPsecPhase2 extends Model
         }
 
         return $rekey_time;
+    }
+
+    /**
+     * Applies pending changes to IPsec.
+     */
+    public function apply(): void
+    {
+        (new IPsecApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

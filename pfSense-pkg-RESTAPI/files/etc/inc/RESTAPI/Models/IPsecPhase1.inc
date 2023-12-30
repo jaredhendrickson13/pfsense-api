@@ -6,6 +6,7 @@ require_once("RESTAPI/autoloader.inc");
 
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\IPsecApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\ForeignModelField;
 use RESTAPI\Fields\IntegerField;
@@ -467,5 +468,13 @@ class IPsecPhase1 extends Model
         }
 
         return $nattport;
+    }
+
+    /**
+     * Applies pending changes to IPsec.
+     */
+    public function apply(): voidq
+    {
+        (new IPsecApplyDispatcher(async: $this->async))->spawn_process();
     }
 }
