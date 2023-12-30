@@ -162,16 +162,16 @@ class IPsecPhase1 extends Model
             help_text: "The hard child SA lifetime (in seconds) after which the child SA will be expired."
         );
         $this->rekey_time = new IntegerField(
-            default: $this->lifetime->default * 0.9,
+            default: 25920,
             help_text: "The amount of time (in seconds) before an child SA establishes new keys."
         );
         $this->reauth_time = new IntegerField(
-            default: $this->lifetime->default * 0.9,
+            default: 0,
             help_text: "The amount of time (in seconds) before an child SA is torn down and recreated from scratch, ".
                 "including authentication."
         );
         $this->rand_time = new IntegerField(
-            default: $this->lifetime->default * 0.1,
+            default: 2880,
             help_text: "A random value up to this amount will be subtracted from the `rekey_time` ".
                 "to avoid simultaneous renegotiation."
         );
@@ -222,18 +222,14 @@ class IPsecPhase1 extends Model
             default: "4500",
             help_text: "The UDP port for NAT-T on the remote gateway."
         );
-        $this->dpd_enable = new BooleanField(
-            default: true,
-            help_text: "Enables or disabled dead peer detection for this tunnel."
-        );
         $this->dpd_delay = new IntegerField(
-            default: 10,
-            conditions: ["dpdenable" => true],
+            default: null,
+            allow_null: true,
             help_text: "The delay (in seconds) between sending peer acknowledgement messages."
         );
         $this->dpd_maxfail = new IntegerField(
-            default: 5,
-            conditions: ["dpdenable" => true],
+            default: null,
+            allow_null: true,
             help_text: "The number of consecutive failures allowed before disconnecting."
         );
         $this->encryption = new NestedModelField(
@@ -473,7 +469,7 @@ class IPsecPhase1 extends Model
     /**
      * Applies pending changes to IPsec.
      */
-    public function apply(): voidq
+    public function apply(): void
     {
         (new IPsecApplyDispatcher(async: $this->async))->spawn_process();
     }
