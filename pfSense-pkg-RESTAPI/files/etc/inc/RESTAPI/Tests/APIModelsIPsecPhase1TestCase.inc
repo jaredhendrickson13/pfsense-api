@@ -2,6 +2,7 @@
 
 namespace RESTAPI\Tests;
 
+use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\IPsecPhase1;
 
@@ -100,6 +101,8 @@ class APIModelsIPsecPhase1TestCase extends TestCase
         # Create an IPsec phase 1 entry to test with and use an INADDR_ANY remote gateway
         $p1 = new IPsecPhase1(data: self::BASE_DATA);
         $p1->remote_gateway->value = "0.0.0.0";
+        $p1->peerid_type->value = "any";
+        $p1->startaction->value = "none";
         $p1->create();
         
         # Ensure multiple phase 1 entries can use this IP even if gw_duplicates is disabled
@@ -109,12 +112,273 @@ class APIModelsIPsecPhase1TestCase extends TestCase
             callable: function () {
                 $dup_p1 = new IPsecPhase1(data: self::BASE_DATA);
                 $dup_p1->remote_gateway->value = "0.0.0.0";
+                $dup_p1->peerid_type->value = "any";
+                $dup_p1->startaction->value = "none";
                 $dup_p1->create();
                 $dup_p1->delete();
             }
         );
 
         # Delete the IPsec phase 1 entry
+        $p1->delete(apply: true);
+    }
+
+    /**
+     * Checks that the `myid_data` field correctly enforces input validation depending on the `myid_type`.
+     */
+    public function test_validate_myid_data(): void {
+        # Ensure `myid_type` value `address` must be IP address
+        $this->assert_throws_response(
+            response_id: "IPSEC_PHASE_1_MYID_DATA_MUST_BE_IP_ADDRESS",
+            code: 400,
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->myid_type->value = "address";
+                $p1->validate_myid_data("not an IP address!");
+            }
+        );
+        $this->assert_does_not_throw(
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->myid_type->value = "address";
+                $p1->validate_myid_data("1.2.3.4");
+            }
+        );
+
+        # Ensure `myid_type` value `fqdn` must be an FQDN
+        $this->assert_throws_response(
+            response_id: "IPSEC_PHASE_1_MYID_DATA_MUST_BE_FQDN",
+            code: 400,
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->myid_type->value = "fqdn";
+                $p1->validate_myid_data("not an FQDN!");
+            }
+        );
+        $this->assert_does_not_throw(
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->myid_type->value = "fqdn";
+                $p1->validate_myid_data("example.com");
+            }
+        );
+
+        # Ensure `myid_type` value `user_fqdn` must be an email address
+        $this->assert_throws_response(
+            response_id: "IPSEC_PHASE_1_MYID_DATA_MUST_BE_EMAIL_ADDRESS",
+            code: 400,
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->myid_type->value = "user_fqdn";
+                $p1->validate_myid_data("not an email!");
+            }
+        );
+        $this->assert_does_not_throw(
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->myid_type->value = "user_fqdn";
+                $p1->validate_myid_data("test@example.com");
+            }
+        );
+
+        # Ensure `myid_type` value `dyn_dns` must be an FQDN
+        $this->assert_throws_response(
+            response_id: "IPSEC_PHASE_1_MYID_DATA_MUST_BE_FQDN",
+            code: 400,
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->myid_type->value = "dyn_dns";
+                $p1->validate_myid_data("not an FQDN!");
+            }
+        );
+        $this->assert_does_not_throw(
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->myid_type->value = "dyn_dns";
+                $p1->validate_myid_data("example.com");
+            }
+        );
+    }
+
+    /**
+     * Checks that the `peerid_type` cannot be set to `peeraddress` when the `remote_gateway` is an INADDR_ANY IP
+     */
+    public function test_peerid_type_cannot_be_peeraddress_with_inaddr_any_remote_gateway(): void {
+        $this->assert_throws_response(
+            response_id: "IPSEC_PHASE_1_NO_INADDR_ANY_WITH_PEERADDRESS",
+            code: 400,
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->remote_gateway->value = "0.0.0.0";
+                $p1->validate_peerid_type("peeraddress");
+            }
+        );
+    }
+
+    /**
+     * Checks that the `peerid_data` field correctly enforces input validation depending on the `peerid_type`.
+     */
+    public function test_validate_peerid_data(): void {
+        # Ensure `peerid_type` value `address` must be IP address
+        $this->assert_throws_response(
+            response_id: "IPSEC_PHASE_1_PEERID_DATA_MUST_BE_IP_ADDRESS",
+            code: 400,
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->peerid_type->value = "address";
+                $p1->validate_peerid_data("not an IP address!");
+            }
+        );
+        $this->assert_does_not_throw(
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->peerid_type->value = "address";
+                $p1->validate_peerid_data("1.2.3.4");
+            }
+        );
+
+        # Ensure `peerid_type` value `fqdn` must be an FQDN
+        $this->assert_throws_response(
+            response_id: "IPSEC_PHASE_1_PEERID_DATA_MUST_BE_FQDN",
+            code: 400,
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->peerid_type->value = "fqdn";
+                $p1->validate_peerid_data("not an FQDN!");
+            }
+        );
+        $this->assert_does_not_throw(
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->peerid_type->value = "fqdn";
+                $p1->validate_peerid_data("example.com");
+            }
+        );
+
+        # Ensure `peerid_type` value `user_fqdn` must be an email address
+        $this->assert_throws_response(
+            response_id: "IPSEC_PHASE_1_PEERID_DATA_MUST_BE_EMAIL_ADDRESS",
+            code: 400,
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->peerid_type->value = "user_fqdn";
+                $p1->validate_peerid_data("not an email!");
+            }
+        );
+        $this->assert_does_not_throw(
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->peerid_type->value = "user_fqdn";
+                $p1->validate_peerid_data("test@example.com");
+            }
+        );
+
+        # Ensure `peerid_type` value `dyn_dns` must be an FQDN
+        $this->assert_throws_response(
+            response_id: "IPSEC_PHASE_1_PEERID_DATA_MUST_BE_FQDN",
+            code: 400,
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->peerid_type->value = "dyn_dns";
+                $p1->validate_peerid_data("not an FQDN!");
+            }
+        );
+        $this->assert_does_not_throw(
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->peerid_type->value = "dyn_dns";
+                $p1->validate_peerid_data("example.com");
+            }
+        );
+    }
+
+    /**
+     * Checks that the `rekey_time` cannot be set to a value higher than `lifetime`
+     */
+    public function test_rekey_time_cannot_be_greater_than_lifetime(): void {
+        $this->assert_throws_response(
+            response_id: "IPSEC_PHASE_1_REKEY_TIME_GREATER_THAN_LIFETIME",
+            code: 400,
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->lifetime->value = 10000;
+                $p1->validate_rekey_time(10001);
+            }
+        );
+    }
+
+    /**
+     * Checks that the `reauth_time` cannot be set to a value higher than `lifetime`
+     */
+    public function test_reauth_time_cannot_be_greater_than_lifetime(): void {
+        $this->assert_throws_response(
+            response_id: "IPSEC_PHASE_1_REAUTH_TIME_GREATER_THAN_LIFETIME",
+            code: 400,
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->lifetime->value = 10000;
+                $p1->validate_reauth_time(10001);
+            }
+        );
+    }
+
+    /**
+     * Checks that the `startaction` must be set to `none` when `remote_gateway` is an INADDR_ANY IP
+     */
+    public function test_startaction_must_be_none_with_inaddr_any_remote_gateway(): void {
+        $this->assert_throws_response(
+            response_id: "IPSEC_PHASE_1_NO_STARTACTION_WITH_INADDR_ANY_REMOTE_GATEWAY",
+            code: 400,
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->remote_gateway->value = "0.0.0.0";
+                $p1->validate_startaction("start");
+            }
+        );
+    }
+
+    /**
+     * Checks that the `nattport` cannot use the same port as `ikeport`
+     */
+    public function test_nattport_cannot_match_ikeport(): void {
+        $this->assert_throws_response(
+            response_id: "IPSEC_PHASE_1_NATTPORT_CANNOT_MATCH_IKEPORT",
+            code: 400,
+            callable: function () {
+                $p1 = new IPsecPhase1();
+                $p1->ikeport->value = "500";
+                $p1->validate_nattport("500");
+            }
+        );
+    }
+
+    /**
+     * Checks that the `iketype` is correctly represented on the backend after applying.
+     */
+    public function test_iketype_found_in_swanctl(): void {
+        # Create a new IPsec phase 1 and ensure
+        $p1 = new IPsecPhase1(data: self::BASE_DATA, async: false);
+        $p1->iketype->value = "ikev2";
+        $p1->create(apply: true);
+
+        # Ensure the `iketype` is correctly shown in swanctl
+        $swanctl_conf = file_get_contents("/var/etc/ipsec/swanctl.conf");
+        $this->assert_str_contains(
+            $swanctl_conf,
+            "version = 2"
+        );
+
+        # Update the p1 entry to IKEv1 and ensure it is correctly shown
+        $p1->iketype->value = "ikev1";
+        $p1->mode->value = "main";
+        $p1->update(apply: true);
+        $swanctl_conf = file_get_contents("/var/etc/ipsec/swanctl.conf");
+        $this->assert_str_contains(
+            $swanctl_conf,
+            "version = 1"
+        );
+
+        # Delete the p1 entry
         $p1->delete(apply: true);
     }
 }

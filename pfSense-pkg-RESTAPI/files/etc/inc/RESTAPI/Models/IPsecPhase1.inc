@@ -138,6 +138,7 @@ class IPsecPhase1 extends Model
         $this->pre_shared_key = new StringField(
             required: true,
             write_only: true,
+            internal_name: "pre-shared-key",
             conditions: ["authentication_method" => "pre_shared_key"],
             help_text: "The Pre-Shared Key (PSK) value. This key must match on both peers and should be long and ".
                 "random to protect the tunnel and its contents. A weak Pre-Shared Key can lead to a tunnel compromise."

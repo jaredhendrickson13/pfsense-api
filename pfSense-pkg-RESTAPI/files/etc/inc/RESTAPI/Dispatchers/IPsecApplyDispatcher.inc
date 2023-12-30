@@ -6,8 +6,7 @@ use RESTAPI\Core\Dispatcher;
 
 class IPsecApplyDispatcher extends Dispatcher
 {
-    public $max_concurrency = 1;
-    public $timeout = 120;
+    public int $timeout = 120;
     public static function process(...$arguments)
     {
         # Restart IPsec and related services
