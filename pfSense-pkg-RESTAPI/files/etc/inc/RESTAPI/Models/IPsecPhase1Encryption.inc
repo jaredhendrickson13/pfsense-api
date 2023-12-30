@@ -55,7 +55,7 @@ class IPsecPhase1Encryption extends Model
             help_text: "The Diffie-Hellman (DH) group to use for this P1 encryption item."
         );
         $this->prf_algorithm = new StringField(
-            required: true,
+            default: "sha256",
             choices: array_keys($p1_halgos),
             internal_name: "prf-algorithm",
             help_text: "The PRF algorithm to use for this P1 encryption item. This value has no affect unless the ".
