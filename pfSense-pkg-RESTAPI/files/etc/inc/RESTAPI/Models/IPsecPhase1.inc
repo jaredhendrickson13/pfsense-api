@@ -50,7 +50,6 @@ class IPsecPhase1 extends Model
     public BooleanField $prfselect_enable;
     public PortField $ikeport;
     public PortField $nattport;
-    public BooleanField $dpd_enable;
     public IntegerField $dpd_delay;
     public IntegerField $dpd_maxfail;
     public NestedModelField $encryption;
@@ -224,12 +223,12 @@ class IPsecPhase1 extends Model
             help_text: "The UDP port for NAT-T on the remote gateway."
         );
         $this->dpd_delay = new IntegerField(
-            default: null,
+            default: 10,
             allow_null: true,
             help_text: "The delay (in seconds) between sending peer acknowledgement messages."
         );
         $this->dpd_maxfail = new IntegerField(
-            default: null,
+            default: 5,
             allow_null: true,
             help_text: "The number of consecutive failures allowed before disconnecting."
         );
