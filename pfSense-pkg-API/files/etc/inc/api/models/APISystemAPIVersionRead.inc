@@ -66,10 +66,7 @@ class APISystemAPIVersionRead extends APIModel {
     }
 
     public static function is_update_available() {
-        # Check if the current version is less than the latest version
-        $curr_ver_num = intval(str_replace(".", "", self::get_api_version()));
-        $latest_ver_num = intval(str_replace(".", "", self::get_latest_api_version()));
-        return $curr_ver_num < $latest_ver_num;
+        return version_compare(self::get_api_version(), self::get_latest_api_version(), operator: "<");
     }
 
     public static function get_github_releases() {

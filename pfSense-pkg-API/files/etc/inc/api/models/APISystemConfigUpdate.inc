@@ -27,8 +27,12 @@ class APISystemConfigUpdate extends APIModel {
     }
 
     public function action() {
+        global $config;
+
         # Simply replace the entire configuration with the data sent in the request
-        $this->set_config("", $this->initial_data);
+        # Note: this requires direct access to the $config since the new configuration access method introduced in
+        # pfSense 2.7+ do not allow the entire configuration to be replaced.
+        $config = $this->initial_data;
         $this->write_config();
         return APIResponse\get(0, $this->initial_data);
     }
