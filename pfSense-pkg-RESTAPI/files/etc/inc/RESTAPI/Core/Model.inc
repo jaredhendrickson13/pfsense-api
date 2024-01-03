@@ -1193,7 +1193,6 @@ class Model {
     public function get_related_links() : ResourceLinkSet {
         # Variables
         $linkset = new ResourceLinkSet();
-        return $linkset;    # TODO: remove this after testing is done
         $endpoint = $this->get_related_endpoint(many: false);
         
         # Add a 'self' link if this Model supports single reads
