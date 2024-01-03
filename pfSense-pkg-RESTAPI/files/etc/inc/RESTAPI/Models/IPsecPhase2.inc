@@ -226,11 +226,11 @@ class IPsecPhase2 extends Model
             help_text: "The hard IKE SA lifetime (in seconds) after which the IKE SA will be expired."
         );
         $this->rekey_time = new IntegerField(
-            default: $this->lifetime->default * 0.9,
+            default: 3240,
             help_text: "The amount of time (in seconds) before an IKE SA establishes new keys."
         );
         $this->rand_time = new IntegerField(
-            default: $this->lifetime->default * 0.1,
+            default: 360,
             help_text: "A random value up to this amount will be subtracted from the `rekey_time` and `reauth_time` ".
             "to avoid simultaneous renegotiation."
         );
@@ -290,7 +290,7 @@ class IPsecPhase2 extends Model
         if (!$this->localid_address->has_label("is_ipaddrv6") and $this->mode->value === "tunnel6") {
             throw new ValidationError(
                 message: "Field `localid_address` must be an IPv6 address while `mode` is set to `tunnel6`.",
-                response_id: "IPSEC_PHASE_2_LOCALID_ADDRESS_MUST_BE_IPV6_WITH_TUNNEL5_MODE"
+                response_id: "IPSEC_PHASE_2_LOCALID_ADDRESS_MUST_BE_IPV6_WITH_TUNNEL6_MODE"
             );
         }
         

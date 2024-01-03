@@ -187,7 +187,7 @@ class TestCase {
             }
             # Ensure the $response_id matches this object
             if ($response_id !== $exc->response_id) {
-                throw new AssertionError("Expected Response to contain response_id $response_id. Received $exc->response_id");
+                throw new AssertionError("Expected Response to contain response_id $response_id. Received '$exc->response_id': $exc_message");
             }
             # Ensure the $code matches this object
             if ($code !== $exc->code) {
