@@ -599,21 +599,30 @@ class Endpoint {
             default:
                 $content_type_unknown = true;
         }
-        
+
         # Ensure the special async, limit and offset parameters are of the correct type
-        if (isset($this->request_data["async"]) and !is_bool($this->request_data["async"])) {
+        if (!isset($this->request_data["async"])) {
+            $this->request_data["async"] = true;
+        }
+        if (!is_bool($this->request_data["async"])) {
             throw new ValidationError(
                 message: "Field `async` must be of type `boolean`.",
                 response_id: "ENDPOINT_ASYNC_FIELD_INVALID_TYPE"
             );
         }
-        if (isset($this->request_data["limit"]) and !is_integer($this->request_data["limit"])) {
+        if (!isset($this->request_data["limit"])) {
+            $this->request_data["limit"] = 0;
+        }
+        if (!is_integer($this->request_data["limit"])) {
             throw new ValidationError(
                 message: "Field `limit` must be of type `integer`.",
                 response_id: "ENDPOINT_LIMIT_FIELD_INVALID_TYPE"
             );
         }
-        if (isset($this->request_data["offset"]) and !is_integer($this->request_data["offset"])) {
+        if (!isset($this->request_data["offset"])) {
+            $this->request_data["offset"] = 0;
+        }
+        if (!is_integer($this->request_data["offset"])) {
             throw new ValidationError(
                 message: "Field `offset` must be of type `integer`.",
                 response_id: "ENDPOINT_OFFSET_FIELD_INVALID_TYPE"
@@ -667,7 +676,7 @@ class Endpoint {
             elseif ($this->request_method === "GET" and $this->many) {
                 $resp_data = $this->model->query(
                     query_params: $this->request_data,
-                    excluded: ["limit", "offset"],
+                    excluded: ["async", "limit", "offset"],
                     limit: $this->request_data["limit"],
                     offset: $this->request_data["offset"],
                 );
