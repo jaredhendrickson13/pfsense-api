@@ -106,6 +106,7 @@ class APIFieldsNestedModelFieldTestCase extends TestCase
         
         # Create a direct FirewallAlias object to compare with
         $alias = new FirewallAlias(data: ["name" => "testalias", "type" => "host", "address" => ["127.0.0.1"]]);
+        $alias->validate();
         
         # Add the $alias representation to the $field values and ensure they match when `to_internal()` runs.
         $field->value = [$alias->to_representation()];

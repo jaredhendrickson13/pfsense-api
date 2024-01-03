@@ -263,8 +263,44 @@ class TestCase {
      */
     protected function assert_is_greater_than(mixed $value1, mixed $value2) {
         # Fail test if $value2 is greater than $value1.
-        if ($value1 < $value2) {
+        if ($value1 <= $value2) {
             throw new AssertionError("Expected $value1 to be greater than $value2");
+        }
+    }
+
+    /**
+     * Checks if a given $value1 is greater than or equal to $value2.
+     * @param mixed $value1 The first value to evaluate. This value must be greater than or equal to value 2 to pass check.
+     * @param mixed $value2 The second value to evaluate. This value must be less than or equal to value 1 to pass check.
+     */
+    protected function assert_is_greater_than_or_equal(mixed $value1, mixed $value2): void {
+        # Fail test if $value2 is greater than or equal to $value1.
+        if ($value1 < $value2) {
+            throw new AssertionError("Expected $value1 to be greater than or equal to $value2");
+        }
+    }
+
+    /**
+     * Checks if a given $value1 is less than $value2.
+     * @param mixed $value1 The first value to evaluate. This value must be less than value 2 to pass check.
+     * @param mixed $value2 The second value to evaluate. This value must be greater than value 1 to pass check.
+     */
+    protected function assert_is_less_than(mixed $value1, mixed $value2): void {
+        # Fail test if $value2 is less than $value1.
+        if ($value1 >= $value2) {
+            throw new AssertionError("Expected $value1 to be less than $value2");
+        }
+    }
+
+    /**
+     * Checks if a given $value1 is less than or equal to $value2.
+     * @param mixed $value1 The first value to evaluate. This value must be less than or equal to value 2 to pass check.
+     * @param mixed $value2 The second value to evaluate. This value must be greater than or equal to value 1 to pass check.
+     */
+    protected function assert_is_less_than_or_equal(mixed $value1, mixed $value2): void {
+        # Fail test if $value2 is less than or equal to $value1.
+        if ($value1 > $value2) {
+            throw new AssertionError("Expected $value1 to be less than or equal to $value2");
         }
     }
 

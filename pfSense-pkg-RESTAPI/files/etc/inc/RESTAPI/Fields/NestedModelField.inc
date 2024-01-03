@@ -94,6 +94,8 @@ class NestedModelField extends Field
      */
     public function validate_extra(mixed $value)
     {
+        # Use a variable to keep track of 
+        
         # Create a new Model object for this value and validate it. Remove any assigned IDs
         unset($value["id"]);
         unset($value["parent_id"]);
@@ -113,7 +115,7 @@ class NestedModelField extends Field
             );
         }
 
-        return $value;
+        return $model;
     }
 
     /**
@@ -123,7 +125,11 @@ class NestedModelField extends Field
     {
         # Empty any existing ModelSet entries in the event this is a subsequent `validate()` call.
         $this->validation_modelset->model_objects = [];
-        return parent::validate();
+        $return_value = parent::validate();
+        
+        # Overwrite the existing `value` with the representation of the validated model object
+        $this->value = ($this->many) ? $this->validation_modelset->to_representation() : $this->validation_modelset->first()->to_representation();
+        return $return_value;
     }
 
     /**

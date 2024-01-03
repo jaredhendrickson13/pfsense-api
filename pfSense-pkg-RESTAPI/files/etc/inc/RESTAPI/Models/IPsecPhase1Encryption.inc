@@ -93,7 +93,7 @@ class IPsecPhase1Encryption extends Model
      * @param string $name The encryption algorithm name to obtain key lengths for.
      * @returns array An array of supported key lengths for this encryption algorithm.
      */
-    public function get_supported_keylens(string $name): array {
+    public static function get_supported_keylens(string $name): array {
         global $p1_ealgos;
 
         # Throw an error if an encryption algorithm does not exist with this name.
