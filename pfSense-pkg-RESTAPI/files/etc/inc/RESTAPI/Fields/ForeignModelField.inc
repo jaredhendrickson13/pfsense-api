@@ -218,9 +218,9 @@ class ForeignModelField extends Field {
     /**
      * Converts the field value to its representation form from it's internal pfSense configuration value.
      * @param mixed $internal_value The internal value from the pfSense configuration.
-     * @return string The field value in its representation form.
+     * @return mixed The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value) : string {
+    protected function _from_internal(mixed $internal_value) : mixed {
         # Add the query parameters needed to locate the related Model object
         $query_params = array_merge($this->model_query, [$this->model_field_internal => $internal_value]);
         
