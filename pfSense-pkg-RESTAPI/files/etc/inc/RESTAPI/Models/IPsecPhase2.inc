@@ -330,7 +330,7 @@ class IPsecPhase2 extends Model
             throw new ValidationError(
                 message: "Field `natlocalid_type` value must match the `localid_type` value if either value is ".
                     "not an interface.",
-                response_id: "IPSEC_PHASE_2_NATLOCALID_TYPE_CANNOT_BE_INTERFACE_WITH_VTI_MODE"
+                response_id: "IPSEC_PHASE_2_NATLOCALID_TYPE_MUST_MATCH_LOCALID_TYPE"
             );
         }
 
@@ -356,7 +356,7 @@ class IPsecPhase2 extends Model
         if (!$this->natlocalid_address->has_label("is_ipaddrv6") and $this->mode->value === "tunnel6") {
             throw new ValidationError(
                 message: "Field `natlocalid_address` must be an IPv6 address while `mode` is set to `tunnel6`.",
-                response_id: "IPSEC_PHASE_2_NATLOCALID_ADDRESS_MUST_BE_IPV6_WITH_TUNNEL5_MODE"
+                response_id: "IPSEC_PHASE_2_NATLOCALID_ADDRESS_MUST_BE_IPV6_WITH_TUNNEL6_MODE"
             );
         }
 
@@ -400,7 +400,7 @@ class IPsecPhase2 extends Model
         if (!$this->remoteid_address->has_label("is_ipaddrv6") and $this->mode->value === "tunnel6") {
             throw new ValidationError(
                 message: "Field `remoteid_address` must be an IPv6 address while `mode` is set to `tunnel6`.",
-                response_id: "IPSEC_PHASE_2_REMOTEID_ADDRESS_MUST_BE_IPV6_WITH_TUNNEL5_MODE"
+                response_id: "IPSEC_PHASE_2_REMOTEID_ADDRESS_MUST_BE_IPV6_WITH_TUNNEL6_MODE"
             );
         }
 
