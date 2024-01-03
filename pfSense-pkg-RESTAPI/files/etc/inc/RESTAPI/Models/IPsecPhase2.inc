@@ -50,6 +50,7 @@ class IPsecPhase2 extends Model
         
         # Set model attributes
         $this->config_path = "ipsec/phase2";
+        $this->subsystem = "ipsec";
         $this->many = true;
         
         # Set model fields
