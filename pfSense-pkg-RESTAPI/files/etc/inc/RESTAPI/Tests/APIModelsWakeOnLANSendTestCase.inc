@@ -42,6 +42,7 @@ class APIModelsWakeOnLANSendTestCase extends TestCase
      * Checks that the _create() method throws an error if the wol command fails for any reason.
      */
     public function test_error_thrown_if_wol_cmd_fails(): void {
+        # Ensure an error is thrown if the wol command fails (i.e. the mac address is somehow invalid, etc.)
         $this->assert_throws_response(
             response_id: "WAKE_ON_LAN_SEND_COMMAND_FAILED",
             code: 500,
@@ -49,6 +50,16 @@ class APIModelsWakeOnLANSendTestCase extends TestCase
                 $wol = new WakeOnLANSend();
                 $wol->interface->value = "lan";
                 $wol->mac_addr->value = "invalid_mac_to_trigger_cmd_failure";
+                $wol->_create();
+            }
+        );
+
+        # Ensure no error is thrown when the wol command is successful
+        $this->assert_does_not_throw(
+            callable: function () {
+                $wol = new WakeOnLANSend();
+                $wol->interface->value = "lan";
+                $wol->mac_addr->value = "00:00:00:00:00:00";
                 $wol->_create();
             }
         );
