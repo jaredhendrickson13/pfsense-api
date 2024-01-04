@@ -25,7 +25,6 @@ use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
 use ReflectionClass;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
-use const RESTAPI\Core\Globals\HAL_REL_NAMESPACE;
 
 # Constants
 const DEFAULT_CLIENT_USERNAME = "(system RESTAPI)";
@@ -284,6 +283,7 @@ class Model {
             # Don't pull internal values unless there is a `config_path` or `internal_callable` defined.
             if ($this->config_path or $this->internal_callable) {
                 $this->id = $id;
+                $this->get_parent_model();
                 $this->from_internal();
                 $this->initial_object = unserialize(serialize($this));
             }
@@ -298,12 +298,10 @@ class Model {
     {
         # Separate the class name's words with spaces, allow consecutive capital characters like 'DNS'
         $model_name = (new ReflectionClass($this))->getShortName();;
-        $verbose_name = preg_replace(
+        return preg_replace(
             '/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', ' ',
             $model_name
         );
-        
-        return $verbose_name;
     }
 
     /**
@@ -1211,7 +1209,6 @@ class Model {
                 $this, rel: "delete", method: "DELETE", use_namespace: false
             );
         }
-        
         # Loop through each field and check for any objects related to those fields.
         foreach ($this->get_fields() as $field) {
             # Determine the HAL rel value for this Field's Model relation

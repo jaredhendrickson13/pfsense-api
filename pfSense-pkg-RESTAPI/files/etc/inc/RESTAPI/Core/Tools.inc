@@ -171,7 +171,7 @@ function get_classes_from_namespace(string $namespace) : array {
 /**
  * Auto-generates OpenAPI documentation for all Endpoints and their associated Models.
  */
-function generate_documentation() {
+function generate_documentation(): bool {
     # Variables
     $endpoint_classes = get_classes_from_namespace("\\RESTAPI\\Endpoints\\");
     $response_classes = get_classes_from_namespace("\\RESTAPI\\Responses\\");
@@ -444,7 +444,7 @@ function generate_documentation() {
         }
     }
 
-    return file_put_contents(
+    return (bool)file_put_contents(
         filename: "/usr/local/www/openapi/openapi.json",
         data: json_encode($openapi_config).PHP_EOL
     );

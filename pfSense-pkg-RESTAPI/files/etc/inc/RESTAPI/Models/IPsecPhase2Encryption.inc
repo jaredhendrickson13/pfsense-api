@@ -22,6 +22,7 @@ class IPsecPhase2Encryption extends Model
         # Set model attributes
         $this->parent_model_class = "IPsecPhase2";
         $this->config_path = "encryption-algorithm-option";
+        $this->subsystem = "ipsec";
         $this->many = true;
 
         # Set model fields
@@ -55,8 +56,7 @@ class IPsecPhase2Encryption extends Model
         # Throw a validation error if this $keylen is not supported for the assigned algo
         if (!in_array($keylen, $supported_keylens)) {
             throw new ValidationError(
-                message: "Field `keylen` value `$keylen` is not valid for ".
-                    "`{$this->name->value}` algorithm.",
+                message: "Field `keylen` value `$keylen` is not valid for the `{$this->name->value}` algorithm.",
                 response_id: "IPSEC_PHASE_2_ENCRYPTION_ALGORITHM_KEYLEN_INVALID_CHOICE"
             );
         }
@@ -69,7 +69,7 @@ class IPsecPhase2Encryption extends Model
      * @param string $name The encryption algorithm name to obtain key lengths for.
      * @returns array An array of supported key lengths for this encryption algorithm.
      */
-    public function get_supported_keylens(string $name): array {
+    public static function get_supported_keylens(string $name): array {
         global $p2_ealgos;
 
         # Throw an error if an encryption algorithm does not exist with this name.

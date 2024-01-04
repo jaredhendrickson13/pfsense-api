@@ -2,6 +2,7 @@
 
 namespace RESTAPI\Core;
 
+use ReflectionClass;
 use RESTAPI\Responses\ServerError;
 
 require_once("RESTAPI/autoloader.inc");
@@ -26,6 +27,7 @@ class Form {
     public array $table_fields = [];
     public array $buttons = [];
     public array $form_data = [];
+    public string $verbose_name = "";
     protected Model $model;
 
     /**
@@ -54,6 +56,23 @@ class Form {
         foreach ($this->title_path as &$path) {
             $path = gettext($path);
         }
+        
+        # Define a verbose name for this Form if one was not specifically assigned
+        $this->verbose_name = ($this->verbose_name) ?: $this->generate_verbose_name();
+    }
+
+    /**
+     * Auto-generates a verbose name for this Form class using its class name.
+     * @returns string The human-readable name for this Form class.
+     */
+    private function generate_verbose_name(): string
+    {
+        # Separate the class name's words with spaces, allow consecutive capital characters like 'DNS'
+        $form_name = (new ReflectionClass($this))->getShortName();;
+        return preg_replace(
+            '/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', ': ',
+            $form_name
+        );
     }
 
     /**
@@ -308,12 +327,43 @@ class Form {
     }
 
     /**
+     * Obtains the pfSense privilege name for this Form. This privilege name is automatically generated using the 
+     * $url attribute and formats it to be consistent with the other webConfigurator page privileges.
+     * @returns string The pfSense privilege name for this Form (i.e. page-test-form)
+     */
+    public function get_priv_name(): string {
+        # Obtain the PHP file name for this Form using it's webroot URL
+        $name = basename($this->url);
+        
+        # Remove the .php extension and convert underscores to hyphens
+        $name = str_replace(".php", "", $name);
+        $name = str_replace("_", "-", $name);
+        
+        # Return the privilege name prefixed with the `page-` privilege type
+        return "page-$name";
+    }
+
+    /**
+     * Utilizes the $url properties of this Form to generate pfSense privileges specific to this Form class. 
+     * The resulting array is then supplied to the pfSense privilege system located at /etc/inc/priv/.
+     * @returns array The pfSense priv list entry array corresponding to the privileges of this Endpoint.
+     */
+    public function generate_pfsense_privs() : array  {
+        return [
+            $this->get_priv_name() => [
+                "name" => "WebCfg - ".$this->verbose_name,
+                "descr" => "Allow access to the $this->url page."
+            ]
+        ];
+    }
+
+    /**
      * Generate an endpoint for this Form in the pfSense webroot.
      */
     public function build_form_url() {
         # Get the fully qualified and non qualified class names for this object
         $fq_class_name = get_class($this);
-        $nq_class_name = (new \ReflectionClass($this))->getShortName();
+        $nq_class_name = (new ReflectionClass($this))->getShortName();
 
         # Specify the PHP code to write to the Endpoints index.php file
         $code = "<?php

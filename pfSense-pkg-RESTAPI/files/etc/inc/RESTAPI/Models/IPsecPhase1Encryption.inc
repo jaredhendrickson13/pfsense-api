@@ -27,6 +27,7 @@ class IPsecPhase1Encryption extends Model
         # Set model attributes
         $this->parent_model_class = "IPsecPhase1";
         $this->config_path = "encryption/item";
+        $this->subsystem = "ipsec";
         $this->many = true;
 
         # Set model fields

@@ -30,6 +30,9 @@ class TestCase {
         # use a property to keep track of the method that is currently running
         $this->method = "unknown";
 
+        # Setup the test case before running tests
+        $this->setup();
+        
         # Loop through all methods in this object
         foreach (get_class_methods($this) as $method) {
             # If this method starts with `test`, run the function.
@@ -49,7 +52,10 @@ class TestCase {
                     $this->$method();
                 }
                 catch (Error|Exception $e) {
+                    # Restore the original configuration, teardown the TestCase and throw the encountered error
                     $config = $original_config;
+                    write_config("Restored config after API test '$method'");
+                    $this->teardown();
                     throw $e;
                 }
 
@@ -58,6 +64,9 @@ class TestCase {
                 write_config("Restored config after API test '$method'");
             }
         }
+        
+        # Teardown the test case now that all tests are completed
+        $this->teardown();
     }
 
     /**
@@ -80,6 +89,18 @@ class TestCase {
 
         return $results;
     }
+
+    /**
+     * Sets up the test case before tests are run. This can be overridden by your TestCase to setup shared resources
+     * required for your tests.
+     */
+    public function setup(): void {}
+
+    /**
+     * Tears down the test case after tests are run. This can be overridden by your TestCase to destroy resources
+     * that may have been created during tests.
+     */
+    public function teardown(): void {}
 
     /**
      * Checks if two values are equal.
