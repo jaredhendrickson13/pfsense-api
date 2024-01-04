@@ -48,6 +48,35 @@ function build_forms() {
     }
 }
 
+function build_privs() {
+    echo "Building privileges... ";
+    
+    # Use a variable to keep track of the privileges associated with this endpoint
+    $privs = [];
+
+    # Import each Form class
+    foreach(glob("/etc/inc/RESTAPI/Endpoints/*.inc") as $file) {
+        # Import classes files and create object
+        require_once($file);
+        $form_class = "\\RESTAPI\\Endpoints\\".str_replace(".inc", "", basename($file));
+        $form_obj = new $form_class();
+        $privs += $form_obj->generate_pfsense_privs();
+    }
+
+    # Import each Form class
+    foreach(glob("/etc/inc/RESTAPI/Forms/*.inc") as $file) {
+        # Import classes files and create object
+        require_once($file);
+        $form_class = "\\RESTAPI\\Forms\\".str_replace(".inc", "", basename($file));
+        $form_obj = new $form_class();
+        $privs += $form_obj->generate_pfsense_privs();
+    }
+
+    # Write the REST API endpoint privileges to privs.json
+    file_put_contents("/usr/local/share/pfSense-pkg-RESTAPI/privs.json", json_encode($privs));
+    echo "done.".PHP_EOL;
+}
+
 function notify_dispatcher(string $dispatcher_name) {
     # Format the fully qualified class name
     $class = "\\RESTAPI\\Dispatchers\\$dispatcher_name";
@@ -218,6 +247,7 @@ function help() {
     echo "  help             : Display the help page (this page)".PHP_EOL;
     echo "  buildendpoints   : Build all REST API Endpoints included in this package".PHP_EOL;
     echo "  buildforms       : Build all REST API Forms included in this package".PHP_EOL;
+    echo "  buildprivs       : Build all REST API privileges included in this package".PHP_EOL;
     echo "  generatedocs     : Regenerates the OpenAPI documentation".PHP_EOL;
     echo "  notifydispatcher : Start a dispatcher process".PHP_EOL;
     echo "  runtests         : Run all REST API unit Tests. Warning: this may be disruptive!".PHP_EOL;
@@ -239,6 +269,10 @@ if (in_array($argv[1], ["buildforms"])) {
 # BUILDENDPOINTS COMMAND
 elseif (in_array($argv[1], ["buildendpoints"])) {
     build_endpoints();
+}
+# BUILDPRIVS COMMAND
+elseif (in_array($argv[1], ["buildprivs"])) {
+    build_privs();
 }
 # GENERATEDOCUMENTATION COMMAND
 elseif (in_array($argv[1], ["generatedocs"])) {
