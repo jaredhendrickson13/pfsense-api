@@ -298,12 +298,10 @@ class Model {
     {
         # Separate the class name's words with spaces, allow consecutive capital characters like 'DNS'
         $model_name = (new ReflectionClass($this))->getShortName();;
-        $verbose_name = preg_replace(
+        return preg_replace(
             '/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', ' ',
             $model_name
         );
-        
-        return $verbose_name;
     }
 
     /**

@@ -69,12 +69,10 @@ class Form {
     {
         # Separate the class name's words with spaces, allow consecutive capital characters like 'DNS'
         $form_name = (new ReflectionClass($this))->getShortName();;
-        $verbose_name = preg_replace(
+        return preg_replace(
             '/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', ': ',
             $form_name
         );
-
-        return $verbose_name;
     }
 
     /**
