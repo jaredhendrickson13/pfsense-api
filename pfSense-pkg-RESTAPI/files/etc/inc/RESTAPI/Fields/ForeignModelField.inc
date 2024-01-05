@@ -221,18 +221,18 @@ class ForeignModelField extends Field {
      * @return mixed The field value in its representation form.
      */
     protected function _from_internal(mixed $internal_value) : mixed {
+        # Ensure the internal field value is converted to its representation value before querying
+        $internal_value = $this->model->{$this->model_field_internal}->_from_internal($internal_value);
+
         # Add the query parameters needed to locate the related Model object
         $query_params = array_merge($this->model_query, [$this->model_field_internal => $internal_value]);
-        
+
         # Query for the Model object this value relates to.
         $query_modelset = $this->model->query($query_params);
         
-        # If the model object exists and this is not a $many enabled field, return the `model_field` value.
-        if ($query_modelset->exists() and !$this->many) {
+        # If the model object exists, return the `model_field` value.
+        if ($query_modelset->exists()) {
             return $query_modelset->first()->{$this->model_field}->value;
-        }
-        elseif ($query_modelset->exists() and $this->many) {
-            return $internal_value;
         }
         
         # As a failsafe, return the existing internal value if we could not find the related object
