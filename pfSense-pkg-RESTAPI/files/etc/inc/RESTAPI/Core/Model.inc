@@ -967,6 +967,12 @@ class Model {
     }
 
     /**
+     * Allows child classes to define extra validation for their Models. This can be used to build complex validations
+     * that check conditions between multiple Model fields.
+     */
+    public function validate_extra(): void {}
+
+    /**
      * Performs a full validation on the API mode. This includes checking that required packages are installed and
      * validating all assigned Fields. Note: Fields are validated in the order they are defined in the class.
      * @param bool $requires_id Whether the `id` field should be validated in this request. This is typically only
@@ -1066,6 +1072,9 @@ class Model {
         if (!$skip_parent) {
             $this->check_unique_together();
         }
+        
+        # Run the `validate_extra()` method for this Model to include any custom validation for the entire Model.
+        $this->validate_extra();
 
         return true;
     }
