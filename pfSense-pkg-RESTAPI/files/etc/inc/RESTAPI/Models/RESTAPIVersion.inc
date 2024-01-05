@@ -92,9 +92,9 @@ class RESTAPIVersion extends Model
 
     /**
      * Obtains the latest API version available to this system.
-     * @return string The latest API version available to this system.
+     * @return string|null The latest API version available to this system or `null` if none are available.
      */
-    public static function get_latest_api_version() : string {
+    public static function get_latest_api_version() : string|null {
         # Fetch our latest version and format it semantically (x.x.x)
         return array_key_first(self::get_all_available_versions());
     }

@@ -59,14 +59,8 @@ class SystemVersion extends Model
             $version = str_replace(PHP_EOL, "", $version);
             $ver_data["version"] = $version;
 
-            # Discard everything but the version tag (e.g. 2.6.0)
-            $version = explode("-", $version)[0];
-
-            # Separate each version category into an array and piece together the major and minor categories as the base
-            $version = explode(".", $version);
-            $major_ver = $version[0];
-            $minor_ver = $version[1];
-            $ver_data["base"] = $major_ver.".".$minor_ver;
+            # Discard everything but the version tag for our base version (e.g. 2.6.0)
+            $ver_data["base"] = explode("-", $version)[0];
         }
         if (file_exists(self::VERSION_PATCH_PATH)) {
             $ver_patch_file = file_get_contents(self::VERSION_PATCH_PATH);

@@ -26,8 +26,6 @@ class APIModelsSystemVersionTestCase extends TestCase
         
         # Ensure the `base` version contains only the major and minor versions
         $version = explode("-", $system_version->version->value)[0];
-        $major_version = explode(".", $version)[0];
-        $minor_version = explode(".", $version)[1];
-        $this->assert_equals($system_version->base->value, "$major_version.$minor_version");
+        $this->assert_equals($system_version->base->value, $version);
     }
 }
