@@ -298,7 +298,11 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             code: 500,
             callable: function () {
                 $test_model = new RESTAPI\Models\Test();
-                $test_model->config_path = "";
+
+                # We need to use an mock internal callable to test this for creates, otherwise the
+                # Model::check_many_minimum() method will throw an error about no internal callable being set
+                $test_model->config_path = null;
+                $test_model->internal_callable = "test_internal_callable";
 
                 # Prevent this unique field from throwing an error first
                 $test_model->test_string_unique->unique = false;

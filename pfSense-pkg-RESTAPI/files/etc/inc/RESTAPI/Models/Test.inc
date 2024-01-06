@@ -80,6 +80,13 @@ class Test extends Model {
     }
 
     /**
+     * Defines a test 'internal_callable' method that can be assigned to this Model
+     */
+    public function test_internal_callable(): array {
+        return [];
+    }
+
+    /**
      * Override the default apply method to write a file to disk. This is used for testing to determine if the
      * `apply` method did or didn't run when expected.
      */
