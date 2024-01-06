@@ -222,7 +222,9 @@ class ForeignModelField extends Field {
      */
     protected function _from_internal(mixed $internal_value) : mixed {
         # Ensure the internal field value is converted to its representation value before querying
-        $internal_value = $this->model->{$this->model_field_internal}->_from_internal($internal_value);
+        if ($this->model_field_internal !== "id") {
+            $internal_value = $this->model->{$this->model_field_internal}->_from_internal($internal_value);
+        }
 
         # Add the query parameters needed to locate the related Model object
         $query_params = array_merge($this->model_query, [$this->model_field_internal => $internal_value]);
