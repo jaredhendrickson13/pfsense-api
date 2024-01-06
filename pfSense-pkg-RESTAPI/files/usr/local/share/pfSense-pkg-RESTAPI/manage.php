@@ -30,11 +30,10 @@ function build_endpoints() {
         $endpoint_class = "\\RESTAPI\\Endpoints\\".str_replace(".inc", "", basename($file));
         $endpoint_obj = new $endpoint_class();
         $endpoint_obj->build_endpoint_url();
-        $endpoint_privs += $endpoint_obj->generate_pfsense_privs();
     }
 
-    # Write the REST API endpoint privileges to privs.json
-    file_put_contents("/usr/local/share/pfSense-pkg-RESTAPI/privs.json", json_encode($endpoint_privs));
+    # Rebuild privileges in case any Endpoint privilege names have changed
+    build_privs();
 }
 
 function build_forms() {
@@ -46,6 +45,9 @@ function build_forms() {
         $form_obj = new $form_class();
         $form_obj->build_form_url();
     }
+
+    # Rebuild privileges in case any Endpoint privilege names have changed
+    build_privs();
 }
 
 function build_privs() {
@@ -54,16 +56,16 @@ function build_privs() {
     # Use a variable to keep track of the privileges associated with this endpoint
     $privs = [];
 
-    # Import each Form class
+    # Import and build privileges for each Endpoint class
     foreach(glob("/etc/inc/RESTAPI/Endpoints/*.inc") as $file) {
         # Import classes files and create object
         require_once($file);
-        $form_class = "\\RESTAPI\\Endpoints\\".str_replace(".inc", "", basename($file));
-        $form_obj = new $form_class();
-        $privs += $form_obj->generate_pfsense_privs();
+        $endpoint_class = "\\RESTAPI\\Endpoints\\".str_replace(".inc", "", basename($file));
+        $endpoint_object = new $endpoint_class();
+        $privs += $endpoint_object->generate_pfsense_privs();
     }
 
-    # Import each Form class
+    # Import and build privileges for each Form class
     foreach(glob("/etc/inc/RESTAPI/Forms/*.inc") as $file) {
         # Import classes files and create object
         require_once($file);
@@ -238,10 +240,10 @@ function version() {
 }
 
 function help() {
-    echo "pfsense-RESTAPI - CLI tool for pfSense REST API management".PHP_EOL;
+    echo "pfsense-restapi - CLI tool for pfSense REST API management".PHP_EOL;
     echo "Copyright - ".date("Y")."© - Jared Hendrickson".PHP_EOL;
     echo "SYNTAX:".PHP_EOL;
-    echo "  pfsense-RESTAPI <command> <args>".PHP_EOL;
+    echo "  pfsense-restapi <command> <args>".PHP_EOL;
     echo "COMMANDS:".PHP_EOL;
     echo "  version          : Display the current package version and build information".PHP_EOL;
     echo "  help             : Display the help page (this page)".PHP_EOL;
