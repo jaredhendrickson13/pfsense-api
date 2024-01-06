@@ -29,6 +29,7 @@ class IPsecPhase1Encryption extends Model
         $this->config_path = "encryption/item";
         $this->subsystem = "ipsec";
         $this->many = true;
+        $this->many_minimum = 1;
 
         # Set model fields
         $this->encryption_algorithm_name = new StringField(

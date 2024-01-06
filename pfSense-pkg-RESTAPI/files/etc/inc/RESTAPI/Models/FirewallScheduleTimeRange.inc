@@ -25,6 +25,7 @@ class FirewallScheduleTimeRange extends Model
         $this->config_path = "timerange";
         $this->many = true;
         $this->always_apply = true;
+        $this->many_minimum = 1;
         
         # Set model fieldsf
         $this->position = new IntegerField(

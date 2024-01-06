@@ -24,6 +24,7 @@ class IPsecPhase2Encryption extends Model
         $this->config_path = "encryption-algorithm-option";
         $this->subsystem = "ipsec";
         $this->many = true;
+        $this->many_minimum = 1;
 
         # Set model fields
         $this->name = new StringField(

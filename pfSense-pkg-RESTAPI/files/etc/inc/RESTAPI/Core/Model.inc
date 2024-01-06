@@ -51,6 +51,22 @@ class Model {
     public bool $many = false;
 
     /**
+     * @var int $many_minimum
+     * Specifies the minimum number of associated Models that must be present at all times. If a deletion is requested,
+     * and it would result in the number of associated objects falling below this value, the deletion will be denied.
+     * This condition is applicable only when the $many property is set to true.
+     */
+    public int $many_minimum = 0;
+
+    /**
+     * @var int $many_maximum
+     * Specifies the maximum number of associated Models that can be present at any time. If a new creation is requested,
+     * and it would result in the number of associated objects growing beyond this value, the creation will be denied.
+     * This condition is applicable only when the $many property is set to true.
+     */
+    public int $many_maximum = 65535;
+
+    /**
      * @var mixed $id
      * The ID of the current Model object. This applies exclusively to Models with $many enabled. New Model objects
      * will not possess an ID until the `create()` method is executed.
@@ -917,6 +933,54 @@ class Model {
     }
 
     /**
+     * Checks if the deletion of this object would put the number of objects for this Model below the $many_minimum value.
+     * @throws ForbiddenError When a new deletion is not allowed because it will put the number of objects below
+     * the $many_minimum value.
+     */
+    public function check_many_minimum(): void {
+        # Only perform this check if this is a $many enabled Model with a $many_minimum value assigned
+        if (!$this->many or !$this->many_minimum) {
+            return;
+        }
+
+        # Obtain the current number of stored objects for this Model
+        $total_objects = count($this->get_internal_objects());
+
+        # Throw a forbidden error if we are already at or under the minimum objects allowed
+        if ($total_objects <= $this->many_minimum) {
+            throw new ForbiddenError(
+                message: "Object deletion denied. Deleting this object would result in the number of existing objects ".
+                    "falling below the minimum number allowed for this Model, $this->many_minimum.",
+                response_id: "MODEL_MANY_MINIMUM_REACHED"
+            );
+        }
+    }
+
+    /**
+     * Checks if the creation of a new object would put the number of objects for this Model over the $many_maximum value.
+     * @throws ForbiddenError When a new creation is not allowed because it will put the number of objects over
+     * the $many_maximum value.
+     */
+    public function check_many_maximum(): void {
+        # Only perform this check if this is a $many enabled Model with a $many_maximum value assigned
+        if (!$this->many or !$this->many_maximum) {
+            return;
+        }
+
+        # Obtain the current number of stored objects for this Model
+        $total_objects = count($this->get_internal_objects());
+
+        # Throw a forbidden error if we are already at or over the maximum objects allowed
+        if ($total_objects >= $this->many_maximum) {
+            throw new ForbiddenError(
+                message: "Object creation denied. Creating this object would result in the number of existing objects ".
+                    "increasing beyond the maximum number allowed for this Model, $this->many_maximum.",
+                response_id: "MODEL_MANY_MAXIMUM_REACHED"
+            );
+        }
+    }
+
+    /**
      * Checks that any Fields which must be unique together are unique from all other existing objects for this Model.
      * @throws ServerError When the Fields specified in `unique_together_fields` are not Field objects known to this
      * Model.
@@ -1587,6 +1651,9 @@ class Model {
     final public function create(bool $apply = false) : Model {
         # Ensure all object Fields and validations succeed for proceeding.
         if ($this->validate(create_id: true)) {
+            # Check if creating this object would put the total number of objects over the $many_maximum
+            $this->check_many_maximum();
+
             # Run the _create method
             $this->_create();
 
@@ -1713,6 +1780,23 @@ class Model {
                 response_id: "MODEL_NON_ARRAY_REPRESENTATION_DATA"
             );
         }
+
+        # Do not allow this replacement unless the number of objects is equal to or greater than the $many_minimum
+        if (count($data) < $this->many_minimum) {
+            throw new ValidationError(
+                message: "A minimum of $this->many_minimum new objects is required to replace all existing objects.",
+                response_id: "MODEL_REPLACE_ALL_MINIMUM_NOT_MET"
+            );
+        }
+
+        # Do not allow this replacement unless the number of objects is equal to or greater than the $many_minimum
+        if (count($data) > $this->many_maximum) {
+            throw new ValidationError(
+                message: "The request to replace all existing objects exceeds the maximum limit of ".
+                    "$this->many_maximum new objects.",
+                response_id: "MODEL_REPLACE_ALL_MAXIMUM_EXCEEDED"
+            );
+        }
         
         # Keep track of all existing objects for this Model before anything is changed. This will be passed back
         # into `apply_replace_all()` so that method can gracefully bring down these objects before replacing them
@@ -1823,6 +1907,9 @@ class Model {
                     data: $referenced_by
                 );
             }
+
+            # Block the deletion if will put us below the minimum number of objects required for this Model
+            $this->check_many_minimum();
 
             # Run the _delete method
             $this->_delete();

@@ -79,6 +79,8 @@ class NestedModelField extends Field
             read_only: $read_only,
             write_only: $write_only,
             many: $this->model->many,
+            many_minimum: $this->model->many_minimum,
+            many_maximum: $this->model->many_maximum,
             verbose_name: $verbose_name,
             verbose_name_plural: $verbose_name_plural,
             internal_name: array_pop($config_path),
@@ -291,6 +293,8 @@ class NestedModelField extends Field
         # Reference the nested Model schema as the items of this property for `many` Fields
         if ($this->many) {
             $openapi_property["type"] = $this->type;
+            $openapi_property["minItems"] = $this->many_minimum;
+            $openapi_property["maxItems"] = $this->many_maximum;
             $openapi_property["items"] = [
                 "allOf" => [
                     ['$ref' => "#/components/schemas/$this->model_class_short"],

@@ -49,6 +49,7 @@ class FirewallRule extends Model
         # Set model attributes
         $this->config_path = "filter/rule";
         $this->many = true;
+        $this->many_minimum = 1;
         $this->client = ($client) ?: new Auth();
 
         # Set model Fields
