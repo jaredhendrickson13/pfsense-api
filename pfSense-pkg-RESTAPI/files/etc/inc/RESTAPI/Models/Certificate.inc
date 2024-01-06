@@ -6,6 +6,7 @@ use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\Base64Field;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Fields\UIDField;
 use RESTAPI\Responses\ForbiddenError;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\RegexValidator;
@@ -14,7 +15,7 @@ use RESTAPI\Validators\X509Validator;
 class Certificate extends Model
 {
     public StringField $descr;
-    public StringField $refid;
+    public UIDField $refid;
     public StringField $type;
     public Base64Field $crt;
     public Base64Field $prv;
@@ -31,10 +32,7 @@ class Certificate extends Model
             validators: [new RegexValidator(pattern: "/[\?\>\<\&\/\\\"\']/", invert: true)],
             help_text: "The descriptive name for this certificate."
         );
-        $this->refid = new StringField(
-            unique: true,
-            default: uniqid(),
-            read_only: true,
+        $this->refid = new UIDField(
             help_text: "The unique ID assigned to this certificate for internal system use. This value is generated ".
                 "by this system and cannot be changed."
         );
