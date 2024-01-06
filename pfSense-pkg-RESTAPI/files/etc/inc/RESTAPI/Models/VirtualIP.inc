@@ -9,6 +9,7 @@ use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Fields\UIDField;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\IPAddressValidator;
 use RESTAPI\Validators\UniqueFromForeignModelValidator;
@@ -18,7 +19,7 @@ use RESTAPI\Validators\UniqueFromForeignModelValidator;
  */
 class VirtualIP extends Model
 {
-    public StringField $uniqid;
+    public UIDField $uniqid;
     public StringField $mode;
     public InterfaceField $interface;
     public StringField $type;
@@ -40,11 +41,7 @@ class VirtualIP extends Model
         $this->many = true;
 
         # Define model Fields
-        $this->uniqid = new StringField(
-            unique: true,
-            default: uniqid(),
-            editable: false,
-            read_only: true,
+        $this->uniqid = new UIDField(
             help_text: "The unique ID for this virtual IP."
         );
         $this->mode = new StringField(
