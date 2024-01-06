@@ -10,7 +10,7 @@ use RESTAPI\Responses\ValidationError;
 
 class FirewallScheduleTimeRange extends Model
 {
-    const SUPPORTED_MINUTES = ["00", "15", "30", "59"];
+    const SUPPORTED_MINUTES = ["00", "15", "30", "45", "59"];
     
     public IntegerField $position;
     public IntegerField $month;
@@ -30,6 +30,8 @@ class FirewallScheduleTimeRange extends Model
         $this->position = new IntegerField(
             choices: [1, 2, 3, 4, 5, 6, 7],
             allow_null: true,
+            many: true,
+            many_maximum: 7,
             help_text: "The day of the week this schedule should be active for. Use `1` for every Monday, `2` for ".
                 "every Tuesday, `3` for every Wednesday, `4` for every Thursday, `5` for every Friday, `6` for every ".
                 "Saturday, or `7` for every Sunday. If this field has a value specified, the `month` and `day` fields ".

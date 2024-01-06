@@ -34,6 +34,7 @@ class FirewallRule extends Model
     public BooleanField $tcp_flags_any;
     public StringField $tcp_flags_out_of;
     public StringField $tcp_flags_set;
+    public ForeignModelField $sched;
     public BooleanField $floating;
     public BooleanField $quick;
     public StringField $direction;
@@ -224,7 +225,13 @@ class FirewallRule extends Model
             internal_namespace: "updated",
             help_text: "The username and IP of the user who last updated this firewall rule."
         );
-        # TODO: Add ForeignModelField for `sched` when the FirewallSchedule model is developed
+        $this->sched = new ForeignModelField(
+            model_name: "FirewallSchedule",
+            model_field: "name",
+            default: null,
+            allow_null: true,
+            help_text: "The name of an existing firewall schedule to assign to this firewall rule."
+        );
         # TODO: Add ForeignModelField for `dnpipe` when the traffic shaper Models are developed
         # TODO: Add ForeignModelField for `pdnpipe` when the traffic shaper Models are developed
         # TODO: Add ForeignModelField for `defaultqueue` when the traffic shaper Models are developed

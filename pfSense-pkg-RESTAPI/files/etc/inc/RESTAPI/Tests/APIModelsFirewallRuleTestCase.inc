@@ -4,6 +4,7 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\FirewallRule;
+use RESTAPI\Models\FirewallSchedule;
 use RESTAPI\Models\RoutingGateway;
 
 class APIModelsFirewallRuleTestCase extends TestCase
@@ -411,5 +412,63 @@ class APIModelsFirewallRuleTestCase extends TestCase
 
         # Delete the firewall rule
         $rule->delete(apply: true);
+    }
+
+    /**
+     * Checks that firewall rules with a `sched` are correctly added in pfctl
+     */
+    public function test_sched_found_in_pfctl(): void {
+        # Get the current month and day so we can test the schedule
+        $current_month = (int)date("m");
+        $current_day = (int)date("d");
+        $test_day = ($current_day !== 15) ? 15 : 14; 
+        
+        # Create a new firewall schedule to test with
+        $sched = new FirewallSchedule(
+            data: [
+                "name" => "test_sched", 
+                "timerange" => [
+                    ["month" => [$current_month], "day" => [$current_day], "hour" => "0:00-23:59"]
+                ]
+            ],
+            async: false
+        );
+        $sched->create();
+
+        # Create a firewall rule to test with
+        $rule = new FirewallRule(
+            data: [
+                "type" => "pass",
+                "interface" => ["lan"],
+                "ipprotocol" => "inet",
+                "protocol" => "tcp",
+                "source" => "any",
+                "destination" => "any",
+                "sched" => $sched->name->value
+            ],
+            async: false
+        );
+        $rule->create(apply: true);
+        
+        # Ensure the schedule is found tied to the rule in pfctl
+        $pfctl = file_get_contents("/tmp/rules.debug");
+        $this->assert_str_contains($pfctl, "s:{$sched->schedlabel->value}");
+        
+        # Update the schedule so it is inactive and ensure the rule is no longer present in pfctl
+        $sched->timerange->value[0]["day"] = [$test_day];
+        $sched->update();
+        $pfctl = file_get_contents("/tmp/rules.debug");
+        $this->assert_str_does_not_contain($pfctl, "s:{$sched->schedlabel->value}");
+        
+        # Update the rule to remove the schedule and ensure it is present again
+        $rule->sched->value = null;
+        $rule->update(apply: true);
+        $pfctl = file_get_contents("/tmp/rules.debug");
+        $this->assert_str_contains($pfctl, "id:{$rule->tracker->value}");
+        $this->assert_str_does_not_contain($pfctl, "s:{$sched->schedlabel->value}");
+
+        # Delete the rule and schedule
+        $rule->delete();
+        $sched->delete();
     }
 }
