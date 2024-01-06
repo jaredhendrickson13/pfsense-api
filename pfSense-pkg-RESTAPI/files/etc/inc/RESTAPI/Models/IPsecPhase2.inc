@@ -11,12 +11,13 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\NestedModelField;
 use RESTAPI\fields\SpecialNetworkField;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Fields\UIDField;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\IPAddressValidator;
 
 class IPsecPhase2 extends Model
 {
-    public StringField $uniqid;
+    public UIDField $uniqid;
     public IntegerField $reqid;
     public ForeignModelField $ikeid;
     public StringField $descr;
@@ -54,11 +55,7 @@ class IPsecPhase2 extends Model
         $this->many = true;
         
         # Set model fields
-        $this->uniqid = new StringField(
-            unique: true,
-            default: uniqid(),
-            editable: false,
-            read_only: true,
+        $this->uniqid = new UIDField(
             help_text: "A unique ID used to identify this IPsec phase2 entry internally. This value is automatically ".
                 "set by the system and cannot be changed."
         );
