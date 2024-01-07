@@ -127,8 +127,6 @@ class APIModelsFirewallRuleTestCase extends TestCase
         );
         $rule->create(apply: true);
 
-        var_dump($rule->to_representation());
-
         # Check that this rule is present in the pfctl rules
         $pfctl_rules = file_get_contents("/tmp/rules.debug");
         $type = $rule->type->value;
