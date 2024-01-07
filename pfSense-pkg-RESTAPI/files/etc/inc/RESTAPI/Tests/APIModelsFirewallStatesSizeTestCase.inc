@@ -24,7 +24,7 @@ class APIModelsFirewallStatesSizeTestCase extends TestCase
      */
     public function test_maximumstates_set_in_pfctl() {
         # Create a FirewallStatesSize object to test with
-        $states_size = new FirewallStatesSize(async: true);
+        $states_size = new FirewallStatesSize(async: false);
         $states_size->maximumstates->value = 500;
         $states_size->update();
         sleep(1);
