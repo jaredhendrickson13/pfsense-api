@@ -20,7 +20,7 @@ use RESTAPI\Validators\UniqueFromForeignModelValidator;
 
 /**
  * A Model that allows us to read, create, update and delete network interfaces. Note: PHP does not allow us to name a
- * class `Interface` so we must use `NetworkInterface` even though this is inconsistent.
+ * class `Interface` so we must use `NetworkInterface` even though this isn't inconsistent.
  */
 class NetworkInterface extends Model
 {

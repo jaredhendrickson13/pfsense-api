@@ -669,12 +669,10 @@ class Model {
         }
         # Obtain the internal objects from the config path if specified
         elseif ($this->config_path) {
-            $this->reload_config();
             $internal_objects = $this->get_config($this->get_config_path(), []);
         }
         # Obtain the internal objects by calling the `internal_callable` if specified
         elseif ($this->internal_callable) {
-            $this->reload_config();
             $callable = $this->internal_callable;
             $internal_objects = $this->$callable();
         }
@@ -1491,8 +1489,8 @@ class Model {
                 
             # Obtain this Model object from internal
             $model_object = new $model();
-            $model_object->from_internal_object($internal_object);
             $model_object->id = $internal_id;
+            $model_object->from_internal_object($internal_object);
 
             # Add the parent_id if given
             if (isset($parent_id)) {

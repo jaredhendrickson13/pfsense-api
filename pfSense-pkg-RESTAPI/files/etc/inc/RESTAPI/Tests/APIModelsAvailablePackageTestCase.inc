@@ -26,12 +26,14 @@ class APIModelsAvailablePackageTestCase extends TestCase
         # Install the package and ensure the `installed` field is now `true`
         # TODO: change this to use the Package model to install the package
         new Command("pkg-static install -y pfSense-pkg-sudo");
+        $pkg->reload_config();
         $pkg->from_internal();
         $this->assert_is_true($pkg->installed->value);
 
         # Delete the package and ensure the `installed` field is once again `false`
         # TODO: change this to use the Package model to delete the package
         new Command("pkg-static delete -y pfSense-pkg-sudo");
+        $pkg->reload_config();
         $pkg->from_internal();
         $this->assert_is_false($pkg->installed->value);
     }
