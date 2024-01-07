@@ -268,6 +268,14 @@ complemented by a few custom enhancements. As you receive a response, you'll fin
 making navigation a breeze and granting swift access to additional, relevant information. This reduces the need for
 applications to hardcode URLs for related items.
 
+> [!NOTE]
+> HATEOAS is disabled by default. HATEOAS can be enabled in the System > REST API > Settings webConfigurator page or via
+> the /api/v2/system/restapi/settings API endpoint.
+
+> [!WARNING]
+> Depending on the size of your pfSense instance's configuration, enabling HATEOAS can dramatically increase the size 
+> of API responses and may increase API response times. 
+
 ### Link types
 
 Below are the different link types that can be returned by the API. These will be found nested under `_links` in the

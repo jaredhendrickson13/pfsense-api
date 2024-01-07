@@ -28,6 +28,7 @@ class RESTAPISettings extends Model {
     public BooleanField $login_protection;
     public BooleanField $log_successful_auth;
     public BooleanField $allow_pre_releases;
+    public BooleanField $hateoas;
     public InterfaceField $allowed_interfaces;
     public StringField $represent_interfaces_as;
     public StringField $auth_mode;
@@ -93,6 +94,16 @@ class RESTAPISettings extends Model {
             help_text: "Enables or disables displaying pre-releases in available API updates. Pre-releases contain fixes
             and features that are currently under development and may not be fully stable. Use of pre-release versions
             is at your own risk."
+        );
+        $this->hateoas = new BooleanField(
+            default: false,
+            indicates_true: "enabled",
+            indicates_false: "disabled",
+            verbose_name: "enable HATEOAS",
+            help_text: "Enables or disables HATEOAS. Enabling HATEOAS will allow the API to include links to related ".
+            "resources in API responses. This is primarily useful for frontend web applications and self-navigating ".
+            "client scripts that integrate with HAL standards. Enabling HATEOAS may increase API response times, ".
+            "especially on systems with large configurations."
         );
         $this->allowed_interfaces = new InterfaceField(
             default: [],

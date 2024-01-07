@@ -19,6 +19,7 @@ require_once("RESTAPI/autoloader.inc");
 
 use Error;
 use ReflectionClass;
+use RESTAPI\Models\RESTAPISettings;
 
 const HTTP_STATUS_MESSAGES = [
     100 => "continue",
@@ -119,13 +120,21 @@ class Response extends Error {
      * @return array An array containing the response details.
      */
     final public function to_representation() : array {
-        return [
+        # Set the standard representation for the Response
+        $representation = [
             "code" => $this->code,
             "status" => $this->status,
             "response_id" => $this->response_id,
             "message" => $this->message,
             "data" => $this->data->to_representation()
-        ] + $this->_links->to_representation();
+        ];
+
+        # If HATEOAS is enabled, include related response _links
+        if (RESTAPISettings::get_api_config()["config"]["hateoas"] === "enabled") {
+            $representation += $this->_links->to_representation();
+        }
+
+        return $representation;
     }
 
     /**
@@ -205,7 +214,7 @@ class Response extends Error {
                 "_links" => [
                     "description" => "An array of links to resources that are related to this API response.",
                     "example" => [],
-                    "type" => "array"
+                    "type" => "object"
                 ]
             ]
         ];

@@ -4,6 +4,7 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\Model;
 use RESTAPI\Core\TestCase;
+use RESTAPI\Models\FirewallRule;
 use RESTAPI\Models\RESTAPISettings;
 use const RESTAPI\Models\API_SETTINGS_BACKUP_FILE_PATH;
 use const RESTAPI\Models\API_SETTINGS_BACKUP_NOT_CONFIGURED;
@@ -591,5 +592,28 @@ class APIModelsAPISettingsTestCase extends TestCase
         # Ensure this field is write only and does not appear when reading representation data
         $api_settings = new RESTAPISettings(data: ["ha_sync_password" => "example password"]);
         $this->assert_is_false(array_key_exists("ha_sync_password", $api_settings->to_representation()));
+    }
+
+    /**
+     * Checks that the `hateoas` field successfully enables or disables HATEOAS links in representations
+     */
+    public function test_hateoas(): void {
+        # Enable hateoas
+        $api_settings = new RESTAPISettings();
+        $api_settings->hateoas->value = true;
+        $api_settings->update();
+
+        # Ensure a Model's `to_representation()` method does include the _links field if hateoas is enabled
+        $rule = new FirewallRule(id: 0);
+        $this->assert_is_true(array_key_exists("_links", $rule->to_representation()));
+
+        # Disable hateoas
+        $api_settings = new RESTAPISettings();
+        $api_settings->hateoas->value = false;
+        $api_settings->update();
+
+        # Ensure a Model's `to_representation()` method does not include the _links field if hateoas is disabled
+        $rule = new FirewallRule(id: 0);
+        $this->assert_is_false(array_key_exists("_links", $rule->to_representation()));
     }
 }

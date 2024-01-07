@@ -47,6 +47,27 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase {
             response_id: "TEST_RESPONSE_ID",
             data: $alias
         );
+
+        # Ensure the response schema is expected
+        $this->assert_equals(
+            $response->to_representation(),
+            [
+                "code" => 500,
+                "status" => "internal server error",
+                "response_id" => "TEST_RESPONSE_ID",
+                "message" => "Test message",
+                "data" => $alias->to_representation()
+            ]
+        );
+
+        # Enable HATEOAS and ensure the response includes the _links field
+        $api_settings = new RESTAPI\Models\RESTAPISettings();
+        $api_settings->hateoas->value = true;
+        $api_settings->update();
+
+        var_dump($response->to_representation());
+
+        # Ensure the response schema now includes the _links field
         $this->assert_equals(
             $response->to_representation(),
             [
@@ -126,7 +147,7 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase {
                     "_links" => [
                         "description" => "An array of links to resources that are related to this API response.",
                         "example" => [],
-                        "type" => "array"
+                        "type" => "object"
                     ]
                 ]
             ]
