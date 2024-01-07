@@ -516,57 +516,6 @@ class Model {
     }
 
     /**
-     * Default method for obtaining the next ID from the pfSense configuration. This searches for the next index ID for
-     * the model in the pfSense configuration and requires the model's `config_path` and `many` properties to be set.
-     * For Models that do not use a `config_path` or does not use config index IDs, this method can be overridden by
-     * the child model class to add custom processes to obtain the next available ID.
-     * @throws ServerError When the path leads to an existing non-empty, non-sequential array value
-     * @returns string|int the next array key (ID) for the config path specified.
-     */
-    public function get_next_id() : string|int {
-        # Since this references config IDs, this method requires `config_path` to be set. Throw an error if it's not.
-        if (!$this->config_path) {
-            throw new ServerError(
-                message: "Model cannot use default method to obtain next available ID without 'config_path'",
-                response_id: "MODEL_NEXT_ID_WITHOUT_CONFIG_PATH"
-            );
-        }
-
-        # IDs are only applicable for `many` Models. Throw an error if `many` is not set.
-        if (!$this->many) {
-            throw new ServerError(
-                message: "Models cannot obtain next ID when 'many' is not enabled.",
-                response_id: "MODEL_NEXT_ID_WITHOUT_MANY"
-            );
-        }
-        
-        # If this Model has a parent Model assigned, get the parent Model object so we can accurately determine the ID
-        if ($this->parent_model_class) {
-            $this->get_parent_model();
-        }
-
-        # First, get the configuration at the specific path
-        $conf = $this->get_config($this->get_config_path(), []);
-
-        # Ensure config is an array
-        if (is_array($conf) and array_key_exists(0, $conf)) {
-            return count($conf);
-        }
-        # If the value is empty, start the array at ID 0
-        elseif (empty($conf)) {
-            return 0;
-        }
-        # Otherwise, this action could be dangerous, throw an error
-        else {
-            throw new ServerError(
-                message: "Model failed to obtain the next available ID because the config path leads to an existing, 
-                non-indexed array value.",
-                response_id: "MODEL_DANGEROUS_CONFIG_PATH"
-            );
-        }
-    }
-
-    /**
      * Write configuration changes to the config file
      * @param string $change_note The message to write to the change log.
      */
@@ -597,6 +546,66 @@ class Model {
 
             # Delay attempts by 1 second
             sleep(1);
+        }
+    }
+
+    /**
+     * Reloads the configuration to include any changes that may have occurred since the last config reload
+     * @param bool $force_parse Force an entire reparse of the config.xml file instead of the cached config.
+     */
+    public function reload_config(bool $force_parse = false): void {
+        global $config;
+        $config = parse_config(parse: $force_parse);
+    }
+
+    /**
+     * Default method for obtaining the next ID from the pfSense configuration. This searches for the next index ID for
+     * the model in the pfSense configuration and requires the model's `config_path` and `many` properties to be set.
+     * For Models that do not use a `config_path` or does not use config index IDs, this method can be overridden by
+     * the child model class to add custom processes to obtain the next available ID.
+     * @throws ServerError When the path leads to an existing non-empty, non-sequential array value
+     * @returns string|int the next array key (ID) for the config path specified.
+     */
+    public function get_next_id() : string|int {
+        # Since this references config IDs, this method requires `config_path` to be set. Throw an error if it's not.
+        if (!$this->config_path) {
+            throw new ServerError(
+                message: "Model cannot use default method to obtain next available ID without 'config_path'",
+                response_id: "MODEL_NEXT_ID_WITHOUT_CONFIG_PATH"
+            );
+        }
+
+        # IDs are only applicable for `many` Models. Throw an error if `many` is not set.
+        if (!$this->many) {
+            throw new ServerError(
+                message: "Models cannot obtain next ID when 'many' is not enabled.",
+                response_id: "MODEL_NEXT_ID_WITHOUT_MANY"
+            );
+        }
+
+        # If this Model has a parent Model assigned, get the parent Model object so we can accurately determine the ID
+        if ($this->parent_model_class) {
+            $this->get_parent_model();
+        }
+
+        # First, get the configuration at the specific path
+        $conf = $this->get_config($this->get_config_path(), []);
+
+        # Ensure config is an array
+        if (is_array($conf) and array_key_exists(0, $conf)) {
+            return count($conf);
+        }
+        # If the value is empty, start the array at ID 0
+        elseif (empty($conf)) {
+            return 0;
+        }
+        # Otherwise, this action could be dangerous, throw an error
+        else {
+            throw new ServerError(
+                message: "Model failed to obtain the next available ID because the config path leads to an existing, 
+                non-indexed array value.",
+                response_id: "MODEL_DANGEROUS_CONFIG_PATH"
+            );
         }
     }
 
@@ -660,10 +669,12 @@ class Model {
         }
         # Obtain the internal objects from the config path if specified
         elseif ($this->config_path) {
+            $this->reload_config();
             $internal_objects = $this->get_config($this->get_config_path(), []);
         }
         # Obtain the internal objects by calling the `internal_callable` if specified
         elseif ($this->internal_callable) {
+            $this->reload_config();
             $callable = $this->internal_callable;
             $internal_objects = $this->$callable();
         }
@@ -679,7 +690,6 @@ class Model {
         return $internal_objects;
     }
 
-    # TODO: Rename this `refresh_from_internal()`
     /**
      * Obtain this Model object from the internal pfSense configuration by object ID. If the specified ID exists in
      * config, this Model object will be overwritten with the contents of that object.
@@ -1191,10 +1201,10 @@ class Model {
      * Obtains the Endpoint this Model class is assigned to.
      * @param bool $many Set to true to obtain the $many enabled Endpoint for this Model, set to false to obtain the
      * Endpoint for this Model that does not have $many enabled.
-     * @return Endpoint The Endpoint object that has this Model class assigned.
+     * @return Endpoint|null The Endpoint object that has this Model class assigned or null if none was found
      * @throws ServerError When no Endpoint could be found for this Model.
      */
-    public function get_related_endpoint(bool $many) : Endpoint {
+    public function get_related_endpoint(bool $many) : Endpoint|null {
         # Obtain the shortname for this class
         $model_name = (new ReflectionClass($this))->getShortName();
 
@@ -1203,17 +1213,13 @@ class Model {
             # Construct the Endpoint object
             $endpoint = new $endpoint_class();
 
-            # If the $many values and $model_name values match, we've found our endoint. Return the object.
+            # If the $many values and $model_name values match, we've found our endpoint. Return the object.
             if ($many === $endpoint->many and $model_name === $endpoint->model_name) {
                 return $endpoint;
             }
         }
 
-        # Throw an error if we could not find an Endpoint associated with this Model
-        throw new ServerError(
-            message: "Could not find a Endpoint class with \$model_name=$model_name and \$many=$many",
-            response_id: "MODEL_COULD_NOT_FIND_RELATED_ENDPOINT"
-        );
+        return null;
     }
 
     /**
@@ -1265,6 +1271,11 @@ class Model {
         # Variables
         $linkset = new ResourceLinkSet();
         $endpoint = $this->get_related_endpoint(many: false);
+
+        # This Model does not support related links if it doesn't have a non-many enabled Endpoint
+        if (!$endpoint) {
+            return $linkset;
+        }
         
         # Add a 'self' link if this Model supports single reads
         if (in_array("GET", $endpoint->request_method_options)) {
@@ -1477,13 +1488,18 @@ class Model {
                 $offset_counter++;
                 continue;
             }
-            
-            # Determine which IDs should be used to obtain this object
-            $ids = ($model->is_parent_model_many()) ? ["id" => $internal_id, "parent_id" => $parent_id] : ["id" => $internal_id];
                 
             # Obtain this Model object from internal
-            $model_object = new $model(data: $ids);
-            $model_object->from_internal();
+            $model_object = new $model();
+            $model_object->from_internal_object($internal_object);
+            $model_object->id = $internal_id;
+
+            # Add the parent_id if given
+            if (isset($parent_id)) {
+                $model_object->parent_id = $internal_id;
+            }
+
+            # Add this model object to the array of all objects
             $model_objects[] = $model_object;
 
             # Break the loop if $limit is set, and we've met our limit of objects to obtain
