@@ -15,6 +15,7 @@
             <keep_backup>enabled</keep_backup>
             <login_protection>enabled</login_protection>
             <log_successful_auth>disabled</log_successful_auth>
+            <hateoas>disabled</hateoas>
             <allow_pre_releases>disabled</allow_pre_releases>
             <allowed_interfaces></allowed_interfaces>
             <represent_interfaces_as>id</represent_interfaces_as>

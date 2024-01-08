@@ -19,22 +19,22 @@ class APIModelsAvailablePackageTestCase extends TestCase
         $this->assert_equals($pkg->name->value, "pfSense-pkg-sudo");
         $this->assert_equals($pkg->shortname->value, "sudo");
         $this->assert_is_not_empty($pkg->descr->value);
-        $this->assert_is_not_empty($pkg->version->value);
+        $this->assert_is_not_empty($pkg->latest_version->value);
         $this->assert_str_contains($pkg->deps->value[0], "sudo-");
-        $this->assert_is_false($pkg->installed->value);
+        $this->assert_is_false($pkg->update_available->value);
 
         # Install the package and ensure the `installed` field is now `true`
         # TODO: change this to use the Package model to install the package
         new Command("pkg-static install -y pfSense-pkg-sudo");
         $pkg->reload_config();
         $pkg->from_internal();
-        $this->assert_is_true($pkg->installed->value);
+        $this->assert_is_true($pkg->update_available->value);
 
         # Delete the package and ensure the `installed` field is once again `false`
         # TODO: change this to use the Package model to delete the package
         new Command("pkg-static delete -y pfSense-pkg-sudo");
         $pkg->reload_config();
         $pkg->from_internal();
-        $this->assert_is_false($pkg->installed->value);
+        $this->assert_is_false($pkg->update_available->value);
     }
 }

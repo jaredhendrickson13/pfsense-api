@@ -31,12 +31,13 @@ class AvailablePackage extends Model
         # Set model fields
         $this->name = new StringField(
             required: true,
+            unique: true,
             help_text: "The name of the pfSense package."
         );
         $this->shortname = new StringField(
             default: "",
             read_only: true,
-            help_text: "The package's description."
+            help_text: "The package's shortname."
         );
         $this->descr = new StringField(
             default: "",
