@@ -1339,7 +1339,7 @@ class Model {
             if (!is_pkg_installed($pkg)) {
                 throw new NotFoundError(
                     message: "The requested action requires the '$pkg' package but it is not installed.",
-                    response_id: "MDOEL_MISSING_REQUIRED_PACKAGE"
+                    response_id: "MODEL_MISSING_REQUIRED_PACKAGE"
                 );
             }
         }

@@ -48,5 +48,29 @@ class APIValidatorsRegexValidatorTestCase extends TestCase
                 $regex_validator->validate("!@# Does not match pattern! #@!");
             }
         );
+
+        # Ensure an error is not thrown if the value is an allowed keyword
+        $this->assert_does_not_throw(
+            callable: function() {
+                $regex_validator = new RegexValidator(
+                    pattern: "/^[a-zA-Z0-9\.\-_]+$/", 
+                    invert: false, 
+                    allowed_keywords: ["!@#test_value#@!"]
+                );
+                $regex_validator->validate("!@#test_value#@!");
+            }
+        );
+        
+        # Ensure an error is not thrown if the value is an allowed keyword, even if the context is inverted
+        $this->assert_does_not_throw(
+            callable: function() {
+                $regex_validator = new RegexValidator(
+                    pattern: "/^[a-zA-Z0-9\.\-_]+$/",
+                    invert: true,
+                    allowed_keywords: ["test_value"]
+                );
+                $regex_validator->validate("test_value");
+            }
+        );
     }
 }

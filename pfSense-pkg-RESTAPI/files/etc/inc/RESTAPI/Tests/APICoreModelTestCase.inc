@@ -231,7 +231,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      */
     public function test_model_validate_packages_missing_package() {
         $this->assert_throws_response(
-            response_id: "MDOEL_MISSING_REQUIRED_PACKAGE",
+            response_id: "MODEL_MISSING_REQUIRED_PACKAGE",
             code: 404,
             callable: function () {
                 $test_model = new RESTAPI\Models\Test();
