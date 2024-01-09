@@ -2,6 +2,7 @@
 
 namespace RESTAPI\Core;
 
+use RESTAPI\Models\CronJob;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ServiceUnavailableError;
 use ReflectionClass;
@@ -28,10 +29,14 @@ use ReflectionClass;
  * background) or synchronously (waits for process to complete). If set to `true`, any `spawn_process()` method calls
  * will spawn the process in the background and immediately respond. If set to `false`, any `spawn_process()` will
  * wait until the process finishes to respond.
+ * @property string $schedule Specifies the frequency in which this Dispatcher should be run on a schedule. Valid
+ * options are `hourly`, `daily`, and `weekly`. Leave blank if this Dispatcher should not automatically run on a schedule.
  */
 class Dispatcher
 {
     const DISPATCH_SCRIPT = "/usr/local/share/pfSense-pkg-RESTAPI/scripts/dispatch.sh";
+    const SCHEDULE_OPTIONS = ["hourly", "daily", "weekly"];
+
     private string $full_name;
     private string $short_name;
     private string $pid_dir;
@@ -40,6 +45,7 @@ class Dispatcher
     public int $timeout = 600;
     public int $max_concurrency = 0;
     public bool $async = true;
+    public string $schedule = "";
 
     /**
      * Constructs the Dispatcher object.
@@ -63,7 +69,7 @@ class Dispatcher
     /**
      * Reads the PID file path that will be used for the next spawned process.
      */
-    public function get_pid_file() {
+    public function get_pid_file(): string {
         return $this->pid_file;
     }
 
@@ -169,5 +175,51 @@ class Dispatcher
     public static function process(mixed ...$arguments) {
         # Emulate a long running process for testing purposes
         sleep(30);
+    }
+
+    /**
+     * Configures this Dispatcher to run on a schedule if the `schedule` property is set.
+     * @return CronJob|null Returns the CronJob created for this Dispatcher if a `schedule` is defined. Returns `null`
+     * if no schedule was defined.
+     */
+    public function setup_schedule(): CronJob|null {
+        # Variables
+        $dispatcher_cmd = "/usr/local/share/pfSense-pkg-RESTAPI/manage.php notifydispatcher $this->short_name";
+
+        # Only proceed if a schedule was requested
+        if ($this->schedule) {
+            # Ensure the requested schedule is supported
+            if (!in_array($this->schedule, self::SCHEDULE_OPTIONS)) {
+                throw new ServerError(
+                    message: "Dispatcher schedule `$this->schedule` is not a supported schedule frequency.",
+                    response_id: "DISPATCHER_SCHEDULE_UNSUPPORTED"
+                );
+            }
+
+            # Check if a cron job already exists for this dispatcher
+            $dispatcher_cron_job_q = CronJob::query(command: $dispatcher_cmd);
+
+            # Delete the cron job for this dispatcher if it exists, so we can recreate it with current values
+            if ($dispatcher_cron_job_q->exists()) {
+                $existing_cron_job = $dispatcher_cron_job_q->first();
+                $existing_cron_job->packages = [];    // Don't require the pfSense-pkg-Cron package to delete
+                $existing_cron_job->delete();
+            }
+
+            # Create the cron job for this dispatcher
+            $cron_job = new CronJob(
+                data: ["minute" => "@$this->schedule", "who" => "root", "command" => $dispatcher_cmd],
+                require_pkg: false
+            );
+            $cron_job->create();
+
+            # Spawn this dispatcher process to ensure applicable values are populated before the next schedule runs
+            $this->spawn_process();
+
+            # Return the created CronJob
+            return $cron_job;
+        }
+
+        return null;
     }
 }

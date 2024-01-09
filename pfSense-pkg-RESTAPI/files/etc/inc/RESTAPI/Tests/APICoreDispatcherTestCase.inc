@@ -4,6 +4,7 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\Dispatcher;
 use RESTAPI\Core\TestCase;
+use RESTAPI\Models\CronJob;
 
 class APICoreDispatcherTestCase extends TestCase
 {
@@ -104,6 +105,43 @@ class APICoreDispatcherTestCase extends TestCase
 
         # Ensure the PID file for the process is no longer present
         $this->assert_is_false(is_file($pid_file));
+    }
+
+    /**
+     * Checks that a Dispatcher cannot be assigned an unsupported `schedule` value
+     */
+    public function test_schedule_options(): void {
+        $this->assert_throws_response(
+            response_id: "DISPATCHER_SCHEDULE_UNSUPPORTED",
+            code: 500,
+            callable: function () {
+                $dispatcher = new Dispatcher();
+                $dispatcher->schedule = "invalid_option";
+                $dispatcher->setup_schedule();
+            }
+        );
+    }
+
+    /**
+     * Checks that the Dispatcher's `setup_schedule()` method creates a CronJob for the Dispatcher using the `schedule`
+     * property.
+     */
+    public function test_setup_schedule(): void {
+        # Create a Dispatcher to test with but do not assign it a schedule yet
+        $dispatcher = new Dispatcher();
+
+        # Ensure the setup_schedule() returns no when no schedule is set
+        $this->assert_equals($dispatcher->setup_schedule(), null);
+
+        # Assign the dispatcher a schedule and ensure setup_schedule() returns a CronJob object with the correct schedule
+        $dispatcher->schedule = "daily";
+        $dispatcher_cron_job = $dispatcher->setup_schedule();
+        $cron_job_cmd = "/usr/local/share/pfSense-pkg-RESTAPI/manage.php notifydispatcher Dispatcher";
+        $this->assert_equals($dispatcher_cron_job->minute->value, "@$dispatcher->schedule");
+        $this->assert_equals($dispatcher_cron_job->command->value, $cron_job_cmd);
+
+        # Delete the CronJob
+        $dispatcher_cron_job->delete();
     }
 
 }

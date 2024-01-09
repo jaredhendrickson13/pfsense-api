@@ -18,6 +18,7 @@ require_once("RESTAPI/Core/TestCase.inc");
 
 use RESTAPI\Dispatchers\WebGUIRestartDispatcher;
 use RESTAPI\Models\RESTAPISettings;
+use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 function build_endpoints() {
     # Use a variable to keep track of the privileges associated with this endpoint
@@ -95,6 +96,18 @@ function notify_dispatcher(string $dispatcher_name) {
     else {
         echo "No dispatcher exists at $class".PHP_EOL;
         exit(1);
+    }
+}
+
+function schedule_dispatchers(): void {
+    # Loop through each defined Dispatcher class and setup the cron jobs for dispatchers with schedules
+    foreach (get_classes_from_namespace("\\RESTAPI\\Dispatchers\\") as $dispatcher_class) {
+        $dispatcher = new $dispatcher_class();
+        if ($dispatcher->schedule) {
+            echo "Configuring schedule for $dispatcher_class... ";
+            $dispatcher->setup_schedule();
+            echo "done.".PHP_EOL;
+        }
     }
 }
 
@@ -245,22 +258,23 @@ function help() {
     echo "SYNTAX:".PHP_EOL;
     echo "  pfsense-restapi <command> <args>".PHP_EOL;
     echo "COMMANDS:".PHP_EOL;
-    echo "  version          : Display the current package version and build information".PHP_EOL;
-    echo "  help             : Display the help page (this page)".PHP_EOL;
-    echo "  buildendpoints   : Build all REST API Endpoints included in this package".PHP_EOL;
-    echo "  buildforms       : Build all REST API Forms included in this package".PHP_EOL;
-    echo "  buildprivs       : Build all REST API privileges included in this package".PHP_EOL;
-    echo "  generatedocs     : Regenerates the OpenAPI documentation".PHP_EOL;
-    echo "  notifydispatcher : Start a dispatcher process".PHP_EOL;
-    echo "  runtests         : Run all REST API unit Tests. Warning: this may be disruptive!".PHP_EOL;
-    echo "  restartwebgui    : Restart the webConfigurator in the background".PHP_EOL;
-    echo "  update           : Update package to the latest stable version available".PHP_EOL;
-    echo "  revert           : Revert package to a specified version".PHP_EOL;
-    echo "  delete           : Delete package from this system".PHP_EOL;
-    echo "  rotateserverkey  : Rotate the REST API server key and remove all existing tokens".PHP_EOL;
-    echo "  backup           : Create a backup of the REST API configuration".PHP_EOL;
-    echo "  restore          : Restore the REST API configuration from the latest backup".PHP_EOL;
-    echo "  sync             : Sync this system's REST API configuration to configured HA nodes".PHP_EOL;
+    echo "  version             : Display the current package version and build information".PHP_EOL;
+    echo "  help                : Display the help page (this page)".PHP_EOL;
+    echo "  buildendpoints      : Build all REST API Endpoints included in this package".PHP_EOL;
+    echo "  buildforms          : Build all REST API Forms included in this package".PHP_EOL;
+    echo "  buildprivs          : Build all REST API privileges included in this package".PHP_EOL;
+    echo "  generatedocs        : Regenerates the OpenAPI documentation".PHP_EOL;
+    echo "  notifydispatcher    : Start a dispatcher process".PHP_EOL;
+    echo "  scheduledispatchers : Sets up cron jobs for dispatchers on a schedule.".PHP_EOL;
+    echo "  runtests            : Run all REST API unit Tests. Warning: this may be disruptive!".PHP_EOL;
+    echo "  restartwebgui       : Restart the webConfigurator in the background".PHP_EOL;
+    echo "  update              : Update package to the latest stable version available".PHP_EOL;
+    echo "  revert              : Revert package to a specified version".PHP_EOL;
+    echo "  delete              : Delete package from this system".PHP_EOL;
+    echo "  rotateserverkey     : Rotate the REST API server key and remove all existing tokens".PHP_EOL;
+    echo "  backup              : Create a backup of the REST API configuration".PHP_EOL;
+    echo "  restore             : Restore the REST API configuration from the latest backup".PHP_EOL;
+    echo "  sync                : Sync this system's REST API configuration to configured HA nodes".PHP_EOL;
     echo PHP_EOL;
 }
 
@@ -285,6 +299,10 @@ elseif (in_array($argv[1], ["generatedocs"])) {
 # NOTIFY_DISPATCHER COMMAND
 elseif (in_array($argv[1], ["notifydispatcher"])) {
     notify_dispatcher(dispatcher_name: $argv[2]);
+}
+# SCHEDULE_DISPATCHER COMMAND
+elseif (in_array($argv[1], ["scheduledispatcher"])) {
+    schedule_dispatchers();
 }
 # RUNTESTS COMMAND
 elseif (in_array($argv[1], ["runtests"])) {
