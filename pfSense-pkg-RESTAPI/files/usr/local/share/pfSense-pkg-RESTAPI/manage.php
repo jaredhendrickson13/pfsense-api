@@ -301,7 +301,7 @@ elseif (in_array($argv[1], ["notifydispatcher"])) {
     notify_dispatcher(dispatcher_name: $argv[2]);
 }
 # SCHEDULE_DISPATCHER COMMAND
-elseif (in_array($argv[1], ["scheduledispatcher"])) {
+elseif (in_array($argv[1], ["scheduledispatchers"])) {
     schedule_dispatchers();
 }
 # RUNTESTS COMMAND
