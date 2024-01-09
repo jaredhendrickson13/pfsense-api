@@ -6,7 +6,6 @@ use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\NotFoundError;
-use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\RegexValidator;
 
 class CronJob extends Model
