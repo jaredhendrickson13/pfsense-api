@@ -12,8 +12,7 @@ use RESTAPI\Fields\StringField;
  */
 class AvailablePackage extends Model
 {
-    const PACKAGES_CACHE_FILE = "/usr/local/share/pfSense-pkg-RESTAPI/packages.json";
-    const PACKAGES_CACHE_EXPIRATION_SECONDS = 60 * 60;    // Cache expires hourly
+    const PACKAGES_CACHE_FILE = "/usr/local/share/pfSense-pkg-RESTAPI/.cache/packages.json";
 
     public StringField $name;
     public StringField $shortname;
@@ -27,6 +26,7 @@ class AvailablePackage extends Model
         # Set model attributes
         $this->internal_callable = "get_all_pkgs";
         $this->many = true;
+        $this->cache_class = "AvailablePackageCache";
 
         # Set model fields
         $this->name = new StringField(
@@ -77,19 +77,9 @@ class AvailablePackage extends Model
     protected function get_all_pkgs(): array {
         # Variables
         $pkgs = [];
-        $pkgs_cache = json_decode(file_get_contents(self::PACKAGES_CACHE_FILE), true);
-        $current_time = time();
 
-        # Check if our previous packages cache has expired
-        if ($pkgs_cache["last_updated"] + self::PACKAGES_CACHE_EXPIRATION_SECONDS < $current_time) {
-            # Pull package data from the remote package repos
-            $pkg_resp = get_pkg_info();
-            $pkgs_cache = ["last_updated" => $current_time, "packages" => $pkg_resp];
-            file_put_contents(self::PACKAGES_CACHE_FILE, json_encode($pkgs_cache));
-        }
-
-        # Loop through each of the output lines and format it
-        foreach ($pkgs_cache["packages"] as $pkg) {
+        # Loop through each available package in the cache and it to our return value
+        foreach ($this->cache->read() as $pkg) {
             # Add our formatted package to our array
             $pkg_data = [
                 "name" => $pkg["name"],

@@ -9,11 +9,6 @@ use RESTAPI\Fields\StringField;
 
 class RESTAPIVersion extends Model
 {
-    const RELEASES_API_URL = "https://api.github.com/repos/jaredhendrickson13/pfsense-api/releases";
-    const RELEASES_API_MAX_TIME = 10;
-    const RELEASES_CACHE_FILE = "/usr/local/share/pfSense-pkg-RESTAPI/releases.json";
-    const RELEASES_CACHE_EXPIRATION_SECONDS = 60 * 60;    // Cache expires hourly
-    
     public StringField $current_version;
     public StringField $latest_version;
     public StringField $latest_version_release_date;
@@ -24,6 +19,7 @@ class RESTAPIVersion extends Model
     {
         # Set model attributes
         $this->internal_callable = "get_api_version_details";
+        $this->cache_class = "RESTAPIVersionReleasesCache";
 
         # Set model Fields
         $this->current_version = new StringField(
@@ -94,18 +90,18 @@ class RESTAPIVersion extends Model
      * Obtains the latest API version available to this system.
      * @return string|null The latest API version available to this system or `null` if none are available.
      */
-    public static function get_latest_api_version() : string|null {
+    public function get_latest_api_version() : string|null {
         # Fetch our latest version and format it semantically (x.x.x)
-        return array_key_first(self::get_all_available_versions());
+        return array_key_first($this->get_all_available_versions());
     }
 
     /**
      * Obtains the release date of the latest API version available to this system.
      * @return string The release date of the latest API version available to this system.
      */
-    public static function get_latest_api_release_date() : string {
+    public function get_latest_api_release_date() : string {
         # Loop through each release and locate the latest available releases creation date
-        foreach (self::get_github_releases()["releases"] as $release) {
+        foreach ($this->get_github_releases() as $release) {
             # Check if this releases is latest available for our platform
             if ($release["tag_name"] === self::get_latest_api_version()) {
                 return $release["created_at"];
@@ -119,8 +115,8 @@ class RESTAPIVersion extends Model
      * Determines if an API update is available to this system.
      * @return bool `true` if there is an API update available to this system. `false` if it is up-to-date.
      */
-    public static function is_update_available() : bool {
-        return version_compare(self::get_api_version(), self::get_latest_api_version(), operator: "<");
+    public function is_update_available() : bool {
+        return version_compare($this->get_api_version(), $this->get_latest_api_version(), operator: "<");
     }
 
     /**
@@ -130,30 +126,23 @@ class RESTAPIVersion extends Model
      * @return array An array of all releases from the pfsense-RESTAPI repository on GitHub via GitHub API.
      * @link https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#list-releases
      */
-    public static function get_github_releases() : array {
-        # Variables
-        $releases = json_decode(file_get_contents(self::RELEASES_CACHE_FILE), true);
-        $fetch_releases_cmd = "curl -s ".self::RELEASES_API_URL." -m ".self::RELEASES_API_MAX_TIME;
-        $current_time = time();
+    public function get_github_releases() : array {
+        return $this->cache->read();
 
-        # Check if our previous releases data is older than 120 seconds
-        if ($releases["last_updated"] + self::RELEASES_CACHE_EXPIRATION_SECONDS < $current_time) {
-            # Pull the releases data from Github and rewrite the releases file
-            $api_resp = shell_exec($fetch_releases_cmd);
-            $api_resp = json_decode($api_resp, true);
-            $releases = ["last_updated" => $current_time, "releases" => $api_resp];
-            file_put_contents(self::RELEASES_CACHE_FILE, json_encode($releases));
-        }
-        return $releases;
     }
 
-    public static function get_all_available_versions() {
+    /**
+     * Obtains all pfSense-pkg-RESTAPI versions available to this version of pfSense.
+     * @returns array Returns an array of all REST API versions available to this host. The array keys will be the
+     * semantic version strings and the array value will a descriptive representation of the version.
+     */
+    public function get_all_available_versions(): array {
         # Variables
         $pf_version = new SystemVersion();
         $api_settings = new RESTAPISettings();
         $versions = [];
         $count = 0;
-        $releases = self::get_github_releases()["releases"];
+        $releases = $this->get_github_releases();
 
         # Loop through each version and populate our version data
         foreach ($releases as $release) {

@@ -30,6 +30,7 @@ require_once("firewall_virtual_ip.inc");
 const RESTAPI_LIBRARIES = [
     "/etc/inc/RESTAPI/Core/",
     "/etc/inc/RESTAPI/Dispatchers/",
+    "/etc/inc/RESTAPI/Caches/",
     "/etc/inc/RESTAPI/Responses/",
     "/etc/inc/RESTAPI/Validators/",
     "/etc/inc/RESTAPI/Fields/",

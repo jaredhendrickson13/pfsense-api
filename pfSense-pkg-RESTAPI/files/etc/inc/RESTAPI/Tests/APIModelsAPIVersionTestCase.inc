@@ -15,7 +15,7 @@ class APIModelsAPIVersionTestCase extends TestCase
         $this->assert_equals(
             preg_match(
                 pattern: "/^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/",
-                subject: RESTAPIVersion::get_api_version()
+                subject: (new RESTAPIVersion)->get_api_version()
             ),
             1
         );
@@ -26,22 +26,8 @@ class APIModelsAPIVersionTestCase extends TestCase
      */
     public function test_get_latest_api_version() {
         $this->assert_equals(
-            RESTAPIVersion::get_latest_api_version(),
-            array_key_first(RESTAPIVersion::get_all_available_versions())
+            (new RESTAPIVersion)->get_latest_api_version(),
+            array_key_first((new RESTAPIVersion)->get_all_available_versions())
         );
     }
-    
-    /**
-     * Checks that the releases cache file is created after running `get_github_releases()`
-     */
-    public function test_releases_are_cached() {
-        # Remove any existing cache file
-        unlink(RESTAPIVersion::RELEASES_CACHE_FILE);
-        
-        # Ensure the releases are cached after running `get_github_releases()`
-        $releases = RESTAPIVersion::get_github_releases();
-        $releases_cache = json_decode(file_get_contents(RESTAPIVersion::RELEASES_CACHE_FILE), associative: true);
-        $this->assert_equals($releases["releases"], $releases_cache["releases"]);
-    }
-
 }

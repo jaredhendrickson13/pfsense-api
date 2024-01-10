@@ -99,15 +99,49 @@ function notify_dispatcher(string $dispatcher_name) {
     }
 }
 
+/**
+ * Creates cron jobs for all Dispatcher classes in \RESTAPI\Dispatchers and all Cache classes in \RESTAPI\Caches
+ * that have configured schedules.
+ */
 function schedule_dispatchers(): void {
+    # Variables
+    $dispatchers = get_classes_from_namespace("\\RESTAPI\\Dispatchers\\");
+    $caches = get_classes_from_namespace("\\RESTAPI\\Caches\\");
+
+    # Include both Dispatcher classes and Cache classes. They inherit from the Dispatcher class.
+    $classes = array_merge($dispatchers, $caches);
+
     # Loop through each defined Dispatcher class and setup the cron jobs for dispatchers with schedules
-    foreach (get_classes_from_namespace("\\RESTAPI\\Dispatchers\\") as $dispatcher_class) {
-        $dispatcher = new $dispatcher_class();
+    foreach ($classes as $class) {
+        $dispatcher = new $class();
         if ($dispatcher->schedule) {
-            echo "Configuring schedule for $dispatcher_class... ";
+            echo "Configuring schedule for $class... ";
             $dispatcher->setup_schedule();
             echo "done.".PHP_EOL;
         }
+    }
+}
+
+/**
+ * Refreshes the cache file by obtaining new day for a given Cache object.
+ * @param string $cache_name The shortname of the Cache class that should have its cache file refreshed.
+ */
+function refresh_cache(string $cache_name): void {
+    # Format the fully qualified class name
+    $class = "\\RESTAPI\\Caches\\$cache_name";
+
+    # Ensure this Dispatcher class exists
+    if (class_exists($class)) {
+        # Start the Dispatcher process
+        echo "Refreshing $class cache file... ";
+        $cache = new $class();
+        $cache->process();
+        echo "done.".PHP_EOL;
+        exit(1);
+    }
+    else {
+        echo "No cache exists at $class".PHP_EOL;
+        exit(1);
     }
 }
 
@@ -265,7 +299,8 @@ function help() {
     echo "  buildprivs          : Build all REST API privileges included in this package".PHP_EOL;
     echo "  generatedocs        : Regenerates the OpenAPI documentation".PHP_EOL;
     echo "  notifydispatcher    : Start a dispatcher process".PHP_EOL;
-    echo "  scheduledispatchers : Sets up cron jobs for dispatchers on a schedule.".PHP_EOL;
+    echo "  scheduledispatchers : Sets up cron jobs for dispatchers and caches on a schedule.".PHP_EOL;
+    echo "  refreshcache        : Refresh the cache file for a given cache class.".PHP_EOL;
     echo "  runtests            : Run all REST API unit Tests. Warning: this may be disruptive!".PHP_EOL;
     echo "  restartwebgui       : Restart the webConfigurator in the background".PHP_EOL;
     echo "  update              : Update package to the latest stable version available".PHP_EOL;
@@ -303,6 +338,10 @@ elseif (in_array($argv[1], ["notifydispatcher"])) {
 # SCHEDULE_DISPATCHER COMMAND
 elseif (in_array($argv[1], ["scheduledispatchers"])) {
     schedule_dispatchers();
+}
+# REFRESH_CACHE COMMAND
+elseif (in_array($argv[1], ["refreshcache"])) {
+    refresh_cache(cache_name: $argv[2]);
 }
 # RUNTESTS COMMAND
 elseif (in_array($argv[1], ["runtests"])) {

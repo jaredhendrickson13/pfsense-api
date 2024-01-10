@@ -27,7 +27,7 @@ use ReflectionClass;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 # Constants
-const DEFAULT_CLIENT_USERNAME = "(system RESTAPI)";
+const DEFAULT_CLIENT_USERNAME = "(system)";
 const DEFAULT_CLIENT_IP_ADDRESS = "127.0.0.1";
 
 /**
@@ -93,6 +93,21 @@ class Model {
      * parent Model class is found, or the parent object does not exist, this value will be `null`.
      */
     public Model|null $parent_model = null;
+
+    /**
+     * @var string $cache_class
+     * The class name of a Cache object this Model utilizes. This is only relevant to Model who pull data from a local
+     * cache file using a Cache object and typically is only used for Models with an `internal_callable` assigned. The
+     * value assigned here must be an existing class shortname in the \RESTAPI\Caches\ namespace.
+     */
+    public string $cache_class = "";
+
+    /**
+     * @var Cache|null
+     * The Cache object of the class specified in the $cache_class property. This is only applicable if a $cache_class
+     * was assigned.
+     */
+    public Cache|null $cache = null;
 
     /**
      * @var ModelSet $related_objects
@@ -259,6 +274,9 @@ class Model {
                 response_id: "MODEL_NON_ARRAY_REPRESENTATION_DATA"
             );
         }
+
+        # Obtain the Cache object for this Model if assigned
+        $this->cache = $this->get_cache();
         
         # Set the parent ID if given
         $this->parent_id = $parent_id;
@@ -355,6 +373,32 @@ class Model {
         $client->username = DEFAULT_CLIENT_USERNAME;
         $client->ip_address = DEFAULT_CLIENT_IP_ADDRESS;
         return $client;
+    }
+
+    /**
+     * Obtains the Cache object of the class assigned in the $cache_class property.
+     * @returns Cache|null Returns a new Cache object of the $cache_class property assigned or null if no $cache_class
+     * property was assigned.
+     */
+    private function get_cache(): Cache|null {
+        # Only continue if this Model has a $cache_class assigned
+        if (!$this->cache_class) {
+            return null;
+        }
+
+        # Format the class's FQN
+        $class = "\\RESTAPI\\Caches\\$this->cache_class";
+
+        # Throw an error if there is no cache class with this name
+        if (!class_exists($class)) {
+            throw new ServerError(
+                message: "Model cannot be assigned non-existent \$cache_class `$class`.",
+                response_id: "MODEL_CACHE_CLASS_INVALID"
+            );
+        }
+
+        # Otherwise, return the Cache object
+        return new $class();
     }
 
     /**

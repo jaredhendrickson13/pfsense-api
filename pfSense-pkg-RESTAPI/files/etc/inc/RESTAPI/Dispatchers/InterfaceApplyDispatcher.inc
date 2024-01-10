@@ -12,7 +12,7 @@ class InterfaceApplyDispatcher extends Dispatcher
     /**
      * Applies pending interface changes.
      */
-    public static function process(...$arguments)
+    public function process(...$arguments)
     {
         # Local variables
         global $g;

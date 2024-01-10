@@ -31,21 +31,23 @@ use ReflectionClass;
  * wait until the process finishes to respond.
  * @property string $schedule Specifies the frequency in which this Dispatcher should be run on a schedule. Valid
  * options are `hourly`, `daily`, and `weekly`. Leave blank if this Dispatcher should not automatically run on a schedule.
+ * @property string $schedule_command The shell command that will be used to call this Dispatcher on a schedule.
  */
 class Dispatcher
 {
     const DISPATCH_SCRIPT = "/usr/local/share/pfSense-pkg-RESTAPI/scripts/dispatch.sh";
     const SCHEDULE_OPTIONS = ["hourly", "daily", "weekly"];
 
-    private string $full_name;
-    private string $short_name;
-    private string $pid_dir;
-    private string $pid_file;
-    private string $pid_file_prefix;
+    protected string $full_name;
+    protected string $short_name;
+    protected string $pid_dir;
+    protected string $pid_file;
+    protected string $pid_file_prefix;
     public int $timeout = 600;
     public int $max_concurrency = 0;
     public bool $async = true;
     public string $schedule = "";
+    protected string $schedule_command = "";
 
     /**
      * Constructs the Dispatcher object.
@@ -64,7 +66,14 @@ class Dispatcher
 
         # Set the Dispatcher async property
         $this->async = $async;
+
+        # Set the schedule command for this Dispatcher
+        $this->schedule_command = "/usr/local/share/pfSense-pkg-RESTAPI/manage.php notifydispatcher $this->short_name";
     }
+
+    /**
+     * Obtains the default schedule command for Dispatcher objects.
+     */
 
     /**
      * Reads the PID file path that will be used for the next spawned process.
@@ -172,7 +181,7 @@ class Dispatcher
      * or perform computations that may take a long time. It is up to the child Dispatcher class to decide what is
      * done here.
      */
-    public static function process(mixed ...$arguments) {
+    public function process(mixed ...$arguments) {
         # Emulate a long running process for testing purposes
         sleep(30);
     }
@@ -183,9 +192,6 @@ class Dispatcher
      * if no schedule was defined.
      */
     public function setup_schedule(): CronJob|null {
-        # Variables
-        $dispatcher_cmd = "/usr/local/share/pfSense-pkg-RESTAPI/manage.php notifydispatcher $this->short_name";
-
         # Only proceed if a schedule was requested
         if ($this->schedule) {
             # Ensure the requested schedule is supported
@@ -197,7 +203,7 @@ class Dispatcher
             }
 
             # Check if a cron job already exists for this dispatcher
-            $dispatcher_cron_job_q = CronJob::query(command: $dispatcher_cmd);
+            $dispatcher_cron_job_q = CronJob::query(command: $this->schedule_command);
 
             # Delete the cron job for this dispatcher if it exists, so we can recreate it with current values
             if ($dispatcher_cron_job_q->exists()) {
@@ -208,7 +214,7 @@ class Dispatcher
 
             # Create the cron job for this dispatcher
             $cron_job = new CronJob(
-                data: ["minute" => "@$this->schedule", "who" => "root", "command" => $dispatcher_cmd],
+                data: ["minute" => "@$this->schedule", "who" => "root", "command" => $this->schedule_command],
                 require_pkg: false
             );
             $cron_job->create();

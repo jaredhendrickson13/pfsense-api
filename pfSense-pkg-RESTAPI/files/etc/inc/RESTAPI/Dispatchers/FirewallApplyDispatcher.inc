@@ -12,7 +12,7 @@ class FirewallApplyDispatcher extends Dispatcher
     /**
      * Reloads the filter services.
      */
-    public static function process(...$arguments)
+    public function process(...$arguments)
     {
         filter_configure_sync();
     }

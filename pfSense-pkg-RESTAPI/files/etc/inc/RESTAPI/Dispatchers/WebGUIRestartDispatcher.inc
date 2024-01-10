@@ -13,7 +13,7 @@ class WebGUIRestartDispatcher extends Dispatcher
     /**
      * Restarts the web GUI.
      */
-    public static function process(...$arguments)
+    public function process(...$arguments)
     {
         # Wait a second to prevent prematurely killing API calls
         sleep(3);
