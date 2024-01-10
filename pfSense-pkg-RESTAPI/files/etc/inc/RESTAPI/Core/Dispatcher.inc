@@ -11,42 +11,76 @@ use ReflectionClass;
  * The Dispatcher object is used to define functions that are intended to be run in the background. The Dispatcher
  * objects allows us to dynamically create a private PHP script that can be called in the background, manages the
  * process spawn queue, and enforces background process timeouts.
- * @const DISPATCH_SCRIPT The absolute file path to the dispatch.sh helper script.
- * @property string $full_name The full name of this Dispatcher. This value is automatically populated using the class
- * FQN, but all slashes are removed. This value is used when reading and writing the Dispatcher's PID file.
- * @property string $short_name The Dispatcher class's short name. This value is passed to the dispatch.sh helper
- * script to indicate which Dispatcher class should be run.
- * @property string $pid_dir Sets the directory where the Dispatcher PID file will be written. This file name must be
- * unique for each Dispatcher process spawned.
- * @property string $pid_file_prefix The PID file name prefix. This value should contain this Dispatcher's $full_name.
- * @property string $pid_file Sets the entire name of the PID file.
- * @property int $timeout Sets the maximum number of seconds that processes spawned by this Dispatcher can run for.
- * After this time-frame, the process will be terminated. This ensures Dispatchers cannot spawn processes that run
- * endlessly and crash the system.
- * @property int $max_concurrency Sets the maximum number of processes this Dispatcher can have running at one time.
- * Attempts to spawn process past this limit will result in a ServiceUnavailableError error.
- * @property bool $async Indicates whether this Dispatcher object should spawn processes asynchronously (in the
- * background) or synchronously (waits for process to complete). If set to `true`, any `spawn_process()` method calls
- * will spawn the process in the background and immediately respond. If set to `false`, any `spawn_process()` will
- * wait until the process finishes to respond.
- * @property string $schedule Specifies the frequency in which this Dispatcher should be run on a schedule. Valid
- * options are `hourly`, `daily`, and `weekly`. Leave blank if this Dispatcher should not automatically run on a schedule.
- * @property string $schedule_command The shell command that will be used to call this Dispatcher on a schedule.
  */
 class Dispatcher
 {
+    /**
+     * @const DISPATCH_SCRIPT The absolute file path to the dispatch.sh helper script.
+     */
     const DISPATCH_SCRIPT = "/usr/local/share/pfSense-pkg-RESTAPI/scripts/dispatch.sh";
+    /**
+     * @const SCHEDULE_OPTIONS The cron event schedules supported by Dispatchers.
+     */
     const SCHEDULE_OPTIONS = ["hourly", "daily", "weekly"];
 
+    /**
+     * @var string $full_name
+     * The full name of this Dispatcher. This value is automatically populated using the class
+     * FQN, but all slashes are removed. This value is used when reading and writing the Dispatcher's PID file.
+     */
     protected string $full_name;
+    /**
+     * @var string $short_name 
+     * The Dispatcher class's short name. This value is passed to the dispatch.sh helper
+     * script to indicate which Dispatcher class should be run.
+     */
     protected string $short_name;
+    /**
+     * @var string $pid_dir 
+     * Sets the directory where the Dispatcher PID file will be written. This file name must be
+     *  unique for each Dispatcher process spawned.
+     */
     protected string $pid_dir;
+    /**
+     * @var string $pid_file 
+     * Sets the entire name of the PID file.
+     */
     protected string $pid_file;
+    /**
+     * @var string $pid_file_prefix The PID file name prefix. This value should contain this Dispatcher's $full_name.
+     */
     protected string $pid_file_prefix;
+    /**
+     * @var int $timeout 
+     * Sets the maximum number of seconds that processes spawned by this Dispatcher can run for.
+     * After this time-frame, the process will be terminated. This ensures Dispatchers cannot spawn processes that run
+     * endlessly and crash the system.
+     */
     public int $timeout = 600;
+    /**
+     * @var int $max_concurrency 
+     * Sets the maximum number of processes this Dispatcher can have running at one time.
+     * Attempts to spawn process past this limit will result in a ServiceUnavailableError error.
+     */
     public int $max_concurrency = 0;
+    /**
+     * @var bool $async 
+     * Indicates whether this Dispatcher object should spawn processes asynchronously (in the
+     * background) or synchronously (waits for process to complete). If set to `true`, any `spawn_process()` method calls
+     * will spawn the process in the background and immediately respond. If set to `false`, any `spawn_process()` will
+     * wait until the process finishes to respond.
+     */
     public bool $async = true;
+    /**
+     * @var string $schedule 
+     * Specifies the frequency in which this Dispatcher should be run on a schedule. Valid options are `hourly`, 
+     * `daily`, and `weekly`. Leave blank if this Dispatcher should not automatically run on a schedule.
+     */
     public string $schedule = "";
+    /**
+     * @var string $schedule_command 
+     * The shell command that will be used to call this Dispatcher on a schedule.
+     */
     protected string $schedule_command = "";
 
     /**
@@ -70,10 +104,6 @@ class Dispatcher
         # Set the schedule command for this Dispatcher
         $this->schedule_command = "/usr/local/share/pfSense-pkg-RESTAPI/manage.php notifydispatcher $this->short_name";
     }
-
-    /**
-     * Obtains the default schedule command for Dispatcher objects.
-     */
 
     /**
      * Reads the PID file path that will be used for the next spawned process.
@@ -110,7 +140,7 @@ class Dispatcher
     /**
      * Kills any running Dispatcher processes.
      */
-    public function kill_running_processes() {
+    public function kill_running_processes(): void {
         # Terminate this Dispatcher's running processes
         foreach ($this->get_running_processes() as $pid) {
             posix_kill($pid, SIGKILL);
@@ -181,7 +211,7 @@ class Dispatcher
      * or perform computations that may take a long time. It is up to the child Dispatcher class to decide what is
      * done here.
      */
-    public function process(mixed ...$arguments) {
+    public function process(mixed ...$arguments): void {
         # Emulate a long running process for testing purposes
         sleep(30);
     }
