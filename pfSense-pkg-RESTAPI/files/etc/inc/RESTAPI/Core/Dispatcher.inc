@@ -8,7 +8,7 @@ use RESTAPI\Responses\ServiceUnavailableError;
 use ReflectionClass;
 
 /**
- * The Dispatcher object is used to define functions that are intended to be run in the background. The Dispatcher
+ * The Dispatcher object is used to define functions that are intended to run in the background. The Dispatcher
  * objects allows us to dynamically create a private PHP script that can be called in the background, manages the
  * process spawn queue, and enforces background process timeouts.
  */

@@ -8,7 +8,7 @@ require_once("RESTAPI/Core/Dispatcher.inc");
 require_once("RESTAPI/autoloader.inc");
 
 /**
- * Defines a Cache object. Cache objects a type of Dispatcher object that is intended to fetch data from an external source
+ * Defines a Cache object. Cache objects are a type of Dispatcher object that is intended to fetch data from an external source
  * and store the output to a local cache file that periodically gets updated. This is helpful when handling data that
  * may take a long time to populate, or data that may have upstream rate limits that need to be respected.
  */

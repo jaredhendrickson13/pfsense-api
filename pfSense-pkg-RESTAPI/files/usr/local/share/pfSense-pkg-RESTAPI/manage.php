@@ -20,7 +20,11 @@ use RESTAPI\Dispatchers\WebGUIRestartDispatcher;
 use RESTAPI\Models\RESTAPISettings;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
-function build_endpoints() {
+/**
+ * Builds a PHP API endpoint in the pfSense webroot for each Endpoint class defined in \RESTAPI\Endpoints using the 
+ * Endpoint class's specified $url property.
+ */
+function build_endpoints(): void {
     # Use a variable to keep track of the privileges associated with this endpoint
     $endpoint_privs = [];
 
@@ -37,7 +41,11 @@ function build_endpoints() {
     build_privs();
 }
 
-function build_forms() {
+/**
+ * Builds a PHP webConfigurator page in the pfSense webroot for each Form class defined in \RESTAPI\Forms using the
+ * Form class's specified $url property.
+ */
+function build_forms(): void {
     # Import each form class
     foreach(glob("/etc/inc/RESTAPI/Forms/*.inc") as $file) {
         # Import classes files and create object
@@ -51,7 +59,11 @@ function build_forms() {
     build_privs();
 }
 
-function build_privs() {
+/**
+ * Automatically creates pfSense privileges for each Endpoint class defined in \RESTAPI\Endpoints and each Form class
+ * defined in \RESTAPI\Forms.
+ */
+function build_privs(): void {
     echo "Building privileges... ";
     
     # Use a variable to keep track of the privileges associated with this endpoint
@@ -80,7 +92,12 @@ function build_privs() {
     echo "done.".PHP_EOL;
 }
 
-function notify_dispatcher(string $dispatcher_name) {
+/**
+ * Runs the process for a specified Dispatcher class in \RESTAPI\Dispatchers.
+ * @param string $dispatcher_name
+ * @note This function does not call the Dispatcher process asynchronously, it will wait for the process to complete.
+ */
+function notify_dispatcher(string $dispatcher_name): void {
     # Format the fully qualified class name
     $class = "\\RESTAPI\\Dispatchers\\$dispatcher_name";
 
@@ -91,7 +108,7 @@ function notify_dispatcher(string $dispatcher_name) {
         $dispatcher = new $class();
         $dispatcher->process();
         echo "done.".PHP_EOL;
-        exit(1);
+        exit(0);
     }
     else {
         echo "No dispatcher exists at $class".PHP_EOL;
@@ -108,7 +125,7 @@ function schedule_dispatchers(): void {
     $dispatchers = get_classes_from_namespace("\\RESTAPI\\Dispatchers\\");
     $caches = get_classes_from_namespace("\\RESTAPI\\Caches\\");
 
-    # Include both Dispatcher classes and Cache classes. They inherit from the Dispatcher class.
+    # Include both Dispatcher classes and Cache classes. Cache classes inherit from the Dispatcher class.
     $classes = array_merge($dispatchers, $caches);
 
     # Loop through each defined Dispatcher class and setup the cron jobs for dispatchers with schedules
@@ -137,7 +154,7 @@ function refresh_cache(string $cache_name): void {
         $cache = new $class();
         $cache->process();
         echo "done.".PHP_EOL;
-        exit(1);
+        exit(0);
     }
     else {
         echo "No cache exists at $class".PHP_EOL;
@@ -145,7 +162,14 @@ function refresh_cache(string $cache_name): void {
     }
 }
 
-function run_tests($contains = "") {
+/**
+ * Runs all (or select) TestCase classes in \RESTAPI\Tests. This is only intended to test development of this package
+ * and should not be used on live installs.
+ * @param $contains string Only run tests that contain this sub-string in the test name.
+ * @note Tests will attempt to create, modify and delete configurations and files as well as restart services; which
+ * can be disruptive to live systems.
+ */
+function run_tests(string $contains = ""): void {
     # Variables
     $test_cases = glob("/etc/inc/RESTAPI/Tests/*.inc");
     $exit_code = 0;
@@ -209,14 +233,24 @@ function run_tests($contains = "") {
     exit($exit_code);
 }
 
-function restart_webgui() {
+/**
+ * Restarts the webConfigurator in the background. 
+ * @note When this package is first installed, this function runs to automatically reload the webConfigurator and 
+ * apply the nginx changes required for this package to operate. Thus eliminating the requirement for the user
+ * to run /etc/rc.restart_webgui after installation.
+ */
+function restart_webgui(): void {
     echo "Scheduling webConfigurator restart... ";
     (new WebGUIRestartDispatcher())->spawn_process();
     echo "done.".PHP_EOL;
     exit(0);
 }
 
-function backup() {
+/**
+ * Creates a backup of the REST API configuration if `keep_backup` is enabled. The backup will be stored in
+ * /usr/local/share/pfSense-pkg-RESTAPI/backup.json
+ */
+function backup(): void {
     echo "Backing up REST API configuration... ";
     echo match (RESTAPISettings::backup_to_file()) {
         RESTAPI\Models\API_SETTINGS_BACKUP_SUCCESS => "done." . PHP_EOL,
@@ -225,7 +259,10 @@ function backup() {
     };
 }
 
-function restore() {
+/**
+ * Restores the latest REST API configuration backup from /usr/local/share/pfSense-pkg-RESTAPI/backup.json
+ */
+function restore(): void {
     echo "Restoring REST API configuration... ";
     echo match (RESTAPISettings::restore_from_backup()) {
         RESTAPI\Models\API_SETTINGS_RESTORE_SUCCESS => "done." . PHP_EOL,
@@ -236,18 +273,28 @@ function restore() {
     };
 }
 
-function sync() {
+/**
+ * Syncs the REST API configuration to HA peers if enabled.
+ */
+function sync(): void {
     RESTAPI\Core\Tools\sync();
 }
 
-function update() {
+/**
+ * Updates this package to the latest version available to this system
+ */
+function update(): void {
     $pf_version = RESTAPI\Core\Tools\get_pfsense_version()["base"];
     echo shell_exec("/usr/local/sbin/pkg-static delete -y pfSense-pkg-RESTAPI");
     echo shell_exec("/usr/local/sbin/pkg-static -C /dev/null add https://github.com/jaredhendrickson13/pfsense-RESTAPI/releases/latest/download/pfSense-".$pf_version."-pkg-REST API.pkg");
     echo shell_exec("/etc/rc.restart_webgui");
 }
 
-function revert($version) {
+/**
+ * Reverts or updates the REST API package to a specific version.
+ * @param $version string semantic version tag to revert or upgrade to.
+ */
+function revert(string $version): void {
     # Local variables
     $pf_version = RESTAPI\Core\Tools\get_pfsense_version()["base"];
     $url = "https://github.com/jaredhendrickson13/pfsense-RESTAPI/releases/download/".urlencode($version)."/pfSense-".$pf_version."-pkg-REST API.pkg";
@@ -268,12 +315,18 @@ function revert($version) {
     }
 }
 
+/**
+ * Delete the REST API package and restart the webConfigurator to remove nginx changes.
+ */
 function delete() {
     echo shell_exec("/usr/local/sbin/pkg-static delete -y pfSense-pkg-RESTAPI");
     echo shell_exec("/etc/rc.restart_webgui");
 }
 
-function rotate_server_key() {
+/**
+ * Rotates the JWT server key. Warning: This will revoke any active JWTs.
+ */
+function rotate_server_key(): void {
     $pkg_index = RESTAPI\Core\Tools\get_api_config()[0];
     config_set_path("installedpackages/package/{$pkg_index}/conf/keys", []);
     echo "Rotating REST API server key... ";
@@ -282,11 +335,17 @@ function rotate_server_key() {
     sync();
 }
 
-function version() {
+/**
+ * Prints the pfSense-pkg-RESTAPI version information.
+ */
+function version(): void {
     echo shell_exec("/usr/local/sbin/pkg-static info pfSense-pkg-RESTAPI");
 }
 
-function help() {
+/**
+ * Prints the pfsense-restapi help page.
+ */
+function help(): void {
     echo "pfsense-restapi - CLI tool for pfSense REST API management".PHP_EOL;
     echo "Copyright - ".date("Y")."© - Jared Hendrickson".PHP_EOL;
     echo "SYNTAX:".PHP_EOL;
@@ -314,81 +373,80 @@ function help() {
 }
 
 # BUILD_FORMS COMMAND
-if (in_array($argv[1], ["buildforms"])) {
+if ($argv[1] == "buildforms") {
     build_forms();
 }
 # BUILDENDPOINTS COMMAND
-elseif (in_array($argv[1], ["buildendpoints"])) {
+elseif ($argv[1] == "buildendpoints") {
     build_endpoints();
 }
 # BUILDPRIVS COMMAND
-elseif (in_array($argv[1], ["buildprivs"])) {
+elseif ($argv[1] == "buildprivs") {
     build_privs();
 }
 # GENERATEDOCUMENTATION COMMAND
-elseif (in_array($argv[1], ["generatedocs"])) {
+elseif ($argv[1] == "generatedocs") {
     echo "Generating OpenAPI documentation... ";
     RESTAPI\Core\Tools\generate_documentation();
     echo "done.".PHP_EOL;
 }
 # NOTIFY_DISPATCHER COMMAND
-elseif (in_array($argv[1], ["notifydispatcher"])) {
+elseif ($argv[1] == "notifydispatcher") {
     notify_dispatcher(dispatcher_name: $argv[2]);
 }
 # SCHEDULE_DISPATCHER COMMAND
-elseif (in_array($argv[1], ["scheduledispatchers"])) {
+elseif ($argv[1] == "scheduledispatchers") {
     schedule_dispatchers();
 }
 # REFRESH_CACHE COMMAND
-elseif (in_array($argv[1], ["refreshcache"])) {
+elseif ($argv[1] == "refreshcache") {
     refresh_cache(cache_name: $argv[2]);
 }
 # RUNTESTS COMMAND
-elseif (in_array($argv[1], ["runtests"])) {
+elseif ($argv[1] == "runtests") {
     run_tests(contains: $argv[2]);
 }
 # RESTART_WEBGUI COMMAND
-elseif (in_array($argv[1], ["restartwebgui"])) {
+elseif ($argv[1] == "restartwebgui") {
     restart_webgui();
 }
 # BACKUP COMMAND
-elseif (in_array($argv[1], ["backup"])) {
+elseif ($argv[1] == "backup") {
     backup();
 }
 # RESTORE COMMAND
-elseif (in_array($argv[1], ["restore"])) {
+elseif ($argv[1] == "restore") {
     restore();
     sync();
 }
 # SYNC COMMAND
-elseif (in_array($argv[1], ["sync"])) {
+elseif ($argv[1] == "sync") {
     sync();
 }
 # UPDATE COMMAND
-elseif (in_array($argv[1], ["update"])) {
+elseif ($argv[1] == "update") {
     update();
 }
 # REVERT COMMAND
-elseif (in_array($argv[1], ["revert"])) {
+elseif ($argv[1] == "revert") {
     revert($argv[2]);
 }
 # DELETE COMMAND
-elseif (in_array($argv[1], ["delete"])) {
+elseif ($argv[1] == "delete") {
     delete();
 }
 # ROTATESERVERKEY COMMAND
-elseif (in_array($argv[1], ["rotateserverkey"])) {
+elseif ($argv[1] == "rotateserverkey") {
     rotate_server_key();
 }
 # VERSION COMMAND
-elseif (in_array($argv[1], ["version"])) {
+elseif ($argv[1] == "version") {
     version();
 }
 # HELP COMMAND
 elseif (in_array($argv[1], ["help", null])) {
     help();
-
-}
+} 
 # UNKNOWN COMMAND/DEFAULT
 else {
     echo "Error: Unknown command".PHP_EOL.PHP_EOL;
