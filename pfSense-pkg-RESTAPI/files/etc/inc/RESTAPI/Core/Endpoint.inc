@@ -805,8 +805,9 @@ class Endpoint {
 
     /**
      * Generate an endpoint for this view in the pfSense webroot.
+     * @returns bool Returns true if the endpoint was successfully built, returns false otherwise.
      */
-    public function build_endpoint_url() {
+    public function build_endpoint_url(): bool {
         # Get the fully qualified and non qualified class names for this object
         $fq_class_name = get_class($this);
         $nq_class_name = (new \ReflectionClass($this))->getShortName();
@@ -816,19 +817,18 @@ class Endpoint {
 
         # Create directories and files corresponding with class
         if ($this->url) {
-            mkdir("/usr/local/www".$this->url, 0755, true);
+            mkdir("/usr/local/www".$this->url, 0644, true);
             file_put_contents(
                 "/usr/local/www".$this->url."/index.php",
                 $code
             );
         }
 
-        # Print success output if file now exists, otherwise output error and exit on non-zero code
+        # Return true if the endpoint was successfully built
         if ($this->url and is_file("/usr/local/www".$this->url."/index.php")) {
-            echo "Building ".$fq_class_name." at URL \"".$this->url."\"... done.".PHP_EOL;
-        } else {
-            echo "Building ".$fq_class_name." at URL \"".$this->url."\"... failed.".PHP_EOL;
-            exit(1);
+            return true;
         }
+
+        return false;
     }
 }

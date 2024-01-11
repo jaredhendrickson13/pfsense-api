@@ -359,8 +359,9 @@ class Form {
 
     /**
      * Generate an endpoint for this Form in the pfSense webroot.
+     * @returns bool Returns true if the form was successfully built, otherwise false.
      */
-    public function build_form_url() {
+    public function build_form_url(): bool {
         # Get the fully qualified and non qualified class names for this object
         $fq_class_name = get_class($this);
         $nq_class_name = (new ReflectionClass($this))->getShortName();
@@ -374,17 +375,14 @@ class Form {
         # Assign the absolute path to the file. Assume index.php filename if not specified.
         $filename = "/usr/local/www/$this->url";
         $filename = (str_ends_with($filename, ".php")) ? $filename : "$filename/index.php";
-        echo "Building ".$fq_class_name." at URL \"".$this->url."\"... ";
-        mkdir(dirname($filename), 0755, true);
+        mkdir(dirname($filename), 0644, true);
         file_put_contents($filename, $code);
 
-        # Print success output if file now exists, otherwise output error and exit on non-zero code
+        # Return true if the form was successfully built
         if (is_file($filename)) {
-            echo "done.".PHP_EOL;
+            return true;
         }
-        else {
-            echo "failed.".PHP_EOL;
-            exit(1);
-        }
+
+        return false;
     }
 }
