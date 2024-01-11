@@ -15,6 +15,7 @@
 //   limitations under the License.
 require_once("RESTAPI/autoloader.inc");
 
+use RESTAPI\Core\Cache;
 use RESTAPI\Dispatchers\WebGUIRestartDispatcher;
 use RESTAPI\Models\RESTAPISettings;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
@@ -24,8 +25,8 @@ use function RESTAPI\Core\Tools\get_classes_from_namespace;
  * Endpoint class's specified $url property.
  */
 function build_endpoints(): void {
-    # Use a variable to keep track of the privileges associated with this endpoint
-    $endpoint_privs = [];
+    # Print that we are starting to build endpoints
+    print("Building endpoints... ");
 
     # Import each endpoint class
     foreach(glob("/etc/inc/RESTAPI/Endpoints/*.inc") as $file) {
@@ -33,8 +34,16 @@ function build_endpoints(): void {
         require_once($file);
         $endpoint_class = "\\RESTAPI\\Endpoints\\".str_replace(".inc", "", basename($file));
         $endpoint_obj = new $endpoint_class();
-        $endpoint_obj->build_endpoint_url();
+
+        # Exit if the endpoint fails to be built
+        if (!$endpoint_obj->build_endpoint_url()) {
+            print("failed! ($endpoint_obj->url)");
+            exit(1);
+        }
     }
+
+    # Print that the build is done if we made it through the loop
+    print("done.".PHP_EOL);
 
     # Rebuild privileges in case any Endpoint privilege names have changed
     build_privs();
@@ -45,16 +54,27 @@ function build_endpoints(): void {
  * Form class's specified $url property.
  */
 function build_forms(): void {
+    # Print that we are starting to build forms
+    print("Building forms... ");
+
     # Import each form class
     foreach(glob("/etc/inc/RESTAPI/Forms/*.inc") as $file) {
         # Import classes files and create object
         require_once($file);
         $form_class = "\\RESTAPI\\Forms\\".str_replace(".inc", "", basename($file));
         $form_obj = new $form_class();
-        $form_obj->build_form_url();
+
+        # Exit if the form fails to be built
+        if (!$form_obj->build_form_url()) {
+            print("failed! ($form_obj->url)");
+            exit(1);
+        }
     }
 
-    # Rebuild privileges in case any Endpoint privilege names have changed
+    # Print that the build is done if we made it through the loop
+    print("done.".PHP_EOL);
+
+    # Rebuild privileges in case any Form privilege names have changed
     build_privs();
 }
 
@@ -131,8 +151,16 @@ function schedule_dispatchers(): void {
     foreach ($classes as $class) {
         $dispatcher = new $class();
         if ($dispatcher->schedule) {
+            # Start setting up the schedules
             echo "Configuring schedule for $class... ";
             $dispatcher->setup_schedule();
+
+            # For Cache objects, run the Cache process to populate the cache file initially
+            if ($dispatcher instanceof Cache) {
+                $dispatcher->process();
+            }
+
+            # Print that we are done setting up the schedule for this Dispatcher
             echo "done.".PHP_EOL;
         }
     }
