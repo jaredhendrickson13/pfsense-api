@@ -93,10 +93,10 @@ function build_privs(): void {
 
 /**
  * Runs the process for a specified Dispatcher class in \RESTAPI\Dispatchers.
- * @param string $dispatcher_name
+ * @param string|null $dispatcher_name
  * @note This function does not call the Dispatcher process asynchronously, it will wait for the process to complete.
  */
-function notify_dispatcher(string $dispatcher_name): void {
+function notify_dispatcher(string|null $dispatcher_name): void {
     # Format the fully qualified class name
     $class = "\\RESTAPI\\Dispatchers\\$dispatcher_name";
 
@@ -140,9 +140,9 @@ function schedule_dispatchers(): void {
 
 /**
  * Refreshes the cache file by obtaining new day for a given Cache object.
- * @param string $cache_name The shortname of the Cache class that should have its cache file refreshed.
+ * @param string|null $cache_name The shortname of the Cache class that should have its cache file refreshed.
  */
-function refresh_cache(string $cache_name): void {
+function refresh_cache(string|null $cache_name): void {
     # Format the fully qualified class name
     $class = "\\RESTAPI\\Caches\\$cache_name";
 
@@ -164,11 +164,11 @@ function refresh_cache(string $cache_name): void {
 /**
  * Runs all (or select) TestCase classes in \RESTAPI\Tests. This is only intended to test development of this package
  * and should not be used on live installs.
- * @param $contains string Only run tests that contain this sub-string in the test name.
+ * @param $contains string|null Only run tests that contain this sub-string in the test name.
  * @note Tests will attempt to create, modify and delete configurations and files as well as restart services; which
  * can be disruptive to live systems.
  */
-function run_tests(string $contains = ""): void {
+function run_tests(string|null $contains = ""): void {
     # Variables
     $test_cases = glob("/etc/inc/RESTAPI/Tests/*.inc");
     $exit_code = 0;
