@@ -2,9 +2,9 @@
 
 namespace RESTAPI\Tests;
 
+use RESTAPI\Caches\AvailablePackageCache;
 use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
-use RESTAPI\Models\AvailablePackage;
 use RESTAPI\Models\Package;
 
 class APIModelsPackageTestCase extends TestCase
@@ -55,15 +55,16 @@ class APIModelsPackageTestCase extends TestCase
         $this->assert_equals($pkg->installed_version->value, $pkg->latest_version->value);
 
         # Adjust the available packages cache so it thinks an update is available
-        $pkgs_cache = json_decode(file_get_contents(AvailablePackage::PACKAGES_CACHE_FILE), associative: true);
-        $pkgs_cache_copy = $pkgs_cache;
-        foreach ($pkgs_cache["packages"] as $pkg_id => $pkg_info) {
+        $pkgs_cache = new AvailablePackageCache();
+        $pkgs_cache_data = $pkgs_cache->read();
+        $pkgs_cache_copy = $pkgs_cache_data;
+        foreach ($pkgs_cache_data as $pkg_id => $pkg_info) {
             if ($pkg_info["name"] === $pkg->name->value) {
-                $pkgs_cache["packages"][$pkg_id]["version"] = "100.0_0";
+                $pkgs_cache_data[$pkg_id]["version"] = "100.0_0";
                 break;
             }
         }
-        file_put_contents(AvailablePackage::PACKAGES_CACHE_FILE, json_encode($pkgs_cache));
+        file_put_contents($pkgs_cache->get_file_path(), json_encode($pkgs_cache_data));
 
         # Refresh the Package object and ensure the package now shows an update is available
         $pkg->from_internal();
@@ -71,7 +72,7 @@ class APIModelsPackageTestCase extends TestCase
         $this->assert_equals($pkg->latest_version->value, "100.0_0");
 
         # Restore the packages cache to its original state and delete the package
-        file_put_contents(AvailablePackage::PACKAGES_CACHE_FILE, json_encode($pkgs_cache_copy));
+        file_put_contents($pkgs_cache->get_file_path(), json_encode($pkgs_cache_copy));
         $pkg->delete();
     }
 }

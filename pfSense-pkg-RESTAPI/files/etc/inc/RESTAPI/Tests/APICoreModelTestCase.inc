@@ -3,6 +3,9 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI;
+use RESTAPI\Caches\RESTAPIVersionReleasesCache;
+use RESTAPI\Core\Model;
+use RESTAPI\Models\Test;
 
 class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     /**
@@ -14,7 +17,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_WITH_ID_AND_REPRESENTATION",
             code: 500,
             callable: function () {
-                new RESTAPI\Core\Model(id: 0, data: ["id" => 0]);
+                new Model(id: 0, data: ["id" => 0]);
             }
         );
     }
@@ -31,7 +34,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         $test_client->ip_address = "1.2.3.4";
 
         # Create a Model object and provide the Auth object
-        $test_model = new RESTAPI\Models\Test(client: $test_client);
+        $test_model = new Test(client: $test_client);
 
         # Ensure the Auth object was accepted and is using the correct values
         $this->assert_equals($test_model->client->username, $test_client->username);
@@ -44,7 +47,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      */
     public function test_model_default_auth_obj() {
         # Create a Model object and but do not provide an Auth object
-        $test_model = new RESTAPI\Models\Test();
+        $test_model = new Test();
 
         # Ensure the Auth object was accepted and is using the correct values
         $this->assert_equals($test_model->client->username, RESTAPI\Core\DEFAULT_CLIENT_USERNAME);
@@ -56,7 +59,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      */
     public function test_model_default_verbose_name() {
         # Create a normal Model object and a FirewallAlias Model object for testing
-        $test_model = new RESTAPI\Models\Test();
+        $test_model = new Test();
         $test_fw_alias = new RESTAPI\Models\FirewallAlias();
 
         # Ensure their default names are correct
@@ -71,7 +74,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      */
     public function test_model_get_config_valid_path() {
         # Try to read the WAN interface configuration since it is always present in the config
-        $this->assert_type(RESTAPI\Core\Model::get_config("interfaces/wan"), "array");
+        $this->assert_type(Model::get_config("interfaces/wan"), "array");
     }
 
     /**
@@ -79,9 +82,9 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      */
     public function test_model_get_config_bad_path() {
         # Try to read the WAN interface configuration since it is always present in the config
-        $this->assert_equals(RESTAPI\Core\Model::get_config("does/not/exists", []), []);
-        $this->assert_equals(RESTAPI\Core\Model::get_config("does/not/exists", false), false);
-        $this->assert_equals(RESTAPI\Core\Model::get_config("does/not/exists"), null);
+        $this->assert_equals(Model::get_config("does/not/exists", []), []);
+        $this->assert_equals(Model::get_config("does/not/exists", false), false);
+        $this->assert_equals(Model::get_config("does/not/exists"), null);
     }
 
     /**
@@ -92,7 +95,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_NEXT_ID_WITHOUT_CONFIG_PATH",
             code: 500,
             callable: function () {
-                $test_model = new RESTAPI\Models\Test();
+                $test_model = new Test();
                 $test_model->config_path = null;
                 $test_model->get_next_id();
             }
@@ -107,7 +110,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_NEXT_ID_WITHOUT_MANY",
             code: 500,
             callable: function () {
-                $test_model = new RESTAPI\Models\Test();
+                $test_model = new Test();
                 $test_model->many = false;
                 $test_model->get_next_id();
             }
@@ -126,7 +129,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_DANGEROUS_CONFIG_PATH",
             code: 500,
             callable: function () {
-                $test_model = new RESTAPI\Models\Test();
+                $test_model = new Test();
                 $test_model->config_path = "system/hostname";
                 $test_model->many = true;
                 $test_model->get_next_id();
@@ -139,7 +142,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * return the first available ID, `0`.
      */
     public function test_model_can_get_next_id_at_empty_path() {
-        $test_model = new RESTAPI\Models\Test();
+        $test_model = new Test();
         $test_model->config_path = "this/path/does/not/exist/yet";
         $test_model->many = true;
         $this->assert_equals($test_model->get_next_id(), 0);
@@ -151,7 +154,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * will always be at least one item in filter/rule.
      */
     public function test_model_can_get_next_id_from_existing_array_path() {
-        $test_model = new RESTAPI\Models\Test();
+        $test_model = new Test();
         $test_model->config_path = "filter/rule";
         $test_model->many = true;
         $this->assert_is_greater_than($test_model->get_next_id(), 1);
@@ -162,7 +165,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      */
     public function test_model_to_internal() {
         # Since the default Model does not have any Fields, use a Test Model to test this.
-        $test_model = new RESTAPI\Models\Test();
+        $test_model = new Test();
         $test_model->test_bool->value = true;
         $test_model->test_integer->value = 3;
         $test_model->test_string_unique->value = "test_unique_value";
@@ -195,7 +198,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
     public function test_model_get_fields() {
         # Use the Test model since the base Model has no Fields assigned.
         $this->assert_equals(
-            (new RESTAPI\Models\Test())->get_fields(),
+            (new Test())->get_fields(),
             [
                 "test_bool",
                 "test_integer",
@@ -215,7 +218,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_FIELDS_WITH_CONFLICTING_INTERNAL_NAMES",
             code: 500,
             callable: function () {
-                $test_model = new RESTAPI\Models\Test();
+                $test_model = new Test();
                 $test_model->test_bool->internal_namespace = "same_namespace";
                 $test_model->test_bool->internal_name = "same_name";
                 $test_model->test_string_unique->internal_namespace = "same_namespace";
@@ -234,7 +237,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_MISSING_REQUIRED_PACKAGE",
             code: 404,
             callable: function () {
-                $test_model = new RESTAPI\Models\Test();
+                $test_model = new Test();
                 $test_model->packages = ["pfSense-pkg-some_package_we_dont_have"];
                 $test_model->validate();
             }
@@ -245,7 +248,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      * Checks to ensure the validate() method is successful when we have the correct packages installed.
      */
     public function test_model_validate_packages_installed_package() {
-        $test_model = new RESTAPI\Models\Test();
+        $test_model = new Test();
         $test_model->packages = ["pfSense-pkg-RESTAPI"];    # Use pfSense-pkg-RESTAPI since we know we have it.
         $test_model->validate();
     }
@@ -259,7 +262,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_WITH_FAILED_INCLUDE",
             code: 500,
             callable: function () {
-                $test_model = new RESTAPI\Models\Test();
+                $test_model = new Test();
                 $test_model->package_includes = ["this_inc_file_does_not_exist.inc"];
                 $test_model->validate();
             }
@@ -276,7 +279,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD",
             code: 500,
             callable: function () {
-                $test_model = new RESTAPI\Models\Test();
+                $test_model = new Test();
                 $test_model->many = false;
 
                 # Prevent this unique field from throwing an error first
@@ -297,7 +300,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD",
             code: 500,
             callable: function () {
-                $test_model = new RESTAPI\Models\Test();
+                $test_model = new Test();
 
                 # We need to use an mock internal callable to test this for creates, otherwise the
                 # Model::check_many_minimum() method will throw an error about no internal callable being set
@@ -317,14 +320,14 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      */
     public function test_model_create() {
         # Create a new test model object in config
-        $test_model = new RESTAPI\Models\Test();
+        $test_model = new Test();
         $test_model->test_bool->value = true;
         $test_model->test_string_unique->value ="test_model_create";
         $test_model->test_string_many->value = ["a", "b", "c"];
         $test_model->create();
 
         # Attempt to load the written object from config using it's ID and ensure the values match.
-        $test_model_from_config = new RESTAPI\Models\Test($test_model->id);
+        $test_model_from_config = new Test($test_model->id);
         $this->assert_equals(
             $test_model->test_bool->value,
             $test_model_from_config->test_bool->value
@@ -350,7 +353,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_REQUIRE_OVERRIDDEN_UPDATE_METHOD",
             code: 500,
             callable: function () {
-                $test_model = new RESTAPI\Models\Test();
+                $test_model = new Test();
                 $test_model->config_path = "";
                 $test_model->id = 0;
 
@@ -371,7 +374,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_REQUIRES_ID",
             code: 400,
             callable: function () {
-                $test_model = new RESTAPI\Models\Test();
+                $test_model = new Test();
                 $test_model->config_path = "test/path";
                 $test_model->many = true;
                 $test_model->update();
@@ -384,21 +387,21 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      */
     public function test_model_update() {
         # Create a new test model object in config
-        $test_model = new RESTAPI\Models\Test();
+        $test_model = new Test();
         $test_model->test_bool->value = true;
         $test_model->test_string_unique->value ="test_model_update initial value";
         $test_model->test_string_many->value = ["a", "b", "c"];
         $test_model->create();
 
         # Create a new test model object in config
-        $test_model_to_update = new RESTAPI\Models\Test($test_model->id);
+        $test_model_to_update = new Test($test_model->id);
         $test_model_to_update->test_bool->value = false;
         $test_model_to_update->test_string_unique->value ="test_model_update updated value";
         $test_model_to_update->test_string_many->value = ["c", "b", "a"];
         $test_model_to_update->update();
 
         # Attempt to load the written object from config using it's ID and ensure the values match.
-        $test_model_from_config = new RESTAPI\Models\Test($test_model_to_update->id);
+        $test_model_from_config = new Test($test_model_to_update->id);
         $this->assert_equals(
             $test_model_to_update->test_bool->value,
             $test_model_from_config->test_bool->value
@@ -424,7 +427,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_REQUIRE_OVERRIDDEN_DELETE_METHOD",
             code: 500,
             callable: function () {
-                $test_model = new RESTAPI\Models\Test();
+                $test_model = new Test();
                 $test_model->many = false;
 
                 # Prevent this unique field from throwing an error first
@@ -445,7 +448,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_REQUIRE_OVERRIDDEN_DELETE_METHOD",
             code: 500,
             callable: function () {
-                $test_model = new RESTAPI\Models\Test();
+                $test_model = new Test();
                 $test_model->config_path = "";
                 $test_model->id = 0;
 
@@ -466,7 +469,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_REQUIRES_ID",
             code: 400,
             callable: function () {
-                $test_model = new RESTAPI\Models\Test();
+                $test_model = new Test();
                 $test_model->config_path = "test/path";
                 $test_model->many = true;
                 $test_model->delete();
@@ -484,12 +487,12 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             code: 404,
             callable: function () {
                 # Create a new test model object in config
-                $test_model = new RESTAPI\Models\Test();
+                $test_model = new Test();
                 $test_model->create();
 
                 # Delete the object and try to load the object from config
                 $test_model->delete();
-                new RESTAPI\Models\Test(id: $test_model->id);
+                new Test(id: $test_model->id);
             }
         );
     }
@@ -504,7 +507,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         unlink("/tmp/.api_models_test_apply.txt");
 
         # Create a new test model object in config and request to apply the change immediately.
-        $test_model = new RESTAPI\Models\Test();
+        $test_model = new Test();
         $test_model->create(apply: true);
 
         # Ensure the expected txt file is present and remove it.
@@ -530,7 +533,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_UNIQUE_TOGETHER_FIELDS_WITH_UNKNOWN_FIELD",
             code: 500,
             callable: function () {
-                $test_model = new RESTAPI\Models\Test();
+                $test_model = new Test();
                 $test_model->unique_together_fields = ["this_field_doesnt_exist"];
                 $test_model->validate();
             }
@@ -543,7 +546,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      */
     public function test_unique_together_validation() {
         # Create a Model object that uses the unique Fields
-        $original_model_obj = new RESTAPI\Models\Test(
+        $original_model_obj = new Test(
             data: [
                 "test_bool" => false,
                 "test_string_namespace" => "This must be unique with `test_bool` being `false`",
@@ -557,7 +560,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
             response_id: "MODEL_FIELDS_NOT_UNIQUE_TOGETHER",
             code: 400,
             callable: function () {
-                $non_unique_model_obj = new RESTAPI\Models\Test(
+                $non_unique_model_obj = new Test(
                     data: [
                         "test_bool" => false,
                         "test_string_namespace" => "This must be unique with `test_bool` being `false`",
@@ -578,7 +581,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      */
     public function test_model_constructs_from_representation() {
         # Construct a new test model object using representation data
-        $test_model = new RESTAPI\Models\Test(
+        $test_model = new Test(
             data: [
                 "test_bool" => true,
                 "test_string_unique" => "test_model_constructs_from_representation",
@@ -606,7 +609,7 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
      */
     public function test_model_to_openapi_schema() {
         # Create a model to test with and generate it's OpenAPI schema
-        $test_model = new RESTAPI\Models\Test();
+        $test_model = new Test();
         $test_model_schema = $test_model->to_openapi_schema();
 
         # Ensure the schema type is an object
@@ -616,6 +619,24 @@ class APICoreModelTestCase extends RESTAPI\Core\TestCase {
         foreach ($test_model_schema["properties"] as $field => $property) {
             $this->assert_equals($test_model->$field->to_openapi_property(), $property);
         }
+    }
+    
+    /**
+     * Checks that the Models with a $cache_class assigned are construct with a specific Cache object.
+     */
+    public function test_cache_class_creates_cache_object_during_construction(): void {
+        # Define a model with a cache class. Use the RESTAPIVersionReleasesCache for testing.
+        $model = new Model();
+        $model->cache_class = "RESTAPIVersionReleasesCache";
+        $model->__construct();
+        
+        # Ensure the $cache property now has the Cache object
+        $this->assert_is_true($model->cache instanceof RESTAPIVersionReleasesCache);
+        
+        # Remove the $cache_class and ensure the $cache property is null after construction
+        $model->cache_class = "";
+        $model->__construct();
+        $this->assert_equals($model->cache, null);
     }
 }
 

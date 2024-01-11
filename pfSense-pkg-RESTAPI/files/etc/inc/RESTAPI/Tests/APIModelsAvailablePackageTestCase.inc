@@ -2,9 +2,9 @@
 
 namespace RESTAPI\Tests;
 
-use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\AvailablePackage;
+use RESTAPI\Models\Package;
 
 class APIModelsAvailablePackageTestCase extends TestCase
 {
@@ -13,28 +13,26 @@ class APIModelsAvailablePackageTestCase extends TestCase
      */
     public function test_read_available_packages(): void {
         # Try to obtain info about the pfSense-pkg-sudo package from remote repos
-        $pkg = AvailablePackage::query(name: "pfSense-pkg-sudo")->first();
+        $avail_pkgs = AvailablePackage::query(name: "pfSense-pkg-sudo")->first();
 
         # Ensure details about this package are accurate
-        $this->assert_equals($pkg->name->value, "pfSense-pkg-sudo");
-        $this->assert_equals($pkg->shortname->value, "sudo");
-        $this->assert_is_not_empty($pkg->descr->value);
-        $this->assert_is_not_empty($pkg->latest_version->value);
-        $this->assert_str_contains($pkg->deps->value[0], "sudo-");
-        $this->assert_is_false($pkg->update_available->value);
+        $this->assert_equals($avail_pkgs->name->value, "pfSense-pkg-sudo");
+        $this->assert_equals($avail_pkgs->shortname->value, "sudo");
+        $this->assert_is_not_empty($avail_pkgs->descr->value);
+        $this->assert_is_not_empty($avail_pkgs->version->value);
+        $this->assert_str_contains($avail_pkgs->deps->value[0], "sudo-");
 
         # Install the package and ensure the `installed` field is now `true`
-        # TODO: change this to use the Package model to install the package
-        new Command("pkg-static install -y pfSense-pkg-sudo");
-        $pkg->reload_config();
-        $pkg->from_internal();
-        $this->assert_is_true($pkg->update_available->value);
+        $sudo_pkg = new Package(data: ["name" => "pfSense-pkg-sudo"]);
+        $sudo_pkg->create();
+        $avail_pkgs->reload_config();
+        $avail_pkgs->from_internal();
+        $this->assert_is_true($avail_pkgs->installed->value);
 
         # Delete the package and ensure the `installed` field is once again `false`
-        # TODO: change this to use the Package model to delete the package
-        new Command("pkg-static delete -y pfSense-pkg-sudo");
-        $pkg->reload_config();
-        $pkg->from_internal();
-        $this->assert_is_false($pkg->update_available->value);
+        $sudo_pkg->delete();
+        $avail_pkgs->reload_config();
+        $avail_pkgs->from_internal();
+        $this->assert_is_false($avail_pkgs->installed->value);
     }
 }
