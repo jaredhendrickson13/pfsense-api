@@ -12,8 +12,6 @@ use RESTAPI\Fields\StringField;
  */
 class AvailablePackage extends Model
 {
-    const PACKAGES_CACHE_FILE = "/usr/local/share/pfSense-pkg-RESTAPI/.cache/packages.json";
-
     public StringField $name;
     public StringField $shortname;
     public StringField $descr;
