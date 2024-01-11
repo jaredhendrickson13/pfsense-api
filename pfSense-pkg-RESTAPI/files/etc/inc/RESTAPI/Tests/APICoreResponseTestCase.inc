@@ -65,8 +65,6 @@ class APICoreResponseTestCase extends RESTAPI\Core\TestCase {
         $api_settings->hateoas->value = true;
         $api_settings->update();
 
-        var_dump($response->to_representation());
-
         # Ensure the response schema now includes the _links field
         $this->assert_equals(
             $response->to_representation(),
