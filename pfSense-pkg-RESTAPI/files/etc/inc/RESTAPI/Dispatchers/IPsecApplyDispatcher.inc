@@ -7,7 +7,7 @@ use RESTAPI\Core\Dispatcher;
 class IPsecApplyDispatcher extends Dispatcher
 {
     public int $timeout = 120;
-    public function process(...$arguments)
+    public function process(mixed ...$arguments): void
     {
         # Restart IPsec and related services
         $ipsec_dynamic_hosts = ipsec_configure();

@@ -13,7 +13,7 @@ class SystemHostnameApplyDispatcher extends Dispatcher
     /**
      * Restarts system hostname services.
      */
-    public function process(...$arguments)
+    public function process(mixed ...$arguments): void
     {
         # Restart system hostname/DNS services
         system_hostname_configure();

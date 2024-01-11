@@ -12,7 +12,7 @@ class DNSResolverApplyDispatcher extends Dispatcher
     /**
      * Reloads the DNS Resolver and associated services.
      */
-    public function process(...$arguments)
+    public function process(mixed ...$arguments): void
     {
         $reload_unbound = 0;
         $reload_unbound |= services_unbound_configure();
