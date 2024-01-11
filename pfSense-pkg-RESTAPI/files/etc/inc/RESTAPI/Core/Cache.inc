@@ -56,7 +56,7 @@ class Cache extends Dispatcher
      */
     final public function read(): array {
         $cache_json = file_get_contents($this->get_file_path());
-        return json_decode($cache_json, associative: true);
+        return (json_decode($cache_json, associative: true)) ?: [];
     }
 
     /**
