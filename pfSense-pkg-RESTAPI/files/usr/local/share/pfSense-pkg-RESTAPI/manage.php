@@ -13,8 +13,7 @@
 //   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
-require_once("RESTAPI/Core/Tools.inc");
-require_once("RESTAPI/Core/TestCase.inc");
+require_once("RESTAPI/autoloader.inc");
 
 use RESTAPI\Dispatchers\WebGUIRestartDispatcher;
 use RESTAPI\Models\RESTAPISettings;
@@ -176,6 +175,10 @@ function run_tests(string $contains = ""): void {
     $test_count = count($test_cases);
     $skipped_count = 0;
     $succeed_count = 0;
+    $failed_tests = [];
+
+    # Print that we are starting tests now
+    echo "Running tests...";
 
     # Import each test class and run the test
     foreach($test_cases as $test_case_file) {
@@ -183,12 +186,8 @@ function run_tests(string $contains = ""): void {
         require_once($test_case_file);
         $test_case = "\\RESTAPI\\Tests\\".str_replace(".inc", "", basename($test_case_file));
 
-        # Print that we're starting this test
-        echo "Running test case $test_case... ";
-
         # Only run this test case if the test name contains the $contains string
         if (!str_contains($test_case, $contains)) {
-            echo "skipped.".PHP_EOL;
             $skipped_count++;
             continue;
         }
@@ -197,30 +196,38 @@ function run_tests(string $contains = ""): void {
         $test_obj = new $test_case();
         try {
             $test_obj->run();
-            echo "done.".PHP_EOL;
+            echo ".";    // Print a dot for each test completed so the user is aware that tests are really running
             $succeed_count++;
             $fail_results = null;
         }
         # If an AssertionError is received, there was a test failure. Print the traceback.
         catch (AssertionError $fail_results) {
-            echo "failed!".PHP_EOL;
+            echo "F";
             $exit_code = 2;
         }
         catch (Exception | Error $fail_results) {
-            echo "fatal!".PHP_EOL;
+            echo "E";
             $exit_code = 1;
         }
 
         if ($fail_results) {
             $exc_class = $fail_results::class;
             $fail_msg = $fail_results->getMessage();
-            echo "---------------------------------------------------------".PHP_EOL;
-            echo "Failure message: [$exc_class] $fail_msg".PHP_EOL;
-            echo "Test name: $test_obj->method".PHP_EOL;
-            echo "Test description: $test_obj->method_docstring".PHP_EOL.PHP_EOL;
-            echo $fail_results->getTraceAsString().PHP_EOL;
-            echo "---------------------------------------------------------".PHP_EOL;
+            $result = "---------------------------------------------------------".PHP_EOL;
+            $result .= "Failure message: [$exc_class] $fail_msg".PHP_EOL;
+            $result .= "Test name: $test_obj->method".PHP_EOL;
+            $result .= "Test description: $test_obj->method_docstring".PHP_EOL.PHP_EOL;
+            $result .= $fail_results->getTraceAsString().PHP_EOL;
+            $failed_tests[] = $result;
         }
+    }
+    
+    # Mark the test as a failure if there are any failed tests, otherwise mark tests as done.
+    echo ($failed_tests) ? " failed!".PHP_EOL : " done.".PHP_EOL;
+    
+    # Loop through each failed test and print its results
+    foreach ($failed_tests as $failed_test) {
+        echo $failed_test;
     }
 
     # Adjust the total test count if Tests were skipped.
