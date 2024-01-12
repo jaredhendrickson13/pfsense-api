@@ -6,7 +6,7 @@
 # $2: The PID file associated with the spawned Dispatcher process.
 # $3: The number of seconds the Dispatcher process can run before timing out.
 
-# Start the Dispatcher process using manage.php (pfsense-RESTAPI CLI), enforce timeout
+# Start the Dispatcher process using manage.php (pfsense-restapi CLI), enforce timeout
 timeout --foreground $3 php -f /usr/local/pkg/RESTAPI/.resources/scripts/manage.php notifydispatcher $1;
 
 # Remove the PID file associated with this Dispatcher process
