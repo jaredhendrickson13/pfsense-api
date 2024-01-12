@@ -15,6 +15,7 @@
 //   limitations under the License.
 require_once("RESTAPI/autoloader.inc");
 
+use RESTAPI\Caches\PrivilegesCache;
 use RESTAPI\Core\Cache;
 use RESTAPI\Dispatchers\WebGUIRestartDispatcher;
 use RESTAPI\Models\RESTAPISettings;
@@ -85,29 +86,10 @@ function build_forms(): void {
 function build_privs(): void {
     echo "Building privileges... ";
     
-    # Use a variable to keep track of the privileges associated with this endpoint
-    $privs = [];
-
-    # Import and build privileges for each Endpoint class
-    foreach(glob("/usr/local/pkg/RESTAPI/Endpoints/*.inc") as $file) {
-        # Import classes files and create object
-        require_once($file);
-        $endpoint_class = "\\RESTAPI\\Endpoints\\".str_replace(".inc", "", basename($file));
-        $endpoint_object = new $endpoint_class();
-        $privs += $endpoint_object->generate_pfsense_privs();
-    }
-
-    # Import and build privileges for each Form class
-    foreach(glob("/usr/local/pkg/RESTAPI/Forms/*.inc") as $file) {
-        # Import classes files and create object
-        require_once($file);
-        $form_class = "\\RESTAPI\\Forms\\".str_replace(".inc", "", basename($file));
-        $form_obj = new $form_class();
-        $privs += $form_obj->generate_pfsense_privs();
-    }
-
-    # Write the REST API endpoint privileges to privs.json
-    file_put_contents("/usr/local/share/pfSense-pkg-RESTAPI/privs.json", json_encode($privs));
+    # Use PrivilegesCache to refresh the privileges cache file
+    $privileges_cache = new PrivilegesCache();
+    $privileges_cache->process();
+    
     echo "done.".PHP_EOL;
 }
 
