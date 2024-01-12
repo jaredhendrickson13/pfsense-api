@@ -108,7 +108,7 @@ class InterfaceField extends RESTAPI\Fields\StringField {
         $this->allow_ipsec_interface = $allow_ipsec_interface;
         $this->allow_openvpn_interface = $allow_openvpn_interface;
         $this->allow_carp_interface = $allow_carp_interface;
-        $this->represented_as = RESTAPI\Models\RESTAPISettings::get_api_config()["config"]["represent_interfaces_as"];
+        $this->represented_as = RESTAPI\Models\RESTAPISettings::get_pkg_config()["represent_interfaces_as"];
 
         # Construct the parent Field object
         parent::__construct(

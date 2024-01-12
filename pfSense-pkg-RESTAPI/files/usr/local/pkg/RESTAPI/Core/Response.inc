@@ -130,7 +130,7 @@ class Response extends Error {
         ];
 
         # If HATEOAS is enabled, include related response _links
-        if (RESTAPISettings::get_api_config()["config"]["hateoas"] === "enabled") {
+        if (RESTAPISettings::get_pkg_config()["hateoas"] === "enabled") {
             $representation += $this->_links->to_representation();
         }
 

@@ -16,22 +16,18 @@ class APIModelsAPISettingsTestCase extends TestCase
     # TODO: Needs Tests for API HA sync feature
 
     /**
-     * Checks that the static `get_api_config()` method returns the API package's internal configuration along with
-     * its ID in the configuration.
+     * Checks that the static `get_pkg_config()` method returns the API package's internal configuration and 
+     * the static `get_pkg_id()` method returns the API package's ID
      */
-    public function test_get_api_config() {
+    public function test_get_api_config_and_id(): void {
         $test_api_settings = new RESTAPISettings();
-        $test_api_config = RESTAPISettings::get_api_config();
 
         # Ensure the API config's ID was returned and ensure it is an integer
-        $this->assert_is_true(array_key_exists("id", $test_api_config));
-        $this->assert_type($test_api_config["id"], "integer");
-
-        # Ensure the API config was returned and all expected Fields are present
-        $this->assert_is_true(array_key_exists("config", $test_api_config));
+        # Note: this assumes pfSense-pkg-RESTAPI is the only add-on package installed when this test runs.
+        $this->assert_equals(RESTAPISettings::get_pkg_id(), 0);
 
         foreach ($test_api_settings->get_fields() as $field) {
-            $this->assert_is_true(array_key_exists($field, $test_api_config["config"]));
+            $this->assert_is_true(array_key_exists($field, RESTAPISettings::get_pkg_config()));
         }
     }
 
@@ -89,12 +85,12 @@ class APIModelsAPISettingsTestCase extends TestCase
         $this->assert_equals($api_settings->restore_from_backup(), API_SETTINGS_RESTORE_NO_CHANGE);
 
         # Capture the current API config, delete the running API config, restore it from backup and ensure it matches
-        $api_config_id = $api_settings->get_api_config()["id"];
-        $original_api_config = $api_settings->get_api_config()["config"];
+        $api_config_id = $api_settings->get_pkg_id();
+        $original_api_config = $api_settings->get_pkg_config();
         config_set_path("installedpackages/package/$api_config_id/conf", ["keep_backup"=>"enabled", "bad-field"=>true]);
         write_config("Unit test removed API config to test restores.");
         $this->assert_equals($api_settings->restore_from_backup(), API_SETTINGS_RESTORE_SUCCESS);
-        $this->assert_equals($original_api_config, $api_settings->get_api_config()["config"]);
+        $this->assert_equals($original_api_config, $api_settings->get_pkg_config());
     }
 
     /**

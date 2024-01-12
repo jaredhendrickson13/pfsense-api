@@ -42,7 +42,7 @@ class RESTAPISettings extends Model {
     public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
     {
         # Obtain the API config index and set the config path to the API configuration
-        $this->id = $this->get_api_config()["id"];
+        $this->id = $this->get_pkg_id();
         $this->config_path = "installedpackages/package/$this->id/conf";
 
         # Set Fields for this Model
@@ -189,7 +189,7 @@ class RESTAPISettings extends Model {
      */
     public static function backup_to_file() : int {
         # Read current API settings
-        $api_config = RESTAPISettings::get_api_config()["config"];
+        $api_config = RESTAPISettings::get_pkg_config();
 
         # Don't allow restore if the `keep_backup` is not enabled
         if ($api_config["keep_backup"] !== "enabled") {
@@ -210,8 +210,8 @@ class RESTAPISettings extends Model {
         # Variables
         $backup_api_conf_json = (is_file(API_SETTINGS_BACKUP_FILE_PATH)) ? file_get_contents(API_SETTINGS_BACKUP_FILE_PATH) : "";
         $backup_api_conf = ($backup_api_conf_json) ? json_decode($backup_api_conf_json, true) : [];
-        $current_api_id = RESTAPISettings::get_api_config()["id"];
-        $current_api_conf = RESTAPISettings::get_api_config()["config"];
+        $current_api_id = RESTAPISettings::get_pkg_id();
+        $current_api_conf = RESTAPISettings::get_pkg_config();
 
         # Don't allow restore if the `keep_backup` is not enabled
         if ($current_api_conf["keep_backup"] !== "enabled") {
@@ -234,23 +234,20 @@ class RESTAPISettings extends Model {
     }
 
     /**
-     * Obtains the internal pfSense-pkg-RESTAPI configuration and package ID from the pfSense configuration.
-     * @return array An associative array containing the API configuration under the `config` key, and the API package
-     * ID under the `id` key. Returns an empty array if the API package could not be found.
+     * Obtains the internal pfSense-pkg-RESTAPI configuration.
+     * @return array An associative array containing the pfSense-pkg-RESTAPI configuration
      */
-    public static function get_api_config() : array {
-        # Variables
-        $api_pkg_name = "RESTAPI";
-        $pkg_conf = self::get_config("installedpackages/package", []);
+    public static function get_pkg_config() : array {
+        return read_package_config("RESTAPI")["conf"];
+    }
 
-        # Loop through each package and locate the API package
-        foreach ($pkg_conf as $id => $pkg) {
-            if ($pkg["name"] === $api_pkg_name) {
-                return ["id"=>$id, "config"=>$pkg["conf"]];
-            }
-        }
-
-        return [];
+    /**
+     * Obtains the `installedpackage` configuration ID for the pfSense-pkg-RESTAPI package.
+     * @return int The pfSense-pkg-RESTAPI package's `installedpackage` configuration ID in integer format. If the
+     * package cannot be found, this will return `-1`
+     */
+    public static function get_pkg_id(): int {
+        return get_package_id("RESTAPI");
     }
 
     /**

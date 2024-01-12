@@ -23,7 +23,7 @@ class RESTAPIKey extends Model
     public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
     {
         # Gather information about current API settings
-        $api_pkg_id = RESTAPISettings::get_api_config()["id"];
+        $api_pkg_id = RESTAPISettings::get_pkg_id();
 
         # Set Model attributes
         $this->config_path = "installedpackages/package/$api_pkg_id/conf/keys/key";

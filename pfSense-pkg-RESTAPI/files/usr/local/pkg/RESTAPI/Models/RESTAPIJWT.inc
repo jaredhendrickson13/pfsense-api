@@ -40,8 +40,8 @@ class RESTAPIJWT extends Model
      */
     public static function init_server_key(bool $rotate = false) : string {
         # Obtain the API package's ID and configuration
-        $pkg_id = RESTAPI\Models\RESTAPISettings::get_api_config()["id"];
-        $api_config = RESTAPI\Models\RESTAPISettings::get_api_config()["config"];
+        $pkg_id = RESTAPI\Models\RESTAPISettings::get_pkg_id();
+        $api_config = RESTAPI\Models\RESTAPISettings::get_pkg_config();
 
         # Create a new server key if one is not set
         if (empty($api_config["server_key"]) or $rotate === true) {
@@ -59,7 +59,7 @@ class RESTAPIJWT extends Model
         }
         
         # Refresh the API config in case the server key changed
-        $api_config = RESTAPI\Models\RESTAPISettings::get_api_config()["config"];
+        $api_config = RESTAPI\Models\RESTAPISettings::get_pkg_config();
 
         # Return the server key
         return $api_config["server_key"];

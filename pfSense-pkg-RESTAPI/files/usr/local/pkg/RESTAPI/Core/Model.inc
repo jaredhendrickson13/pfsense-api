@@ -840,7 +840,7 @@ class Model {
         }
         
         # Append any related HATEOAS links if HATEOAS is enabled
-        if (RESTAPI\Models\RESTAPISettings::get_api_config()["config"]["hateoas"] === "enabled") {
+        if (RESTAPI\Models\RESTAPISettings::get_pkg_config()["hateoas"] === "enabled") {
             $representation += $this->get_related_links()->to_representation();
         }
 

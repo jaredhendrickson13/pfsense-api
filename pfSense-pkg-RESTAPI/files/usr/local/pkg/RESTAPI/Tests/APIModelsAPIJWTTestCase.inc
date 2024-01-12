@@ -15,20 +15,20 @@ class APIModelsAPIJWTTestCase extends TestCase
      */
     public function test_init_server_key() {
         # First ensure there is not already a JWT server key
-        $api_pkg_id = RESTAPISettings::get_api_config()["id"];
+        $api_pkg_id = RESTAPISettings::get_pkg_id();
         Model::del_config("installedpackages/package/{$api_pkg_id}/conf/server_key");
-        $api_pkg_conf = RESTAPISettings::get_api_config()["config"];
+        $api_pkg_conf = RESTAPISettings::get_pkg_config();
         $this->assert_is_empty($api_pkg_conf["server_key"]);
 
         # Ensure a server key is created after running init_jwt_server_key()
         RESTAPIJWT::init_server_key();
-        $api_pkg_conf = RESTAPISettings::get_api_config()["config"];
+        $api_pkg_conf = RESTAPISettings::get_pkg_config();
         $this->assert_is_not_empty($api_pkg_conf["server_key"]);
-        $first_server_key = RESTAPISettings::get_api_config()["config"]["server_key"];
+        $first_server_key = RESTAPISettings::get_pkg_config()["server_key"];
 
         # Ensure the Jwt server key can be rotated
         RESTAPIJWT::init_server_key(rotate: true);
-        $second_server_key = RESTAPISettings::get_api_config()["config"]["server_key"];
+        $second_server_key = RESTAPISettings::get_pkg_config()["server_key"];
 
         # Ensure the server key changed during rotation
         $this->assert_not_equals($first_server_key, $second_server_key);
@@ -43,7 +43,7 @@ class APIModelsAPIJWTTestCase extends TestCase
      */
     public function test_create_and_decode_jwt() {
         # Get our API pkg config
-        $api_pkg_id = RESTAPISettings::get_api_config()["id"];
+        $api_pkg_id = RESTAPISettings::get_pkg_id();
         $api_settings = new RESTAPISettings();
 
         # Generate a JWT

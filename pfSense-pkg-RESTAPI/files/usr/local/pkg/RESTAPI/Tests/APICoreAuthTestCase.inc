@@ -81,7 +81,7 @@ class APICoreAuthTestCase extends TestCase
         $this->assert_is_true($auth->authenticate(secret: $jwt->token->value));
 
         # Remove the JWT server key created by generate_jwt()
-        $api_pkg_id = RESTAPISettings::get_api_config()["id"];
+        $api_pkg_id = RESTAPISettings::get_pkg_id();
         config_set_path("installedpackages/package/{$api_pkg_id}/conf/server_key", "");
         write_config("Unit test removed JWT server key used for testing");
     }

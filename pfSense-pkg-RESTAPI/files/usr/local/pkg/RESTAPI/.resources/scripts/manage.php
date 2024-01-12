@@ -344,8 +344,8 @@ function delete() {
  * Rotates the JWT server key. Warning: This will revoke any active JWTs.
  */
 function rotate_server_key(): void {
-    $pkg_index = RESTAPI\Core\Tools\get_api_config()[0];
-    config_set_path("installedpackages/package/{$pkg_index}/conf/keys", []);
+    $pkg_index = RESTAPISettings::get_pkg_id();
+    config_set_path("installedpackages/package/$pkg_index/conf/keys", []);
     echo "Rotating REST API server key... ";
     RESTAPI\Core\Tools\create_jwt_server_key(true);
     echo "done.".PHP_EOL;

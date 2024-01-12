@@ -238,7 +238,7 @@ class Endpoint {
         error_reporting(E_ERROR);
 
         # Fetch the current API configuration whenever the object is first created.
-        $this->api_config = RESTAPI\Models\RESTAPISettings::get_api_config()["config"];
+        $this->api_config = RESTAPI\Models\RESTAPISettings::get_pkg_config();
 
         # Fetch request method whenever the object is first created.
         $this->request_method = strtoupper($_SERVER["REQUEST_METHOD"]);
