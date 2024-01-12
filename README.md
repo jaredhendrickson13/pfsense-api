@@ -270,7 +270,7 @@ applications to hardcode URLs for related items.
 
 > [!NOTE]
 > HATEOAS is disabled by default. HATEOAS can be enabled in the System > REST API > Settings webConfigurator page or via
-> the /api/v2/system/restapi/settings API endpoint. While disables, the `_links` field will not show up in the API
+> the /api/v2/system/restapi/settings API endpoint. While disabled, the `_links` field will not show up in the API
 > response schemas.
 
 > [!WARNING]
