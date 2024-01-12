@@ -1,6 +1,6 @@
 #!/usr/local/bin/php -f
 <?php
-//   Copyright 2023 Jared Hendrickson
+//   Copyright 2024 Jared Hendrickson
 //
 //   Licensed under the Apache License, Version 2.0 (the "License");
 //   you may not use this file except in compliance with the License.

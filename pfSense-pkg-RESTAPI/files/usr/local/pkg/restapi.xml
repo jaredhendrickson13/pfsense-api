@@ -5,10 +5,10 @@
     <copyright>
         <![CDATA[
 /**
- * API
+ * REST API
  *  - The missing REST API package for pfSense
  *
- * Copyright 2023 Jared Hendrickson
+ * Copyright 2024 Jared Hendrickson
  */
 	]]>
     </copyright>
