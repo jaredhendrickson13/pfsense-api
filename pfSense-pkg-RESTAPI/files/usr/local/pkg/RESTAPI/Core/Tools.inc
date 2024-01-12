@@ -445,6 +445,6 @@ function generate_documentation(): bool {
 
     return (bool)file_put_contents(
         filename: "/usr/local/www/openapi/openapi.json",
-        data: Tools . incjson_encode($openapi_config) . PHP_EOL
+        data: json_encode($openapi_config) . PHP_EOL
     );
 }
