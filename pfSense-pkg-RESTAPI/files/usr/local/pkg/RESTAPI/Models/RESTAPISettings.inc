@@ -238,7 +238,12 @@ class RESTAPISettings extends Model {
      * @return array An associative array containing the pfSense-pkg-RESTAPI configuration
      */
     public static function get_pkg_config() : array {
-        return read_package_config("RESTAPI")["conf"];
+        foreach (self::get_config("installedpackages/package") as $installed_package) {
+            if ($installed_package["name"] === "RESTAPI") {
+                return $installed_package["conf"];
+            }
+        }
+        return [];
     }
 
     /**

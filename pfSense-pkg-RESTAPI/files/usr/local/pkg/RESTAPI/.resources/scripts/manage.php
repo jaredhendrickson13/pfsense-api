@@ -18,6 +18,7 @@ require_once("RESTAPI/autoloader.inc");
 use RESTAPI\Caches\PrivilegesCache;
 use RESTAPI\Core\Cache;
 use RESTAPI\Dispatchers\WebGUIRestartDispatcher;
+use RESTAPI\Models\RESTAPIJWT;
 use RESTAPI\Models\RESTAPISettings;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
@@ -347,7 +348,7 @@ function rotate_server_key(): void {
     $pkg_index = RESTAPISettings::get_pkg_id();
     config_set_path("installedpackages/package/$pkg_index/conf/keys", []);
     echo "Rotating REST API server key... ";
-    RESTAPI\Core\Tools\create_jwt_server_key(true);
+    RESTAPIJWT::init_server_key(rotate: true);
     echo "done.".PHP_EOL;
     sync();
 }
