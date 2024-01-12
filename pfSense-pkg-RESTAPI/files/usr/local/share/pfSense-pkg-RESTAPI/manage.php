@@ -275,7 +275,7 @@ function run_tests(string|null $contains = ""): void {
  * to run /etc/rc.restart_webgui after installation.
  */
 function restart_webgui(): void {
-    echo "Scheduling webConfigurator restart... ";
+    echo "Initiating webConfigurator restart... ";
     (new WebGUIRestartDispatcher())->spawn_process();
     echo "done.".PHP_EOL;
     exit(0);
