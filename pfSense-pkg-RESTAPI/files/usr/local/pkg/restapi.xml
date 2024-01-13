@@ -30,7 +30,7 @@
         <section>System</section>
         <url>/system_restapi_settings.php</url>
     </menu>
-    <include_file>/usr/local/share/pfSense-pkg-RESTAPI/nginx.inc</include_file>
+    <include_file>/usr/local/pkg/RESTAPI/nginx.inc</include_file>
     <plugins>
         <item>
             <type>plugin_nginx</type>
