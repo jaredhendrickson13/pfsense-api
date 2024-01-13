@@ -1,0 +1,139 @@
+<?php
+
+namespace RESTAPI\Models;
+
+require_once("RESTAPI/autoloader.inc");
+
+use RESTAPI\Core\Auth;
+use RESTAPI\Core\Model;
+use RESTAPI\Endpoints\SystemRESTAPISettingsSync;
+use RESTAPI\Fields\StringField;
+use RESTAPI\Responses\ValidationError;
+use function RESTAPI\Core\Tools\cprint;
+
+class RESTAPISettingsSync extends Model
+{
+    public StringField $sync_data;
+    
+    public function __construct(mixed $data = [], Auth $client = null, bool $async = true)
+    {
+        # Set model attributes
+        $this->internal_callable = "serialize_settings";
+        $this->many = false;
+        
+        # Set model fields
+        $this->sync_data = new StringField(
+            required: true,
+            representation_only: true,
+            help_text: "The serialized REST API settings data to be synced."
+        );
+        
+        parent::__construct(data: $data, client: $client, async: $async);
+    }
+    
+    /**
+     * Serializes the current REST API settings on this system. This method is the internal callable and is used to
+     * populate this Model's field existing values.
+     * @returns array An array containing this Model's internal field values where the key is the field name and
+     * the value is the field's internal value.
+     */
+    public function serialize_settings(): array {
+        return [
+            "sync_data" => serialize(RESTAPISettings::get_pkg_config())
+        ];
+    }
+    
+    /**
+     * Adds extra validation to the `sync_data` field.
+     * @param string $sync_data The incoming value to be validated.
+     * @returns string The validated value to be assigned
+     * @throws ValidationError When `sync_data` cannot be unserialized into an array of REST API settings
+     */
+    public function validate_sync_data(string $sync_data): string {
+        # Attempt to unserialize the sync data
+        $unserialized_sync_data = unserialize($sync_data);
+        
+        # Throw a validation error if $sync_data could not be unserialized
+        if (!$unserialized_sync_data) {
+            throw new ValidationError(
+                message: "Field `sync_data` value could not be unserialized.",
+                response_id: "RESTAPI_SETTINGS_SYNC_SYNC_DATA_COULD_NOT_BE_UNSERIALIZED"
+            );
+        }
+        
+        return $sync_data;
+    }
+    
+    /**
+     * Writes the synced changes to configuration.
+     */
+    public function _update(): void
+    {
+        # Unserialize the sync data
+        $unserialized_sync_data = unserialize($this->sync_data->value);
+        
+        # Remove ha_sync settings from the sync data so we don't create a sync loop
+        foreach ($unserialized_sync_data as $sync_data_field => $sync_data_value) {
+            if (str_starts_with($sync_data_field, "ha_sync")) {
+                unset($unserialized_sync_data[$sync_data_field]);
+            }
+        }
+        
+        # Write the synced REST API settings over this hosts REST API settings
+        $pkg_id = RESTAPISettings::get_pkg_id();
+        $current_settings = RESTAPISettings::get_pkg_config();
+        $merged_settings = array_merge($current_settings, $unserialized_sync_data);
+        $this->set_config("installedpackages/package/$pkg_id/conf", $merged_settings);
+        $this->write_config(change_note: "Synced REST API settings from ".$this->client->ip_address);
+    }
+    
+    /**
+     * Syncs this host's REST API settings to HA peers if configured.
+     * @param bool $print_status Set to true to print the progress of the sync to the console. Set to false run the
+     * sync quietly.
+     */
+    public static function sync(bool $print_status = false): void {
+        # Variables
+        $settings = new RESTAPISettings(); 
+        $endpoint_url = (new SystemRESTAPISettingsSync)->url;
+        # TODO: Replace these with a WebGUI Model call once developed.
+        $wc_protocol = self::get_config(path: "system/webgui/protocol", default: "https");
+        $wc_port = self::get_config(path: "system/webgui/port", default: "443");
+        cprint(message: "Starting REST API settings sync... ", condition: $print_status);
+        
+        # Don't perform sync if HA sync is disabled
+        if (!$settings->ha_sync->value) {
+            cprint(message: "not configured.".PHP_EOL, condition: $print_status);
+            return;
+        }
+        
+        # Sync our REST API settings to each configured HA sync host
+        foreach ($settings->ha_sync_hosts->value as $ha_sync_host) {
+            # Make an API request to the sync endpoint on the HA peer
+            cprint("Syncing REST API settings to $ha_sync_host... ", $print_status);
+            $response = \RESTAPI\Core\Tools\http_request(
+                url: "$wc_protocol://$ha_sync_host:$wc_port$endpoint_url",
+                method: "PATCH",
+                data: ["sync_data" => serialize($settings->to_internal())],
+                headers: ["content-type" => "application/json"],
+                username: $settings->ha_sync_username->value,
+                password: $settings->ha_sync_password->value,
+                validate_certs: $settings->ha_sync_validate_certs->value
+            );
+            
+            # Decode the response from JSON
+            $response_json = json_decode($response, associative: true);
+            
+            # Log an error if the HTTP failed
+            if (!$response) {
+                self::log_error("Failed to sync REST API settings to $ha_sync_host: no response received.");
+            }
+            elseif (!$response_json) {
+                self::log_error("Failed to sync REST API settings to $ha_sync_host: received unexpected response.");
+            }
+            elseif ($response_json["code"] !== 200) {
+                self::log_error("Failed to sync REST API settings to $ha_sync_host: {$response_json["message"]}");
+            }
+        }
+    }
+}

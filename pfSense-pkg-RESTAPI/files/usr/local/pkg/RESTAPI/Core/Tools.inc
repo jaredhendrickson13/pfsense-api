@@ -44,6 +44,19 @@ function is_assoc_array(array $array) : bool {
 }
 
 /**
+ * Conditionally prints a message to the console. The specified $message will only be printed if $condition is true.
+ * @param string $message The message to be printed if the $condition is true.
+ * @param bool $condition A true or false condition. If the condition is true, the $message will be printed. Otherwise
+ * it will not.
+ */
+function cprint(string $message, bool $condition): void
+{
+    if ($condition) {
+        print($message);
+    }
+}
+
+/**
  * Makes an HTTP request.
  * @param string $url The full URL of the resource to submit the request to.
  * @param string $method The HTTP method to use to submit the request.
@@ -62,7 +75,8 @@ function http_request(
     string $username="",
     string $password="",
     bool $validate_certs=true
-) {
+): bool|string
+{
     # Format data and headers
     $data = json_encode($data);
 
