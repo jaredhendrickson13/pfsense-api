@@ -7,6 +7,7 @@ require_once("RESTAPI/autoloader.inc");
 use RESTAPI;
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\RESTAPISettingsSyncDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
@@ -44,6 +45,7 @@ class RESTAPISettings extends Model {
         # Obtain the API config index and set the config path to the API configuration
         $this->id = $this->get_pkg_id();
         $this->config_path = "installedpackages/package/$this->id/conf";
+        $this->always_apply = true;
 
         # Set Fields for this Model
         $this->enabled = new BooleanField(
@@ -258,8 +260,9 @@ class RESTAPISettings extends Model {
     /**
      * Refresh the API backup file and sync changes to API clients if configured.
      */
-    public function apply()
+    public function apply(): void
     {
         $this->backup_to_file();
+        (new RESTAPISettingsSyncDispatcher(async: $this->async))->spawn_process();
     }
 }

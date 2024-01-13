@@ -51,7 +51,7 @@ class RESTAPISettingsSync extends Model
      */
     public function validate_sync_data(string $sync_data): string {
         # Attempt to unserialize the sync data
-        $unserialized_sync_data = unserialize($sync_data);
+        $unserialized_sync_data = unserialize($this->sync_data->value);
         
         # Throw a validation error if $sync_data could not be unserialized
         if (!$unserialized_sync_data) {
@@ -81,9 +81,7 @@ class RESTAPISettingsSync extends Model
         
         # Write the synced REST API settings over this hosts REST API settings
         $pkg_id = RESTAPISettings::get_pkg_id();
-        $current_settings = RESTAPISettings::get_pkg_config();
-        $merged_settings = array_merge($current_settings, $unserialized_sync_data);
-        $this->set_config("installedpackages/package/$pkg_id/conf", $merged_settings);
+        $this->set_config("installedpackages/package/$pkg_id/conf", $unserialized_sync_data);
         $this->write_config(change_note: "Synced REST API settings from ".$this->client->ip_address);
     }
     
@@ -106,6 +104,8 @@ class RESTAPISettingsSync extends Model
             cprint(message: "not configured.".PHP_EOL, condition: $print_status);
             return;
         }
+
+        cprint(PHP_EOL, $print_status);
         
         # Sync our REST API settings to each configured HA sync host
         foreach ($settings->ha_sync_hosts->value as $ha_sync_host) {
@@ -114,11 +114,10 @@ class RESTAPISettingsSync extends Model
             $response = \RESTAPI\Core\Tools\http_request(
                 url: "$wc_protocol://$ha_sync_host:$wc_port$endpoint_url",
                 method: "PATCH",
-                data: ["sync_data" => serialize($settings->to_internal())],
-                headers: ["content-type" => "application/json"],
+                data: ["sync_data" => serialize($settings->get_pkg_config())],
                 username: $settings->ha_sync_username->value,
                 password: $settings->ha_sync_password->value,
-                validate_certs: $settings->ha_sync_validate_certs->value
+                validate_certs: false
             );
             
             # Decode the response from JSON
@@ -126,14 +125,21 @@ class RESTAPISettingsSync extends Model
             
             # Log an error if the HTTP failed
             if (!$response) {
+                cprint(message: "failed.".PHP_EOL, condition: $print_status);
                 self::log_error("Failed to sync REST API settings to $ha_sync_host: no response received.");
             }
             elseif (!$response_json) {
+                cprint(message: "failed.".PHP_EOL, condition: $print_status);
                 self::log_error("Failed to sync REST API settings to $ha_sync_host: received unexpected response.");
             }
             elseif ($response_json["code"] !== 200) {
+                cprint(message: "failed.".PHP_EOL, condition: $print_status);
                 self::log_error("Failed to sync REST API settings to $ha_sync_host: {$response_json["message"]}");
             }
+            else {
+                cprint(message: "done.".PHP_EOL, condition: $print_status);
+            }
+
         }
     }
 }

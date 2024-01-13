@@ -80,8 +80,8 @@ function http_request(
     # Format data and headers
     $data = json_encode($data);
 
-    $headers["Content-Type"] = "application/json";
-    $headers["Content-Length"] = strlen($data);
+    $headers[] = "content-type: application/json";
+    $headers[] = "content-length: ".strlen($data);
 
     # Setup cURL options
     $ch = curl_init($url);
@@ -104,59 +104,6 @@ function http_request(
     $result = curl_exec($ch);
     curl_close($ch);
     return $result;
-}
-
-function sync() {
-    # Local variables
-    $api_settings = new RESTAPISettings();
-    $protocol = config_get_path("system/webgui/protocol", "https");
-    $port = config_get_path("system/webgui/port", "443");
-
-    # Only perform sync when HA Sync is enabled for the API
-    if ($api_settings->ha_sync->value) {
-        # Loop through each HA sync node and try to sync the configuration
-        foreach ($api_settings->ha_sync_hosts->value as $node) {
-            # Make the API request to sync configuration
-            echo "Syncing API configuration to node ".$node."... ";
-            $resp = http_request(
-                url: $protocol."://".$node.":".$port."/api/v2/system/restapi/sync",
-                method: "PUT",
-                data: $api_settings->to_representation(),
-                headers: [],
-                username: $api_settings->ha_sync_username->value,
-                password: $api_settings->ha_sync_password->value,
-                validate_certs: $api_settings->ha_sync_validate_certs->value
-            );
-
-            # Ensure the sync was successful
-            if ($resp) {
-                $resp = json_decode($resp, true);
-                # Check if our response was decoded correctly
-                if ($resp) {
-                    if ($resp["return"] === 0) {
-                        echo "done." . PHP_EOL;
-                    } elseif ($resp["return"] === 3) {
-                        log_error("API sync failure (".$node."): Authentication failed");
-                        echo "failed. Authentication failure.".PHP_EOL;
-                    } elseif ($resp["return"] === 4) {
-                        log_error("API sync failure (".$node."): Authorization failed");
-                        echo "failed. Authorization failure.".PHP_EOL;
-                    } else {
-                        log_error("API sync failure (".$node."): Sync received return code ".strval($resp["return"]));
-                        echo "failed. Received return code ".strval($resp["return"]).".".PHP_EOL;
-                    }
-                } else {
-                    log_error("API sync failure (".$node."): Sync received unexpected response");
-                    echo "failed. Received unexpected response.".PHP_EOL;
-                }
-            } else {
-                log_error("API sync failure (".$node."): No response received from node");
-                echo "failed. No response received from node.".PHP_EOL;
-            }
-        }
-    } else {
-        echo "Syncing API configuration... not configured.".PHP_EOL;
-    }
 }
 
 /**

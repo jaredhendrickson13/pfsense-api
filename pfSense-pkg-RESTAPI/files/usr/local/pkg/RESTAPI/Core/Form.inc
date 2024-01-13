@@ -237,6 +237,14 @@ class Form {
         $representation_data += $this->form_data_to_model_representation(form_data: $_POST, model: $this->model);
         $this->model->from_representation(data: $representation_data);
 
+        # If any 'sensitive' fields are assigned to this Model, ensure the confirmed value matches
+        foreach ($this->model->get_fields() as $field) {
+            if ($this->model->$field->sensitive and $_POST[$field] !== $_POST[$field."_confirm"]) {
+                $this->print_input_error_banner(message: "Field '$field' confirm value does not match.");
+                return;
+            }
+        }
+
         # When an ID was found or the assigned model is not a `many` model, update the object. Otherwise create it.
         try {
             ($this->id or !$this->model->many) ? $this->model->update() : $this->model->create();
@@ -288,6 +296,11 @@ class Form {
             # For boolean Fields, assume the value is false if it does not match the true value exactly
             if ($class === "RESTAPI\Fields\BooleanField" and $form_data[$field] !== $model->$field->indicates_true) {
                 $form_data[$field] = $model->$field->indicates_false;
+            }
+
+            # For sensitive fields, do not update the value if the value matches the masked value
+            if ($model->$field->sensitive and $form_data[$field] === Field::SENSITIVE_MASK) {
+                unset($form_data[$field]);
             }
 
             # Skip this field if it is not found in the form data

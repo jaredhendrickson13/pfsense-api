@@ -20,6 +20,7 @@ use RESTAPI\Core\Cache;
 use RESTAPI\Dispatchers\WebGUIRestartDispatcher;
 use RESTAPI\Models\RESTAPIJWT;
 use RESTAPI\Models\RESTAPISettings;
+use RESTAPI\Models\RESTAPISettingsSync;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 /**
@@ -295,7 +296,7 @@ function restore(): void {
  * Syncs the REST API configuration to HA peers if enabled.
  */
 function sync(): void {
-    RESTAPI\Core\Tools\sync();
+    RESTAPISettingsSync::sync(print_status: true);
 }
 
 /**

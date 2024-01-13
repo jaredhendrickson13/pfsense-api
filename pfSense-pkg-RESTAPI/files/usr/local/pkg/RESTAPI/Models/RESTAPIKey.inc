@@ -7,6 +7,7 @@ require_once("RESTAPI/autoloader.inc");
 use RESTAPI;
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\RESTAPISettingsSyncDispatcher;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
@@ -28,7 +29,8 @@ class RESTAPIKey extends Model
         # Set Model attributes
         $this->config_path = "installedpackages/package/$api_pkg_id/conf/keys/key";
         $this->many = true;
-        $this->verbose_name = "API Key";
+        $this->always_apply = true;
+        $this->verbose_name = "REST API Key";
         
         # Set Model Fields
         $this->username = new StringField(
@@ -132,5 +134,14 @@ class RESTAPIKey extends Model
         }
 
         return false;
+    }
+
+    /**
+     * Refresh the API backup file and sync changes to API clients if configured.
+     */
+    public function apply(): void
+    {
+        RESTAPISettings::backup_to_file();
+        (new RESTAPISettingsSyncDispatcher(async: $this->async))->spawn_process();
     }
 }

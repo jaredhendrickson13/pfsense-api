@@ -20,6 +20,12 @@ use const RESTAPI\Core\Globals\RESERVED_FIELD_NAMES;
 class Field
 {
     /**
+     * @const SENSITIVE_MASK The value that is used to mask the value of a $sensitive Field object. This only applies
+     * to values shown in the webConfigurator.
+     */
+    const SENSITIVE_MASK = "********";
+
+    /**
      * Represents the current value for this Field.
      *
      * @var mixed $value
@@ -1054,6 +1060,16 @@ class Field
                 value: $this->value,
                 values: $this->verbose_choices,
                 allowMultiple: $this->many
+            );
+        }
+        # Do not include the current value in input field if this is a sensitive field
+        elseif ($this->sensitive) {
+            $input = new \Form_Input(
+                name: $this->name,
+                title: $title,
+                type: $type,
+                value: ($this->value) ? self::SENSITIVE_MASK : "",
+                attributes: $attributes,
             );
         }
         # Return a normal input for other Fields
