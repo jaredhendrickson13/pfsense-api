@@ -12,7 +12,7 @@ class SystemRESTAPISettingsSync extends Endpoint
         # Set Endpoint attributes
         $this->url = "/api/v2/system/restapi/settings/sync";
         $this->model_name = "RESTAPISettingsSync";
-        $this->request_method_options = ["PATCH"];
+        $this->request_method_options = ["POST"];
 
         # Ensure the primary HA node can always sync to HA peers, regardless of its current settings
         $this->ignore_enabled = true;

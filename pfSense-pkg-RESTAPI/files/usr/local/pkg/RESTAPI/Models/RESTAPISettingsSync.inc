@@ -18,7 +18,7 @@ class RESTAPISettingsSync extends Model
     public function __construct(mixed $data = [], Auth $client = null, bool $async = true)
     {
         # Set model attributes
-        $this->internal_callable = "serialize_settings";
+        $this->internal_callable = "void";
         $this->many = false;
         
         # Set model fields
@@ -32,15 +32,11 @@ class RESTAPISettingsSync extends Model
     }
     
     /**
-     * Serializes the current REST API settings on this system. This method is the internal callable and is used to
-     * populate this Model's field existing values.
-     * @returns array An array containing this Model's internal field values where the key is the field name and
-     * the value is the field's internal value.
+     * Returns an empty array as the internall callable
+     * @returns array An array containing nothing
      */
-    public function serialize_settings(): array {
-        return [
-            "sync_data" => serialize(RESTAPISettings::get_pkg_config())
-        ];
+    protected function void(): array {
+        return [];
     }
     
     /**
@@ -67,18 +63,18 @@ class RESTAPISettingsSync extends Model
     /**
      * Writes the synced changes to configuration.
      */
-    public function _update(): void
+    public function _create(): void
     {
         # Unserialize the sync data
         $unserialized_sync_data = unserialize($this->sync_data->value);
         
-        # Remove ha_sync settings from the sync data so we don't create a sync loop
-        foreach ($unserialized_sync_data as $sync_data_field => $sync_data_value) {
-            if (str_starts_with($sync_data_field, "ha_sync")) {
-                unset($unserialized_sync_data[$sync_data_field]);
-            }
-        }
-        
+        # Disable HA sync on this system since it is being managed by a remote peer.
+        $unserialized_sync_data["ha_sync"] = "disabled";
+        $unserialized_sync_data["ha_sync_hosts"] = "";
+        $unserialized_sync_data["ha_sync_username"] = "";
+        $unserialized_sync_data["ha_sync_password"] = "";
+
+
         # Write the synced REST API settings over this hosts REST API settings
         $pkg_id = RESTAPISettings::get_pkg_id();
         $this->set_config("installedpackages/package/$pkg_id/conf", $unserialized_sync_data);
@@ -113,7 +109,7 @@ class RESTAPISettingsSync extends Model
             cprint("Syncing REST API settings to $ha_sync_host... ", $print_status);
             $response = \RESTAPI\Core\Tools\http_request(
                 url: "$wc_protocol://$ha_sync_host:$wc_port$endpoint_url",
-                method: "PATCH",
+                method: "POST",
                 data: ["sync_data" => serialize($settings->get_pkg_config())],
                 username: $settings->ha_sync_username->value,
                 password: $settings->ha_sync_password->value,
