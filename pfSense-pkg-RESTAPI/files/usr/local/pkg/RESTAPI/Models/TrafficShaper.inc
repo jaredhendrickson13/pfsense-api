@@ -3,8 +3,8 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Auth;
-use RESTAPI\Core\Dispatcher;
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\FirewallApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
@@ -45,7 +45,6 @@ class TrafficShaper extends Model
         );
         $this->name = new StringField(
             allow_null: true,
-            editable: false,
             read_only: true,
             help_text: "The name of this traffic shaper. This value is automatically set by the system and cannot ".
                 "be changed."
@@ -91,6 +90,16 @@ class TrafficShaper extends Model
     }
 
     /**
+     * Obtains the internal value for the `name` field. This method is responsible for ensuring the shaper name always
+     * matches the `interface` field's internal value.
+     * @param string|null $name The incoming internal `name` value.
+     * @returns string The internal `name` value to assign.
+     */
+    public function from_internal_name(string|null $name): string {
+        return $this->interface->to_internal();
+    }
+
+    /**
      * Adds extra validation to the `bandwidth` field.
      * @param int $bandwidth The incoming value to be validated.
      * @returns int The validated value to be assigned.
@@ -113,10 +122,9 @@ class TrafficShaper extends Model
      */
     public function apply(): void
     {
-        (new Dispatcher(async: $this->async))->spawn_process();
+        (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
         system("rm -f /var/db/rrd/*queuedrops.rrd");
         system("rm -f /var/db/rrd/*queues.rrd");
         enable_rrd_graphing();
-        clear_subsystem_dirty('shaper');
     }
 }

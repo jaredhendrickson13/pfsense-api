@@ -263,6 +263,18 @@ class TrafficShaperQueue extends Model
     }
 
     /**
+     * Obtains the internal value for `interface`. This method ensures this Model's `interface` field always matches
+     * the parent Model's `interface` field.
+     * @param string|null $interface The incoming internal value for the `interface` field. If this object is a new
+     * TrafficShaperQueue, this value will be null.
+     * @returns string The internal value to be set for the `interface` field. This will always match the parent
+     * TrafficShaper's `interface` field value.
+     */
+    public function from_internal_interface(string|null $interface): string {
+        return $this->parent_model->interface->to_internal();
+    }
+
+    /**
      * Adds extra validation to the `priority` field.
      * @param integer $priority The incoming value to be validated.
      * @returns integer The validated value to be assigned.

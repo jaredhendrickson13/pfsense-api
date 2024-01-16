@@ -1130,7 +1130,7 @@ class Model {
             # Obtain the exact parent Model object
             $this->get_parent_model();
         }
-        
+
         # Create an ID for this object if requested
         if ($create_id and $this->config_path and $this->many) {
             $this->id = $this->get_next_id();
@@ -1190,7 +1190,7 @@ class Model {
         if (!$skip_parent) {
             $this->check_unique_together();
         }
-        
+
         # Run the `validate_extra()` method for this Model to include any custom validation for the entire Model.
         $this->validate_extra();
 
