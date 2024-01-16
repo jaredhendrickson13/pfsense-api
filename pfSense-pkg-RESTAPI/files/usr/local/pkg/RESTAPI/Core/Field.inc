@@ -465,7 +465,7 @@ class Field
 
         # Obtain the existing context Model as it is in the config currently
         $field_name = $this->name;
-        $current_model = $this->context->query(id: $this->context->id);
+        $current_model = $this->context->query(parent_id: $this->context->parent_id, id: $this->context->id);
         
         # Only proceed if the current model exists in config so an error is not thrown during Model `create()`.
         if (!$current_model->exists()) {
@@ -696,11 +696,17 @@ class Field
 
             # If this is a $many field, query for any other object has this value in the array
             if ($this->many) {
-                $query = $this->context->query(["id__except" => $this->context->id, "{$this->name}__has" => $value]);
+                $query = $this->context->query(
+                    query_params: ["id__except" => $this->context->id, "{$this->name}__has" => $value],
+                    parent_id: $this->context->parent_id
+                );
             }
             # Otherwise, query for any other of the parent context's Model objects with the same exact field value
             else {
-                $query = $this->context->query(["id__except" => $this->context->id, $this->name => $value]);
+                $query = $this->context->query(
+                    query_params: ["id__except" => $this->context->id, $this->name => $value],
+                    parent_id: $this->context->parent_id
+                );
             }
 
             # If we found another object with matching Fields, throw a validation error
