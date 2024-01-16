@@ -232,9 +232,10 @@ class NestedModelField extends Field
             $representations = [];
             foreach ($internal_value as $id => $internal_data) {
                 $object = new $this->model_class();
-                $object->from_internal_object($internal_data);
                 $object->id = $id;
                 $object->parent_id = $this->context->id;
+                $object->parent_model = $this->context;
+                $object->from_internal_object($internal_data);
                 $representation = $object->to_representation();
                 $representations[] = $representation;
             }
