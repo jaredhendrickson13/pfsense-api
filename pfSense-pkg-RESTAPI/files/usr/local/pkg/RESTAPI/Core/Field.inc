@@ -487,12 +487,14 @@ class Field
 
     /**
      * Checks if the conditions defined in the `conditions` property are met.
+     * @note The context of the condition can be inverted by prefixing ! to the conditions array key.
+     * @note The condition can reference a parent's Model Field by prefixing parent__ to the conditions array key.
      * @returns bool `true` if all conditions were met, `false` if any conditions failed.
      */
     private function are_conditions_met() : bool {
         # Variables
         $conditions_met = true;
-
+        
         # Consider conditions to be met if no conditions were specified
         if (!$this->conditions) {
             return true;
@@ -502,39 +504,54 @@ class Field
         foreach ($this->conditions as $condition_field => $condition_value) {
             # Check if this field is inverted, strip the invert character if so
             if (str_starts_with($condition_field, "!")) {
-                $invert = true;
+                $is_inverted = true;
                 $condition_field = substr($condition_field, 1);
             }
+            else {
+                $is_inverted = false;
+            }
+            
+            # Check if the condition applies to the context model's parent
+            if (str_starts_with($condition_field, "parent__")) {
+                $is_parent_field = true;
+                $condition_field = str_replace("parent__", "", $condition_field);
+            }
+            else {
+                $is_parent_field = false;
+            }
+            
+            # Use the parent model as the context if this is a parent field, otherwise use this field's context model
+            $context_model = ($is_parent_field) ? $this->context->parent_model : $this->context;
 
             # Safety check to ensure the Model context even has a field with the field name specified in the condition
-            if (!in_array($condition_field, $this->context->get_fields())) {
-                $parent_model_class = get_class($this->context);
+            if (!in_array($condition_field, $context_model->get_fields())) {
+                $assigned_model_class = get_class($context_model);
                 throw new ServerError(
                     message: "Field '$this->name' contains a condition for field `$condition_field` from 
-                        its parent Model '$parent_model_class', but '$parent_model_class' has no such field. ",
-                    response_id: "FIELD_CONDITIONS_REQUIRE_NON_EXISTENT_PARENT_MODEL_FIELD"
+                        its assigned Model '$assigned_model_class', but '$assigned_model_class' has no such field. ",
+                    response_id: "FIELD_CONDITIONS_REQUIRE_NON_EXISTENT_MODEL_FIELD"
                 );
             }
 
-            $condition_field_value = $this->context->$condition_field->value;
+            $condition_field_value = $context_model->$condition_field->value;
 
             # For 'value in array' conditions, mark condition as unmet if value is not present in the array
-            if (!$invert and is_array($condition_value) and !in_array($condition_field_value, $condition_value)) {
+            if (!$is_inverted and is_array($condition_value) and !in_array($condition_field_value, $condition_value)) {
                 $conditions_met = false;
                 break;
             }
             # For 'value equals' conditions, mark condition as unmet if values are not equal
-            if (!$invert and !is_array($condition_value) and $condition_field_value !== $condition_value) {
+            if (!$is_inverted and !is_array($condition_value) and $condition_field_value !== $condition_value) {
                 $conditions_met = false;
                 break;
             }
             # For 'value not in array' conditions, mark condition as unmet if value is present in the array
-            if ($invert and is_array($condition_value) and in_array($condition_field_value, $condition_value)) {
+            if ($is_inverted and is_array($condition_value) and in_array($condition_field_value, $condition_value)) {
                 $conditions_met = false;
                 break;
             }
             # For 'value does not equal' conditions, mark condition as unmet if values are equal
-            if ($invert and !is_array($condition_value) and $condition_field_value === $condition_value) {
+            if ($is_inverted and !is_array($condition_value) and $condition_field_value === $condition_value) {
                 $conditions_met = false;
                 break;
             }
@@ -1000,31 +1017,34 @@ class Field
                 # Stored a string representation of the $value
                 $value_str = var_export($value, true);
 
-                # Determine if the context of the condition is inverted
-                $inverted = str_starts_with($field, "!");
+                # Determine if the context of the condition is inverted or applies to a parent model
+                $is_inverted = str_starts_with($field, "!");
+                $is_parent_field = str_starts_with($field, "parent__");
                 
                 # Remove the invert prefix if this condition is inverted
-                if ($inverted) {
-                    $field = substr($field, 1);
-                }
+                $field = ($is_inverted) ? substr($field, 1) : $field;
+                
+                # Remove the parent prefix if applicable set a string that indicates the field applies to a parent
+                $field = ($is_parent_field) ? str_replace("parent__", "", $field) : $field;
+                $conditions_text_prefix = ($is_parent_field) ? "- Parent field" : "-";
 
                 # Add descriptive text for field value equals conditions
-                if (!$inverted and !is_array($value)) {
-                    $conditions_text .= "- `$field` must be equal to `$value_str`<br>";
+                if (!$is_inverted and !is_array($value)) {
+                    $conditions_text .= "$conditions_text_prefix `$field` must be equal to `$value_str`<br>";
                 }
                 # Add descriptive text for field value does not equal conditions
-                elseif ($inverted and !is_array($value)) {
-                    $conditions_text .= "- `$field` must not be equal to `$value_str`<br>";
+                elseif ($is_inverted and !is_array($value)) {
+                    $conditions_text .= "$conditions_text_prefix `$field` must not be equal to `$value_str`<br>";
                 }
                 # Add descriptive text for field value in array conditions
-                elseif (!$inverted and is_array($value)) {
+                elseif (!$is_inverted and is_array($value)) {
                     $options = implode(", ", $value);
-                    $conditions_text .= "- `$field` must be one of [ $options ]<br>";
+                    $conditions_text .= "$conditions_text_prefix `$field` must be one of [ $options ]<br>";
                 }
                 # Add descriptive text for field value not in array conditions
-                elseif ($inverted and is_array($value)) {
+                elseif ($is_inverted and is_array($value)) {
                     $options = implode(", ", $value);
-                    $conditions_text .= "- `$field` must not be one of [ $options ]<br>";
+                    $conditions_text .= "$conditions_text_prefix `$field` must not be one of [ $options ]<br>";
                 }
             }
         }

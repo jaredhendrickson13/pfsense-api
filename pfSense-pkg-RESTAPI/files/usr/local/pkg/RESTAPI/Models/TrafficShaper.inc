@@ -8,6 +8,7 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
+use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 
@@ -21,6 +22,7 @@ class TrafficShaper extends Model
     public IntegerField $bandwidth;
     public IntegerField $qlimit;
     public IntegerField $tbrconfig;
+    public NestedModelField $queue;
 
     public function __construct(mixed $id = null, mixed $data = [], Auth $client = null, bool $async = true)
     {
@@ -38,6 +40,7 @@ class TrafficShaper extends Model
         $this->interface = new InterfaceField(
             required: true,
             unique: true,
+            editable: false,
             help_text: "The interface this traffic shaper will be applied to."
         );
         $this->name = new StringField(
@@ -67,6 +70,7 @@ class TrafficShaper extends Model
             default: 50,
             allow_null: true,
             minimum: 1,
+            conditions: ["!scheduler" => ["CODELQ"]],
             help_text: "The number of packets that can be held in a queue waiting to be transmitted by the shaper."
         );
         $this->tbrconfig = new IntegerField(
@@ -75,6 +79,12 @@ class TrafficShaper extends Model
             minimum: 1,
             help_text: "The size, in bytes, of the token bucket regulator. If `null`, heuristics based on the ".
                 "interface bandwidth are used to determine the size."
+        );
+        $this->queue = new NestedModelField(
+            model_class: "TrafficShaperQueue",
+            default: [],
+            allow_empty: true,
+            help_text: "The child queues assigned to this traffic shaper."
         );
 
         parent::__construct(id: $id, data: $data, client: $client, async: $async);
