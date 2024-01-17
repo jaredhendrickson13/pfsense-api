@@ -457,24 +457,14 @@ class Field
      * @throws ValidationError When this is not an `editable` Field, but the value given differs from the value stored
      * for the parent Model context
      */
-    private function is_value_editable() {
-        # Only proceed with validation if the parent Model context already has an ID (i.e. was created previously) OR
-        # the field is editable.
-        if (is_null($this->context->id) or $this->editable) {
-            return;
-        }
-
-        # Obtain the existing context Model as it is in the config currently
-        $field_name = $this->name;
-        $current_model = $this->context->query(parent_id: $this->context->parent_id, id: $this->context->id);
-        
-        # Only proceed if the current model exists in config so an error is not thrown during Model `create()`.
-        if (!$current_model->exists()) {
+    private function is_value_editable(): void {
+        # Only proceed with validation if the parent Model has an initial object set and this value is not editable
+        if (is_null($this->context->initial_object) or $this->editable) {
             return;
         }
         
         # Obtain the current value for this field
-        $current_value = $current_model->first()->$field_name->value;
+        $current_value = $this->context->initial_object->{$this->name}->value;
 
         # Throw an error if this is a non `editable` field but the values changed.
         if ($this->value !== $current_value) {

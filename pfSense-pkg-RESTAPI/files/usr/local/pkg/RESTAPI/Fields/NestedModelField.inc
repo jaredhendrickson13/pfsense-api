@@ -99,14 +99,14 @@ class NestedModelField extends Field
         # Create a new Model object for this value and validate it. Remove any assigned IDs
         unset($value["id"]);
         unset($value["parent_id"]);
-        $model = new $this->model_class(parent_id: $this->context->id, data: $value);
+        $model = new $this->model_class(data: $value);
         $model->parent_id = $this->context->id;
-        $model->get_parent_model();
+        $model->parent_model = $this->context;
+        $model->id = count($this->validation_modelset->model_objects);
 
         # Try to validate the nested Model object
         try {
             $model->validate(skip_parent: true, modelset: $this->validation_modelset);
-            $this->check_unique_together_fields($model);
             $this->validation_modelset->model_objects[] = $model;
         }
         catch (Response $resp) {
@@ -133,63 +133,6 @@ class NestedModelField extends Field
         # Overwrite the existing `value` with the representation of the validated model object
         $this->value = ($this->many) ? $this->validation_modelset->to_representation() : $this->validation_modelset->first()->to_representation();
         return $return_value;
-    }
-
-    /**
-     * Checks that any of the nested Model's `unique` Fields are unique from any other value being assigned.
-     * @param Model $model The Model to check Fields for uniqueness.
-     * @throws ValidationError When a `unique` field value is not unique
-     */
-    private function check_unique_fields(Model $model) {
-        # Only validate `unique` if this is a `many` model
-        if ($model->many) {
-            # Loop through each of this Model's Fields and check for `unique` Fields.
-            foreach ($model->get_fields() as $field) {
-                if ($model->$field->unique) {
-                    # Query for other validated Models with the same field value
-                    $model_query = $this->validation_modelset->query([$field => $model->$field->value]);
-                    if ($model_query->exists()) {
-                        throw new ValidationError(
-                            message: "Field '$field' must be unique.",
-                            response_id: "MODEL_FIELD_MUST_BE_UNIQUE"
-                        );
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Checks that any Fields which must be unique together are unique from all other existing objects for this Model.
-     * @throws ServerError When the Fields specified in `unique_together_fields` are not Field objects known to this
-     * Model.
-     * @throws ValidationError When the unique together Fields are not unique and are present in another Model object.
-     */
-    private function check_unique_together_fields(Model $model) {
-        # Skip this validation for non `many` Models or Models without unique together Fields
-        if (!$model->many or !$model->unique_together_fields) {
-            return;
-        }
-
-        # Use this variable to keep track of query parameters to use when checking uniqueness
-        $query_params = [];
-
-        # Format the query parameters as an associative array
-        foreach ($model->unique_together_fields as $field) {
-            $query_params[$field] = $model->$field->value;
-        }
-
-        # Query for existing objects with the same Field values
-        $model_query = $this->validation_modelset->query(query_params: $query_params);
-
-        # If any existing Models were found matching the query, Fields are not unique together, throw an error
-        if ($model_query->exists()) {
-            $unique_fields_string = implode(", ", $model->unique_together_fields);
-            throw new ValidationError(
-                message: "Fields [$unique_fields_string] together must be unique from all other objects of its kind.",
-                response_id: "MODEL_FIELDS_NOT_UNIQUE_TOGETHER"
-            );
-        }
     }
 
     /**

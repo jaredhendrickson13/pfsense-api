@@ -219,7 +219,6 @@ function run_tests(string|null $contains = ""): void {
         }
         catch (Exception | Error $fail_results) {
             echo "E";
-            throw $fail_results;
             $exit_code = 1;
         }
 

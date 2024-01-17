@@ -1036,11 +1036,14 @@ class Model {
 
     /**
      * Checks that any Fields which must be unique together are unique from all other existing objects for this Model.
+     * @param ModelSet|null $modelset Sets a specific ModelSet to use when validations require the use of all existing
+     * objects for this Model. The only current use case for this is in \RESTAPI\Fields\NestedModelField where we need
+     * to validate many objects before they are created.
      * @throws ServerError When the Fields specified in `unique_together_fields` are not Field objects known to this
      * Model.
      * @throws ValidationError When the unique together Fields are not unique and are present in another Model object.
      */
-    private function check_unique_together() {
+    private function check_unique_together(?ModelSet $modelset = null): void {
         # Skip this validation for non `many` Models or Models without unique together Fields
         if (!$this->many or !$this->unique_together_fields) {
             return;
@@ -1056,6 +1059,9 @@ class Model {
             }
         }
 
+        # Use the $modelset if provided, otherwise obtain a ModelSet of all existing objects for this Model
+        $modelset = ($modelset) ?: $this->read_all(parent_id: $this->parent_id);
+
         # Use this variable to keep track of query parameters to use when checking uniqueness
         $query_params = [];
 
@@ -1070,7 +1076,7 @@ class Model {
         }
 
         # Query for existing objects with the same Field values
-        $model_query = $this->query(query_params: $query_params, parent_id: $this->parent_id);
+        $model_query = $modelset->query(query_params: $query_params);
 
         # If any existing Models were found matching the query, Fields are not unique together, throw an error
         if ($model_query->model_objects) {
@@ -1102,8 +1108,8 @@ class Model {
      * `parent_model_class` value assigned. In most cases, this should not be changed from the default. This is
      * only intended for nested Model validation.
      * @param ModelSet|null $modelset Sets a specific ModelSet to use when validations require the use of all existing
-     * objects for this Field's $context Model. The only current use case for this is in \RESTAPI\Fields\NestedModelField
-     * where we need to validate many objects before they are created.
+     * objects for this Model. The only current use case for this is in \RESTAPI\Fields\NestedModelField where we need
+     * to validate many objects before they are created.
      * @return bool `true` if the model's data is valid.
      */
     final public function validate(
@@ -1189,11 +1195,8 @@ class Model {
             }
         }
 
-        # Validate unique together Fields if `$skip_parent` is not set. `$skip_parent` is used by the NestedModelField
-        # which validates unique_together on its own.
-        if (!$skip_parent) {
-            $this->check_unique_together();
-        }
+        # Validate unique together Fields
+        $this->check_unique_together(modelset: $modelset);
 
         # Run the `validate_extra()` method for this Model to include any custom validation for the entire Model.
         $this->validate_extra();
@@ -1524,7 +1527,6 @@ class Model {
         
         # Obtain the parent Model if applicable and get internal objects
         $model->parent_id = $parent_id;
-        var_dump($model->parent_id);
         $model->get_parent_model();
         $internal_objects = $model->get_internal_objects();
 

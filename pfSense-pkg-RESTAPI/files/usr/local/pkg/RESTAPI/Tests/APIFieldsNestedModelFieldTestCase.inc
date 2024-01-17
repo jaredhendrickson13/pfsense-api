@@ -62,7 +62,7 @@ class APIFieldsNestedModelFieldTestCase extends TestCase
         $field->name = "test";
 
         $this->assert_throws_response(
-            response_id: "MODEL_FIELD_MUST_BE_UNIQUE",
+            response_id: "FIELD_MUST_BE_UNIQUE",
             code: 400,
             callable: function () use ($field) {
                 $field->value = [
