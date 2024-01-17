@@ -8,9 +8,11 @@ use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\UnprocessableContentError;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\FilterNameValidator;
+use function RESTAPI\Core\Tools\bandwidth_to_bits;
 
 class TrafficShaperQueue extends Model
 {
@@ -249,17 +251,6 @@ class TrafficShaperQueue extends Model
                 response_id: "TRAFFIC_SHAPER_QUEUE_NOT_SUPPORTED_BY_PARENT_SCHEDULER"
             );
         }
-        
-        # Do not allow the bandwidth allowed by this queue to push the sum of all bandwidth for the interface over
-        if ($this->is_bandwidth_exceeded()) {
-            $our_bw = $this->bandwidth->value.$this->bandwidthtype->value;
-            $parent_bw = $this->parent_model->bandwidth->value.$this->parent_model->bandwidthtype->value;
-            throw new UnprocessableContentError(
-                message: "Cannot allot $our_bw to this queue because sum of all queues for this parent exceeds ".
-                    "the parent's maximum bandwidth limit of $parent_bw.",
-                response_id: "TRAFFIC_SHAPER_EXCEEDS_PARENTS_BANDWIDTH_LIMITS"
-            );
-        }
     }
 
     /**
@@ -271,7 +262,52 @@ class TrafficShaperQueue extends Model
      * TrafficShaper's `interface` field value.
      */
     public function from_internal_interface(string|null $interface): string {
-        return $this->parent_model->interface->to_internal();
+        if (!$interface) {
+            return $this->parent_model->interface->to_internal();
+        }
+        
+        return $interface;
+    }
+
+    /**
+     * Adds extra validation to the `bandwidthtype` field.
+     * @param string $bandwidthtype The incoming value to be validated.
+     * @returns string The validated value to be assigned.
+     * @throws ValidationError When the parent TrafficShaper has its type set to `%` but this object specifies an 
+     * exact amount.
+     */
+    public function validate_bandwidthtype(string $bandwidthtype): string {
+        # Throw an error if the parent's `bandwidthtype` is `%` but this object's is not
+        if ($bandwidthtype !== "%" and $this->parent_model->bandwidthtype->value === "%") {
+            throw new UnprocessableContentError(
+                message: "Field `bandwidthtype` must be set `%` when the parent's `bandwidthtype` is set to `%`.",
+                response_id: "TRAFFIC_SHAPER_QUEUE_BANDWIDTHTYPE_MUST_MATCH_PARENT_WITH_PERCENT"
+            );
+        }
+        
+        return $bandwidthtype;
+    }
+
+    /**
+     * Adds extra validation to the `bandwidth` field.
+     * @param int $bandwidth The incoming value to be validated.
+     * @returns int The validated value to be assigned.
+     * @throws ValidationError When the sum of all queue bandwidth assigned to this queue's parent exceeds the 
+     * maximum bandwidth allowed by the parent.
+     */
+    public function validated_bandwidth(int $bandwidth): int {
+        # Do not allow the bandwidth allowed by this queue to push the sum of all bandwidth for the interface over
+        if ($this->is_bandwidth_exceeded()) {
+            $our_bw = $bandwidth.$this->bandwidthtype->value;
+            $parent_bw = $this->parent_model->bandwidth->value.$this->parent_model->bandwidthtype->value;
+            throw new UnprocessableContentError(
+                message: "Cannot allot $our_bw to this queue because sum of all queues for this parent exceeds ".
+                    "the parent's maximum bandwidth limit of $parent_bw.",
+                response_id: "TRAFFIC_SHAPER_EXCEEDS_PARENTS_BANDWIDTH_LIMITS"
+            );
+        }
+        
+        return $bandwidth;
     }
 
     /**
@@ -292,7 +328,7 @@ class TrafficShaperQueue extends Model
             );
         }
         
-        return $parent_scheduler;
+        return $priority;
     }
 
     /**
@@ -396,46 +432,55 @@ class TrafficShaperQueue extends Model
         }
         return false;
     }
-    
+
     /**
-     * Checks if the sum of all child queue bandwidth is greater than the bandwidth limit set on the parent
+     * Obtains the total bandwidth for a given TrafficShaperQueue in bits. If the queue is percentage based, and the
+     * parent TrafficShaper is percentage based, this will return the 1-100 percentage value.
+     * @param TrafficShaperQueue $queue The TrafficShaperQueue object to obtain the bandwidth total for.
+     * @return int The total number of bandwidth in bits allowed by this queue, or the 1-100 percentage value if both
+     * $queue and its parent TrafficShaper are percentage based.
+     */
+    public static function get_bandwidth_bits(TrafficShaperQueue $queue): int {
+        # Variables
+        $parent_is_percent = ($queue->parent_model->bandwidthtype->value === "%");
+        $parent_bandwidth_max = $queue->parent_model->get_bandwidth_bits();
+        
+        # Convert percentage to real bits if both parent and child are percentage-based.
+        if ($parent_is_percent && $queue->bandwidthtype->value === "%") {
+            return $queue->bandwidth->value;
+        }
+        
+        # When the parent is not percentage-based but this queue is, convert the percentage to real bits.
+        if (!$parent_is_percent && $queue->bandwidthtype->value === "%") {
+            return intval($queue->bandwidth->value / 100 * $parent_bandwidth_max);
+        } 
+        
+        # Otherwise, just convert the bandwidth scale to bits.
+        return bandwidth_to_bits($queue->bandwidth->value, $queue->bandwidthtype->value);
+    }
+
+    /**
+     * Checks if the sum of all child queue bandwidth exceeds the parent's bandwidth limit.
      * @return bool Returns true if the total bandwidth exceeds the parent's bandwidth limit. Otherwise, false.
      */
-    private function is_bandwidth_exceeded(): bool {
-        global $altq_list_queues;
-
+    public function is_bandwidth_exceeded(): bool {
         # Variables
-        $bandwidth = $this->bandwidth->value;
-        $bandwidth_type = $this->bandwidthtype->value;
-        $interface = $this->interface->to_internal();
-        
-        # Get the altq queue
-        read_altq_config();
-        $altq = $altq_list_queues[$interface];
+        $parent_bandwidth_max = $this->parent_model->get_bandwidth_bits();
+        $queues = TrafficShaperQueue::query(parent_id: $this->parent_id);
+        $bandwidth_total = 0;
 
-        # Check that a altq object exists for this interface
-        if (isset($altq)) {
-            # Don't compare % to bit-based bandwidth
-            if ($bandwidth_type != "%") {
-                # Get the bandwidth of our parent to initialize the sum of all bandwidth
-                $sum = $altq->GetTotalBw($altq);
-                # Add the requested bandwidth to the sum of all bandwidth
-                if ($bandwidth > 0) {
-                    $sum += get_bandwidth($bandwidth, $bandwidth_type, $altq);
-                }
-                # Check the sum of all bandwidth exceeds the limit of the parent
-                if ($sum > get_queue_bandwidth($altq)) {
-                    return true;
-                }
-            }
-
-            # Check the bandwidth of each subqueue as well
-            foreach ($altq->subqueues as $q) {
-                if ($q->CheckBandwidth(0, '')) {
-                    return true;
-                }
+        # Loop through each child queue and ensure the sum of each does not exceed the parent's maximum.
+        foreach ($queues->model_objects as $queue) {
+            # Skip this object in case its being updated, we'll add this objects values after the loop
+            if ($queue->id !== $this->id) {
+                $bandwidth_total += $this->get_bandwidth_bits($queue);
             }
         }
-        return false;
+        
+        # Add our current bandwidth too
+        $bandwidth_total += $this->get_bandwidth_bits($this);
+
+        return $bandwidth_total > $parent_bandwidth_max;
     }
+
 }

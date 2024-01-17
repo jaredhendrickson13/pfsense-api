@@ -344,11 +344,12 @@ class Field
 
     /**
      * Runs all validations for this field.
+     * @param ModelSet|null $modelset Sets a specific ModelSet to use when validations require the use of all existing
+     * objects for this Field's $context Model. The only current use case for this is in \RESTAPI\Fields\NestedModelField
+     * where we need to validate many objects before they are created.
      * @return bool `true` if all validation succeeded.
-     * @throws ValidationError If any validations failed.
-     * @throws ServerError If a programming error is detected.
      */
-    public function validate() : bool {
+    public function validate(?ModelSet $modelset = null) : bool {
         # Ensure model context exists when needed
         $this->check_model_context();
 
@@ -393,7 +394,7 @@ class Field
             $this->check_value_choice($value);
 
             # Ensure value is unique if set
-            $this->check_field_unique($value);
+            $this->check_field_unique($value, modelset: $modelset);
 
             # Ensure this value is not empty unless empty values are allowed by this field. If value is empty and
             # empty values are allowed (returns `true`, skip remaining validation as the empty value itself is
@@ -670,12 +671,18 @@ class Field
      * Checks if a 'unique' field is actually unique from all other objects related to the $context Model's config path.
      * The $context Model must have a `config_path` set AND have it's `many` value set to `true` to support unique
      * validation.
+     * @param mixed $value The value to being checked for uniqueness.
+     * @param ModelSet|null $modelset Sets a specific ModelSet to use when checking uniqueness. If set, this Field's
+     * value must be unique from all other Models in this ModelSet. If no value is specified here, a ModelSet will
+     * automatically be obtained for all existing Model objects for this Field's $context Model. Note: This is rarely
+     * needed. The only current use case is \RESTAPI\Fields\NestedModelField as it needs to check the uniqueness of
+     * a set of Model objects before they are created.
      * @throws ValidationError When the assigned $context Model does not have a `config_path` set OR the assigned
      * $context Model does not have it's $many value to `true`.
      * @throws ServerError When $unique is enabled but a $config_path is not assigned to the parent model $context
      * @throws ServerError When $unique is enabled, but the parent model $context does not have $many enabled
      */
-    private function check_field_unique(mixed $value) {
+    private function check_field_unique(mixed $value, ?ModelSet $modelset = null): void {
         # Only check this if `unique` is enabled
         if ($this->unique) {
             # Throw an error if unique is set but the model context has no config path specified
@@ -694,18 +701,19 @@ class Field
                 );
             }
 
+            # Use $modelset if provided. Otherwise, use all existing $context model objects as the $modelset
+            $modelset = ($modelset) ?: $this->context->read_all(parent_id: $this->context->parent_id);
+
             # If this is a $many field, query for any other object has this value in the array
             if ($this->many) {
-                $query = $this->context->query(
-                    query_params: ["id__except" => $this->context->id, "{$this->name}__has" => $value],
-                    parent_id: $this->context->parent_id
+                $query = $modelset->query(
+                    query_params: ["id__except" => $this->context->id, "{$this->name}__has" => $value]
                 );
             }
             # Otherwise, query for any other of the parent context's Model objects with the same exact field value
             else {
-                $query = $this->context->query(
-                    query_params: ["id__except" => $this->context->id, $this->name => $value],
-                    parent_id: $this->context->parent_id
+                $query = $modelset->query(
+                    query_params: ["id__except" => $this->context->id, $this->name => $value]
                 );
             }
 

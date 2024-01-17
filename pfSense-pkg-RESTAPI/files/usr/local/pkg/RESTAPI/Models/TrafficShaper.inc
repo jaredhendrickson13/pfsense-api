@@ -11,6 +11,7 @@ use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
+use function RESTAPI\Core\Tools\bandwidth_to_bits;
 
 class TrafficShaper extends Model
 {
@@ -113,7 +114,7 @@ class TrafficShaper extends Model
                 response_id: "TRAFFIC_SHAPER_BANDWIDTH_EXCEED_MAXIMUM_PERCENTAGE"
             );
         }
-
+        
         return $bandwidth;
     }
 
@@ -126,5 +127,21 @@ class TrafficShaper extends Model
         system("rm -f /var/db/rrd/*queuedrops.rrd");
         system("rm -f /var/db/rrd/*queues.rrd");
         enable_rrd_graphing();
+    }
+
+    /**
+     * Obtains this TrafficShaper's maximum bandwidth in total bits. If the `bandwidthtype` field is set
+     * to `%`, this will return the bandwidth in a  1-100 percentage value.
+     * @returns int The bandwidth percentage limit (1-100) for percentage based bandwidths, or the bandwidth's
+     * total in bits.
+     */
+    public function get_bandwidth_bits(): int {
+        # When the bandwidth type is percentage, just return the direct bandwidth value as it's already a percentage.
+        if ($this->bandwidthtype->value === "%") {
+            return $this->bandwidth->value;
+        }
+
+        # Return the bandwidth value converted to bits
+        return bandwidth_to_bits($this->bandwidth->value, $this->bandwidthtype->value);
     }
 }

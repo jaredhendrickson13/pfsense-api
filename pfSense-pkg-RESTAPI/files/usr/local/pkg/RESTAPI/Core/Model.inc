@@ -1091,7 +1091,7 @@ class Model {
     public function validate_extra(): void {}
 
     /**
-     * Performs a full validation on the API mode. This includes checking that required packages are installed and
+     * Performs a full validation on the API model. This includes checking that required packages are installed and
      * validating all assigned Fields. Note: Fields are validated in the order they are defined in the class.
      * @param bool $requires_id Whether the `id` field should be validated in this request. This is typically only
      * necessary for update and delete actions.
@@ -1101,13 +1101,17 @@ class Model {
      * @param bool $skip_parent Skip validating the assigned parent ID. This only applies to Models that have a
      * `parent_model_class` value assigned. In most cases, this should not be changed from the default. This is
      * only intended for nested Model validation.
+     * @param ModelSet|null $modelset Sets a specific ModelSet to use when validations require the use of all existing
+     * objects for this Field's $context Model. The only current use case for this is in \RESTAPI\Fields\NestedModelField
+     * where we need to validate many objects before they are created.
      * @return bool `true` if the model's data is valid.
      */
     final public function validate(
         bool $requires_id = false, 
         bool $create_id = false,
         bool $only_id = false, 
-        bool $skip_parent = false
+        bool $skip_parent = false,
+        ?ModelSet $modelset = null,
     ) : bool {
         # When an ID is required and this is a `many` model, check that an ID is set.
         if ($requires_id and $this->many and !isset($this->id)) {
@@ -1130,7 +1134,7 @@ class Model {
             # Obtain the exact parent Model object
             $this->get_parent_model();
         }
-
+        
         # Create an ID for this object if requested
         if ($create_id and $this->config_path and $this->many) {
             $this->id = $this->get_next_id();
@@ -1138,7 +1142,7 @@ class Model {
 
         # Check for required packages
         $this->check_packages();
-        
+
         # Don't validate field values if `only_id` is enabled
         if ($only_id) {
             return true;
@@ -1156,7 +1160,7 @@ class Model {
             $this->is_fields_internal_name_unique($field);
 
             # Run validation on this field
-            $this->$field->validate();
+            $this->$field->validate(modelset: $modelset);
 
             # Check if a custom validation method was implemented for this model field. Skip if null.
             if (method_exists($this, "validate_$field") and !is_null($this->$field->value)) {
@@ -1519,6 +1523,8 @@ class Model {
         }
         
         # Obtain the parent Model if applicable and get internal objects
+        $model->parent_id = $parent_id;
+        var_dump($model->parent_id);
         $model->get_parent_model();
         $internal_objects = $model->get_internal_objects();
 
@@ -1540,7 +1546,8 @@ class Model {
 
             # Add the parent_id if given
             if (isset($parent_id)) {
-                $model_object->parent_id = $internal_id;
+                $model_object->parent_id = $parent_id;
+                $model_object->get_parent_model();
             }
 
             # Add this model object to the array of all objects

@@ -99,14 +99,13 @@ class NestedModelField extends Field
         # Create a new Model object for this value and validate it. Remove any assigned IDs
         unset($value["id"]);
         unset($value["parent_id"]);
-        $model = new $this->model_class(data: $value);
+        $model = new $this->model_class(parent_id: $this->context->id, data: $value);
         $model->parent_id = $this->context->id;
-        $model->parent_model = $this->context;
+        $model->get_parent_model();
 
         # Try to validate the nested Model object
         try {
-            $model->validate(skip_parent: true);
-            $this->check_unique_fields($model);
+            $model->validate(skip_parent: true, modelset: $this->validation_modelset);
             $this->check_unique_together_fields($model);
             $this->validation_modelset->model_objects[] = $model;
         }
@@ -122,8 +121,10 @@ class NestedModelField extends Field
 
     /**
      * Extends the default Field validation method to clear the validation_modelset before starting validation
+     * @param ModelSet|null $modelset
+     * @return bool Returns true if the validation was successful.
      */
-    public function validate(): bool
+    public function validate(?ModelSet $modelset = null): bool
     {
         # Empty any existing ModelSet entries in the event this is a subsequent `validate()` call.
         $this->validation_modelset->model_objects = [];

@@ -17,6 +17,7 @@ namespace RESTAPI\Core\Tools;
 
 use RESTAPI\Core\Response;
 use RESTAPI\Models\RESTAPISettings;
+use RESTAPI\Responses\ServerError;
 
 require_once("RESTAPI/autoloader.inc");
 
@@ -54,6 +55,32 @@ function cprint(string $message, bool $condition): void
     if ($condition) {
         print($message);
     }
+}
+
+/**
+ * Converts a $bandwidth to bits for it's given $bandwidthtype
+ * @param int $bandwidth The amount of bandwidth scaled using $bandwidthtype.
+ * @param string $scale The scale of $bandwidth. Options are: b, Kb, Mb, and Gb.
+ * @return int The bandwidth's total number of bits.
+ * @throws ServerError When $bandwidthtype is not a supported option.
+ */
+ function bandwidth_to_bits(int $bandwidth, string $scale): int {
+    # Set scale factors we can use to convert various bandwidth values into total bit count
+    $gigabit_scale_factor = 1024 * 1024 * 1024;
+    $megabit_scale_factor = 1024 * 1024;
+    $kilobit_scale_factor = 1024;
+
+    return match ($scale) {
+        "Gb" => $bandwidth * $gigabit_scale_factor,
+        "Mb" => $bandwidth * $megabit_scale_factor,
+        "Kb" => $bandwidth * $kilobit_scale_factor,
+        "b" => $bandwidth,    // Already represented as bits
+        default => throw new ServerError(
+            message: "Unsupported \$bandwidthtype value `$scale` provided to bandwidth_to_bits(). ".
+                "Supported options are b, Kb, Mb, and Gb.",
+            response_id: "TOOLS_BANDWIDTH_TO_BITS_INVALID_SCALE_OPTION"
+        ),
+    };
 }
 
 /**
