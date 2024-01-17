@@ -285,7 +285,7 @@ class Model {
         $this->async = $async;
 
         # Obtain the current object from internal if an ID was given or this is not a `many` model.
-        $this->construct_from_internal(id: $id);
+        $this->construct_from_internal(id: $id, parent_id: $parent_id);
 
         # Use the representation to obtain or construct this object if present.
         if ($data) {
@@ -310,14 +310,18 @@ class Model {
      * Attempts to construct this Model object by fetching an existing object from config/internally.
      * @param mixed $id The ID of the internal object to construct this object from
      */
-    private function construct_from_internal(mixed $id = null): void
+    private function construct_from_internal(mixed $id = null, mixed $parent_id = null): void
     {
+        # Obtain the parent Model if a parent_id was provided and this Model has a parent Model class assigned
+        if (isset($parent_id) and $this->parent_model_class) {
+            $this->parent_id = $parent_id;
+            $this->get_parent_model();
+        }
         # Only proceed if an ID was provided or this Model is not a $many enabled Model.
         if (isset($id) or !$this->many) {
             # Don't pull internal values unless there is a `config_path` or `internal_callable` defined.
             if ($this->config_path or $this->internal_callable) {
                 $this->id = $id;
-                $this->get_parent_model();
                 $this->from_internal();
                 $this->initial_object = unserialize(serialize($this));
             }
@@ -917,7 +921,7 @@ class Model {
             catch (NotFoundError) {
                 # Throw a NotFoundError but change some of the verbage
                 throw new NotFoundError(
-                    message: "Parent object with ID '$this->id' does not exist.",
+                    message: "Parent object with ID '$this->parent_id' does not exist.",
                     response_id: "MODEL_PARENT_OBJECT_NOT_FOUND"
                 );
             }
@@ -1541,18 +1545,20 @@ class Model {
                 continue;
             }
                 
-            # Obtain this Model object from internal
+            # Create a new Model object for this internal object and assign its ID
             $model_object = new $model();
             $model_object->id = $internal_id;
-            $model_object->from_internal_object($internal_object);
 
-            # Add the parent_id if given
+            # Add the parent_id if given. Note: this must happen before calling from_internal_object()!
+            # TODO: this statement is only needed because some models don't have a __construct parameter name $parent_id
+            # TODO: this should be changed so these statements can be removed.
             if (isset($parent_id)) {
                 $model_object->parent_id = $parent_id;
                 $model_object->get_parent_model();
             }
-
-            # Add this model object to the array of all objects
+            
+            # Populate the Model object using its current internal values and add it to the array of all Model objects
+            $model_object->from_internal_object($internal_object);
             $model_objects[] = $model_object;
 
             # Break the loop if $limit is set, and we've met our limit of objects to obtain

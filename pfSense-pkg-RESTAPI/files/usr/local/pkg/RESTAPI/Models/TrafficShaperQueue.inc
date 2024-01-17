@@ -4,6 +4,7 @@ namespace RESTAPI\Models;
 
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\FirewallApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
@@ -251,22 +252,10 @@ class TrafficShaperQueue extends Model
                 response_id: "TRAFFIC_SHAPER_QUEUE_NOT_SUPPORTED_BY_PARENT_SCHEDULER"
             );
         }
-    }
-
-    /**
-     * Obtains the internal value for `interface`. This method ensures this Model's `interface` field always matches
-     * the parent Model's `interface` field.
-     * @param string|null $interface The incoming internal value for the `interface` field. If this object is a new
-     * TrafficShaperQueue, this value will be null.
-     * @returns string The internal value to be set for the `interface` field. This will always match the parent
-     * TrafficShaper's `interface` field value.
-     */
-    public function from_internal_interface(string|null $interface): string {
-        if (!$interface) {
-            return $this->parent_model->interface->to_internal();
-        }
         
-        return $interface;
+        # Force the `interface` field value to always match the parent
+        # TODO: Change this to use the default_callable for this field when developed
+        $this->interface->value = $this->parent_model->interface->to_internal();
     }
 
     /**
@@ -278,6 +267,9 @@ class TrafficShaperQueue extends Model
      */
     public function validate_bandwidthtype(string $bandwidthtype): string {
         # Throw an error if the parent's `bandwidthtype` is `%` but this object's is not
+        # Note: This is not enforced in the pfSense webConfigurator but probably should be. The algorithm used to check
+        # if a queue is over committed on bandwidth becomes inaccurate when the parent uses % but child queues use
+        # a set amount.
         if ($bandwidthtype !== "%" and $this->parent_model->bandwidthtype->value === "%") {
             throw new UnprocessableContentError(
                 message: "Field `bandwidthtype` must be set `%` when the parent's `bandwidthtype` is set to `%`.",
@@ -321,10 +313,11 @@ class TrafficShaperQueue extends Model
         $parent_scheduler = $this->parent_model->scheduler->value;
         
         # Throw an error if the $priority is greater than 7, but the parent `scheduler` is not `PRIQ`
+        # Note: the `priority` field's `maximum` property will still force a value for 15 or less.
         if ($parent_scheduler !== "PRIQ" and $priority > 7) {
             throw new ValidationError(
                 message: "Field `priority` must be 7 or less while the parent's `scheduler` is `$parent_scheduler`.",
-                response_id: "TRAFFIC_SHAPER_QUEUE_PRIORITY_MAXIMUM_EXCEEDED_FOR_SCHEDULER"
+                response_id: "TRAFFIC_SHAPER_QUEUE_PRIORITY_MAXIMUM_EXCEEDED_FOR_PARENT_SCHEDULER"
             );
         }
         
@@ -343,7 +336,7 @@ class TrafficShaperQueue extends Model
         if (!$this->is_bandwidth_string($upperlimit_m1)) {
             throw new ValidationError(
                 message: "Field `upperlimit_m1` must be in a valid bandwidth format.",
-                response_id: "TRAFFIC_SHAPER_QUEUE_UPPERLIMIT_M1_INVALID_BANDWIDTH"
+                response_id: "TRAFFIC_SHAPER_QUEUE_UPPERLIMIT_M1_INVALID_BANDWIDTH_FORMAT"
             );
         }
         
@@ -370,7 +363,7 @@ class TrafficShaperQueue extends Model
         if (!$this->is_bandwidth_string($realtime_m1)) {
             throw new ValidationError(
                 message: "Field `realtime_m1` must be in a valid bandwidth format.",
-                response_id: "TRAFFIC_SHAPER_QUEUE_REALTIME_M1_INVALID_BANDWIDTH"
+                response_id: "TRAFFIC_SHAPER_QUEUE_REALTIME_M1_INVALID_BANDWIDTH_FORMAT"
             );
         }
 
@@ -397,7 +390,7 @@ class TrafficShaperQueue extends Model
         if (!$this->is_bandwidth_string($linkshare_m1)) {
             throw new ValidationError(
                 message: "Field `linkshare_m1` must be in a valid bandwidth format.",
-                response_id: "TRAFFIC_SHAPER_QUEUE_LINKSHARE_M1_INVALID_BANDWIDTH"
+                response_id: "TRAFFIC_SHAPER_QUEUE_LINKSHARE_M1_INVALID_BANDWIDTH_FORMAT"
             );
         }
 
@@ -410,6 +403,17 @@ class TrafficShaperQueue extends Model
         }
 
         return $linkshare_m1;
+    }
+
+    /**
+     * Reloads the firewall filter and restarts queue graphing.
+     */
+    public function apply(): void
+    {
+        (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
+        system("rm -f /var/db/rrd/*queuedrops.rrd");
+        system("rm -f /var/db/rrd/*queues.rrd");
+        enable_rrd_graphing();
     }
 
     /**
@@ -442,16 +446,17 @@ class TrafficShaperQueue extends Model
      */
     public static function get_bandwidth_bits(TrafficShaperQueue $queue): int {
         # Variables
+        $queue->get_parent_model();
         $parent_is_percent = ($queue->parent_model->bandwidthtype->value === "%");
         $parent_bandwidth_max = $queue->parent_model->get_bandwidth_bits();
         
-        # Convert percentage to real bits if both parent and child are percentage-based.
-        if ($parent_is_percent && $queue->bandwidthtype->value === "%") {
+        # When both parent and child are percentage-based, just return the bandwidth as it's already a percentage
+        if ($parent_is_percent and $queue->bandwidthtype->value === "%") {
             return $queue->bandwidth->value;
         }
         
         # When the parent is not percentage-based but this queue is, convert the percentage to real bits.
-        if (!$parent_is_percent && $queue->bandwidthtype->value === "%") {
+        if (!$parent_is_percent and $queue->bandwidthtype->value === "%") {
             return intval($queue->bandwidth->value / 100 * $parent_bandwidth_max);
         } 
         
