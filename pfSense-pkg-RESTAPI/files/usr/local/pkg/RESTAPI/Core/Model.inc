@@ -1526,7 +1526,7 @@ class Model {
     public static function read_all(mixed $parent_id = null, int $limit = 0, int $offset = 0) : ModelSet|Model {
         # Variables
         $model_name = get_called_class();
-        $model = new $model_name();
+        $model = new $model_name(parent_id: $parent_id);
         $model_objects = [];
         $is_parent_model_many = $model->is_parent_model_many();
         $requests_pagination = ($limit or $offset);
@@ -1549,9 +1549,7 @@ class Model {
             );
         }
         
-        # Obtain the parent Model if applicable and get internal objects
-        $model->parent_id = $parent_id;
-        $model->get_parent_model();
+        # Obtain all of this Model's internally stored objects
         $internal_objects = $model->get_internal_objects();
 
         # For non `many` Models, wrap the internal object in an array so we can loop
@@ -1566,16 +1564,7 @@ class Model {
             }
                 
             # Create a new Model object for this internal object and assign its ID
-            $model_object = new $model();
-            $model_object->id = $internal_id;
-
-            # Add the parent_id if given. Note: this must happen before calling from_internal_object()!
-            # TODO: this statement is only needed because some models don't have a __construct parameter name $parent_id
-            # TODO: this should be changed so these statements can be removed.
-            if (isset($parent_id)) {
-                $model_object->parent_id = $parent_id;
-                $model_object->get_parent_model();
-            }
+            $model_object = new $model(id: $internal_id, parent_id: $parent_id);
             
             # Populate the Model object using its current internal values and add it to the array of all Model objects
             $model_object->from_internal_object($internal_object);
