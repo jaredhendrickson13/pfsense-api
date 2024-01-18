@@ -7,15 +7,15 @@ require_once("RESTAPI/autoloader.inc");
 use RESTAPI;
 
 /**
- * Defines a IntegerField class that extends the Core Field method. This Field adds validation and representation for
- * integer type Model Fields.
+ * Defines a FloatField class that extends the Core Field method. This Field adds validation and representation for
+ * float type Model Fields.
  */
-class IntegerField extends RESTAPI\Core\Field {
+class FloatField extends RESTAPI\Core\Field {
     public int $minimum;
     public int $maximum;
 
     /**
-     * Defines the IntegerField object and sets its options.
+     * Defines the FloatField object and sets its options.
      * @param bool $required If `true`, this field is required to have a value at all times.
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
@@ -97,7 +97,7 @@ class IntegerField extends RESTAPI\Core\Field {
         $this->minimum = $minimum;
         $this->maximum = $maximum;
         parent::__construct(
-            type: "integer",
+            type: "double", // gettype() identifies floats as doubles
             required: $required,
             unique: $unique,
             default: $default,
@@ -131,7 +131,7 @@ class IntegerField extends RESTAPI\Core\Field {
     protected function _from_internal(mixed $internal_value) : mixed {
         # Return the value as an integer if it's numeric
         if (is_numeric($internal_value)) {
-            return intval($internal_value);
+            return floatval($internal_value);
         }
 
         # If the value is an empty string, assume it's null
@@ -141,9 +141,9 @@ class IntegerField extends RESTAPI\Core\Field {
 
         # Otherwise, the internal value cannot be represented by this Field. Throw an error.
         throw new RESTAPI\Responses\ServerError(
-            message: "Cannot parse IntegerField '$this->name' from internal because its internal value is not
+            message: "Cannot parse FloatField '$this->name' from internal because its internal value is not
                     a numeric value. Consider changing this field to a StringField.",
-            response_id: "INTEGER_FIELD_WITH_NON_INTEGER_INTERNAL_VALUE"
+            response_id: "FLOAT_FIELD_WITH_NON_FLOAT_INTERNAL_VALUE"
         );
     }
 
@@ -160,10 +160,14 @@ class IntegerField extends RESTAPI\Core\Field {
 
         # Add the minimum and maximum to the OpenAPI property.
         if ($this->many) {
+            $openapi_property["items"]["type"] = "number";
+            $openapi_property["items"]["format"] = "float";
             $openapi_property["items"]["minimum"] = $this->minimum;
             $openapi_property["items"]["maximum"] = $this->maximum;
         }
         else {
+            $openapi_property["type"] = "number";
+            $openapi_property["format"] = "float";
             $openapi_property["minimum"] = $this->minimum;
             $openapi_property["maximum"] = $this->maximum;
         }
