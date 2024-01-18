@@ -35,7 +35,7 @@ class OutboundNATMapping extends Model
     public StringField $source_hash_key;
     public StringField $descr;
 
-    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null, bool $async = true)
+    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Set model attributes
         $this->config_path = "nat/outbound/rule";
@@ -181,7 +181,7 @@ class OutboundNATMapping extends Model
             help_text: "A description for the outbound NAT mapping."
         );
 
-        parent::__construct(id: $id, data: $data, client: $client, async: $async);
+        parent::__construct(...$options, id: $id, data: $data);
     }
 
     /**

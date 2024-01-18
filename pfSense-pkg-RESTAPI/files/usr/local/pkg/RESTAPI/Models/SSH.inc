@@ -15,7 +15,7 @@ class SSH extends Model
     public StringField $sshdkeyonly;
     public BooleanField $sshdagentforwarding;
 
-    public function __construct(mixed $data = [], Auth $client = null, bool $async = true)
+    public function __construct(mixed $data = [], mixed ...$options)
     {
         # Set model attributes
         $this->config_path = "system/ssh";
@@ -47,7 +47,7 @@ class SSH extends Model
         );
 
         # Construct the parent Model object
-        parent::__construct(data: $data, client: $client, async: $async);
+        parent::__construct(...$options, data: $data);
     }
 
     /**
@@ -56,11 +56,11 @@ class SSH extends Model
     public function apply() {
         # Stop the sshd service
         killbyname("sshd");
-        log_error(gettext("secure shell configuration has changed. Stopping sshd."));
+        $this->log_error("secure shell configuration has changed. Stopping sshd.");
 
         # If sshd is still enabled, restart the sshd service using the new config
         if (config_path_enabled('system/ssh', 'enable')) {
-            log_error(gettext("secure shell configuration has changed. Restarting sshd."));
+            $this->log_error("secure shell configuration has changed. Restarting sshd.");
             send_event("service restart sshd");
         }
     }

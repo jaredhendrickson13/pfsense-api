@@ -16,7 +16,7 @@ class CommandPrompt extends Model
     public StringField $command;
     public StringField $output;
     public IntegerField $result_code;
-    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Define Model Fields
         $this->command = new StringField(
@@ -35,7 +35,7 @@ class CommandPrompt extends Model
             help_text: "The result code of the executed command."
         );
 
-        parent::__construct(id: $id, data: $data, client: $client);
+        parent::__construct(...$options, id: $id, data: $data);
     }
 
     /**

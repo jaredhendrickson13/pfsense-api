@@ -14,7 +14,7 @@ class IPsecPhase2Encryption extends Model
     public StringField $name;
     public IntegerField $keylen;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], Auth $client = null, bool $async = true)
+    public function __construct(mixed $id = null, mixed $parent_id = null, array $data = [], mixed ...$options)
     {
         # Obtain global p2 algorithm variables
         global $p2_ealgos;
@@ -40,7 +40,7 @@ class IPsecPhase2Encryption extends Model
             help_text: "The key length for the encryption algorithm."
         );
 
-        parent::__construct(id: $id, parent_id: $parent_id, data: $data, client: $client, async: $async);
+        parent::__construct(...$options, id: $id, parent_id: $parent_id, data: $data);
     }
 
     /**

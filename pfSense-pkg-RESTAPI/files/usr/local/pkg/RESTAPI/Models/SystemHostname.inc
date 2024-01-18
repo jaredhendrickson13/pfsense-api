@@ -13,9 +13,7 @@ class SystemHostname extends Model
     public StringField $hostname;
     public StringField $domain;
 
-    public function __construct(
-        mixed $id = null, mixed $parent_id = null, mixed $data = [], Auth $client = null, bool $async = true
-    )
+    public function __construct(mixed $data = [], mixed ...$options)
     {
         # Set model attributes
         $this->config_path = "system";
@@ -36,7 +34,7 @@ class SystemHostname extends Model
             help_text: "The domain portion of the FQDN to assign to this system."
         );
 
-        parent::__construct(id: $id, parent_id: $parent_id, data: $data, client: $client, async: $async);
+        parent::__construct(...$options, data: $data);
     }
 
     /**

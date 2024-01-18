@@ -17,7 +17,7 @@ class SystemVersion extends Model
     public StringField $patch;
     public StringField $buildtime;
 
-    public function __construct(mixed $data = [], Auth $client = null)
+    public function __construct(mixed $data = [], mixed ...$options)
     {
         # Set model attributes
         $this->internal_callable = "get_pfsense_version";
@@ -41,7 +41,7 @@ class SystemVersion extends Model
             help_text: "The datetime string of when the pfSense version was initially built."
         );
 
-        parent::__construct(data: $data, client: $client);
+        parent::__construct(...$options, data: $data);
     }
 
     /**

@@ -19,7 +19,7 @@ class InterfaceApply extends Model
     public BooleanField $applied;
     public InterfaceField $pending_interfaces;
 
-    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Set model attributes
         $this->internal_callable = "get_applied_status";
@@ -41,7 +41,7 @@ class InterfaceApply extends Model
         );
 
 
-        parent::__construct(id: $id, data: $data, client: $client);
+        parent::__construct(...$options, id: $id, data: $data);
     }
 
     /**

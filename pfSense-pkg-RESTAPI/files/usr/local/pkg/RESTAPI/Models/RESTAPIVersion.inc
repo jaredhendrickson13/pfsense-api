@@ -15,7 +15,7 @@ class RESTAPIVersion extends Model
     public BooleanField $update_available;
     public StringField $install_version;
 
-    public function __construct(mixed $data = [], Auth $client = null)
+    public function __construct(mixed $data = [], mixed ...$options)
     {
         # Set model attributes
         $this->internal_callable = "get_api_version_details";
@@ -46,7 +46,7 @@ class RESTAPIVersion extends Model
             help_text: "Set the API version to update or rollback to."
         );
 
-        parent::__construct(data: $data, client: $client);
+        parent::__construct(...$options, data: $data);
     }
 
     /**

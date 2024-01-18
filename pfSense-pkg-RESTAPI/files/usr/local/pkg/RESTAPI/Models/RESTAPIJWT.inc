@@ -18,7 +18,7 @@ class RESTAPIJWT extends Model
 {
     public StringField $token;
     
-    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Set Model attributes
         $this->verbose_name = "API JWT";
@@ -30,7 +30,7 @@ class RESTAPIJWT extends Model
             help_text: "The generated JWT that can be used for JWT authentication."
         );
 
-        parent::__construct(id: $id, data: $data, client: $client);
+        parent::__construct(...$options, id: $id, data: $data);
     }
 
     /**

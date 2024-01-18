@@ -34,13 +34,7 @@ class CronJob extends Model
      * technically the package is optional, the webConfigurator mandates its installation for managing Cron. 
      * Consequently, the API adheres to the same default behavior, requiring the package for Cron management.
      */
-    public function __construct(
-        mixed $id = null, 
-        mixed $data = [], 
-        Auth $client = null, 
-        bool $async = true, 
-        bool $require_pkg = true
-    )
+    public function __construct(mixed $id = null, mixed $data = [], bool $require_pkg = true, mixed ...$options)
     {
         # Set model attributes
         $this->config_path = "cron/item";
@@ -116,7 +110,7 @@ class CronJob extends Model
             help_text: "The command to run. Use full file paths for this command and include an command parameters."
         );
         
-        parent::__construct(id: $id, data: $data, client: $client, async: $async);
+        parent::__construct(...$options, id: $id, data: $data);
     }
     
     /**

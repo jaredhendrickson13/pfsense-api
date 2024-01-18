@@ -33,7 +33,7 @@ class VirtualIP extends Model
     public StringField $password;
     public StringField $carp_status;
 
-    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Define model attributes
         $this->config_path = "virtualip/vip";
@@ -127,7 +127,7 @@ class VirtualIP extends Model
                 "is the primary or backup peer."
         );
 
-        parent::__construct(id: $id, data: $data, client: $client);
+        parent::__construct(...$options, id: $id, data: $data);
     }
 
     /**

@@ -42,7 +42,7 @@ class RoutingGateway extends Model
     public IntegerField $time_period;
     public IntegerField $alert_interval;
 
-    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Define Model attributes
         $this->config_path = "gateways/gateway_item";
@@ -176,7 +176,7 @@ class RoutingGateway extends Model
             help_text: "Sets the time interval in milliseconds between checking for an alert conditions."
         );
 
-        parent::__construct(id: $id, data: $data, client: $client);
+        parent::__construct(...$options, id: $id, data: $data);
     }
 
     /**

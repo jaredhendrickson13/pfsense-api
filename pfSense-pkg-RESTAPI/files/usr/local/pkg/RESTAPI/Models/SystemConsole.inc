@@ -10,7 +10,7 @@ class SystemConsole extends Model
 {
     public BooleanField $passwd_protect_console;
 
-    public function __construct(mixed $data = [], Auth $client = null, bool $async = true)
+    public function __construct(mixed $data = [], mixed ...$options)
     {
         # Set model attributes
         $this->config_path = "system";
@@ -25,7 +25,7 @@ class SystemConsole extends Model
             help_text: "Enables or disables password protecting the console."
         );
 
-        parent::__construct(data: $data, client: $client, async: $async);
+        parent::__construct(...$options, data: $data);
     }
 
     /**

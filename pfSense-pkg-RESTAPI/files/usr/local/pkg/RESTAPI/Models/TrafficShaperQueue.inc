@@ -46,7 +46,7 @@ class TrafficShaperQueue extends Model
     public IntegerField $linkshare_d;
     public StringField $linkshare_m2;
     
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], Auth $client = null, bool $async = true)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
     {
         # Set model attributes
         $this->parent_model_class = "TrafficShaper";
@@ -234,7 +234,7 @@ class TrafficShaperQueue extends Model
                 "current assigned to the `bandwidth` field."
         );
         
-        parent::__construct($id, $parent_id, $data, $client, $async);
+        parent::__construct(...$options, id: $id, parent_id: $parent_id, data: $data);
     }
 
     /**

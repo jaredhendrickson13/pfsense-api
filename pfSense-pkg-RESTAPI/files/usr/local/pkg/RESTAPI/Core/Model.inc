@@ -252,13 +252,17 @@ class Model {
      * @param mixed $data Allows objects to be obtained, created and/or updated using an array of
      * field-value pairs. If this array contains an `id` field, the internal object with this ID will be obtained as
      * the Model object first. Any additional Fields will be used to set the Model object's values.
-     * @param Auth|null $client Optionally assign an API client's `Auth` object. Required for tying users to
-     * changes made through Models.
-     * @param bool $async Set to `true` to request this Model's apply methods to run in the background and return a
-     * response immediately. Set to `false` to wait for the apply methods to complete before returning a response. Note:
-     * Some Models' apply methods may not support asynchronous execution and therefor may ignore this setting.
+     * @param mixed ...$options Additional arguments to provide to this Model. Any additional arguments provided will
+     * merged into the Model's $data parameter. This can be used to set Model field values using parameters instead
+     * of an array format via $data. Note: In the event that a field value is set in $data and $args, the value
+     * found in $args will be used.
      */
-    public function __construct(mixed $id=null, mixed $parent_id=null, mixed $data=[], Auth $client=null, bool $async=true) {
+    public function __construct(
+        mixed $id=null, 
+        mixed $parent_id=null, 
+        mixed $data=[],
+        mixed ...$options
+    ) {
         # Throw an error if both $id and data are set.
         if (isset($id) and $data) {
             throw new ServerError(
@@ -274,15 +278,15 @@ class Model {
                 response_id: "MODEL_NON_ARRAY_REPRESENTATION_DATA"
             );
         }
+        
+        # Check for known $options and map them to their Model properties
+        $options = $this->set_construct_options($options);
+        
+        # Merge the remaining options into the $data array so they can be used to populate field values
+        $data = array_merge($data, $options);
 
         # Obtain the Cache object for this Model if assigned
         $this->cache = $this->get_cache();
-        
-        # Set the parent ID if given
-        $this->parent_id = $parent_id;
-
-        # Set the asynchronous flag if given
-        $this->async = $async;
 
         # Obtain the current object from internal if an ID was given or this is not a `many` model.
         $this->construct_from_internal(id: $id, parent_id: $parent_id);
@@ -291,9 +295,6 @@ class Model {
         if ($data) {
             $this->from_representation($data);
         }
-
-        # Obtain a default $client Auth object for this Model object to use if one was not provided
-        $this->client = ($client) ?: $this->get_default_client();
 
         # Auto-set the verbose name and plural verbose name for this object if it was not specified by a parent class
         $this->verbose_name = ($this->verbose_name) ?: $this->generate_verbose_name();
@@ -304,6 +305,25 @@ class Model {
         
         # Set the default $related_objects ModelSet so it can be populated later
         $this->related_objects = new ModelSet();
+    }
+
+    /**
+     * Checks for options passed in during object construction and maps known options to Model properties. Any
+     * options that are not known options to the core Model will be returned so they can be merged into 
+     * the Model data during construction.
+     * @param array $options The $options passed into the Model's __construct() method.
+     * @return array An array of additional options that do not relate to core Model properties.
+     */
+    private function set_construct_options(array $options): array {
+        # Set the async flag if given. Ensure this defaults to true.
+        $this->async = (isset($options["async"])) ? $options["async"] : true;
+        unset($options["async"]);
+
+        # Obtain a default $client Auth object for this Model object to use if one was not provided
+        $this->client = ($options["client"]) ?: $this->get_default_client();
+        unset($options["client"]);
+        
+        return $options;
     }
 
     /**
@@ -857,16 +877,16 @@ class Model {
      * representation.
      */
     final public function from_representation(array $data) {
-        # Set the parent ID if provided
-        if (array_key_exists("parent_id", $data)) {
+        # Set the parent ID if provided and obtain the parent model object if applicable
+        if (array_key_exists("parent_id", $data) and $this->parent_model_class) {
             $this->parent_id = $data["parent_id"];
+            $this->get_parent_model();
         }
         
         # When an ID is provided, fetch this objects from the internal configuration using the ID.
         if (array_key_exists("id", $data)) {
-            # Extract the ID from the data and obtain the parent model object if applicable
+            # Extract the ID from the data
             $this->id = $data["id"];
-            $this->get_parent_model();
             
             # Obtain the object from its internal form
             $this->from_internal();

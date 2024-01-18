@@ -20,7 +20,7 @@ class InterfaceVLAN extends Model {
     public IntegerField $pcp;
     public StringField $descr;
 
-    public function __construct(mixed $id=null, mixed $data=[], Auth $client=null) {
+    public function __construct(mixed $id=null, mixed $data=[], mixed ...$options) {
         # Set the configuration path for these objects and allow many to be stored.
         $this->config_path = "vlans/vlan";
         $this->many = true;
@@ -60,7 +60,7 @@ class InterfaceVLAN extends Model {
         );
 
         # Needs to be constructed after Fields are defined
-        parent::__construct(id: $id, data: $data, client: $client);
+        parent::__construct(...$options, id: $id, data: $data);
     }
 
     /**

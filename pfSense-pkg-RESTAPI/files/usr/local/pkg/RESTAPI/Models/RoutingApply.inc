@@ -14,7 +14,7 @@ class RoutingApply extends Model
 {
     public BooleanField $applied;
 
-    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
+    public function __construct(mixed $data = [], mixed ...$options)
     {
         # Set model attributes
         $this->internal_callable = "get_applied_status";
@@ -28,7 +28,7 @@ class RoutingApply extends Model
             help_text: "Displays `true` when all routing changes are applied and there are no pending changes left.".
             "Displays `false` when there are pending routing changes that have not been applied."
         );
-        parent::__construct(id: $id, data: $data, client: $client);
+        parent::__construct(...$options, data: $data);
     }
 
     /**

@@ -18,7 +18,7 @@ class FirewallScheduleTimeRange extends Model
     public StringField $hour;
     public StringField $rangedescr;
     
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], Auth $client = null, bool $async = true)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
     {
         # Set model attributes
         $this->parent_model_class = "FirewallSchedule";
@@ -70,7 +70,7 @@ class FirewallScheduleTimeRange extends Model
             help_text: "A description detailing this firewall schedule time range's purpose."
         );
         
-        parent::__construct(id: $id, parent_id: $parent_id, data: $data, client: $client, async: $async);
+        parent::__construct(...$options, id: $id, parent_id: $parent_id, data: $data);
     }
 
     /**

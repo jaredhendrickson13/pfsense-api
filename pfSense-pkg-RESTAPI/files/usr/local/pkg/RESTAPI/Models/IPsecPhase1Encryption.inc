@@ -17,7 +17,7 @@ class IPsecPhase1Encryption extends Model
     public IntegerField $dhgroup;
     public StringField $prf_algorithm;
 
-    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], Auth $client = null, bool $async = true)
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
     {
         # Obtain global p1 algorithm variables
         global $p1_ealgos;
@@ -64,7 +64,7 @@ class IPsecPhase1Encryption extends Model
             help_text: "The PRF algorithm to use for this P1 encryption item. This value has no affect unless the ".
                 "P1 entry has PRF enabled."
         );
-        parent::__construct(id: $id, parent_id: $parent_id, data: $data, client: $client, async: $async);
+        parent::__construct(...$options, id: $id, parent_id: $parent_id, data: $data);
     }
 
     /**

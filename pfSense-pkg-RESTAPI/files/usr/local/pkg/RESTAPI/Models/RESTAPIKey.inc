@@ -21,7 +21,7 @@ class RESTAPIKey extends Model
     public StringField $hash;
     public StringField $key;
     
-    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null)
+    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Gather information about current API settings
         $api_pkg_id = RESTAPISettings::get_pkg_id();
@@ -71,7 +71,7 @@ class RESTAPIKey extends Model
             help_text: "The hash of the generated API key"
         );
 
-        parent::__construct(id: $id, data: $data, client: $client);
+        parent::__construct(...$options, id: $id, data: $data);
     }
 
     /**

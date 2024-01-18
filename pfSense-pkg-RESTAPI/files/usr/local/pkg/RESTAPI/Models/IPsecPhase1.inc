@@ -54,7 +54,7 @@ class IPsecPhase1 extends Model
     public IntegerField $dpd_maxfail;
     public NestedModelField $encryption;
 
-    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null, bool $async = true)
+    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         
         # Define model attributes
@@ -237,7 +237,7 @@ class IPsecPhase1 extends Model
             required: true,
             help_text: "The encryption algorithms supported by this P1 encryption."
         );
-        parent::__construct(id: $id, data: $data, client: $client, async: $async);
+        parent::__construct(...$options, id: $id, data: $data);
     }
 
     /**

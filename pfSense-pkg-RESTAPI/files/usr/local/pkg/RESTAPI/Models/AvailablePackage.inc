@@ -19,7 +19,7 @@ class AvailablePackage extends Model
     public BooleanField $installed;
     public StringField $deps;
 
-    public function __construct(mixed $id = null,mixed $data = [], Auth $client = null, bool $async = true)
+    public function __construct(mixed $id = null,mixed $data = [], mixed ...$options)
     {
         # Set model attributes
         $this->internal_callable = "get_all_pkgs";
@@ -62,7 +62,7 @@ class AvailablePackage extends Model
             help_text: "Dependencies for this package that are also installed when this package is installed."
         );
 
-        parent::__construct(id: $id, data: $data, client: $client, async: $async);
+        parent::__construct(...$options, id: $id, data: $data);
     }
 
     /**

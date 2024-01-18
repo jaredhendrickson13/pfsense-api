@@ -34,7 +34,7 @@ class PortForward extends Model
     public UnixTimeField $updated_time;
     public StringField $updated_by;
     
-    public function __construct(mixed $id = null, mixed $data = [], Auth $client = null, bool $async = true)
+    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Set model attributes
         $this->config_path = "nat/rule";
@@ -42,7 +42,7 @@ class PortForward extends Model
         $this->subsystem = "natconf";
         $this->sort_by_field = "interface";
         $this->sort_option = SORT_ASC;
-        $this->client = ($client) ?: new Auth();
+        $this->client = ($options["client"] instanceof Auth) ? $options["client"] : new Auth();
 
         # Set model Fields
         $this->interface = new InterfaceField(
@@ -167,7 +167,7 @@ class PortForward extends Model
             help_text: "The username and IP of the user who last updated this port forward rule."
         );
         
-        parent::__construct(id: $id, data: $data, client: $client, async: $async);
+        parent::__construct(...$options, id: $id, data: $data);
     }
 
     /**

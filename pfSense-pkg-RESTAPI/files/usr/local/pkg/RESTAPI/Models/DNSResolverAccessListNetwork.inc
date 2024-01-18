@@ -18,17 +18,8 @@ class DNSResolverAccessListNetwork extends Model
     public StringField $network;
     public IntegerField $mask;
     public StringField $description;
-
-    /**
-     * @inheritDoc
-     */
-    public function __construct(
-        mixed $id = null,
-        mixed $parent_id = null,
-        mixed $data = [],
-        Auth $client = null,
-        bool $async = true
-    )
+    
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
     {
         # Set model attributes
         $this->parent_model_class = "DNSResolverAccessList";
@@ -57,7 +48,7 @@ class DNSResolverAccessListNetwork extends Model
         );
 
         # Construct the parent model object
-        parent::__construct(id: $id, parent_id: $parent_id, data: $data, client: $client, async: $async);
+        parent::__construct(...$options, id: $id, parent_id: $parent_id, data: $data);
     }
 
     /**
