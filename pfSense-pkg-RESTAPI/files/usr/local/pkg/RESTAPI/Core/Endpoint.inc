@@ -494,8 +494,8 @@ class Endpoint {
                 );
         }
 
-        # Only proceed if this a view that requires auth
-        if ($this->requires_auth === true) {
+        # Only proceed if authentication is required for this endpoint and this is not an OPTIONS request
+        if ($this->requires_auth === true and $this->request_method !== "OPTIONS") {
             if (!$this->client->authenticate(secret: $secret, username: $this->client->username)) {
                 throw new AuthenticationError(
                     message: "Authentication failed",
@@ -713,7 +713,6 @@ class Endpoint {
             elseif ($this->request_method === "OPTIONS") {
                 header("access-control-allow-methods: ".implode(", ", $this->request_method_options));
                 header("Allow: ".implode(", ", $this->request_method_options));
-
             }
 
             # Create our success API response object if no errors were thrown
