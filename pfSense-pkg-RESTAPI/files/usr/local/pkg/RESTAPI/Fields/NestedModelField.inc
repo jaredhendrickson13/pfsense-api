@@ -99,7 +99,11 @@ class NestedModelField extends Field
         # Create a new Model object for this value and validate it. Remove any assigned IDs
         unset($value["id"]);
         unset($value["parent_id"]);
+        
+        # Construct the model without specifying IDs to prevent the object or its parent from being loaded
         $model = new $this->model_class(data: $value);
+        
+        # Assign the IDs and parent manually using this Field's context in case it does not yet exist in config
         $model->parent_id = $this->context->id;
         $model->parent_model = $this->context;
         $model->id = count($this->validation_modelset->model_objects);
