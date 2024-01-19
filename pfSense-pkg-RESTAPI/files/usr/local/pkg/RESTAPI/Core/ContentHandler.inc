@@ -4,6 +4,7 @@ namespace RESTAPI\Core;
 
 use RESTAPI\Responses\MediaTypeError;
 use RESTAPI\Responses\NotAcceptableError;
+use RESTAPI\Responses\ServerError;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 require_once("RESTAPI/autoloader.inc");
@@ -24,19 +25,44 @@ class ContentHandler
     public string $mime_type;
 
     /**
+     * Obtains the content from the remote client in its unprocessed form.
+     * @return mixed The unprocessed content from the remote client.
+     * @throws ServerError When this method is called but not overridden by the child class.
+     */
+    protected function get_content(): mixed {
+        throw new ServerError(
+            message: "Child ContentHanlder classes must override the get_content() method.",
+            response_id: "CONTENT_HANDLER_GET_CONTENT_NOT_OVERRIDDEN"
+        );
+    }
+
+    /**
      * Defines the steps necessary to encode the given content into the correct format. This method is generally used
      * to encode the remote client's response in the format requested by the client.
-     * @note This method must be overridden by the child class to be used in response to a client's Accept header
+     * @note This method MUST be overridden by the child class to be used in response to a client's Accept header
      * @param mixed $content The content to be encoded in this ContentHandler's format.
      * @return mixed The content in this ContentHandler's respective format. 
      * @throws NotAcceptableError When this ContentHandler does not support encoding content.
      */
-    public function encode_content(mixed $content = null): mixed {
+    protected function _encode(mixed $content = null): mixed {
         throw new NotAcceptableError(
             message: "Content handler `$this->mime_type` cannot format a response as it does not support content ".
                 "encoding. Change the value of your `Accept` header to a valid option and try again.",
             response_id: "CONTENT_HANDLER_CANNOT_ENCODE_CONTENT"
         );
+    }
+
+    /**
+     * Encodes the provided content into the format corresponding with this ContentHandler's MIME type and sets the
+     * Content-Type and Content-Length response headers accordingly.
+     * @param mixed $content The content to be encoded in this ContentHandler's format.
+     * @return mixed The content in this ContentHandler's respective format.
+     */
+    final public function encode(mixed $content): mixed {
+        $encoded_content = $this->_encode($content);
+        header("content-type: $this->mime_type");
+        header("content-length: ".strlen($this->mime_type));
+        return $encoded_content;
     }
 
     /**
@@ -47,7 +73,7 @@ class ContentHandler
      * @return mixed The content in this ContentHandler's respective format.
      * @throws MediaTypeError When this ContentHandler does not support decoding content.
      */
-    public function decode_content(mixed $content = null): mixed {
+    protected function _decode(mixed $content = null): mixed {
         throw new MediaTypeError(
             message: "Content handler `$this->mime_type` does not support decoding content. Change the value of your ".
                 "`Content-Type` header to a valid option and try again.",
@@ -56,25 +82,34 @@ class ContentHandler
     }
 
     /**
-     * Checks if this ContentHandler object is capable of encoding content.
-     * @return bool Returns true if this ContentHandler can encode content, otherwise false.
+     * Obtains and decodes the content from the format corresponding with this ContentHandler's MIME type.
+     * @return mixed The content in this ContentHandler's respective format.
      */
-    final public function can_encode_content(): bool {
-        $content_handler = get_called_class();
-        return method_exists($content_handler, "encode_content");
+    final public function decode(): mixed {
+        $content = $this->get_content();
+        return $this->_decode($content);
     }
 
     /**
-     * Checks if this ContentHandler object is capable of deocding content.
+     * Checks if this ContentHandler object is capable of encoding content.
+     * @return bool Returns true if this ContentHandler can encode content, otherwise false.
+     */
+    final public function can_encode(): bool {
+        $content_handler = get_called_class();
+        return method_exists($content_handler, "_encode");
+    }
+
+    /**
+     * Checks if this ContentHandler object is capable of decoding content.
      * @return bool Returns true if this ContentHandler can decode content, otherwise false.
      */
-    final public function can_decode_content(): bool {
+    final public function can_decode(): bool {
         $content_handler = get_called_class();
-        return method_exists($content_handler, "decode_content");
+        return method_exists($content_handler, "_decode");
     }
     
     /**
-     * Obtains an encode-capapble ContentHandler for a given MIME type.
+     * Obtains an encode-capable ContentHandler for a given MIME type.
      * @param string $mime_type The MIME type of the ContentHandler to look for.
      * @returns ContentHandler The encode-capable ContentHandler object with the requested $mime_type.
      * @throws NotAcceptableError When the ContentHandler with the requested $mime_type does not support encoding.
@@ -96,12 +131,68 @@ class ContentHandler
                 continue;
             }
             
-            # When mime types match, but the handler doesn't support encoding, run encode_content() to throw an error
-            if (!$handler->encode_content()) {
-                
+            # When mime types match, but the handler doesn't support encoding, throw a not accepted error
+            if (!$handler->can_encode()) {
+                throw new NotAcceptableError(
+                    message: "Content handler `$mime_type` cannot format a response as it does not support ".
+                        "content encoding. Change the value of your `Accept` header to a valid option and try again.",
+                    response_id: "CONTENT_HANDLER_CANNOT_ENCODE_CONTENT"
+                );
             }
-            
+
+            # Otherwise, this is the requested handler, return it
+            return $handler;
         }
+
+        # Throw a not acceptable error if there was no ContentHandler with the requested $mime_type
+        throw new NotAcceptableError(
+            message: "No content handler exists for `$mime_type`. Change the value of your `Accept` header ".
+                "to a valid option and try again.",
+            response_id: "CONTENT_HANDLER_ENCODE_NOT_FOUND"
+        );
     }
 
+    /**
+     * Obtains an decode-capable ContentHandler for a given MIME type.
+     * @param string $mime_type The MIME type of the ContentHandler to look for.
+     * @returns ContentHandler The decode-capable ContentHandler object with the requested $mime_type.
+     * @throws NotAcceptableError When the ContentHandler with the requested $mime_type does not support decoding.
+     * @throws NotAcceptableError When no ContentHandler exists with this $mime_type.
+     */
+    public static function get_decode_handler(string $mime_type): ContentHandler {
+        # Variables
+        $handler_classes = get_classes_from_namespace("\\RESTAPI\\ContentHandlers\\");
+        $mime_type = strtolower($mime_type);
+
+        # Loop through each ContentHandler child class and find the handler for this $mime_type
+        foreach ($handler_classes as $handler_class) {
+            # Loop variables
+            $handler = new $handler_class();
+            $hanlder_mime_type = strtolower($handler->mime_type);
+
+            # Skip this handler if the $mime_type does not match
+            if ($mime_type !== $hanlder_mime_type) {
+                continue;
+            }
+
+            # When mime types match, but the handler doesn't support decoding, throw a media type error
+            if (!$handler->can_decode()) {
+                throw new MediaTypeError(
+                    message: "Content handler `$mime_type` does not support decoding content. Change the value of your ".
+                        "`Content-Type` header to a valid option and try again.",
+                    response_id: "CONTENT_HANDLER_CANNOT_DECODE_CONTENT"
+                );
+            }
+
+            # Otherwise, this is the requested handler, return it
+            return $handler;
+        }
+
+        # Throw a media type error if there was no ContentHandler with the requested $mime_type
+        throw new MediaTypeError(
+            message: "No content handler exists for `$mime_type`. Change the value of your `Content-Type` header ".
+                "to a valid option and try again.",
+            response_id: "CONTENT_HANDLER_DECODE_NOT_FOUND"
+        );
+    }
 }
