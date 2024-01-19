@@ -20,6 +20,7 @@ use Error;
 use Exception;
 use JsonException;
 use RESTAPI;
+use RESTAPI\ContentHandlers\JSONContentHandler;
 use RESTAPI\Responses\AuthenticationError;
 use RESTAPI\Responses\ForbiddenError;
 use RESTAPI\Responses\MediaTypeError;
@@ -459,7 +460,7 @@ class Endpoint {
         foreach ($this->request_method_options as $method_option) {
             # Set the privilege config to pass to pfSense's privilege system
             $privs[$this->get_method_priv_name($method_option)] = [
-                "name" => "API - $this->url ".strtoupper($method_option),
+                "name" => "REST API - $this->url ".strtoupper($method_option),
                 "descr" => "Allow $method_option request to $this->url"
             ];
         }
@@ -561,7 +562,7 @@ class Endpoint {
     /**
      * Check if the HTTP method requested by the API client is supported by this view.
      */
-    private function check_request_method() {
+    private function check_request_method(): void {
         # Check if the requested HTTP method is a supported HTTP method.
         if (!in_array($this->request_method, $this->request_method_options) and $this->request_method !== "OPTIONS") {
             throw new MethodNotAllowedError(
@@ -577,7 +578,6 @@ class Endpoint {
      */
     private function check_request_data() {
         # Variables
-        $content_type_unknown = false;
         $content_type = $_SERVER["HTTP_CONTENT_TYPE"];
 
         # Assign the default content type for the request method if no content type was specified
@@ -588,17 +588,9 @@ class Endpoint {
             };
         }
 
-        # Parse the content according to the content-type request header
-        switch ($content_type) {
-            case "application/x-www-form-urlencoded":
-                $this->request_data = $this->decode_form_content($_GET);
-                break;
-            case "application/json":
-                $this->request_data = $this->decode_json_content(file_get_contents('php://input'));
-                break;
-            default:
-                $content_type_unknown = true;
-        }
+        # Locate the ContentHandler associated with this content type and obtain our decoded content from the client
+        $content_handler = ContentHandler::get_decode_handler($content_type);
+        $this->request_data = $content_handler->decode();
 
         # Ensure the special async, limit and offset parameters are of the correct type
         if (!isset($this->request_data["async"])) {
@@ -628,22 +620,15 @@ class Endpoint {
                 response_id: "ENDPOINT_OFFSET_FIELD_INVALID_TYPE"
             );
         }
-
-        # Check if the client requested an unknown content type
-        if ($content_type_unknown) {
-            throw new MediaTypeError(
-                message: "The requested content-type is not supported",
-                response_id: "ENDPOINT_CONTENT_TYPE_UNSUPPORTED"
-            );
-        }
     }
 
     /**
      * Listens for incoming API calls from API clients and checks if the API call is allowed.
      */
-    public function listen() {
+    public function listen(): void {
         # Variables
         $resp_data = null;
+        $content_handler = new JSONContentHandler();
         $links = new ResourceLinkSet();
 
         try {
@@ -654,6 +639,11 @@ class Endpoint {
             if ($this->requires_auth) {
                 $this->check_auth();
             }
+
+            # Ensure we can obtain the ContentHandler that will be responsible for encoding response content
+            # This will throw an error if the client's Accept header is not supported by an existing ContentHandler
+            $accept_type = $_SERVER["HTTP_ACCEPT"];
+            $content_handler = ContentHandler::get_encode_handler($accept_type);
 
             # Checks that request data was properly received and parsed.
             $this->check_request_method();
@@ -737,69 +727,9 @@ class Endpoint {
 
         # Format the HTTP response as JSON and set response code
         http_response_code($response->code);
-        echo $this->content_type_encode($response->to_representation()) . PHP_EOL;
+        echo $content_handler->encode($response->to_representation()) . PHP_EOL;
         session_destroy();
         exit();
-    }
-
-    /**
-     * Encodes the API response according to the Accept header received by the API client.
-     * @param array $data The API response data to encode in the requested format.
-     * @return string The encoded API response or `false` if the data could not be encoded.
-     */
-    public function content_type_encode(array $data) : string {
-        # TODO: in future if additional response Content-Types need to be supported we can add them here
-        # TODO: and control the requested content-type using the Accept HTTP header
-        # Encode response as JSON if content type is application/json
-        header("Content-Type: application/json", true);
-        return json_encode($data);
-    }
-
-    /**
-     * Attempts to decode a given JSON string into a PHP array. This is essentially a wrapper for the default
-     * `json_decode()` PHP function that allows us to apply some additional logic.
-     */
-    public static function decode_json_content(string $json_string) : array {
-        # Allow empty strings, but convert it to an empty array.
-        if (empty($json_string)) {
-            return [];
-        }
-
-        # Try to decode the JSON string, throw a not acceptable error if the string is not JSON encoded.
-        try {
-            return json_decode($json_string, associative: true, flags: JSON_THROW_ON_ERROR);
-        }
-        catch (JsonException) {
-            throw new ValidationError(
-                message: "Request body could not be decoded as JSON.",
-                response_id: "ENDPOINT_COULD_NOT_DECODE_JSON"
-            );
-        }
-    }
-
-    /**
-     * Applies primitive type assumption to application/x-www-form-urlencoded request data.
-     * @param array $array The form data array to decode.
-     * @return array The parsed API client's request data
-     */
-    public static function decode_form_content(array $array) : array {
-        # Loop through each query string item and check for expected data types
-        foreach ($array as $key=>$value) {
-            # Check for boolean type query strings
-            if ($value === "true") {
-                $array[$key] = true;
-            }
-            elseif ($value === "false") {
-                $array[$key] = false;
-            }
-
-            # Check for integer type query strings
-            if (is_numeric($value)) {
-                $array[$key] = intval($value);
-            }
-        }
-
-        return $array;
     }
 
     /**
