@@ -4,7 +4,9 @@ namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
 use RESTAPI\Fields\ForeignModelField;
+use RESTAPI\Models\DNSResolverHostOverride;
 use RESTAPI\Models\FirewallAlias;
+use RESTAPI\Models\TrafficShaper;
 
 class APIFieldsForeignModelFieldTestCase extends TestCase
 {
@@ -273,5 +275,59 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
         $host_alias->delete(apply: true);
         $net_alias->delete(apply: true);
         $port_alias->delete(apply: true);
+    }
+    
+    /**
+     * Checks that we can use Model classes that have parent classes assigned.
+     */
+    public function test_foreign_models_with_parents(): void {
+        # Use TrafficShapers to test this
+        $shaper1 = new TrafficShaper(
+            interface: "lan",
+            scheduler: "FAIRQ",
+            bandwidth: 100,
+            bandwidthtype: "Mb",
+            queue: [
+                ["name" => "TestQueue1", "qlimit" => 50, "bandwidth" => 50, "bandwidthtype" => "Mb"]
+            ]
+        );
+        $shaper1->create();
+        $shaper2 = new TrafficShaper(
+            interface: "wan",
+            scheduler: "FAIRQ",
+            bandwidth: 100,
+            bandwidthtype: "Mb",
+            queue: [
+                ["name" => "TestQueue2", "qlimit" => 50, "bandwidth" => 50, "bandwidthtype" => "Mb"]
+            ]
+        );
+        $shaper2->create(apply: true);
+        
+        # Define a ForeignModelField that targets DNSResolverHostOverrideAliases
+        $field = new ForeignModelField(
+            model_name: "TrafficShaperQueue",
+            model_field: "name"
+        );
+        
+        # Ensure we are able to obtain the shaper queue with `name` value set to `TestQueue1`
+        $field->value = "TestQueue1";
+        $this->assert_equals($field->value, $field->get_related_model()->name->value);
+        
+        # Ensure we are able to obtain many models
+        $field->many = true;
+        $field->value = ["TestQueue2", "TestQueue1"];
+        $related_objects = $field->get_related_models();
+        $this->assert_equals(
+            $related_objects->model_objects[0]->name->value,
+            "TestQueue2"
+        );
+        $this->assert_equals(
+            $related_objects->model_objects[1]->name->value,
+            "TestQueue1"
+        );
+        
+        # Delete the shapers
+        $shaper1->delete();
+        $shaper2->delete(apply: true);
     }
 }
