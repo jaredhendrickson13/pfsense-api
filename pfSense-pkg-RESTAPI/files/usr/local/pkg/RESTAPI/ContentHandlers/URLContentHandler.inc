@@ -8,9 +8,9 @@ use RESTAPI\Responses\ValidationError;
 
 class URLContentHandler extends ContentHandler
 {
-    public string $mime_type = "application/json";
+    public string $mime_type = "application/x-www-form-urlencoded";
 
-    protected function get_content(): array
+    public function get_content(): array
     {
         return $_GET;
     }
