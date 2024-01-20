@@ -2,6 +2,8 @@
 
 namespace RESTAPI\Core;
 
+use ReflectionException;
+use ReflectionMethod;
 use RESTAPI\Responses\MediaTypeError;
 use RESTAPI\Responses\NotAcceptableError;
 use RESTAPI\Responses\ServerError;
@@ -12,8 +14,7 @@ require_once("RESTAPI/autoloader.inc");
 /**
  * Defines a class that is responsible for decoding request content from remote clients, and encoding response content to
  * be sent to the remote client. Children of this class must correspond with the valid HTTP MIME type this 
- * ContentHandler is designed to interact with. Note: ContentHandlers should not interact with the remote client 
- * directly. That is the Endpoint's job. Only use ContentHandlers to encode and decode content in the associated format.
+ * ContentHandler is designed to interact with.
  * @link MIME-Types https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types.
  */
 class ContentHandler
@@ -29,7 +30,7 @@ class ContentHandler
      * @return mixed The unprocessed content from the remote client.
      * @throws ServerError When this method is called but not overridden by the child class.
      */
-    protected function get_content(): mixed {
+    public function get_content(): mixed {
         throw new ServerError(
             message: "Child ContentHanlder classes must override the get_content() method.",
             response_id: "CONTENT_HANDLER_GET_CONTENT_NOT_OVERRIDDEN"
@@ -61,7 +62,7 @@ class ContentHandler
     final public function encode(mixed $content): mixed {
         $encoded_content = $this->_encode($content);
         header("content-type: $this->mime_type");
-        header("content-length: ".strlen($this->mime_type));
+        header("content-length: ".strlen($encoded_content));
         return $encoded_content;
     }
 
@@ -83,29 +84,33 @@ class ContentHandler
 
     /**
      * Obtains and decodes the content from the format corresponding with this ContentHandler's MIME type.
+     * @param mixed $content The content to be decoded in this ContentHandler's format. If no value is specified,
+     * the content will automatically be populated using the `get_content()` method.
      * @return mixed The content in this ContentHandler's respective format.
      */
-    final public function decode(): mixed {
-        $content = $this->get_content();
+    final public function decode(mixed $content = null): mixed {
+        $content = ($content) ?: $this->get_content();
         return $this->_decode($content);
     }
 
     /**
      * Checks if this ContentHandler object is capable of encoding content.
      * @return bool Returns true if this ContentHandler can encode content, otherwise false.
+     * @throws ReflectionException When the _encode() method is missing entirely.
      */
     final public function can_encode(): bool {
-        $content_handler = get_called_class();
-        return method_exists($content_handler, "_encode");
+        $reflector = new ReflectionMethod($this, '_encode');
+        return ($reflector->getDeclaringClass()->getName() === get_class($this));
     }
 
     /**
      * Checks if this ContentHandler object is capable of decoding content.
      * @return bool Returns true if this ContentHandler can decode content, otherwise false.
+     * @throws ReflectionException When the _decode() method is missing entirely.
      */
     final public function can_decode(): bool {
-        $content_handler = get_called_class();
-        return method_exists($content_handler, "_decode");
+        $reflector = new ReflectionMethod($this, '_decode');
+        return ($reflector->getDeclaringClass()->getName() === get_class($this));
     }
     
     /**

@@ -17,11 +17,10 @@ use RESTAPI\Responses\ServerError;
  * route to its parent Gateway model object. 
  */
 class ForeignModelField extends Field {
+    /**
+     * @var Model $model Contains the Model object of the foreign Model this Field's value relates to.
+     */
     public Model $model;
-    public string $model_name;
-    public array $model_query;
-    public string $model_field;
-    public string $model_field_internal;
 
     /**
      * Defines the ForeignModelField object and sets its options.
@@ -39,6 +38,9 @@ class ForeignModelField extends Field {
      * referenced by this field. For example, say this field's value must be set to an existing FirewallAlias object's
      * `name`, but you only want to allow `port` type aliases; you would set $model_name to `FirewallAlias`, $model_field to
      * `name`, and $model_query to `["type" => "port"]`. Defaults to all existing $model objects.
+     * @param array $parent_model_query When the assigned $model_name class has a parent Model, use this variable to
+     * limit the scope of which parent Model objects can have their child Models included. By default, the child
+     * Models of ALL parent Models are included.
      * @param bool $required If `true`, this field is required to have a value at all times.
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
@@ -90,10 +92,11 @@ class ForeignModelField extends Field {
      * @param string $help_text Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
-        string $model_name,
-        string $model_field,
-        string $model_field_internal = "",
-        array $model_query = [],
+        public string $model_name,
+        public string $model_field,
+        public string $model_field_internal = "",
+        public array $model_query = [],
+        public array $parent_model_query = [],
         bool $required = false,
         bool $unique = false,
         mixed $default = null,
@@ -121,8 +124,6 @@ class ForeignModelField extends Field {
     {
         # Assign properties unique to this Field object
         $model_name = "\\RESTAPI\\Models\\$model_name";
-        $this->model_query = $model_query;
-        $this->model_field = $model_field;
         $this->model_field_internal = ($model_field_internal) ?: $model_field;
         
         # Ensure the properties assigned are allowed and that the assigned $model_name can be constructed
@@ -161,7 +162,7 @@ class ForeignModelField extends Field {
      * Checks that the object to be constructed has no conflicts.
      * @param string $model_name The foreign Model class's FQN. 
      */
-    private function check_construct(string $model_name) {
+    private function check_construct(string $model_name): void {
         # Ensure the assigned $model_name is an existing Model class
         if (!class_exists($model_name)) {
             throw new ServerError(
@@ -226,11 +227,8 @@ class ForeignModelField extends Field {
             $internal_value = $this->model->{$this->model_field_internal}->_from_internal($internal_value);
         }
 
-        # Add the query parameters needed to locate the related Model object
-        $query_params = array_merge($this->model_query, [$this->model_field_internal => $internal_value]);
-
         # Query for the Model object this value relates to.
-        $query_modelset = $this->model->query($query_params);
+        $query_modelset = $this->__get_matches($this->model_field_internal, $internal_value);
         
         # If the model object exists, return the `model_field` value.
         if ($query_modelset->exists()) {
@@ -247,11 +245,8 @@ class ForeignModelField extends Field {
      * @return array|string|null The internal value(s) suitable for writing to the pfSense configuration.
      */
     protected function _to_internal(mixed $representation_value) : array|string|null {
-        # Add the query parameters needed to locate the related Model object
-        $query_params = array_merge($this->model_query, [$this->model_field => $representation_value]);
-
-        # Query for the Model object this value relates to.
-        $query_modelset = $this->model->query($query_params);
+        # Obtain Model objects that matches this field's criteria
+        $query_modelset = $this->__get_matches($this->model_field, $representation_value);
 
         # If the model object exists, return the existing `model_field_internal` value.
         if ($query_modelset->exists()) {
@@ -267,12 +262,9 @@ class ForeignModelField extends Field {
      * @param mixed $value The value being validated. In the event that this is a `many` field, this method will
      * receive each value of the array individually, not the array value itself.
      */
-    public function validate_extra(mixed $value) {
-        # Add the query parameters needed to locate the related Model object
-        $query_params = array_merge($this->model_query, [$this->model_field => $value]);
-
-        # Query for the Model object this value relates to.
-        $query_modelset = $this->model->query($query_params);
+    public function validate_extra(mixed $value): void {
+        # Obtain Models that match this Field's criteria
+        $query_modelset = $this->__get_matches($this->model_field, $value);
         
         # If the model object exists, return the existing `model_field_internal` value.
         if (!$query_modelset->exists()) {
@@ -285,16 +277,54 @@ class ForeignModelField extends Field {
     }
 
     /**
+     * Obtains the ModelSet of Model objects that are in-scope for this field using the $model_query and
+     * $parent_model_query properties.
+     * @return ModelSet A ModelSet of Model objects that are in-scope for this field
+     */
+    public function get_in_scope_models(): ModelSet {
+        # Variables
+        $models = new ModelSet();
+
+        # Obtain the parent Models if the assigned $model has a $parent_model_class assigned to it.
+        if ($this->model->parent_model_class) {
+            $parent_model_class = $this->model->get_parent_model();
+            $parent_model = new $parent_model_class();
+            $parent_models = $parent_model->query($this->parent_model_query);
+
+            # Loop through each identified parent and add its children into the ModelSet
+            foreach ($parent_models->model_objects as $parent) {
+                $parent_children = $this->model->query(parent_id: $parent->id);
+                $models->model_objects = array_merge($models->model_objects, $parent_children->model_objects);
+            }
+        }
+        # Otherwise, just use all of this $model's current objects
+        else {
+            $models = $this->model->read_all();
+        }
+
+        # Query for the Model object this value relates to.
+        return $models->query($this->model_query);
+    }
+
+    /**
+     * Obtains a ModelSet of the Model(s) that match this field's criteria.
+     * @param string $field_name The name of the field used to check for matching values. This is typically set to the
+     * same value as $this->field_name.
+     * @param mixed $field_value The value of the $field_name that indicates there is a match. This is typically set
+     * to the same value as $this->value.
+     */
+    private function __get_matches(string $field_name, mixed $field_value): ModelSet {
+        return $this->get_in_scope_models()->query(query_params: [$field_name => $field_value]);
+    }
+
+    /**
      * Obtains the Model object associated with this field's current value. This is only applicable when this is not
      * a $many enabled field.
      * @returns Model|null Returns the Model object associated with this Field's current value.
      */
     public function get_related_model() : Model|null {
-        # Add the query parameters needed to locate the related Model object
-        $query_params = array_merge($this->model_query, [$this->model_field => $this->value]);
-
-        # Query for the Model object this value relates to.
-        $query_modelset = $this->model->query($query_params);
+        # Get the Model objects that match this field's criteria
+        $query_modelset = $this->__get_matches($this->model_field, $this->value);
 
         # Return the related model object if it exists
         if ($query_modelset->exists()) {
@@ -317,11 +347,8 @@ class ForeignModelField extends Field {
 
         # Loop through each current value and query for model objects that match them
         foreach ($this->value as $value) {
-            # Add the query parameters needed to locate the related Model object
-            $query_params = array_merge($this->model_query, [$this->model_field => $value]);
-
-            # Query for the Model object this value relates to.
-            $query_modelset = $this->model->query($query_params);
+            # Obtain Model objects that match this value
+            $query_modelset = $this->__get_matches($this->model_field, $value);
 
             # Only add the Model object if it exists
             if ($query_modelset->exists()) {

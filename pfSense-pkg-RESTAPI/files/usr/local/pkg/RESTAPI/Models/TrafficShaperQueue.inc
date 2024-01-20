@@ -2,14 +2,14 @@
 
 namespace RESTAPI\Models;
 
-use RESTAPI\Core\Auth;
+require_once("RESTAPI/autoloader.inc");
+
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\FirewallApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\StringField;
-use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\UnprocessableContentError;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\FilterNameValidator;

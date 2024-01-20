@@ -26,7 +26,6 @@ class FirewallRule extends Model
     public PortField $source_port;
     public FilterAddressField $destination;
     public PortField $destination_port;
-    public ForeignModelField $gateway;
     public StringField $descr;
     public BooleanField $disabled;
     public BooleanField $log;
@@ -34,7 +33,10 @@ class FirewallRule extends Model
     public BooleanField $tcp_flags_any;
     public StringField $tcp_flags_out_of;
     public StringField $tcp_flags_set;
+    public ForeignModelField $gateway;
     public ForeignModelField $sched;
+    public ForeignModelField $defaultqueue;
+    public ForeignModelField $ackqueue;
     public BooleanField $floating;
     public BooleanField $quick;
     public StringField $direction;
@@ -121,12 +123,18 @@ class FirewallRule extends Model
             conditions: ["protocol" => ["tcp", "udp", "tcp/udp"]],
             help_text: "The destination port this rule applies to. Set to `null` to allow any destination port."
         );
-        $this->gateway = new ForeignModelField(
-            model_name: "RoutingGateway",
-            model_field: "name",
-            default: null,
-            allow_null: true,
-            help_text: "The gateway traffic matching this rule will be routed to. Set to `null` to use default."
+        $this->descr = new StringField(
+            default: "",
+            allow_empty: true,
+            help_text: "A description detailing the purpose or justification of this firewall rule."
+        );
+        $this->disabled = new BooleanField(
+            default: false,
+            help_text: "Enable or disable this firewall rule."
+        );
+        $this->log = new BooleanField(
+            default: false,
+            help_text: "Enable or disable logging of traffic that matches this rule."
         );
         $this->statetype = new StringField(
             default: "keep state",
@@ -156,18 +164,35 @@ class FirewallRule extends Model
             conditions: ["tcp_flags_any" => false],
             help_text: "The TCP flags that must be set for this rule to match."
         );
-        $this->descr = new StringField(
-            default: "",
-            allow_empty: true,
-            help_text: "A description detailing the purpose or justification of this firewall rule."
+        $this->gateway = new ForeignModelField(
+            model_name: "RoutingGateway",
+            model_field: "name",
+            default: null,
+            allow_null: true,
+            help_text: "The gateway traffic matching this rule will be routed to. Set to `null` to use default."
         );
-        $this->disabled = new BooleanField(
-            default: false,
-            help_text: "Enable or disable this firewall rule."
+        $this->sched = new ForeignModelField(
+            model_name: "FirewallSchedule",
+            model_field: "name",
+            default: null,
+            allow_null: true,
+            help_text: "The name of an existing firewall schedule to assign to this firewall rule."
         );
-        $this->log = new BooleanField(
-            default: false,
-            help_text: "Enable or disable logging of traffic that matches this rule."
+        $this->defaultqueue = new ForeignModelField(
+            model_name: "TrafficShaperQueue",
+            model_field: "name",
+            default: null,
+            allow_null: true,
+            help_text: "The name of the traffic shaper queue to assume as the default queue for traffic matching ".
+                "this rule."
+        );
+        $this->ackqueue = new ForeignModelField(
+            model_name: "TrafficShaperQueue",
+            model_field: "name",
+            default: null,
+            allow_null: true,
+            help_text: "The name of the traffic shaper queue to assume as the ACK queue for ACK traffic matching ".
+                "this rule."
         );
         $this->floating = new BooleanField(
             default: false,
@@ -225,13 +250,6 @@ class FirewallRule extends Model
             internal_name: "username",
             internal_namespace: "updated",
             help_text: "The username and IP of the user who last updated this firewall rule."
-        );
-        $this->sched = new ForeignModelField(
-            model_name: "FirewallSchedule",
-            model_field: "name",
-            default: null,
-            allow_null: true,
-            help_text: "The name of an existing firewall schedule to assign to this firewall rule."
         );
         # TODO: Add ForeignModelField for `dnpipe` when the traffic shaper Models are developed
         # TODO: Add ForeignModelField for `pdnpipe` when the traffic shaper Models are developed
@@ -299,6 +317,33 @@ class FirewallRule extends Model
         }
 
         return $tcp_flags_set;
+    }
+
+    /**
+     * Adds extra validation to the `ackqueue` field.
+     * @param string $ackqueue The incoming value to be validated.
+     * @return string The value to be assigned.
+     * @throws ValidationError When both the `ackqueue` and `defaultqueue` are the same.
+     * @throws ValidationError When `ackqueue` is defined but `defaultqueue` is not.
+     */
+    public function validate_ackqueue(string $ackqueue): string {
+        # Throw an error if ackqueue is defined, but defaultqueue is not
+        if ($ackqueue and !$this->defaultqueue->value) {
+            throw new ValidationError(
+                message: "Field `ackqueue` cannot be defined without `defaultqueue`.",
+                response_id: "FIREWALL_RULE_ACKQUEUE_WITHOUT_DEFAULTQUEUE"
+            );
+        }
+        
+        # Throw an error if the defaultqueue and ackqueue are the same
+        if ($ackqueue === $this->defaultqueue->value) {
+            throw new ValidationError(
+                message: "Field `ackqueue` cannot match the value of `defaultqueue`.",
+                response_id: "FIREWALL_RULE_ACKQUEUE_MATCHES_DEFAULTQUEUE"
+            );
+        }
+        
+        return $ackqueue;
     }
 
     /**

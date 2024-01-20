@@ -2,10 +2,12 @@
 
 namespace RESTAPI\Tests;
 
+use RESTAPI\Core\Command;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\FirewallRule;
 use RESTAPI\Models\FirewallSchedule;
 use RESTAPI\Models\RoutingGateway;
+use RESTAPI\Models\TrafficShaper;
 
 class APIModelsFirewallRuleTestCase extends TestCase
 {
@@ -470,5 +472,143 @@ class APIModelsFirewallRuleTestCase extends TestCase
         # Delete the rule and schedule
         $rule->delete();
         $sched->delete();
+    }
+    
+    /**
+     * Checks that the `defaultqueue` field is correctly shown in pfctl after creation, modification and deletion
+     */
+    public function test_defaultqueue_found_in_pfctl(): void {
+        # Create TrafficShapers to test with
+        $shaper1 = new TrafficShaper(
+            interface: "lan",
+            scheduler: "FAIRQ",
+            bandwidth: 100,
+            bandwidthtype: "Mb",
+            queue: [
+                [
+                    "name" => "TestQueue1", 
+                    "qlimit" => 50, 
+                    "priority" => 1,
+                    "bandwidth" => 50, 
+                    "bandwidthtype" => "Mb",
+                    "default" => true
+                ],
+                [
+                    "name" => "TestQueue2",
+                    "qlimit" => 50,
+                    "priority" => 2,
+                    "bandwidth" => 50,
+                    "bandwidthtype" => "Mb",
+                    "red" => true
+                ]
+            ]
+        );
+        $shaper1->create(apply: true);
+        
+        # Create a firewall rule that references a traffic shaper queue
+        $rule = new FirewallRule(
+            interface: ["lan"],
+            type: "pass",
+            ipprotocol: "inet",
+            source: "any",
+            destination: "any",
+            defaultqueue: "TestQueue1",
+            async: false
+        );
+        $rule->create(apply: true);
+        
+        # Ensure the rule with the queue is seen in pfctl
+        $pfctl = new Command("pfctl -sr");
+        $this->assert_str_contains($pfctl->output, "ridentifier ".$rule->tracker->value." queue TestQueue1");
+        
+        # Update the rule to use a different queue and ensure it is seen in pfctl
+        $rule->defaultqueue->value = "TestQueue2";
+        $rule->update(apply: true);
+        $pfctl = new Command("pfctl -sr");
+        $this->assert_str_contains($pfctl->output, "ridentifier ".$rule->tracker->value." queue TestQueue2");
+        
+        # Delete the rule and ensure the rule referencing the queue no longer exists
+        $rule->delete();
+        $shaper1->delete();
+        $rule->apply();
+        $pfctl = new Command("pfctl -sr");
+        $this->assert_str_does_not_contain($pfctl->output, "ridentifier ".$rule->tracker->value." queue TestQueue1");
+        $this->assert_str_does_not_contain($pfctl->output, "ridentifier ".$rule->tracker->value." queue TestQueue2");
+    }
+
+    /**
+     * Checks that the `ackqueue` field is correctly shown in pfctl after creation, modification and deletion
+     */
+    public function test_ackqueue_found_in_pfctl(): void {
+        # Create TrafficShapers to test with
+        $shaper1 = new TrafficShaper(
+            interface: "lan",
+            scheduler: "FAIRQ",
+            bandwidth: 100,
+            bandwidthtype: "Mb",
+            queue: [
+                [
+                    "name" => "TestQueue1",
+                    "qlimit" => 50,
+                    "priority" => 1,
+                    "bandwidth" => 50,
+                    "bandwidthtype" => "Mb",
+                    "default" => true
+                ],
+                [
+                    "name" => "TestQueue2",
+                    "qlimit" => 50,
+                    "priority" => 2,
+                    "bandwidth" => 50,
+                    "bandwidthtype" => "Mb",
+                    "red" => true
+                ]
+            ]
+        );
+        $shaper1->create(apply: true);
+
+        # Create a firewall rule that references a traffic shaper queue
+        $rule = new FirewallRule(
+            interface: ["lan"],
+            type: "pass",
+            ipprotocol: "inet",
+            source: "any",
+            destination: "any",
+            defaultqueue: "TestQueue1",
+            ackqueue: "TestQueue2",
+            async: false
+        );
+        $rule->create(apply: true);
+
+        # Ensure the rule with the queue is seen in pfctl
+        $pfctl = new Command("pfctl -sr");
+        $this->assert_str_contains(
+            $pfctl->output, 
+            "ridentifier ".$rule->tracker->value." queue(TestQueue1, TestQueue2)"
+        );
+
+        # Update the rule to use a different queue and ensure it is seen in pfctl
+        $rule->defaultqueue->value = "TestQueue2";
+        $rule->ackqueue->value = "TestQueue1";
+        $rule->update(apply: true);
+        $pfctl = new Command("pfctl -sr");
+        $this->assert_str_contains(
+            $pfctl->output,
+            "ridentifier ".$rule->tracker->value." queue(TestQueue2, TestQueue1)"
+        );
+
+        # Delete the rule and ensure the rule referencing the queue no longer exists
+        $rule->delete();
+        $shaper1->delete();
+        $rule->apply();
+        $pfctl = new Command("pfctl -sr");
+        $this->assert_str_does_not_contain(
+            $pfctl->output,
+            "ridentifier ".$rule->tracker->value." queue(TestQueue1, TestQueue2)"
+        );
+        $this->assert_str_does_not_contain(
+            $pfctl->output,
+            "ridentifier ".$rule->tracker->value." queue(TestQueue2, TestQueue1)"
+        );
     }
 }

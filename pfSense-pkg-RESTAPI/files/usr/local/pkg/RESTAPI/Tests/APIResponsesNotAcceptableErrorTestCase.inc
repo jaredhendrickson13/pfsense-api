@@ -5,7 +5,7 @@ namespace RESTAPI\Tests;
 require_once("RESTAPI/autoloader.inc");
 
 use RESTAPI\Core\TestCase;
-use RESTAPI\Responses\NotFoundError;
+use RESTAPI\Responses\NotAcceptableError;
 
 class APIResponsesNotAcceptableErrorTestCase extends TestCase
 {
@@ -17,7 +17,7 @@ class APIResponsesNotAcceptableErrorTestCase extends TestCase
             response_id: "TEST_ERROR",
             code: 406,
             callable: function () {
-                throw new NotFoundError(
+                throw new NotAcceptableError(
                     message: "test error",
                     response_id: "TEST_ERROR");
             }

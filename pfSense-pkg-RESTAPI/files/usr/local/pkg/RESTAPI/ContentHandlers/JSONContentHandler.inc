@@ -10,7 +10,7 @@ class JSONContentHandler extends ContentHandler
 {
     public string $mime_type = "application/json";
 
-    protected function get_content(): string
+    public function get_content(): string
     {
         return (file_get_contents('php://input')) ?: "";
     }
