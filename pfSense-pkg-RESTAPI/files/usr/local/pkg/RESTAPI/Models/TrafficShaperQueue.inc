@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Models;
 
-require_once("RESTAPI/autolaoder.inc");
+require_once("RESTAPI/autoloader.inc");
 
 use RESTAPI\Core\Model;
 use RESTAPI\Dispatchers\FirewallApplyDispatcher;
