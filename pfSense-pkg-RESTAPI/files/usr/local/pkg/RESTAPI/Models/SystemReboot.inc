@@ -3,10 +3,10 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
-use RESTAPI\Dispatchers\SystemHaltDispatcher;
+use RESTAPI\Dispatchers\SystemRebootDispatcher;
 use RESTAPI\Fields\BooleanField;
 
-class SystemHalt extends Model
+class SystemReboot extends Model
 {
     public BooleanField $dry_run;
 
@@ -19,7 +19,7 @@ class SystemHalt extends Model
         $this->dry_run = new BooleanField(
             default: false,
             write_only: true,
-            help_text: "Run through the call but don't actually initiate a shutdown."
+            help_text: "Run through the call but don't actually initiate a reboot."
         );
 
         parent::__construct(...$options, data: $data);
@@ -33,13 +33,13 @@ class SystemHalt extends Model
     }
 
     /**
-     * Defines the steps necessary to initiate a shutdown.
+     * Defines the steps necessary to initiate a reboot.
      */
     public function _create(): void
     {
-        # Only initiate the shutdown if this is not a dry run
+        # Only initiate the reboot if this is not a dry run
         if (!$this->dry_run->value) {
-            (new SystemHaltDispatcher($this->async))->spawn_process();
+            (new SystemRebootDispatcher($this->async))->spawn_process();
         }
     }
 }
