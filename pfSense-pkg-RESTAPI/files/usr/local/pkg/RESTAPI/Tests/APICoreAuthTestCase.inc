@@ -282,7 +282,7 @@ class APICoreAuthTestCase extends TestCase
                 $key = new RESTAPIKey();
                 $key->client->username = "admin";
                 $key->create();
-                $_SERVER["HTTP_AUTHORIZATION"] = "key ".$key->key->value;
+                $_SERVER["HTTP_AUTHORIZATION"] = "KeyAuth ".$key->key->value;
                 Auth::attempt_multi_auth(auth_classes: ["BasicAuth", "JWTAuth", "KeyAuth"]);
 
                 # Delete the API key
