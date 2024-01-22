@@ -28,6 +28,7 @@ use RESTAPI\Responses\MethodNotAllowedError;
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\Success;
 use RESTAPI\Responses\ValidationError;
+use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 /**
  * Represents an API Endpoint, encapsulating attributes essential for generating the API endpoint
@@ -259,6 +260,11 @@ class Endpoint {
 
         # Set default endpoint privileges
         $this->get_default_privs();
+
+        # Assume this endpoint supports all available authentication methods if not specified
+        if (!$this->auth_methods) {
+            $this->auth_methods = get_classes_from_namespace(namespace: "\\RESTAPI\\Auth\\", shortnames: true);
+        }
     }
 
     /**

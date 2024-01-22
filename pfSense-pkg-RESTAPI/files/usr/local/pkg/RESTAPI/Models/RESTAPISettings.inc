@@ -13,6 +13,7 @@ use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Validators\IPAddressValidator;
+use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 # Constants
 const API_SETTINGS_BACKUP_FILE_PATH = "/usr/local/share/pfSense-pkg-RESTAPI/backup.json";
@@ -124,7 +125,7 @@ class RESTAPISettings extends Model {
         );
         $this->auth_methods = new StringField(
             default: "BasicAuth",
-            choices: ["BasicAuth" => "Local database", "JWTAuth" => "JWT", "KeyAuth" => "API key"],
+            choices_callable: "get_auth_methods_choices",
             many: true,
             many_minimum: 1,
             verbose_name: "authentication methods",
@@ -184,6 +185,14 @@ class RESTAPISettings extends Model {
         );
 
         parent::__construct(...$options, data: $data);
+    }
+
+    /**
+     * Obtains the choices for the `auth_methods` field. This will dynamically populate a choice for each Auth class
+     * in the \RESTAPI\Auth\ namespace.
+     */
+    public function get_auth_methods_choices(): array {
+        return get_classes_from_namespace(namespace: "\\RESTAPI\\Auth\\", shortnames: true);
     }
 
     /**

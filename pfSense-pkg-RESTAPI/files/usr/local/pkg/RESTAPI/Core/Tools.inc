@@ -139,9 +139,10 @@ function http_request(
  * a matching name.
  * @param string $namespace The namespace to obtain classes from. This must be the full namespace including leading
  * and trailing slash (\Full\Namespace\).
+ * @param bool $shortnames Obtain the class shortnames instead of FQNs.
  * @return array An array containing the class names for each .inc class file.
  */
-function get_classes_from_namespace(string $namespace) : array {
+function get_classes_from_namespace(string $namespace, bool $shortnames = false) : array {
     # Variables
     $classes = [];
     $namespace_path = str_replace(["\\", "//"], "/", "/usr/local/pkg/".$namespace);
@@ -149,7 +150,8 @@ function get_classes_from_namespace(string $namespace) : array {
     foreach(glob($namespace_path."*.inc") as $inc_file) {
         # Obtain the class name from the file name
         $class_name = basename($inc_file);
-        $classes[] = str_replace(".inc", "", $namespace.$class_name);
+        $class_name = str_replace(".inc", "", $class_name);
+        $classes[] = ($shortnames) ? $class_name : $namespace.$class_name;
     }
 
     return $classes;
@@ -162,6 +164,7 @@ function generate_documentation(): bool {
     # Variables
     $endpoint_classes = get_classes_from_namespace("\\RESTAPI\\Endpoints\\");
     $response_classes = get_classes_from_namespace("\\RESTAPI\\Responses\\");
+    $auth_classes = get_classes_from_namespace("\\RESTAPI\\Auth\\", shortnames: true);
     $assigned_tags = [];
     
     # Set static openapi details
@@ -192,14 +195,15 @@ function generate_documentation(): bool {
                 "KeyAuth" => ["type" => "apiKey", "in" => "header", "name" => "Authorization"]
             ]
         ],
-        "security" => [
-            ["BasicAuth" => []],
-            ["JWTAuth" => []],
-            ["KeyAuth" => []],
-        ],
+        "security" => [],
         "paths" => [],
         "tags" => []
     ];
+
+    # Add security definitions for each Auth class
+    foreach ($auth_classes as $auth_class) {
+        $openapi_config["security"][] = [$auth_class => []];
+    }
 
     # Add Response components for each Response class in RESTAPI\Responses
     foreach($response_classes as $response_class) {
@@ -267,9 +271,11 @@ function generate_documentation(): bool {
 
             # Ensure the security mode is enforced for this path if the Endpoint has `auth_methods` set
             if ($endpoint->auth_methods) {
-                $openapi_config["paths"][$endpoint->url][$request_method]["security"] = [
-                    [$endpoint->auth_methods => []]
-                ];
+                foreach ($endpoint->auth_methods as $auth_method) {
+                    $openapi_config["paths"][$endpoint->url][$request_method]["security"] = [
+                        [$auth_method => []]
+                    ];
+                }
             }
 
             # Assign request body definitions for POST, PUT and PATCH requests
