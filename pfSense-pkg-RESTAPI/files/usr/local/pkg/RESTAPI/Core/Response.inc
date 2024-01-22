@@ -20,6 +20,7 @@ require_once("RESTAPI/autoloader.inc");
 use Error;
 use ReflectionClass;
 use RESTAPI\Models\RESTAPISettings;
+use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 const HTTP_STATUS_MESSAGES = [
     100 => "continue",
@@ -162,18 +163,32 @@ class Response extends Error {
     }
 
     /**
-     * Represents this Response object as an OpenAPI response component.
+     * Represents this Response object as an OpenAPI response component. This component details which content-types
+     * are allowed by the Accept header.
      * @return array This Response object as an OpenAPI response component
      */
     final public function to_openapi_component() : array {
-        return [
-            "description" => $this->help_text,
-            "content" => [
-                "application/json" => [
+        # Variables
+        $component = ["description" => $this->help_text, "content" => []];
+        $content_handler_classes = get_classes_from_namespace("\\RESTAPI\\ContentHandlers\\");
+        
+        # Default to application/json
+        $component["content"]["application/json"] = ["schema" => ['$ref' => '#/components/schemas/Response']];
+        
+        # Populate a component content schema for each ContentHandler that can encode content
+        foreach ($content_handler_classes as $content_handler_class) {
+            # Create the content handler object
+            $content_handler = new $content_handler_class();
+            
+            # Only include this content if it can encode responses
+            if ($content_handler->can_encode()) {
+                $component["content"][$content_handler->mime_type] = [
                     "schema" => ['$ref' => '#/components/schemas/Response']
-                ]
-            ]
-        ];
+                ];
+            }
+        }
+        
+        return $component;
     }
 
     /**
