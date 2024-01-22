@@ -19,7 +19,7 @@
             <allow_pre_releases>disabled</allow_pre_releases>
             <allowed_interfaces></allowed_interfaces>
             <represent_interfaces_as>id</represent_interfaces_as>
-            <auth_methods>local</auth_methods>
+            <auth_methods>BasicAuth</auth_methods>
             <ha_sync>disabled</ha_sync>
             <ha_sync_hosts></ha_sync_hosts>
             <ha_sync_username></ha_sync_username>
