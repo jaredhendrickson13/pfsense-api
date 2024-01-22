@@ -25,7 +25,7 @@ class SystemRESTAPISettings extends Form {
             "Fields" => [
                 "allowed_interfaces",
                 "read_only",
-                "auth_mode",
+                "auth_methods",
                 "jwt_exp",
                 "login_protection",
                 "log_successful_auth",

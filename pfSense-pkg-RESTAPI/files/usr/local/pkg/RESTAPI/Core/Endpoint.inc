@@ -121,21 +121,21 @@ class Endpoint {
     public bool $requires_auth = true;
 
     /**
-     * @var string $enforce_auth_mode
-     * Explicitly specify an API authentication mode clients MUST use when making
+     * @var array $auth_methods
+     * Explicitly specify the API authentication methods clients can use when making
      * requests to this Endpoint. Leave blank to use the authentication mode specified
      * in the API settings.
      */
-    public string $enforce_auth_mode = "";
+    public array $auth_methods = [];
 
     /**
-     * @var bool $ignore_read_mode
+     * @var bool $ignore_read_only
      * Allow this Endpoint to ignore the current `read_only` API setting. By default,
      * when the `read_only` API setting is enabled, Endpoints are only allowed to
      * respond to GET requests. Setting this value to `true` will allow requests using
      * any HTTP method even if `read_only` is enabled.
      */
-    public bool $ignore_read_mode = false;
+    public bool $ignore_read_only = false;
 
     /**
      * @var bool $ignore_interfaces
@@ -309,7 +309,7 @@ class Endpoint {
     /**
      * Determines the appropriate default help text for each method according to the assigned Model and Endpoint properties.
      */
-    private function set_default_help_text() {
+    private function set_default_help_text(): void {
         # Variables
         $model_verbose_name = $this->model->verbose_name;
         $model_verbose_name_plural = $this->model->verbose_name_plural;
@@ -333,25 +333,6 @@ class Endpoint {
             $this->patch_help_text = ($this->patch_help_text) ?: "Updates current $model_verbose_name_plural.";
             $this->delete_help_text = ($this->delete_help_text) ?: "Deletes current $model_verbose_name_plural.";
         }
-    }
-
-    /**
-     * Obtains the API key or JWT as a bearer token from the client.
-     * @returns String A string containing the API token or the JWT from the client.
-     */
-    private function get_bearer_token() : string {
-        # Obtain the API key or JWT from the authorization header.
-        $auth_header = explode(" ", $_SERVER["HTTP_AUTHORIZATION"]);
-        $token_type = strtolower($auth_header[0]);
-        $secret = ($auth_header[1]) ?: "";
-
-        # Ensure this API key or JWT was passed in as a bearer token
-        if ($token_type === "bearer") {
-            return $secret;
-        }
-
-        # Return an empty string if there were any problems obtaining the secret
-        return "";
     }
 
     /**
@@ -426,24 +407,14 @@ class Endpoint {
      */
     private function get_required_privs() : array {
         # Determine the privileges required for this API call
-        if ($this->request_method === "GET") {
-            return $this->get_privileges;
-        }
-        elseif ($this->request_method === "POST") {
-            return $this->post_privileges;
-        }
-        elseif ($this->request_method === "PUT") {
-            return $this->put_privileges;
-        }
-        elseif ($this->request_method === "PATCH") {
-            return $this->patch_privileges;
-        }
-        elseif ($this->request_method === "DELETE") {
-            return $this->delete_privileges;
-        }
-        else {
-            return [];
-        }
+        return match ($this->request_method) {
+            "GET" => $this->get_privileges,
+            "POST" => $this->post_privileges,
+            "PUT" => $this->put_privileges,
+            "PATCH" => $this->patch_privileges,
+            "DELETE" => $this->delete_privileges,
+            default => [],
+        };
     }
 
     /**
@@ -469,53 +440,21 @@ class Endpoint {
     }
 
     /**
-     * Checks if the API client is authenticated and authorized to make this call.
+     * Checks if authentication and authorization for this Endpoint is successful. This will attempt authentication
+     * and authorization for each allowed auth method. Only one auth method needs to succeed to allow access.
      */
-    private function check_auth() {
-        # Variables
-        $read_only = ($this->api_config["read_only"] === "enabled" and !$this->ignore_read_mode);
-        $this->client = new Auth($this->get_required_privs(), $this->enforce_auth_mode, $read_only);
-
-        # Obtain the auth credentials from client according to the current API auth mode
-        switch ($this->client->mode) {
-            case "local":
-                $this->client->username = ($_SERVER["PHP_AUTH_USER"]) ?: "";
-                $secret = ($_SERVER["PHP_AUTH_PW"]) ?: "";
-                break;
-            case "jwt":
-                $secret = $this->get_bearer_token();
-                break;
-            case "key":
-                $secret = ($_SERVER["HTTP_AUTHORIZATION"]) ?: "";
-                break;
-            default:
-                throw new ServerError(
-                    message: "Unknown authentication mode configured.",
-                    response_id: "ENDPOINT_WITH_UNKNOWN_AUTH_MODE"
-                );
-        }
-
-        # Only proceed if authentication is required for this endpoint and this is not an OPTIONS request
-        if ($this->requires_auth === true and $this->request_method !== "OPTIONS") {
-            if (!$this->client->authenticate(secret: $secret, username: $this->client->username)) {
-                throw new AuthenticationError(
-                    message: "Authentication failed",
-                    response_id: "INVALID_AUTH"
-                );
-            }
-            if (!$this->client->authorize()) {
-                throw new ForbiddenError(
-                    message: "Client does not have sufficient privileges to access this resource.",
-                    response_id: "INSUFFICIENT_PRIVILEGES"
-                );
-            }
-        }
+    private function check_auth(): void {
+        # Attempt to authenticate the remote client
+        $this->client = Auth::attempt_multi_auth(
+            auth_classes: $this->auth_methods,
+            required_privileges: $this->get_required_privs()
+        );
     }
 
     /**
      * Checks if the API is enabled before allowing the call.
      */
-    private function check_enabled() {
+    private function check_enabled(): void {
         if (!$this->api_config["enabled"] == "enabled" and !$this->ignore_enabled) {
             header("Location: /");
             exit();
@@ -525,7 +464,7 @@ class Endpoint {
     /**
      * Checks if the interface receiving the API call is allowed to answer API calls.
      */
-    private function check_server_ip() {
+    private function check_server_ip(): void {
         # Variables
         $allow_ifs = $this->api_config["allowed_interfaces"];
         $whitelist = explode(",", $allow_ifs);
@@ -563,11 +502,26 @@ class Endpoint {
      * Check if the HTTP method requested by the API client is supported by this view.
      */
     private function check_request_method(): void {
+        # Always allow OPTIONS requests
+        if ($this->request_method === "OPTIONS") {
+            return;
+        }
+
         # Check if the requested HTTP method is a supported HTTP method.
-        if (!in_array($this->request_method, $this->request_method_options) and $this->request_method !== "OPTIONS") {
+        if (!in_array($this->request_method, $this->request_method_options)) {
             throw new MethodNotAllowedError(
                 message: "Resource at $this->url does not support the requested HTTP method '$this->request_method'",
                 response_id: "METHOD_NOT_ALLOWED"
+            );
+        }
+
+        # Throw an error if the API is currently in read mode and this is not a GET or OPTIONS request
+        $read_only = ($this->api_config["read_only"] === "enabled" and !$this->ignore_read_only);
+        if ($read_only and $this->request_method !== "GET") {
+            throw new MethodNotAllowedError(
+                message: "Resource at $this->url cannot support the requested HTTP method `$this->request_method` ".
+                    "because the REST API is currently in read-only mode.",
+                response_id: "ENDPOINT_METHOD_NOT_ALLOWED_IN_READ_ONLY_MODE"
             );
         }
     }
@@ -576,7 +530,7 @@ class Endpoint {
      * Checks if the API client's request data was successfully received and parsed by the API. This method populates
      * the $this->request_data property according to the client's requested content-type.
      */
-    private function check_request_data() {
+    private function check_request_data(): void {
         # Variables
         $content_type = $_SERVER["HTTP_CONTENT_TYPE"];
 
@@ -591,7 +545,14 @@ class Endpoint {
         # Locate the ContentHandler associated with this content type and obtain our decoded content from the client
         $content_handler = ContentHandler::get_decode_handler($content_type);
         $this->request_data = $content_handler->decode();
+        $this->validate_endpoint_fields();
+    }
 
+    /**
+     * Performs validation on non-Model fields. These fields control how Models are initially obtained/constructed.
+     * @throws ValidationError When one or more Endpoint releated fields fail validation.
+     */
+    private function validate_endpoint_fields(): void {
         # Ensure the special async, limit and offset parameters are of the correct type
         if (!isset($this->request_data["async"])) {
             $this->request_data["async"] = true;

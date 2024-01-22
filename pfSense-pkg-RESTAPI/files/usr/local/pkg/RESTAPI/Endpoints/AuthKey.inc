@@ -12,7 +12,7 @@ class AuthKey extends Endpoint
         # Set Endpoint attributes
         $this->url = "/api/v2/auth/key";
         $this->model_name = "RESTAPIKey";
-        $this->enforce_auth_mode = "local";
+        $this->auth_methods = ["BasicAuth"];
         $this->request_method_options = ["POST", "DELETE"];
 
         # Construct the parent Endpoint object

@@ -17,8 +17,8 @@ class SystemRESTAPISettingsSync extends Endpoint
         # Ensure the primary HA node can always sync to HA peers, regardless of its current settings
         $this->ignore_enabled = true;
         $this->ignore_interfaces = true;
-        $this->ignore_read_mode = true;
-        $this->enforce_auth_mode = "local";
+        $this->ignore_read_only = true;
+        $this->auth_methods = ["BasicAuth"];
 
         # Construct the parent Endpoint object
         parent::__construct();

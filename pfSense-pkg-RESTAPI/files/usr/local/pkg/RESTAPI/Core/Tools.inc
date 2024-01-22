@@ -187,15 +187,15 @@ function generate_documentation(): bool {
             "responses" => [],
             "schemas" => ["Response" => Response::to_openapi_schema()],
             "securitySchemes" => [
-                "local" => ["type" => "http", "scheme" => "basic"],
-                "jwt" => ["type" => "http", "scheme" => "bearer", "bearerFormat" => "JWT"],
-                "key" => ["type" => "apiKey", "in" => "header", "name" => "Authorization"]
+                "BasicAuth" => ["type" => "http", "scheme" => "basic"],
+                "JWTAuth" => ["type" => "http", "scheme" => "bearer", "bearerFormat" => "JWT"],
+                "KeyAuth" => ["type" => "apiKey", "in" => "header", "name" => "Authorization"]
             ]
         ],
         "security" => [
-            ["local" => []],
-            ["jwt" => []],
-            ["key" => []],
+            ["BasicAuth" => []],
+            ["JWTAuth" => []],
+            ["KeyAuth" => []],
         ],
         "paths" => [],
         "tags" => []
@@ -245,7 +245,7 @@ function generate_documentation(): bool {
             $priv_options_str = implode(", ", $endpoint->$privilege_property);
             $required_packages_str = ($model->packages) ? implode(", ", $model->packages) : "None";
             $requires_auth_str = ($endpoint->requires_auth) ? "Yes" : "No";
-            $auth_modes_str = ($endpoint->enforce_auth_mode) ? "$endpoint->enforce_auth_mode" : "local, jwt, key";
+            $auth_method_str = implode(", ", $endpoint->auth_methods);
 
             # Add openapi for all requests at this path
             $openapi_config["paths"][$endpoint->url][$request_method] = [
@@ -257,7 +257,7 @@ function generate_documentation(): bool {
                     "**Assigned model**: $endpoint->model_name<br>".
                     "**Parent model**: $parent_model_class<br>".
                     "**Requires authentication**: $requires_auth_str<br>".
-                    "**Supported authentication modes:** [ $auth_modes_str ]<br>".
+                    "**Supported authentication modes:** [ $auth_method_str ]<br>".
                     "**Allowed privileges**: [ $priv_options_str ]<br>".
                     "**Requires packages**: [ $required_packages_str ]"
             ];
@@ -265,10 +265,10 @@ function generate_documentation(): bool {
             # Nest this endpoint under its assigned or assumed tag
             $openapi_config["paths"][$endpoint->url][$request_method]["tags"] = [$endpoint->tag];
 
-            # Ensure the security mode is enforced for this path if the Endpoint has `enforce_auth_mode` set
-            if ($endpoint->enforce_auth_mode) {
+            # Ensure the security mode is enforced for this path if the Endpoint has `auth_methods` set
+            if ($endpoint->auth_methods) {
                 $openapi_config["paths"][$endpoint->url][$request_method]["security"] = [
-                    [$endpoint->enforce_auth_mode => []]
+                    [$endpoint->auth_methods => []]
                 ];
             }
 

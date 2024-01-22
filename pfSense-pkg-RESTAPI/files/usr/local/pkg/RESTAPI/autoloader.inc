@@ -36,6 +36,7 @@ const RESTAPI_LIBRARIES = [
     "/usr/local/pkg/RESTAPI/Fields/",
     "/usr/local/pkg/RESTAPI/Models/",
     "/usr/local/pkg/RESTAPI/ContentHandlers/",
+    "/usr/local/pkg/RESTAPI/Auth",
     "/usr/local/pkg/RESTAPI/Endpoints/",
     "/usr/local/pkg/RESTAPI/Forms/",
     "/usr/local/pkg/RESTAPI/Tests/",

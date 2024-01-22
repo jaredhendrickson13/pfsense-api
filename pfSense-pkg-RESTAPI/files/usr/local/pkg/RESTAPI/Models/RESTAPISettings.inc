@@ -32,7 +32,7 @@ class RESTAPISettings extends Model {
     public BooleanField $hateoas;
     public InterfaceField $allowed_interfaces;
     public StringField $represent_interfaces_as;
-    public StringField $auth_mode;
+    public StringField $auth_methods;
     public IntegerField $jwt_exp;
     public BooleanField $ha_sync;
     public BooleanField $ha_sync_validate_certs;
@@ -122,19 +122,20 @@ class RESTAPISettings extends Model {
             internal pfSense ID (e.g. wan, lan, opt1), or use `if` to represent interface objects by their
             real interface name (e.g. em0, igb1, bxe3)."
         );
-        $this->auth_mode = new StringField(
-            default: "local",
-            choices: ["local" => "Local database", "jwt" => "JWT", "key" => "API key"],
-            verbose_name: "authentication mode",
-            help_text: "Sets the API authentication mode required to authenticate API calls."
+        $this->auth_methods = new StringField(
+            default: "BasicAuth",
+            choices: ["BasicAuth" => "Local database", "JWTAuth" => "JWT", "KeyAuth" => "API key"],
+            many: true,
+            many_minimum: 1,
+            verbose_name: "authentication methods",
+            help_text: "Sets the API authentication methods allowed to authenticate API calls."
         );
         $this->jwt_exp = new IntegerField(
             default: 3600,
             minimum: 300,
             maximum: 86400,
             verbose_name: "JWT expiration",
-            help_text: "Sets the amount of time (in seconds) JWTs are valid for. This field is only applicable when
-            `auth_mode` is set to `jwt`."
+            help_text: "Sets the amount of time (in seconds) JWTs are valid for."
         );
         $this->ha_sync = new BooleanField(
             default: false,

@@ -303,28 +303,28 @@ class APIModelsAPISettingsTestCase extends TestCase
     }
 
     /**
-     * Checks that validation on the `auth_mode` field works as intended.
+     * Checks that validation on the `auth_methods` field works as intended.
      */
-    public function test_auth_mode() {
+    public function test_auth_methods(): void {
         # Ensure value must be a string
         $this->assert_throws_response(
             "FIELD_INVALID_TYPE",
             code: 400,
             callable: function () {
                 $api_settings = new RESTAPISettings(
-                    data: ["auth_mode" => 0]
+                    auth_methods: [0]
                 );
                 $api_settings->validate();
             }
         );
 
-        # Ensure values must be either `local`, `jwt`, or `key`
+        # Ensure values must be an existing Auth class
         $this->assert_throws_response(
             "FIELD_INVALID_CHOICE",
             code: 400,
             callable: function () {
                 $api_settings = new RESTAPISettings(
-                    data: ["auth_mode" => "not a valid choice"]
+                    auth_methods: ["not_a_valid_choice"]
                 );
                 $api_settings->validate();
             }
@@ -333,11 +333,7 @@ class APIModelsAPISettingsTestCase extends TestCase
         # Ensure valid values are accepted
         $this->assert_does_not_throw(
             callable: function () {
-                $api_settings = new RESTAPISettings(data: ["auth_mode" => "local"]);
-                $api_settings->validate();
-                $api_settings = new RESTAPISettings(data: ["auth_mode" => "jwt"]);
-                $api_settings->validate();
-                $api_settings = new RESTAPISettings(data: ["auth_mode" => "key"]);
+                $api_settings = new RESTAPISettings(auth_methods: ["BasicAuth", "KeyAuth", "JWTAuth"]);
                 $api_settings->validate();
             }
         );

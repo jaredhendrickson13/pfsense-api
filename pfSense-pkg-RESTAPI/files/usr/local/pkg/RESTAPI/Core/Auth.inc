@@ -18,38 +18,63 @@ namespace RESTAPI\Core;
 require_once("RESTAPI/autoloader.inc");
 
 use RESTAPI;
+use RESTAPI\Auth\BasicAuth;
 use RESTAPI\Models\RESTAPIJWT;
 use RESTAPI\Models\RESTAPIKey;
+use RESTAPI\Models\RESTAPISettings;
+use RESTAPI\Models\User;
+use RESTAPI\Responses\AuthenticationError;
+use RESTAPI\Responses\ForbiddenError;
+use RESTAPI\Responses\ServerError;
+use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 /**
- * Creates object that performs authentication and authorization for API Endpoints.
+ * Creates object that performs authentication and authorization for REST API Endpoints and obtains details about the
+ * authenticating client.
  */
 class Auth {
-    private array $api_config;
-    public string $mode;
-    public bool $read_only;
+    /**
+     * @var array $api_settings The current REST API settings config. This contains the settings internal values.
+     */
+    private array $api_settings;
+
+    /**
+     * @var array $required_privileges The list of privileges that allow authorization.
+     */
     public array $required_privileges;
+
+    /**
+     * @var array $client_privileges The list of privileges the remote client currently has assigned.
+     */
     public array $client_privileges = [];
-    public string $username = "unknown user";
-    public string $ip_address = "unknown IP";
+
+    /**
+     * @var string|null The username of the authenticated remote client.
+     */
+    public ?string $username = null;
+
+    /**
+     * @var string $ip_address The IP address of the remote client.
+     */
+    public string $ip_address = "";
+
+    /**
+     * @var bool $is_authenticated Indicates whether the remote client is currently authenticated.
+     */
     public bool $is_authenticated = false;
+
+    /**
+     * @var bool $is_authenticated Indicates whether the remote client is currently authorized.
+     */
     public bool $is_authorized = false;
 
     /**
      * Creates an Auth object which can be used to authenticate an external client requesting API access.
      * @param array $required_privileges An array of required pfSense privileges to check during authorization.
-     * @param string $mode Explicitly sets the API `auth_mode` to use during authentication.
-     * Defaults to `auth_mode` API configuration value.
-     * @param bool|null $read_only Explicitly set the API `read_mode` during authentication. Defaults to `readonly`
-     * API configuration value.
      */
-    public function __construct(array $required_privileges=[], string $mode="", bool|null $read_only=null){
+    public function __construct(array $required_privileges=[]){
         # Obtain the internal API package configuration
-        $this->api_config = RESTAPI\Models\RESTAPISettings::get_pkg_config();
-
-        # Allow the auth_mode and read_only settings to be overwritten, otherwise default to their configured values
-        $this->mode = (!$mode) ? $this->api_config["auth_mode"] : $mode;
-        $this->read_only = (is_null($read_only)) ? $this->api_config["read_only"] === "enabled" : $read_only;
+        $this->api_settings = RESTAPISettings::get_pkg_config();
 
         # Assign required privileges
         $this->required_privileges = $required_privileges;
@@ -57,85 +82,58 @@ class Auth {
     }
 
     /**
-     * Attempts to authenticate using local authentication.
-     * @param string $username The username of the user authenticating.
-     * @param string $password The password of the user authenticating.
-     * @return bool `true` if authentication was successful, `false` if authentication was unsuccessful.
+     * Provides additional logic whenever authentication is successful. This is intended to be overridden by a
+     * child Auth class when it needs something specific to happen after a client successfully authenticates.
      */
-    private function authenticate_local_database(string $username, string $password) : bool {
-        $this->username = $username;
+    protected function on_successful_auth(): void {}
 
-        # Authenticate against the local user database
-        if (authenticate_user($username, $password)) {
-            unset($_SESSION["Username"]);
-            $_SESSION["Username"] = $username;
-            return true;
-        }
+    /**
+     * Provides additional logic whenever authentication has failed. This is intended to be overridden by a
+     * child Auth class when it needs something specific to happen after a client fails to authenticate.
+     */
+    protected function on_failed_auth(): void {}
 
-        return false;
+    /**
+     * Defines the steps required for users to authenticate wit this authentication method. This method must be
+     * overridden by a child Auth class. This method MUST return the username of the authenticating client if auth
+     * is successful, and null if it is not. NOTE: This method MUST set $this->username.
+     * @return bool Returns true if authentication was successful, returns false otherwise.
+     * @throws ServerError When this method is not overridden by a child class.
+     */
+    public function _authenticate(): bool {
+        $class = get_called_class();
+        throw new ServerError(
+            message: "Auth class `$class` must override `_authenticate()` method.",
+            response_id: "AUTH_CLASS_WITHOUT_OVERRIDDEN_AUTHENTICATE_METHOD"
+        );
     }
 
     /**
-     * Attempts to authenticate using JWT authentication.
-     * @param string $jwt The JWT encoded string to authenticate.
+     * Perform authentication using the current authentication method.
      * @return bool `true` if authentication was successful, `false` if authentication was unsuccessful.
      */
-    private function authenticate_jwt(string $jwt) : bool {
-        # Decode the JWT
-        $decoded_jwt = RESTAPIJWT::decode($jwt);
+    final public function authenticate() : bool {
+        # Assume user is no longer authenticated or authorized.
+        $this->is_authenticated = false;
+        $this->is_authorized = false;
+        $this->username = null;
+        unset($_SESSION["Username"]);
 
-        # Check that the JWT from our Authorization header is valid
-        if ($decoded_jwt) {
-            # Extract the owner's username from the JWT's payload data
-            $this->username = $decoded_jwt["data"];
-            unset($_SESSION["Username"]);
+        # Start the user session if authentication was successful and the user was not disabled.
+        if ($this->_authenticate() and $this->is_user_enabled($this->username)) {
             $_SESSION["Username"] = $this->username;
-            return true;
-            }
-
-        return false;
-    }
-
-    /**
-     * Attempts to authenticate using API key authentication.
-     * @return bool `true` if authentication was successful, `false` if authentication was unsuccessful.
-     */
-    private function authenticate_key(string $key) : bool {
-        # Loop through the existing keys for this user and check the key hashes for a match
-        foreach (RESTAPIKey::read_all()->model_objects as $api_key_obj) {
-            if ($api_key_obj->authenticate($key)) {
-                $this->username = $api_key_obj->username->value;
-                unset($_SESSION["Username"]);
-                $_SESSION["Username"] = $this->username;
-                return true;
-            }
+            $this->is_authenticated = true;
+            $this->on_successful_auth();
         }
-
-        return false;
-    }
-
-    /**
-     * Run authentication using the current configured auth mode.
-     * @param string $secret The secret password, token or key from the authenticating client.
-     * @param string $username The username of the authenticating client. This only applies to `local` authentication.
-     * @return bool `true` if authentication was successful, `false` if authentication was unsuccessful.
-     */
-    public function authenticate(string $secret, string $username = "") : bool {
-        # Attempt to authenticate using the assigned auth mode
-        $this->is_authenticated = match ($this->mode) {
-            "local" => $this->authenticate_local_database(username: $username, password: $secret),
-            "jwt" => $this->authenticate_jwt(jwt: $secret),
-            "key" => $this->authenticate_key(key: $secret),
-            default => false,
-        };
-
-        # Fail authentication if the user authenticating is disabled
-        if ($this->is_user_disabled($this->username)) {
+        # Otherwise, fail authentication.
+        else {
             $this->is_authenticated = false;
+            $this->on_failed_auth();
         }
 
         # Log this authentication attempt and return the authentication result
         $this->log_authentication();
+
         return $this->is_authenticated;
     }
 
@@ -148,11 +146,6 @@ class Auth {
         $is_not_authorized = false;
         $this->client_privileges = get_user_privileges(getUserEntry($this->username));
 
-        # This client is not authorized if this `readonly` mode is enabled but this isn't a read request
-        if ($this->read_only and $_SERVER['REQUEST_METHOD'] !== "GET") {
-            $is_not_authorized= true;
-        }
-
         # This client is not authorized if the client does not have at least one of the required privileges
         if ($this->required_privileges and !array_intersect($this->required_privileges, $this->client_privileges)) {
             $is_not_authorized= true;
@@ -164,29 +157,24 @@ class Auth {
     }
 
     /**
-     * Checks if a given username is an existing user, but is disabled.
+     * Checks if a given username is an existing user that is not disabled
      * @param string $username The username to check.
      * @return bool `true` if the user is disabled, `false` if it is not.
      */
-    private function is_user_disabled(string $username) : bool {
-        $users = index_users();
-        $user = $users[$username];
-        if (config_path_enabled("system/user/{$user}", "disabled")) {
-            return true;
-        }
-        return false;
+    public static function is_user_enabled(string $username) : bool {
+        return User::query(name: $username, disabled: false)->exists();
     }
 
     /**
      * Logs API authentication according to the current API configuration.
      */
-    private function log_authentication() {
+    private function log_authentication(): void {
         # Variables
         $username = ($this->username) ?: "unknown";
         $ip_address = $this->ip_address;
 
         # Log authentication attempts if enabled
-        if ($this->api_config["login_protection"] === "enabled") {
+        if ($this->api_settings["login_protection"] === "enabled") {
             # Log failed authentication
             if (!$this->is_authenticated) {
                 # This log entry is required for Login Protection to work, do not change the log text.
@@ -195,11 +183,107 @@ class Auth {
                 );
             }
             # Log successful authentication if the API is configured to do so. Disabled by default to avoid log spam.
-            elseif ($this->api_config["log_successful_auth"] === "enabled") {
+            elseif ($this->api_settings["log_successful_auth"] === "enabled") {
                 log_auth(
                     gettext("Successful login for user '{$username}' from: {$ip_address} (Local Database)")
                 );
             }
         }
+    }
+
+    /**
+     * Obtains the key with a specified identifier (i.e. bearer) from the client via the authorization header.
+     * @param String $identifier The key identifier to look for in the authorization header (i.e. 'bearer', 'apiKey').
+     * Note: This identifier is case-insensitive.
+     * @returns String A string containing the submitted bearer token from the client. If a key with the matching
+     * $identifier is not found, an empty string will be returned.
+     */
+    public static function get_auth_key(string $identifier) : string {
+        # Obtain the key from the authorization header.
+        $auth_header = explode(" ", $_SERVER["HTTP_AUTHORIZATION"]);
+        $token_type = $auth_header[0];
+        $secret = ($auth_header[1]) ?: "";
+
+        # Ensure the value was passed in with the same identifier.
+        if (strtolower($token_type) === strtolower($identifier)) {
+            return $secret;
+        }
+
+        # Return an empty string if there were any problems obtaining the secret
+        return "";
+    }
+
+    /**
+     * Throws an error if a given Auth class shortname is not an Auth child class in the \RESTAPI\Auth\ namespace.
+     * @param string $class_name The name of the Auth class to check for.
+     * @throws ServerError When $class_name is not an existing Auth child class in the \RESTAPI\Auth\ namespace
+     */
+    public static function ensure_class_exists(string $class_name): void {
+        # Variables
+        $namespace = "\\RESTAPI\\Auth\\";
+
+        # Do not allow this $auth_class if it is not an existing Auth class
+        if (!in_array($namespace.$class_name, get_classes_from_namespace($namespace))) {
+            throw new ServerError(
+                message: "Auth class `$class_name` does not exist.",
+                response_id: "AUTH_CLASS_DOES_NOT_EXIST"
+            );
+        }
+    }
+
+    /**
+     * Attempts authentication for each allowed Auth class. Authentication AND authorization must pass using at least
+     * one of the allowed Auth classes for authentication to be considered successful. In the event that all Auth
+     * class methods fail, an error will be thrown detailing the failure.
+     * @param array $auth_classes Specifies Auth classes that should be included in this multi auth attempt.
+     * This must be an array of existing Auth class short names. If no value is assigned, the Auth methods configured
+     * in the REST API settings will be assumed.
+     * @param array $required_privileges An array of pfSense privileges that are pre-authorized. The client must hold at
+     * least one of these privileges to be considered authorized.
+     * @return Auth The Auth object which succeeded authentication and authorization. This object will contain the
+     * details about the authenticated client.
+     * @throws AuthenticationError When no allowed Auth classes had successful authentication.
+     * @throws ForbiddenError When authentication was successful for an Auth class, but the client failed to be
+     * authorized due to missing privileges.
+     */
+    final static public function attempt_multi_auth(array $auth_classes = [], array $required_privileges = []): Auth {
+        # Variables
+        $auth_namespace = "\\RESTAPI\\Auth\\";
+        $matched_auth = new BasicAuth(); // Default to basic auth
+        $api_settings = new RESTAPISettings();
+        $auth_classes = ($auth_classes) ?: $api_settings->auth_methods->value;
+
+        # Loop through each allowed Auth class and perform preliminary authentication
+        foreach ($auth_classes as $auth_class) {
+            # Do not allow this $auth_class if it is not an existing Auth class
+            self::ensure_class_exists($auth_class);
+
+            # Create a new object for this Auth class
+            $auth_class = $auth_namespace.$auth_class;
+            $auth = new $auth_class(required_privileges: $required_privileges);
+
+            # If preliminary authentication is successful, break the loop and authenticate using this class
+            if ($auth->_authenticate()) {
+                $matched_auth = $auth;
+                break;
+            }
+        }
+
+        # Throw an authentication error if no preliminary auth passed or authentication for the identified class fails
+        if (!$matched_auth->authenticate()) {
+            throw new AuthenticationError(
+                message: "Authentication failed.",
+                response_id: "AUTH_AUTHENTICATION_FAILED"
+            );
+        }
+        # Throw an authorization error if authorization for the identified class fails
+        elseif (!$matched_auth->authorize()) {
+            throw new ForbiddenError(
+                message: "Authorization failed. You do not have sufficient privileges to access this resource.",
+                response_id: "AUTH_AUTHORIZATION_FAILED"
+            );
+        }
+
+        return $matched_auth;
     }
 }
