@@ -145,6 +145,8 @@ function http_request(
 function get_classes_from_namespace(string $namespace, bool $shortnames = false) : array {
     # Variables
     $classes = [];
+    $namespace = (!str_starts_with($namespace, "\\")) ? $namespace."\\" : $namespace;
+    $namespace = (!str_starts_with($namespace, "\\")) ? "\\".$namespace : $namespace;
     $namespace_path = str_replace(["\\", "//"], "/", "/usr/local/pkg/".$namespace);
 
     foreach(glob($namespace_path."*.inc") as $inc_file) {
@@ -164,7 +166,8 @@ function generate_documentation(): bool {
     # Variables
     $endpoint_classes = get_classes_from_namespace("\\RESTAPI\\Endpoints\\");
     $response_classes = get_classes_from_namespace("\\RESTAPI\\Responses\\");
-    $auth_classes = get_classes_from_namespace("\\RESTAPI\\Auth\\", shortnames: true);
+    $auth_classes = get_classes_from_namespace("\\RESTAPI\\Auth\\");
+    $content_handler_classes = get_classes_from_namespace("\\RESTAPI\\ContentHandlers\\");
     $assigned_tags = [];
     
     # Set static openapi details
@@ -189,20 +192,24 @@ function generate_documentation(): bool {
         "components" => [
             "responses" => [],
             "schemas" => ["Response" => Response::to_openapi_schema()],
-            "securitySchemes" => [
-                "BasicAuth" => ["type" => "http", "scheme" => "basic"],
-                "JWTAuth" => ["type" => "http", "scheme" => "bearer", "bearerFormat" => "JWT"],
-                "KeyAuth" => ["type" => "apiKey", "in" => "header", "name" => "Authorization"]
-            ]
+            "securitySchemes" => []
         ],
         "security" => [],
         "paths" => [],
         "tags" => []
     ];
 
-    # Add security definitions for each Auth class
+    # Add security and securitySchemes definitions for each Auth class
     foreach ($auth_classes as $auth_class) {
-        $openapi_config["security"][] = [$auth_class => []];
+        # Create an object for this Auth class so we can obtain class information
+        $auth_method = new $auth_class();
+        $auth_shortname = $auth_method->get_class_shortname();
+        
+        # Add global security definitions.
+        $openapi_config["security"][] = [$auth_shortname => []];
+        
+        # Add securitySchemes for each \RESTAPI\Auth class
+        $openapi_config["components"]["securitySchemes"][$auth_shortname] = $auth_method->security_scheme;
     }
 
     # Add Response components for each Response class in RESTAPI\Responses
@@ -272,9 +279,7 @@ function generate_documentation(): bool {
             # Ensure the security mode is enforced for this path if the Endpoint has `auth_methods` set
             if ($endpoint->auth_methods) {
                 foreach ($endpoint->auth_methods as $auth_method) {
-                    $openapi_config["paths"][$endpoint->url][$request_method]["security"] = [
-                        [$auth_method => []]
-                    ];
+                    $openapi_config["paths"][$endpoint->url][$request_method]["security"][] = [$auth_method => []];
                 }
             }
 
@@ -348,12 +353,18 @@ function generate_documentation(): bool {
                     ]);
                 }
 
-                $openapi_config["paths"][$endpoint->url][$request_method]["requestBody"] = [
-                    "content" => [
-                        "application/json" => $schema,
-                        "application/x-www-form-urlencoded" => $schema,
-                    ]
-                ];
+                # Populate OpenAPI 'content' definitions for each ContentHandler capable of decoding request bodies.
+                $contents = [];
+                foreach ($content_handler_classes as $content_handler_class) {
+                    # Create an object for this content handler so we can extract handler info
+                    $content_handler = new $content_handler_class();
+                    
+                    # Only include this ContentHandler as a valid content definition if it can decode data
+                    if ($content_handler->can_decode()) {
+                        $contents[$content_handler->mime_type] = $schema;
+                    }
+                }
+                $openapi_config["paths"][$endpoint->url][$request_method]["requestBody"]["content"] = $contents;
             }
 
             # Assign the ID query parameter for GET and DELETE requests to non `many` Endpoints with a `many` Model assigned

@@ -17,7 +17,7 @@ require_once("RESTAPI/autoloader.inc");
  * ContentHandler is designed to interact with.
  * @link MIME-Types https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types.
  */
-class ContentHandler
+class ContentHandler extends BaseClass
 {
     /**
      * @var string $mime_type The unique name for this ContentHandler. This name MUST correspond to a valid HTTP Content-Type

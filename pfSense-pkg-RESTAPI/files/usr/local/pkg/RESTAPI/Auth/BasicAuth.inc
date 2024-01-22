@@ -9,6 +9,11 @@ class BasicAuth extends Auth
     const WWW_AUTHENTICATE_HEADER = 'WWW-Authenticate: Basic realm="Login for pfSense REST API"';
 
     /**
+     * @var array $security_scheme The OpenAPI security scheme for this Auth class.
+     */
+    public array $security_scheme = ["type" => "http", "scheme" => "basic"];
+
+    /**
      * Obtains the submitted username and password from the client using Basic authentication and performs
      * authentication against the pfSense local user database.
      * @link Basic https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication

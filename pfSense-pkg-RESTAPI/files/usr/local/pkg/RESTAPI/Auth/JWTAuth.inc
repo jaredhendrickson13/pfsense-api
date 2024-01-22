@@ -8,6 +8,11 @@ use RESTAPI\Models\RESTAPIJWT;
 class JWTAuth extends Auth
 {
     /**
+     * @var array $security_scheme The OpenAPI security scheme for this Auth class.
+     */
+    public array $security_scheme = ["type" => "http", "scheme" => "bearer", "bearerFormat" => "JWT"];
+    
+    /**
      * Obtains the submitted JWT from the client and attempts to decode the JWT using this host's server key.
      * @return bool Returns true if the JWT was successfully decoded, returns false otherwise.
      */

@@ -19,8 +19,6 @@ require_once("RESTAPI/autoloader.inc");
 
 use RESTAPI;
 use RESTAPI\Auth\BasicAuth;
-use RESTAPI\Models\RESTAPIJWT;
-use RESTAPI\Models\RESTAPIKey;
 use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\User;
 use RESTAPI\Responses\AuthenticationError;
@@ -32,11 +30,19 @@ use function RESTAPI\Core\Tools\get_classes_from_namespace;
  * Creates object that performs authentication and authorization for REST API Endpoints and obtains details about the
  * authenticating client.
  */
-class Auth {
+class Auth extends BaseClass {
     /**
      * @var array $api_settings The current REST API settings config. This contains the settings internal values.
      */
     private array $api_settings;
+
+    /**
+     * @var array $security_scheme Sets the OpenAPI securityScheme definition for this Auth class. This value should
+     * be the innermost array of the securityScheme and not include the scheme name.
+     * @link SecurityScheme https://swagger.io/docs/specification/authentication/
+     * @example ["type" => "apiKey", "in" => "header", "name" => "Authorization"]
+     */
+    public array $security_scheme = [];
 
     /**
      * @var array $required_privileges The list of privileges that allow authorization.

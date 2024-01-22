@@ -25,6 +25,9 @@ require_once("certs.inc");
 require_once("pkg-utils.inc");
 require_once("firewall_virtual_ip.inc");
 
+# Ensure the RESTAPI BaseClass is imported before any other libraries
+require_once("RESTAPI/Core/BaseClass.inc");
+
 # An array of paths to each library within this package. The order in which they are defined in this array is the order
 # they will be included by this autoloader.
 const RESTAPI_LIBRARIES = [
