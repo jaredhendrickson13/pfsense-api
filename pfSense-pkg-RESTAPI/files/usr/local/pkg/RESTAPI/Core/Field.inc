@@ -857,11 +857,13 @@ class Field
 
             $this->value = $representation;
         }
+        # For boolean values that do not have their conditions met, set to null.
+        elseif ($this->type === "boolean" and !$this->are_conditions_met()) {
+            $this->value = null;
+        }
         # Otherwise, just convert the value to representation directly if conditions are met
         else {
-            if ($this->are_conditions_met()) {
-                $this->value = $this->_from_internal($internal_value);
-            }
+            $this->value = $this->_from_internal($internal_value);
         }
     }
 

@@ -257,7 +257,7 @@ class ForeignModelField extends Field {
         }
 
         # As a failsafe, return the existing representation value if we could not find the related object
-        return (string)$representation_value;
+        return parent::_to_internal($representation_value);
     }
 
     /**

@@ -193,8 +193,19 @@ class PortField extends Field {
      */
     protected function _to_internal(mixed $representation_value): array|string|null
     {
-        # Replace the representation range character to the internal range character
-        return str_replace(self::REPR_RANGE_CHAR, $this->internal_range_char, $representation_value); 
+        # Return null values if they are already null
+        if ($representation_value === null) {
+            return null;
+        }
+        
+        # Otherwise, replace the representation range character to the internal range character
+        $representation_value = str_replace(
+            self::REPR_RANGE_CHAR, 
+            $this->internal_range_char, 
+            $representation_value
+        );
+        
+        return parent::_to_internal($representation_value); 
     }
 
     /**
