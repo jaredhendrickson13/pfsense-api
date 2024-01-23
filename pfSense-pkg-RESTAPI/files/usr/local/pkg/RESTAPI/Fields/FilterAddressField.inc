@@ -203,20 +203,36 @@ class FilterAddressField extends InterfaceField
             }
         }
 
-        # Allow this value if it is an IP address and this Field allows IP address values
-        if ($this->allow_ipaddr and is_ipaddr($value)) {
+        # Allow this value if it is an IPv4 address and this Field allows IP address values
+        if ($this->allow_ipaddr and is_ipaddrv4($value)) {
+            $this->labels[] = "is_ipaddrv4";
             $this->labels[] = "is_ipaddr";
             return;
         }
 
-        # Allow this value if it is a subnet and this Field allows subnet values
-        if ($this->allow_subnet and is_subnet($value)) {
+        # Allow this value if it is an IPv4 address and this Field allows IP address values
+        if ($this->allow_ipaddr and is_ipaddrv6($value)) {
+            $this->labels[] = "is_ipaddrv6";
+            $this->labels[] = "is_ipaddr";
+            return;
+        }
+
+        # Allow this value if it is a v4 subnet and this Field allows subnet values
+        if ($this->allow_subnet and is_subnetv4($value)) {
+            $this->labels[] = "is_subnetv4";
+            $this->labels[] = "is_subnet";
+            return;
+        }
+
+        # Allow this value if it is a v6 subnet and this Field allows subnet values
+        if ($this->allow_subnet and is_subnetv6($value)) {
+            $this->labels[] = "is_subnetv6";
             $this->labels[] = "is_subnet";
             return;
         }
 
         # Allow this value if it is a network or host alias and this Field allows alias values
-        if ($this->allow_alias and FirewallAlias::query(["type__except" => "port", "name" => $value])->exists()) {
+        if ($this->allow_alias and FirewallAlias::query(type__except: "port", name: $value)->exists()) {
             $this->labels[] = "is_alias";
             return;
         }
