@@ -25,14 +25,14 @@ class ForeignModelField extends Field {
     /**
      * Defines the ForeignModelField object and sets its options.
      * @param string $model_name The name of the foreign Model class this field relates to. This should be the name of an
-     * existing Model class in the \RESTAPI\Models namespace, but should not include the \RESTAPI\Models namespace prefix. 
+     * existing Model class in the \RESTAPI\Models namespace, but should not include the \RESTAPI\Models namespace prefix.
      * @param string $model_field The field on the assigned $model_name class that this field's value relates to. For
      * example, if this Fields value must be an existing Gateway model object's `name`, you would set $model_name to
      * `Gateway` and $model_field to `name`. This field must be a `unique` field on the assigned $model_name.
      * @param string $model_field_internal In the event that you want to store a different field value internally,
      * specify that field name here. Leave empty to use the $model_field for both the internal and representation values.
-     * For example, if this field's value must be set in config as an existing Gateway model object's `name`, but you 
-     * want clients to reference the Gateway model object by its `id` instead, you would set $model_field to `id` and 
+     * For example, if this field's value must be set in config as an existing Gateway model object's `name`, but you
+     * want clients to reference the Gateway model object by its `id` instead, you would set $model_field to `id` and
      * $model_field_internal to `name`.
      * @param array $model_query Enter query parameters to limit which of the $model's existing objects can be
      * referenced by this field. For example, say this field's value must be set to an existing FirewallAlias object's
@@ -41,6 +41,8 @@ class ForeignModelField extends Field {
      * @param array $parent_model_query When the assigned $model_name class has a parent Model, use this variable to
      * limit the scope of which parent Model objects can have their child Models included. By default, the child
      * Models of ALL parent Models are included.
+     * @param array $allowed_keywords Specific values that should always be allowed, even if they don't relate to the
+     * assigned Model or its fields.
      * @param bool $required If `true`, this field is required to have a value at all times.
      * @param bool $unique If `true`, this field must be unique from all other parent model objects. Enabling this
      * option requires the Model $context to be set AND the Model $context must have a `config_path` set.
@@ -97,6 +99,7 @@ class ForeignModelField extends Field {
         public string $model_field_internal = "",
         public array $model_query = [],
         public array $parent_model_query = [],
+        public array $allowed_keywords = [],
         bool $required = false,
         bool $unique = false,
         mixed $default = null,
@@ -263,6 +266,11 @@ class ForeignModelField extends Field {
      * receive each value of the array individually, not the array value itself.
      */
     public function validate_extra(mixed $value): void {
+        # Accept this value matches an allowed keyword exactly
+        if (in_array($value, $this->allowed_keywords)) {
+            return;
+        }
+        
         # Obtain Models that match this Field's criteria
         $query_modelset = $this->__get_matches($this->model_field, $value);
         

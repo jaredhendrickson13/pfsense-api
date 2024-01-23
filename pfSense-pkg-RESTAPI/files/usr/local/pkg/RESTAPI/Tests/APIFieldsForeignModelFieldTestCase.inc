@@ -330,4 +330,24 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
         $shaper1->delete();
         $shaper2->delete(apply: true);
     }
+    
+    /**
+     * Checks that values specified in `allowed_keywords` are always accepted.
+     */
+    public function test_allowed_keywords(): void {
+        # Ensure no error is thrown if we validate a ForeignModelField assigned an allowed keyword.
+        $this->assert_does_not_throw(
+            callable: function () {
+                $field = new ForeignModelField(
+                    model_name: "FirewallAlias",
+                    model_field: "name",
+                    allowed_keywords: ["always_accept_this_value"],
+                    required: true
+                );
+                $field->name = "test";
+                $field->value = "always_accept_this_value";
+                $field->validate();
+            }
+        );
+    }
 }
