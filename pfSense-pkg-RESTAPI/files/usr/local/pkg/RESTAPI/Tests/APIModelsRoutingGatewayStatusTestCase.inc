@@ -36,7 +36,6 @@ class APIModelsRoutingGatewayStatusTestCase extends TestCase
         $this->assert_is_not_empty($gateway_status->stddev->value);
 
         $this->assert_type($gateway_status->loss->value, "double");
-        $this->assert_is_not_empty($gateway_status->loss->value);
         $this->assert_is_greater_than_or_equal($gateway_status->loss->value, 0);
         $this->assert_is_less_than_or_equal($gateway_status->loss->value, 100);
 
