@@ -427,6 +427,11 @@ class APIFieldsFilterAddressFieldTestCase extends TestCase
         $field->validate();
         $this->assert_equals($field->labels, ["is_subnetv6", "is_subnet"]);
 
+        # Ensure the field obtains the `is_interface` label when the value is an interface based value
+        $field->value = "lan";
+        $field->validate();
+        $this->assert_equals($field->labels, ["is_interface"]);
+
         # Delete the firewall alias
         $alias->delete();
     }

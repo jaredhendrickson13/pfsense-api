@@ -265,6 +265,7 @@ class FilterAddressField extends InterfaceField
 
         # Allow this value if it is an existing interface and interface values are allowed
         if ($this->allow_interface and in_array($value, array_keys($this->get_interface_choices()))) {
+            $this->labels[] = "is_interface";
             return;
         }
 
