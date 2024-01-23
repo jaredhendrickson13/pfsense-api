@@ -875,8 +875,15 @@ class Model {
      * Loads the Model object using an array representation of the object.
      * @param array $data The array of key-value pairs to use when loading the Model object from
      * representation.
+     * @param mixed ...$options Additional arguments to provide to this Model. Any additional arguments provided will
+     * merged into the Model's $data parameter. This can be used to set Model field values using parameters instead
+     * of an array format via $data. Note: In the event that a field value is set in $data and $args, the value
+     * found in $args will be used.
      */
-    final public function from_representation(array $data) {
+    final public function from_representation(array $data = [], mixed ...$options) {
+        # Merge additional arguments into the $data array
+        $data = array_merge($data, $options);
+
         # Set the parent ID if provided and obtain the parent model object if applicable
         if (array_key_exists("parent_id", $data) and $this->parent_model_class) {
             $this->parent_id = $data["parent_id"];

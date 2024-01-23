@@ -385,6 +385,9 @@ class Field
             return true;
         }
 
+        # Reset Field labels before running Validators so they can be repopulated if needed
+        $this->labels = [];
+
         # Loop through each value to be validated
         foreach($values as $value) {
             # Ensure the value's type is supported
@@ -403,9 +406,6 @@ class Field
                 return true;
             }
 
-            # Reset Field labels before running Validators so they can be repopulated if needed
-            $this->labels = [];
-
             # Loop through each validator and run it's `validate` method against the current value.
             foreach ($this->validators as $validator) {
                 # Provide the Validator context to this Field and it's parent Model
@@ -413,7 +413,7 @@ class Field
                 $validator->field_context = $this;
                 $validator->validate(value: $value, field_name: $this->name);
             }
-            
+
             # Run any extra validation this Field may have
             $this->validate_extra($value);
         }
