@@ -21,6 +21,7 @@ use RESTAPI\Dispatchers\WebGUIRestartDispatcher;
 use RESTAPI\Models\RESTAPIJWT;
 use RESTAPI\Models\RESTAPISettings;
 use RESTAPI\Models\RESTAPISettingsSync;
+use function RESTAPI\Core\Tools\cprint;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 /**
@@ -208,8 +209,9 @@ function run_tests(string|null $contains = ""): void {
         $test_obj = new $test_case();
         try {
             $test_obj->run();
-            echo ".";    // Print a dot for each test completed so the user is aware that tests are really running
             $succeed_count++;
+            echo ".";    // Print a dot for each test completed so the user is aware that tests are really running
+            cprint(PHP_EOL, condition: ($succeed_count > 60));    // Move to next line if too long
             $fail_results = null;
         }
         # If an AssertionError is received, there was a test failure. Print the traceback.
