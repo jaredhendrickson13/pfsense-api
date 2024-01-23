@@ -3,6 +3,7 @@
 namespace RESTAPI\Tests;
 
 use RESTAPI\Core\TestCase;
+use RESTAPI\Fields\FilterAddressField;
 use RESTAPI\Fields\SpecialNetworkField;
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Models\RESTAPISettings;
@@ -321,5 +322,46 @@ class APIFieldsSpecialNetworkFieldTestCase extends TestCase
         $this->assert_equals($field->value, "example_alias");
         $field->from_internal("l2tp");
         $this->assert_equals($field->value, "l2tp");
+    }
+
+    /**
+     * Checks that expected labels are set after running `validated_extra()`.
+     */
+    public function test_validate_extra_sets_labels(): void {
+        # Create a firewall alias we can use to populate the `is_alias` label for this test
+        $alias = new FirewallAlias(name: "test_alias", type: "host");
+        $alias->create();
+
+        # Create a FilterAddressField to use for testing
+        $field = new SpecialNetworkField(required: true, allow_ipaddr: true, allow_subnet: true, allow_alias: true);
+        $field->name = "test";
+
+        # Ensure the field obtains the `is_alias` label when the value is an existing firewall alias
+        $field->value = $alias->name->value;
+        $field->validate();
+        $this->assert_equals($field->labels, ["is_alias"]);
+
+        # Ensure the field obtains the `is_ipaddr` and `is_ipaddrv4` labels when the value is an IPv4 address
+        $field->value = "1.2.3.4";
+        $field->validate();
+        $this->assert_equals($field->labels, ["is_ipaddrv4", "is_ipaddr"]);
+
+        # Ensure the field obtains the `is_ipaddr` and `is_ipaddrv6` labels when the value is an IPv4 address
+        $field->value = "1234::1";
+        $field->validate();
+        $this->assert_equals($field->labels, ["is_ipaddrv6", "is_ipaddr"]);
+
+        # Ensure the field obtains the `is_subnet` and `is_subnetv4` labels when the value is an IPv4 address
+        $field->value = "1.2.3.4/32";
+        $field->validate();
+        $this->assert_equals($field->labels, ["is_subnetv4", "is_subnet"]);
+
+        # Ensure the field obtains the `is_subnet` and `is_subnetv6` labels when the value is an IPv4 address
+        $field->value = "1234::1/128";
+        $field->validate();
+        $this->assert_equals($field->labels, ["is_subnetv6", "is_subnet"]);
+
+        # Delete the firewall alias
+        $alias->delete();
     }
 }

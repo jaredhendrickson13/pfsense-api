@@ -143,7 +143,7 @@ class SpecialNetworkField extends InterfaceField
             help_text: $help_text
         );
 
-        # To prevent the need to add redundant openapi to the help text, append a standard set of help text.
+        # To prevent the need to add redundant documentation to the help text, append a standard set of help text.
         $this->help_text .= " Valid value options are: ". $this->get_valid_opts_str().". For interface values, the `:ip` ".
             " modifier can be appended to the value to use the interface's IP address instead of its entire subnet.";
 
@@ -171,8 +171,16 @@ class SpecialNetworkField extends InterfaceField
             return;
         }
 
-        # Allow this value if it is a subnet and this Field allows subnet values
-        if ($this->allow_subnet and is_subnet($value)) {
+        # Allow this value if it is a v4 subnet and this Field allows subnet values
+        if ($this->allow_subnet and is_subnetv4($value)) {
+            $this->labels[] = "is_subnetv4";
+            $this->labels[] = "is_subnet";
+            return;
+        }
+
+        # Allow this value if it is a v6 subnet and this Field allows subnet values
+        if ($this->allow_subnet and is_subnetv6($value)) {
+            $this->labels[] = "is_subnetv6";
             $this->labels[] = "is_subnet";
             return;
         }
