@@ -211,7 +211,7 @@ function run_tests(string|null $contains = ""): void {
             $test_obj->run();
             $succeed_count++;
             echo ".";    // Print a dot for each test completed so the user is aware that tests are really running
-            cprint(PHP_EOL, condition: ($succeed_count > 60));    // Move to next line if too long
+            cprint(PHP_EOL, condition: ($succeed_count % 60 == 0));    // Move to next line if too long
             $fail_results = null;
         }
         # If an AssertionError is received, there was a test failure. Print the traceback.
