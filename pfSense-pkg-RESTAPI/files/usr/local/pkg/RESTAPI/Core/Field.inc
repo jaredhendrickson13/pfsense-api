@@ -857,9 +857,11 @@ class Field
 
             $this->value = $representation;
         }
-        # Otherwise, just convert the value to representation directly
+        # Otherwise, just convert the value to representation directly if conditions are met
         else {
-            $this->value = $this->_from_internal($internal_value);
+            if ($this->are_conditions_met()) {
+                $this->value = $this->_from_internal($internal_value);
+            }
         }
     }
 
