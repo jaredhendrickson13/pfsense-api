@@ -8,6 +8,7 @@ use RESTAPI;
 use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
+use RESTAPI\Fields\NestedModelField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\IPAddressValidator;
@@ -40,6 +41,7 @@ class DHCPServer extends Model
     public BooleanField $dhcpleaseinlocaltime;
     public BooleanField $statsgraph;
     public StringField $denyunknown;
+    public NestedModelField $staticmap;
 
     /**
      * Constructs the Model object.
@@ -214,6 +216,12 @@ class DHCPServer extends Model
             "any DHCP client with a MAC address listed in a static mapping on any scope(s)/interface(s) will ".
             "get an IP address. If set to `class`, only MAC addresses listed in static mappings on this interface ".
             "will get an IP address within this scope/range."
+        );
+        $this->staticmap = new NestedModelField(
+            model_class: "DHCPServerStaticMapping",
+            default: [],
+            allow_empty: true,
+            help_text: "Static mappings applied to this DHCP server."
         );
 
         parent::__construct(...$options, id: $id, data: $data);
