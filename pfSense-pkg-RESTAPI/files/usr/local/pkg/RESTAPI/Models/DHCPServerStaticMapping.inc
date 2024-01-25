@@ -6,6 +6,7 @@ require_once("RESTAPI/autoloader.inc");
 
 use RESTAPI;
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\DHCPServerApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
@@ -206,7 +207,7 @@ class DHCPServerStaticMapping extends Model
      * @return Model|null Returns the Model object that has this
      * $ipaddr reserved if found, returns null if this $ipaddr is not reserved.
      */
-    public function get_ip_overlap(string $ipaddr): ?Model
+    private function get_ip_overlap(string $ipaddr): ?Model
     {
         # Ensure this IP address is not reserved by the primary DHCPServer address pool
         if (is_inrange_v4($ipaddr, $this->parent_model->range_from->value, $this->parent_model->range_to->value)) {
@@ -221,19 +222,11 @@ class DHCPServerStaticMapping extends Model
             }
         }
 
-        # Ensure IP is not reserved by any existing DHCPServerStaticMappings
-        $static_mappings = DHCPServerStaticMapping::read_all(parent_id: $this->parent_id);
-        foreach ($static_mappings->model_objects as $static_mapping) {
-            if ($ipaddr === $static_mapping->ipaddr->value) {
-                return $static_mapping;
-            }
-        }
-
         # Ensure IP is not reserved by any existing VirtualIP
-        $static_mappings = VirtualIP::read_all();
-        foreach ($static_mappings->model_objects as $static_mapping) {
-            if ($ipaddr === $static_mapping->ipaddr->value) {
-                return $static_mapping;
+        $vips = VirtualIP::read_all();
+        foreach ($vips->model_objects as $vip) {
+            if ($ipaddr === $vip->subnet->value) {
+                return $vip;
             }
         }
 
@@ -245,6 +238,6 @@ class DHCPServerStaticMapping extends Model
      */
     public function apply(): void
     {
-        (new DHCPServerApply())->apply();
+        (new DHCPServerApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

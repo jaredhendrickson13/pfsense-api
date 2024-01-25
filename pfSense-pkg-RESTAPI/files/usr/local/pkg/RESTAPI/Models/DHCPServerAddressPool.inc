@@ -178,7 +178,7 @@ class DHCPServerAddressPool extends Model
     public function validate_extra(): void
     {
         # Check if this pool's range overlaps with another model object.
-        $overlapped_model = $this->parent_model->get_range_overlap($this->range_from->value, $this->range_to->value);
+        $overlapped_model = $this->get_range_overlap($this->range_from->value, $this->range_to->value);
         
         # Do not allow this DHCPServerAddressPool to overlap with other objects
         if ($overlapped_model) {
@@ -305,7 +305,7 @@ class DHCPServerAddressPool extends Model
      * @return Model|null Returns the Model object that this range overlaps with, returns
      * null if the range did not overlap with an existing Model object.
      */
-    public function get_range_overlap(string $range_from, string $range_to): ?Model
+    private function get_range_overlap(string $range_from, string $range_to): ?Model
     {
         # Ensure this IP address is not reserved by the primary DHCPServer address pool
         if (is_inrange_v4($this->range_from, $range_to, $range_from) or is_inrange_v4($this->range_to, $range_to, $range_from)) {
@@ -313,7 +313,7 @@ class DHCPServerAddressPool extends Model
         }
 
         # Ensure range does not overlap with existing static mappings
-        $static_mappings = DHCPServerStaticMapping::read_all(parent_id: $this->id);
+        $static_mappings = DHCPServerStaticMapping::read_all(parent_id: $this->parent_id);
         foreach ($static_mappings->model_objects as $static_mapping) {
             if (is_inrange_v4($static_mapping->ipaddr->value, $range_from, $range_to)) {
                 return $static_mapping;
