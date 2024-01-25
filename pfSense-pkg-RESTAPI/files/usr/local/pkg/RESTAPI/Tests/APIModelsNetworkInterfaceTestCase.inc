@@ -899,6 +899,16 @@ class APIModelsNetworkInterfaceTestCase extends TestCase
             "inet6 4321::1 prefixlen 96"
         );
     }
+    
+    /**
+     * Checks that the `is_ipv4_in_cidr()` method correctly determines if a given IP address is within an interface's
+     * configured IPv4 CIDR
+     */
+    public function test_is_ipv4_in_cidr(): void {
+        $if = new NetworkInterface(id: "lan");
+        $this->assert_is_true($if->is_ipv4_in_cidr("192.168.1.5"));
+        $this->assert_is_false($if->is_ipv4_in_cidr("192.168.2.5"));
+    }
 
     # TODO: Needs Tests to ensure other interface types are correctly configured on the backend
 }

@@ -9,6 +9,7 @@ use RESTAPI\Core\Model;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\StringField;
+use RESTAPI\Responses\ConflictError;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\HostnameValidator;
 use RESTAPI\Validators\IPAddressValidator;
@@ -141,6 +142,27 @@ class DHCPServerStaticMapping extends Model
     }
 
     /**
+     * Provides extra validation for the `ipaddr` field.
+     * @param string $ipaddr The incoming value to validate.
+     * @return string $ipaddr The validated value to be assigned.
+     * @throws ConflictError When the $ipaddr value is in use or overlaps another object such as virtual IPs, 
+     * or DHCP address pools.
+     */
+    public function validate_ipaddr(string $ipaddr): string {
+        # Do not allow this $ipaddr to overlap other model objects
+        $overlapped_model = $this->get_ip_overlap($ipaddr);
+        if ($overlapped_model) {
+            throw new ConflictError(
+                message: "Field `ipaddr` overlaps existing $overlapped_model->verbose_name with ID ".
+                    "`$overlapped_model->id`.",
+                response_id: "DHCP_SERVER_STATIC_MAPPING_IPADDR_OVERLAPS_EXISTING_OBJECT"
+            );
+        }
+        
+        return $ipaddr;
+    }
+
+    /**
      * Provides extra validation for the `maxleasetime` field.
      * @param int $maxleasetime The incoming `maxleasetime` field value to validate.
      * @return int The validated `maxleasetime` field value to be assigned.
@@ -150,7 +172,7 @@ class DHCPServerStaticMapping extends Model
         if ($maxleasetime < $this->defaultleasetime->value) {
             throw new ValidationError(
                 message: "DHCP server `maxleasetime` cannot be less than the `defaultleasetime`",
-                response_id: "DHCP_SERVER_MAX_LEASE_TIME_LESS_THAN_DEFAULT"
+                response_id: "DHCP_SERVER_STATIC_MAPPING_MAX_LEASE_TIME_LESS_THAN_DEFAULT"
             );
         }
 
@@ -171,11 +193,51 @@ class DHCPServerStaticMapping extends Model
         if ($gateway and !ip_in_subnet($gateway, $interface->get_current_ipv4()."/".$interface->get_current_subnetv4())) {
             throw new ValidationError(
                 message: "DHCP server `gateway` must be within interface's subnet.",
-                response_id: "DHCP_SERVER_GATEWAY_NOT_WITHIN_SUBNET"
+                response_id: "DHCP_SERVER_STATIC_MAPPING_GATEWAY_NOT_WITHIN_SUBNET"
             );
         }
 
         return $gateway;
+    }
+
+    /**
+     * Checks if a given IP is already reserved by an existing Model object such as address pools or virtual IPs
+     * @param string $ipaddr The IP address to check for existing reservation.
+     * @return Model|null Returns the Model object that has this
+     * $ipaddr reserved if found, returns null if this $ipaddr is not reserved.
+     */
+    public function get_ip_overlap(string $ipaddr): ?Model
+    {
+        # Ensure this IP address is not reserved by the primary DHCPServer address pool
+        if (is_inrange_v4($ipaddr, $this->parent_model->range_from->value, $this->parent_model->range_to->value)) {
+            return $this;
+        }
+
+        # Ensure IP is not reserved by any existing DHCPServerAddressPools
+        $pools = DHCPServerAddressPool::read_all(parent_id: $this->parent_id);
+        foreach ($pools->model_objects as $pool) {
+            if (is_inrange_v4($ipaddr, $pool->range_from->value, $pool->range_to->value)) {
+                return $pool;
+            }
+        }
+
+        # Ensure IP is not reserved by any existing DHCPServerStaticMappings
+        $static_mappings = DHCPServerStaticMapping::read_all(parent_id: $this->parent_id);
+        foreach ($static_mappings->model_objects as $static_mapping) {
+            if ($ipaddr === $static_mapping->ipaddr->value) {
+                return $static_mapping;
+            }
+        }
+
+        # Ensure IP is not reserved by any existing VirtualIP
+        $static_mappings = VirtualIP::read_all();
+        foreach ($static_mappings->model_objects as $static_mapping) {
+            if ($ipaddr === $static_mapping->ipaddr->value) {
+                return $static_mapping;
+            }
+        }
+
+        return null;
     }
 
     /**

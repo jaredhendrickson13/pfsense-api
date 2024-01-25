@@ -6,6 +6,7 @@ use RESTAPI\Core\Command;
 use RESTAPI\Core\Model;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\DHCPServer;
+use RESTAPI\Models\DHCPServerStaticMapping;
 use RESTAPI\Models\NetworkInterface;
 use RESTAPI\Models\VirtualIP;
 
@@ -139,24 +140,23 @@ class APIModelsDHCPServerTestCase extends TestCase
     public function test_primary_dhcp_pool_cannot_conflict_with_vip() {
         # Create a virtual IP to use for testing
         $vip = new VirtualIP(
-            data: [
-                "interface" => "lan", 
-                "mode" => "ipalias",
-                "subnet" => "192.168.1.2", 
-                "subnet_bits" => 24
-            ]
+            interface: "lan",
+            mode: "ipalias",
+            subnet: "192.168.1.2",
+            subnet_bits: 24
         );
         $vip->create();
         
         # Ensure an error is thrown when we try to change the DHCP server pool to conflict with the vip
         $this->assert_throws_response(
-            response_id: "DHCP_SERVER_POOL_OVERLAPS_VIP",
-            code: 400,
+            response_id: "DHCP_SERVER_PRIMARY_POOL_OVERLAPS_EXISTING_OBJECT",
+            code: 409,
             callable: function() {
                 # Use the `lan` DHCP server for this test
                 $dhcp_server = new DHCPServer(id: "lan");
                 $dhcp_server->range_from->value = "192.168.1.2";
-                $dhcp_server->validate_range_to(range_to: "192.168.1.3");
+                $dhcp_server->range_to->value = "192.168.1.3";
+                $dhcp_server->validate_extra();
             }
         );
         
@@ -169,20 +169,24 @@ class APIModelsDHCPServerTestCase extends TestCase
      */
     public function test_dhcp_pool_cannot_conflict_with_static_mapping() {
         # Add a DHCP static mapping
-        # TODO: Change this to use the DHCPServerStaticMapping Model when developed
-        Model::set_config("dhcpd/lan/staticmap", [["ipaddr" => "192.168.1.2"]]);
+        $static_map = new DHCPServerStaticMapping(parent_id: "lan", mac: "11:22:33:44:55:66", ipaddr: "192.168.1.2");
+        $static_map->create();
 
         # Ensure an error is thrown when we try to change the DHCP server pool to conflict with the static mapping
         $this->assert_throws_response(
-            response_id: "DHCP_SERVER_POOL_OVERLAPS_STATIC_MAPPING",
-            code: 400,
+            response_id: "DHCP_SERVER_PRIMARY_POOL_OVERLAPS_EXISTING_OBJECT",
+            code: 409,
             callable: function() {
                 # Use the `lan` DHCP server for this test
                 $dhcp_server = new DHCPServer(id: "lan");
                 $dhcp_server->range_from->value = "192.168.1.2";
-                $dhcp_server->validate_range_to(range_to: "192.168.1.3");
+                $dhcp_server->range_to->value = "192.168.1.3";
+                $dhcp_server->validate_extra();
             }
         );
+        
+        # Delete the static map
+        $static_map->delete();
     }
 
     /**
@@ -237,8 +241,8 @@ class APIModelsDHCPServerTestCase extends TestCase
      */
     public function test_no_staticarp_with_no_ip_static_mappings() {
         # Add a DHCP static mapping
-        # TODO: Change this to use the DHCPServerStaticMapping Model when developed
-        Model::set_config("dhcpd/lan/staticmap", [["mac" => "00:00:00:00:00:00"]]);
+        $static_mapping = new DHCPServerStaticMapping(parent_id: "lan", mac: "00:00:00:00:00:00");
+        $static_mapping->create();
 
         # Ensure an error is thrown when we try to change the DHCP server pool to conflict with the static mapping
         $this->assert_throws_response(
@@ -250,6 +254,9 @@ class APIModelsDHCPServerTestCase extends TestCase
                 $dhcp_server->validate_staticarp(staticarp: true);
             }
         );
+        
+        # Delete the static mapping
+        $static_mapping->delete();
     }
 
     /**

@@ -1212,4 +1212,14 @@ class NetworkInterface extends Model
         $subnet = $this->get_current_subnetv4();
         return gen_subnetv4_max($ip, $subnet);
     }
+    
+    /**
+     * Checks if a given IPv4 address is within this interface's configured network CIDR.
+     * @param string $ipaddr The IPv4 address to check.
+     * @return bool Returns true if the $ipaddr is an address within this interface's configured IPv4 CIDR, returns
+     * false otherwise.
+     */
+    public function is_ipv4_in_cidr(string $ipaddr): bool {
+        return (bool)ip_in_subnet($ipaddr, $this->get_current_ipv4()."/".$this->get_current_subnetv4());
+    }
 }
