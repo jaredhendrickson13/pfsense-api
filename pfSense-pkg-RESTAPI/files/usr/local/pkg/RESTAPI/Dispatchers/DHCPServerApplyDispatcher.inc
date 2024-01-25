@@ -3,6 +3,7 @@
 namespace RESTAPI\Dispatchers;
 
 use RESTAPI\Core\Dispatcher;
+use RESTAPI\Core\Model;
 
 class DHCPServerApplyDispatcher extends Dispatcher
 {
@@ -17,13 +18,13 @@ class DHCPServerApplyDispatcher extends Dispatcher
         $retvaldhcp = 0;
         $retvaldns = 0;
 
-        if ($this->is_config_enabled('dnsmasq') && $this->is_config_enabled('dnsmasq', 'regdhcpstatic')) {
+        if (Model::is_config_enabled('dnsmasq') && Model::is_config_enabled('dnsmasq', 'regdhcpstatic')) {
             $retvaldns |= services_dnsmasq_configure();
             if ($retvaldns == 0) {
                 clear_subsystem_dirty('hosts');
                 clear_subsystem_dirty('staticmaps');
             }
-            if ($this->is_config_enabled('unbound') && $this->is_config_enabled('unbound', 'regdhcpstatic')) {
+            if (Model::is_config_enabled('unbound') && Model::is_config_enabled('unbound', 'regdhcpstatic')) {
                 $retvaldns |= services_unbound_configure();
                 if ($retvaldns == 0) {
                     clear_subsystem_dirty('unbound');
@@ -41,10 +42,10 @@ class DHCPServerApplyDispatcher extends Dispatcher
         if (!function_exists('is_package_installed')) {
             require_once('pkg-utils.inc');
         }
-        if (is_package_installed('pfSense-pkg-bind') && $this->is_config_enabled('installedpackages/bind/config/0', 'enable_bind')) {
+        if (is_package_installed('pfSense-pkg-bind') && Model::is_config_enabled('installedpackages/bind/config/0', 'enable_bind')) {
             $reloadbind = false;
-            if (is_array($this->get_config('installedpackages/bindzone'))) {
-                $bindzone = $this->get_config('installedpackages/bindzone/config');
+            if (is_array(Model::get_config('installedpackages/bindzone'))) {
+                $bindzone = Model::get_config('installedpackages/bindzone/config');
             } else {
                 $bindzone = array();
             }

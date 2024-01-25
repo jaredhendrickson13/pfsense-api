@@ -3,6 +3,7 @@
 namespace RESTAPI\Models;
 
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\DHCPServerApplyDispatcher;
 use RESTAPI\Fields\StringField;
 
 class DHCPServerBackend extends Model
@@ -15,6 +16,7 @@ class DHCPServerBackend extends Model
         $this->config_path = "/";
         $this->many = false;
         $this->update_strategy = "merge";
+        $this->always_apply = true;
 
         # Set model fields
         $this->dhcpbackend = new StringField(
@@ -25,5 +27,13 @@ class DHCPServerBackend extends Model
         );
 
         parent::__construct(...$options, data: $data);
+    }
+    
+    /**
+     * Apply changes to the DHCP server service.
+     */
+    public function apply(): void
+    {
+        (new DHCPServerApplyDispatcher(async: $this->async))->spawn_process();
     }
 }
