@@ -119,14 +119,14 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
     }
 
     private function __validate_subacct() {
-        if (isset($this->initial_data['lw_subacct'])) {
-            if (strlen($this->initial_data['lw_subacct']) == 6 && ctype_alnum($this->initial_data['lw_subacct'])) {
-                $this->validated_data['lw_subacct'] = $this->initial_data['lw_subacct'];
+        if (isset($this->initial_data['external_ref_tag'])) {
+            if (ctype_alnum($this->initial_data['external_ref_tag'])) {
+                $this->validated_data['external_ref_tag'] = $this->initial_data['external_ref_tag'];
             } else {
-                $this->errors[] = APIResponse\get(2273, ['lw_subacct' => $this->initial_data['lw_subacct']]);
+                $this->errors[] = APIResponse\get(2273, ['external_ref_tag' => $this->initial_data['external_ref_tag']]);
             }
         } else {
-            $this->errors[] = APIResponse\get(2273, ['lw_subacct' => $this->initial_data['lw_subacct']]);
+            $this->errors[] = APIResponse\get(2273, ['external_ref_tag' => $this->initial_data['external_ref_tag']]);
         }
     }
 
@@ -193,11 +193,11 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
                 if (!is_bool($extaddr['ssl'])) {
                     $this->errors[] = APIResponse\get(2271, ['extaddr' => $extaddr]);
                     $extaddr_bad_ssl = true;
-                } elseif ($extaddr['ssl'] === 'no') {
+                } elseif ($extaddr['ssl'] === false) {
                     unset($extaddr['ssl']);
                 } else {
                     $this->validate_crt = true;
-                    $bind_address['extaddr_ssl'] = $extaddr['ssl'];
+                    $bind_address['extaddr_ssl'] = 'yes';
                 } 
             }
 
@@ -304,10 +304,11 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
             $revert_msg = 'Reverting back to original configuration.';
             $result = haproxy_check_and_run($revert_msg, true);
             clear_subsystem_dirty('haproxy.conf');
-            return APIResponse\get(2272, ['request_data' => $this->initial_data, 'haproxy_errors' => $haproxy_errors]);
+            $this->errors[] = APIResponse\get(2272, ['request_data' => $this->initial_data, 'haproxy_errors' => $haproxy_errors]);
+            return false;
         } else {
             clear_subsystem_dirty('haproxy.conf');
-            return APIResponse\get(0, ['msg' => 'Frontend successfully created!', 'request_data' => $this->initial_data]);
+            return true;
         }
     }
 
@@ -319,7 +320,9 @@ class APIServicesHAProxyFrontendCreate extends APIModel {
         $this->write_config();
 
         if ($this->initial_data['apply'] === true) {
-            $this->__apply();
+            if ($this->__apply()) {
+                return APIResponse\get(0, ['msg' => 'Frontend successfully created!', 'request_data' => $this->initial_data]);
+            }
         } else {
             return APIResponse\get(0, ['msg' => 'Frontend successfully created, but not applied. Apply changes using /api/v1/services/haproxy/apply', 'request_data' => $this->initial_data]);
         }
