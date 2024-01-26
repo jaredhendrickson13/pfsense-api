@@ -258,7 +258,7 @@ class ModelSet {
      * @return bool `true` if the $value1 and $value2 do not match. `false` if they do not.
      */
     private static function except(mixed $value1, mixed $value2) : bool {
-        return ($value1 != $value2);
+        return ($value1 !== $value2);
     }
 
     /**

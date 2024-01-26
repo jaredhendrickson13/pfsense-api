@@ -42,7 +42,12 @@ class APIModelsDHCPServerStaticMappingTestCase extends TestCase
      */
     public function test_ipaddr_cannot_overlap_address_pool(): void {
         # Create an address pool to test with
-        $pool = new DHCPServerAddressPool(parent_id: "lan", range_from: "192.168.1.210", range_to: "192.168.1.215");
+        $pool = new DHCPServerAddressPool(
+            parent_id: "lan",
+            range_from: "192.168.1.210",
+            range_to: "192.168.1.215",
+            async: false
+        );
         $pool->create();
 
         # Ensure an error is thrown if we try to create a DHCPServerStaticMapping with the IP within the address pool

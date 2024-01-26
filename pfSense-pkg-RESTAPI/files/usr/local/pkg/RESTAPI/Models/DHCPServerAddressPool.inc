@@ -6,6 +6,7 @@ require_once("RESTAPI/autoloader.inc");
 
 use RESTAPI;
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\DHCPServerApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\NestedModelField;
@@ -45,8 +46,7 @@ class DHCPServerAddressPool extends Model
         $this->always_apply = true;
         
         $this->range_from = new StringField(
-            default: "",
-            allow_empty: true,
+            required: true,
             maximum_length: 15,
             internal_name: "from",
             internal_namespace: "range",
@@ -55,8 +55,7 @@ class DHCPServerAddressPool extends Model
             "to the `range_to` field."
         );
         $this->range_to = new StringField(
-            default: "",
-            allow_empty: true,
+            required: true,
             maximum_length: 15,
             internal_name: "to",
             internal_namespace: "range",
@@ -178,14 +177,14 @@ class DHCPServerAddressPool extends Model
     public function validate_extra(): void
     {
         # Check if this pool's range overlaps with another model object.
-        $overlapped_model = $this->get_range_overlap($this->range_from->value, $this->range_to->value);
+        $overlapped_model = $this->get_range_overlap();
         
         # Do not allow this DHCPServerAddressPool to overlap with other objects
         if ($overlapped_model) {
             throw new ConflictError(
-                message: "This DHCP server's primary address pool overlaps with $overlapped_model->verbose_name ".
+                message: "This DHCP server address pool overlaps with $overlapped_model->verbose_name ".
                 "object with ID `$overlapped_model->id`. Adjust your `range_from` and `range_to` values.",
-                response_id: "DHCP_SERVER_PRIMARY_POOL_OVERLAPS_EXISTING_OBJECT"
+                response_id: "DHCP_SERVER_ADDRESS_POOL_OVERLAPS_EXISTING_OBJECT"
             );
         }
     }
@@ -206,7 +205,7 @@ class DHCPServerAddressPool extends Model
         if ($interface->get_network_ipv4() == $range_from) {
             throw new ValidationError(
                 message: "DHCP server `range_from` cannot be the interface subnet's network address.",
-                response_id: "DHCP_SERVER_RANGE_FROM_CANNOT_BE_NETWORK_ADDRESS"
+                response_id: "DHCP_SERVER_ADDRESS_POOL_RANGE_FROM_CANNOT_BE_NETWORK_ADDRESS"
             );
         }
 
@@ -214,7 +213,7 @@ class DHCPServerAddressPool extends Model
         if (ip_greater_than($range_from, $this->range_to->value)) {
             throw new ValidationError(
                 message: "DHCP server `range_from` cannot be greater than `range_to`.",
-                response_id: "DHCP_SERVER_RANGE_FROM_CANNOT_BE_GREATER_THAN_RANGE_TO"
+                response_id: "DHCP_SERVER_ADDRESS_POOL_RANGE_FROM_CANNOT_BE_GREATER_THAN_RANGE_TO"
             );
         }
 
@@ -222,7 +221,7 @@ class DHCPServerAddressPool extends Model
         if (!is_inrange_v4($range_from, $interface->get_network_ipv4(), $interface->get_broadcast_ipv4())) {
             throw new ValidationError(
                 message: "DHCP server `range_from` must lie within the interface's subnet.",
-                response_id: "DHCP_SERVER_RANGE_FROM_OUTSIDE_OF_SUBNET"
+                response_id: "DHCP_SERVER_ADDRESS_POOL_RANGE_FROM_OUTSIDE_OF_SUBNET"
             );
         }
 
@@ -245,7 +244,7 @@ class DHCPServerAddressPool extends Model
         if ($interface->get_broadcast_ipv4() === $range_to) {
             throw new ValidationError(
                 message: "DHCP server `range_to` cannot be the interface subnet's broadcast address.",
-                response_id: "DHCP_SERVER_RANGE_FROM_CANNOT_BE_BROADCAST_ADDRESS"
+                response_id: "DHCP_SERVER_ADDRESS_POOL_RANGE_TO_CANNOT_BE_BROADCAST_ADDRESS"
             );
         }
 
@@ -253,7 +252,7 @@ class DHCPServerAddressPool extends Model
         if (!is_inrange_v4($range_to, $interface->get_network_ipv4(), $interface->get_broadcast_ipv4())) {
             throw new ValidationError(
                 message: "DHCP server `range_to` must lie within the interface's subnet.",
-                response_id: "DHCP_SERVER_RANGE_TO_OUTSIDE_OF_SUBNET"
+                response_id: "DHCP_SERVER_ADDRESS_POOL_RANGE_TO_OUTSIDE_OF_SUBNET"
             );
         }
 
@@ -270,7 +269,7 @@ class DHCPServerAddressPool extends Model
         if ($maxleasetime < $this->defaultleasetime->value) {
             throw new ValidationError(
                 message: "DHCP server `maxleasetime` cannot be less than the `defaultleasetime`",
-                response_id: "DHCP_SERVER_MAX_LEASE_TIME_LESS_THAN_DEFAULT"
+                response_id: "DHCP_SERVER_ADDRESS_POOL_MAX_LEASE_TIME_LESS_THAN_DEFAULT"
             );
         }
 
@@ -291,7 +290,7 @@ class DHCPServerAddressPool extends Model
         if ($gateway and !$interface->is_ipv4_in_cidr($gateway)) {
             throw new ValidationError(
                 message: "DHCP server `gateway` must be within interface's subnet.",
-                response_id: "DHCP_SERVER_GATEWAY_NOT_WITHIN_SUBNET"
+                response_id: "DHCP_SERVER_ADDRESS_POOL_GATEWAY_NOT_WITHIN_SUBNET"
             );
         }
 
@@ -299,16 +298,20 @@ class DHCPServerAddressPool extends Model
     }
 
     /**
-     * Checks if a given address range overlaps with reserved IPs such as static mappings, pools and virtual IPs.
-     * @param string $range_from The start address of the range.
-     * @param string $range_to The end address of the range.
+     * Checks if this pool's address range overlaps with reserved IPs such as static mappings, pools and virtual IPs.
      * @return Model|null Returns the Model object that this range overlaps with, returns
      * null if the range did not overlap with an existing Model object.
      */
-    private function get_range_overlap(string $range_from, string $range_to): ?Model
+    private function get_range_overlap(): ?Model
     {
+        # Variables
+        $range_from = $this->range_from->value;
+        $range_to = $this->range_to->value;
+        $parent_range_from = $this->parent_model->range_from->value;
+        $parent_range_to = $this->parent_model->range_to->value;
+
         # Ensure this IP address is not reserved by the primary DHCPServer address pool
-        if (is_inrange_v4($this->range_from, $range_to, $range_from) or is_inrange_v4($this->range_to, $range_to, $range_from)) {
+        if (is_inrange_v4($parent_range_from, $range_from, $range_to) or is_inrange_v4($parent_range_to, $range_from, $range_to)) {
             return $this;
         }
 
@@ -344,6 +347,6 @@ class DHCPServerAddressPool extends Model
      */
     public function apply(): void
     {
-        (new DHCPServerApply())->apply();
+        (new DHCPServerApplyDispatcher(async: $this->async))->spawn_process();
     }
 }
