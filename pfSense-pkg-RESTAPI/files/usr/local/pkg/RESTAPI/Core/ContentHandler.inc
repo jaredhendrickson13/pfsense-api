@@ -19,6 +19,8 @@ require_once("RESTAPI/autoloader.inc");
  */
 class ContentHandler extends BaseClass
 {
+    const DEFAULT_ENCODE_MIME_TYPE = "application/json";
+    
     /**
      * @var string $mime_type The unique name for this ContentHandler. This name MUST correspond to a valid HTTP Content-Type
      * and/or Accept type. This value is case-insensitive!
@@ -114,16 +116,15 @@ class ContentHandler extends BaseClass
     }
     
     /**
-     * Obtains an encode-capable ContentHandler for a given MIME type.
-     * @param string $mime_type The MIME type of the ContentHandler to look for.
+     * Obtains an encode-capable ContentHandler for the MIME type provided via the HTTP Accept header.
      * @returns ContentHandler The encode-capable ContentHandler object with the requested $mime_type.
      * @throws NotAcceptableError When the ContentHandler with the requested $mime_type does not support encoding.
      * @throws NotAcceptableError When no ContentHandler exists with this $mime_type. 
      */
-    public static function get_encode_handler(string $mime_type): ContentHandler {
+    public static function get_encode_handler(): ContentHandler {
         # Variables
         $handler_classes = get_classes_from_namespace("\\RESTAPI\\ContentHandlers\\");
-        $mime_type = strtolower($mime_type);
+        $mime_type = self::get_encode_mime_type();
         
         # Loop through each ContentHandler child class and find the handler for this $mime_type
         foreach ($handler_classes as $handler_class) {
@@ -158,16 +159,15 @@ class ContentHandler extends BaseClass
     }
 
     /**
-     * Obtains an decode-capable ContentHandler for a given MIME type.
-     * @param string $mime_type The MIME type of the ContentHandler to look for.
+     * Obtains a decode-capable ContentHandler for the MIME type provided via the HTTP Content-Type header.
      * @returns ContentHandler The decode-capable ContentHandler object with the requested $mime_type.
      * @throws NotAcceptableError When the ContentHandler with the requested $mime_type does not support decoding.
      * @throws NotAcceptableError When no ContentHandler exists with this $mime_type.
      */
-    public static function get_decode_handler(string $mime_type): ContentHandler {
+    public static function get_decode_handler(): ContentHandler {
         # Variables
         $handler_classes = get_classes_from_namespace("\\RESTAPI\\ContentHandlers\\");
-        $mime_type = strtolower($mime_type);
+        $mime_type = self::get_decode_mime_type();
 
         # Loop through each ContentHandler child class and find the handler for this $mime_type
         foreach ($handler_classes as $handler_class) {
@@ -199,5 +199,56 @@ class ContentHandler extends BaseClass
                 "to a valid option and try again.",
             response_id: "CONTENT_HANDLER_DECODE_NOT_FOUND"
         );
+    }
+    
+    /**
+     * Obtains the MIME type from the HTTP Accept header or assumes the default if no Accept header is specified. The
+     * Accept header controls which ContentHandler will be used to encode API responses.
+     * @return string The MIME type to be used as requested in the HTTP Accept header.
+     */
+    public static function get_encode_mime_type(): string {
+        # Obtain the requested MIME type from the HTTP Accept header sent by the remote client.
+        $mime_type = strtolower($_SERVER["HTTP_ACCEPT"]);
+        
+        # Assume the default if the Accept header is empty or any MIME type was requested
+        if (empty($mime_type) or $mime_type === "*/*") {
+            return self::DEFAULT_ENCODE_MIME_TYPE;
+        }
+
+        # Ignore media type parameters if present, they are unsupported at this time.
+        if (str_contains($mime_type, ";")) {
+            $mime_type = strstr($mime_type, ";", before_needle: true);
+        }
+        
+        return $mime_type;
+    }
+
+    /**
+     * Obtains the MIME type from the HTTP Content-Type header. The Content-Type header controls which ContentHandler
+     * will be used to decode request data sent by the remote client. If no content-header was specified, the API 
+     * will assume a default of application/x-www-form-urlencoded for GET and DELETE requests and a default of 
+     * application/json for POST, PUT and PATCH requests.
+     * @return string The MIME type to be used as requested in the HTTP Content-Header header.
+     */
+    public static function get_decode_mime_type(): string {
+        # Obtain the requested MIME type from the HTTP Accept header sent by the remote client.
+        $mime_type = strtolower($_SERVER["HTTP_CONTENT_TYPE"]);
+        $request_method = strtoupper($_SERVER["REQUEST_METHOD"]);
+
+        # Assume the default content-type based on the request method if no content-type was provided
+        if (empty($mime_type)) {
+            $mime_type = match ($request_method) {
+                "DELETE", "GET" => "application/x-www-form-urlencoded",
+                "POST", "PUT", "PATCH" => "application/json",
+                default => $mime_type,
+            };
+        }
+
+        # Ignore media type parameters if present, they are unsupported at this time.
+        if (str_contains($mime_type, ";")) {
+            $mime_type = strstr($mime_type, ";", before_needle: true);
+        }
+        
+        return $mime_type;
     }
 }

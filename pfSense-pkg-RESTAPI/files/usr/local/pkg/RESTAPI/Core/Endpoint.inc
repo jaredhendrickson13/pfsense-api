@@ -537,19 +537,8 @@ class Endpoint {
      * the $this->request_data property according to the client's requested content-type.
      */
     private function check_request_data(): void {
-        # Variables
-        $content_type = $_SERVER["HTTP_CONTENT_TYPE"];
-
-        # Assign the default content type for the request method if no content type was specified
-        if (!$content_type) {
-            $content_type = match ($this->request_method) {
-                "GET", "DELETE" => "application/x-www-form-urlencoded",
-                default => "application/json",
-            };
-        }
-
-        # Locate the ContentHandler associated with this content type and obtain our decoded content from the client
-        $content_handler = ContentHandler::get_decode_handler($content_type);
+        # Obtain the ContentHandler associated with the HTTP Content-Type header sent by the client
+        $content_handler = ContentHandler::get_decode_handler();
         $this->request_data = $content_handler->decode();
         $this->validate_endpoint_fields();
     }
@@ -609,8 +598,7 @@ class Endpoint {
 
             # Ensure we can obtain the ContentHandler that will be responsible for encoding response content
             # This will throw an error if the client's Accept header is not supported by an existing ContentHandler
-            $accept_type = $_SERVER["HTTP_ACCEPT"];
-            $content_handler = ContentHandler::get_encode_handler($accept_type);
+            $content_handler = ContentHandler::get_encode_handler();
 
             # Checks that request data was properly received and parsed.
             $this->check_request_method();

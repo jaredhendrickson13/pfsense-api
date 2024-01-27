@@ -351,6 +351,129 @@ class APIModelsDHCPServerAddressPoolTestCase extends TestCase
         $pool->delete();
         $dhcpd_conf = file_get_contents("/var/dhcpd/etc/dhcpd.conf");
         $this->assert_str_does_not_contain($dhcpd_conf, "range 192.168.1.205 192.168.1.210;");
+    }
 
+    /**
+     * Checks that address pools are correctly represented in kea-dhcp4.conf after creation, modification and deletion.
+     */
+    public function test_crud_kea(): void
+    {
+        # Switch the DHCP server backend to Kea DHCP (kea-dhcp4)
+        $backend = new DHCPServerBackend(dhcpbackend: "kea", async: false);
+        $backend->update();
+
+        # Create an address pool to test with
+        # TODO: A current bug in pfSense prevents us from apply address pools with winsservers set. Once this bug
+        # TODO: is fixed we will want to include winsserver in this test
+        $pool = new DHCPServerAddressPool(
+            parent_id: "lan",
+            range_from: "192.168.1.200",
+            range_to: "192.168.1.205",
+            domain: "example.com",
+            mac_allow: ["00:11:22:33:44:55"],
+            mac_deny: ["55:44:33:22:11:00"],
+            domainsearchlist: ["example.com"],
+            defaultleasetime: 7201,
+            maxleasetime: 86401,
+            gateway: "192.168.1.2",
+            dnsserver: ["127.0.0.53"],
+            ntpserver: ["127.0.0.123"],
+            async: false
+        );
+        $pool->create();
+
+        # Ensure the pool is found in kea-dhcp4.conf
+        $kea_conf = file_get_contents("/usr/local/etc/kea/kea-dhcp4.conf");
+        $kea_json = json_decode($kea_conf, associative: true);
+        $kea_pool = $kea_json["Dhcp4"]["subnet4"][0]["pools"][1];
+        $this->assert_equals($kea_pool["pool"], $pool->range_from->value." - ".$pool->range_to->value);
+        $this->assert_equals($kea_pool["valid-lifetime"], (string)$pool->defaultleasetime->value);
+        $this->assert_equals($kea_pool["max-valid-lifetime"], (string)$pool->maxleasetime->value);
+        $this->assert_equals(
+            $this->get_kea_option_by_name("domain-name-servers", $kea_pool["option-data"]), 
+            $pool->dnsserver->value[0]
+        );
+        $this->assert_equals(
+            $this->get_kea_option_by_name("routers", $kea_pool["option-data"]),
+            $pool->gateway->value
+        );
+        $this->assert_equals(
+            $this->get_kea_option_by_name("domain-name", $kea_pool["option-data"]),
+            $pool->domain->value
+        );
+        $this->assert_equals(
+            $this->get_kea_option_by_name("domain-search", $kea_pool["option-data"]),
+            $pool->domainsearchlist->value[0]
+        );
+        $this->assert_equals(
+            $this->get_kea_option_by_name("ntp-servers", $kea_pool["option-data"]),
+            $pool->ntpserver->value[0]
+        );
+        
+        # Update the pool with new values and ensure they are updated in kea-dhcp4.conf
+        $pool->from_representation(
+            parent_id: "lan",
+            range_from: "192.168.1.205",
+            range_to: "192.168.1.210",
+            domain: "example.com",
+            mac_allow: ["55:44:33:22:11:00"],
+            mac_deny: ["00:11:22:33:44:55"],
+            domainsearchlist: ["new.example.com"],
+            defaultleasetime: 7205,
+            maxleasetime: 86405,
+            gateway: "192.168.1.5",
+            dnsserver: ["127.0.1.53"],
+            ntpserver: ["127.0.1.123"],
+        );
+        $pool->update();
+
+        # Ensure the updated pool is found in kea-dhcp4.conf
+        $kea_conf = file_get_contents("/usr/local/etc/kea/kea-dhcp4.conf");
+        $kea_json = json_decode($kea_conf, associative: true);
+        $kea_pool = $kea_json["Dhcp4"]["subnet4"][0]["pools"][1];
+        $this->assert_equals($kea_pool["pool"], $pool->range_from->value." - ".$pool->range_to->value);
+        $this->assert_equals($kea_pool["valid-lifetime"], (string)$pool->defaultleasetime->value);
+        $this->assert_equals($kea_pool["max-valid-lifetime"], (string)$pool->maxleasetime->value);
+        $this->assert_equals(
+            $this->get_kea_option_by_name("domain-name-servers", $kea_pool["option-data"]),
+            $pool->dnsserver->value[0]
+        );
+        $this->assert_equals(
+            $this->get_kea_option_by_name("routers", $kea_pool["option-data"]),
+            $pool->gateway->value
+        );
+        $this->assert_equals(
+            $this->get_kea_option_by_name("domain-name", $kea_pool["option-data"]),
+            $pool->domain->value
+        );
+        $this->assert_equals(
+            $this->get_kea_option_by_name("domain-search", $kea_pool["option-data"]),
+            $pool->domainsearchlist->value[0]
+        );
+        $this->assert_equals(
+            $this->get_kea_option_by_name("ntp-servers", $kea_pool["option-data"]),
+            $pool->ntpserver->value[0]
+        );
+        
+        # Delete this DHCP pool and ensure it is no longe present in kea-dhcp4.conf
+        $pool->delete();
+        $kea_conf = file_get_contents("/usr/local/etc/kea/kea-dhcp4.conf");
+        $this->assert_str_does_not_contain($kea_conf,$pool->range_from->value." - ".$pool->range_to->value);
+    }
+
+    /**
+     * Obtains the 'data' value of a Kea reservations options-data item with a provided name.
+     * @param string $name The name of the reservations option-data item to obtain
+     * @param array $option_data The entire reservation's `option-data` array.
+     * @return string The 'data' value of the $options_data item with the given $name
+     */
+    public function get_kea_option_by_name(string $name, array $option_data): string {
+        foreach ($option_data as $option) {
+            if ($option["name"] === $name) {
+                return $option["data"];
+            }
+        }
+
+        return "";
     }
 }
