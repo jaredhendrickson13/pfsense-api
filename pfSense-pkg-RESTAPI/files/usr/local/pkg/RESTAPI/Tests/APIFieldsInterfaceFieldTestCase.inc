@@ -41,6 +41,12 @@ class APIFieldsInterfaceFieldTestCase extends TestCase
         $test_field->set_choices_from_callable();
         $this->assert_is_true(in_array("em0", $test_field->choices));
         $this->assert_is_true(in_array("em1", $test_field->choices));
+
+        # Check that allowed keywords are present when set
+        $test_field = new InterfaceField(allowed_keywords: ["lo0", "test"]);
+        $test_field->set_choices_from_callable();
+        $this->assert_is_true(in_array("lo0", $test_field->choices));
+        $this->assert_is_true(in_array("test", $test_field->choices));
     }
 
     /**

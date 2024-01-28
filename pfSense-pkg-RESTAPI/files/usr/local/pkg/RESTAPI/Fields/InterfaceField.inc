@@ -15,12 +15,12 @@ use RESTAPI\Responses\NotFoundError;
  * Defines an InterfaceField class that extends the Core Field method. This Field adds validation and representation for
  * Fields that accept interface IDs and/or names as input.
  */
-class InterfaceField extends RESTAPI\Fields\StringField {
-    public array $interface_query;
-    public bool $allow_interface_groups;
-    public bool $allow_ipsec_interface;
-    public bool $allow_openvpn_interface;
-    public bool $allow_carp_interface;
+class InterfaceField extends StringField
+{
+    /**
+     * @var string $represented_as The interface field that interfaces are represented as by this field. This value
+     * directly corresponds with the REST API setting's `represent_interfaces_as` field.
+     */
     public string $represented_as;
 
     /**
@@ -35,6 +35,7 @@ class InterfaceField extends RESTAPI\Fields\StringField {
      * @param bool $allow_ipsec_interface If `true`, IPsec's `enc0` interface will included as a valid choice.
      * @param bool $allow_openvpn_interface If `true`, the `openvpn` interface will be included as valid choice.
      * @param bool $allow_carp_interface If `true`, all CARP unique IDs will be included as valid choices.
+     * @param array $allowed_keywords An array of non-interface values that should be considered as valid.
      * @param bool $allow_empty If `true`, empty strings will be allowed by this field.
      * @param bool $allow_null If `true`, null values will be allowed by this field.
      * @param bool $read_only If `true`, this field can only read its value and cannot write its value to config.
@@ -77,11 +78,12 @@ class InterfaceField extends RESTAPI\Fields\StringField {
         bool $required = false,
         bool $unique = false,
         mixed $default = null,
-        array $interface_query = [],
-        bool $allow_interface_groups = false,
-        bool $allow_ipsec_interface = false,
-        bool $allow_openvpn_interface = false,
-        bool $allow_carp_interface = false,
+        public array $interface_query = [],
+        public bool $allow_interface_groups = false,
+        public bool $allow_ipsec_interface = false,
+        public bool $allow_openvpn_interface = false,
+        public bool $allow_carp_interface = false,
+        public array $allowed_keywords = [],
         bool $allow_empty = false,
         bool $allow_null = false,
         bool $read_only = false,
@@ -102,12 +104,6 @@ class InterfaceField extends RESTAPI\Fields\StringField {
         string $help_text = ""
     )
     {
-        # Assign properties unique to this Field
-        $this->interface_query = $interface_query;
-        $this->allow_interface_groups = $allow_interface_groups;
-        $this->allow_ipsec_interface = $allow_ipsec_interface;
-        $this->allow_openvpn_interface = $allow_openvpn_interface;
-        $this->allow_carp_interface = $allow_carp_interface;
         $this->represented_as = RESTAPI\Models\RESTAPISettings::get_pkg_config()["represent_interfaces_as"];
 
         # Construct the parent Field object
@@ -233,6 +229,11 @@ class InterfaceField extends RESTAPI\Fields\StringField {
         # Allow the OpenVPN `openvpn` interface if requested
         if ($this->allow_openvpn_interface) {
             $choices["openvpn"] = "OpenVPN";
+        }
+
+        # Allow allowed keywords as valid choices
+        foreach ($this->allowed_keywords as $allowed_keyword) {
+            $choices[$allowed_keyword] = $allowed_keyword;
         }
 
         return $choices;
