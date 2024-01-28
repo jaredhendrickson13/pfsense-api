@@ -11,7 +11,7 @@ use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use RESTAPI\Validators\LengthValidator;
 
-class NTPServer extends Model
+class NTPSettings extends Model
 {
     public BooleanField $enable;
     public InterfaceField $interface;
@@ -49,6 +49,7 @@ class NTPServer extends Model
         );
         $this->interface = new InterfaceField(
             default: [],
+            allowed_keywords: ["lo0"],
             allow_empty: true,
             many: true,
             help_text: "The interfaces the NTP server will listen on."
@@ -177,21 +178,35 @@ class NTPServer extends Model
             );
         }
 
-        # Throw an error if $serverauthkey is not a hex value of 40 characters and `serverauthalgo` is sha1
-        if ($this->serverauthalgo->value === "sha1" and strlen($serverauthkey) === 40 or !ctype_xdigit($serverauthkey)) {
+        # Throw an error if $serverauthkey is not exactly 40 characters and `serverauthalgo` is sha1
+        if ($this->serverauthalgo->value === "sha1" and (strlen($serverauthkey) !== 40)) {
             throw new ValidationError(
-                message: "Field `serverauthkey` must be a hex-encoded string that is 40 characters in length when .".
-                    "`serverauthalgo` is `sha1`.",
-                response_id: "NTP_SERVER_SERVERAUTHKEY_INVALID_SHA1_VALUE"
+                message: "Field `serverauthkey` must be exactly 40 characters when `serverauthalgo` is set to `sha1`.",
+                response_id: "NTP_SERVER_SERVERAUTHKEY_SHA1_CHARACTER_REQUIREMENT_UNMET"
             );
         }
 
-        # Throw an error if $serverauthkey is not a hex value of 64 characters and `serverauthalgo` is sha256
-        if ($this->serverauthalgo->value === "sha256" and strlen($serverauthkey) === 64 or !ctype_xdigit($serverauthkey)) {
+        # Throw an error if $serverauthkey is not a hex value and `serverauthalgo` is sha1
+        if ($this->serverauthalgo->value === "sha1" and !ctype_xdigit($serverauthkey)) {
             throw new ValidationError(
-                message: "Field `serverauthkey` must be a hex-encoded string that is 64 characters in length when .".
-                    "`serverauthalgo` is `sha56`.",
-                response_id: "NTP_SERVER_SERVERAUTHKEY_INVALID_SHA1_VALUE"
+                message: "Field `serverauthkey` must be a hex-encoded value when `serverauthalgo` is set to `sha1`.",
+                response_id: "NTP_SERVER_SERVERAUTHKEY_MUST_BE_HEX_VALUE_SHA1"
+            );
+        }
+
+        # Throw an error if $serverauthkey is not exactly of 64 characters and `serverauthalgo` is sha256
+        if ($this->serverauthalgo->value === "sha256" and (strlen($serverauthkey) !== 64)) {
+            throw new ValidationError(
+                message: "Field `serverauthkey` must be exactly 40 characters when `serverauthalgo` is set to `sha1`.",
+                response_id: "NTP_SERVER_SERVERAUTHKEY_SHA256_CHARACTER_REQUIREMENT_UNMET"
+            );
+        }
+
+        # Throw an error if $serverauthkey is not a hex value and `serverauthalgo` is sha256
+        if ($this->serverauthalgo->value === "sha256" and !ctype_xdigit($serverauthkey)) {
+            throw new ValidationError(
+                message: "Field `serverauthkey` must be a hex-encoded value when `serverauthalgo` is set to `sha256`.",
+                response_id: "NTP_SERVER_SERVERAUTHKEY_MUST_BE_HEX_VALUE_SHA256"
             );
         }
 
