@@ -25,7 +25,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                 "ipprotocol" => "inet",
                 "interface" => "lan",
                 "gateway" => "192.168.1.10"
-            ]
+            ],
+            async: false
         );
         $test_gateway->create(apply: true);
 
@@ -34,7 +35,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
             data: [
                 "network" => "1.2.3.4/32",
                 "gateway" => "TEST_GW"
-            ]
+            ],
+            async: false
         );
         $test_route->create(apply: true);
 
@@ -75,7 +77,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                 "descr" => "TEST_IFACE",
                 "typev4" => "none",
                 "typev6" => "none"
-            ]
+            ],
+            async: false
         );
         $test_if->create();
 
@@ -90,7 +93,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                         "interface" => $test_if->id,
                         "ipprotocol" => "inet",
                         "gateway" => "1.2.3.4"
-                    ]
+                    ],
+                    async: false
                 );
                 $test_gw->validate();
             }
@@ -106,7 +110,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                         "interface" => $test_if->id,
                         "ipprotocol" => "inet6",
                         "gateway" => "1234::2"
-                    ]
+                    ],
+                    async: false
                 );
                 $test_gw->validate();
             }
@@ -136,7 +141,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                         "interface" => $test_if->id,
                         "ipprotocol" => "inet",
                         "gateway" => "1.2.3.4"
-                    ]
+                    ],
+                    async: false
                 );
                 $test_gw->validate();
             }
@@ -150,7 +156,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                         "interface" => $test_if->id,
                         "ipprotocol" => "inet6",
                         "gateway" => "1234::2"
-                    ]
+                    ],
+                    async: false
                 );
                 $test_gw->validate();
             }
@@ -174,7 +181,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                         "interface" => "wan",
                         "ipprotocol" => "inet6",
                         "gateway" => "1.2.3.4"
-                    ]
+                    ],
+                    async: false
                 );
                 $test_gw->validate();
             }
@@ -191,7 +199,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                         "interface" => "wan",
                         "ipprotocol" => "inet",
                         "gateway" => "1234::2"
-                    ]
+                    ],
+                    async: false
                 );
                 $test_gw->validate();
             }
@@ -206,7 +215,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                         "interface" => "wan",
                         "ipprotocol" => "inet6",
                         "gateway" => "1234::2"
-                    ]
+                    ],
+                    async: false
                 );
                 $test_gw->validate();
             }
@@ -221,7 +231,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                         "interface" => "wan",
                         "ipprotocol" => "inet",
                         "gateway" => "1.2.3.4"
-                    ]
+                    ],
+                    async: false
                 );
                 $test_gw->validate();
             }
@@ -244,7 +255,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                         "gateway" => "1.2.3.4",
                         "latencylow" => 200,
                         "latencyhigh" => 199
-                    ]
+                    ],
+                    async: false
                 );
                 $test_gw->validate();
             }
@@ -267,7 +279,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                         "gateway" => "1.2.3.4",
                         "losslow" => 10,
                         "losshigh" => 9
-                    ]
+                    ],
+                    async: false
                 );
                 $test_gw->validate();
             }
@@ -290,7 +303,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                         "gateway" => "1.2.3.4",
                         "loss_interval" => 499,
                         "latencyhigh" => 500
-                    ]
+                    ],
+                    async: false
                 );
                 $test_gw->validate();
             }
@@ -320,7 +334,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                         "time_period" => $minimum,
                         "interval" => $interval,
                         "loss_interval" => $loss_interval
-                    ]
+                    ],
+                    async: false
                 );
                 $test_gw->validate();
             }
@@ -338,7 +353,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                         "time_period" => $minimum + 1,
                         "interval" => $interval,
                         "loss_interval" => $loss_interval
-                    ]
+                    ],
+                    async: false
                 );
                 $test_gw->validate();
             }
@@ -361,7 +377,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                         "gateway" => "1.2.3.4",
                         "interval" => 500,
                         "alert_interval" => 499
-                    ]
+                    ],
+                    async: false
                 );
                 $test_gw->validate();
             }
@@ -379,7 +396,8 @@ class APIModelsRoutingGatewayTestCase extends TestCase
                 "interface" => "lan",
                 "ipprotocol" => "inet",
                 "gateway" => "1.2.3.4"
-            ]
+            ],
+            async: false
         );
         $test_gw->create(apply: true);
 

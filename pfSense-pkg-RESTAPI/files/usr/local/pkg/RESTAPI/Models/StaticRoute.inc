@@ -3,8 +3,8 @@
 namespace RESTAPI\Models;
 
 use RESTAPI;
-use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\RoutingApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
@@ -167,7 +167,7 @@ class StaticRoute extends Model
      * Applies pending static route changes.
      */
     public function apply() {
-        (new RoutingApply())->apply();
+        (new RoutingApplyDispatcher(async: $this->async))->spawn_process();
     }
 
     /**

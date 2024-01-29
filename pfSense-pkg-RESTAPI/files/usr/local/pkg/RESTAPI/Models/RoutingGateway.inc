@@ -3,8 +3,8 @@
 namespace RESTAPI\Models;
 
 use RESTAPI;
-use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
+use RESTAPI\Dispatchers\RoutingApplyDispatcher;
 use RESTAPI\Fields\BooleanField;
 use RESTAPI\Fields\IntegerField;
 use RESTAPI\Fields\InterfaceField;
@@ -373,8 +373,8 @@ class RoutingGateway extends Model
     /**
      * Defines how gateways should be applied after creation and updates.
      */
-    public function apply() {
-        (new RoutingApply())->apply();
+    public function apply(): void {
+        (new RoutingApplyDispatcher(async: $this->async))->spawn_process();
     }
 
     /**

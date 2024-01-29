@@ -26,7 +26,8 @@ class APIModelsStaticRouteTestCase extends TestCase
                 "typev6" => "staticv6",
                 "ipaddrv6" => "1234::2",
                 "subnetv6" => 64
-            ]
+            ],
+            async: false
         );
         $test_if->create();
 
@@ -37,7 +38,8 @@ class APIModelsStaticRouteTestCase extends TestCase
                 "interface" => $test_if->id,
                 "ipprotocol" => "inet",
                 "gateway" => "1.2.3.1"
-            ]
+            ],
+            async: false
         );
         $test_gw6 = new RoutingGateway(
             data: [
@@ -45,7 +47,8 @@ class APIModelsStaticRouteTestCase extends TestCase
                 "interface" => $test_if->id,
                 "ipprotocol" => "inet6",
                 "gateway" => "1234::1"
-            ]
+            ],
+            async: false
         );
         $test_gw4->create();
         $test_gw6->create();
@@ -59,7 +62,8 @@ class APIModelsStaticRouteTestCase extends TestCase
                     data: [
                         "gateway" => $test_gw4->name->value,
                         "network" => $test_if->ipaddr->value."/".$test_if->subnet->value,
-                    ]
+                    ],
+                    async: false
                 );
                 $test_route->validate();
             }
@@ -73,7 +77,8 @@ class APIModelsStaticRouteTestCase extends TestCase
                     data: [
                         "gateway" => $test_gw6->name->value,
                         "network" => $test_if->ipaddrv6->value."/".$test_if->subnetv6->value,
-                    ]
+                    ],
+                    async: false
                 );
                 $test_route->validate();
             }
@@ -86,7 +91,8 @@ class APIModelsStaticRouteTestCase extends TestCase
                     data: [
                         "gateway" => $test_gw4->name->value,
                         "network" => "4.3.2.1/24",
-                    ]
+                    ],
+                    async: false
                 );
                 $test_route->validate();
             }
@@ -97,7 +103,8 @@ class APIModelsStaticRouteTestCase extends TestCase
                     data: [
                         "gateway" => $test_gw6->name->value,
                         "network" => "4321::/64",
-                    ]
+                    ],
+                    async: false
                 );
                 $test_route->validate();
             }
@@ -125,7 +132,8 @@ class APIModelsStaticRouteTestCase extends TestCase
                 "typev6" => "staticv6",
                 "ipaddrv6" => "1234::2",
                 "subnetv6" => 64
-            ]
+            ],
+            async: false
         );
         $test_if->create();
 
@@ -136,7 +144,8 @@ class APIModelsStaticRouteTestCase extends TestCase
                 "interface" => $test_if->id,
                 "ipprotocol" => "inet",
                 "gateway" => "1.2.3.1"
-            ]
+            ],
+            async: false
         );
         $test_gw6 = new RoutingGateway(
             data: [
@@ -144,7 +153,8 @@ class APIModelsStaticRouteTestCase extends TestCase
                 "interface" => $test_if->id,
                 "ipprotocol" => "inet6",
                 "gateway" => "1234::1"
-            ]
+            ],
+            async: false
         );
         $test_gw4->create();
         $test_gw6->create();
@@ -158,7 +168,8 @@ class APIModelsStaticRouteTestCase extends TestCase
                     data: [
                         "gateway" => $test_gw4->name->value,
                         "network" => "1111::1/64",
-                    ]
+                    ],
+                    async: false
                 );
                 $test_route->validate();
             }
@@ -172,7 +183,8 @@ class APIModelsStaticRouteTestCase extends TestCase
                     data: [
                         "gateway" => $test_gw6->name->value,
                         "network" => "1.1.1.1/24",
-                    ]
+                    ],
+                    async: false
                 );
                 $test_route->validate();
             }
@@ -196,7 +208,8 @@ class APIModelsStaticRouteTestCase extends TestCase
                 "ipprotocol" => "inet",
                 "gateway" => "1.2.3.1",
                 "disabled" => true
-            ]
+            ],
+            async: false
         );
         $test_gw4->create();
 
@@ -210,7 +223,8 @@ class APIModelsStaticRouteTestCase extends TestCase
                         "gateway" => $test_gw4->name->value,
                         "network" => "4.3.2.1/24",
                         "disabled" => false
-                    ]
+                    ],
+                    async: false
                 );
                 $test_route->validate();
             }
@@ -240,7 +254,8 @@ class APIModelsStaticRouteTestCase extends TestCase
                 "interface" => "lan",
                 "ipprotocol" => "inet",
                 "gateway" => "192.168.1.10"
-            ]
+            ],
+            async: false
         );
         $test_gw->create();
 
@@ -249,7 +264,8 @@ class APIModelsStaticRouteTestCase extends TestCase
             data: [
                 "gateway" => $test_gw->name->value,
                 "network" => $test_alias->name->value
-            ]
+            ],
+            async: false
         );
 
         # Validate the route and check that the output of get_networks() is expected
@@ -283,13 +299,15 @@ class APIModelsStaticRouteTestCase extends TestCase
                 "interface" => "lan",
                 "ipprotocol" => "inet",
                 "gateway" => "192.168.1.10"
-            ]
+            ],
+            async: false
         );
         $test_gw->create();
 
         # Create a static route using the gateway above
-        $test_route = new StaticRoute(data:
-            ["network" => "1.2.3.0/24", "gateway" => $test_gw->name->value]
+        $test_route = new StaticRoute(
+            data: ["network" => "1.2.3.0/24", "gateway" => $test_gw->name->value],
+            async: false
         );
         $test_route->create(apply: true);
 
