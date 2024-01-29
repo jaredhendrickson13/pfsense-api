@@ -35,7 +35,7 @@ class InterfaceField extends StringField
      * @param bool $allow_ipsec_interface If `true`, IPsec's `enc0` interface will included as a valid choice.
      * @param bool $allow_openvpn_interface If `true`, the `openvpn` interface will be included as valid choice.
      * @param bool $allow_carp_interface If `true`, all CARP unique IDs will be included as valid choices.
-     * @param array $allowed_keywords An array of non-interface values that should be considered as valid.
+     * @param bool $allow_localhost_interface If `true`, the localhost interface will be included as a valid choice.
      * @param bool $allow_empty If `true`, empty strings will be allowed by this field.
      * @param bool $allow_null If `true`, null values will be allowed by this field.
      * @param bool $read_only If `true`, this field can only read its value and cannot write its value to config.
@@ -75,25 +75,25 @@ class InterfaceField extends StringField
      * @param string $help_text Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
-        bool $required = false,
-        bool $unique = false,
-        mixed $default = null,
+        bool         $required = false,
+        bool         $unique = false,
+        mixed        $default = null,
         public array $interface_query = [],
-        public bool $allow_interface_groups = false,
-        public bool $allow_ipsec_interface = false,
-        public bool $allow_openvpn_interface = false,
-        public bool $allow_carp_interface = false,
-        public array $allowed_keywords = [],
-        bool $allow_empty = false,
-        bool $allow_null = false,
-        bool $read_only = false,
-        bool $write_only = false,
-        bool $representation_only = false,
-        bool $editable = true,
-        bool $many = false,
-        int $many_minimum = 1,
-        int $many_maximum = 128,
-        string|null $delimiter = ",",
+        public bool  $allow_interface_groups = false,
+        public bool  $allow_ipsec_interface = false,
+        public bool  $allow_openvpn_interface = false,
+        public bool  $allow_carp_interface = false,
+        public bool  $allow_localhost_interface = false,
+        bool         $allow_empty = false,
+        bool         $allow_null = false,
+        bool         $read_only = false,
+        bool         $write_only = false,
+        bool         $representation_only = false,
+        bool         $editable = true,
+        bool         $many = false,
+        int          $many_minimum = 1,
+        int          $many_maximum = 128,
+        string|null  $delimiter = ",",
         string $verbose_name = "",
         string $verbose_name_plural = "",
         string $internal_name = "",
@@ -231,9 +231,9 @@ class InterfaceField extends StringField
             $choices["openvpn"] = "OpenVPN";
         }
 
-        # Allow allowed keywords as valid choices
-        foreach ($this->allowed_keywords as $allowed_keyword) {
-            $choices[$allowed_keyword] = $allowed_keyword;
+        # Allow the Localhost `lo0` interface if requested
+        if ($this->allow_localhost_interface) {
+            $choices["lo0"] = "Localhost";
         }
 
         return $choices;

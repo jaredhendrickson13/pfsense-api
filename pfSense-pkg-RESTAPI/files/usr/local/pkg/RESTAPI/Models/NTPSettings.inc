@@ -49,7 +49,7 @@ class NTPSettings extends Model
         );
         $this->interface = new InterfaceField(
             default: [],
-            allowed_keywords: ["lo0"],
+            allow_localhost_interface: true,
             allow_empty: true,
             many: true,
             help_text: "The interfaces the NTP server will listen on."
