@@ -10,6 +10,15 @@ use RESTAPI\Models\Service;
 class APIModelsNTPSettingsTestCase extends TestCase
 {
     /**
+     * Ensure the NTP server is enabled before starting tests.
+     */
+    public function setup(): void
+    {
+        $ntp_settings = new NTPSettings(enable: true);
+        $ntp_settings->update();
+    }
+
+    /**
      * Checks that `ntpminpoll` cannot exceed the `ntpmaxpoll` value when both are numeric.
      */
     public function test_ntpminpoll_cannot_exceed_ntpmaxpoll(): void {
