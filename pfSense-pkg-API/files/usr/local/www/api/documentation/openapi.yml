@@ -6713,8 +6713,8 @@ paths:
                 descr:
                   description: Description of the created frontend.
                   type: string
-                lw_subacct:
-                  description: Customer subaccount, used for filtering results.
+                external_ref_tag:
+                  description: External metadata tag, used to group related frontends or backends together. 
                   type: string
                 ssloffloadcert:
                   description: Reference ID of the certificate to use for SSL termination. Use a GET
@@ -6733,7 +6733,7 @@ paths:
                     ssl: true
                 descr: ABC123_http_443
                 type: http
-                lw_subacct: ABC123
+                external_ref_tag: ABC123
                 ssloffloadcert: 65529826c2d24
                 backend_serverpool: ABC123_pool_443
                 apply: true
@@ -6742,7 +6742,7 @@ paths:
                 - name
                 - type
                 - descr
-                - lw_subacct
+                - external_ref_tag
                 - backend_serverpool
               type: object
       responses:
@@ -6807,8 +6807,8 @@ paths:
                 descr:
                   description: Description of the created frontend.
                   type: string
-                lw_subacct:
-                  description: Customer subaccount, used for filtering results.
+                external_ref_tag:
+                  description: External metadata tag, used to group related frontends or backends together.
                   type: string
                 ssloffloadcert:
                   description: Reference ID of the certificate to use for SSL termination. Use a GET
@@ -6828,7 +6828,7 @@ paths:
                     ssl: true
                 descr: ABC123_http_443
                 type: http
-                lw_subacct: ABC123
+                external_ref_tag: ABC123
                 ssloffloadcert: 65529826c2d24
                 backend_serverpool: ABC123_pool_443
                 apply: true
@@ -6948,8 +6948,8 @@ paths:
                   enum:
                     - http
                     - basic
-                lw_subacct:
-                  description: Customer subaccount, used for filtering results and also to set a deterministic
+                external_ref_tag:
+                  description: External metadata tag, used to group related frontends or backends together and also to set a deterministic
                     cookie name if cookie persistence is enabled.
                   type: string
                 persist_sticky_type:
@@ -6976,7 +6976,7 @@ paths:
               required:
                 - name
                 - balance
-                - lw_subacct
+                - external_ref_tag
                 - servers
               type: object
       responses:

@@ -116,19 +116,23 @@ class APIServicesHAProxyPoolCreate extends APIModel {
             $this->validated_data['name'] = $this->initial_data['name'];
         }
 
-        if (array_key_exists('lw_subacct', $this->initial_data) && strlen($this->initial_data['lw_subacct']) == 6 && ctype_alnum($this->initial_data['lw_subacct'])) {
-            $this->validated_data['lw_subacct'] = $this->initial_data['lw_subacct'];
+        if (isset($this->initial_data['external_ref_tag']) {
+            if (ctype_alnum($this->initial_data['external_ref_tag'])) {
+                $this->validated_data['external_ref_tag'] = $this->initial_data['external_ref_tag'];
+            } else {
+                $this->errors[] = APIResponse\get(2273, ['external_ref_tag' => $this->initial_data['external_ref_tag']]);
+            }
         } else {
-            $this->errors[] = APIResponse\get(2273, ['lw_subacct' => $this->initial_data['lw_subacct']]);
+            $this->validated_data['external_ref_tag'] = "";
         }
 
         if (!in_array($this->initial_data['persist_sticky_type'], $this->allowed_persistence)) {
-            $this->errors[] = APIResponse\get(2264, ['lw_subacct' => $this->initial_data['persist_sticky_type']]);
+            $this->errors[] = APIResponse\get(2264, ['persist_sticky_type' => $this->initial_data['persist_sticky_type']]);
         } else {
             $this->validated_data['persist_sticky_type'] = $this->initial_data['persist_sticky_type'];
             if ($this->validated_data['persist_sticky_type'] == 'stick_cookie_value') {
                 $this->validated_data['persist_cookie_enabled'] = 'yes';
-                $cookie_uniq_str = substr(md5($this->validated_data['name'].$this->validated_data['lw_subacct'].gethostname()), 0, 10);
+                $cookie_uniq_str = substr(md5($this->validated_data['name'].$this->validated_data['external_ref_tag'].gethostname()), 0, 10);
                 $this->validated_data['persist_stick_cookiename'] = 'X-HAProxy-Session-'.$cookie_uniq_str;
                 $this->validated_data['persist_cookie_name'] = 'X-HAProxy-Session-'.$cookie_uniq_str;
             }

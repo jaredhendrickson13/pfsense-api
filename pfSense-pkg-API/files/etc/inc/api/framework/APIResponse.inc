@@ -2247,7 +2247,7 @@ function get($id, $data=[], $all=false) {
             "status" => "bad request",
             "code" => 400,
             "return" => $id,
-            "message" => "LiquidWeb subaccount is either missing or malformed."
+            "message" => "External reference tag is malformed."
         ],
         2274 => [
             "status" => "bad request",

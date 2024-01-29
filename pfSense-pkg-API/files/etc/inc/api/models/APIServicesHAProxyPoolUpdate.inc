@@ -69,11 +69,11 @@ class APIServicesHAProxyPoolUpdate extends APIModel {
             } else {
                 $this->validated_data['persist_sticky_type'] = $this->initial_data['persist_sticky_type'];
                 if ($this->validated_data['persist_sticky_type'] == 'stick_cookie_value') {
-                    if (!isset($this->initial_data['lw_subacct'])) {
+                    if (!isset($this->initial_data['external_ref_tag'])) {
                         $this->errors[] = APIResponse\get(2273, ['request_data' => $this->initial_data]);
                     }
                     $this->validated_data['persist_cookie_enabled'] = 'yes';
-                    $cookie_uniq_str = substr(md5($this->validated_data['name'].$this->validated_data['lw_subacct'].gethostname()), 0, 10);
+                    $cookie_uniq_str = substr(md5($this->validated_data['name'].$this->validated_data['external_ref_tag'].gethostname()), 0, 10);
                     $this->validated_data['persist_stick_cookiename'] = 'X-HAProxy-Session-'.$cookie_uniq_str;
                     $this->validated_data['persist_cookie_name'] = 'X-HAProxy-Session-'.$cookie_uniq_str;
                 } else {
