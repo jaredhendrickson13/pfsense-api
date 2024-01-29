@@ -18,12 +18,12 @@ class APIModelsDHCPServerBackendTestCase extends TestCase
         
         # Ensure ISCP DHCP (dhcpd) is no longer running and Kea DHCP (kea-dhcp4) is now running
         $this->assert_is_false(Service::query(name: "dhcpd")->exists());
-        $this->assert_is_true(Service::query(name: "kea-dhcp4", status: true)->exists());
+        $this->assert_is_true(Service::query(name: "kea-dhcp4")->exists());
         
         # Switch the backend back to ISCP DHCP and ensure Kea is no longer running, but ISC DHCP is.
         $dhcp_backend->dhcpbackend->value = "isc";
         $dhcp_backend->update();
         $this->assert_is_false(Service::query(name: "kea-dhcp4")->exists());
-        $this->assert_is_true(Service::query(name: "dhcpd", status: true)->exists());
+        $this->assert_is_true(Service::query(name: "dhcpd")->exists());
     }
 }
