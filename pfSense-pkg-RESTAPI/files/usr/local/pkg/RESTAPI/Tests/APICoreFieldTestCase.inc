@@ -221,28 +221,6 @@ class APICoreFieldTestCase extends RESTAPI\Core\TestCase
     }
 
     /**
-     * Checks that the field's parent model context has a config path set if the field is `unique`.
-     */
-    public function test_context_has_config_path_when_field_is_unique() {
-        $this->assert_throws_response(
-            response_id: "FIELD_UNIQUE_WITH_NO_MODEL_CONFIG_PATH",
-            code: 500,
-            callable: function () {
-                # Create a model to use for testing
-                $test_model = new RESTAPI\Models\Test();
-                $test_model->config_path = null;
-
-                # Create a field to test with and ensure the test model is assigned as its parent context
-                $test_field = new Field(type: "string", required: true, unique: true);
-                $test_field->name = "test_field";
-                $test_field->value = "test_value";
-                $test_field->context = $test_model;
-                $test_field->validate();
-            }
-        );
-    }
-
-    /**
      * Checks that a validation error occurs if there are less array entries than the `many_minimum` requires.
      */
     public function test_field_many_minimum() {

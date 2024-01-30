@@ -675,14 +675,6 @@ class Field
     private function check_field_unique(mixed $value, ?ModelSet $modelset = null): void {
         # Only check this if `unique` is enabled
         if ($this->unique) {
-            # Throw an error if unique is set but the model context has no config path specified
-            if (!$this->context->config_path) {
-                throw new ServerError(
-                    message: "Field '$this->name' cannot be 'unique' when its model context has no 'config_path'.",
-                    response_id: "FIELD_UNIQUE_WITH_NO_MODEL_CONFIG_PATH"
-                );
-            }
-
             # Throw an error if unique is set but the model context is not a 'many' model.
             if (!$this->context->many) {
                 throw new ServerError(
