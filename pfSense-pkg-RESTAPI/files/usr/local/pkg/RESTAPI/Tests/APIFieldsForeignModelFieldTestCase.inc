@@ -60,19 +60,6 @@ class APIFieldsForeignModelFieldTestCase extends TestCase
     }
 
     /**
-     * Ensure assigned `model_field` must be a `unique` Field
-     */
-    public function test_model_field_must_be_unique(): void {
-        $this->assert_throws_response(
-            response_id: "FOREIGN_MODEL_FIELD_WITH_NON_UNIQUE_MODEL_FIELD",
-            code: 500,
-            callable: function () {
-                new ForeignModelField(model_name: "RoutingGateway", model_field: "descr");
-            }
-        );
-    }
-
-    /**
      * Ensure assigned `model_field_internal` must be an existing Field name from the assigned Model class.
      */
     public function test_model_field_internal_must_be_existing_field_name(): void {

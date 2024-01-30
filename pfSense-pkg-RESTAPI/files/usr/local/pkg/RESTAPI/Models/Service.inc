@@ -25,7 +25,6 @@ class Service extends Model
         # Set Model Fields
         $this->name = new StringField(
             required: true,
-            unique: true,
             choices_callable: "get_service_name_choices",
             help_text: "The internal name of the service."
         );
