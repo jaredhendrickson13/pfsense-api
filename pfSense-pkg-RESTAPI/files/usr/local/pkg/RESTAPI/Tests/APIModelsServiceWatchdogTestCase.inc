@@ -59,6 +59,6 @@ class APIModelsServiceWatchdogTestCase extends TestCase
         
         # Delete the watchdog and ensure the service watchdog cron job is no longer present
         $watchdog->delete();
-        $this->assert_is_true(CronJob::query(command: "/usr/local/pkg/servicewatchdog_cron.php")->exists());
+        $this->assert_is_false(CronJob::query(command: "/usr/local/pkg/servicewatchdog_cron.php")->exists());
     }
 }
