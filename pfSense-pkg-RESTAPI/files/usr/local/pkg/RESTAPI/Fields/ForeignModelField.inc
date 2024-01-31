@@ -201,14 +201,6 @@ class ForeignModelField extends Field {
                 response_id: "FOREIGN_MODEL_FIELD_WITH_UNKNOWN_MODEL_FIELD_INTERNAL"
             );
         }
-
-        # Ensure the `model_field_internal` is unique
-        if ($this->model_field_internal !== "id" and !$this->model->{$this->model_field_internal}->unique) {
-            throw new ServerError(
-                message: "ForeignModelField's `model_field_internal` must be a `unique` Field.",
-                response_id: "FOREIGN_MODEL_FIELD_WITH_NON_UNIQUE_MODEL_FIELD_INTERNAL"
-            );
-        }
     }
 
     /**
