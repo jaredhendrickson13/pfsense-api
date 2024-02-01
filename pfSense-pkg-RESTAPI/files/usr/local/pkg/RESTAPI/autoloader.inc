@@ -24,6 +24,7 @@ require_once("openvpn.inc");
 require_once("certs.inc");
 require_once("pkg-utils.inc");
 require_once("firewall_virtual_ip.inc");
+require_once("includes/functions.inc.php");
 
 # Ensure the RESTAPI BaseClass is imported before any other libraries
 require_once("RESTAPI/Core/BaseClass.inc");
