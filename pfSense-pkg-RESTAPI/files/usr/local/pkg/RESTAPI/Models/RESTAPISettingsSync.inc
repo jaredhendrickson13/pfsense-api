@@ -6,7 +6,7 @@ require_once("RESTAPI/autoloader.inc");
 
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
-use RESTAPI\Endpoints\SystemRESTAPISettingsSync;
+use RESTAPI\Endpoints\SystemRESTAPISettingsSyncEndpoint;
 use RESTAPI\Fields\StringField;
 use RESTAPI\Responses\ValidationError;
 use function RESTAPI\Core\Tools\cprint;
@@ -89,7 +89,7 @@ class RESTAPISettingsSync extends Model
     public static function sync(bool $print_status = false): void {
         # Variables
         $settings = new RESTAPISettings(); 
-        $endpoint_url = (new SystemRESTAPISettingsSync)->url;
+        $endpoint_url = (new SystemRESTAPISettingsSyncEndpoint)->url;
         # TODO: Replace these with a WebGUI Model call once developed.
         $wc_protocol = self::get_config(path: "system/webgui/protocol", default: "https");
         $wc_port = self::get_config(path: "system/webgui/port", default: "443");
