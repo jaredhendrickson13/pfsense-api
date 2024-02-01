@@ -5,7 +5,7 @@ namespace RESTAPI\Tests;
 use RESTAPI\Core\TestCase;
 use RESTAPI\Models\CommandPrompt;
 
-class APIModelCommandPromptTestCase extends TestCase
+class APIModelsCommandPromptTestCase extends TestCase
 {
     /**
      * Checks that CommandPrompt correctly runs shell commands and provides the correct response.
