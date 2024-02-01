@@ -8,6 +8,11 @@ use RESTAPI\Models\RESTAPIJWT;
 class JWTAuth extends Auth
 {
     /**
+     * @var string|null $verbose_name The human-readable name for this Auth class.
+     */
+    public ?string $verbose_name = "JWT";
+    
+    /**
      * @var array $security_scheme The OpenAPI security scheme for this Auth class.
      */
     public array $security_scheme = ["type" => "http", "scheme" => "bearer", "bearerFormat" => "JWT"];

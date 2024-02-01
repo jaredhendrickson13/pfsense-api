@@ -8,6 +8,11 @@ use RESTAPI\Models\RESTAPIKey;
 class KeyAuth extends Auth
 {
     /**
+     * @var string|null $verbose_name The human-readable name for this Auth class.
+     */
+    public ?string $verbose_name = "Key";
+    
+    /**
      * @var array $security_scheme The OpenAPI security scheme for this Auth class.
      */
     public array $security_scheme = ["type" => "apiKey", "in" => "header", "name" => "restapikey"];

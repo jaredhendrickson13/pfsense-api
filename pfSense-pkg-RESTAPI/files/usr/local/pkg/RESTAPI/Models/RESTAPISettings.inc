@@ -192,7 +192,16 @@ class RESTAPISettings extends Model {
      * in the \RESTAPI\Auth\ namespace.
      */
     public function get_auth_methods_choices(): array {
-        return get_classes_from_namespace(namespace: "\\RESTAPI\\Auth\\", shortnames: true);
+        # Variables
+        $choices = [];
+        
+        # Format choices so they include the class's verbose name as the choice's verbose name
+        foreach (get_classes_from_namespace(namespace: "\\RESTAPI\\Auth\\") as $auth_class) {
+            $auth = new $auth_class();
+            $choices[$auth->get_class_shortname()] = $auth->verbose_name;
+        }
+        
+        return $choices;
     }
 
     /**

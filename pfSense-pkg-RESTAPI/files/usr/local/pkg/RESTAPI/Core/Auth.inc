@@ -75,6 +75,11 @@ class Auth extends BaseClass {
     public bool $is_authorized = false;
 
     /**
+     * @var string|null $verbose_name The human-readable name for this Auth class.
+     */
+    public ?string $verbose_name = null;
+
+    /**
      * Creates an Auth object which can be used to authenticate an external client requesting API access.
      * @param array $required_privileges An array of required pfSense privileges to check during authorization.
      */
@@ -85,6 +90,9 @@ class Auth extends BaseClass {
         # Assign required privileges
         $this->required_privileges = $required_privileges;
         $this->ip_address = ($_SERVER["REMOTE_ADDR"]) ?: "unknown IP";
+        
+        # Use the class shortname as the default verbose name if none was set by a child class
+        $this->verbose_name = ($this->verbose_name) ?: $this->get_class_shortname();
     }
 
     /**
