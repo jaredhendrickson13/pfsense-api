@@ -83,7 +83,9 @@ class APISystemAPIVersionRead extends APIModel {
             $releases = ["last_updated" => time(), "releases" => $api_resp];
             file_put_contents($releases_file, json_encode($releases));
         }
-        return $releases;
+        
+        # Ensure releases is always an array
+        return (is_array($releases)) ? $releases : [];
     }
 
     public static function get_all_available_versions() {
