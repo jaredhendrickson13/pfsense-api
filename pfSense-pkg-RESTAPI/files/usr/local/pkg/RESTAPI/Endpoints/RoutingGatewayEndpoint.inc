@@ -11,9 +11,8 @@ class RoutingGatewayEndpoint extends Endpoint
     public function __construct()
     {
         # Set Endpoint attributes
-        $this->url = '/api/v2/system/routing/gateway';
+        $this->url = '/api/v2/routing/gateway';
         $this->model_name = 'RoutingGateway';
-        $this->tag = 'ROUTING';
         $this->request_method_options = ['GET', 'POST', 'PATCH', 'DELETE'];
 
         # Construct the parent Endpoint object
