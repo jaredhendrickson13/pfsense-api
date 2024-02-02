@@ -7,3 +7,4 @@ venv/
 vendor/
 .vagrant
 *.pkg
+node_modules

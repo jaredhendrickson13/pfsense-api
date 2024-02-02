@@ -1,0 +1,14 @@
+{
+  "plugins": ["@prettier/plugin-php"],
+  "overrides": [
+    {
+      "files": "*.inc",
+      "options": {
+        "parser": "php",
+        "phpVersion": "8.2",
+        "printWidth": 120,
+        "singleQuote": true
+      }
+    }
+  ]
+}
