@@ -22,7 +22,7 @@ class InterfaceGroup extends Model
     public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Set model attributes
-        $this->config_path = "ifgroups/ifgroupentry";
+        $this->config_path = 'ifgroups/ifgroupentry';
         $this->many = true;
         $this->always_apply = true;
 
@@ -33,22 +33,22 @@ class InterfaceGroup extends Model
             editable: false,
             maximum_length: 15,
             validators: [new FilterNameValidator()],
-            help_text: "The name of this interface group."
+            help_text: 'The name of this interface group.',
         );
         $this->members = new InterfaceField(
             default: [],
             allow_empty: true,
             many: true,
-            delimiter: " ",
-            help_text: "The member interfaces to assign to this interface group."
+            delimiter: ' ',
+            help_text: 'The member interfaces to assign to this interface group.',
         );
         $this->descr = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
-            help_text: "The description for this interface group."
+            help_text: 'The description for this interface group.',
         );
 
-        parent::__construct(...$options, id: $id, data: $data);
+        parent::__construct($id, null, $data, ...$options);
     }
 
     /**
@@ -68,7 +68,7 @@ class InterfaceGroup extends Model
         foreach ($this->initial_object->members->get_related_models()->model_objects as $member) {
             new Command("/sbin/ifconfig {$member->if->value} -group " . $this->ifname->value);
         }
-        
+
         # Setup the group with the new member interfaces
         interface_group_setup($this->to_internal());
     }
@@ -83,7 +83,7 @@ class InterfaceGroup extends Model
             new Command("/sbin/ifconfig {$member->if->value} -group " . $this->ifname->value);
         }
     }
-    
+
     /**
      * Gracefully brings down the previous (existing) set InterfaceGroup objects and applies the new set.
      * @param ModelSet $initial_objects A ModelSet containing each existing object for this Model as they were when
@@ -102,7 +102,7 @@ class InterfaceGroup extends Model
                 new Command("/sbin/ifconfig {$member->if->value} -group " . $old_if_group->ifname->value);
             }
         }
-        
+
         # Loop through each new InterfaceGroup object and ensure it is applied
         foreach ($new_objects->model_objects as $new_object) {
             interface_group_setup($new_object->to_internal());

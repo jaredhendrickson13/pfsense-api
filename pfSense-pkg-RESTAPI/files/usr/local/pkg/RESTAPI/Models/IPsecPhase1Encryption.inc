@@ -25,9 +25,9 @@ class IPsecPhase1Encryption extends Model
         global $p1_dhgroups;
 
         # Set model attributes
-        $this->parent_model_class = "IPsecPhase1";
-        $this->config_path = "encryption/item";
-        $this->subsystem = "ipsec";
+        $this->parent_model_class = 'IPsecPhase1';
+        $this->config_path = 'encryption/item';
+        $this->subsystem = 'ipsec';
         $this->many = true;
         $this->many_minimum = 1;
 
@@ -35,36 +35,36 @@ class IPsecPhase1Encryption extends Model
         $this->encryption_algorithm_name = new StringField(
             required: true,
             choices: array_keys($p1_ealgos),
-            internal_name: "name",
-            internal_namespace: "encryption-algorithm",
-            help_text: "The name of the encryption algorithm to use for this P1 encryption item."
+            internal_name: 'name',
+            internal_namespace: 'encryption-algorithm',
+            help_text: 'The name of the encryption algorithm to use for this P1 encryption item.',
         );
         $this->encryption_algorithm_keylen = new IntegerField(
             required: true,
-            internal_name: "keylen",
-            internal_namespace: "encryption-algorithm",
-            conditions: ["encryption_algorithm_name" => $this->get_keylen_enabled_algos()],
-            help_text: "The key length for the encryption algorithm."
+            internal_name: 'keylen',
+            internal_namespace: 'encryption-algorithm',
+            conditions: ['encryption_algorithm_name' => $this->get_keylen_enabled_algos()],
+            help_text: 'The key length for the encryption algorithm.',
         );
         $this->hash_algorithm = new StringField(
             required: true,
             choices: array_keys($p1_halgos),
-            internal_name: "hash-algorithm",
-            help_text: "The hash algorithm to use for this P1 encryption item."
+            internal_name: 'hash-algorithm',
+            help_text: 'The hash algorithm to use for this P1 encryption item.',
         );
         $this->dhgroup = new IntegerField(
             required: true,
             choices: array_keys($p1_dhgroups),
-            help_text: "The Diffie-Hellman (DH) group to use for this P1 encryption item."
+            help_text: 'The Diffie-Hellman (DH) group to use for this P1 encryption item.',
         );
         $this->prf_algorithm = new StringField(
-            default: "sha256",
+            default: 'sha256',
             choices: array_keys($p1_halgos),
-            internal_name: "prf-algorithm",
-            help_text: "The PRF algorithm to use for this P1 encryption item. This value has no affect unless the ".
-                "P1 entry has PRF enabled."
+            internal_name: 'prf-algorithm',
+            help_text: 'The PRF algorithm to use for this P1 encryption item. This value has no affect unless the ' .
+                'P1 entry has PRF enabled.',
         );
-        parent::__construct(...$options, id: $id, parent_id: $parent_id, data: $data);
+        parent::__construct($id, $parent_id, $data, ...$options);
     }
 
     /**
@@ -74,16 +74,17 @@ class IPsecPhase1Encryption extends Model
      * @throws ValidationError When the $encryption_algorithm_keylen is not supported by the
      * `encryption_algorithm_name` field's assigned value.
      */
-    public function validate_encryption_algorithm_keylen(int $encryption_algorithm_keylen): int {
+    public function validate_encryption_algorithm_keylen(int $encryption_algorithm_keylen): int
+    {
         # Variables
         $supported_keylens = $this->get_supported_keylens(name: $this->encryption_algorithm_name->value);
 
         # Throw a validation error if this $encryption_algorithm_keylen is not supported for the assigned algo
         if (!in_array($encryption_algorithm_keylen, $supported_keylens)) {
             throw new ValidationError(
-                message: "Field `encryption_algorithm_keylen` value `$encryption_algorithm_keylen` is not valid for ".
+                message: "Field `encryption_algorithm_keylen` value `$encryption_algorithm_keylen` is not valid for " .
                     "`{$this->encryption_algorithm_name->value}` algorithm.",
-                response_id: "IPSEC_PHASE_1_ENCRYPTION_ALGORITHM_KEYLEN_INVALID_CHOICE"
+                response_id: 'IPSEC_PHASE_1_ENCRYPTION_ALGORITHM_KEYLEN_INVALID_CHOICE',
             );
         }
 
@@ -95,14 +96,15 @@ class IPsecPhase1Encryption extends Model
      * @param string $name The encryption algorithm name to obtain key lengths for.
      * @returns array An array of supported key lengths for this encryption algorithm.
      */
-    public static function get_supported_keylens(string $name): array {
+    public static function get_supported_keylens(string $name): array
+    {
         global $p1_ealgos;
 
         # Throw an error if an encryption algorithm does not exist with this name.
         if (!array_key_exists($name, $p1_ealgos)) {
             throw new ValidationError(
                 message: "Could not obtain supported key lengths for unknown algorithm `$name`.",
-                response_id: "IPSEC_PHASE1_ENCRYPTION_COULD_NOT_GET_KEYLENS_FOR_UNKNOWN_ALGO"
+                response_id: 'IPSEC_PHASE1_ENCRYPTION_COULD_NOT_GET_KEYLENS_FOR_UNKNOWN_ALGO',
             );
         }
 
@@ -111,11 +113,11 @@ class IPsecPhase1Encryption extends Model
         $key_lens = [];
 
         # Determine available key lengths for this algo when selections are available
-        if (array_key_exists("keysel", $p1_ealgo)) {
+        if (array_key_exists('keysel', $p1_ealgo)) {
             # Determine the lowest and highest key lengths available, as well as intermittent steps.
-            $key_len = $p1_ealgo["keysel"]["lo"];
-            $key_len_max = $p1_ealgo["keysel"]["hi"];
-            $key_len_step = $p1_ealgo["keysel"]["step"];
+            $key_len = $p1_ealgo['keysel']['lo'];
+            $key_len_max = $p1_ealgo['keysel']['hi'];
+            $key_len_step = $p1_ealgo['keysel']['step'];
 
             # Loop until key length steps are exhausted
             while ($key_len <= $key_len_max) {
@@ -131,13 +133,14 @@ class IPsecPhase1Encryption extends Model
      * Obtains an array of encryption algorithm names that support variable key length selection.
      * @returns array An array of encryption algorithm names that support variable key length selection.
      */
-    public static function get_keylen_enabled_algos(): array {
+    public static function get_keylen_enabled_algos(): array
+    {
         global $p1_ealgos;
         $supports_keylen = [];
 
         # Loop through each support encryption algorithm and capture those who support variable key length selection
         foreach ($p1_ealgos as $p1_ealgo_name => $p1_ealgo) {
-            if (array_key_exists("keysel", $p1_ealgo)) {
+            if (array_key_exists('keysel', $p1_ealgo)) {
                 $supports_keylen[] = $p1_ealgo_name;
             }
         }

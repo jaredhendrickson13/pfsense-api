@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Models;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Auth;
 use RESTAPI\Core\Model;
@@ -20,29 +20,28 @@ class FirewallSchedule extends Model
     public StringField $descr;
     public BooleanField $active;
     public NestedModelField $timerange;
-    
-    
+
     public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Set model attributes
-        $this->config_path = "schedules/schedule";
+        $this->config_path = 'schedules/schedule';
         $this->many = true;
         $this->always_apply = true;
-        $this->sort_by_field = "name";
+        $this->sort_by_field = 'name';
         $this->sort_option = SORT_ASC;
-        
+
         # Set model fields
-        $this->schedlabel = new UIDField(help_text: "A unique ID for this schedule used internally by the system.");
+        $this->schedlabel = new UIDField(help_text: 'A unique ID for this schedule used internally by the system.');
         $this->name = new StringField(
             required: true,
             unique: true,
             validators: [new FilterNameValidator()],
-            help_text: "The unique name to assign this schedule."
+            help_text: 'The unique name to assign this schedule.',
         );
         $this->descr = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
-            help_text: "A description of this schedules purpose."
+            help_text: 'A description of this schedules purpose.',
         );
         $this->active = new BooleanField(
             default: false,
@@ -50,37 +49,39 @@ class FirewallSchedule extends Model
             representation_only: true,
             indicates_true: true,
             indicates_false: false,
-            help_text: "Displays whether the schedule is currently active or not."
+            help_text: 'Displays whether the schedule is currently active or not.',
         );
         $this->timerange = new NestedModelField(
-            model_class: "FirewallScheduleTimeRange",
+            model_class: 'FirewallScheduleTimeRange',
             required: true,
-            help_text: "The date/times this firewall schedule will be active."
+            help_text: 'The date/times this firewall schedule will be active.',
         );
-        
-        parent::__construct(...$options, id:$id, data: $data);
+
+        parent::__construct($id, null, $data, ...$options);
     }
 
     /**
      * Obtains the `active` status for this FirewallSchedule
      */
-    protected function from_internal_active(): bool {
+    protected function from_internal_active(): bool
+    {
         # Only attempt to obtain this value if this FirewallSchedule already exists
         if (isset($this->id)) {
             return filter_get_time_based_rule_status($this->to_internal());
         }
-        
+
         # Otherwise, assume this schedule is not active
         return false;
     }
-    
+
     /**
      * Applies the schedule by reloading the filter.
      */
-    public function apply(): void {
+    public function apply(): void
+    {
         # Reload the filter
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
-        
+
         # Refresh the 'active' field so it reflects any changes made.
         $this->active->value = $this->from_internal_active();
     }

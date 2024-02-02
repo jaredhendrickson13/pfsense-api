@@ -20,19 +20,19 @@ class WakeOnLANSend extends Model
     {
         # Set model attributes
         $this->many = false;
-        $this->internal_callable = "void_internal_callable";
+        $this->internal_callable = 'void_internal_callable';
 
         # Set model fields
         $this->interface = new InterfaceField(
             required: true,
-            help_text: "The interface the host to be woken up is connected to."
+            help_text: 'The interface the host to be woken up is connected to.',
         );
         $this->mac_addr = new StringField(
             required: true,
             validators: [new MACAddressValidator()],
-            help_text: "The MAC address of the host to be awoken."
+            help_text: 'The MAC address of the host to be awoken.',
         );
-        parent::__construct(...$options, data: $data);
+        parent::__construct(null, null, $data, ...$options);
     }
 
     /**
@@ -41,12 +41,13 @@ class WakeOnLANSend extends Model
      * @returns string The validated value to be set.
      * @throws ValidationError When $interface does not have a valid broadcast address
      */
-    public function validate_interface(string $interface): string {
+    public function validate_interface(string $interface): string
+    {
         # Throw an error if the $interface does not have a valid IPv4 broadcast address.
         if (!$this->interface->get_related_model()->get_broadcast_ipv4()) {
             throw new ValidationError(
-                message: "Field `interface` must have a valid IPv4 broadcast address.",
-                response_id: "WAKE_ON_LAN_SEND_INTERFACE_MUST_HAVE_BROADCAST_ADDRESS"
+                message: 'Field `interface` must have a valid IPv4 broadcast address.',
+                response_id: 'WAKE_ON_LAN_SEND_INTERFACE_MUST_HAVE_BROADCAST_ADDRESS',
             );
         }
 
@@ -67,7 +68,7 @@ class WakeOnLANSend extends Model
         if ($wol->result_code !== 0) {
             throw new ServerError(
                 message: "Wake-on-LAN command failed: {$wol->output}",
-                response_id: "WAKE_ON_LAN_SEND_COMMAND_FAILED"
+                response_id: 'WAKE_ON_LAN_SEND_COMMAND_FAILED',
             );
         }
     }
@@ -77,7 +78,8 @@ class WakeOnLANSend extends Model
      * this method essentially reads nothing.
      * @returns array An empty array to act as a blank internal callable.
      */
-    public function void_internal_callable(): array {
+    public function void_internal_callable(): array
+    {
         return [];
     }
 }

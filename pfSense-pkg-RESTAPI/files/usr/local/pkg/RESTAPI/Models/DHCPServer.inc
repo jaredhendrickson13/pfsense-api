@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Models;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 use RESTAPI\Core\Model;
@@ -44,54 +44,51 @@ class DHCPServer extends Model
     public StringField $denyunknown;
     public NestedModelField $pool;
     public NestedModelField $staticmap;
-    
+
     public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Define Model attributes
-        $this->config_path = "dhcpd";
+        $this->config_path = 'dhcpd';
         $this->many = true;
         $this->always_apply = true;
-        $this->update_strategy = "merge";
-        $this->verbose_name = "DHCP Server";
+        $this->update_strategy = 'merge';
+        $this->verbose_name = 'DHCP Server';
 
         # Define Model Fields
-        $this->enable = new BooleanField(
-            default: false,
-            help_text: "Enable the DHCP server for this interface."
-        );
+        $this->enable = new BooleanField(default: false, help_text: 'Enable the DHCP server for this interface.');
         $this->range_from = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             maximum_length: 15,
-            internal_name: "from",
-            internal_namespace: "range",
+            internal_name: 'from',
+            internal_namespace: 'range',
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
-            help_text: "The starting IP address for the primary DHCP pool. This address must be less than or equal ".
-            "to the `range_to` field."
+            help_text: 'The starting IP address for the primary DHCP pool. This address must be less than or equal ' .
+                'to the `range_to` field.',
         );
         $this->range_to = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             maximum_length: 15,
-            internal_name: "to",
-            internal_namespace: "range",
+            internal_name: 'to',
+            internal_namespace: 'range',
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
-            help_text: "The ending IP address for the primary DHCP pool. This address must be greater than or equal ".
-            "to the `range_to` field."
+            help_text: 'The ending IP address for the primary DHCP pool. This address must be greater than or equal ' .
+                'to the `range_to` field.',
         );
         $this->domain = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             maximum_length: 255,
-            help_text: "The domain to be assigned via DHCP."
+            help_text: 'The domain to be assigned via DHCP.',
         );
         $this->failover_peerip = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             maximum_length: 255,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_fqdn: true)],
-            help_text: "The interface IP address of the other firewall (failover peer) in this subnet. Leave ".
-            "empty to disable failover peering."
+            help_text: 'The interface IP address of the other firewall (failover peer) in this subnet. Leave ' .
+                'empty to disable failover peering.',
         );
         $this->mac_allow = new StringField(
             default: [],
@@ -99,7 +96,7 @@ class DHCPServer extends Model
             many: true,
             maximum_length: 17,
             validators: [new MACAddressValidator()],
-            help_text: "MAC addresses this DHCP server is allowed to provide leases for."
+            help_text: 'MAC addresses this DHCP server is allowed to provide leases for.',
         );
         $this->mac_deny = new StringField(
             default: [],
@@ -107,37 +104,37 @@ class DHCPServer extends Model
             many: true,
             maximum_length: 17,
             validators: [new MACAddressValidator()],
-            help_text: "MAC addresses this DHCP server is not allowed to provide leases for."
+            help_text: 'MAC addresses this DHCP server is not allowed to provide leases for.',
         );
         $this->domainsearchlist = new StringField(
             default: [],
             allow_empty: true,
             many: true,
             maximum_length: 255,
-            delimiter: ";",
+            delimiter: ';',
             validators: [new IPAddressValidator(allow_ipv4: false, allow_ipv6: false, allow_fqdn: true)],
-            help_text: "The domain search list to provide via DHCP."
+            help_text: 'The domain search list to provide via DHCP.',
         );
         $this->defaultleasetime = new IntegerField(
             default: 7200,
             allow_null: true,
             minimum: 60,
-            help_text: "The default DHCP lease validity period (in seconds). This is used for clients that do not ask ".
-            "for a specific expiration time."
+            help_text: 'The default DHCP lease validity period (in seconds). This is used for clients that do not ask ' .
+                'for a specific expiration time.',
         );
         $this->maxleasetime = new IntegerField(
             default: 86400,
             allow_null: true,
             minimum: 60,
-            help_text: "The maximum DHCP lease validity period (in seconds) a client can request."
+            help_text: 'The maximum DHCP lease validity period (in seconds) a client can request.',
         );
         $this->gateway = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             maximum_length: 15,
-            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_keywords: ["none"])],
-            help_text: "The gateway IPv4 address to provide via DHCP. This is only necessary if you are not using ".
-            "the interface's IP as the gateway. Specify `none` for no gateway assignment."
+            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_keywords: ['none'])],
+            help_text: 'The gateway IPv4 address to provide via DHCP. This is only necessary if you are not using ' .
+                "the interface's IP as the gateway. Specify `none` for no gateway assignment.",
         );
         $this->dnsserver = new StringField(
             default: [],
@@ -147,7 +144,7 @@ class DHCPServer extends Model
             maximum_length: 15,
             delimiter: null,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
-            help_text: "The DNS servers to provide via DHCP. Leave empty to default to system nameservers."
+            help_text: 'The DNS servers to provide via DHCP. Leave empty to default to system nameservers.',
         );
         $this->winsserver = new StringField(
             default: [],
@@ -157,7 +154,7 @@ class DHCPServer extends Model
             maximum_length: 15,
             delimiter: null,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
-            help_text: "The WINS servers to provide via DHCP."
+            help_text: 'The WINS servers to provide via DHCP.',
         );
         $this->ntpserver = new StringField(
             default: [],
@@ -167,69 +164,69 @@ class DHCPServer extends Model
             maximum_length: 256,
             delimiter: null,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_fqdn: true)],
-            help_text: "The NTP servers to provide via DHCP."
+            help_text: 'The NTP servers to provide via DHCP.',
         );
         $this->staticarp = new BooleanField(
             default: false,
-            help_text: "Assign static ARP entries for DHCP leases provided by this server."
+            help_text: 'Assign static ARP entries for DHCP leases provided by this server.',
         );
         $this->ignorebootp = new BooleanField(
             default: false,
-            help_text: "Force this DHCP server to ignore BOOTP queries."
+            help_text: 'Force this DHCP server to ignore BOOTP queries.',
         );
         $this->ignoreclientuids = new BooleanField(
             default: false,
-            help_text: "Prevent recording a unique identifier (UID) in client lease data if present in the client ".
-            "DHCP request. This option may be useful when a client can dual boot using different client ".
-            "identifiers but the same hardware (MAC) address. Note that the resulting server behavior violates ".
-            "the official DHCP specification."
+            help_text: 'Prevent recording a unique identifier (UID) in client lease data if present in the client ' .
+                'DHCP request. This option may be useful when a client can dual boot using different client ' .
+                'identifiers but the same hardware (MAC) address. Note that the resulting server behavior violates ' .
+                'the official DHCP specification.',
         );
         $this->nonak = new BooleanField(
             default: false,
-            help_text: "Ignore denied clients rather than reject. This option is not compatible with failover and ".
-            "cannot be enabled when a Failover Peer IP address is configured."
+            help_text: 'Ignore denied clients rather than reject. This option is not compatible with failover and ' .
+                'cannot be enabled when a Failover Peer IP address is configured.',
         );
         $this->disablepingcheck = new BooleanField(
             default: false,
-            indicates_true: "yes",
-            help_text: "Prevent the DHCP server from sending a ping to the address being assigned, where if no ".
-            "response has been heard, it assigns the address."
+            indicates_true: 'yes',
+            help_text: 'Prevent the DHCP server from sending a ping to the address being assigned, where if no ' .
+                'response has been heard, it assigns the address.',
         );
         $this->dhcpleaseinlocaltime = new BooleanField(
             default: false,
-            indicates_true: "yes",
-            help_text: "Display the DHCP lease times in local time instead of UTC."
+            indicates_true: 'yes',
+            help_text: 'Display the DHCP lease times in local time instead of UTC.',
         );
         $this->statsgraph = new BooleanField(
             default: false,
-            indicates_true: "yes",
-            help_text: "Enable adding DHCP lease statistics to the pfSense Monitoring graphs."
+            indicates_true: 'yes',
+            help_text: 'Enable adding DHCP lease statistics to the pfSense Monitoring graphs.',
         );
         $this->denyunknown = new StringField(
             default: null,
-            choices: ["enabled", "class"],
+            choices: ['enabled', 'class'],
             allow_empty: true,
             allow_null: true,
-            help_text: "Define how to handle unknown clients requesting DHCP leases. When set to `null`, any DHCP ".
-            "client will get an IP address within this scope/range on this interface. If set to `enabled`, ".
-            "any DHCP client with a MAC address listed in a static mapping on any scope(s)/interface(s) will ".
-            "get an IP address. If set to `class`, only MAC addresses listed in static mappings on this interface ".
-            "will get an IP address within this scope/range."
+            help_text: 'Define how to handle unknown clients requesting DHCP leases. When set to `null`, any DHCP ' .
+                'client will get an IP address within this scope/range on this interface. If set to `enabled`, ' .
+                'any DHCP client with a MAC address listed in a static mapping on any scope(s)/interface(s) will ' .
+                'get an IP address. If set to `class`, only MAC addresses listed in static mappings on this interface ' .
+                'will get an IP address within this scope/range.',
         );
         $this->pool = new NestedModelField(
-            model_class: "DHCPServerAddressPool",
+            model_class: 'DHCPServerAddressPool',
             default: [],
             allow_empty: true,
-            help_text: "Additional address pools applied to this DHCP server."
+            help_text: 'Additional address pools applied to this DHCP server.',
         );
         $this->staticmap = new NestedModelField(
-            model_class: "DHCPServerStaticMapping",
+            model_class: 'DHCPServerStaticMapping',
             default: [],
             allow_empty: true,
-            help_text: "Static mappings applied to this DHCP server."
+            help_text: 'Static mappings applied to this DHCP server.',
         );
 
-        parent::__construct(...$options, id: $id, data: $data);
+        parent::__construct($id, null, $data, ...$options);
     }
 
     /**
@@ -241,9 +238,9 @@ class DHCPServer extends Model
         $overlapped_model = $this->get_range_overlap($this->range_from->value, $this->range_to->value);
         if ($overlapped_model) {
             throw new ConflictError(
-                message: "This DHCP server's primary address pool overlaps with $overlapped_model->verbose_name ".
+                message: "This DHCP server's primary address pool overlaps with $overlapped_model->verbose_name " .
                     "object with ID `$overlapped_model->id`. Adjust your `range_from` and `range_to` values.",
-                response_id: "DHCP_SERVER_PRIMARY_POOL_OVERLAPS_EXISTING_OBJECT"
+                response_id: 'DHCP_SERVER_PRIMARY_POOL_OVERLAPS_EXISTING_OBJECT',
             );
         }
     }
@@ -255,26 +252,27 @@ class DHCPServer extends Model
      * @throws ValidationError When `enable` is `true` but interface associated with `id` does not have a static IP.
      * @throws ValidationError When `enable` is `true`, but there is a DHCP relay running on this interface.
      */
-    public function validate_enable(bool $enable) : bool {
+    public function validate_enable(bool $enable): bool
+    {
         # Get the interface associated with this DHCP server
-        $interface = NetworkInterface::query(["id" => $this->id])->first();
+        $interface = NetworkInterface::query(['id' => $this->id])->first();
 
         # Do not allow the DHCP server to be enabled if the interface does not have a static IP address assigned
-        if ($enable and $interface->typev4->value !== "static") {
+        if ($enable and $interface->typev4->value !== 'static') {
             throw new ValidationError(
-                message: "DHCP server cannot be enabled because interface `{$this->id}` does not have a static IPv4 ".
-                    "address assigned.",
-                response_id: "DHCP_SERVER_CANNOT_ENABLE_WITHOUT_STATIC_IPV4"
+                message: "DHCP server cannot be enabled because interface `{$this->id}` does not have a static IPv4 " .
+                    'address assigned.',
+                response_id: 'DHCP_SERVER_CANNOT_ENABLE_WITHOUT_STATIC_IPV4',
             );
         }
 
         # Do not allow the DHCP server to be enabled if this interface is already running a DHCP relay
         # TODO: Replace this with a Model query when the DHCPRelay Model is developed
-        foreach ($this->get_config("dhcrelay", []) as $dhcp_relay) {
-            if ($this->id === $dhcp_relay["interface"]) {
+        foreach ($this->get_config('dhcrelay', []) as $dhcp_relay) {
+            if ($this->id === $dhcp_relay['interface']) {
                 throw new ValidationError(
-                    message: "DHCP server cannot be enabled because a DHCP relay is already running.",
-                    response_id: "DHCP_SERVER_CANNOT_BE_ENABLED_WITH_DHCP_RELAY"
+                    message: 'DHCP server cannot be enabled because a DHCP relay is already running.',
+                    response_id: 'DHCP_SERVER_CANNOT_BE_ENABLED_WITH_DHCP_RELAY',
                 );
             }
         }
@@ -290,23 +288,24 @@ class DHCPServer extends Model
      * @throws ValidationError When `range_from` is not in the interface's subnet.
      * @throws ValidationError When `range_from` is greater than the `range_to` IP.
      */
-    public function validate_range_from(string $range_from) : string {
+    public function validate_range_from(string $range_from): string
+    {
         # Get the parent interface for this DHCP server
-        $interface = NetworkInterface::query(["id" => $this->id])->first();
+        $interface = NetworkInterface::query(['id' => $this->id])->first();
 
         # Do not allow this IP to be the network address
         if ($interface->get_network_ipv4() == $range_from) {
             throw new ValidationError(
                 message: "DHCP server `range_from` cannot be the interface subnet's network address.",
-                response_id: "DHCP_SERVER_RANGE_FROM_CANNOT_BE_NETWORK_ADDRESS"
+                response_id: 'DHCP_SERVER_RANGE_FROM_CANNOT_BE_NETWORK_ADDRESS',
             );
         }
 
         # Do not allow the `range_from` to be greater `range_to`
         if (ip_greater_than($range_from, $this->range_to->value)) {
             throw new ValidationError(
-                message: "DHCP server `range_from` cannot be greater than `range_to`.",
-                response_id: "DHCP_SERVER_RANGE_FROM_CANNOT_BE_GREATER_THAN_RANGE_TO"
+                message: 'DHCP server `range_from` cannot be greater than `range_to`.',
+                response_id: 'DHCP_SERVER_RANGE_FROM_CANNOT_BE_GREATER_THAN_RANGE_TO',
             );
         }
 
@@ -314,7 +313,7 @@ class DHCPServer extends Model
         if (!$interface->is_ipv4_in_cidr($range_from)) {
             throw new ValidationError(
                 message: "DHCP server `range_from` must lie within the interface's subnet.",
-                response_id: "DHCP_SERVER_RANGE_FROM_OUTSIDE_OF_SUBNET"
+                response_id: 'DHCP_SERVER_RANGE_FROM_OUTSIDE_OF_SUBNET',
             );
         }
 
@@ -329,15 +328,16 @@ class DHCPServer extends Model
      * @throws ValidationError When `range_from` is not in the interface's subnet.
      * @throws ValidationError When `range_from` is greater than the `range_to` IP.
      */
-    public function validate_range_to(string $range_to) : string {
+    public function validate_range_to(string $range_to): string
+    {
         # Get the parent interface for this DHCP server
-        $interface = NetworkInterface::query(["id" => $this->id])->first();
+        $interface = NetworkInterface::query(['id' => $this->id])->first();
 
         # Do not allow this IP to be the network address
         if ($interface->get_broadcast_ipv4() === $range_to) {
             throw new ValidationError(
                 message: "DHCP server `range_to` cannot be the interface subnet's broadcast address.",
-                response_id: "DHCP_SERVER_RANGE_FROM_CANNOT_BE_BROADCAST_ADDRESS"
+                response_id: 'DHCP_SERVER_RANGE_FROM_CANNOT_BE_BROADCAST_ADDRESS',
             );
         }
 
@@ -345,7 +345,7 @@ class DHCPServer extends Model
         if (!$interface->is_ipv4_in_cidr($range_to)) {
             throw new ValidationError(
                 message: "DHCP server `range_to` must lie within the interface's subnet.",
-                response_id: "DHCP_SERVER_RANGE_TO_OUTSIDE_OF_SUBNET"
+                response_id: 'DHCP_SERVER_RANGE_TO_OUTSIDE_OF_SUBNET',
             );
         }
 
@@ -358,11 +358,12 @@ class DHCPServer extends Model
      * @return int The validated `maxleasetime` field value to be assigned.
      * @throws ValidationError When `maxleasetime` is less than the `defaultleasetime`
      */
-    public function validate_maxleasetime(int $maxleasetime) : int {
+    public function validate_maxleasetime(int $maxleasetime): int
+    {
         if ($maxleasetime < $this->defaultleasetime->value) {
             throw new ValidationError(
-                message: "DHCP server `maxleasetime` cannot be less than the `defaultleasetime`",
-                response_id: "DHCP_SERVER_MAX_LEASE_TIME_LESS_THAN_DEFAULT"
+                message: 'DHCP server `maxleasetime` cannot be less than the `defaultleasetime`',
+                response_id: 'DHCP_SERVER_MAX_LEASE_TIME_LESS_THAN_DEFAULT',
             );
         }
 
@@ -375,15 +376,16 @@ class DHCPServer extends Model
      * @return string The validated `gateway` field value to be assigned.
      * @throws ValidationError When `gateway` is not an IP within the interface's subnet
      */
-    public function validate_gateway(string $gateway) : string {
+    public function validate_gateway(string $gateway): string
+    {
         # Get the parent interface for this DHCP server
-        $interface = NetworkInterface::query(["id" => $this->id])->first();
+        $interface = NetworkInterface::query(['id' => $this->id])->first();
 
         # Do not allow non-empty gateway values that are not within the interface's subnet
         if ($gateway and !$interface->is_ipv4_in_cidr($gateway)) {
             throw new ValidationError(
                 message: "DHCP server `gateway` must be within interface's subnet.",
-                response_id: "DHCP_SERVER_GATEWAY_NOT_WITHIN_SUBNET"
+                response_id: 'DHCP_SERVER_GATEWAY_NOT_WITHIN_SUBNET',
             );
         }
 
@@ -396,12 +398,13 @@ class DHCPServer extends Model
      * @return bool The validated `nonak` field value to be assigned.
      * @throws ValidationError When `nonak` is `true` and a `failover_peerip` is assigned.
      */
-    public function validate_nonak(bool $nonak) : bool {
+    public function validate_nonak(bool $nonak): bool
+    {
         # Do not allow `nonak` to be enabled if a `failover_peerip` is set.
         if ($nonak and $this->failover_peerip->value) {
             throw new ValidationError(
-                "DHCP server `nonak` cannot be enabled while a `failover_peerip` is assigned.",
-                response_id: "DHCP_SERVER_NONAK_WITH_FAILOVER_PEERIP_NOT_ALLOWED"
+                'DHCP server `nonak` cannot be enabled while a `failover_peerip` is assigned.',
+                response_id: 'DHCP_SERVER_NONAK_WITH_FAILOVER_PEERIP_NOT_ALLOWED',
             );
         }
 
@@ -414,22 +417,22 @@ class DHCPServer extends Model
      * @return bool The validated `staticarp` field value to be assigned.
      * @throws ValidationError When `staticarp` is `true` but there are configured static mappings without IPs.
      */
-    public function validate_staticarp(bool $staticarp) : bool {
+    public function validate_staticarp(bool $staticarp): bool
+    {
         # Do not allow `staticarp` to be enabled if there are any configured static mappings without IPs
         $static_mappings = DHCPServerStaticMapping::read_all(parent_id: $this->id);
         foreach ($static_mappings->model_objects as $static_mapping) {
             if (empty($static_mapping->ipaddr->value)) {
                 throw new ValidationError(
-                    "DHCP server `staticarp` cannot be enabled while there are DHCP server static mappings ".
-                        "configured without an assigned IP.",
-                    response_id: "DHCP_SERVER_STATICARP_WITH_NO_IP_STATIC_MAPPINGS"
+                    'DHCP server `staticarp` cannot be enabled while there are DHCP server static mappings ' .
+                        'configured without an assigned IP.',
+                    response_id: 'DHCP_SERVER_STATICARP_WITH_NO_IP_STATIC_MAPPINGS',
                 );
             }
         }
 
         return $staticarp;
     }
-
 
     /**
      * Checks if a given address range overlaps with reserved IPs such as static mappings, pools and virtual IPs.
@@ -447,7 +450,7 @@ class DHCPServer extends Model
                 return $static_mapping;
             }
         }
-        
+
         # Ensure range does not overlap with existing address pools `range_from` or `range_to` addresses
         $pools = DHCPServerAddressPool::read_all(parent_id: $this->id);
         foreach ($pools->model_objects as $pool) {
@@ -466,7 +469,7 @@ class DHCPServer extends Model
                 return $vip;
             }
         }
-        
+
         return null;
     }
 
@@ -482,7 +485,7 @@ class DHCPServer extends Model
 
         # Remove the existing dhcpd db files if the `failover_peerip` changed
         if ($this->initial_object->failover_peerip->value !== $this->failover_peerip->value) {
-            mwexec("/bin/rm -rf /var/dhcpd/var/db/*");
+            mwexec('/bin/rm -rf /var/dhcpd/var/db/*');
         }
 
         (new DHCPServerApply())->apply();

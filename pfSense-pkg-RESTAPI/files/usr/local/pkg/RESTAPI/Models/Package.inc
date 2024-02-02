@@ -23,45 +23,37 @@ class Package extends Model
     public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Set model attributes
-        $this->internal_callable = "get_installed_pkgs";
+        $this->internal_callable = 'get_installed_pkgs';
         $this->many = true;
 
         # Set model fields
         $this->name = new ForeignModelField(
-            model_name: "AvailablePackage",
-            model_field: "name",
+            model_name: 'AvailablePackage',
+            model_field: 'name',
             required: true,
-            help_text: "The name of the pfSense package."
+            help_text: 'The name of the pfSense package.',
         );
-        $this->shortname = new StringField(
-            default: "",
-            read_only: true,
-            help_text: "The package's shortname."
-        );
-        $this->descr = new StringField(
-            default: "",
-            read_only: true,
-            help_text: "The package's description."
-        );
+        $this->shortname = new StringField(default: '', read_only: true, help_text: "The package's shortname.");
+        $this->descr = new StringField(default: '', read_only: true, help_text: "The package's description.");
         $this->installed_version = new StringField(
-            default: "",
+            default: '',
             read_only: true,
-            help_text: "The version of the package currently installed."
+            help_text: 'The version of the package currently installed.',
         );
         $this->latest_version = new StringField(
-            default: "",
+            default: '',
             read_only: true,
-            help_text: "The latest version available for this package."
+            help_text: 'The latest version available for this package.',
         );
         $this->update_available = new BooleanField(
             default: false,
             read_only: true,
             indicates_true: true,
             indicates_false: false,
-            help_text: "Indicates whether the installed package has an update available."
+            help_text: 'Indicates whether the installed package has an update available.',
         );
 
-        parent::__construct(...$options, id: $id, data: $data);
+        parent::__construct($id, null, $data, ...$options);
     }
 
     /**
@@ -69,24 +61,25 @@ class Package extends Model
      * used to populate this Model's Field object internal values.
      * @return array An array containing the internal values of all available packages
      */
-    protected function get_installed_pkgs(): array {
+    protected function get_installed_pkgs(): array
+    {
         # Variables
         $pkgs = [];
-        $pkgs_info = get_pkg_info(pkgs: "all", remote_repo_usage_disabled: true, installed_pkgs_only: true);
+        $pkgs_info = get_pkg_info(pkgs: 'all', remote_repo_usage_disabled: true, installed_pkgs_only: true);
 
         # Loop through each of the output lines and format it
         foreach ($pkgs_info as $pkg) {
             # Obtain the latest version available for this package
-            $latest_version = AvailablePackage::query(name: $pkg["name"])->first()->version->value;
+            $latest_version = AvailablePackage::query(name: $pkg['name'])->first()->version->value;
 
             # Add our formatted package to our array
             $pkgs[] = [
-                "name" => $pkg["name"],
-                "shortname" => $pkg["shortname"],
-                "descr" => $pkg["desc"],
-                "installed_version" => $pkg["installed_version"],
-                "latest_version" => $latest_version,
-                "update_available" => (pkg_version_compare($pkg['installed_version'], $latest_version) == "<")
+                'name' => $pkg['name'],
+                'shortname' => $pkg['shortname'],
+                'descr' => $pkg['desc'],
+                'installed_version' => $pkg['installed_version'],
+                'latest_version' => $latest_version,
+                'update_available' => pkg_version_compare($pkg['installed_version'], $latest_version) == '<',
             ];
         }
 

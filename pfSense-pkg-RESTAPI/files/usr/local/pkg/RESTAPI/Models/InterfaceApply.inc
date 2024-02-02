@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Models;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 use RESTAPI\Core\Auth;
@@ -22,7 +22,7 @@ class InterfaceApply extends Model
     public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Set model attributes
-        $this->internal_callable = "get_applied_status";
+        $this->internal_callable = 'get_applied_status';
         $this->always_apply = true;
 
         # Set model Fields
@@ -30,18 +30,17 @@ class InterfaceApply extends Model
             read_only: true,
             indicates_true: true,
             indicates_false: false,
-            help_text: "Displays `true` when all interfaces are applied and there are no pending changes left.".
-                "Displays `false` when there are pending interface changes that have not been applied."
+            help_text: 'Displays `true` when all interfaces are applied and there are no pending changes left.' .
+                'Displays `false` when there are pending interface changes that have not been applied.',
         );
         $this->pending_interfaces = new InterfaceField(
             allow_empty: true,
             read_only: true,
             many: true,
-            help_text: "Displays a list of interfaces that have pending changes waiting to be applied."
+            help_text: 'Displays a list of interfaces that have pending changes waiting to be applied.',
         );
 
-
-        parent::__construct(...$options, id: $id, data: $data);
+        parent::__construct($id, null, $data, ...$options);
     }
 
     /**
@@ -49,11 +48,12 @@ class InterfaceApply extends Model
      * interface changes.
      * @return array An array of internal values for Field objects in this Model
      */
-    public function get_applied_status() : array {
+    public function get_applied_status(): array
+    {
         global $g;
 
         # Check if there are pending interface changes
-        $applied = !is_file($g['tmp_path']."/.interfaces.apply");
+        $applied = !is_file($g['tmp_path'] . '/.interfaces.apply');
         $pending_interfaces = [];
 
         # Populate pending interfaces if there are pending changes
@@ -64,19 +64,21 @@ class InterfaceApply extends Model
         }
 
         return [
-            "applied" => $applied,
-            "pending_interfaces" => implode(",", $pending_interfaces)
+            'applied' => $applied,
+            'pending_interfaces' => implode(',', $pending_interfaces),
         ];
     }
 
-    public function _create() {
+    public function _create()
+    {
         # Override this method but don't do anything. We only want to apply the changes.
     }
 
     /**
      * Spawns a new dispatcher process which applies any pending interface changes.
      */
-    public function apply() {
+    public function apply()
+    {
         (new InterfaceApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

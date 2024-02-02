@@ -45,10 +45,10 @@ class RoutingGateway extends Model
     public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Define Model attributes
-        $this->config_path = "gateways/gateway_item";
-        $this->subsystem = "staticroutes";
+        $this->config_path = 'gateways/gateway_item';
+        $this->subsystem = 'staticroutes';
         $this->many = true;
-        $this->unique_together_fields = ["interface", "ipprotocol", "gateway"];
+        $this->unique_together_fields = ['interface', 'ipprotocol', 'gateway'];
 
         # Define Model Fields
         $this->name = new StringField(
@@ -56,127 +56,121 @@ class RoutingGateway extends Model
             unique: true,
             editable: false,
             maximum_length: 31,
-            referenced_by: ["StaticRoute" => "gateway", "FirewallRule" => "gateway"],
+            referenced_by: ['StaticRoute' => 'gateway', 'FirewallRule' => 'gateway'],
             validators: [new FilterNameValidator()],
-            help_text: "Sets a name for the gateway."
+            help_text: 'Sets a name for the gateway.',
         );
         $this->descr = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
-            help_text: "Sets a descriptions for the gateway."
+            help_text: 'Sets a descriptions for the gateway.',
         );
-        $this->disabled = new BooleanField(
-            default: false,
-            help_text: "Disable this gateway."
-        );
+        $this->disabled = new BooleanField(default: false, help_text: 'Disable this gateway.');
         $this->ipprotocol = new StringField(
             required: true,
-            choices: ["inet", "inet6"],
-            help_text: "Sets the Internet Protocol version this gateway uses."
+            choices: ['inet', 'inet6'],
+            help_text: 'Sets the Internet Protocol version this gateway uses.',
         );
         $this->interface = new InterfaceField(
             required: true,
-            help_text: "Sets the interface this gateway will apply to."
+            help_text: 'Sets the interface this gateway will apply to.',
         );
-        $this->gateway =  new StringField(
+        $this->gateway = new StringField(
             required: true,
-            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_keywords: ["dynamic"])],
-            help_text: "Sets the IP address of the remote gateway."
+            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_keywords: ['dynamic'])],
+            help_text: 'Sets the IP address of the remote gateway.',
         );
         $this->monitor_disable = new BooleanField(
             default: false,
-            help_text: "Disable gateway monitoring for this gateway."
+            help_text: 'Disable gateway monitoring for this gateway.',
         );
-        $this->monitor =  new StringField(
+        $this->monitor = new StringField(
             required: false,
             allow_null: true,
-            conditions: ["monitor_disable" => false],
+            conditions: ['monitor_disable' => false],
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true)],
             help_text: "Sets a different IP address to use when monitoring this gateway. This is typically only
-                necessary if the gateway IP does not accept ICMP probes."
+                necessary if the gateway IP does not accept ICMP probes.",
         );
         $this->action_disable = new BooleanField(
             default: false,
             help_text: "Disable actions from taking place when gateway events occur. The gateway will always be
-                considered up."
+                considered up.",
         );
-        $this->force_down = new BooleanField(
-            default: false,
-            help_text: "Always consider this gateway to be up."
-        );
+        $this->force_down = new BooleanField(default: false, help_text: 'Always consider this gateway to be up.');
         $this->dpinger_dont_add_static_route = new BooleanField(
             default: false,
-            help_text: "Prevents gateway monitoring from adding a static route for this gateway's monitor IP."
+            help_text: "Prevents gateway monitoring from adding a static route for this gateway's monitor IP.",
         );
         $this->gw_down_kill_states = new StringField(
-            default: "",
-            choices: ["", "none", "down"],
+            default: '',
+            choices: ['', 'none', 'down'],
             allow_empty: true,
-            help_text: "Controls the state killing behavior when this specific gateway goes down. Killing states for ".
-                "specific down gateways only affects states created by policy routing rules and reply-to. Has no ".
-                "effect if gateway monitoring or its action are disabled or if the gateway is forced down. May not ".
-                "have any effect on dynamic gateways during a link loss event."
+            help_text: 'Controls the state killing behavior when this specific gateway goes down. Killing states for ' .
+                'specific down gateways only affects states created by policy routing rules and reply-to. Has no ' .
+                'effect if gateway monitoring or its action are disabled or if the gateway is forced down. May not ' .
+                'have any effect on dynamic gateways during a link loss event.',
         );
         $this->nonlocalgateway = new BooleanField(
             default: true,
-            help_text: "Allows or disallows gateway IPs that are not a part of the parent interface's subnet(s)."
+            help_text: "Allows or disallows gateway IPs that are not a part of the parent interface's subnet(s).",
         );
         $this->weight = new IntegerField(
             default: 1,
             minimum: 1,
             maximum: 30,
-            help_text: "Sets the weight for this gateway when used in a Gateway Group."
+            help_text: 'Sets the weight for this gateway when used in a Gateway Group.',
         );
         $this->data_payload = new IntegerField(
             default: 1,
             minimum: 1,
-            help_text: "Sets the data payload to send in ICMP packets to gateway monitor IP."
+            help_text: 'Sets the data payload to send in ICMP packets to gateway monitor IP.',
         );
         $this->latencylow = new IntegerField(
             default: 200,
             minimum: 1,
-            help_text: "Sets the threshold to consider latency as low."
+            help_text: 'Sets the threshold to consider latency as low.',
         );
         $this->latencyhigh = new IntegerField(
             default: 500,
             minimum: 2,
-            help_text: "Sets the threshold to consider latency as high. This value must be greater than `latencylow`."
+            help_text: 'Sets the threshold to consider latency as high. This value must be greater than `latencylow`.',
         );
         $this->losslow = new IntegerField(
             default: 10,
             minimum: 1,
             maximum: 99,
-            help_text: "Sets the threshold to consider packet loss as low."
+            help_text: 'Sets the threshold to consider packet loss as low.',
         );
         $this->losshigh = new IntegerField(
             default: 20,
             minimum: 2,
             maximum: 100,
-            help_text: "Sets the threshold to consider packet loss as high. This value must be greater than `losslow`."
+            help_text: 'Sets the threshold to consider packet loss as high. This value must be greater than `losslow`.',
         );
         $this->interval = new IntegerField(
             default: 500,
             minimum: 1,
             maximum: 3600000,
-            help_text: "Sets how often ICMP probes will be sent in milliseconds."
+            help_text: 'Sets how often ICMP probes will be sent in milliseconds.',
         );
         $this->loss_interval = new IntegerField(
             default: 2000,
             minimum: 1,
-            help_text: "Sets the time interval in milliseconds before packets are treated as lost."
+            help_text: 'Sets the time interval in milliseconds before packets are treated as lost.',
         );
         $this->time_period = new IntegerField(
             default: 60000,
             minimum: 1,
-            help_text: "Sets the time period in milliseconds over which results are averaged."
+            help_text: 'Sets the time period in milliseconds over which results are averaged.',
         );
         $this->alert_interval = new IntegerField(
             default: 1000,
             minimum: 1,
-            help_text: "Sets the time interval in milliseconds between checking for an alert conditions."
+            help_text: 'Sets the time interval in milliseconds between checking for an alert conditions.',
         );
 
-        parent::__construct(...$options, id: $id, data: $data);
+        parent::__construct($id, null, $data, ...$options);
     }
 
     /**
@@ -184,43 +178,44 @@ class RoutingGateway extends Model
      * @param bool $disabled The current $disabled value to validate.
      * @return bool The validated disabled value to set.
      */
-    public function validate_disabled(bool $disabled) : bool {
+    public function validate_disabled(bool $disabled): bool
+    {
         # When disabling this gateway is requested, ensure it is not in use first
         if ($disabled) {
             # Ensure the gateway cannot be disabled while it is in use by a gateway group
             # TODO: replace this with a `referenced_by` Field value when the GatewayGroups Model is developed
             foreach ($this->get_config(path: 'gateways/gateway_group', default: []) as $gw_group_id => $gw_group) {
                 foreach ($gw_group['item'] as $item) {
-                    $items = explode("|", $item);
+                    $items = explode('|', $item);
                     if ($items[0] == $this->name->value) {
                         throw new ValidationError(
-                            message: "Gateway cannot be disabled because it is in use by gateway " .
-                            "group with ID `$gw_group_id`",
-                            response_id: "ROUTING_GATEWAY_DISABLED_NOT_ALLOWED_WITH_EXISTING_GW_GROUP"
+                            message: 'Gateway cannot be disabled because it is in use by gateway ' .
+                                "group with ID `$gw_group_id`",
+                            response_id: 'ROUTING_GATEWAY_DISABLED_NOT_ALLOWED_WITH_EXISTING_GW_GROUP',
                         );
                     }
                 }
             }
 
             # Ensure the gateway cannot be disabled while it is in use by a non-disabled static route
-            $routes_in_use = StaticRoute::query(["gateway" => $this->name->value, "disabled" => false]);
+            $routes_in_use = StaticRoute::query(['gateway' => $this->name->value, 'disabled' => false]);
             if ($routes_in_use->exists()) {
                 throw new ValidationError(
-                    message: "Gateway cannot be disabled because it is in use by gateway " .
-                    "route with ID `{$routes_in_use->first()->id}`",
-                    response_id: "ROUTING_GATEWAY_DISABLED_NOT_ALLOWED_WITH_EXISTING_ROUTE"
+                    message: 'Gateway cannot be disabled because it is in use by gateway ' .
+                        "route with ID `{$routes_in_use->first()->id}`",
+                    response_id: 'ROUTING_GATEWAY_DISABLED_NOT_ALLOWED_WITH_EXISTING_ROUTE',
                 );
             }
 
             # Ensure the gateway cannot be disabled while it is in use by a system DNS server
             # TODO: replace with a Model query when the SystemDNSServer Model is developed
             $dnsgw_counter = 1;
-            while (isset($config["system"]["dns{$dnsgw_counter}gw"])) {
-                if ($this->name->value == $config["system"]["dns{$dnsgw_counter}gw"]) {
+            while (isset($config['system']["dns{$dnsgw_counter}gw"])) {
+                if ($this->name->value == $config['system']["dns{$dnsgw_counter}gw"]) {
                     throw new ValidationError(
-                        message: "Gateway cannot be disabled because it is in use by a system DNS " .
-                        "server with ID `$dnsgw_counter`",
-                        response_id: "ROUTING_GATEWAY_DISABLED_NOT_ALLOWED_WITH_EXISTING_ROUTE"
+                        message: 'Gateway cannot be disabled because it is in use by a system DNS ' .
+                            "server with ID `$dnsgw_counter`",
+                        response_id: 'ROUTING_GATEWAY_DISABLED_NOT_ALLOWED_WITH_EXISTING_ROUTE',
                     );
                 }
                 $dnsgw_counter++;
@@ -235,24 +230,31 @@ class RoutingGateway extends Model
      * @param string $interface The $interface value to validate.
      * @return string The validated interface value to set.
      */
-    public function validate_interface(string $interface) : string {
+    public function validate_interface(string $interface): string
+    {
         # Obtain the NetworkInterface Model object associated with our current interface value
         $if_obj = $this->interface->get_related_model();
 
         # Ensure the configured `interface` has an IPv4 address if `protocol` is set to `inet`
-        if ($this->ipprotocol->value === "inet" and (!$if_obj->get_current_ipv4() or !$if_obj->get_current_subnetv4())) {
+        if (
+            $this->ipprotocol->value === 'inet' and
+            (!$if_obj->get_current_ipv4() or !$if_obj->get_current_subnetv4())
+        ) {
             throw new ValidationError(
-                message: "Field `interface` must be an interface with an existing IPv4 address when `ipprotocol` ".
-                    "is set to `inet`",
-                response_id: "ROUTING_GATEWAY_INTERFACE_HAS_NO_IPV4"
+                message: 'Field `interface` must be an interface with an existing IPv4 address when `ipprotocol` ' .
+                    'is set to `inet`',
+                response_id: 'ROUTING_GATEWAY_INTERFACE_HAS_NO_IPV4',
             );
         }
         # Ensure the configured `interface` has an IPv6 address if `protocol` is set to `inet6`
-        if ($this->ipprotocol->value === "inet6" and (!$if_obj->get_current_ipv6() or !$if_obj->get_current_subnetv6())) {
+        if (
+            $this->ipprotocol->value === 'inet6' and
+            (!$if_obj->get_current_ipv6() or !$if_obj->get_current_subnetv6())
+        ) {
             throw new ValidationError(
-                message: "Field `interface` must be an interface with an existing IPv6 address when `ipprotocol` ".
-                "is set to `inet6`",
-                response_id: "ROUTING_GATEWAY_INTERFACE_HAS_NO_IPV6"
+                message: 'Field `interface` must be an interface with an existing IPv6 address when `ipprotocol` ' .
+                    'is set to `inet6`',
+                response_id: 'ROUTING_GATEWAY_INTERFACE_HAS_NO_IPV6',
             );
         }
 
@@ -264,20 +266,29 @@ class RoutingGateway extends Model
      * @param string $gateway The gateway value to validate.
      * @return string The validated gateway value to set.
      */
-    public function validate_gateway(string $gateway) : string {
+    public function validate_gateway(string $gateway): string
+    {
         # Only allow IPv4 addresses if `ipprotocol` is `inet`
-        if ($this->ipprotocol->value === "inet" and !$this->gateway->has_label("is_ipaddrv4") and $gateway !== "dynamic") {
+        if (
+            $this->ipprotocol->value === 'inet' and
+            !$this->gateway->has_label('is_ipaddrv4') and
+            $gateway !== 'dynamic'
+        ) {
             throw new ValidationError(
-                message: "Field `gateway` must be an IPv4 address when `ipprotocol` is set to `inet`",
-                response_id: "ROUTING_GATEWAY_NO_IPV6_WITH_INET"
+                message: 'Field `gateway` must be an IPv4 address when `ipprotocol` is set to `inet`',
+                response_id: 'ROUTING_GATEWAY_NO_IPV6_WITH_INET',
             );
         }
 
         # Only allow IPv4 addresses if `ipprotocol` is `inet6`
-        if ($this->ipprotocol->value === "inet6" and !$this->gateway->has_label("is_ipaddrv6") and $gateway !== "dynamic") {
+        if (
+            $this->ipprotocol->value === 'inet6' and
+            !$this->gateway->has_label('is_ipaddrv6') and
+            $gateway !== 'dynamic'
+        ) {
             throw new ValidationError(
-                message: "Field `gateway` must be an IPv6 address when `ipprotocol` is set to `inet6`",
-                response_id: "ROUTING_GATEWAY_NO_IPV4_WITH_INET6"
+                message: 'Field `gateway` must be an IPv6 address when `ipprotocol` is set to `inet6`',
+                response_id: 'ROUTING_GATEWAY_NO_IPV4_WITH_INET6',
             );
         }
 
@@ -289,12 +300,13 @@ class RoutingGateway extends Model
      * @param int $latencyhigh The incoming `latencyhigh` value to validate.
      * @return int The validated `latencyhigh`value to set.
      */
-    public function validate_latencyhigh(int $latencyhigh) : int {
+    public function validate_latencyhigh(int $latencyhigh): int
+    {
         # Do not allow the `latencylow` value to be greater than `latencyhigh`
         if ($this->latencylow->value > $latencyhigh) {
             throw new ValidationError(
-                message: "Routing gateway `latencyhigh` must be greater than `latencylow`.",
-                response_id: "ROUTING_GATEWAY_WITH_LATENCY_LOW_GREATER_THAN_HIGH"
+                message: 'Routing gateway `latencyhigh` must be greater than `latencylow`.',
+                response_id: 'ROUTING_GATEWAY_WITH_LATENCY_LOW_GREATER_THAN_HIGH',
             );
         }
 
@@ -306,12 +318,13 @@ class RoutingGateway extends Model
      * @param int $losshigh The incoming `losshigh` value to validate.
      * @return int The validated `losshigh`value to set.
      */
-    public function validate_losshigh(int $losshigh) : int {
+    public function validate_losshigh(int $losshigh): int
+    {
         # Do not allow the `losslow` value to be greater than `losshigh`
         if ($this->losslow->value > $losshigh) {
             throw new ValidationError(
-                message: "Routing gateway `losshigh` must be greater than `losslow`.",
-                response_id: "ROUTING_GATEWAY_WITH_LOSS_LOW_GREATER_THAN_HIGH"
+                message: 'Routing gateway `losshigh` must be greater than `losslow`.',
+                response_id: 'ROUTING_GATEWAY_WITH_LOSS_LOW_GREATER_THAN_HIGH',
             );
         }
 
@@ -323,12 +336,13 @@ class RoutingGateway extends Model
      * @param int $loss_interval The incoming `loss_interval` value to validate.
      * @return int The validated `loss_interval`value to set.
      */
-    public function validate_loss_interval(int $loss_interval) : int {
+    public function validate_loss_interval(int $loss_interval): int
+    {
         # Do not allow the `loss_interval` value to be less than `latencyhigh`
         if ($this->latencyhigh->value > $loss_interval) {
             throw new ValidationError(
-                message: "Routing gateway `loss_interval` must be greater than or equal to `latencyhigh`.",
-                response_id: "ROUTING_GATEWAY_WITH_LOSS_INTERVAL_GREATER_THAN_LATENCY_HIGH"
+                message: 'Routing gateway `loss_interval` must be greater than or equal to `latencyhigh`.',
+                response_id: 'ROUTING_GATEWAY_WITH_LOSS_INTERVAL_GREATER_THAN_LATENCY_HIGH',
             );
         }
 
@@ -340,13 +354,14 @@ class RoutingGateway extends Model
      * @param int $time_period The incoming `time_period` value to validate.
      * @return int The validated `time_period`value to set.
      */
-    public function validate_time_period(int $time_period) : int {
+    public function validate_time_period(int $time_period): int
+    {
         # Require `time_period` to be greater than twice the `interval` plus the `loss_interval`
         if ($time_period <= 2 * $this->interval->value + $this->loss_interval->value) {
             throw new ValidationError(
-                message: "Routing gateway `time_period` must be greater than twice the `interval` value plus the ".
-                    "`loss_interval` value.",
-                response_id: "ROUTING_GATEWAY_TIME_PERIOD_UNDER_MINIMUM"
+                message: 'Routing gateway `time_period` must be greater than twice the `interval` value plus the ' .
+                    '`loss_interval` value.',
+                response_id: 'ROUTING_GATEWAY_TIME_PERIOD_UNDER_MINIMUM',
             );
         }
 
@@ -358,12 +373,13 @@ class RoutingGateway extends Model
      * @param int $alert_interval The incoming `alert_interval` value to validate.
      * @return int The validated `alert_interval`value to set.
      */
-    public function validate_alert_interval(int $alert_interval) : int {
+    public function validate_alert_interval(int $alert_interval): int
+    {
         # Require `alert_interval` to be greater than or equal to the `interval`
         if ($alert_interval <= $this->interval->value) {
             throw new ValidationError(
-                message: "Routing gateway `alert_interval` must be greater than or equal to the `interval`.",
-                response_id: "ROUTING_GATEWAY_ALERT_INTERVAL_UNDER_MINIMUM"
+                message: 'Routing gateway `alert_interval` must be greater than or equal to the `interval`.',
+                response_id: 'ROUTING_GATEWAY_ALERT_INTERVAL_UNDER_MINIMUM',
             );
         }
 
@@ -373,14 +389,16 @@ class RoutingGateway extends Model
     /**
      * Defines how gateways should be applied after creation and updates.
      */
-    public function apply(): void {
+    public function apply(): void
+    {
         (new RoutingApplyDispatcher(async: $this->async))->spawn_process();
     }
 
     /**
      * Define steps to create this RoutingGateway object internally.
      */
-    public function _create() {
+    public function _create()
+    {
         # Variables
         $internal_values = $this->to_internal();
 
@@ -388,8 +406,11 @@ class RoutingGateway extends Model
         # strings. To accommodate this, change true bool values to `yes` beforehand.
         foreach ($internal_values as $internal_name => $internal_value) {
             # Check if this is a BooleanField
-            if ($this->$internal_name->type === "boolean" and $internal_value === $this->$internal_name->indicates_true) {
-                $internal_values[$internal_name] = "yes";
+            if (
+                $this->$internal_name->type === 'boolean' and
+                $internal_value === $this->$internal_name->indicates_true
+            ) {
+                $internal_values[$internal_name] = 'yes';
             }
         }
 
@@ -400,7 +421,8 @@ class RoutingGateway extends Model
     /**
      * Define steps to update this RoutingGateway object internally.
      */
-    public function _update() {
+    public function _update()
+    {
         # Variables
         $internal_values = $this->to_internal();
 
@@ -408,8 +430,11 @@ class RoutingGateway extends Model
         # strings. To accommodate this, change true bool values to `yes` beforehand.
         foreach ($internal_values as $internal_name => $internal_value) {
             # Check if this is a BooleanField
-            if ($this->$internal_name->type === "boolean" and $internal_value === $this->$internal_name->indicates_true) {
-                $internal_values[$internal_name] = "yes";
+            if (
+                $this->$internal_name->type === 'boolean' and
+                $internal_value === $this->$internal_name->indicates_true
+            ) {
+                $internal_values[$internal_name] = 'yes';
             }
         }
 
@@ -420,14 +445,15 @@ class RoutingGateway extends Model
     /**
      * Overrides the `apply()` method for RoutingGateway deletions.
      */
-    public function _delete() {
+    public function _delete()
+    {
         # Remove the static routes for this gateway and it's monitor IP
         route_del($this->gateway->value, $this->ipprotocol->value);
         route_del($this->monitor->value, $this->ipprotocol->value);
 
         # Remove the default route if this is a default gateway
         if ($this->is_default_gateway()) {
-            route_del("default", $this->ipprotocol->value);
+            route_del('default', $this->ipprotocol->value);
         }
 
         # Remove the gateway from config
@@ -439,12 +465,13 @@ class RoutingGateway extends Model
      * Checks if this RoutingGateway is the current default route.
      * @return bool Returns `true` if this RoutingGateway is a default route, `false` if not.
      */
-    public function is_default_gateway() : bool {
+    public function is_default_gateway(): bool
+    {
         # Loop through the gateway days until we find the gateway to delete
         foreach (return_gateways_array(true, false, true, true) as $gw) {
             # Check if this gateways 'attribute' matches the ID of this RoutingGateway
-            if ($this->id === $gw["attribute"]) {
-                if ($gw["isdefaultgw"]) {
+            if ($this->id === $gw['attribute']) {
+                if ($gw['isdefaultgw']) {
                     return true;
                 }
             }

@@ -14,20 +14,20 @@ class OutboundNATMode extends Model
     public function __construct(mixed $data = [], mixed ...$options)
     {
         # Set model attributes
-        $this->config_path = "nat/outbound";
+        $this->config_path = 'nat/outbound';
 
         # Set model fields
         $this->mode = new StringField(
             required: true,
-            choices: ["automatic", "hybrid", "advanced", "disabled"],
-            help_text: "The outbound NAT mode to assign this system. Set to `automatic` to have this system ".
-                "automatically generate NAT rules this firewall, `hybrid` to automatically generate NAT rules AND ".
-                "allow manual outbound NAT mappings to be assigned, `manual` to prevent the system from automatically ".
-                "generating NAT rules and only allow manual outbound NAT mappings, or `disabled` to disable outbound ".
-                "NAT on this system entirely."
+            choices: ['automatic', 'hybrid', 'advanced', 'disabled'],
+            help_text: 'The outbound NAT mode to assign this system. Set to `automatic` to have this system ' .
+                'automatically generate NAT rules this firewall, `hybrid` to automatically generate NAT rules AND ' .
+                'allow manual outbound NAT mappings to be assigned, `manual` to prevent the system from automatically ' .
+                'generating NAT rules and only allow manual outbound NAT mappings, or `disabled` to disable outbound ' .
+                'NAT on this system entirely.',
         );
 
-        parent::__construct(...$options, data: $data);
+        parent::__construct(null, null, $data, ...$options);
     }
 
     /**
@@ -37,5 +37,4 @@ class OutboundNATMode extends Model
     {
         (new FirewallApplyDispatcher(async: $this->async))->spawn_process();
     }
-
 }

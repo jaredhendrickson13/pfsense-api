@@ -13,19 +13,19 @@ class SystemConsole extends Model
     public function __construct(mixed $data = [], mixed ...$options)
     {
         # Set model attributes
-        $this->config_path = "system";
-        $this->update_strategy = "merge";
+        $this->config_path = 'system';
+        $this->update_strategy = 'merge';
         $this->many = false;
         $this->always_apply = true;
 
         # Set model fields
         $this->passwd_protect_console = new BooleanField(
             default: false,
-            internal_name: "disableconsolemenu",
-            help_text: "Enables or disables password protecting the console."
+            internal_name: 'disableconsolemenu',
+            help_text: 'Enables or disables password protecting the console.',
         );
 
-        parent::__construct(...$options, data: $data);
+        parent::__construct(null, null, $data, ...$options);
     }
 
     /**
@@ -35,5 +35,4 @@ class SystemConsole extends Model
     {
         console_configure();
     }
-
 }

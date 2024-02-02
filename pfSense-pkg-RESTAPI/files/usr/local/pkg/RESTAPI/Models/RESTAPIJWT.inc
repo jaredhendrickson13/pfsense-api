@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Models;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use Exception;
 use Firebase\JWT\JWT;
@@ -17,20 +17,20 @@ use RESTAPI\Responses\ServerError;
 class RESTAPIJWT extends Model
 {
     public StringField $token;
-    
+
     public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Set Model attributes
-        $this->verbose_name = "API JWT";
-        
+        $this->verbose_name = 'API JWT';
+
         # Set Model Fields
         $this->token = new StringField(
             allow_null: true,
             read_only: true,
-            help_text: "The generated JWT that can be used for JWT authentication."
+            help_text: 'The generated JWT that can be used for JWT authentication.',
         );
 
-        parent::__construct(...$options, id: $id, data: $data);
+        parent::__construct($id, null, $data, ...$options);
     }
 
     /**
@@ -39,33 +39,33 @@ class RESTAPIJWT extends Model
      * @throws Exception When a sufficient source of randomness is not found for `random_bytes`.
      * @return string The API's current JWT server key
      */
-    public static function init_server_key(bool $rotate = false) : string {
+    public static function init_server_key(bool $rotate = false): string
+    {
         # Obtain the API package's ID and configuration
         $pkg_id = RESTAPISettings::get_pkg_id();
         $api_config = RESTAPISettings::get_pkg_config();
 
         # Create a new server key if one is not set
-        if (empty($api_config["server_key"]) or $rotate === true) {
+        if (empty($api_config['server_key']) or $rotate === true) {
             # Try to generate the server key, throw a ServerError if we cannot
             try {
                 config_set_path("installedpackages/package/$pkg_id/conf/server_key", bin2hex(random_bytes(32)));
-                write_config("API server key created");
-            }
-            catch (Exception) {
+                write_config('API server key created');
+            } catch (Exception) {
                 throw new ServerError(
-                    message: "Server failed to initialize the JWT server key.",
-                    response_id: "API_JWT_INIT_SERVER_KEY_FAILED"
+                    message: 'Server failed to initialize the JWT server key.',
+                    response_id: 'API_JWT_INIT_SERVER_KEY_FAILED',
                 );
             }
         }
-        
+
         # Refresh the API config in case the server key changed
         $api_config = RESTAPISettings::get_pkg_config();
         (new RESTAPISettingsSyncDispatcher(async: true))->spawn_process();
         RESTAPISettings::backup_to_file();
 
         # Return the server key
-        return $api_config["server_key"];
+        return $api_config['server_key'];
     }
 
     /**
@@ -73,19 +73,19 @@ class RESTAPIJWT extends Model
      * @param string $jwt The incoming JWT string to decode.
      * @return array An array of decoded JWT attributes. If the JWT could not be decoded, this array will be empty.
      */
-    public static function decode(string $jwt) : array {
+    public static function decode(string $jwt): array
+    {
         # Obtain the current JWT server key
         $jwt_server_key = self::init_server_key();
 
         # Attempt to decode the JWT, if decoding fails return empty array.
         try {
-            return (array) JWT::decode($jwt, new Key($jwt_server_key, "HS256"));
-        }
-        catch (Exception) {
+            return (array) JWT::decode($jwt, new Key($jwt_server_key, 'HS256'));
+        } catch (Exception) {
             return [];
         }
     }
-    
+
     /**
      * Generates the JWT and assigns the `token` field.
      */
@@ -98,15 +98,15 @@ class RESTAPIJWT extends Model
         $api_settings = new RESTAPISettings();
 
         # Assign the JWT payload values. Assign the configured JWT expiration from the API configuration
-        $payload = array(
-            "iss" => config_get_path("system/hostname"),    # TODO: Replace with Model call when developed
-            "aud" => config_get_path("system/hostname"),    # TODO: Replace with Model call when developed
-            "exp" => time() + $api_settings->jwt_exp->value,
-            "nbf" => time(),
-            "data" => $this->client->username
-        );
+        $payload = [
+            'iss' => config_get_path('system/hostname'), # TODO: Replace with Model call when developed
+            'aud' => config_get_path('system/hostname'), # TODO: Replace with Model call when developed
+            'exp' => time() + $api_settings->jwt_exp->value,
+            'nbf' => time(),
+            'data' => $this->client->username,
+        ];
 
         # Assign the JWT string to `token`
-        $this->token->value = JWT::encode($payload, $server_key, "HS256");
+        $this->token->value = JWT::encode($payload, $server_key, 'HS256');
     }
 }

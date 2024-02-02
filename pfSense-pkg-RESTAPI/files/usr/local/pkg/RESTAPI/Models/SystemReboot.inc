@@ -19,16 +19,17 @@ class SystemReboot extends Model
         $this->dry_run = new BooleanField(
             default: false,
             write_only: true,
-            help_text: "Run through the call but don't actually initiate a reboot."
+            help_text: "Run through the call but don't actually initiate a reboot.",
         );
 
-        parent::__construct(...$options, data: $data);
+        parent::__construct(null, null, $data, ...$options);
     }
 
     /**
      * Returns an empty array. This method is the internal callable for this Model
      */
-    protected function void(): array {
+    protected function void(): array
+    {
         return [];
     }
 

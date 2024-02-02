@@ -27,32 +27,29 @@ class StaticRoute extends Model
     public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Define model attributes
-        $this->config_path = "staticroutes/route";
+        $this->config_path = 'staticroutes/route';
         $this->many = true;
-        $this->subsystem = "staticroutes";
+        $this->subsystem = 'staticroutes';
 
         # Define model Fields
         $this->network = new StringField(
             required: true,
             validators: [new SubnetValidator(allow_ipv4: true, allow_ipv6: true, allow_alias: true)],
-            help_text: "Sets the destination network for this static route in CIDR notation."
+            help_text: 'Sets the destination network for this static route in CIDR notation.',
         );
         $this->gateway = new StringField(
             required: true,
             validators: [new GatewayValidator(allow_ipv4: true, allow_ipv6: true)],
-            help_text: "Sets which gateway this route applies to."
+            help_text: 'Sets which gateway this route applies to.',
         );
         $this->descr = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
-            help_text: "Sets a description for administrative reference."
+            help_text: 'Sets a description for administrative reference.',
         );
-        $this->disabled = new BooleanField(
-            default: false,
-            help_text: "Disable this static route."
-        );
+        $this->disabled = new BooleanField(default: false, help_text: 'Disable this static route.');
 
-        parent::__construct(...$options, id: $id, data: $data);
+        parent::__construct($id, null, $data, ...$options);
     }
 
     /**
@@ -60,21 +57,21 @@ class StaticRoute extends Model
      * @param string $network The incoming `network` value to be validated.
      * @return string The validated `network` value to set.
      */
-    public function validate_network(string $network): string {
+    public function validate_network(string $network): string
+    {
         # Skip additional validation if the `network` is an alias
-        if ($this->network->has_label("is_alias")) {
+        if ($this->network->has_label('is_alias')) {
             return $network;
         }
 
         # Extract the address and subnet from the CIDR
-        $addr = explode("/", $network)[0];
-        $subnet = explode("/", $network)[1];
+        $addr = explode('/', $network)[0];
+        $subnet = explode('/', $network)[1];
 
         # Find the network address for the subnet
-        if ($this->network->has_label("is_subnetv4")) {
+        if ($this->network->has_label('is_subnetv4')) {
             $addr = gen_subnet($addr, $subnet);
-        }
-        elseif ($this->network->has_label("is_subnetv6")) {
+        } elseif ($this->network->has_label('is_subnetv6')) {
             $addr = gen_subnetv6($addr, $subnet);
         }
 
@@ -84,24 +81,24 @@ class StaticRoute extends Model
         # Ensure this network is not used by an existing NetworkInterface
         foreach (NetworkInterface::read_all()->model_objects as $interface) {
             # Check if this is an IPv4 address and this interface has a static IPv4 address
-            if ($this->network->has_label("is_subnetv4") and $interface->typev4->value === "static") {
+            if ($this->network->has_label('is_subnetv4') and $interface->typev4->value === 'static') {
                 # Ensure this route doesn't conflict with this interface's subnet
                 if ($addr === gen_subnet($interface->ipaddr->value, $interface->subnet->value)) {
                     throw new ValidationError(
-                        message: "Destination network `$network` conflicts with the IP address of interface with ".
+                        message: "Destination network `$network` conflicts with the IP address of interface with " .
                             "ID `$interface->id`",
-                        response_id: "STATIC_ROUTE_CONFLICTS_WITH_IPV4_INTERFACE"
+                        response_id: 'STATIC_ROUTE_CONFLICTS_WITH_IPV4_INTERFACE',
                     );
                 }
             }
             # Check if this is an IPv4 address and this interface has a static IPv6 address
-            if ($this->network->has_label("is_subnetv6") and $interface->typev6->value === "staticv6") {
+            if ($this->network->has_label('is_subnetv6') and $interface->typev6->value === 'staticv6') {
                 # Ensure this route doesn't conflict with this interface's subnet
                 if ($addr === gen_subnetv6($interface->ipaddrv6->value, $interface->subnetv6->value)) {
                     throw new ValidationError(
-                        message: "Destination network `$network` conflicts with the IP address of interface with ".
-                        "ID `$interface->id`",
-                        response_id: "STATIC_ROUTE_CONFLICTS_WITH_IPV6_INTERFACE"
+                        message: "Destination network `$network` conflicts with the IP address of interface with " .
+                            "ID `$interface->id`",
+                        response_id: 'STATIC_ROUTE_CONFLICTS_WITH_IPV6_INTERFACE',
                     );
                 }
             }
@@ -115,28 +112,29 @@ class StaticRoute extends Model
      * @param string $gateway The incoming `gateway` value to be validated.
      * @return string The validated `gateway` value to set.
      */
-    public function validate_gateway(string $gateway) : string {
+    public function validate_gateway(string $gateway): string
+    {
         # Skip extra validation if the `network` is an alias
-        if ($this->network->has_label("is_alias")) {
+        if ($this->network->has_label('is_alias')) {
             return $gateway;
         }
 
         # Fetch the gateway object of the value assigned
-        $gateway_obj = RoutingGateway::query(["name" => $gateway])->first();
+        $gateway_obj = RoutingGateway::query(['name' => $gateway])->first();
 
         # Ensure the upstream gateways IP version matches the `network` assigned
-        if ($gateway_obj->ipprotocol->value === "inet" and !$this->network->has_label("is_subnetv4")) {
+        if ($gateway_obj->ipprotocol->value === 'inet' and !$this->network->has_label('is_subnetv4')) {
             throw new ValidationError(
-                message: "Cannot assign non-IPv4 `network` to IPv4 `gateway`.",
-                response_id: "STATIC_ROUTE_NON_IPV4_NETWORK_WITH_IPV4_GATEWAY"
+                message: 'Cannot assign non-IPv4 `network` to IPv4 `gateway`.',
+                response_id: 'STATIC_ROUTE_NON_IPV4_NETWORK_WITH_IPV4_GATEWAY',
             );
         }
 
         # Ensure the upstream gateways IP version matches the `network` assigned
-        if ($gateway_obj->ipprotocol->value === "inet6" and !$this->network->has_label("is_subnetv6")) {
+        if ($gateway_obj->ipprotocol->value === 'inet6' and !$this->network->has_label('is_subnetv6')) {
             throw new ValidationError(
-                message: "Cannot assign non-IPv6 `network` to IPv6 `gateway`.",
-                response_id: "STATIC_ROUTE_NON_IPV6_NETWORK_WITH_IPV6_GATEWAY"
+                message: 'Cannot assign non-IPv6 `network` to IPv6 `gateway`.',
+                response_id: 'STATIC_ROUTE_NON_IPV6_NETWORK_WITH_IPV6_GATEWAY',
             );
         }
 
@@ -148,15 +146,16 @@ class StaticRoute extends Model
      * @param bool $disabled The incoming `disabled` value to be validated.
      * @return bool The validated `disabled` value to set.
      */
-    public function validate_disabled(bool $disabled) : bool {
+    public function validate_disabled(bool $disabled): bool
+    {
         # Fetch the gateway object of the gateway assigned
-        $gateway_obj = RoutingGateway::query(["name" => $this->gateway->value])->first();
+        $gateway_obj = RoutingGateway::query(['name' => $this->gateway->value])->first();
 
         # Force route to be disabled if the parent gateway is disabled
         if ($gateway_obj->disabled->value and !$disabled) {
             throw new ValidationError(
-                message: " Static route must also be `disabled` when the parent gateway is `disabled`.",
-                response_id: "STATIC_ROUTE_GATEWAY_DISABLED"
+                message: ' Static route must also be `disabled` when the parent gateway is `disabled`.',
+                response_id: 'STATIC_ROUTE_GATEWAY_DISABLED',
             );
         }
 
@@ -166,7 +165,8 @@ class StaticRoute extends Model
     /**
      * Applies pending static route changes.
      */
-    public function apply() {
+    public function apply()
+    {
         (new RoutingApplyDispatcher(async: $this->async))->spawn_process();
     }
 
@@ -181,7 +181,8 @@ class StaticRoute extends Model
     /**
      * Ensures the static route deletion is performed before removing it from config
      */
-    public function _delete() {
+    public function _delete()
+    {
         delete_static_route($this->id, true);
         parent::_delete();
     }
@@ -189,22 +190,23 @@ class StaticRoute extends Model
     /**
      * Expands `network` values that are aliases in an array of subnets to apply static routes for.
      */
-    public function get_networks() {
+    public function get_networks()
+    {
         # Keep track of networks that can be applied to a static route
         $networks = [];
 
         # Check if the current network value is an alias
-        if ($this->network->has_label("is_alias")) {
+        if ($this->network->has_label('is_alias')) {
             # Query for the alias assigned and loop through it's addresses
-            $alias = FirewallAlias::query(["name" => $this->network->value])->first();
+            $alias = FirewallAlias::query(['name' => $this->network->value])->first();
             foreach ($alias->address->value as $alias_network) {
                 # Set CIDR if this is an IPv4 address
                 if (is_ipaddrv4($alias_network)) {
-                    $alias_network .= "/32";
+                    $alias_network .= '/32';
                 }
                 # Set CIDR if this is an IPv6 address
                 if (is_ipaddrv6($alias_network)) {
-                    $alias_network .= "/128";
+                    $alias_network .= '/128';
                 }
                 # Don't include this network if it is not a subnet
                 if (!is_subnet($alias_network)) {
@@ -232,9 +234,8 @@ class StaticRoute extends Model
         # Include pending route changes that haven't been applied yet, or simply initialize our pending change var
         if (file_exists("{$g['tmp_path']}/.system_routes.apply")) {
             $to_apply_list = unserialize(file_get_contents("{$g['tmp_path']}/.system_routes.apply"));
-        }
-        else {
-            $to_apply_list = array();
+        } else {
+            $to_apply_list = [];
         }
 
         # Check for the static route that is currently operating
@@ -247,7 +248,7 @@ class StaticRoute extends Model
         }
 
         # If was set previously, and has changed, ensure we delete the old route and recreate it.
-        if (!empty($old_gateway) && ($this->gateway->value != $old_gateway)) {
+        if (!empty($old_gateway) && $this->gateway->value != $old_gateway) {
             $delete_networks = $old_network;
             $delete_gateway = lookup_gateway_ip_by_name($old_gateway);
         }
@@ -262,7 +263,7 @@ class StaticRoute extends Model
             foreach ($delete_networks as $del_net) {
                 # Set the IP address family correctly when this is an IPv6 route
                 if (is_ipaddrv6($del_net)) {
-                    $ip_family = "-inet6";
+                    $ip_family = '-inet6';
                 }
                 # Fetch the route to be deleted
                 $route = route_get($del_net, '', true);

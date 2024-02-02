@@ -18,7 +18,7 @@ class RoutingApply extends Model
     public function __construct(mixed $data = [], mixed ...$options)
     {
         # Set model attributes
-        $this->internal_callable = "get_applied_status";
+        $this->internal_callable = 'get_applied_status';
         $this->always_apply = true;
 
         # Set model Fields
@@ -26,29 +26,33 @@ class RoutingApply extends Model
             read_only: true,
             indicates_true: true,
             indicates_false: false,
-            help_text: "Displays `true` when all routing changes are applied and there are no pending changes left.".
-            "Displays `false` when there are pending routing changes that have not been applied."
+            help_text: 'Displays `true` when all routing changes are applied and there are no pending changes left.' .
+                'Displays `false` when there are pending routing changes that have not been applied.',
         );
-        parent::__construct(...$options, data: $data);
+        parent::__construct(null, null, $data, ...$options);
     }
 
     /**
      * Obtains the current applied status.
      * @return array The internal value array to be loaded by this model as the internal callable
      */
-    public function get_applied_status() : array {
-        return ["applied" => !is_subsystem_dirty("staticroutes")];
+    public function get_applied_status(): array
+    {
+        return ['applied' => !is_subsystem_dirty('staticroutes')];
     }
 
     /**
      * Override the _create method so it does nothing. We only want to apply changes when this is called.
      */
-    public function _create(): void {}
+    public function _create(): void
+    {
+    }
 
     /**
      * Applies pending routing changes.
      */
-    public function apply(): void {
+    public function apply(): void
+    {
         (new RoutingApplyDispatcher(async: $this->async))->spawn_process();
     }
 }

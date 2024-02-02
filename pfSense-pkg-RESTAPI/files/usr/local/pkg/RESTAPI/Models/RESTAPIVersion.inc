@@ -18,48 +18,49 @@ class RESTAPIVersion extends Model
     public function __construct(mixed $data = [], mixed ...$options)
     {
         # Set model attributes
-        $this->internal_callable = "get_api_version_details";
-        $this->cache_class = "RESTAPIVersionReleasesCache";
+        $this->internal_callable = 'get_api_version_details';
+        $this->cache_class = 'RESTAPIVersionReleasesCache';
 
         # Set model Fields
         $this->current_version = new StringField(
             read_only: true,
-            help_text: "The current API version installed on this system."
+            help_text: 'The current API version installed on this system.',
         );
         $this->latest_version = new StringField(
             read_only: true,
-            help_text: "The latest API version available to this system."
+            help_text: 'The latest API version available to this system.',
         );
         $this->latest_version_release_date = new StringField(
             read_only: true,
-            verbose_name: "Release date",
-            help_text: "The latest API version's release date."
+            verbose_name: 'Release date',
+            help_text: "The latest API version's release date.",
         );
         $this->update_available = new BooleanField(
             read_only: true,
-            help_text: "Indicates if an API update is available for this system."
+            help_text: 'Indicates if an API update is available for this system.',
         );
         $this->install_version = new StringField(
-            choices_callable: "get_all_available_versions",
+            choices_callable: 'get_all_available_versions',
             allow_null: true,
             write_only: true,
-            help_text: "Set the API version to update or rollback to."
+            help_text: 'Set the API version to update or rollback to.',
         );
 
-        parent::__construct(...$options, data: $data);
+        parent::__construct(null, null, $data, ...$options);
     }
 
     /**
      * Obtains API version details. This method is the internal callable for this model.
      * @return array An array of API version details that correspond with this model's Fields.
      */
-    protected function get_api_version_details() : array {
+    protected function get_api_version_details(): array
+    {
         return [
-            "current_version" => $this->get_api_version(),
-            "latest_version" => $this->get_latest_api_version(),
-            "latest_version_release_date" => $this->get_latest_api_release_date(),
-            "update_available" => $this->is_update_available(),
-            "install_version" => array_keys($this->get_all_available_versions())
+            'current_version' => $this->get_api_version(),
+            'latest_version' => $this->get_latest_api_version(),
+            'latest_version_release_date' => $this->get_latest_api_release_date(),
+            'update_available' => $this->is_update_available(),
+            'install_version' => array_keys($this->get_all_available_versions()),
         ];
     }
 
@@ -67,30 +68,32 @@ class RESTAPIVersion extends Model
      * Obtains the current API version installed on the system.
      * @return string The current API version installed in vX.X.X format
      */
-    public static function get_api_version() : string {
+    public static function get_api_version(): string
+    {
         # Pull the raw pkg info for the API package into an array for each line
-        $pkg_info = explode(PHP_EOL, shell_exec("pkg-static info pfSense-pkg-RESTAPI"));
+        $pkg_info = explode(PHP_EOL, shell_exec('pkg-static info pfSense-pkg-RESTAPI'));
 
         # Loop through each line and check the version
         foreach ($pkg_info as $pkg_line) {
-            if (str_starts_with($pkg_line, "Version")) {
+            if (str_starts_with($pkg_line, 'Version')) {
                 # Locate the version and format it to a standard semantic version format (x.x.x)
-                $version = str_replace(" ", "", $pkg_line);
-                $version = explode(":", $version)[1];
-                $version = (strlen($version) === 3) ? $version.".0" : $version;
-                $version = str_replace("_", ".", $version);
+                $version = str_replace(' ', '', $pkg_line);
+                $version = explode(':', $version)[1];
+                $version = strlen($version) === 3 ? $version . '.0' : $version;
+                $version = str_replace('_', '.', $version);
                 return "v$version";
             }
         }
 
-        return "unknown";
+        return 'unknown';
     }
 
     /**
      * Obtains the latest API version available to this system.
      * @return string|null The latest API version available to this system or `null` if none are available.
      */
-    public function get_latest_api_version() : string|null {
+    public function get_latest_api_version(): string|null
+    {
         # Fetch our latest version and format it semantically (x.x.x)
         return array_key_first($this->get_all_available_versions());
     }
@@ -99,24 +102,26 @@ class RESTAPIVersion extends Model
      * Obtains the release date of the latest API version available to this system.
      * @return string The release date of the latest API version available to this system.
      */
-    public function get_latest_api_release_date() : string {
+    public function get_latest_api_release_date(): string
+    {
         # Loop through each release and locate the latest available releases creation date
         foreach ($this->get_github_releases() as $release) {
             # Check if this releases is latest available for our platform
-            if ($release["tag_name"] === self::get_latest_api_version()) {
-                return $release["created_at"];
+            if ($release['tag_name'] === self::get_latest_api_version()) {
+                return $release['created_at'];
             }
         }
 
-        return "unknown";
+        return 'unknown';
     }
 
     /**
      * Determines if an API update is available to this system.
      * @return bool `true` if there is an API update available to this system. `false` if it is up-to-date.
      */
-    public function is_update_available() : bool {
-        return version_compare($this->get_api_version(), $this->get_latest_api_version(), operator: "<");
+    public function is_update_available(): bool
+    {
+        return version_compare($this->get_api_version(), $this->get_latest_api_version(), operator: '<');
     }
 
     /**
@@ -126,9 +131,9 @@ class RESTAPIVersion extends Model
      * @return array An array of all releases from the pfsense-RESTAPI repository on GitHub via GitHub API.
      * @link https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#list-releases
      */
-    public function get_github_releases() : array {
+    public function get_github_releases(): array
+    {
         return $this->cache->read();
-
     }
 
     /**
@@ -136,7 +141,8 @@ class RESTAPIVersion extends Model
      * @returns array Returns an array of all REST API versions available to this host. The array keys will be the
      * semantic version strings and the array value will a descriptive representation of the version.
      */
-    public function get_all_available_versions(): array {
+    public function get_all_available_versions(): array
+    {
         # Variables
         $pf_version = new SystemVersion();
         $api_settings = new RESTAPISettings();
@@ -147,20 +153,20 @@ class RESTAPIVersion extends Model
         # Loop through each version and populate our version data
         foreach ($releases as $release) {
             # Loop through the assets of each release and check if our version of pfSense is supported
-            foreach ($release["assets"] as $asset) {
+            foreach ($release['assets'] as $asset) {
                 # Skip pre-releases if pre-releases are not allowed
-                if ($release["prerelease"] and !$api_settings->allow_pre_releases->value) {
+                if ($release['prerelease'] and !$api_settings->allow_pre_releases->value) {
                     continue;
                 }
 
                 # Only include releases for this version of pfSense
-                if (str_starts_with($asset["name"], "pfSense-" . $pf_version->base->value)) {
+                if (str_starts_with($asset['name'], 'pfSense-' . $pf_version->base->value)) {
                     # The first item of our list is the latest release, mark it as such.
                     if ($count === 0) {
-                        $versions[$release["tag_name"]] = $release["name"] . " - Latest";
+                        $versions[$release['tag_name']] = $release['name'] . ' - Latest';
                         $count++;
                     } else {
-                        $versions[$release["tag_name"]] = $release["name"];
+                        $versions[$release['tag_name']] = $release['name'];
                     }
                 }
             }

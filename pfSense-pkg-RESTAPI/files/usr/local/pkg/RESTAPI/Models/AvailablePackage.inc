@@ -19,50 +19,38 @@ class AvailablePackage extends Model
     public BooleanField $installed;
     public StringField $deps;
 
-    public function __construct(mixed $id = null,mixed $data = [], mixed ...$options)
+    public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Set model attributes
-        $this->internal_callable = "get_all_pkgs";
+        $this->internal_callable = 'get_all_pkgs';
         $this->many = true;
-        $this->cache_class = "AvailablePackageCache";
+        $this->cache_class = 'AvailablePackageCache';
 
         # Set model fields
-        $this->name = new StringField(
-            required: true,
-            unique: true,
-            help_text: "The name of the pfSense package."
-        );
-        $this->shortname = new StringField(
-            default: "",
-            read_only: true,
-            help_text: "The package's shortname."
-        );
-        $this->descr = new StringField(
-            default: "",
-            read_only: true,
-            help_text: "The package's description."
-        );
+        $this->name = new StringField(required: true, unique: true, help_text: 'The name of the pfSense package.');
+        $this->shortname = new StringField(default: '', read_only: true, help_text: "The package's shortname.");
+        $this->descr = new StringField(default: '', read_only: true, help_text: "The package's description.");
         $this->version = new StringField(
-            default: "",
+            default: '',
             read_only: true,
-            help_text: "The latest version available for this package."
+            help_text: 'The latest version available for this package.',
         );
         $this->installed = new BooleanField(
             default: false,
             read_only: true,
             indicates_true: true,
             indicates_false: false,
-            help_text: "Indicates whether the package is currently installed or not."
+            help_text: 'Indicates whether the package is currently installed or not.',
         );
         $this->deps = new StringField(
             default: [],
             read_only: true,
             many: true,
             delimiter: null,
-            help_text: "Dependencies for this package that are also installed when this package is installed."
+            help_text: 'Dependencies for this package that are also installed when this package is installed.',
         );
 
-        parent::__construct(...$options, id: $id, data: $data);
+        parent::__construct($id, null, $data, ...$options);
     }
 
     /**
@@ -72,7 +60,8 @@ class AvailablePackage extends Model
      * @note To avoid flooding the package servers with requests, this method will automatically cache package
      * information obtained from the remote repos hourly.
      */
-    protected function get_all_pkgs(): array {
+    protected function get_all_pkgs(): array
+    {
         # Variables
         $pkgs = [];
 
@@ -80,18 +69,18 @@ class AvailablePackage extends Model
         foreach ($this->cache->read() as $pkg) {
             # Add our formatted package to our array
             $pkg_data = [
-                "name" => $pkg["name"],
-                "shortname" => $pkg["shortname"],
-                "version" => $pkg["version"],
-                "descr" => $pkg["desc"],
-                "installed" => is_package_installed($pkg["shortname"]),
-                "deps" => []
+                'name' => $pkg['name'],
+                'shortname' => $pkg['shortname'],
+                'version' => $pkg['version'],
+                'descr' => $pkg['desc'],
+                'installed' => is_package_installed($pkg['shortname']),
+                'deps' => [],
             ];
 
             # If this package has dependencies, include them
-            if ($pkg["deps"]) {
-                foreach($pkg["deps"] as $dep => $dep_data) {
-                    $pkg_data["deps"][] = $dep."-".$dep_data["version"];
+            if ($pkg['deps']) {
+                foreach ($pkg['deps'] as $dep => $dep_data) {
+                    $pkg_data['deps'][] = $dep . '-' . $dep_data['version'];
                 }
             }
 

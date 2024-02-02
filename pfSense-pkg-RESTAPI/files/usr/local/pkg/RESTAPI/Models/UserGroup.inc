@@ -25,56 +25,56 @@ class UserGroup extends Model
     public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Set model attributes
-        $this->config_path = "system/group";
+        $this->config_path = 'system/group';
         $this->many = true;
         $this->always_apply = true;
         $this->sort_option = SORT_ASC;
-        $this->sort_by_field = "name";
-        $this->protected_model_query = ["scope" => "system"];
+        $this->sort_by_field = 'name';
+        $this->protected_model_query = ['scope' => 'system'];
 
         # Set model Fields
         $this->name = new StringField(
             required: true,
             unique: true,
             maximum_length: 64,
-            validators: [new RegexValidator(pattern: "/[^a-zA-Z0-9\.\-_]/", invert: true)],
-            help_text: "The name for this user group."
+            validators: [new RegexValidator(pattern: '/[^a-zA-Z0-9\.\-_]/', invert: true)],
+            help_text: 'The name for this user group.',
         );
         $this->gid = new IntegerField(
-            default: (int)$this->get_config("system/nextgid"),
+            default: (int) $this->get_config('system/nextgid'),
             editable: false,
             read_only: true,
-            help_text: "The GID of this user group. This value is automatically assigned and cannot be changed."
+            help_text: 'The GID of this user group. This value is automatically assigned and cannot be changed.',
         );
         $this->scope = new StringField(
-            default: "local",
-            choices: ["local", "remote"],
-            help_text: "The scope of this user group. Use `local` for user groups that only apply to this system. use ".
-                "`remote` for groups that also apply to remote authentication servers."
+            default: 'local',
+            choices: ['local', 'remote'],
+            help_text: 'The scope of this user group. Use `local` for user groups that only apply to this system. use ' .
+                '`remote` for groups that also apply to remote authentication servers.',
         );
         $this->member = new ForeignModelField(
-            model_name: "User",
-            model_field: "name",
-            model_field_internal: "uid",
+            model_name: 'User',
+            model_field: 'name',
+            model_field_internal: 'uid',
             default: [],
             allow_empty: true,
             many: true,
             delimiter: null,
-            help_text: "The local user names to assign to this user group."
+            help_text: 'The local user names to assign to this user group.',
         );
         $this->priv = new StringField(
             default: [],
             allow_empty: true,
             many: true,
             delimiter: null,
-            help_text: "The privileges to assign to this user group."
+            help_text: 'The privileges to assign to this user group.',
         );
         $this->description = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
-            help_text: "The description to assign to this user group."
+            help_text: 'The description to assign to this user group.',
         );
-        parent::__construct(...$options, id: $id, data: $data);
+        parent::__construct($id, null, $data, ...$options);
     }
 
     /**
@@ -83,12 +83,13 @@ class UserGroup extends Model
      * @returns string The validated value to be assigned.
      * @throws ValidationError When `scope` is `local` and the value contains more than 16 characters.
      */
-    public function validate_name(string $name) : string {
+    public function validate_name(string $name): string
+    {
         # Require the `name` to be 16 characters or less if `scope` is set to `local`
-        if ($this->scope->value === "local" and strlen($name) > 16) {
+        if ($this->scope->value === 'local' and strlen($name) > 16) {
             throw new ValidationError(
-                message: "Field `name` must be 16 characters or less if `scope` is set to `local`.",
-                response_id: "USER_GROUP_NAME_EXCEEDS_MAXIMUM_LENGTH_FOR_LOCAL_SCOPE"
+                message: 'Field `name` must be 16 characters or less if `scope` is set to `local`.',
+                response_id: 'USER_GROUP_NAME_EXCEEDS_MAXIMUM_LENGTH_FOR_LOCAL_SCOPE',
             );
         }
 
@@ -101,14 +102,15 @@ class UserGroup extends Model
      * @return string The validated value to be assigned.
      * @throws ValidationError When an unknown privilege name is requested.
      */
-    public function validate_priv(string $priv) : string {
+    public function validate_priv(string $priv): string
+    {
         global $priv_list;
 
         # Ensure requested privileges are valid privilege names
         if (!array_key_exists($priv, $priv_list)) {
             throw new NotFoundError(
                 message: "Field `priv` contains unknown privilege `$priv`",
-                response_id: "USER_GROUP_PRIV_NOT_FOUND"
+                response_id: 'USER_GROUP_PRIV_NOT_FOUND',
             );
         }
 
@@ -121,7 +123,7 @@ class UserGroup extends Model
     public function _create()
     {
         # Bump the nextuid in config to one greater than this UID
-        $this->set_config("system/nextgid", $this->gid->value + 1);
+        $this->set_config('system/nextgid', $this->gid->value + 1);
         parent::_create();
     }
 
@@ -132,10 +134,10 @@ class UserGroup extends Model
     public function _delete()
     {
         # Do not allow the deletion of `system` scope UserGroups
-        if ($this->scope->value === "system") {
+        if ($this->scope->value === 'system') {
             throw new ForbiddenError(
-                message: "User groups with `scope` set to `system` cannot be deleted.",
-                response_id: "USER_GROUP_CANNOT_DELETE_SYSTEM_SCOPED_GROUPS"
+                message: 'User groups with `scope` set to `system` cannot be deleted.',
+                response_id: 'USER_GROUP_CANNOT_DELETE_SYSTEM_SCOPED_GROUPS',
             );
         }
 

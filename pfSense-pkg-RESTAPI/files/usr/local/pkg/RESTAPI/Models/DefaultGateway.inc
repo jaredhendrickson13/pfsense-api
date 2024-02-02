@@ -14,34 +14,34 @@ class DefaultGateway extends Model
     public function __construct(mixed $data = [], ...$options)
     {
         # Set model attributes
-        $this->config_path = "gateways";
-        $this->update_strategy = "merge";
-        $this->subsystem = "staticroutes";
+        $this->config_path = 'gateways';
+        $this->update_strategy = 'merge';
+        $this->subsystem = 'staticroutes';
         $this->many = false;
 
         # Set model fields
         $this->defaultgw4 = new ForeignModelField(
-            model_name: "RoutingGateway",
-            model_field: "name",
-            model_query: ["ipprotocol" => "inet"],
-            allowed_keywords: ["", "-"],
-            default: "",
+            model_name: 'RoutingGateway',
+            model_field: 'name',
+            model_query: ['ipprotocol' => 'inet'],
+            allowed_keywords: ['', '-'],
+            default: '',
             allow_empty: true,
-            help_text: "The gateway to assigns as the default IPv4 gateway for this system. Leave blank to ".
-                "automatically determine the default gateway, or set to `-` to assign no gateway."
+            help_text: 'The gateway to assigns as the default IPv4 gateway for this system. Leave blank to ' .
+                'automatically determine the default gateway, or set to `-` to assign no gateway.',
         );
         $this->defaultgw6 = new ForeignModelField(
-            model_name: "RoutingGateway",
-            model_field: "name",
-            model_query: ["ipprotocol" => "inet6"],
-            allowed_keywords: ["", "-"],
-            default: "",
+            model_name: 'RoutingGateway',
+            model_field: 'name',
+            model_query: ['ipprotocol' => 'inet6'],
+            allowed_keywords: ['', '-'],
+            default: '',
             allow_empty: true,
-            help_text: "The gateway to assigns as the default IPv6 gateway for this system. Leave blank to ".
-                "automatically determine the default gateway, or set to `-` to assign no gateway."
+            help_text: 'The gateway to assigns as the default IPv6 gateway for this system. Leave blank to ' .
+                'automatically determine the default gateway, or set to `-` to assign no gateway.',
         );
 
-        parent::__construct(...$options, data: $data);
+        parent::__construct(null, null, $data, ...$options);
     }
 
     /**

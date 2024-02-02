@@ -38,35 +38,26 @@ class OutboundNATMapping extends Model
     public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Set model attributes
-        $this->config_path = "nat/outbound/rule";
+        $this->config_path = 'nat/outbound/rule';
         $this->many = true;
-        $this->subsystem = "natconf";
+        $this->subsystem = 'natconf';
 
         # Set model properties
         $this->interface = new InterfaceField(
             required: true,
             allow_interface_groups: true,
-            help_text: "The interface on which traffic is matched as it exits the firewall. In most cases this is a ".
-                "WAN-type or another externally-connected interface."
+            help_text: 'The interface on which traffic is matched as it exits the firewall. In most cases this is a ' .
+                'WAN-type or another externally-connected interface.',
         );
         $this->protocol = new StringField(
             default: null,
-            choices: ["tcp", "udp", "tcp/udp", "icmp", "esp", "ah", "gre", "ipv6", "igmp", "pim", "ospf"],
+            choices: ['tcp', 'udp', 'tcp/udp', 'icmp', 'esp', 'ah', 'gre', 'ipv6', 'igmp', 'pim', 'ospf'],
             allow_null: true,
-            help_text: "The protocol this rule should match. Use `null` for any protocol."
+            help_text: 'The protocol this rule should match. Use `null` for any protocol.',
         );
-        $this->disabled = new BooleanField(
-            default: false,
-            help_text: "Disable this outbound NAT rule."
-        );
-        $this->nonat = new BooleanField(
-            default: false,
-            help_text: "Do not NAT traffic matching this rule."
-        );
-        $this->nosync = new BooleanField(
-            default: false,
-            help_text: "Do not sync this rule to HA peers."
-        );
+        $this->disabled = new BooleanField(default: false, help_text: 'Disable this outbound NAT rule.');
+        $this->nonat = new BooleanField(default: false, help_text: 'Do not NAT traffic matching this rule.');
+        $this->nosync = new BooleanField(default: false, help_text: 'Do not sync this rule to HA peers.');
         $this->source = new FilterAddressField(
             required: true,
             allow_ipaddr: false,
@@ -79,16 +70,16 @@ class OutboundNATMapping extends Model
             allow_invert: false,
             allow_self: true,
             allow_l2tp: false,
-            internal_value_key: "network",
-            help_text: "The source network this rule should match."
+            internal_value_key: 'network',
+            help_text: 'The source network this rule should match.',
         );
         $this->source_port = new PortField(
             default: null,
             allow_alias: true,
             allow_range: true,
             allow_null: true,
-            internal_name: "sourceport",
-            help_text: "The source port this rule should match."
+            internal_name: 'sourceport',
+            help_text: 'The source port this rule should match.',
         );
         $this->destination = new FilterAddressField(
             required: true,
@@ -102,16 +93,16 @@ class OutboundNATMapping extends Model
             allow_invert: true,
             allow_self: false,
             allow_l2tp: false,
-            internal_value_key: "network",
-            help_text: "The destination network this rule should match."
+            internal_value_key: 'network',
+            help_text: 'The destination network this rule should match.',
         );
         $this->destination_port = new PortField(
             default: null,
             allow_alias: true,
             allow_range: true,
             allow_null: true,
-            internal_name: "dstport",
-            help_text: "The destination port this rule should match."
+            internal_name: 'dstport',
+            help_text: 'The destination port this rule should match.',
         );
         $this->target = new SpecialNetworkField(
             required: true,
@@ -124,64 +115,64 @@ class OutboundNATMapping extends Model
             allow_self: false,
             allow_l2tp: false,
             allow_pppoe: false,
-            conditions: ["nonat" => false],
-            help_text: "The target network traffic matching this rule should be translated to."
+            conditions: ['nonat' => false],
+            help_text: 'The target network traffic matching this rule should be translated to.',
         );
         $this->target_subnet = new IntegerField(
             default: 128,
             minimum: 1,
             maximum: 128,
-            conditions: ["nonat" => false],
-            help_text: "The subnet bits for the assigned `target`. This field is only applicable if `target` is set ".
-                "to an IP address. This has no affect for alias or interface `targets`."
+            conditions: ['nonat' => false],
+            help_text: 'The subnet bits for the assigned `target`. This field is only applicable if `target` is set ' .
+                'to an IP address. This has no affect for alias or interface `targets`.',
         );
         $this->static_nat_port = new BooleanField(
             default: false,
-            internal_name: "staticnatport",
-            conditions: ["nonat" => false],
-            help_text: "Do not rewrite source port for traffic matching this rule."
+            internal_name: 'staticnatport',
+            conditions: ['nonat' => false],
+            help_text: 'Do not rewrite source port for traffic matching this rule.',
         );
         $this->nat_port = new PortField(
-            default: "",
+            default: '',
             allow_alias: false,
             allow_range: true,
-            internal_range_char: ":",
+            internal_range_char: ':',
             allow_empty: true,
-            internal_name: "natport",
-            conditions: ["static_nat_port" => false, "nonat" => false],
-            help_text: "The external source port or port range used for rewriting the original source port on ".
-                "connections matching the rule."
+            internal_name: 'natport',
+            conditions: ['static_nat_port' => false, 'nonat' => false],
+            help_text: 'The external source port or port range used for rewriting the original source port on ' .
+                'connections matching the rule.',
         );
         $this->poolopts = new StringField(
             default: null,
             choices: [
-                "round-robin",
-                "round-robin sticky-address",
-                "random",
-                "random sticky-address",
-                "source-hash",
-                "bitmask"
+                'round-robin',
+                'round-robin sticky-address',
+                'random',
+                'random sticky-address',
+                'source-hash',
+                'bitmask',
             ],
             allow_null: true,
-            conditions: ["nonat" => false],
-            help_text: "The pool option used to load balance external IP mapping when `target` is set to a subnet ".
-                "or alias of many addresses. Set to `null` to revert to the system default."
+            conditions: ['nonat' => false],
+            help_text: 'The pool option used to load balance external IP mapping when `target` is set to a subnet ' .
+                'or alias of many addresses. Set to `null` to revert to the system default.',
         );
         $this->source_hash_key = new StringField(
-            default: "0x".bin2hex(openssl_random_pseudo_bytes(length: self::SOURCE_HASH_KEY_BYTES)),
-            conditions: ["poolopts" => "source-hash", "nonat" => false],
+            default: '0x' . bin2hex(openssl_random_pseudo_bytes(length: self::SOURCE_HASH_KEY_BYTES)),
+            conditions: ['poolopts' => 'source-hash', 'nonat' => false],
             validators: [new HexValidator(bytes: self::SOURCE_HASH_KEY_BYTES, allow_hex_prefix: true)],
-            help_text: "The key that is fed to the hashing algorithm in hex format. This must be a 16 byte (32 ".
-                "character) hex string prefixed with `0x`. If a value is not provided, one will automatically be ".
-                "generated"
+            help_text: 'The key that is fed to the hashing algorithm in hex format. This must be a 16 byte (32 ' .
+                'character) hex string prefixed with `0x`. If a value is not provided, one will automatically be ' .
+                'generated',
         );
         $this->descr = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
-            help_text: "A description for the outbound NAT mapping."
+            help_text: 'A description for the outbound NAT mapping.',
         );
 
-        parent::__construct(...$options, id: $id, data: $data);
+        parent::__construct($id, null, $data, ...$options);
     }
 
     /**
@@ -190,12 +181,13 @@ class OutboundNATMapping extends Model
      * @returns string The validated value to be set.
      * @throws ValidationError When `poolopts` is set but `target` is not an IP address or alias.
      */
-    public function validate_poolopts(string $poolopts) : string {
+    public function validate_poolopts(string $poolopts): string
+    {
         # Do not allow poolopts to be set if `target` is not an alias or IP address
-        if (!$this->target->has_label("is_ipaddr") and !$this->target->has_label("is_alias")) {
+        if (!$this->target->has_label('is_ipaddr') and !$this->target->has_label('is_alias')) {
             throw new ValidationError(
-                message: "Field `poolopts` cannot be set if `target` is not an IP address or alias.",
-                response_id: "OUTBOUND_NAT_MAPPING_POOLOPTS_SET_WITHOUT_MULTI_HOST_TARGET"
+                message: 'Field `poolopts` cannot be set if `target` is not an IP address or alias.',
+                response_id: 'OUTBOUND_NAT_MAPPING_POOLOPTS_SET_WITHOUT_MULTI_HOST_TARGET',
             );
         }
 
@@ -208,17 +200,18 @@ class OutboundNATMapping extends Model
      * @returns int|null The validated value to be set. Returns null if `target` is not an IP address or alias.
      * @throws ValidationError When `target` is an IPv4 address but $target_subnet is greater than 32
      */
-    public function validate_target_subnet(int $target_subnet) : int|null {
+    public function validate_target_subnet(int $target_subnet): int|null
+    {
         # Throw an error if `target` is an IPv4 address, but `target_subnet` is greater than 32.
-        if ($this->target->has_label("is_ipaddrv4") and $target_subnet > 32) {
+        if ($this->target->has_label('is_ipaddrv4') and $target_subnet > 32) {
             throw new ValidationError(
-                message: "Field `target_subnet` must be 32 or less when `target` is an IPv4 address.",
-                response_id: "OUTBOUND_NAT_MAPPING_TARGET_SUBNET_TOO_LARGE_FOR_IPV4"
+                message: 'Field `target_subnet` must be 32 or less when `target` is an IPv4 address.',
+                response_id: 'OUTBOUND_NAT_MAPPING_TARGET_SUBNET_TOO_LARGE_FOR_IPV4',
             );
         }
 
         # Unset this value if `target` is not an IP address or alias
-        if (!$this->target->has_label("is_alias") and !$this->target->has_label("is_ipaddr")) {
+        if (!$this->target->has_label('is_alias') and !$this->target->has_label('is_ipaddr')) {
             return null;
         }
 

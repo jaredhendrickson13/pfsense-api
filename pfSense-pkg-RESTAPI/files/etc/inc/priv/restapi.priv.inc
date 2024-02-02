@@ -13,7 +13,7 @@
 //   See the License for the specific language governing permissions and
 //   limitations under the License.
 
-require_once("RESTAPI/Caches/PrivilegesCache.inc");
+require_once 'RESTAPI/Caches/PrivilegesCache.inc';
 
 use RESTAPI\Caches\PrivilegesCache;
 

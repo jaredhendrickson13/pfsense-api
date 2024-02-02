@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Models;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 use RESTAPI\Core\Auth;
@@ -16,14 +16,15 @@ use RESTAPI\Validators\IPAddressValidator;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 # Constants
-const API_SETTINGS_BACKUP_FILE_PATH = "/usr/local/share/pfSense-pkg-RESTAPI/backup.json";
+const API_SETTINGS_BACKUP_FILE_PATH = '/usr/local/share/pfSense-pkg-RESTAPI/backup.json';
 const API_SETTINGS_BACKUP_NOT_CONFIGURED = -1;
 const API_SETTINGS_BACKUP_SUCCESS = 0;
 const API_SETTINGS_RESTORE_SUCCESS = 0;
 const API_SETTINGS_RESTORE_NO_CHANGE = 1;
 const API_SETTINGS_RESTORE_NO_BACKUP = 2;
 
-class RESTAPISettings extends Model {
+class RESTAPISettings extends Model
+{
     public BooleanField $enabled;
     public BooleanField $read_only;
     public BooleanField $keep_backup;
@@ -51,110 +52,110 @@ class RESTAPISettings extends Model {
         # Set Fields for this Model
         $this->enabled = new BooleanField(
             default: true,
-            indicates_true: "enabled",
-            indicates_false: "disabled",
+            indicates_true: 'enabled',
+            indicates_false: 'disabled',
             help_text: "Enables or disables the API. If set to `false`, the API will no longer respond to API requests 
-            and can only be re-enabled via webConfigurator."
+            and can only be re-enabled via webConfigurator.",
         );
         $this->read_only = new BooleanField(
             default: false,
-            indicates_true: "enabled",
-            indicates_false: "disabled",
+            indicates_true: 'enabled',
+            indicates_false: 'disabled',
             help_text: "Enables or disables read-only API access. If enabled, the API will only respond to GET requests
-            and can only be disabled via webConfigurator."
+            and can only be disabled via webConfigurator.",
         );
         $this->keep_backup = new BooleanField(
             default: true,
-            indicates_true: "enabled",
-            indicates_false: "disabled",
+            indicates_true: 'enabled',
+            indicates_false: 'disabled',
             help_text: "Enables or disables keeping a persistent backup of the API configuration that can be used
-            to restore the API configuration after package and systems updates."
+            to restore the API configuration after package and systems updates.",
         );
         $this->login_protection = new BooleanField(
             default: true,
-            indicates_true: "enabled",
-            indicates_false: "disabled",
+            indicates_true: 'enabled',
+            indicates_false: 'disabled',
             help_text: "Enables or disables Login Protection for API authentication. When enabled, Login Protection will
             monitor API attempts and temporarily block clients who fail API authentication too many times within a
             period of time. When disabled, Login Protection will not monitor API authentication but will continue to 
             monitor webConfigurator and SSH logins (if configured). Login Protection can be configured globally in
-            System > Advanced."
+            System > Advanced.",
         );
         $this->log_successful_auth = new BooleanField(
             default: false,
-            indicates_true: "enabled",
-            indicates_false: "disabled",
-            verbose_name: "log successful authentication",
+            indicates_true: 'enabled',
+            indicates_false: 'disabled',
+            verbose_name: 'log successful authentication',
             help_text: "Enables or disables logging of API authentication attempts that are successful. By default, only
             failed API authentication attempts are logged to prevent flooding the authentication logs. This field is
-            only applicable when the API `login_protection` setting is enabled."
+            only applicable when the API `login_protection` setting is enabled.",
         );
         $this->allow_pre_releases = new BooleanField(
             default: false,
-            indicates_true: "enabled",
-            indicates_false: "disabled",
-            verbose_name: "allow pre-releases",
+            indicates_true: 'enabled',
+            indicates_false: 'disabled',
+            verbose_name: 'allow pre-releases',
             help_text: "Enables or disables displaying pre-releases in available API updates. Pre-releases contain fixes
             and features that are currently under development and may not be fully stable. Use of pre-release versions
-            is at your own risk."
+            is at your own risk.",
         );
         $this->hateoas = new BooleanField(
             default: false,
-            indicates_true: "enabled",
-            indicates_false: "disabled",
-            verbose_name: "enable HATEOAS",
-            help_text: "Enables or disables HATEOAS. Enabling HATEOAS will allow the API to include links to related ".
-            "resources in API responses. This is primarily useful for frontend web applications and self-navigating ".
-            "client scripts that integrate with HAL standards. Enabling HATEOAS may increase API response times, ".
-            "especially on systems with large configurations."
+            indicates_true: 'enabled',
+            indicates_false: 'disabled',
+            verbose_name: 'enable HATEOAS',
+            help_text: 'Enables or disables HATEOAS. Enabling HATEOAS will allow the API to include links to related ' .
+                'resources in API responses. This is primarily useful for frontend web applications and self-navigating ' .
+                'client scripts that integrate with HAL standards. Enabling HATEOAS may increase API response times, ' .
+                'especially on systems with large configurations.',
         );
         $this->allowed_interfaces = new InterfaceField(
             default: [],
             allow_empty: true,
             many: true,
-            delimiter: ",",
-            help_text: "Sets the interfaces allowed to accept incoming API calls."
+            delimiter: ',',
+            help_text: 'Sets the interfaces allowed to accept incoming API calls.',
         );
         $this->represent_interfaces_as = new StringField(
-            default: "descr",
-            choices: ["descr" => "Description", "id" => "Internal ID", "if" => "Real interface"],
+            default: 'descr',
+            choices: ['descr' => 'Description', 'id' => 'Internal ID', 'if' => 'Real interface'],
             help_text: "Specifies how the API should represent interface names. Use `descr` to represent 
             interface objects by their description name, use `id` to represent interface objects by their
             internal pfSense ID (e.g. wan, lan, opt1), or use `if` to represent interface objects by their
-            real interface name (e.g. em0, igb1, bxe3)."
+            real interface name (e.g. em0, igb1, bxe3).",
         );
         $this->auth_methods = new StringField(
-            default: "BasicAuth",
-            choices_callable: "get_auth_methods_choices",
+            default: 'BasicAuth',
+            choices_callable: 'get_auth_methods_choices',
             many: true,
             many_minimum: 1,
-            verbose_name: "authentication methods",
-            help_text: "Sets the API authentication methods allowed to authenticate API calls."
+            verbose_name: 'authentication methods',
+            help_text: 'Sets the API authentication methods allowed to authenticate API calls.',
         );
         $this->jwt_exp = new IntegerField(
             default: 3600,
             minimum: 300,
             maximum: 86400,
-            verbose_name: "JWT expiration",
-            help_text: "Sets the amount of time (in seconds) JWTs are valid for."
+            verbose_name: 'JWT expiration',
+            help_text: 'Sets the amount of time (in seconds) JWTs are valid for.',
         );
         $this->ha_sync = new BooleanField(
             default: false,
-            indicates_true: "enabled",
-            indicates_false: "disabled",
-            verbose_name: "HA sync",
+            indicates_true: 'enabled',
+            indicates_false: 'disabled',
+            verbose_name: 'HA sync',
             help_text: "Enables or disables syncing API settings to HA peers. When enabled, API settings from this
-            host will automatically be synced to any hosts defined in `ha_sync_hosts`."
+            host will automatically be synced to any hosts defined in `ha_sync_hosts`.",
         );
         $this->ha_sync_validate_certs = new BooleanField(
             default: true,
-            indicates_true: "enabled",
-            indicates_false: "disabled",
-            verbose_name: "HA sync validate certs",
+            indicates_true: 'enabled',
+            indicates_false: 'disabled',
+            verbose_name: 'HA sync validate certs',
             help_text: "Enables or disables certificate validation when syncing API configurations to HA sync peers. If
             enabled, all hosts defined in `ha_sync_hosts` must have their webConfigurator configured with a certificate
             trusted by this system. It is strongly recommended this be enabled at all times to help mitigate 
-            Man-in-the-Middle attacks."
+            Man-in-the-Middle attacks.",
         );
         $this->ha_sync_hosts = new StringField(
             default: [],
@@ -162,45 +163,46 @@ class RESTAPISettings extends Model {
             many: true,
             many_minimum: 0,
             many_maximum: 10,
-            delimiter: " ",
-            verbose_name: "HA sync hosts",
+            delimiter: ' ',
+            verbose_name: 'HA sync hosts',
             validators: [new IPAddressValidator(allow_fqdn: true)],
-            help_text: "Set a list of IP addresses or hostnames to sync API settings to."
+            help_text: 'Set a list of IP addresses or hostnames to sync API settings to.',
         );
         $this->ha_sync_username = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
-            verbose_name: "HA username",
+            verbose_name: 'HA username',
             help_text: "Sets the username to use when authenticating for HA sync processes. This user must be the present
-            on all hosts defined in `ha_sync_hosts`."
+            on all hosts defined in `ha_sync_hosts`.",
         );
         $this->ha_sync_password = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             write_only: true,
             sensitive: true,
-            verbose_name: "HA sync password",
+            verbose_name: 'HA sync password',
             help_text: "Sets the password to use when authenticating for HA sync processes. This must be the password
-            for the user defined in `ha_sync_username` and must be the same on all hosts defined in `ha_sync_hosts`."
+            for the user defined in `ha_sync_username` and must be the same on all hosts defined in `ha_sync_hosts`.",
         );
 
-        parent::__construct(...$options, data: $data);
+        parent::__construct(null, null, $data, ...$options);
     }
 
     /**
      * Obtains the choices for the `auth_methods` field. This will dynamically populate a choice for each Auth class
      * in the \RESTAPI\Auth\ namespace.
      */
-    public function get_auth_methods_choices(): array {
+    public function get_auth_methods_choices(): array
+    {
         # Variables
         $choices = [];
-        
+
         # Format choices so they include the class's verbose name as the choice's verbose name
-        foreach (get_classes_from_namespace(namespace: "\\RESTAPI\\Auth\\") as $auth_class) {
+        foreach (get_classes_from_namespace(namespace: '\\RESTAPI\\Auth\\') as $auth_class) {
             $auth = new $auth_class();
             $choices[$auth->get_class_shortname()] = $auth->verbose_name;
         }
-        
+
         return $choices;
     }
 
@@ -208,12 +210,13 @@ class RESTAPISettings extends Model {
      * Creates a backup of the current API configuration at /usr/local/share/pfSense-pkg-RESTAPI/backup.json.
      * @returns integer Returns 0 when backup was successful, or -1 when the API's `keep_backup` field is disabled.
      */
-    public static function backup_to_file() : int {
+    public static function backup_to_file(): int
+    {
         # Read current API settings
         $api_config = RESTAPISettings::get_pkg_config();
 
         # Don't allow restore if the `keep_backup` is not enabled
-        if ($api_config["keep_backup"] !== "enabled") {
+        if ($api_config['keep_backup'] !== 'enabled') {
             return API_SETTINGS_BACKUP_NOT_CONFIGURED;
         }
 
@@ -227,15 +230,18 @@ class RESTAPISettings extends Model {
      * API configuration and the backup file, 2 when no backup file exists current, or -1 when the API's `keep_backup`
      * field is disabled.
      */
-    public static function restore_from_backup() : int {
+    public static function restore_from_backup(): int
+    {
         # Variables
-        $backup_api_conf_json = (is_file(API_SETTINGS_BACKUP_FILE_PATH)) ? file_get_contents(API_SETTINGS_BACKUP_FILE_PATH) : "";
-        $backup_api_conf = ($backup_api_conf_json) ? json_decode($backup_api_conf_json, true) : [];
+        $backup_api_conf_json = is_file(API_SETTINGS_BACKUP_FILE_PATH)
+            ? file_get_contents(API_SETTINGS_BACKUP_FILE_PATH)
+            : '';
+        $backup_api_conf = $backup_api_conf_json ? json_decode($backup_api_conf_json, true) : [];
         $current_api_id = RESTAPISettings::get_pkg_id();
         $current_api_conf = RESTAPISettings::get_pkg_config();
 
         # Don't allow restore if the `keep_backup` is not enabled
-        if ($current_api_conf["keep_backup"] !== "enabled") {
+        if ($current_api_conf['keep_backup'] !== 'enabled') {
             return API_SETTINGS_BACKUP_NOT_CONFIGURED;
         }
 
@@ -250,7 +256,7 @@ class RESTAPISettings extends Model {
         }
 
         config_set_path("installedpackages/package/$current_api_id/conf", $backup_api_conf);
-        write_config("Synchronized persistent API configuration");
+        write_config('Synchronized persistent API configuration');
         return API_SETTINGS_RESTORE_SUCCESS;
     }
 
@@ -258,10 +264,11 @@ class RESTAPISettings extends Model {
      * Obtains the internal pfSense-pkg-RESTAPI configuration.
      * @return array An associative array containing the pfSense-pkg-RESTAPI configuration
      */
-    public static function get_pkg_config() : array {
-        foreach (self::get_config("installedpackages/package") as $installed_package) {
-            if ($installed_package["name"] === "RESTAPI") {
-                return $installed_package["conf"];
+    public static function get_pkg_config(): array
+    {
+        foreach (self::get_config('installedpackages/package') as $installed_package) {
+            if ($installed_package['name'] === 'RESTAPI') {
+                return $installed_package['conf'];
             }
         }
         return [];
@@ -272,8 +279,9 @@ class RESTAPISettings extends Model {
      * @return int The pfSense-pkg-RESTAPI package's `installedpackage` configuration ID in integer format. If the
      * package cannot be found, this will return `-1`
      */
-    public static function get_pkg_id(): int {
-        return get_package_id("RESTAPI");
+    public static function get_pkg_id(): int
+    {
+        return get_package_id('RESTAPI');
     }
 
     /**

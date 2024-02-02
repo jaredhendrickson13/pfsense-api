@@ -9,7 +9,7 @@ use RESTAPI\Validators\IPAddressValidator;
 
 class NTPTimeServer extends Model
 {
-    const AUTO_POOL_SUFFIX = "pool.ntp.org";
+    const AUTO_POOL_SUFFIX = 'pool.ntp.org';
 
     public StringField $timeserver;
     public StringField $type;
@@ -22,37 +22,39 @@ class NTPTimeServer extends Model
         $this->many_minimum = 1; // Require at least one timeserver at all times
         $this->many = true;
         $this->always_apply = true;
-        $this->internal_callable = "get_timeservers_from_internal";
+        $this->internal_callable = 'get_timeservers_from_internal';
 
         # Set model fields
         $this->timeserver = new StringField(
             required: true,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: true, allow_fqdn: true)],
-            help_text: "The IP or hostname of the remote NTP time server, pool or peer."
+            help_text: 'The IP or hostname of the remote NTP time server, pool or peer.',
         );
         $this->type = new StringField(
-            default: "server",
-            choices: ["server", "pool", "peer"],
-            help_text: "The type of this timeserver. Use `server` is `timeserver` is a standalone NTP server, use ".
-                "`pool` if `timeserver` represents an NTP pool, or `peer` if `timeserver` is an NTP peer. Note: If ".
-                "the `timeserver` value ends with the `".self::AUTO_POOL_SUFFIX."` suffix, this field will be forced ".
-                "to use `pool`."
+            default: 'server',
+            choices: ['server', 'pool', 'peer'],
+            help_text: 'The type of this timeserver. Use `server` is `timeserver` is a standalone NTP server, use ' .
+                '`pool` if `timeserver` represents an NTP pool, or `peer` if `timeserver` is an NTP peer. Note: If ' .
+                'the `timeserver` value ends with the `' .
+                self::AUTO_POOL_SUFFIX .
+                '` suffix, this field will be forced ' .
+                'to use `pool`.',
         );
         $this->prefer = new BooleanField(
             default: false,
             indicates_true: true,
             indicates_false: false,
-            help_text: "Enable NTP favoring the use of this server more than all others."
+            help_text: 'Enable NTP favoring the use of this server more than all others.',
         );
         $this->noselect = new BooleanField(
             default: false,
             indicates_true: true,
             indicates_false: false,
-            conditions: ["!type" => "pool"],
-            help_text: "Prevent NTP from using this timeserver, but continue collecting stats."
+            conditions: ['!type' => 'pool'],
+            help_text: 'Prevent NTP from using this timeserver, but continue collecting stats.',
         );
 
-        parent::__construct(...$options, id: $id, data: $data);
+        parent::__construct($id, null, $data, ...$options);
     }
 
     /**
@@ -60,10 +62,11 @@ class NTPTimeServer extends Model
      * @param string $type The incoming value to be validated
      * @return string The validated value to be assigned.
      */
-    public function validate_type(string $type): string {
+    public function validate_type(string $type): string
+    {
         # Force $type to be `pool` if it ends with the auto pool suffix (pool.ntp.org)
         if (str_ends_with($this->timeserver->value, self::AUTO_POOL_SUFFIX)) {
-            $type = "pool";
+            $type = 'pool';
         }
 
         return $type;
@@ -75,38 +78,44 @@ class NTPTimeServer extends Model
      * represent them in a more structured format.
      * @return array The internal values for this Model object obtained from the pfSense configuration.
      */
-    public function get_timeservers_from_internal(): array {
+    public function get_timeservers_from_internal(): array
+    {
         # Variables
         $internal_objects = [];
-        $timeservers = explode(" ", $this->get_config(path: "system/timeservers", default: ""));
-        $ntp_config = $this->get_config(path: "ntpd", default: []);
-        $pools = explode(" ", $ntp_config["ispool"]);
-        $peers = explode(" ", $ntp_config["ispeer"]);
-        $preferred = explode(" ", $ntp_config["prefer"]);
-        $noselects = explode(" ", $ntp_config["noselect"]);
+        $timeservers = explode(' ', $this->get_config(path: 'system/timeservers', default: ''));
+        $ntp_config = $this->get_config(path: 'ntpd', default: []);
+        $pools = explode(' ', $ntp_config['ispool']);
+        $peers = explode(' ', $ntp_config['ispeer']);
+        $preferred = explode(' ', $ntp_config['prefer']);
+        $noselects = explode(' ', $ntp_config['noselect']);
 
         # Loop through each system timeserver and check its NTP configuration
         foreach ($timeservers as $id => $timeserver) {
             # Assign an internal object for this timeserver
-            $internal_objects[$id] = ["timeserver" => $timeserver, "type" => "server", "prefer" => false, "noselect" => false];
+            $internal_objects[$id] = [
+                'timeserver' => $timeserver,
+                'type' => 'server',
+                'prefer' => false,
+                'noselect' => false,
+            ];
 
             # If this timeserver is a pool, assign its type accordingly
             if (in_array($timeserver, $pools)) {
-                $internal_objects[$id]["type"] = "pool";
+                $internal_objects[$id]['type'] = 'pool';
             }
             # If this timeserver is a peer, assign its type accordingly
             elseif (in_array($timeserver, $peers)) {
-                $internal_objects[$id]["type"] = "peer";
+                $internal_objects[$id]['type'] = 'peer';
             }
 
             # If this timeserver is preferred, assign it as such
             if (in_array($timeserver, $preferred)) {
-                $internal_objects[$id]["prefer"] = true;
+                $internal_objects[$id]['prefer'] = true;
             }
 
             # If this timeserver is a no select and it is not a pool, assign it as such
-            if (in_array($timeserver, $noselects) and $internal_objects[$id]["type"] !== "pool") {
-                $internal_objects[$id]["noselect"] = true;
+            if (in_array($timeserver, $noselects) and $internal_objects[$id]['type'] !== 'pool') {
+                $internal_objects[$id]['noselect'] = true;
             }
         }
 
@@ -119,8 +128,8 @@ class NTPTimeServer extends Model
     public function get_next_id(): int
     {
         # Get the total number of timeservers in configuration
-        $timeservers = $this->get_config(path: "system/timeservers", default: "");
-        $timeservers = explode(" ", $timeservers);
+        $timeservers = $this->get_config(path: 'system/timeservers', default: '');
+        $timeservers = explode(' ', $timeservers);
         $timeservers = array_filter($timeservers); // Remove empty array items
         return count($timeservers);
     }
@@ -179,7 +188,8 @@ class NTPTimeServer extends Model
     /**
      * Applies changes to NTP server.
      */
-    public function apply(): void {
+    public function apply(): void
+    {
         system_ntp_configure();
     }
 
@@ -188,21 +198,22 @@ class NTPTimeServer extends Model
      * the requested action.
      * @param bool $delete Forcibly remove this timeserver from system/timeservers
      */
-    private function set_system_timeservers(bool $delete = false): void {
+    private function set_system_timeservers(bool $delete = false): void
+    {
         # Variables
-        $timeservers = explode(" ", $this->get_config(path: "system/timeservers", default: ""));
+        $timeservers = explode(' ', $this->get_config(path: 'system/timeservers', default: ''));
 
         # Assign this timeserver to the system timeserver if it is not already present and we are not deleting
         if (!in_array($this->timeserver->value, $timeservers) and !$delete) {
             $timeservers[] = $this->timeserver->value;
-            $this->set_config(path: "system/timeservers", value: implode(" ", $timeservers), default: []);
+            $this->set_config(path: 'system/timeservers', value: implode(' ', $timeservers), default: []);
         }
 
         # Remove this timeserver from the system timeservers if deletion was requested
         if ($delete) {
             $del_key = array_search($this->timeserver->value, $timeservers);
             unset($timeservers[$del_key]);
-            $this->set_config(path: "system/timeservers", value: implode(" ", $timeservers), default: []);
+            $this->set_config(path: 'system/timeservers', value: implode(' ', $timeservers), default: []);
         }
     }
 
@@ -211,21 +222,22 @@ class NTPTimeServer extends Model
      * requested action.
      * @param bool $delete Forcibly remove this timeserver from ntpd/ispool
      */
-    private function set_ntpd_ispool(bool $delete = false): void {
+    private function set_ntpd_ispool(bool $delete = false): void
+    {
         # Variables
-        $pools = explode(" ", $this->get_config(path: "ntpd/ispool", default: ""));
+        $pools = explode(' ', $this->get_config(path: 'ntpd/ispool', default: ''));
 
         # If this timeserver is a pool and is not already present in the ispool config, assign it
-        if ($this->type->value === "pool" and !in_array($this->timeserver->value, $pools)) {
+        if ($this->type->value === 'pool' and !in_array($this->timeserver->value, $pools)) {
             $pools[] = $this->timeserver->value;
-            $this->set_config(path: "ntpd/ispool", value: implode(" ", $pools), default: []);
+            $this->set_config(path: 'ntpd/ispool', value: implode(' ', $pools), default: []);
         }
 
         # If this timeserver is not a pool and is present in the ispool config or delete was requested, remove it
-        if ($delete or (!$this->type->value === "pool" and in_array($this->timeserver->value, $pools))) {
+        if ($delete or !$this->type->value === 'pool' and in_array($this->timeserver->value, $pools)) {
             $del_key = array_search($this->timeserver->value, $pools);
             unset($pools[$del_key]);
-            $this->set_config(path: "ntpd/ispool", value: implode(" ", $pools), default: []);
+            $this->set_config(path: 'ntpd/ispool', value: implode(' ', $pools), default: []);
         }
     }
 
@@ -234,21 +246,22 @@ class NTPTimeServer extends Model
      * requested action.
      * @param bool $delete Forcibly remove this timeserver from ntpd/ispeer
      */
-    private function set_ntpd_ispeer(bool $delete = false): void {
+    private function set_ntpd_ispeer(bool $delete = false): void
+    {
         # Variables
-        $peers = explode(" ", $this->get_config(path: "ntpd/ispeer", default: ""));
+        $peers = explode(' ', $this->get_config(path: 'ntpd/ispeer', default: ''));
 
         # If this timeserver is a peer and is not already present in the ispeer config, assign it
-        if ($this->type->value === "peer" and !in_array($this->timeserver->value, $peers)) {
+        if ($this->type->value === 'peer' and !in_array($this->timeserver->value, $peers)) {
             $peers[] = $this->timeserver->value;
-            $this->set_config(path: "ntpd/ispeer", value: implode(" ", $peers), default: []);
+            $this->set_config(path: 'ntpd/ispeer', value: implode(' ', $peers), default: []);
         }
 
         # If this timeserver is not a peer and is present in the ispeer config or delete was requested, remove it
-        if ($delete or (!$this->type->value === "peer" and in_array($this->timeserver->value, $peers))) {
+        if ($delete or !$this->type->value === 'peer' and in_array($this->timeserver->value, $peers)) {
             $del_key = array_search($this->timeserver->value, $peers);
             unset($peers[$del_key]);
-            $this->set_config(path: "ntpd/ispeer", value: implode(" ", $peers), default: []);
+            $this->set_config(path: 'ntpd/ispeer', value: implode(' ', $peers), default: []);
         }
     }
 
@@ -257,21 +270,22 @@ class NTPTimeServer extends Model
      * requested action.
      * @param bool $delete Forcibly remove this timeserver from ntpd/prefer
      */
-    private function set_ntpd_prefer(bool $delete = false): void {
+    private function set_ntpd_prefer(bool $delete = false): void
+    {
         # Variables
-        $prefers = explode(" ", $this->get_config(path: "ntpd/prefer", default: ""));
+        $prefers = explode(' ', $this->get_config(path: 'ntpd/prefer', default: ''));
 
         # If this timeserver is a prefer and is not already present in the prefer config, assign it
         if ($this->prefer->value and !in_array($this->timeserver->value, $prefers)) {
             $prefers[] = $this->timeserver->value;
-            $this->set_config(path: "ntpd/prefer", value: implode(" ", $prefers), default: []);
+            $this->set_config(path: 'ntpd/prefer', value: implode(' ', $prefers), default: []);
         }
 
         # If this timeserver is not a prefer and is present in the prefer config or delete was requested, remove it
-        if ($delete or (!$this->prefer->value and in_array($this->timeserver->value, $prefers))) {
+        if ($delete or !$this->prefer->value and in_array($this->timeserver->value, $prefers)) {
             $del_key = array_search($this->timeserver->value, $prefers);
             unset($prefers[$del_key]);
-            $this->set_config(path: "ntpd/prefer", value: implode(" ", $prefers), default: []);
+            $this->set_config(path: 'ntpd/prefer', value: implode(' ', $prefers), default: []);
         }
     }
 
@@ -280,21 +294,22 @@ class NTPTimeServer extends Model
      * requested action.
      * @param bool $delete Forcibly remove this timeserver from ntpd/noselect
      */
-    private function set_ntpd_noselect(bool $delete = false): void {
+    private function set_ntpd_noselect(bool $delete = false): void
+    {
         # Variables
-        $noselects = explode(" ", $this->get_config(path: "ntpd/noselect", default: ""));
+        $noselects = explode(' ', $this->get_config(path: 'ntpd/noselect', default: ''));
 
         # If this timeserver is a noselect and is not already present in the noselect config, assign it
         if ($this->noselect->value and !in_array($this->timeserver->value, $noselects)) {
             $noselects[] = $this->timeserver->value;
-            $this->set_config(path: "ntpd/noselect", value: implode(" ", $noselects), default: []);
+            $this->set_config(path: 'ntpd/noselect', value: implode(' ', $noselects), default: []);
         }
 
         # If this timeserver is not a noselect and is present in the noselect config or delete was requested, remove it
-        if ($delete or (!$this->noselect->value and in_array($this->timeserver->value, $noselects))) {
+        if ($delete or !$this->noselect->value and in_array($this->timeserver->value, $noselects)) {
             $del_key = array_search($this->timeserver->value, $noselects);
             unset($noselects[$del_key]);
-            $this->set_config(path: "ntpd/noselect", value: implode(" ", $noselects), default: []);
+            $this->set_config(path: 'ntpd/noselect', value: implode(' ', $noselects), default: []);
         }
     }
 }

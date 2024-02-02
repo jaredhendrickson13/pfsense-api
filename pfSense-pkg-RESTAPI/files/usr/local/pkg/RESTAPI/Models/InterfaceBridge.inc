@@ -17,7 +17,7 @@ class InterfaceBridge extends Model
     public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Set model attributes
-        $this->config_path = "bridges/bridged";
+        $this->config_path = 'bridges/bridged';
         $this->many = true;
         $this->always_apply = true;
 
@@ -27,21 +27,21 @@ class InterfaceBridge extends Model
             unique: true,
             many: true,
             many_minimum: 1,
-            help_text: "The member interfaces to include in this bridge."
+            help_text: 'The member interfaces to include in this bridge.',
         );
         $this->descr = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
-            help_text: "A description for this interface bridge."
+            help_text: 'A description for this interface bridge.',
         );
         $this->bridgeif = new StringField(
             default: $this->get_next_bridgeif(),
             allow_empty: true,
             read_only: true,
-            help_text: "The real interface name for this bridge interface."
+            help_text: 'The real interface name for this bridge interface.',
         );
 
-        parent::__construct(...$options, id: $id, data: $data);
+        parent::__construct($id, null, $data, ...$options);
     }
 
     /**
@@ -49,17 +49,18 @@ class InterfaceBridge extends Model
      * @param string $members The incoming value to validate.
      * @returns string The validated value to be set.
      */
-    public function validate_members(string $members) : string {
+    public function validate_members(string $members): string
+    {
         # Variables
         $member_internal = NetworkInterface::query([$this->members->represented_as => $members])->first()->id;
-        $is_wireless = ($this->get_config("interfaces/$member_internal/wireless"));
-        $is_wireless_hostap = ($this->get_config("interfaces/$member_internal/wireless/mode") == "hostap");
+        $is_wireless = $this->get_config("interfaces/$member_internal/wireless");
+        $is_wireless_hostap = $this->get_config("interfaces/$member_internal/wireless/mode") == 'hostap';
 
         # Throw an error if this is a wireless interface but it is not in `hostap` mode
         if ($is_wireless and !$is_wireless_hostap) {
             throw new ValidationError(
                 message: "Bridge `members` cannot be wireless interface unless it's in `hostap` mode.",
-                response_id: "INTERFACE_BRIDGE_NO_NON_HOSTAP_WIRELESS_MEMBERS"
+                response_id: 'INTERFACE_BRIDGE_NO_NON_HOSTAP_WIRELESS_MEMBERS',
             );
         }
 
@@ -67,8 +68,8 @@ class InterfaceBridge extends Model
         foreach ($this->get_config('captiveportal', []) as $cp) {
             if (in_array($member_internal, explode(',', $cp['interface']))) {
                 throw new ValidationError(
-                    message: "Bridge `members` cannot be assigned to a captive portal",
-                    response_id: "INTERFACE_BRIDGE_MEMBER_IS_ASSIGNED_TO_CAPTIVE_PORTAL"
+                    message: 'Bridge `members` cannot be assigned to a captive portal',
+                    response_id: 'INTERFACE_BRIDGE_MEMBER_IS_ASSIGNED_TO_CAPTIVE_PORTAL',
                 );
             }
         }
@@ -101,9 +102,9 @@ class InterfaceBridge extends Model
         $if_query = NetworkInterface::query(if: $this->bridgeif->value);
         if ($if_query->exists()) {
             throw new ValidationError(
-                message: "Interface bridge cannot be deleted because it is in use by interface with ID ".
+                message: 'Interface bridge cannot be deleted because it is in use by interface with ID ' .
                     "ID `{$if_query->first()->id}",
-                response_id: "INTERFACE_BRIDGE_IN_USE"
+                response_id: 'INTERFACE_BRIDGE_IN_USE',
             );
         }
 
@@ -115,21 +116,22 @@ class InterfaceBridge extends Model
      * Obtains the next available bridgeif value
      * @returns string The next available bridgeif value.
      */
-    public function get_next_bridgeif() : string {
+    public function get_next_bridgeif(): string
+    {
         # Local variables
         $counter = 0;
         $in_use = true;
 
         # Loop continuously until unique bridge if is found
-        while($in_use) {
+        while ($in_use) {
             # Loop variables
-            $next_bridge = "bridge".$counter;
+            $next_bridge = 'bridge' . $counter;
             $in_use = false;
 
             # Loop through all existing bridges and see if this bridgeif is in use
-            foreach ($this->get_config("bridges/bridged", []) as $bridge) {
+            foreach ($this->get_config('bridges/bridged', []) as $bridge) {
                 # Check if this value matches our potential next bridge
-                if ($bridge["bridgeif"] === $next_bridge) {
+                if ($bridge['bridgeif'] === $next_bridge) {
                     $in_use = true;
                 }
             }

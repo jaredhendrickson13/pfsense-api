@@ -24,36 +24,36 @@ class DNSResolverAccessList extends Model
     public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Set model attributes
-        $this->config_path = "unbound/acls";
-        $this->subsystem = "unbound";
+        $this->config_path = 'unbound/acls';
+        $this->subsystem = 'unbound';
         $this->many = true;
 
         # Set model Fields
         $this->name = new StringField(
             required: true,
             allow_empty: true,
-            internal_name: "aclname",
-            help_text: "The name of this access list."
+            internal_name: 'aclname',
+            help_text: 'The name of this access list.',
         );
         $this->action = new StringField(
             required: true,
-            choices: ["allow", "deny", "refuse", "allow snoop", "deny nonlocal", "refuse nonlocal"],
-            internal_name: "aclaction",
-            help_text: "The action to take when an access list match is found."
+            choices: ['allow', 'deny', 'refuse', 'allow snoop', 'deny nonlocal', 'refuse nonlocal'],
+            internal_name: 'aclaction',
+            help_text: 'The action to take when an access list match is found.',
         );
         $this->description = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
-            help_text: "A description for this access list."
+            help_text: 'A description for this access list.',
         );
         $this->networks = new NestedModelField(
-            model_class: "DNSResolverAccessListNetwork",
+            model_class: 'DNSResolverAccessListNetwork',
             required: true,
-            help_text: "The DNS Resolver access list network entries to include in this access list."
+            help_text: 'The DNS Resolver access list network entries to include in this access list.',
         );
 
         # Construct the parent model object
-        parent::__construct(...$options, id: $id, data: $data);
+        parent::__construct($id, null, $data, ...$options);
     }
 
     /**

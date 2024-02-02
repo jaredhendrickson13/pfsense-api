@@ -19,23 +19,19 @@ class CommandPrompt extends Model
     public function __construct(mixed $id = null, mixed $data = [], mixed ...$options)
     {
         # Define Model Fields
-        $this->command = new StringField(
-            required: true,
-            write_only: true,
-            help_text: "The command to be executed."
-        );
+        $this->command = new StringField(required: true, write_only: true, help_text: 'The command to be executed.');
         $this->output = new StringField(
             allow_null: true,
             read_only: true,
-            help_text: "The output of the executed command."
+            help_text: 'The output of the executed command.',
         );
         $this->result_code = new IntegerField(
             allow_null: true,
             read_only: true,
-            help_text: "The result code of the executed command."
+            help_text: 'The result code of the executed command.',
         );
 
-        parent::__construct(...$options, id: $id, data: $data);
+        parent::__construct($id, null, $data, ...$options);
     }
 
     /**

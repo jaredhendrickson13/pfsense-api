@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Models;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 use RESTAPI\Core\Model;
@@ -39,8 +39,8 @@ class DHCPServerStaticMapping extends Model
     public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
     {
         # Define model attributes
-        $this->parent_model_class = "DHCPServer";
-        $this->config_path = "staticmap";
+        $this->parent_model_class = 'DHCPServer';
+        $this->config_path = 'staticmap';
         $this->many = true;
         $this->always_apply = true;
 
@@ -49,60 +49,60 @@ class DHCPServerStaticMapping extends Model
             required: true,
             unique: true,
             validators: [new MACAddressValidator()],
-            help_text: "The MAC address of the client this mapping is for."
+            help_text: 'The MAC address of the client this mapping is for.',
         );
         $this->ipaddr = new StringField(
             default: null,
             allow_null: true,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
-            help_text: "The IP address to assign this client via DHCP."
+            help_text: 'The IP address to assign this client via DHCP.',
         );
         $this->cid = new StringField(
             default: null,
             allow_null: true,
-            help_text: "The client identifier of the client this mapping is for."
+            help_text: 'The client identifier of the client this mapping is for.',
         );
         $this->hostname = new StringField(
             default: null,
             allow_null: true,
             validators: [new HostnameValidator()],
-            help_text: "The hostname to assign this client via DHCP."
+            help_text: 'The hostname to assign this client via DHCP.',
         );
         $this->domain = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             maximum_length: 255,
-            help_text: "The domain to be assigned via DHCP."
+            help_text: 'The domain to be assigned via DHCP.',
         );
         $this->domainsearchlist = new StringField(
             default: [],
             allow_empty: true,
             many: true,
             maximum_length: 255,
-            delimiter: ";",
+            delimiter: ';',
             validators: [new IPAddressValidator(allow_ipv4: false, allow_ipv6: false, allow_fqdn: true)],
-            help_text: "The domain search list to provide via DHCP."
+            help_text: 'The domain search list to provide via DHCP.',
         );
         $this->defaultleasetime = new IntegerField(
             default: 7200,
             allow_null: true,
             minimum: 60,
-            help_text: "The default DHCP lease validity period (in seconds). This is used for clients that do not ask ".
-                "for a specific expiration time."
+            help_text: 'The default DHCP lease validity period (in seconds). This is used for clients that do not ask ' .
+                'for a specific expiration time.',
         );
         $this->maxleasetime = new IntegerField(
             default: 86400,
             allow_null: true,
             minimum: 60,
-            help_text: "The maximum DHCP lease validity period (in seconds) this client can request."
+            help_text: 'The maximum DHCP lease validity period (in seconds) this client can request.',
         );
         $this->gateway = new StringField(
-            default: "",
+            default: '',
             allow_empty: true,
             maximum_length: 15,
-            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_keywords: ["none"])],
-            help_text: "The gateway IPv4 address to provide via DHCP. This is only necessary if you are not using ".
-                "the interface's IP as the gateway. Specify `none` for no gateway assignment."
+            validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_keywords: ['none'])],
+            help_text: 'The gateway IPv4 address to provide via DHCP. This is only necessary if you are not using ' .
+                "the interface's IP as the gateway. Specify `none` for no gateway assignment.",
         );
         $this->dnsserver = new StringField(
             default: [],
@@ -112,7 +112,7 @@ class DHCPServerStaticMapping extends Model
             maximum_length: 15,
             delimiter: null,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
-            help_text: "The DNS servers to provide via DHCP. Leave empty to default to system nameservers."
+            help_text: 'The DNS servers to provide via DHCP. Leave empty to default to system nameservers.',
         );
         $this->winsserver = new StringField(
             default: [],
@@ -122,7 +122,7 @@ class DHCPServerStaticMapping extends Model
             maximum_length: 15,
             delimiter: null,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false)],
-            help_text: "The WINS servers to provide via DHCP."
+            help_text: 'The WINS servers to provide via DHCP.',
         );
         $this->ntpserver = new StringField(
             default: [],
@@ -132,34 +132,35 @@ class DHCPServerStaticMapping extends Model
             maximum_length: 256,
             delimiter: null,
             validators: [new IPAddressValidator(allow_ipv4: true, allow_ipv6: false, allow_fqdn: true)],
-            help_text: "The NTP servers to provide via DHCP."
+            help_text: 'The NTP servers to provide via DHCP.',
         );
         $this->arp_table_static_entry = new BooleanField(
             default: false,
-            help_text: "Assign a static ARP entry for this static mapping."
+            help_text: 'Assign a static ARP entry for this static mapping.',
         );
 
-        parent::__construct(...$options, id: $id, parent_id: $parent_id, data: $data);
+        parent::__construct($id, $parent_id, $data, ...$options);
     }
 
     /**
      * Provides extra validation for the `ipaddr` field.
      * @param string $ipaddr The incoming value to validate.
      * @return string $ipaddr The validated value to be assigned.
-     * @throws ConflictError When the $ipaddr value is in use or overlaps another object such as virtual IPs, 
+     * @throws ConflictError When the $ipaddr value is in use or overlaps another object such as virtual IPs,
      * or DHCP address pools.
      */
-    public function validate_ipaddr(string $ipaddr): string {
+    public function validate_ipaddr(string $ipaddr): string
+    {
         # Do not allow this $ipaddr to overlap other model objects
         $overlapped_model = $this->get_ip_overlap($ipaddr);
         if ($overlapped_model) {
             throw new ConflictError(
-                message: "Field `ipaddr` overlaps existing $overlapped_model->verbose_name with ID ".
+                message: "Field `ipaddr` overlaps existing $overlapped_model->verbose_name with ID " .
                     "`$overlapped_model->id`.",
-                response_id: "DHCP_SERVER_STATIC_MAPPING_IPADDR_OVERLAPS_EXISTING_OBJECT"
+                response_id: 'DHCP_SERVER_STATIC_MAPPING_IPADDR_OVERLAPS_EXISTING_OBJECT',
             );
         }
-        
+
         return $ipaddr;
     }
 
@@ -169,11 +170,12 @@ class DHCPServerStaticMapping extends Model
      * @return int The validated `maxleasetime` field value to be assigned.
      * @throws ValidationError When `maxleasetime` is less than the `defaultleasetime`
      */
-    public function validate_maxleasetime(int $maxleasetime) : int {
+    public function validate_maxleasetime(int $maxleasetime): int
+    {
         if ($maxleasetime < $this->defaultleasetime->value) {
             throw new ValidationError(
-                message: "DHCP server `maxleasetime` cannot be less than the `defaultleasetime`",
-                response_id: "DHCP_SERVER_STATIC_MAPPING_MAX_LEASE_TIME_LESS_THAN_DEFAULT"
+                message: 'DHCP server `maxleasetime` cannot be less than the `defaultleasetime`',
+                response_id: 'DHCP_SERVER_STATIC_MAPPING_MAX_LEASE_TIME_LESS_THAN_DEFAULT',
             );
         }
 
@@ -186,15 +188,19 @@ class DHCPServerStaticMapping extends Model
      * @return string The validated `gateway` field value to be assigned.
      * @throws ValidationError When `gateway` is not an IP within the interface's subnet
      */
-    public function validate_gateway(string $gateway) : string {
+    public function validate_gateway(string $gateway): string
+    {
         # Get the parent interface for this DHCP server
-        $interface = NetworkInterface::query(["id" => $this->parent_id])->first();
+        $interface = NetworkInterface::query(['id' => $this->parent_id])->first();
 
         # Do not allow non-empty gateway values that are not within the interface's subnet
-        if ($gateway and !ip_in_subnet($gateway, $interface->get_current_ipv4()."/".$interface->get_current_subnetv4())) {
+        if (
+            $gateway and
+            !ip_in_subnet($gateway, $interface->get_current_ipv4() . '/' . $interface->get_current_subnetv4())
+        ) {
             throw new ValidationError(
                 message: "DHCP server `gateway` must be within interface's subnet.",
-                response_id: "DHCP_SERVER_STATIC_MAPPING_GATEWAY_NOT_WITHIN_SUBNET"
+                response_id: 'DHCP_SERVER_STATIC_MAPPING_GATEWAY_NOT_WITHIN_SUBNET',
             );
         }
 

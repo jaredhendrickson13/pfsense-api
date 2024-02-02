@@ -8,10 +8,10 @@ use RESTAPI\Fields\StringField;
 
 class SystemVersion extends Model
 {
-    const VERSION_PATH = "/etc/version";
-    const VERSION_PATCH_PATH = "/etc/version.patch";
-    const VERSION_BUILDTIME_PATH = "/etc/version.buildtime";
-    
+    const VERSION_PATH = '/etc/version';
+    const VERSION_PATCH_PATH = '/etc/version.patch';
+    const VERSION_BUILDTIME_PATH = '/etc/version.buildtime';
+
     public StringField $version;
     public StringField $base;
     public StringField $patch;
@@ -20,35 +20,33 @@ class SystemVersion extends Model
     public function __construct(mixed $data = [], mixed ...$options)
     {
         # Set model attributes
-        $this->internal_callable = "get_pfsense_version";
+        $this->internal_callable = 'get_pfsense_version';
 
         # Set model Fields
         $this->version = new StringField(
             read_only: true,
-            help_text: "The official pfSense version release name. (e.g. X.X.X-RELEASE)"
+            help_text: 'The official pfSense version release name. (e.g. X.X.X-RELEASE)',
         );
         $this->base = new StringField(
             read_only: true,
-            help_text: "The base pfSense version. For pfSense CE, this will be the major and minor version but not ".
-                "the patch. For pfSense Plus, this will be the version year and month but not the patch."
+            help_text: 'The base pfSense version. For pfSense CE, this will be the major and minor version but not ' .
+                'the patch. For pfSense Plus, this will be the version year and month but not the patch.',
         );
-        $this->patch = new StringField(
-            read_only: true,
-            help_text: "The pfSense build's patch version."
-        );
+        $this->patch = new StringField(read_only: true, help_text: "The pfSense build's patch version.");
         $this->buildtime = new StringField(
             read_only: true,
-            help_text: "The datetime string of when the pfSense version was initially built."
+            help_text: 'The datetime string of when the pfSense version was initially built.',
         );
 
-        parent::__construct(...$options, data: $data);
+        parent::__construct(null, null, $data, ...$options);
     }
 
     /**
      * Obtains details about the current running version of pfSense.
      * @return array An array of the running pfSense version details
      */
-    protected static function get_pfsense_version() : array {
+    protected static function get_pfsense_version(): array
+    {
         # VARIABLES
         $ver_data = [];
 
@@ -56,21 +54,21 @@ class SystemVersion extends Model
         if (file_exists(self::VERSION_PATH)) {
             # Read full release version
             $version = file_get_contents(self::VERSION_PATH);
-            $version = str_replace(PHP_EOL, "", $version);
-            $ver_data["version"] = $version;
+            $version = str_replace(PHP_EOL, '', $version);
+            $ver_data['version'] = $version;
 
             # Discard everything but the version tag for our base version (e.g. 2.6.0)
-            $ver_data["base"] = explode("-", $version)[0];
+            $ver_data['base'] = explode('-', $version)[0];
         }
         if (file_exists(self::VERSION_PATCH_PATH)) {
             $ver_patch_file = file_get_contents(self::VERSION_PATCH_PATH);
-            $ver_patch = str_replace(PHP_EOL, "", $ver_patch_file);
-            $ver_data["patch"] = $ver_patch;
+            $ver_patch = str_replace(PHP_EOL, '', $ver_patch_file);
+            $ver_data['patch'] = $ver_patch;
         }
         if (file_exists(self::VERSION_BUILDTIME_PATH)) {
             $ver_bt_file = file_get_contents(self::VERSION_BUILDTIME_PATH);
-            $ver_bt = str_replace(PHP_EOL, "", $ver_bt_file);
-            $ver_data["buildtime"] = $ver_bt;
+            $ver_bt = str_replace(PHP_EOL, '', $ver_bt_file);
+            $ver_data['buildtime'] = $ver_bt;
         }
 
         return $ver_data;
