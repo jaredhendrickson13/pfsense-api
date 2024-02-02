@@ -14,7 +14,7 @@
 //   limitations under the License.
 namespace RESTAPI\Core;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use Error;
 use Exception;
@@ -34,20 +34,21 @@ use function RESTAPI\Core\Tools\get_classes_from_namespace;
  * Represents an API Endpoint, encapsulating attributes essential for generating the API endpoint
  * and facilitating API calls. description is not adequate.
  */
-class Endpoint extends BaseClass {
+class Endpoint extends BaseClass
+{
     /**
      * @var string $url
      * The URL of this endpoint, used to generate a PHP file in the web path pointing
      * back to this Endpoint class.
      */
-    public string $url = "";
+    public string $url = '';
 
     /**
      * @var string $model_name
      * The name of the Model class this Endpoint interacts with (excluding the Model
      * class's namespace).
      */
-    public string $model_name = "";
+    public string $model_name = '';
 
     /**
      * @var Model $model
@@ -61,7 +62,7 @@ class Endpoint extends BaseClass {
      * the OpenAPI documentation. Defaults to the first value in the $url after
      * /api/v2/.
      */
-    public string $tag = "";
+    public string $tag = '';
 
     /**
      * @var array $errors
@@ -198,7 +199,7 @@ class Endpoint extends BaseClass {
      * used when generating the OpenAPI documentation for this Endpoint. This is
      * typically only necessary if the default description is not adequate.
      */
-    public string $get_help_text = "";
+    public string $get_help_text = '';
 
     /**
      * @var string $post_help_text
@@ -206,7 +207,7 @@ class Endpoint extends BaseClass {
      * used when generating the OpenAPI documentation for this Endpoint. This is
      * typically only necessary if the default description is not adequate.
      */
-    public string $post_help_text = "";
+    public string $post_help_text = '';
 
     /**
      * @var string $put_help_text
@@ -214,7 +215,7 @@ class Endpoint extends BaseClass {
      * used when generating the OpenAPI documentation for this Endpoint. This is
      * typically only necessary if the default description is not adequate.
      */
-    public string $put_help_text = "";
+    public string $put_help_text = '';
 
     /**
      * @var string $patch_help_text
@@ -222,7 +223,7 @@ class Endpoint extends BaseClass {
      * used when generating the OpenAPI documentation for this Endpoint. This is
      * typically only necessary if the default description is not adequate.
      */
-    public string $patch_help_text = "";
+    public string $patch_help_text = '';
 
     /**
      * @var string $delete_help_text
@@ -230,12 +231,13 @@ class Endpoint extends BaseClass {
      * used when generating the OpenAPI documentation for this Endpoint. This is
      * typically only necessary if the default description is not adequate.
      */
-    public string $delete_help_text = "";
+    public string $delete_help_text = '';
 
     /**
      * Sets values whenever the Endpoint object is crated.
      */
-    public function __construct() {
+    public function __construct()
+    {
         # Prevent PHP warnings in API Responses.
         error_reporting(E_ERROR);
 
@@ -243,10 +245,10 @@ class Endpoint extends BaseClass {
         $this->api_config = RESTAPI\Models\RESTAPISettings::get_pkg_config();
 
         # Fetch request method whenever the object is first created.
-        $this->request_method = strtoupper($_SERVER["REQUEST_METHOD"]);
+        $this->request_method = strtoupper($_SERVER['REQUEST_METHOD']);
 
         # Initialize the assigned model
-        $model_class = "RESTAPI\\Models\\".$this->model_name;
+        $model_class = 'RESTAPI\\Models\\' . $this->model_name;
         $this->model = new $model_class();
 
         # Set the default OpenAPI tag for this endpoint if no tag was explicitly assigned
@@ -263,7 +265,7 @@ class Endpoint extends BaseClass {
 
         # Assume this endpoint supports all available authentication methods if not specified
         if (!$this->auth_methods) {
-            $this->auth_methods = get_classes_from_namespace(namespace: "\\RESTAPI\\Auth\\", shortnames: true);
+            $this->auth_methods = get_classes_from_namespace(namespace: '\\RESTAPI\\Auth\\', shortnames: true);
         }
     }
 
@@ -275,27 +277,27 @@ class Endpoint extends BaseClass {
         # Do not allow `many` Endpoints that are assigned non `many` Models
         if ($this->many and !$this->model->many) {
             throw new ServerError(
-                message: "Endpoints cannot enable `many` when the assigned Model is not a `many` Model",
-                response_id: "ENDPOINT_MANY_WITHOUT_MANY_MODEL"
+                message: 'Endpoints cannot enable `many` when the assigned Model is not a `many` Model',
+                response_id: 'ENDPOINT_MANY_WITHOUT_MANY_MODEL',
             );
         }
 
         # Do not allow Endpoints to allow unsupported request methods
-        $supported_methods = ($this->many) ? ["GET", "PUT"] : ["GET", "POST", "PATCH", "DELETE"];
+        $supported_methods = $this->many ? ['GET', 'PUT'] : ['GET', 'POST', 'PATCH', 'DELETE'];
         foreach ($this->request_method_options as $method_option) {
             if (!in_array($method_option, $supported_methods)) {
                 throw new ServerError(
                     "Endpoint contains unsupported request method option `$method_option`.",
-                    response_id: "ENDPOINT_WITH_UNSUPPORTED_REQUEST_METHOD_OPTION"
+                    response_id: 'ENDPOINT_WITH_UNSUPPORTED_REQUEST_METHOD_OPTION',
                 );
             }
         }
-        
+
         # Do not allow `many` Endpoints that are assigned a Model with a parent Model
         if ($this->many and $this->model->parent_model_class) {
             throw new ServerError(
-                message: "Endpoints cannot enable `many` when the assigned Model has a parent Model",
-                response_id: "ENDPOINT_MANY_WHEN_MODEL_HAS_PARENT"
+                message: 'Endpoints cannot enable `many` when the assigned Model has a parent Model',
+                response_id: 'ENDPOINT_MANY_WHEN_MODEL_HAS_PARENT',
             );
         }
     }
@@ -308,36 +310,37 @@ class Endpoint extends BaseClass {
         # Only assume the default if a tag was not set
         if (!$this->tag) {
             # Set the tag for this URL according to it's root namespace (the section in URL after /api/v2/)
-            $this->tag = strtoupper(explode("/", $this->url)[3]);
+            $this->tag = strtoupper(explode('/', $this->url)[3]);
         }
     }
 
     /**
      * Determines the appropriate default help text for each method according to the assigned Model and Endpoint properties.
      */
-    private function set_default_help_text(): void {
+    private function set_default_help_text(): void
+    {
         # Variables
         $model_verbose_name = $this->model->verbose_name;
         $model_verbose_name_plural = $this->model->verbose_name_plural;
 
         # For non `many` Endpoints, set default help text with an applicable context for `many` Models
         if (!$this->many and $this->model->many) {
-            $this->get_help_text = ($this->get_help_text) ?: "Reads an existing $model_verbose_name.";
-            $this->post_help_text = ($this->post_help_text) ?: "Creates a new $model_verbose_name.";
-            $this->patch_help_text = ($this->patch_help_text) ?: "Updates an existing $model_verbose_name.";
-            $this->delete_help_text = ($this->delete_help_text) ?: "Deletes an existing $model_verbose_name.";
+            $this->get_help_text = $this->get_help_text ?: "Reads an existing $model_verbose_name.";
+            $this->post_help_text = $this->post_help_text ?: "Creates a new $model_verbose_name.";
+            $this->patch_help_text = $this->patch_help_text ?: "Updates an existing $model_verbose_name.";
+            $this->delete_help_text = $this->delete_help_text ?: "Deletes an existing $model_verbose_name.";
         }
         # For `many` Vies, set default help text with an applicable context for `many` Models
         elseif ($this->many and $this->model->many) {
-            $this->get_help_text = ($this->get_help_text) ?: "Reads all existing $model_verbose_name_plural.";
-            $this->put_help_text = ($this->put_help_text) ?: "Replaces all existing $model_verbose_name_plural.";
+            $this->get_help_text = $this->get_help_text ?: "Reads all existing $model_verbose_name_plural.";
+            $this->put_help_text = $this->put_help_text ?: "Replaces all existing $model_verbose_name_plural.";
         }
         # Set default help text with an applicable context for non `many` Models
         else {
-            $this->get_help_text = ($this->get_help_text) ?: "Reads current $model_verbose_name_plural.";
-            $this->post_help_text = ($this->post_help_text) ?: "Creates $model_verbose_name_plural.";
-            $this->patch_help_text = ($this->patch_help_text) ?: "Updates current $model_verbose_name_plural.";
-            $this->delete_help_text = ($this->delete_help_text) ?: "Deletes current $model_verbose_name_plural.";
+            $this->get_help_text = $this->get_help_text ?: "Reads current $model_verbose_name_plural.";
+            $this->post_help_text = $this->post_help_text ?: "Creates $model_verbose_name_plural.";
+            $this->patch_help_text = $this->patch_help_text ?: "Updates current $model_verbose_name_plural.";
+            $this->delete_help_text = $this->delete_help_text ?: "Deletes current $model_verbose_name_plural.";
         }
     }
 
@@ -350,18 +353,19 @@ class Endpoint extends BaseClass {
      * the `prev` and `next` link values.
      * @returns ResourceLinkSet A ResourceLinkSet containing the `prev` and `next` ResourceLinks.
      */
-    public function get_pagination_resource_links(int $limit, int $offset) : ResourceLinkSet {
+    public function get_pagination_resource_links(int $limit, int $offset): ResourceLinkSet
+    {
         # Calculate the offset for the `prev` and `next` resource link values
-        $prev_offset = ($offset - $limit >= 0) ? $offset - $limit : 0;
+        $prev_offset = $offset - $limit >= 0 ? $offset - $limit : 0;
         $next_offset = $offset + $limit;
 
         # Format the URLs using the calculate offsets
-        $prev_url = $this->url."?offset=$prev_offset&limit=$limit";
-        $next_url = $this->url."?offset=$next_offset&limit=$limit";
+        $prev_url = $this->url . "?offset=$prev_offset&limit=$limit";
+        $next_url = $this->url . "?offset=$next_offset&limit=$limit";
 
         # Construct ResourceLinks objects containing the `next` and `prev` links
-        $prev_link = new ResourceLink(rel: "prev", href: $prev_url, use_namespace: false);
-        $next_link = new ResourceLink(rel: "next", href: $next_url, use_namespace: false);
+        $prev_link = new ResourceLink(rel: 'prev', href: $prev_url, use_namespace: false);
+        $next_link = new ResourceLink(rel: 'next', href: $next_url, use_namespace: false);
 
         # Return a ResourceLinkSet with our `next` and `prev` links
         return new ResourceLinkSet([$prev_link, $next_link]);
@@ -370,55 +374,58 @@ class Endpoint extends BaseClass {
     /**
      * Generates the privilege name necessary to execute a specific request method on this Endpoint.
      * @param string $method The HTTP method for which the resulting privilege name is intended.
-     * @returns string The complete pfSense privilege name needed to authorize API requests to this endpoint using 
+     * @returns string The complete pfSense privilege name needed to authorize API requests to this endpoint using
      * the specified $method.
      */
-    private function get_method_priv_name(string $method) : string {
+    private function get_method_priv_name(string $method): string
+    {
         # Convert the URL and request method to a pfSense privilege name
-        $priv_name_prefix = str_replace("/", "-", $this->url)."-";
-        
+        $priv_name_prefix = str_replace('/', '-', $this->url) . '-';
+
         # Replace underscores with hyphens
-        $priv_name_prefix = str_replace("_", "-", $priv_name_prefix);
-        
+        $priv_name_prefix = str_replace('_', '-', $priv_name_prefix);
+
         # Remove leading `-` if present, this occurs because the URL starts with a `/` which gets replaced with `-`
-        if (str_starts_with($priv_name_prefix, "-")) {
+        if (str_starts_with($priv_name_prefix, '-')) {
             $priv_name_prefix = substr($priv_name_prefix, offset: 1);
         }
-        
-        return $priv_name_prefix.strtolower($method);
+
+        return $priv_name_prefix . strtolower($method);
     }
 
     /**
      * Assigns the default privileges required to make API calls to this endpoint. This method will automatically
      * populate the following properties:
-     * 
+     *
      *      - $this->get_privileges
      *      - $this->post_privileges
      *      - $this->patch_privileges
      *      - $this->put_privileges
      *      - $this->delete_privileges
      */
-    private function get_default_privs() : void {
-        $page_all_priv = "page-all";
-        $this->get_privileges = [$page_all_priv, $this->get_method_priv_name("GET")];
-        $this->post_privileges = [$page_all_priv, $this->get_method_priv_name("POST")];
-        $this->patch_privileges = [$page_all_priv, $this->get_method_priv_name("PATCH")];
-        $this->put_privileges = [$page_all_priv, $this->get_method_priv_name("PUT")];
-        $this->delete_privileges = [$page_all_priv, $this->get_method_priv_name("DELETE")];
+    private function get_default_privs(): void
+    {
+        $page_all_priv = 'page-all';
+        $this->get_privileges = [$page_all_priv, $this->get_method_priv_name('GET')];
+        $this->post_privileges = [$page_all_priv, $this->get_method_priv_name('POST')];
+        $this->patch_privileges = [$page_all_priv, $this->get_method_priv_name('PATCH')];
+        $this->put_privileges = [$page_all_priv, $this->get_method_priv_name('PUT')];
+        $this->delete_privileges = [$page_all_priv, $this->get_method_priv_name('DELETE')];
     }
 
     /**
      * Retrieves the necessary privileges for processing the received API call.
      * @return array An array of required privileges for the current API call.
      */
-    private function get_required_privs() : array {
+    private function get_required_privs(): array
+    {
         # Determine the privileges required for this API call
         return match ($this->request_method) {
-            "GET" => $this->get_privileges,
-            "POST" => $this->post_privileges,
-            "PUT" => $this->put_privileges,
-            "PATCH" => $this->patch_privileges,
-            "DELETE" => $this->delete_privileges,
+            'GET' => $this->get_privileges,
+            'POST' => $this->post_privileges,
+            'PUT' => $this->put_privileges,
+            'PATCH' => $this->patch_privileges,
+            'DELETE' => $this->delete_privileges,
             default => [],
         };
     }
@@ -429,7 +436,8 @@ class Endpoint extends BaseClass {
      * located at /etc/inc/priv/.
      * @returns array The pfSense priv list entry array corresponding to the privileges of this Endpoint.
      */
-    public function generate_pfsense_privs() : array  {
+    public function generate_pfsense_privs(): array
+    {
         # Set an array to populate pfSense priv entries for this Endpoint
         $privs = [];
 
@@ -437,8 +445,8 @@ class Endpoint extends BaseClass {
         foreach ($this->request_method_options as $method_option) {
             # Set the privilege config to pass to pfSense's privilege system
             $privs[$this->get_method_priv_name($method_option)] = [
-                "name" => "REST API - $this->url ".strtoupper($method_option),
-                "descr" => "Allow $method_option request to $this->url"
+                'name' => "REST API - $this->url " . strtoupper($method_option),
+                'descr' => "Allow $method_option request to $this->url",
             ];
         }
 
@@ -449,20 +457,22 @@ class Endpoint extends BaseClass {
      * Checks if authentication and authorization for this Endpoint is successful. This will attempt authentication
      * and authorization for each allowed auth method. Only one auth method needs to succeed to allow access.
      */
-    private function check_auth(): void {
+    private function check_auth(): void
+    {
         # Attempt to authenticate the remote client
         $this->client = Auth::attempt_multi_auth(
             auth_classes: $this->auth_methods,
-            required_privileges: $this->get_required_privs()
+            required_privileges: $this->get_required_privs(),
         );
     }
 
     /**
      * Checks if the API is enabled before allowing the call.
      */
-    private function check_enabled(): void {
-        if (!$this->api_config["enabled"] == "enabled" and !$this->ignore_enabled) {
-            header("Location: /");
+    private function check_enabled(): void
+    {
+        if (!$this->api_config['enabled'] == 'enabled' and !$this->ignore_enabled) {
+            header('Location: /');
             exit();
         }
     }
@@ -470,10 +480,11 @@ class Endpoint extends BaseClass {
     /**
      * Checks if the interface receiving the API call is allowed to answer API calls.
      */
-    private function check_server_ip(): void {
+    private function check_server_ip(): void
+    {
         # Variables
-        $allow_ifs = $this->api_config["allowed_interfaces"];
-        $whitelist = explode(",", $allow_ifs);
+        $allow_ifs = $this->api_config['allowed_interfaces'];
+        $whitelist = explode(',', $allow_ifs);
 
         # Allow the action if the allowed interfaces is empty
         if (empty($allow_ifs)) {
@@ -484,13 +495,13 @@ class Endpoint extends BaseClass {
         foreach ($whitelist as $wif) {
             $if_info = get_interface_info($wif);
             # Check if our server IP is a valid if address, VIP, localhost, or any
-            if ($_SERVER["SERVER_ADDR"] === $if_info["ipaddr"]) {
+            if ($_SERVER['SERVER_ADDR'] === $if_info['ipaddr']) {
                 return;
-            } elseif ($_SERVER["SERVER_ADDR"] === $if_info["ipaddrv6"]) {
+            } elseif ($_SERVER['SERVER_ADDR'] === $if_info['ipaddrv6']) {
                 return;
-            } elseif (in_array($_SERVER["SERVER_ADDR"], ["::1", "127.0.0.1", "localhost"]) and $wif === "localhost") {
+            } elseif (in_array($_SERVER['SERVER_ADDR'], ['::1', '127.0.0.1', 'localhost']) and $wif === 'localhost') {
                 return;
-            } elseif ($wif === "any") {
+            } elseif ($wif === 'any') {
                 return;
             } elseif ($this->ignore_interfaces) {
                 return;
@@ -499,17 +510,18 @@ class Endpoint extends BaseClass {
 
         # Throw a forbidden error if this API call was made to a non-API enabled interface
         throw new ForbiddenError(
-            message: "The requested action is not allowed by admin policy",
-            response_id: "NOT_ALLOWED"
+            message: 'The requested action is not allowed by admin policy',
+            response_id: 'NOT_ALLOWED',
         );
     }
 
     /**
      * Check if the HTTP method requested by the API client is supported by this view.
      */
-    private function check_request_method(): void {
+    private function check_request_method(): void
+    {
         # Always allow OPTIONS requests
-        if ($this->request_method === "OPTIONS") {
+        if ($this->request_method === 'OPTIONS') {
             return;
         }
 
@@ -517,17 +529,17 @@ class Endpoint extends BaseClass {
         if (!in_array($this->request_method, $this->request_method_options)) {
             throw new MethodNotAllowedError(
                 message: "Resource at $this->url does not support the requested HTTP method '$this->request_method'",
-                response_id: "METHOD_NOT_ALLOWED"
+                response_id: 'METHOD_NOT_ALLOWED',
             );
         }
 
         # Throw an error if the API is currently in read mode and this is not a GET or OPTIONS request
-        $read_only = ($this->api_config["read_only"] === "enabled" and !$this->ignore_read_only);
-        if ($read_only and $this->request_method !== "GET") {
+        $read_only = ($this->api_config['read_only'] === 'enabled' and !$this->ignore_read_only);
+        if ($read_only and $this->request_method !== 'GET') {
             throw new MethodNotAllowedError(
-                message: "Resource at $this->url cannot support the requested HTTP method `$this->request_method` ".
-                    "because the REST API is currently in read-only mode.",
-                response_id: "ENDPOINT_METHOD_NOT_ALLOWED_IN_READ_ONLY_MODE"
+                message: "Resource at $this->url cannot support the requested HTTP method `$this->request_method` " .
+                    'because the REST API is currently in read-only mode.',
+                response_id: 'ENDPOINT_METHOD_NOT_ALLOWED_IN_READ_ONLY_MODE',
             );
         }
     }
@@ -536,7 +548,8 @@ class Endpoint extends BaseClass {
      * Checks if the API client's request data was successfully received and parsed by the API. This method populates
      * the $this->request_data property according to the client's requested content-type.
      */
-    private function check_request_data(): void {
+    private function check_request_data(): void
+    {
         # Obtain the ContentHandler associated with the HTTP Content-Type header sent by the client
         $content_handler = ContentHandler::get_decode_handler();
         $this->request_data = $content_handler->decode();
@@ -547,33 +560,34 @@ class Endpoint extends BaseClass {
      * Performs validation on non-Model fields. These fields control how Models are initially obtained/constructed.
      * @throws ValidationError When one or more Endpoint releated fields fail validation.
      */
-    private function validate_endpoint_fields(): void {
+    private function validate_endpoint_fields(): void
+    {
         # Ensure the special async, limit and offset parameters are of the correct type
-        if (!isset($this->request_data["async"])) {
-            $this->request_data["async"] = true;
+        if (!isset($this->request_data['async'])) {
+            $this->request_data['async'] = true;
         }
-        if (!is_bool($this->request_data["async"])) {
+        if (!is_bool($this->request_data['async'])) {
             throw new ValidationError(
-                message: "Field `async` must be of type `boolean`.",
-                response_id: "ENDPOINT_ASYNC_FIELD_INVALID_TYPE"
+                message: 'Field `async` must be of type `boolean`.',
+                response_id: 'ENDPOINT_ASYNC_FIELD_INVALID_TYPE',
             );
         }
-        if (!isset($this->request_data["limit"])) {
-            $this->request_data["limit"] = 0;
+        if (!isset($this->request_data['limit'])) {
+            $this->request_data['limit'] = 0;
         }
-        if (!is_integer($this->request_data["limit"])) {
+        if (!is_integer($this->request_data['limit'])) {
             throw new ValidationError(
-                message: "Field `limit` must be of type `integer`.",
-                response_id: "ENDPOINT_LIMIT_FIELD_INVALID_TYPE"
+                message: 'Field `limit` must be of type `integer`.',
+                response_id: 'ENDPOINT_LIMIT_FIELD_INVALID_TYPE',
             );
         }
-        if (!isset($this->request_data["offset"])) {
-            $this->request_data["offset"] = 0;
+        if (!isset($this->request_data['offset'])) {
+            $this->request_data['offset'] = 0;
         }
-        if (!is_integer($this->request_data["offset"])) {
+        if (!is_integer($this->request_data['offset'])) {
             throw new ValidationError(
-                message: "Field `offset` must be of type `integer`.",
-                response_id: "ENDPOINT_OFFSET_FIELD_INVALID_TYPE"
+                message: 'Field `offset` must be of type `integer`.',
+                response_id: 'ENDPOINT_OFFSET_FIELD_INVALID_TYPE',
             );
         }
     }
@@ -581,7 +595,8 @@ class Endpoint extends BaseClass {
     /**
      * Listens for incoming API calls from API clients and checks if the API call is allowed.
      */
-    public function listen(): void {
+    public function listen(): void
+    {
         # Variables
         $resp_data = null;
         $content_handler = new JSONContentHandler();
@@ -606,79 +621,77 @@ class Endpoint extends BaseClass {
 
             # Assign the authenticated client object context to the Model
             $this->model->client = $this->client;
-            
+
             # Set this Model's async property if specified in the request data
-            if (isset($this->request_data["async"])) {
-                $this->model->async = $this->request_data["async"];
+            if (isset($this->request_data['async'])) {
+                $this->model->async = $this->request_data['async'];
             }
 
             # For GET requests on non-many Endpoints, obtain a single object from the assigned Model.
-            if ($this->request_method === "GET" and !$this->many) {
+            if ($this->request_method === 'GET' and !$this->many) {
                 $this->model->from_representation(data: $this->request_data);
                 $resp_data = $this->model->read();
             }
             # For GET requests on many Endpoints, obtain all objects from the assigned Model.
-            elseif ($this->request_method === "GET" and $this->many) {
+            elseif ($this->request_method === 'GET' and $this->many) {
                 $resp_data = $this->model->query(
                     query_params: $this->request_data,
-                    excluded: ["async", "limit", "offset"],
-                    limit: $this->request_data["limit"],
-                    offset: $this->request_data["offset"],
+                    excluded: ['async', 'limit', 'offset'],
+                    limit: $this->request_data['limit'],
+                    offset: $this->request_data['offset'],
                 );
                 $links = $this->get_pagination_resource_links(
-                    limit: $this->request_data["limit"],
-                    offset: $this->request_data["offset"]
+                    limit: $this->request_data['limit'],
+                    offset: $this->request_data['offset'],
                 );
             }
             # For POST requests on non-many Endpoints, create a single object for the assigned Model
-            elseif ($this->request_method === "POST" and !$this->many) {
+            elseif ($this->request_method === 'POST' and !$this->many) {
                 # POST request cannot include an ID, strip the ID if present
-                unset($this->request_data["id"]);
+                unset($this->request_data['id']);
                 $this->model->from_representation(data: $this->request_data);
-                $resp_data = $this->model->create(apply: ($this->request_data["apply"] === true));
+                $resp_data = $this->model->create(apply: $this->request_data['apply'] === true);
             }
             # For PUT requests on many Endpoints, replace all existing objects for the assigned Model
-            elseif ($this->request_method === "PUT" and $this->many) {
+            elseif ($this->request_method === 'PUT' and $this->many) {
                 $resp_data = $this->model->replace_all(
                     data: $this->request_data,
-                    apply: ($this->request_data["apply"] === true)
+                    apply: $this->request_data['apply'] === true,
                 );
             }
             # For PATCH requests on non-many Endpoints, update a single object for the assigned Model
-            elseif ($this->request_method === "PATCH" and !$this->many) {
+            elseif ($this->request_method === 'PATCH' and !$this->many) {
                 $this->model->from_representation(data: $this->request_data);
-                $resp_data = $this->model->update(apply: ($this->request_data["apply"] === true));
+                $resp_data = $this->model->update(apply: $this->request_data['apply'] === true);
             }
             # For DELETE requests on non-many Endpoints, delete a single object for the assigned Model
-            elseif ($this->request_method === "DELETE" and !$this->many) {
+            elseif ($this->request_method === 'DELETE' and !$this->many) {
                 $this->model->from_representation(data: $this->request_data);
-                $resp_data = $this->model->delete(apply: ($this->request_data["apply"] === true));
+                $resp_data = $this->model->delete(apply: $this->request_data['apply'] === true);
             }
             # Return the available request methods in a response header
-            elseif ($this->request_method === "OPTIONS") {
-                header("access-control-allow-methods: ".implode(", ", $this->request_method_options));
-                header("Allow: ".implode(", ", $this->request_method_options));
+            elseif ($this->request_method === 'OPTIONS') {
+                header('access-control-allow-methods: ' . implode(', ', $this->request_method_options));
+                header('Allow: ' . implode(', ', $this->request_method_options));
             }
 
             # Create our success API response object if no errors were thrown
             $response = new Success(
-                message: "",
-                response_id: "SUCCESS",
+                message: '',
+                response_id: 'SUCCESS',
                 data: $resp_data ?: new ModelSet(),
-                _links: $links
+                _links: $links,
             );
-        }
-        catch (Response $response) {
-        }
-        catch (Exception|Error $error) {
+        } catch (Response $response) {
+        } catch (Exception | Error $error) {
             $response = new ServerError(
-                message: $error->getMessage().PHP_EOL.$error->getTraceAsString(),
-                response_id: "ENDPOINT_RECEIVED_UNEXPECTED_ERROR"
+                message: $error->getMessage() . PHP_EOL . $error->getTraceAsString(),
+                response_id: 'ENDPOINT_RECEIVED_UNEXPECTED_ERROR',
             );
         }
 
         # Add API required response headers, these will override any custom headers
-        header("Referer: no-referrer");
+        header('Referer: no-referrer');
 
         # Format the HTTP response as JSON and set response code
         http_response_code($response->code);
@@ -691,25 +704,28 @@ class Endpoint extends BaseClass {
      * Generate an endpoint for this view in the pfSense webroot.
      * @returns bool Returns true if the endpoint was successfully built, returns false otherwise.
      */
-    public function build_endpoint_url(): bool {
+    public function build_endpoint_url(): bool
+    {
         # Get the fully qualified and non qualified class names for this object
         $fq_class_name = get_class($this);
         $nq_class_name = (new \ReflectionClass($this))->getShortName();
 
         # Specify the PHP code to write to the Endpoints index.php file
-        $code = "<?php\nrequire_once('RESTAPI/Endpoints/".$nq_class_name.".inc');\n(new ".$fq_class_name."())->listen();\n";
+        $code =
+            "<?php\nrequire_once('RESTAPI/Endpoints/" .
+            $nq_class_name .
+            ".inc');\n(new " .
+            $fq_class_name .
+            "())->listen();\n";
 
         # Create directories and files corresponding with class
         if ($this->url) {
-            mkdir("/usr/local/www".$this->url, 0644, true);
-            file_put_contents(
-                "/usr/local/www".$this->url."/index.php",
-                $code
-            );
+            mkdir('/usr/local/www' . $this->url, 0644, true);
+            file_put_contents('/usr/local/www' . $this->url . '/index.php', $code);
         }
 
         # Return true if the endpoint was successfully built
-        if ($this->url and is_file("/usr/local/www".$this->url."/index.php")) {
+        if ($this->url and is_file('/usr/local/www' . $this->url . '/index.php')) {
             return true;
         }
 

@@ -19,7 +19,7 @@ class DNSResolverApplyDispatcher extends Dispatcher
         if ($reload_unbound === 0) {
             system_resolvconf_generate();
             system_dhcpleases_configure();
-            clear_subsystem_dirty("unbound");
+            clear_subsystem_dirty('unbound');
         }
     }
 }

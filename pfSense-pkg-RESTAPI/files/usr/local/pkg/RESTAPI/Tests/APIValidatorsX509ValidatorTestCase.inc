@@ -83,113 +83,112 @@ H0t+b8M07WqCw6FuSkg/UcMgMMshSooVSIemL+YhK7tYQ9oQKcVdy34Xt69NDh2T
     /**
      * Checks that the `allow_crt` parameter allows X509 encoded certificate strings.
      */
-    public function test_allow_crt() {
+    public function test_allow_crt()
+    {
         # Ensure valid X509 certificate strings are accepted
         $this->assert_does_not_throw(
             callable: function () {
                 $validator = new X509Validator(allow_crt: true);
                 $validator->validate(self::EXAMPLE_CRT);
-            }
+            },
         );
 
-         # Ensure non X509 certificate strings are rejected
+        # Ensure non X509 certificate strings are rejected
         $this->assert_throws_response(
-            response_id: "X509_VALIDATOR_INVALID_VALUE",
+            response_id: 'X509_VALIDATOR_INVALID_VALUE',
             code: 400,
             callable: function () {
                 $validator = new X509Validator(allow_crt: true);
-                $validator->validate("not a certificate!");
-            }
+                $validator->validate('not a certificate!');
+            },
         );
     }
 
     /**
      * Checks that the `allow_prv` parameter allows X509 encoded private key strings.
      */
-    public function test_allow_prv() {
+    public function test_allow_prv()
+    {
         # Ensure valid X509 private key strings are accepted
         $this->assert_does_not_throw(
             callable: function () {
                 $validator = new X509Validator(allow_crt: false, allow_prv: true);
                 $validator->validate(self::EXAMPLE_PRV);
-            }
+            },
         );
 
         # Ensure non X509 private key strings are rejected
         $this->assert_throws_response(
-            response_id: "X509_VALIDATOR_INVALID_VALUE",
+            response_id: 'X509_VALIDATOR_INVALID_VALUE',
             code: 400,
             callable: function () {
                 $validator = new X509Validator(allow_prv: true);
-                $validator->validate("not a private key!");
-            }
+                $validator->validate('not a private key!');
+            },
         );
     }
 
     /**
      * Checks that the `allow_ecprv` parameter allows X509 encoded EC private key strings.
      */
-    public function test_allow_ecprv() {
+    public function test_allow_ecprv()
+    {
         # Ensure valid X509 EC private key strings are accepted
         $this->assert_does_not_throw(
             callable: function () {
                 $validator = new X509Validator(allow_crt: false, allow_ecprv: true);
                 $validator->validate(self::EXAMPLE_ECPRV);
-            }
+            },
         );
 
         # Ensure non X509 EC private key strings are rejected
         $this->assert_throws_response(
-            response_id: "X509_VALIDATOR_INVALID_VALUE",
+            response_id: 'X509_VALIDATOR_INVALID_VALUE',
             code: 400,
             callable: function () {
                 $validator = new X509Validator(allow_ecprv: true);
-                $validator->validate("not an EC private key!");
-            }
+                $validator->validate('not an EC private key!');
+            },
         );
     }
 
     /**
      * Checks that the `allow_csr` parameter allows X509 encoded CSR strings.
      */
-    public function test_allow_csr() {
+    public function test_allow_csr()
+    {
         # Ensure valid X509 CSRs are accepted
         $this->assert_does_not_throw(
             callable: function () {
                 $validator = new X509Validator(allow_crt: false, allow_csr: true);
                 $validator->validate(self::EXAMPLE_CSR);
-            }
+            },
         );
 
         # Ensure non X509 EC CSR strings are rejected
         $this->assert_throws_response(
-            response_id: "X509_VALIDATOR_INVALID_VALUE",
+            response_id: 'X509_VALIDATOR_INVALID_VALUE',
             code: 400,
             callable: function () {
                 $validator = new X509Validator(allow_csr: true);
-                $validator->validate("not a CSR!");
-            }
+                $validator->validate('not a CSR!');
+            },
         );
     }
 
     /**
      * Checks that the `is_matching_keypair()` correctly identifies matching keypairs.
      */
-    public function test_is_matching_key_pair() {
+    public function test_is_matching_key_pair()
+    {
         # Ensure matching key pairs return `true`
         $this->assert_is_true(
-            X509Validator::is_matching_keypair(
-                public_key: self::EXAMPLE_CRT,
-                private_key: self::EXAMPLE_PRV
-            )
+            X509Validator::is_matching_keypair(public_key: self::EXAMPLE_CRT, private_key: self::EXAMPLE_PRV),
         );
 
         # Ensure non matching key pairs return `false`
         $this->assert_is_false(
-            X509Validator::is_matching_keypair(
-                public_key: self::EXAMPLE_CRT,
-                private_key: self::EXAMPLE_ECPRV
-            )
+            X509Validator::is_matching_keypair(public_key: self::EXAMPLE_CRT, private_key: self::EXAMPLE_ECPRV),
         );
     }
 }

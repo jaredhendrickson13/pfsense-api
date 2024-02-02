@@ -8,18 +8,17 @@
  * @param mixed $pluginparams Plugin parameters passed in by the pfSense package system.
  * @return string The custom nginx block to be added to the webConfigurator's nginx.conf file
  */
-function restapi_plugin_nginx(mixed $pluginparams): string {
+function restapi_plugin_nginx(mixed $pluginparams): string
+{
     global $g;
 
     # Caller did not properly define data, exit early
-    if (!is_array($pluginparams) ||
-        empty($pluginparams) ||
-        empty($pluginparams['section'])) {
-        return "";
+    if (!is_array($pluginparams) || empty($pluginparams) || empty($pluginparams['section'])) {
+        return '';
     }
 
     return match ($pluginparams['section']) {
-        "location" => "
+        'location' => "
             # This block is required to allow URI's without trailing slash or .php extension.
             # This block also enables PHP to handle PATCH and DELETE requests for API functionality.
             location /api/v2/ {
@@ -32,6 +31,6 @@ function restapi_plugin_nginx(mixed $pluginparams): string {
                 fastcgi_read_timeout 180;
                 include        /usr/local/etc/nginx/fastcgi_params;
             }",
-        default => "",
+        default => '',
     };
 }

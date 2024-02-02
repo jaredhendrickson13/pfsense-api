@@ -15,7 +15,6 @@ class SystemRebootDispatcher extends Dispatcher
      */
     public function process(mixed ...$arguments): void
     {
-        new Command("shutdown -r +15s");
+        new Command('shutdown -r +15s');
     }
-
 }

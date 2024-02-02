@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Fields;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 
@@ -10,7 +10,8 @@ use RESTAPI;
  * Defines a BooleanField class that extends the Core Field method. This Field adds validation and representation for
  * boolean Model Fields.
  */
-class BooleanField extends RESTAPI\Core\Field {
+class BooleanField extends RESTAPI\Core\Field
+{
     public mixed $indicates_true;
     public mixed $indicates_false;
 
@@ -66,22 +67,21 @@ class BooleanField extends RESTAPI\Core\Field {
         bool $read_only = false,
         bool $write_only = false,
         bool $representation_only = false,
-        mixed $indicates_true = "",
+        mixed $indicates_true = '',
         mixed $indicates_false = null,
-        string $verbose_name = "",
-        string $verbose_name_plural = "",
-        string $internal_name = "",
-        string $internal_namespace = "",
+        string $verbose_name = '',
+        string $verbose_name_plural = '',
+        string $internal_name = '',
+        string $internal_namespace = '',
         array $referenced_by = [],
         array $conditions = [],
         array $validators = [],
-        string $help_text = ""
-    )
-    {
+        string $help_text = '',
+    ) {
         $this->indicates_true = $indicates_true;
         $this->indicates_false = $indicates_false;
         parent::__construct(
-            type: "boolean",
+            type: 'boolean',
             required: $required,
             unique: $unique,
             default: $default,
@@ -98,7 +98,7 @@ class BooleanField extends RESTAPI\Core\Field {
             referenced_by: $referenced_by,
             conditions: $conditions,
             validators: $validators,
-            help_text: $help_text
+            help_text: $help_text,
         );
     }
 
@@ -107,7 +107,8 @@ class BooleanField extends RESTAPI\Core\Field {
      * @param mixed $internal_value The internal value from the pfSense configuration.
      * @return bool The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value) : bool {
+    protected function _from_internal(mixed $internal_value): bool
+    {
         # Check if the string matches our `indicates_true` value, if so, set this value as true.
         if ($internal_value === $this->indicates_true) {
             return true;
@@ -141,14 +142,15 @@ class BooleanField extends RESTAPI\Core\Field {
      * @return object The pfSense webConfigurator form input object.
      * @link https://github.com/pfsense/pfsense/tree/master/src/usr/local/www/classes/Form
      */
-    public function to_form_input(string $type = "text", array $attributes = []) : object {
+    public function to_form_input(string $type = 'text', array $attributes = []): object
+    {
         # Populate the GENERAL section of the UI form
         $input = new \Form_Checkbox(
             $this->name,
             ucwords($this->verbose_name),
-            "Enable",
+            'Enable',
             $this->value,
-            $this->indicates_true
+            $this->indicates_true,
         );
         $input->setHelp($this->help_text);
 

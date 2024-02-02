@@ -8,50 +8,51 @@ use Exception;
 use ReflectionException;
 use ReflectionMethod;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 /**
  * Defines a TestCase object that can be used to define child TestCase classes that test internal functionality of
  * the API. This is needed because pfSense does not have PHPUnit readily available.
  */
-class TestCase extends BaseClass {
-    public string $method = "unknown";
-    public string $method_docstring = "";
+class TestCase extends BaseClass
+{
+    public string $method = 'unknown';
+    public string $method_docstring = '';
 
     /**
      * Runs this TestCase when the object is created. Any method that starts with `test` will automatically be run.
      * @throws ReflectionException When ReflectionMethod could not find a test method.
      * @throws Error|Exception The exception thrown by failed Tests, typically an AssertionError.
      */
-    public function run() {
+    public function run()
+    {
         # Need direct config access to revert any changes made by Tests
         global $config;
-        
+
         # use a property to keep track of the method that is currently running
-        $this->method = "unknown";
+        $this->method = 'unknown';
 
         # Setup the test case before running tests
         $this->setup();
-        
+
         # Loop through all methods in this object
         foreach (get_class_methods($this) as $method) {
             # If this method starts with `test`, run the function.
-            if (str_starts_with($method, "test")) {
+            if (str_starts_with($method, 'test')) {
                 # Backup the current config so we can undo any changes made during the test
                 $original_config = unserialize(serialize($config));
-                
+
                 # Set the current method undergoing testing
                 $this->method = $method;
 
                 # Gather the description for this test method from its doc comment
                 $this->method_docstring = (new ReflectionMethod($this, $method))->getDocComment();
-                $this->method_docstring = str_replace([PHP_EOL, "/**", "*/", "*", "  "], "", $this->method_docstring);
+                $this->method_docstring = str_replace([PHP_EOL, '/**', '*/', '*', '  '], '', $this->method_docstring);
 
                 # Try to run the test. On failure, restore the original config and throw the exception
                 try {
                     $this->$method();
-                }
-                catch (Error|Exception $e) {
+                } catch (Error | Exception $e) {
                     # Restore the original configuration, teardown the TestCase and throw the encountered error
                     $config = $original_config;
                     write_config("Restored config after API test '$method'");
@@ -64,7 +65,7 @@ class TestCase extends BaseClass {
                 write_config("Restored config after API test '$method'");
             }
         }
-        
+
         # Teardown the test case now that all tests are completed
         $this->teardown();
     }
@@ -77,14 +78,15 @@ class TestCase extends BaseClass {
      * @return array An array where the `output` key contains the commands output and the `result_code` key contains the
      * resulting result code of the command.
      */
-    function run_command(string $command, bool $trim_whitespace = false) : array {
-        $results = ["output" => null, "code" => null];
-        exec(command: "$command 2>/dev/null", output: $results["output"], result_code: $results["result_code"]);
-        $results["output"] = implode(PHP_EOL, $results["output"]);
+    function run_command(string $command, bool $trim_whitespace = false): array
+    {
+        $results = ['output' => null, 'code' => null];
+        exec(command: "$command 2>/dev/null", output: $results['output'], result_code: $results['result_code']);
+        $results['output'] = implode(PHP_EOL, $results['output']);
 
         # Normalize output's whitespace if requested
         if ($trim_whitespace) {
-            $results["output"] = preg_replace('/\s+/', ' ', $results["output"]);
+            $results['output'] = preg_replace('/\s+/', ' ', $results['output']);
         }
 
         return $results;
@@ -94,13 +96,17 @@ class TestCase extends BaseClass {
      * Sets up the test case before tests are run. This can be overridden by your TestCase to setup shared resources
      * required for your tests.
      */
-    public function setup(): void {}
+    public function setup(): void
+    {
+    }
 
     /**
      * Tears down the test case after tests are run. This can be overridden by your TestCase to destroy resources
      * that may have been created during tests.
      */
-    public function teardown(): void {}
+    public function teardown(): void
+    {
+    }
 
     /**
      * Checks if two values are equal.
@@ -109,13 +115,14 @@ class TestCase extends BaseClass {
      * @param string $message Set the error message embedded in any AssertionError thrown by this method.
      * @throws AssertionError When $value1 and $value2 are not equal.
      */
-    protected function assert_equals(mixed $value1, mixed $value2, string $message = "") {
+    protected function assert_equals(mixed $value1, mixed $value2, string $message = '')
+    {
         # Throw a TestError if the two values do not match
         if ($value1 !== $value2) {
             # Ensure the test failure message includes the values that did not equal. Serialize objects into strings.
-            $value1_str = (is_object($value1)) ? serialize($value1) : $value1;
-            $value2_str = (is_object($value2)) ? serialize($value2) : $value2;
-            $message = ($message) ?: "Expected value `$value1_str` to equal `$value2_str`.";
+            $value1_str = is_object($value1) ? serialize($value1) : $value1;
+            $value2_str = is_object($value2) ? serialize($value2) : $value2;
+            $message = $message ?: "Expected value `$value1_str` to equal `$value2_str`.";
             throw new AssertionError($message);
         }
     }
@@ -127,14 +134,14 @@ class TestCase extends BaseClass {
      * @param string $message Set the error message embedded in any AssertionError thrown by this method.
      * @throws AssertionError When $value1 and $value2 are equal.
      */
-    protected function assert_not_equals(mixed $value1, mixed $value2, string $message = "")
+    protected function assert_not_equals(mixed $value1, mixed $value2, string $message = '')
     {
         # Throw a TestError if the two values match
         if ($value1 === $value2) {
             # Ensure the test failure message includes the values that did not equal. Serialize objects into strings.
-            $value1_str = (is_object($value1)) ? serialize($value1) : $value1;
-            $value2_str = (is_object($value2)) ? serialize($value2) : $value2;
-            $message = ($message) ?: "Expected value `$value1_str` to not equal `$value2_str`.";
+            $value1_str = is_object($value1) ? serialize($value1) : $value1;
+            $value2_str = is_object($value2) ? serialize($value2) : $value2;
+            $message = $message ?: "Expected value `$value1_str` to not equal `$value2_str`.";
             throw new AssertionError($message);
         }
     }
@@ -146,20 +153,20 @@ class TestCase extends BaseClass {
      * @param string $message Set the error message embedded in any AssertionError thrown by this method.
      * @throws AssertionError When the $callable did not raise one of the $exceptions.
      */
-    protected function assert_throws(array $exceptions, mixed $callable, string $message = "") {
+    protected function assert_throws(array $exceptions, mixed $callable, string $message = '')
+    {
         # Variables
-        $exceptions_str = implode(", ", $exceptions);
-        $message = ($message) ?: "Expected callable to raise one of [$exceptions_str]";
+        $exceptions_str = implode(', ', $exceptions);
+        $message = $message ?: "Expected callable to raise one of [$exceptions_str]";
 
         # Try to run the call able
         try {
             $callable();
-        }
-        # If an exception was thrown, make sure it was one of the expected exceptions.
-        catch (Exception | Error $exc) {
+        } catch (Exception | Error $exc) {
+            # If an exception was thrown, make sure it was one of the expected exceptions.
             $class_name = $exc::class;
             if (!in_array($class_name, $exceptions)) {
-                $message = $message." Received '$class_name'.";
+                $message = $message . " Received '$class_name'.";
                 throw new AssertionError($message);
             }
             return;
@@ -174,13 +181,15 @@ class TestCase extends BaseClass {
      * @param mixed $callable A callable to run and check for thrown exception.
      * @throws AssertionError If the $callable throws any exception.
      */
-    protected function assert_does_not_throw(mixed $callable) {
+    protected function assert_does_not_throw(mixed $callable)
+    {
         try {
             $callable();
-        }
-        catch (Error | Exception $exc) {
+        } catch (Error | Exception $exc) {
             $class_name = $exc::class;
-            throw new AssertionError("Expected callable to not throw an exception. Received $class_name: {$exc->getMessage()}");
+            throw new AssertionError(
+                "Expected callable to not throw an exception. Received $class_name: {$exc->getMessage()}",
+            );
         }
     }
 
@@ -191,13 +200,13 @@ class TestCase extends BaseClass {
      * @param int $code The Response object's error code. This typically corresponds with an HTTP status code.
      * @param mixed $callable An anonymous function that raises one of the $exceptions.
      */
-    protected function assert_throws_response(string $response_id, int $code, mixed $callable) {
+    protected function assert_throws_response(string $response_id, int $code, mixed $callable)
+    {
         # Try to run the call able
         try {
             $callable();
-        }
+        } catch (Response | Error | Exception $exc) {
             # If an exception was thrown, make sure it was one of the expected exceptions.
-        catch (Response | Error | Exception $exc) {
             $exc_class_name = $exc::class;
             $exc_message = $exc->getMessage();
 
@@ -208,7 +217,9 @@ class TestCase extends BaseClass {
             }
             # Ensure the $response_id matches this object
             if ($response_id !== $exc->response_id) {
-                throw new AssertionError("Expected Response to contain response_id $response_id. Received '$exc->response_id': $exc_message");
+                throw new AssertionError(
+                    "Expected Response to contain response_id $response_id. Received '$exc->response_id': $exc_message",
+                );
             }
             # Ensure the $code matches this object
             if ($code !== $exc->code) {
@@ -218,7 +229,7 @@ class TestCase extends BaseClass {
         }
 
         # If we ended up here, no exception was thrown. Throw an AssertionError
-        throw new AssertionError("Expected callable to throw an exception.");
+        throw new AssertionError('Expected callable to throw an exception.');
     }
 
     /**
@@ -227,11 +238,10 @@ class TestCase extends BaseClass {
      * @param string $message Set the error message embedded in any AssertionError thrown by this method.
      * @throws AssertionError When the value is not `true`.
      */
-    protected function assert_is_true (
-        mixed $value, string $message = "Expected value to equal 'true'."
-    ) {
+    protected function assert_is_true(mixed $value, string $message = "Expected value to equal 'true'.")
+    {
         # Check if this value is true
-        if ($value !== true ) {
+        if ($value !== true) {
             throw new AssertionError($message);
         }
     }
@@ -242,11 +252,10 @@ class TestCase extends BaseClass {
      * @param string $message Set the error message embedded in any AssertionError thrown by this method.
      * @throws AssertionError When the value is not `false`.
      */
-    protected function assert_is_false (
-        mixed $value, string $message = "Expected value to equal 'false'."
-    ) {
+    protected function assert_is_false(mixed $value, string $message = "Expected value to equal 'false'.")
+    {
         # Check if this value is false
-        if ($value !== false ) {
+        if ($value !== false) {
             throw new AssertionError($message);
         }
     }
@@ -257,7 +266,8 @@ class TestCase extends BaseClass {
      * @param string $needle The string to check for within the $haystack.
      * @throws AssertionError When $haystack string did not contain the $needle string.
      */
-    protected function assert_str_contains(string $haystack, string $needle) {
+    protected function assert_str_contains(string $haystack, string $needle)
+    {
         # Fail the test if $needle is not in $haystack
         if (!str_contains($haystack, $needle)) {
             throw new AssertionError("Expected string `$haystack` to contain string `$needle`");
@@ -270,7 +280,8 @@ class TestCase extends BaseClass {
      * @param string $needle The string to check for within the $haystack.
      * @throws AssertionError When $haystack string did contain the $needle string.
      */
-    protected function assert_str_does_not_contain(string $haystack, string $needle) {
+    protected function assert_str_does_not_contain(string $haystack, string $needle)
+    {
         # Fail the test if $needle is found in $haystack
         if (str_contains($haystack, $needle)) {
             throw new AssertionError("Expected string `$haystack` to not contain string `$needle`");
@@ -282,7 +293,8 @@ class TestCase extends BaseClass {
      * @param mixed $value1 The first value to evaluate. This value must be greater than value 2 to pass check.
      * @param mixed $value2 The second value to evaluate. This value must be less than value 1 to pass check.
      */
-    protected function assert_is_greater_than(mixed $value1, mixed $value2) {
+    protected function assert_is_greater_than(mixed $value1, mixed $value2)
+    {
         # Fail test if $value2 is greater than $value1.
         if ($value1 <= $value2) {
             throw new AssertionError("Expected $value1 to be greater than $value2");
@@ -294,7 +306,8 @@ class TestCase extends BaseClass {
      * @param mixed $value1 The first value to evaluate. This value must be greater than or equal to value 2 to pass check.
      * @param mixed $value2 The second value to evaluate. This value must be less than or equal to value 1 to pass check.
      */
-    protected function assert_is_greater_than_or_equal(mixed $value1, mixed $value2): void {
+    protected function assert_is_greater_than_or_equal(mixed $value1, mixed $value2): void
+    {
         # Fail test if $value2 is greater than or equal to $value1.
         if ($value1 < $value2) {
             throw new AssertionError("Expected $value1 to be greater than or equal to $value2");
@@ -306,7 +319,8 @@ class TestCase extends BaseClass {
      * @param mixed $value1 The first value to evaluate. This value must be less than value 2 to pass check.
      * @param mixed $value2 The second value to evaluate. This value must be greater than value 1 to pass check.
      */
-    protected function assert_is_less_than(mixed $value1, mixed $value2): void {
+    protected function assert_is_less_than(mixed $value1, mixed $value2): void
+    {
         # Fail test if $value2 is less than $value1.
         if ($value1 >= $value2) {
             throw new AssertionError("Expected $value1 to be less than $value2");
@@ -318,7 +332,8 @@ class TestCase extends BaseClass {
      * @param mixed $value1 The first value to evaluate. This value must be less than or equal to value 2 to pass check.
      * @param mixed $value2 The second value to evaluate. This value must be greater than or equal to value 1 to pass check.
      */
-    protected function assert_is_less_than_or_equal(mixed $value1, mixed $value2): void {
+    protected function assert_is_less_than_or_equal(mixed $value1, mixed $value2): void
+    {
         # Fail test if $value2 is less than or equal to $value1.
         if ($value1 > $value2) {
             throw new AssertionError("Expected $value1 to be less than or equal to $value2");
@@ -331,7 +346,8 @@ class TestCase extends BaseClass {
      * @param string $message Set the error message embedded in any AssertionError thrown by this method.
      * @throws AssertionError When the value is not empty.
      */
-    protected function assert_is_empty(mixed $value,string $message = "Expected value to be empty.") {
+    protected function assert_is_empty(mixed $value, string $message = 'Expected value to be empty.')
+    {
         # Check if this value is false
         if (!empty($value)) {
             throw new AssertionError($message);
@@ -344,7 +360,8 @@ class TestCase extends BaseClass {
      * @param string $message Set the error message embedded in any AssertionError thrown by this method.
      * @throws AssertionError When the value is not empty.
      */
-    protected function assert_is_not_empty(mixed $value,string $message = "Expected value to not be empty.") {
+    protected function assert_is_not_empty(mixed $value, string $message = 'Expected value to not be empty.')
+    {
         # Check if this value is false
         if (empty($value)) {
             throw new AssertionError($message);
@@ -358,9 +375,10 @@ class TestCase extends BaseClass {
      * @param string $message Set the error message embedded in any AssertionError thrown by this method.
      * @throws AssertionError When the $value's type does not match the given $type.
      */
-    protected function assert_type(mixed $value, string $type, string $message = "") {
+    protected function assert_type(mixed $value, string $type, string $message = '')
+    {
         # Variables
-        $message = ($message) ?: "Expected value to be of type '$type'";
+        $message = $message ?: "Expected value to be of type '$type'";
 
         # Throw an assertion error if the type specified does not match the type of our value
         if (gettype($value) !== $type) {

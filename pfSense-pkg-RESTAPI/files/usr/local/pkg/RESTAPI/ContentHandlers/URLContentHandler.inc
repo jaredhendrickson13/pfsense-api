@@ -8,7 +8,7 @@ use RESTAPI\Responses\ValidationError;
 
 class URLContentHandler extends ContentHandler
 {
-    public string $mime_type = "application/x-www-form-urlencoded";
+    public string $mime_type = 'application/x-www-form-urlencoded';
 
     public function get_content(): array
     {
@@ -18,12 +18,11 @@ class URLContentHandler extends ContentHandler
     protected function _decode(mixed $content = null): mixed
     {
         # Loop through each query string item and check for expected data types
-        foreach ($content as $key=>$value) {
+        foreach ($content as $key => $value) {
             # Check for boolean type query strings
-            if ($value === "true") {
+            if ($value === 'true') {
                 $content[$key] = true;
-            }
-            elseif ($value === "false") {
+            } elseif ($value === 'false') {
                 $content[$key] = false;
             }
 
@@ -35,6 +34,4 @@ class URLContentHandler extends ContentHandler
 
         return $content;
     }
-
-
 }

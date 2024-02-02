@@ -11,7 +11,8 @@ class APIModelsFirewallStatesSizeTestCase extends TestCase
     /**
      * Ensure the `from_internal_defaultmaximumstates()` obtains the correct default state table size.
      */
-    public function test_from_internal_defaultmaximumstates() {
+    public function test_from_internal_defaultmaximumstates()
+    {
         # Create a FirewallStatesSize object to test with
         $states_size = new FirewallStatesSize();
 
@@ -22,7 +23,8 @@ class APIModelsFirewallStatesSizeTestCase extends TestCase
     /**
      * Ensure setting the `maximumstates` field actually sets the states limit in pfctl
      */
-    public function test_maximumstates_set_in_pfctl() {
+    public function test_maximumstates_set_in_pfctl()
+    {
         # Create a FirewallStatesSize object to test with
         $states_size = new FirewallStatesSize(async: false);
         $states_size->maximumstates->value = 500;
@@ -30,8 +32,8 @@ class APIModelsFirewallStatesSizeTestCase extends TestCase
         sleep(1);
 
         # Check the hard states limit in pfctl and ensure it matches the value we set
-        $pfctl_sm = new Command("pfctl -sm", trim_whitespace: true);
-        $this->assert_str_contains($pfctl_sm->output, "states hard limit 500");
+        $pfctl_sm = new Command('pfctl -sm', trim_whitespace: true);
+        $this->assert_str_contains($pfctl_sm->output, 'states hard limit 500');
 
         # Set the states limit back to the default
         $states_size->maximumstates->value = $states_size->defaultmaximumstates->value;

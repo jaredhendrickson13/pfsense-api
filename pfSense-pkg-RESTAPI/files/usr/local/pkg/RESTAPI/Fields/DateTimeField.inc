@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Fields;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use DateTime;
 use RESTAPI;
@@ -14,7 +14,8 @@ use RESTAPI\Responses\ValidationError;
  * Defines a DateTimeField class that extends the Core Field method. This Field adds validation and representation for
  * datetime Model Fields.
  */
-class DateTimeField extends Field {
+class DateTimeField extends Field
+{
     public string $datetime_format;
     public bool $auto_add_now;
     public bool $auto_update_now;
@@ -82,8 +83,8 @@ class DateTimeField extends Field {
         bool $unique = false,
         mixed $default = null,
         array $choices = [],
-        string $choices_callable = "",
-        string $datetime_format = "m/d/Y",
+        string $choices_callable = '',
+        string $datetime_format = 'm/d/Y',
         bool $auto_add_now = false,
         bool $auto_update_now = false,
         bool $allow_empty = false,
@@ -95,33 +96,32 @@ class DateTimeField extends Field {
         bool $many = false,
         int $many_minimum = 1,
         int $many_maximum = 128,
-        string|null $delimiter = ",",
-        string $verbose_name = "",
-        string $verbose_name_plural = "",
-        string $internal_name = "",
-        string $internal_namespace = "",
+        string|null $delimiter = ',',
+        string $verbose_name = '',
+        string $verbose_name_plural = '',
+        string $internal_name = '',
+        string $internal_namespace = '',
         array $referenced_by = [],
         array $conditions = [],
         array $validators = [],
-        string $help_text = ""
-    )
-    {
+        string $help_text = '',
+    ) {
         # Assign properties unique to this field
         $this->datetime_format = $datetime_format;
         $this->auto_add_now = $auto_add_now;
         $this->auto_update_now = $auto_update_now;
-        
+
         # Do not allow $auto_update_now and $many at the same time. The resulting array would just be redundant values.
         if ($auto_update_now and $many) {
             throw new ServerError(
-                message: "DateTimeField cannot set `auto_update_now` and `many` at the same time",
-                response_id: "DATETIME_FIELD_CANNOT_AUTO_UPDATE_NOW_WITH_MANY"
+                message: 'DateTimeField cannot set `auto_update_now` and `many` at the same time',
+                response_id: 'DATETIME_FIELD_CANNOT_AUTO_UPDATE_NOW_WITH_MANY',
             );
         }
-        
+
         # Construct the parent object for this field
         parent::__construct(
-            type: "string",
+            type: 'string',
             required: $required,
             unique: $unique,
             default: $default,
@@ -144,13 +144,13 @@ class DateTimeField extends Field {
             referenced_by: $referenced_by,
             conditions: $conditions,
             validators: $validators,
-            help_text: $help_text
+            help_text: $help_text,
         );
-        
+
         # Set the Fields value to now if $auto_add_now is enabled
         if ($this->auto_add_now) {
             $current_time = (new DateTime())->format($this->datetime_format);
-            $this->value = ($this->many) ? [$current_time] : $current_time;
+            $this->value = $this->many ? [$current_time] : $current_time;
         }
     }
 
@@ -159,16 +159,17 @@ class DateTimeField extends Field {
      * @param string $format The DateTime format of the $datetime string. (i.e. m/d/Y)
      * @return bool `true` when the datetime string is valid, `false` when it is not.
      */
-    public static function is_valid_datetime(string $datetime, string $format) : bool {
+    public static function is_valid_datetime(string $datetime, string $format): bool
+    {
         # Try to create a DateTime object with this datetime string and format, then check for errors
         $datetime_obj = DateTime::createFromFormat($format, $datetime);
         $errors = DateTime::getLastErrors();
-        
+
         # This is not a valid datetime string if there are warnings
-        if ($errors["warning_count"]) {
+        if ($errors['warning_count']) {
             return false;
         }
-        
+
         return $datetime_obj !== false;
     }
 
@@ -185,7 +186,7 @@ class DateTimeField extends Field {
             $this->value = (new DateTime())->format($this->datetime_format);
             return parent::_to_internal($this->value);
         }
-        
+
         # Otherwise, just return the value as usual
         return parent::_to_internal($representation_value);
     }
@@ -195,13 +196,14 @@ class DateTimeField extends Field {
      * @param mixed $internal_value The internal value from the pfSense configuration.
      * @return string The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value) : string {
+    protected function _from_internal(mixed $internal_value): string
+    {
         return strval($internal_value);
     }
 
     /**
      * Add extra validation to DateTimeFields to ensure the value matches the DateTime format.
-     * @param mixed $value The incoming 
+     * @param mixed $value The incoming
      */
     public function validate_extra(mixed $value)
     {
@@ -209,7 +211,7 @@ class DateTimeField extends Field {
         if (!$this->is_valid_datetime($value, $this->datetime_format)) {
             throw new ValidationError(
                 message: "Field `$this->name` must be a DateTime in format `$this->datetime_format`. Received `$value`",
-                response_id: "DATETIME_FIELD_MUST_MATCH_FORMAT"
+                response_id: 'DATETIME_FIELD_MUST_MATCH_FORMAT',
             );
         }
     }

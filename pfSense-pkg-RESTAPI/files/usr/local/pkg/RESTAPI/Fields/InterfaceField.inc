@@ -2,8 +2,8 @@
 
 namespace RESTAPI\Fields;
 
-require_once("RESTAPI/Fields/StringField.inc");
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/Fields/StringField.inc';
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 use RESTAPI\Core\Model;
@@ -75,43 +75,42 @@ class InterfaceField extends StringField
      * @param string $help_text Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
-        bool         $required = false,
-        bool         $unique = false,
-        mixed        $default = null,
+        bool $required = false,
+        bool $unique = false,
+        mixed $default = null,
         public array $interface_query = [],
-        public bool  $allow_interface_groups = false,
-        public bool  $allow_ipsec_interface = false,
-        public bool  $allow_openvpn_interface = false,
-        public bool  $allow_carp_interface = false,
-        public bool  $allow_localhost_interface = false,
-        bool         $allow_empty = false,
-        bool         $allow_null = false,
-        bool         $read_only = false,
-        bool         $write_only = false,
-        bool         $representation_only = false,
-        bool         $editable = true,
-        bool         $many = false,
-        int          $many_minimum = 1,
-        int          $many_maximum = 128,
-        string|null  $delimiter = ",",
-        string $verbose_name = "",
-        string $verbose_name_plural = "",
-        string $internal_name = "",
-        string $internal_namespace = "",
+        public bool $allow_interface_groups = false,
+        public bool $allow_ipsec_interface = false,
+        public bool $allow_openvpn_interface = false,
+        public bool $allow_carp_interface = false,
+        public bool $allow_localhost_interface = false,
+        bool $allow_empty = false,
+        bool $allow_null = false,
+        bool $read_only = false,
+        bool $write_only = false,
+        bool $representation_only = false,
+        bool $editable = true,
+        bool $many = false,
+        int $many_minimum = 1,
+        int $many_maximum = 128,
+        string|null $delimiter = ',',
+        string $verbose_name = '',
+        string $verbose_name_plural = '',
+        string $internal_name = '',
+        string $internal_namespace = '',
         array $referenced_by = [],
         array $conditions = [],
         array $validators = [],
-        string $help_text = ""
-    )
-    {
-        $this->represented_as = RESTAPI\Models\RESTAPISettings::get_pkg_config()["represent_interfaces_as"];
+        string $help_text = '',
+    ) {
+        $this->represented_as = RESTAPI\Models\RESTAPISettings::get_pkg_config()['represent_interfaces_as'];
 
         # Construct the parent Field object
         parent::__construct(
             required: $required,
             unique: $unique,
             default: $default,
-            choices_callable: "get_interface_choices",
+            choices_callable: 'get_interface_choices',
             allow_empty: $allow_empty,
             allow_null: $allow_null,
             editable: $editable,
@@ -129,7 +128,7 @@ class InterfaceField extends StringField
             referenced_by: $referenced_by,
             conditions: $conditions,
             validators: $validators,
-            help_text: $help_text
+            help_text: $help_text,
         );
     }
 
@@ -138,19 +137,20 @@ class InterfaceField extends StringField
      * @param mixed $internal_value The internal value from the pfSense configuration.
      * @return string The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value) : string {
+    protected function _from_internal(mixed $internal_value): string
+    {
         # Variables
-        $interfaces = Model::get_config("interfaces", []);
+        $interfaces = Model::get_config('interfaces', []);
 
         # Check if this value is an existing interface ID
         if (array_key_exists($internal_value, $interfaces)) {
             switch ($this->represented_as) {
-                case "id":
+                case 'id':
                     return $internal_value;
-                case "if":
-                    return $interfaces[$internal_value]["if"];
-                case "descr":
-                    return ($interfaces[$internal_value]["descr"]) ?: strtoupper($internal_value);
+                case 'if':
+                    return $interfaces[$internal_value]['if'];
+                case 'descr':
+                    return $interfaces[$internal_value]['descr'] ?: strtoupper($internal_value);
             }
         }
 
@@ -161,11 +161,10 @@ class InterfaceField extends StringField
     /**
      * Converts the field's representation value into it's internal pfSense value.
      */
-    protected function _to_internal(mixed $representation_value): array|null|string {
+    protected function _to_internal(mixed $representation_value): array|null|string
+    {
         # Query to find this interface using the interfaces representation field and value
-        $interface_query = NetworkInterface::query(
-            query_params: [$this->represented_as => $representation_value]
-        );
+        $interface_query = NetworkInterface::query(query_params: [$this->represented_as => $representation_value]);
 
         # Return the first matches' ID if found
         if ($interface_query->exists()) {
@@ -180,18 +179,19 @@ class InterfaceField extends StringField
      * Enumerates a list of every interface choice available to this Field.
      * @return array A list of every interface option available to this Field.
      */
-    public function get_interface_choices() : array {
+    public function get_interface_choices(): array
+    {
         # Variables
         $choices = [];
         $interface_query = NetworkInterface::query($this->interface_query);
-        $interface_groups = Model::get_config("ifgroups/ifgroupentry", []);
-        $virtual_ips = Model::get_config("virtualip/vip", []);
+        $interface_groups = Model::get_config('ifgroups/ifgroupentry', []);
+        $virtual_ips = Model::get_config('virtualip/vip', []);
 
         # Loop through each configured interface and check for a match
         foreach ($interface_query->model_objects as $interface) {
             $represented_as = $this->represented_as;
             # Use the interface's ID if interfaces are represented by `id`
-            if ($this->represented_as === "id") {
+            if ($this->represented_as === 'id') {
                 $choices[$interface->id] = $interface->descr->value;
             }
             # Otherwise, use the field interfaces are represented by
@@ -205,7 +205,7 @@ class InterfaceField extends StringField
         if ($this->allow_interface_groups) {
             # Loop through all existing interface groups and add their names
             foreach ($interface_groups as $interface_group) {
-                $choices[$interface_group["ifname"]] = $interface_group["ifname"];
+                $choices[$interface_group['ifname']] = $interface_group['ifname'];
             }
         }
 
@@ -215,25 +215,25 @@ class InterfaceField extends StringField
             # Loop through all existing interface groups and add their names
             foreach ($virtual_ips as $virtual_ip) {
                 # Only include CARP virtual iPs with unique IDs
-                if ($virtual_ip["mode"] === "carp" and $virtual_ip["uniqid"]) {
-                    $choices[$virtual_ip["uniqid"]] = $virtual_ip["uniqid"];
+                if ($virtual_ip['mode'] === 'carp' and $virtual_ip['uniqid']) {
+                    $choices[$virtual_ip['uniqid']] = $virtual_ip['uniqid'];
                 }
             }
         }
 
         # Allow the IPsec `enc0` interface if requested
         if ($this->allow_ipsec_interface) {
-            $choices["enc0"] = "IPsec";
+            $choices['enc0'] = 'IPsec';
         }
 
         # Allow the OpenVPN `openvpn` interface if requested
         if ($this->allow_openvpn_interface) {
-            $choices["openvpn"] = "OpenVPN";
+            $choices['openvpn'] = 'OpenVPN';
         }
 
         # Allow the Localhost `lo0` interface if requested
         if ($this->allow_localhost_interface) {
-            $choices["lo0"] = "Localhost";
+            $choices['lo0'] = 'Localhost';
         }
 
         return $choices;
@@ -244,7 +244,8 @@ class InterfaceField extends StringField
      * @return array|string An array of the internal interfaces assigned to this Field (e.g. ["wan", "lan", "opt1"])
      * when this is a `many` Field, or the internal interface value as a string
      */
-    public function to_internal_interfaces() : array|string {
+    public function to_internal_interfaces(): array|string
+    {
         # Return the internal interface values for each interface value when this is a `many` Field
         if ($this->many) {
             return explode($this->delimiter, $this->to_internal());
@@ -261,7 +262,7 @@ class InterfaceField extends StringField
      * @throws NotFoundError when a NetworkInterface object could not be found using one or more of this Field's
      * assigned values.
      */
-    public function get_related_model() : Model|null
+    public function get_related_model(): Model|null
     {
         # Query for the NetworkInterface object that matches our current value
         $query = NetworkInterface::query([$this->represented_as => $this->value]);
@@ -273,9 +274,7 @@ class InterfaceField extends StringField
 
         # Otherwise return null
         return null;
-        
     }
-
 
     /**
      * Fetches all NetworkInterface objects associated with this Field's current values when $many is enabled.

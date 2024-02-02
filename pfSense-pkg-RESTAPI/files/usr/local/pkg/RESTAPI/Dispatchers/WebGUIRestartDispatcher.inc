@@ -17,7 +17,6 @@ class WebGUIRestartDispatcher extends Dispatcher
     {
         # Wait a second to prevent prematurely killing API calls
         sleep(3);
-        new Command("/etc/rc.restart_webgui");
+        new Command('/etc/rc.restart_webgui');
     }
-
 }

@@ -8,16 +8,16 @@ use RESTAPI\Responses\ValidationError;
 
 class JSONContentHandler extends ContentHandler
 {
-    public string $mime_type = "application/json";
+    public string $mime_type = 'application/json';
 
     public function get_content(): string
     {
-        return (file_get_contents('php://input')) ?: "";
+        return file_get_contents('php://input') ?: '';
     }
 
     protected function _encode(mixed $content = null): mixed
     {
-        return ($content) ? json_encode($content) : [];
+        return $content ? json_encode($content) : [];
     }
 
     protected function _decode(mixed $content = null): mixed
@@ -30,14 +30,11 @@ class JSONContentHandler extends ContentHandler
         # Try to decode the JSON string, throw a not acceptable error if the string is not JSON encoded.
         try {
             return json_decode($content, associative: true, flags: JSON_THROW_ON_ERROR);
-        }
-        catch (JsonException) {
+        } catch (JsonException) {
             throw new ValidationError(
-                message: "Request body could not be decoded as JSON.",
-                response_id: "JSON_CONTENT_HANDLER_COULD_NOT_DECODE_JSON"
+                message: 'Request body could not be decoded as JSON.',
+                response_id: 'JSON_CONTENT_HANDLER_COULD_NOT_DECODE_JSON',
             );
         }
     }
-
-
 }

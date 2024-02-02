@@ -47,22 +47,21 @@ class NestedModelField extends Field
         string $model_class,
         bool $required = false,
         mixed $default = null,
-        bool $allow_empty = false, 
-        bool $allow_null = false, 
-        bool $editable = true, 
-        bool $read_only = false, 
-        bool $write_only = false, 
-        string $verbose_name = "",
-        string $verbose_name_plural = "",
-        array $conditions = [], 
-        string $help_text = ""
-    )
-    {
+        bool $allow_empty = false,
+        bool $allow_null = false,
+        bool $editable = true,
+        bool $read_only = false,
+        bool $write_only = false,
+        string $verbose_name = '',
+        string $verbose_name_plural = '',
+        array $conditions = [],
+        string $help_text = '',
+    ) {
         # Assign attributes specific to this Field
         $this->model_class = "\\RESTAPI\\Models\\$model_class";
         $this->model_class_short = $model_class;
         $this->model = new $this->model_class();
-        $config_path = explode("/", $this->model->config_path);
+        $config_path = explode('/', $this->model->config_path);
 
         # Initialize the validation ModelSet. This is used to keep track of nested Model objects that have already
         # been validated.
@@ -70,7 +69,7 @@ class NestedModelField extends Field
 
         # Construct the parent Field object with desired parameters.
         parent::__construct(
-            type: "array",
+            type: 'array',
             required: $required,
             default: $default,
             allow_empty: $allow_empty,
@@ -84,12 +83,12 @@ class NestedModelField extends Field
             verbose_name: $verbose_name,
             verbose_name_plural: $verbose_name_plural,
             internal_name: array_pop($config_path),
-            internal_namespace: implode("/", $config_path),
+            internal_namespace: implode('/', $config_path),
             conditions: $conditions,
-            help_text: $help_text
+            help_text: $help_text,
         );
     }
-    
+
     /**
      * Validates the incoming value using the assigned Model's `validate()` method.
      * @throws ValidationError If any Response error occurred when validating the nested Model object
@@ -97,12 +96,12 @@ class NestedModelField extends Field
     public function validate_extra(mixed $value)
     {
         # Create a new Model object for this value and validate it. Remove any assigned IDs
-        unset($value["id"]);
-        unset($value["parent_id"]);
-        
+        unset($value['id']);
+        unset($value['parent_id']);
+
         # Construct the model without specifying IDs to prevent the object or its parent from being loaded
         $model = new $this->model_class(data: $value);
-        
+
         # Assign the IDs and parent manually using this Field's context in case it does not yet exist in config
         $model->parent_id = $this->context->id;
         $model->parent_model = $this->context;
@@ -112,11 +111,10 @@ class NestedModelField extends Field
         try {
             $model->validate(skip_parent: true, modelset: $this->validation_modelset);
             $this->validation_modelset->model_objects[] = $model;
-        }
-        catch (Response $resp) {
+        } catch (Response $resp) {
             throw new ValidationError(
                 message: "Field `$this->name` encountered a nested validation error: $resp->message",
-                response_id: $resp->response_id
+                response_id: $resp->response_id,
             );
         }
 
@@ -133,9 +131,11 @@ class NestedModelField extends Field
         # Empty any existing ModelSet entries in the event this is a subsequent `validate()` call.
         $this->validation_modelset->model_objects = [];
         $return_value = parent::validate();
-        
+
         # Overwrite the existing `value` with the representation of the validated model object
-        $this->value = ($this->many) ? $this->validation_modelset->to_representation() : $this->validation_modelset->first()->to_representation();
+        $this->value = $this->many
+            ? $this->validation_modelset->to_representation()
+            : $this->validation_modelset->first()->to_representation();
         return $return_value;
     }
 
@@ -153,8 +153,8 @@ class NestedModelField extends Field
             $internal_objects = [];
             foreach ($this->value as $representation_data) {
                 # Remove any assigned IDs
-                unset($representation_data["id"]);
-                unset($representation_data["parent_id"]);
+                unset($representation_data['id']);
+                unset($representation_data['parent_id']);
                 $representation_object = new $this->model(data: $representation_data);
                 $internal_objects[] = $representation_object->to_internal();
             }
@@ -171,7 +171,8 @@ class NestedModelField extends Field
      * Converts any nested Model objects from their internal values to their representation values.
      * @param string|null $internal_value The raw internal config value to convert to a representation value.
      */
-    public function from_internal(mixed $internal_value) {
+    public function from_internal(mixed $internal_value)
+    {
         # Create the nested Model object
         $model = new $this->model_class();
 
@@ -198,9 +199,10 @@ class NestedModelField extends Field
 
     /**
      * Sorts the nested Model data use the nested Model's `sort_option` and `sort_by_field` setting. This method
-     * closely resembles the Model->sort() method, but does not require values to be set in config beforehand. 
+     * closely resembles the Model->sort() method, but does not require values to be set in config beforehand.
      */
-    public function sort() {
+    public function sort()
+    {
         # Only sort this Field's values if this is a `many` field and it has a value
         if ($this->many and $this->value) {
             # Do not sort if there is no `sort_option` or `sort_by_field` set for this nested Model
@@ -214,7 +216,7 @@ class NestedModelField extends Field
                 if (!empty($object[$this->model->sort_by_field])) {
                     $criteria[$id] = $object[$this->model->sort_by_field];
                 } else {
-                    $criteria[$id] = "";
+                    $criteria[$id] = '';
                 }
             }
 
@@ -226,35 +228,35 @@ class NestedModelField extends Field
     }
 
     /**
-     * Converts this NestedModelField object to a PHP array representation of an OpenAPI schema property configuration. 
+     * Converts this NestedModelField object to a PHP array representation of an OpenAPI schema property configuration.
      * This is used when auto-generating API documentation.
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this field as an OpenAPI schema property configuration.
      */
-    public function to_openapi_property() : array {
+    public function to_openapi_property(): array
+    {
         # Assign primitive property attributes
         $openapi_property = [];
-        $openapi_property["description"] = $this->help_text."<br>".$this->get_conditions_text();
-        $openapi_property["nullable"] = $this->allow_null;
-        $openapi_property["readOnly"] = $this->read_only;
-        $openapi_property["writeOnly"] = $this->write_only;
+        $openapi_property['description'] = $this->help_text . '<br>' . $this->get_conditions_text();
+        $openapi_property['nullable'] = $this->allow_null;
+        $openapi_property['readOnly'] = $this->read_only;
+        $openapi_property['writeOnly'] = $this->write_only;
 
         # Reference the nested Model schema as the items of this property for `many` Fields
         if ($this->many) {
-            $openapi_property["type"] = $this->type;
-            $openapi_property["minItems"] = $this->many_minimum;
-            $openapi_property["maxItems"] = $this->many_maximum;
-            $openapi_property["items"] = [
-                "allOf" => [
+            $openapi_property['type'] = $this->type;
+            $openapi_property['minItems'] = $this->many_minimum;
+            $openapi_property['maxItems'] = $this->many_maximum;
+            $openapi_property['items'] = [
+                'allOf' => [
                     ['$ref' => "#/components/schemas/$this->model_class_short"],
-                    ["type" => "object", "required" => $this->model->get_fields(required_only: true)]
-                ]
+                    ['type' => 'object', 'required' => $this->model->get_fields(required_only: true)],
+                ],
             ];
-        }
-        else {
-            $openapi_property["allOf"] = [
+        } else {
+            $openapi_property['allOf'] = [
                 ['$ref' => "#/components/schemas/$this->model_class_short"],
-                ["type" => "object", "required" => $this->model->get_fields(required_only: true)]
+                ['type' => 'object', 'required' => $this->model->get_fields(required_only: true)],
             ];
         }
 

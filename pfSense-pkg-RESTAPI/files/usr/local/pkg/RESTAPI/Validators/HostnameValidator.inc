@@ -2,12 +2,13 @@
 
 namespace RESTAPI\Validators;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 use RESTAPI\Responses\ValidationError;
 
-class HostnameValidator extends RESTAPI\Core\Validator {
+class HostnameValidator extends RESTAPI\Core\Validator
+{
     public bool $allow_hostname;
     public bool $allow_domain;
     public bool $allow_fqdn;
@@ -25,7 +26,7 @@ class HostnameValidator extends RESTAPI\Core\Validator {
         bool $allow_hostname = true,
         bool $allow_domain = false,
         bool $allow_fqdn = false,
-        array $allow_keywords = []
+        array $allow_keywords = [],
     ) {
         $this->allow_hostname = $allow_hostname;
         $this->allow_domain = $allow_domain;
@@ -39,7 +40,8 @@ class HostnameValidator extends RESTAPI\Core\Validator {
      * @param string $field_name The field name of the value being validated. This is used for error messages.
      * @throws ValidationError When the value is not a valid hostname
      */
-    public function validate(mixed $value, string $field_name = "") {
+    public function validate(mixed $value, string $field_name = '')
+    {
         # Allow this value if it matches an allowed keyword exactly
         if (in_array($value, $this->allow_keywords)) {
             return;
@@ -63,7 +65,7 @@ class HostnameValidator extends RESTAPI\Core\Validator {
         # Otherwise throw a ValidationError, this value is not valid
         throw new ValidationError(
             message: "Field `$field_name` must be a valid hostname, received `$value`.",
-            response_id: "HOSTNAME_VALIDATOR_FAILED"
+            response_id: 'HOSTNAME_VALIDATOR_FAILED',
         );
     }
 }

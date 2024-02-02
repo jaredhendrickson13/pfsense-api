@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Fields;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 
@@ -10,8 +10,8 @@ use RESTAPI;
  * Defines a UIDField class that extends the Core Field method. This field will automatically populate a unique ID that
  * is immutable.
  */
-class UIDField extends RESTAPI\Core\Field {
-    
+class UIDField extends RESTAPI\Core\Field
+{
     /**
      * Defines the UIDField object and sets its options.
      * @param string $prefix A specific string to prefix to the generated UID.
@@ -42,21 +42,20 @@ class UIDField extends RESTAPI\Core\Field {
      * @param string $help_text Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
-        string $prefix = "",
+        string $prefix = '',
         bool $sensitive = false,
         bool $representation_only = false,
-        string $verbose_name = "",
-        string $verbose_name_plural = "",
-        string $internal_name = "",
-        string $internal_namespace = "",
+        string $verbose_name = '',
+        string $verbose_name_plural = '',
+        string $internal_name = '',
+        string $internal_namespace = '',
         array $referenced_by = [],
         array $conditions = [],
         array $validators = [],
-        string $help_text = ""
-    )
-    {
+        string $help_text = '',
+    ) {
         parent::__construct(
-            type: "string",
+            type: 'string',
             unique: true,
             default: uniqid(prefix: $prefix),
             editable: false,
@@ -70,7 +69,7 @@ class UIDField extends RESTAPI\Core\Field {
             referenced_by: $referenced_by,
             conditions: $conditions,
             validators: $validators,
-            help_text: $help_text
+            help_text: $help_text,
         );
     }
 
@@ -79,7 +78,8 @@ class UIDField extends RESTAPI\Core\Field {
      * @param mixed $internal_value The internal value from the pfSense configuration.
      * @return string The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value) : string {
+    protected function _from_internal(mixed $internal_value): string
+    {
         return strval($internal_value);
     }
 }

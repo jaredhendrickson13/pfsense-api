@@ -2,17 +2,18 @@
 
 namespace RESTAPI\Endpoints;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Endpoint;
 
 class FirewallNATOutboundModeEndpoint extends Endpoint
 {
-    public function __construct() {
+    public function __construct()
+    {
         # Set Endpoint attributes
-        $this->url = "/api/v2/firewall/nat/outbound/mode";
-        $this->model_name = "OutboundNATMode";
-        $this->request_method_options = ["GET", "PATCH"];
+        $this->url = '/api/v2/firewall/nat/outbound/mode';
+        $this->model_name = 'OutboundNATMode';
+        $this->request_method_options = ['GET', 'PATCH'];
 
         # Construct the parent Endpoint object
         parent::__construct();

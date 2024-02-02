@@ -15,7 +15,6 @@ class SystemHaltDispatcher extends Dispatcher
      */
     public function process(mixed ...$arguments): void
     {
-        new Command("shutdown -h +15s");
+        new Command('shutdown -h +15s');
     }
-
 }

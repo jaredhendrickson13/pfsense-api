@@ -11,31 +11,31 @@ class APICoreCacheTestCase extends TestCase
     /**
      * Checks that a ServerError is thrown if the `get_data_to_cache()` method is not overwritten by a child class.
      */
-    public function test_get_data_to_cache_must_be_overwritten(): void {
+    public function test_get_data_to_cache_must_be_overwritten(): void
+    {
         $this->assert_throws_response(
-            response_id: "CACHE_GET_DATA_TO_CACHE_MUST_BE_OVERWRITTEN",
+            response_id: 'CACHE_GET_DATA_TO_CACHE_MUST_BE_OVERWRITTEN',
             code: 500,
             callable: function () {
-                (new Cache)->process();
-            }
+                (new Cache())->process();
+            },
         );
     }
 
     /**
      * Checks that the `get_file_path()` method correctly obtains the file path for the Cache's cache file.
      */
-    public function test_get_file_path(): void {
+    public function test_get_file_path(): void
+    {
         $cache = new Cache();
-        $this->assert_equals(
-            $cache->get_file_path(),
-            Cache::CACHE_DIR."Cache.json"
-        );
+        $this->assert_equals($cache->get_file_path(), Cache::CACHE_DIR . 'Cache.json');
     }
 
     /**
      * Checks that the `read()` method correctly reads the cached data from the cache file.
      */
-    public function test_read(): void {
+    public function test_read(): void
+    {
         # Use the releases cache to test this
         $cache = new RESTAPIVersionReleasesCache();
         $cache->process();
@@ -45,7 +45,8 @@ class APICoreCacheTestCase extends TestCase
     /**
      * Checks that the `process()` method correctly refreshes the cache file with new data.
      */
-    public function test_process(): void {
+    public function test_process(): void
+    {
         # Use the releases cache to test this
         $cache = new RESTAPIVersionReleasesCache();
 

@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Fields;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 use RESTAPI\Core\Field;
@@ -14,8 +14,9 @@ use RESTAPI\Responses\ValidationError;
  * Defines a PortField class that extends the Core Field method. This Field adds validation and representation for
  * TCP/UDP port values and ranges.
  */
-class PortField extends Field {
-    const REPR_RANGE_CHAR = ":";
+class PortField extends Field
+{
+    const REPR_RANGE_CHAR = ':';
     public bool $allow_alias;
     public bool $allow_range;
     public string $internal_range_char;
@@ -78,42 +79,41 @@ class PortField extends Field {
      * @param string $help_text Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
-        bool    $required = false,
-        bool    $unique = false,
-        mixed   $default = null,
-        array   $choices = [],
-        string  $choices_callable = "",
-        bool    $allow_alias = false,
-        bool    $allow_range = false, 
-        string  $internal_range_char = "-",
-        bool    $allow_empty = false,
-        bool    $allow_null = false,
-        bool    $editable = true,
-        bool    $read_only = false,
-        bool    $write_only = false,
-        bool    $representation_only = false,
-        bool    $many = false,
-        int     $many_minimum = 1,
-        int     $many_maximum = 128,
-        ?string $delimiter = ",",
-        string  $verbose_name = "",
-        string  $verbose_name_plural = "",
-        string  $internal_name = "",
-        string  $internal_namespace = "",
-        array   $referenced_by = [],
-        array   $conditions = [],
-        array   $validators = [],
-        string  $help_text = ""
-    )
-    {
+        bool $required = false,
+        bool $unique = false,
+        mixed $default = null,
+        array $choices = [],
+        string $choices_callable = '',
+        bool $allow_alias = false,
+        bool $allow_range = false,
+        string $internal_range_char = '-',
+        bool $allow_empty = false,
+        bool $allow_null = false,
+        bool $editable = true,
+        bool $read_only = false,
+        bool $write_only = false,
+        bool $representation_only = false,
+        bool $many = false,
+        int $many_minimum = 1,
+        int $many_maximum = 128,
+        ?string $delimiter = ',',
+        string $verbose_name = '',
+        string $verbose_name_plural = '',
+        string $internal_name = '',
+        string $internal_namespace = '',
+        array $referenced_by = [],
+        array $conditions = [],
+        array $validators = [],
+        string $help_text = '',
+    ) {
         # Set properties specific to this field
         $this->allow_alias = $allow_alias;
         $this->allow_range = $allow_range;
         $this->internal_range_char = $internal_range_char;
-        
+
         # Construct the parent object for this field
         parent::__construct(
-            type: "string",
+            type: 'string',
             required: $required,
             unique: $unique,
             default: $default,
@@ -136,39 +136,40 @@ class PortField extends Field {
             referenced_by: $referenced_by,
             conditions: $conditions,
             validators: $validators,
-            help_text: $help_text
+            help_text: $help_text,
         );
 
         # To prevent the need to add redundant openapi to the help text, append a standard set of help text.
-        $this->help_text .= " Valid value options are: ". $this->get_valid_opts_str();
+        $this->help_text .= ' Valid value options are: ' . $this->get_valid_opts_str();
     }
 
     /**
      * Adds extra validation to determine if this value should be accepted given the current Field settings.
      */
-    public function validate_extra(mixed $value) {
+    public function validate_extra(mixed $value)
+    {
         # Allow this value if it is an existing port alias name and alias values are allowed
-        if ($this->allow_alias and FirewallAlias::query(["type" => "port", "name" => $value])->exists()) {
-            $this->labels[] = "is_alias";
+        if ($this->allow_alias and FirewallAlias::query(['type' => 'port', 'name' => $value])->exists()) {
+            $this->labels[] = 'is_alias';
             return;
         }
-        
+
         # Allow this value if it is a valid port range and ranges are allowed
         if ($this->allow_range and is_portrange($value)) {
-            $this->labels[] = "is_portrange";
+            $this->labels[] = 'is_portrange';
             return;
         }
-        
+
         # Always allow singular port values
         if (is_port($value)) {
-            $this->labels[] = "is_port";
+            $this->labels[] = 'is_port';
             return;
         }
-        
+
         # Any other value should be considered invalid, throw an error
         throw new ValidationError(
-            message: "Field `$this->name` contains invalid port value `$value`. ".$this->get_valid_opts_str(),
-            response_id: "PORT_FIELD_INVALID"
+            message: "Field `$this->name` contains invalid port value `$value`. " . $this->get_valid_opts_str(),
+            response_id: 'PORT_FIELD_INVALID',
         );
     }
 
@@ -177,10 +178,11 @@ class PortField extends Field {
      * help messages depending on this Field's current settings.
      * @return string A string representation of values that are considered valid for this Field.
      */
-    private function get_valid_opts_str() : string {
-        $opts_str = "Valid options are: a TCP/UDP port number, ";
-        $opts_str .= ($this->allow_range) ? "a TCP/UDP port range separated by `".self::REPR_RANGE_CHAR."`, " : "";
-        $opts_str .= ($this->allow_alias) ? "an existing port type firewall alias, " : "";
+    private function get_valid_opts_str(): string
+    {
+        $opts_str = 'Valid options are: a TCP/UDP port number, ';
+        $opts_str .= $this->allow_range ? 'a TCP/UDP port range separated by `' . self::REPR_RANGE_CHAR . '`, ' : '';
+        $opts_str .= $this->allow_alias ? 'an existing port type firewall alias, ' : '';
 
         # Return the value but replace the trailing ", " characters
         return substr($opts_str, 0, -2);
@@ -197,15 +199,11 @@ class PortField extends Field {
         if ($representation_value === null) {
             return null;
         }
-        
+
         # Otherwise, replace the representation range character to the internal range character
-        $representation_value = str_replace(
-            self::REPR_RANGE_CHAR, 
-            $this->internal_range_char, 
-            $representation_value
-        );
-        
-        return parent::_to_internal($representation_value); 
+        $representation_value = str_replace(self::REPR_RANGE_CHAR, $this->internal_range_char, $representation_value);
+
+        return parent::_to_internal($representation_value);
     }
 
     /**

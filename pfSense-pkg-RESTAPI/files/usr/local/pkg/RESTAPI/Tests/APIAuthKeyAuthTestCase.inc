@@ -14,17 +14,18 @@ class APIAuthKeyAuthTestCase extends TestCase
     /**
      * Checks that the _authenticate_method() correctly determines whether a client successfully authenticates or not.
      */
-    public function test_authenticate(): void {
+    public function test_authenticate(): void
+    {
         # Simulate success key auth
         $jwt = new RESTAPIKey();
-        $jwt->client->username = "admin";
+        $jwt->client->username = 'admin';
         $jwt->create();
-        $_SERVER["HTTP_AUTHORIZATION"] = "KeyAuth ". $jwt->key->value;
+        $_SERVER['HTTP_AUTHORIZATION'] = 'KeyAuth ' . $jwt->key->value;
         $auth = new KeyAuth();
         $this->assert_is_true($auth->authenticate());
 
         # Simulate a client submitting invalid key auth credentials
-        $_SERVER["HTTP_AUTHORIZATION"] = "KeyAuth badtoken";
+        $_SERVER['HTTP_AUTHORIZATION'] = 'KeyAuth badtoken';
         $auth = new KeyAuth();
         $this->assert_is_false($auth->authenticate());
     }

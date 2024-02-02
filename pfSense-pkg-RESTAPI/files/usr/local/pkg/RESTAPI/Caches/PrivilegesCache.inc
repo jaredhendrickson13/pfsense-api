@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Caches;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Cache;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
@@ -22,17 +22,17 @@ class PrivilegesCache extends Cache
         $privs = [];
 
         # Obtain privileges for each Endpoint class
-        foreach(get_classes_from_namespace("\\RESTAPI\\Endpoints\\") as $endpoint_class) {
+        foreach (get_classes_from_namespace('\\RESTAPI\\Endpoints\\') as $endpoint_class) {
             $endpoint_object = new $endpoint_class();
             $privs += $endpoint_object->generate_pfsense_privs();
         }
 
         # Obtain privileges for each Endpoint class
-        foreach(get_classes_from_namespace("\\RESTAPI\\Forms\\") as $endpoint_class) {
+        foreach (get_classes_from_namespace('\\RESTAPI\\Forms\\') as $endpoint_class) {
             $endpoint_object = new $endpoint_class();
             $privs += $endpoint_object->generate_pfsense_privs();
         }
-        
+
         return $privs;
     }
 }

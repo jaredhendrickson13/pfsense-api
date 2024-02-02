@@ -2,12 +2,13 @@
 
 namespace RESTAPI\Validators;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 use RESTAPI\Responses\ValidationError;
 
-class GatewayValidator extends RESTAPI\Core\Validator {
+class GatewayValidator extends RESTAPI\Core\Validator
+{
     public bool $allow_ipv4;
     public bool $allow_ipv6;
     public bool $allow_empty;
@@ -21,7 +22,10 @@ class GatewayValidator extends RESTAPI\Core\Validator {
      * interface ID (e.g. wan, lan, opt1) or be left blank to allow any interface. This value is passed in by reference.
      */
     public function __construct(
-        bool $allow_ipv4 = true, bool $allow_ipv6 = true, bool $allow_empty = true, string|null &$interface = ""
+        bool $allow_ipv4 = true,
+        bool $allow_ipv6 = true,
+        bool $allow_empty = true,
+        string|null &$interface = '',
     ) {
         $this->allow_ipv4 = $allow_ipv4;
         $this->allow_ipv6 = $allow_ipv6;
@@ -35,9 +39,10 @@ class GatewayValidator extends RESTAPI\Core\Validator {
      * @param string $field_name The field name of the value being validated. This is used for error messages.
      * @throws \RESTAPI\Responses\ValidationError When the value is not a valid gateway.
      */
-    public function validate(mixed $value, string $field_name = "") {
+    public function validate(mixed $value, string $field_name = '')
+    {
         # Allow empty values if requested
-        if ($this->allow_empty and $value === "") {
+        if ($this->allow_empty and $value === '') {
             return;
         }
 
@@ -47,19 +52,19 @@ class GatewayValidator extends RESTAPI\Core\Validator {
         # Loop through each gateway and see if name matches
         foreach ($gateways as $gateway) {
             # Continue if this value does not match this gateway's name
-            if ($value != $gateway["name"]) {
+            if ($value != $gateway['name']) {
                 continue;
             }
             # Continue if this is an IPv4 gateway but IPv4 gateways are not allowed
-            elseif (!$this->allow_ipv4 and $gateway["ipprotocol"] === "inet") {
+            elseif (!$this->allow_ipv4 and $gateway['ipprotocol'] === 'inet') {
                 continue;
             }
             # Continue if this is an IPv6 gateway but IPv6 gateways are not allowed
-            elseif (!$this->allow_ipv6 and $gateway["ipprotocol"] === "inet6") {
+            elseif (!$this->allow_ipv6 and $gateway['ipprotocol'] === 'inet6') {
                 continue;
             }
             # Continue if only gateways of a specific interface are allowed
-            elseif ($this->interface and $this->interface !== $gateway["friendlyiface"]) {
+            elseif ($this->interface and $this->interface !== $gateway['friendlyiface']) {
                 continue;
             }
 
@@ -67,10 +72,10 @@ class GatewayValidator extends RESTAPI\Core\Validator {
             return;
         }
 
-    # If the value was not allowed from an earlier statement, throw a validation error
+        # If the value was not allowed from an earlier statement, throw a validation error
         throw new ValidationError(
             message: "Field `$field_name` must be a valid gateway, received `$value`.",
-            response_id: "GATEWAY_VALIDATOR_FAILED"
+            response_id: 'GATEWAY_VALIDATOR_FAILED',
         );
     }
 }

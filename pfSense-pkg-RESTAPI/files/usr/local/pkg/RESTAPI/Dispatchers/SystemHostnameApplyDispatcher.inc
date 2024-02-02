@@ -23,8 +23,7 @@ class SystemHostnameApplyDispatcher extends Dispatcher
         # Restart DNS server services if configured
         if (Model::is_config_enabled('dnsmasq')) {
             services_dnsmasq_configure();
-        }
-        elseif (Model::is_config_enabled('unbound')) {
+        } elseif (Model::is_config_enabled('unbound')) {
             services_unbound_configure();
         }
 

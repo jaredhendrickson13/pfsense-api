@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Fields;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 use RESTAPI\Core\Field;
@@ -12,7 +12,8 @@ use RESTAPI\Responses\ServerError;
  * Defines a Base64Field class that extends the Core Field method. This Field adds validation and representation for
  * Base64 encoded Model Fields.
  */
-class Base64Field extends Field {
+class Base64Field extends Field
+{
     /**
      * Defines the Base64Field object and sets its options.
      * @param bool $required If `true`, this field is required to have a value at all times.
@@ -71,7 +72,7 @@ class Base64Field extends Field {
         bool $unique = false,
         mixed $default = null,
         array $choices = [],
-        string $choices_callable = "",
+        string $choices_callable = '',
         bool $allow_empty = false,
         bool $allow_null = false,
         bool $editable = true,
@@ -82,20 +83,19 @@ class Base64Field extends Field {
         bool $many = false,
         int $many_minimum = 1,
         int $many_maximum = 128,
-        string|null $delimiter = ",",
-        string $verbose_name = "",
-        string $verbose_name_plural = "",
-        string $internal_name = "",
-        string $internal_namespace = "",
+        string|null $delimiter = ',',
+        string $verbose_name = '',
+        string $verbose_name_plural = '',
+        string $internal_name = '',
+        string $internal_namespace = '',
         array $referenced_by = [],
         array $conditions = [],
         array $validators = [],
-        string $help_text = ""
-    )
-    {
+        string $help_text = '',
+    ) {
         # Construct the parent object for this field
         parent::__construct(
-            type: "string",
+            type: 'string',
             required: $required,
             unique: $unique,
             default: $default,
@@ -119,10 +119,10 @@ class Base64Field extends Field {
             referenced_by: $referenced_by,
             conditions: $conditions,
             validators: $validators,
-            help_text: $help_text
+            help_text: $help_text,
         );
     }
-    
+
     /**
      * Converts the represented value into the base64 encoded internal pfSense value.
      * @param mixed $representation_value The value to convert into it's internal form.

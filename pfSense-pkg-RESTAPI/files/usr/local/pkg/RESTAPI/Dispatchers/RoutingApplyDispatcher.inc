@@ -33,7 +33,7 @@ class RoutingApplyDispatcher extends Dispatcher
         system_resolvconf_generate();
         filter_configure();
         setup_gateways_monitor();
-        send_event("service reload dyndnsall");
-        clear_subsystem_dirty("staticroutes");
+        send_event('service reload dyndnsall');
+        clear_subsystem_dirty('staticroutes');
     }
 }

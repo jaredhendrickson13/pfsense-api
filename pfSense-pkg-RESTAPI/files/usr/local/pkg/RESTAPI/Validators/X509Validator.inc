@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Validators;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Validator;
 use RESTAPI\Responses\ValidationError;
@@ -12,16 +12,16 @@ use RESTAPI\Responses\ValidationError;
  */
 class X509Validator extends Validator
 {
-    const CRT_BEGIN = "BEGIN CERTIFICATE";
-    const CRT_END = "BEGIN CERTIFICATE";
-    const CSR_BEGIN = "BEGIN CERTIFICATE REQUEST";
-    const CSR_END = "END CERTIFICATE REQUEST";
-    const CSR_BEGIN_NEW = "BEGIN NEW CERTIFICATE REQUEST";
-    const CSR_END_NEW = "END NEW CERTIFICATE REQUEST";
-    const PRV_BEGIN = "BEGIN PRIVATE KEY";
-    const PRV_END = "END PRIVATE KEY";
-    const ECPRV_BEGIN = "BEGIN EC PRIVATE KEY";
-    const ECPRV_END = "END EC PRIVATE KEY";
+    const CRT_BEGIN = 'BEGIN CERTIFICATE';
+    const CRT_END = 'BEGIN CERTIFICATE';
+    const CSR_BEGIN = 'BEGIN CERTIFICATE REQUEST';
+    const CSR_END = 'END CERTIFICATE REQUEST';
+    const CSR_BEGIN_NEW = 'BEGIN NEW CERTIFICATE REQUEST';
+    const CSR_END_NEW = 'END NEW CERTIFICATE REQUEST';
+    const PRV_BEGIN = 'BEGIN PRIVATE KEY';
+    const PRV_END = 'END PRIVATE KEY';
+    const ECPRV_BEGIN = 'BEGIN EC PRIVATE KEY';
+    const ECPRV_END = 'END EC PRIVATE KEY';
 
     /**
      * Constructs the X509Validator object.
@@ -34,9 +34,9 @@ class X509Validator extends Validator
         public bool $allow_crt = true,
         public bool $allow_csr = false,
         public bool $allow_prv = false,
-        public bool $allow_ecprv = false
-    )
-    {}
+        public bool $allow_ecprv = false,
+    ) {
+    }
 
     /**
      * Checks if a given value is a valid X509 string.
@@ -44,7 +44,7 @@ class X509Validator extends Validator
      * @param string $field_name The name of the field being validated.
      * @throws ValidationError When the $value is not a valid X509 string.
      */
-    public function validate(mixed $value, string $field_name = ""): void
+    public function validate(mixed $value, string $field_name = ''): void
     {
         # Accept X509 certificates if allowed
         if ($this->allow_crt and str_contains($value, self::CRT_BEGIN) and str_contains($value, self::CRT_END)) {
@@ -55,7 +55,11 @@ class X509Validator extends Validator
             return;
         }
         # Accept X509 New CSRs if allowed
-        if ($this->allow_csr and str_contains($value, self::CSR_BEGIN_NEW) and str_contains($value, self::CSR_END_NEW)) {
+        if (
+            $this->allow_csr and
+            str_contains($value, self::CSR_BEGIN_NEW) and
+            str_contains($value, self::CSR_END_NEW)
+        ) {
             return;
         }
         # Accept X509 Private Keys if allowed
@@ -70,20 +74,21 @@ class X509Validator extends Validator
         # Throw a validation error if no previous statements were matched
         throw new ValidationError(
             message: "Field `$field_name` is not a valid X509 string. Valid X509 types are: [{$this->get_options_str()}]",
-            response_id: "X509_VALIDATOR_INVALID_VALUE"
+            response_id: 'X509_VALIDATOR_INVALID_VALUE',
         );
     }
 
     /**
      * Uses the `allow_*` properties to format a string of value options this validator will accept.
      */
-    private function get_options_str(): string {
+    private function get_options_str(): string
+    {
         $options = [];
-        $options += ($this->allow_crt) ? ["certificate"] : [];
-        $options += ($this->allow_csr) ? ["certificate signing request"] : [];
-        $options += ($this->allow_prv) ? ["private key"] : [];
-        $options += ($this->allow_ecprv) ? ["EC private key"] : [];
-        return implode(", ", $options);
+        $options += $this->allow_crt ? ['certificate'] : [];
+        $options += $this->allow_csr ? ['certificate signing request'] : [];
+        $options += $this->allow_prv ? ['private key'] : [];
+        $options += $this->allow_ecprv ? ['EC private key'] : [];
+        return implode(', ', $options);
     }
 
     /**
@@ -92,9 +97,10 @@ class X509Validator extends Validator
      * @param string $private_key the x509 private key to evaluate
      * @returns bool true if the public key and private key are matching key pairs.
      */
-    public static function is_matching_keypair(string $public_key, string $private_key): bool {
-        $crt_public_key = cert_get_publickey($public_key, decode: false, type: "crt");
-        $prv_public_key = cert_get_publickey($private_key, decode: false, type: "prv");
+    public static function is_matching_keypair(string $public_key, string $private_key): bool
+    {
+        $crt_public_key = cert_get_publickey($public_key, decode: false, type: 'crt');
+        $prv_public_key = cert_get_publickey($private_key, decode: false, type: 'prv');
         return $crt_public_key === $prv_public_key;
     }
 }

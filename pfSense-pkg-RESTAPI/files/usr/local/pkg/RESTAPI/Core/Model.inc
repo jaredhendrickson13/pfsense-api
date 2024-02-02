@@ -15,7 +15,7 @@
 
 namespace RESTAPI\Core;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use ReflectionClass;
 use RESTAPI;
@@ -27,15 +27,16 @@ use RESTAPI\Responses\ValidationError;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 # Constants
-const DEFAULT_CLIENT_USERNAME = "(system)";
-const DEFAULT_CLIENT_IP_ADDRESS = "127.0.0.1";
+const DEFAULT_CLIENT_USERNAME = '(system)';
+const DEFAULT_CLIENT_IP_ADDRESS = '127.0.0.1';
 
 /**
  * Creates a Model object that relates to a pfSense configuration or service. This model defines the necessary steps
  * to validate incoming configuration and create, read, update, and/or delete data from the pfSense configuration this
  * object relates to.
-*/
-class Model extends BaseClass {
+ */
+class Model extends BaseClass
+{
     /**
      * @var string|null $config_path
      * The configuration path where this Model's object(s) are internally stored. This property is mandatory unless
@@ -84,7 +85,7 @@ class Model extends BaseClass {
      * @var string $parent_model_class
      * The class name of the parent Model class. This is necessary only if this Model is nested under another Model.
      */
-    public string $parent_model_class = "";
+    public string $parent_model_class = '';
 
     /**
      * @var Model|null
@@ -100,7 +101,7 @@ class Model extends BaseClass {
      * cache file using a Cache object and typically is only used for Models with an `internal_callable` assigned. The
      * value assigned here must be an existing class shortname in the \RESTAPI\Caches\ namespace.
      */
-    public string $cache_class = "";
+    public string $cache_class = '';
 
     /**
      * @var Cache|null
@@ -180,7 +181,7 @@ class Model extends BaseClass {
      * to pull the internal values for this Model. This property cannot be used if a $config_path is already specified.
      * This must be set to an existing method name assigned to this Model class.
      */
-    public string $internal_callable = "";
+    public string $internal_callable = '';
 
     /**
      * @var int|null $sort_option
@@ -209,7 +210,7 @@ class Model extends BaseClass {
      * (if any) subsystem should be set. Typically, it will appear as a parameter value in the mark_subsystem_dirty() or
      * clear_subsystem_dirty() pfSense functions.
      */
-    public string $subsystem = "";
+    public string $subsystem = '';
 
     /**
      * @var bool $always_apply
@@ -224,7 +225,7 @@ class Model extends BaseClass {
      * In general, `replace` works well for $many enabled Models, and `merge` works well for non $many enabled Models or
      * for Models that share a $config_path with other Models.
      */
-    public string $update_strategy = "merge";
+    public string $update_strategy = 'merge';
 
     /**
      * @var string $verbose_name
@@ -233,7 +234,7 @@ class Model extends BaseClass {
      * separating capitalized words in the class name with a space. In some cases, this may not be accurately determined
      * and can be manually set using this property if needed.
      */
-    public string $verbose_name = "";
+    public string $verbose_name = '';
 
     /**
      * @var string $verbose_name_plural
@@ -242,7 +243,7 @@ class Model extends BaseClass {
      * instead. In some cases, this may not be accurate; this property can be manually set using this property if needed.
      */
 
-    public string $verbose_name_plural = "";
+    public string $verbose_name_plural = '';
 
     /**
      * Values to assign when a Model object is first constructed.
@@ -257,31 +258,27 @@ class Model extends BaseClass {
      * of an array format via $data. Note: In the event that a field value is set in $data and $args, the value
      * found in $args will be used.
      */
-    public function __construct(
-        mixed $id=null, 
-        mixed $parent_id=null, 
-        mixed $data=[],
-        mixed ...$options
-    ) {
+    public function __construct(mixed $id = null, mixed $parent_id = null, mixed $data = [], mixed ...$options)
+    {
         # Throw an error if both $id and data are set.
         if (isset($id) and $data) {
             throw new ServerError(
-                message: "Model objects cannot be constructed with both an ID and representation data.",
-                response_id: "MODEL_WITH_ID_AND_REPRESENTATION"
+                message: 'Model objects cannot be constructed with both an ID and representation data.',
+                response_id: 'MODEL_WITH_ID_AND_REPRESENTATION',
             );
         }
 
         # Ensure the representation data is an array
         if (!is_array($data)) {
             throw new ValidationError(
-                message: "Representation data must be of type `array`.",
-                response_id: "MODEL_NON_ARRAY_REPRESENTATION_DATA"
+                message: 'Representation data must be of type `array`.',
+                response_id: 'MODEL_NON_ARRAY_REPRESENTATION_DATA',
             );
         }
-        
+
         # Check for known $options and map them to their Model properties
         $options = $this->set_construct_options($options);
-        
+
         # Merge the remaining options into the $data array so they can be used to populate field values
         $data = array_merge($data, $options);
 
@@ -297,32 +294,33 @@ class Model extends BaseClass {
         }
 
         # Auto-set the verbose name and plural verbose name for this object if it was not specified by a parent class
-        $this->verbose_name = ($this->verbose_name) ?: $this->generate_verbose_name();
-        $this->verbose_name_plural = ($this->verbose_name_plural) ?: $this->generate_verbose_name_plural();
+        $this->verbose_name = $this->verbose_name ?: $this->generate_verbose_name();
+        $this->verbose_name_plural = $this->verbose_name_plural ?: $this->generate_verbose_name_plural();
 
         # Setup Field properties assigned to this Model
         $this->setup_fields();
-        
+
         # Set the default $related_objects ModelSet so it can be populated later
         $this->related_objects = new ModelSet();
     }
 
     /**
      * Checks for options passed in during object construction and maps known options to Model properties. Any
-     * options that are not known options to the core Model will be returned so they can be merged into 
+     * options that are not known options to the core Model will be returned so they can be merged into
      * the Model data during construction.
      * @param array $options The $options passed into the Model's __construct() method.
      * @return array An array of additional options that do not relate to core Model properties.
      */
-    private function set_construct_options(array $options): array {
+    private function set_construct_options(array $options): array
+    {
         # Set the async flag if given. Ensure this defaults to true.
-        $this->async = (isset($options["async"])) ? $options["async"] : true;
-        unset($options["async"]);
+        $this->async = isset($options['async']) ? $options['async'] : true;
+        unset($options['async']);
 
         # Obtain a default $client Auth object for this Model object to use if one was not provided
-        $this->client = ($options["client"]) ?: $this->get_default_client();
-        unset($options["client"]);
-        
+        $this->client = $options['client'] ?: $this->get_default_client();
+        unset($options['client']);
+
         return $options;
     }
 
@@ -346,7 +344,7 @@ class Model extends BaseClass {
                 $this->initial_object = unserialize(serialize($this));
             }
         }
-    } 
+    }
 
     /**
      * Auto-generates a verbose name for this Model class using its class name.
@@ -355,11 +353,8 @@ class Model extends BaseClass {
     private function generate_verbose_name(): string
     {
         # Separate the class name's words with spaces, allow consecutive capital characters like 'DNS'
-        $model_name = (new ReflectionClass($this))->getShortName();;
-        return preg_replace(
-            '/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', ' ',
-            $model_name
-        );
+        $model_name = (new ReflectionClass($this))->getShortName();
+        return preg_replace('/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', ' ', $model_name);
     }
 
     /**
@@ -371,16 +366,16 @@ class Model extends BaseClass {
         # Only add a plural suffix to the verbose name if this is a $many enabled Model
         if ($this->many) {
             # When the verbose name ends with 'y', remove the 'y' and append 'ies'.
-            if (str_ends_with($this->verbose_name, "y")) {
-                return substr($this->verbose_name, 0, -1)."ies";
+            if (str_ends_with($this->verbose_name, 'y')) {
+                return substr($this->verbose_name, 0, -1) . 'ies';
             }
             # When the verbose name ends with 's', append 'es' to the end.
-            elseif (str_ends_with($this->verbose_name, "s")) {
-                return $this->verbose_name."es";
+            elseif (str_ends_with($this->verbose_name, 's')) {
+                return $this->verbose_name . 'es';
             }
             # Otherwise, just append 's'
             else {
-                return $this->verbose_name."s";
+                return $this->verbose_name . 's';
             }
         }
 
@@ -392,7 +387,8 @@ class Model extends BaseClass {
      * Obtains a default $client Auth object for this Model object to use.
      * @returns Auth An Auth object that uses the default client username and IP address.
      */
-    private function get_default_client() : Auth {
+    private function get_default_client(): Auth
+    {
         $client = new Auth();
         $client->username = DEFAULT_CLIENT_USERNAME;
         $client->ip_address = DEFAULT_CLIENT_IP_ADDRESS;
@@ -404,7 +400,8 @@ class Model extends BaseClass {
      * @returns Cache|null Returns a new Cache object of the $cache_class property assigned or null if no $cache_class
      * property was assigned.
      */
-    private function get_cache(): Cache|null {
+    private function get_cache(): Cache|null
+    {
         # Only continue if this Model has a $cache_class assigned
         if (!$this->cache_class) {
             return null;
@@ -417,7 +414,7 @@ class Model extends BaseClass {
         if (!class_exists($class)) {
             throw new ServerError(
                 message: "Model cannot be assigned non-existent \$cache_class `$class`.",
-                response_id: "MODEL_CACHE_CLASS_INVALID"
+                response_id: 'MODEL_CACHE_CLASS_INVALID',
             );
         }
 
@@ -429,7 +426,8 @@ class Model extends BaseClass {
      * Provides this Model's Field object properties relevant information like its field name and provides this Model
      * object as this Field's $context Model object.
      */
-    private function setup_fields() : void {
+    private function setup_fields(): void
+    {
         # Assign names and model context to each field in this Model
         foreach ($this->get_fields() as $field) {
             $this->$field->set_names($field);
@@ -440,54 +438,61 @@ class Model extends BaseClass {
     /**
      * Retrieves the full config path including any assigned parent Model paths.
      */
-    public function get_config_path() : string|null {
+    public function get_config_path(): string|null
+    {
         # Do not allow this method to be called if a parent Model class is assigned, but the parent hasn't been obtained
         if ($this->parent_model_class and !$this->parent_model) {
             throw new ServerError(
-                message: "Model `get_config_path()` cannot be called until the parent Model has been constructed. ".
-                    "Run the `get_parent_model()` method first.",
-                response_id: "MODEL_CANNOT_GET_CONFIG_PATH_WITHOUT_PARENT_MODEL"
+                message: 'Model `get_config_path()` cannot be called until the parent Model has been constructed. ' .
+                    'Run the `get_parent_model()` method first.',
+                response_id: 'MODEL_CANNOT_GET_CONFIG_PATH_WITHOUT_PARENT_MODEL',
             );
         }
-        
+
         # Format the config path accordingly when a `parent_model_class` is assigned
         if ($this->parent_model) {
             # Do not allow a parent Model to be set if this Model has an `internal_callable` assigned
             if ($this->internal_callable) {
                 throw new ServerError(
-                    message: "Model ".get_called_class()." cannot assign `parent_model_class` $this->parent_model_class ".
-                        "while also having an `internal_callable` assigned.",
-                    response_id: "MODEL_CANNOT_HAVE_PARENT_MODEL_CLASS_AND_INTERNAL_CALLABLE"
+                    message: 'Model ' .
+                        get_called_class() .
+                        " cannot assign `parent_model_class` $this->parent_model_class " .
+                        'while also having an `internal_callable` assigned.',
+                    response_id: 'MODEL_CANNOT_HAVE_PARENT_MODEL_CLASS_AND_INTERNAL_CALLABLE',
                 );
             }
-            
+
             # Do not allow the parent Model to be a child of any other model
             if ($this->parent_model->parent_model_class) {
                 throw new ServerError(
-                    message: "Model ".get_called_class()." cannot assign `parent_model_class` $this->parent_model_class ".
-                    "because itself has a `parent_model_class` {$this->parent_model->parent_model_class}",
-                    response_id: "MODEL_PARENT_MODEL_CLASS_CANNOT_HAVE_PARENT"
+                    message: 'Model ' .
+                        get_called_class() .
+                        " cannot assign `parent_model_class` $this->parent_model_class " .
+                        "because itself has a `parent_model_class` {$this->parent_model->parent_model_class}",
+                    response_id: 'MODEL_PARENT_MODEL_CLASS_CANNOT_HAVE_PARENT',
                 );
             }
 
             # Do not allow the parent Model to be assigned if itself does not have a config path
             if (!$this->parent_model->config_path) {
                 throw new ServerError(
-                    message: "Model ".get_called_class()." cannot assign `parent_model_class` $this->parent_model_class ".
-                    "because it does not have a `config_path` set.",
-                    response_id: "MODEL_PARENT_MODEL_CLASS_MUST_HAVE_CONFIG_PATH"
+                    message: 'Model ' .
+                        get_called_class() .
+                        " cannot assign `parent_model_class` $this->parent_model_class " .
+                        'because it does not have a `config_path` set.',
+                    response_id: 'MODEL_PARENT_MODEL_CLASS_MUST_HAVE_CONFIG_PATH',
                 );
             }
-            
+
             # Return a config path including the parent ID if the parent Model is a `many` model
             if ($this->parent_model->many) {
                 return "{$this->parent_model->config_path}/$this->parent_id/$this->config_path";
             }
-            
+
             # Otherwise, just prefix the parent Model's config path to this Model's config path
             return "{$this->parent_model->config_path}/$this->config_path";
         }
-        
+
         # Just use this Model's config path if no parent Model is assigned
         return $this->config_path;
     }
@@ -496,7 +501,8 @@ class Model extends BaseClass {
      * Initialize the configuration array of a specific config path
      * @param $path string config path with '/' as separators
      */
-    protected static function init_config(string $path) {
+    protected static function init_config(string $path)
+    {
         # Initialize the configuration array of a specified path.
         global $config;
         array_init_path($config, $path);
@@ -509,9 +515,10 @@ class Model extends BaseClass {
      * @returns mixed value at path or $default if the path does not exist or if the
      *          path keys an empty string and $default is non-null
      */
-    public static function get_config(string $path, mixed $default=null) {
+    public static function get_config(string $path, mixed $default = null)
+    {
         global $config;
-        return(array_get_path($config, $path, $default));
+        return array_get_path($config, $path, $default);
     }
 
     /**
@@ -521,9 +528,10 @@ class Model extends BaseClass {
      * @param $default mixed value to return if the path is not found
      * @returns mixed $val or $default if the path prefix does not exist
      */
-    public static function set_config(string $path, mixed $value, mixed $default=null) {
+    public static function set_config(string $path, mixed $value, mixed $default = null)
+    {
         global $config;
-        return (array_set_path($config, $path, $value, $default));
+        return array_set_path($config, $path, $value, $default);
     }
 
     /**
@@ -532,14 +540,14 @@ class Model extends BaseClass {
      * object that are not defined in a Field assigned to this Model will be left unchanged.
      * @param $path string The Model config path including any Model ID
      */
-    public function merge_config(string $path) {
+    public function merge_config(string $path)
+    {
         # Loop through each field known to this Model
         foreach ($this->get_fields() as $field) {
             # Determine the field path
             if ($this->$field->internal_namespace) {
                 $field_path = "$path/{$this->$field->internal_namespace}/{$this->$field->internal_name}";
-            }
-            else {
+            } else {
                 $field_path = "$path/{$this->$field->internal_name}";
             }
 
@@ -564,9 +572,10 @@ class Model extends BaseClass {
      * @param $path string path with '/' separators
      * @returns array copy of the removed value or null
      */
-    public static function del_config(string $path) : mixed {
+    public static function del_config(string $path): mixed
+    {
         global $config;
-        return (array_del_path($config, $path));
+        return array_del_path($config, $path);
     }
 
     /**
@@ -578,18 +587,20 @@ class Model extends BaseClass {
      * @returns bool true if $enable_key exists in the array at $path, and has a
      * non-null value, otherwise false.
      */
-    public static function is_config_enabled(string $path, string $enable_key="enable") : bool {
+    public static function is_config_enabled(string $path, string $enable_key = 'enable'): bool
+    {
         global $config;
-        return (array_path_enabled($config, $path, $enable_key));
+        return array_path_enabled($config, $path, $enable_key);
     }
 
     /**
      * Write configuration changes to the config file
      * @param string $change_note The message to write to the change log.
      */
-    final protected function write_config(string $change_note) {
+    final protected function write_config(string $change_note)
+    {
         # Local variables
-        $lock_file = "/tmp/.RESTAPI.write_config.lock";
+        $lock_file = '/tmp/.RESTAPI.write_config.lock';
 
         # Ensure there is not an API config lock, loop until the lock is released
         foreach (range(0, 60) as $attempt) {
@@ -599,8 +610,8 @@ class Model extends BaseClass {
                 file_put_contents($lock_file, microtime());
 
                 # Start a temporary session to write the config that contains the user's username in the config history
-                $_SESSION["Username"] = $this->client->username;
-                write_config(sprintf(gettext(" ".$change_note)));
+                $_SESSION['Username'] = $this->client->username;
+                write_config(sprintf(gettext(' ' . $change_note)));
 
                 # If a subsystem is specified for this Model, mark it as dirty
                 if ($this->subsystem) {
@@ -621,7 +632,8 @@ class Model extends BaseClass {
      * Reloads the configuration to include any changes that may have occurred since the last config reload
      * @param bool $force_parse Force an entire reparse of the config.xml file instead of the cached config.
      */
-    public function reload_config(bool $force_parse = false): void {
+    public function reload_config(bool $force_parse = false): void
+    {
         global $config;
         $config = parse_config(parse: $force_parse);
     }
@@ -634,12 +646,13 @@ class Model extends BaseClass {
      * @throws ServerError When the path leads to an existing non-empty, non-sequential array value
      * @returns string|int the next array key (ID) for the config path specified.
      */
-    public function get_next_id() : string|int {
+    public function get_next_id(): string|int
+    {
         # Since this references config IDs, this method requires `config_path` to be set. Throw an error if it's not.
         if (!$this->config_path) {
             throw new ServerError(
                 message: "Model cannot use default method to obtain next available ID without 'config_path'",
-                response_id: "MODEL_NEXT_ID_WITHOUT_CONFIG_PATH"
+                response_id: 'MODEL_NEXT_ID_WITHOUT_CONFIG_PATH',
             );
         }
 
@@ -647,7 +660,7 @@ class Model extends BaseClass {
         if (!$this->many) {
             throw new ServerError(
                 message: "Models cannot obtain next ID when 'many' is not enabled.",
-                response_id: "MODEL_NEXT_ID_WITHOUT_MANY"
+                response_id: 'MODEL_NEXT_ID_WITHOUT_MANY',
             );
         }
 
@@ -672,7 +685,7 @@ class Model extends BaseClass {
             throw new ServerError(
                 message: "Model failed to obtain the next available ID because the config path leads to an existing, 
                 non-indexed array value.",
-                response_id: "MODEL_DANGEROUS_CONFIG_PATH"
+                response_id: 'MODEL_DANGEROUS_CONFIG_PATH',
             );
         }
     }
@@ -681,7 +694,8 @@ class Model extends BaseClass {
      * Logs an error to the syslog.
      * @param string $message The error message to write to the syslog
      */
-    public static function log_error(string $message): void {
+    public static function log_error(string $message): void
+    {
         # Call the pfSense `log_error` function
         log_error($message);
     }
@@ -690,7 +704,8 @@ class Model extends BaseClass {
      * Converts this Model object into it's internal pfSense configuration form.
      * @return array The internal value suitable for writing to the pfSense configuration.
      */
-    public function to_internal() : array {
+    public function to_internal(): array
+    {
         # Variables
         $internal_object = [];
 
@@ -702,13 +717,18 @@ class Model extends BaseClass {
             }
 
             # Init the namespace for this field if a namespace is specified and does not exist yet.
-            if ($this->$field->internal_namespace and !array_key_exists($this->$field->internal_namespace, $internal_object)) {
+            if (
+                $this->$field->internal_namespace and
+                !array_key_exists($this->$field->internal_namespace, $internal_object)
+            ) {
                 $internal_object[$this->$field->internal_namespace] = [];
             }
 
             # Nest this field under the namespace if specified and continue through the loop.
             if ($this->$field->internal_namespace) {
-                $internal_object[$this->$field->internal_namespace][$this->$field->internal_name] = $this->$field->to_internal();
+                $internal_object[$this->$field->internal_namespace][
+                    $this->$field->internal_name
+                ] = $this->$field->to_internal();
                 continue;
             }
 
@@ -727,12 +747,13 @@ class Model extends BaseClass {
      * `config_path` and a `internal_callable` are assigned to this model
      * @return array The array of internal objects without any additional processing performed.
      */
-    public function get_internal_objects() : array {
+    public function get_internal_objects(): array
+    {
         # Throw an error if both `config_path` and `internal_callable` are set.
         if ($this->config_path and $this->internal_callable) {
             throw new ServerError(
-                message: "Models cannot define both a config path and an internal callable.",
-                response_id: "MODEL_WITH_CONFIG_PATH"
+                message: 'Models cannot define both a config path and an internal callable.',
+                response_id: 'MODEL_WITH_CONFIG_PATH',
             );
         }
         # Obtain the internal objects from the config path if specified
@@ -749,7 +770,7 @@ class Model extends BaseClass {
             throw new ServerError(
                 message: "Model requires a 'config_path' or 'internal_callable' value to be defined before 
                     obtaining internal objects.",
-                response_id: "MODEL_WITH_NO_INTERNAL_METHOD"
+                response_id: 'MODEL_WITH_NO_INTERNAL_METHOD',
             );
         }
 
@@ -762,20 +783,21 @@ class Model extends BaseClass {
      * @throws ServerError When this Model does not have a `config_path` set.
      * @throws NotFoundError When an object with the specified $id does not exist.
      */
-    public function from_internal() {
+    public function from_internal()
+    {
         # Require a `parent_id` if a `many` parent Model is assigned
         if ($this->parent_model_class and $this->parent_model->many and !isset($this->parent_id)) {
             throw new ServerError(
                 message: "A parent ID is required when refreshing objects from config on model with a 'many' parent.",
-                response_id: "MODEL_PARENT_ID_REQUIRED_FOR_REFRESH"
+                response_id: 'MODEL_PARENT_ID_REQUIRED_FOR_REFRESH',
             );
         }
-        
+
         # Require an $id if `many` is set
         if ($this->many and !isset($this->id)) {
             throw new ServerError(
                 message: "An ID is required when refreshing objects from config on model with 'many'.",
-                response_id: "MODEL_ID_REQUIRED_FOR_REFRESH"
+                response_id: 'MODEL_ID_REQUIRED_FOR_REFRESH',
             );
         }
 
@@ -786,17 +808,18 @@ class Model extends BaseClass {
         if ($this->many and !array_key_exists($this->id, $internal_objects)) {
             throw new NotFoundError(
                 message: "Object with ID '$this->id' does not exist.",
-                response_id: "MODEL_OBJECT_NOT_FOUND"
+                response_id: 'MODEL_OBJECT_NOT_FOUND',
             );
         }
 
         # When `many` is enabled, obtain the object with our ID. Otherwise, just assign the direct object
-        $internal_object = ($this->many) ? $internal_objects[$this->id] : $internal_objects;
+        $internal_object = $this->many ? $internal_objects[$this->id] : $internal_objects;
 
         $this->from_internal_object($internal_object);
     }
 
-    public function from_internal_object(array $internal_object) {
+    public function from_internal_object(array $internal_object)
+    {
         # Variables
         $custom_from_internal_fields = [];
 
@@ -814,16 +837,21 @@ class Model extends BaseClass {
             }
 
             # Check if this field has a namespace and check if the internal object has the namespace
-            if ($this->$field->internal_namespace and array_key_exists($this->$field->internal_namespace, $internal_object)) {
+            if (
+                $this->$field->internal_namespace and
+                array_key_exists($this->$field->internal_namespace, $internal_object)
+            ) {
                 # Ensure the internal namespace is an array if the namespace is empty
                 if (!$internal_object[$this->$field->internal_namespace]) {
                     $internal_object[$this->$field->internal_namespace] = [];
                 }
 
                 # Check the namespace for the field and convert it's value from internal to representation
-                if (array_key_exists($this->$field->internal_name, $internal_object[$this->$field->internal_namespace])) {
+                if (
+                    array_key_exists($this->$field->internal_name, $internal_object[$this->$field->internal_namespace])
+                ) {
                     $this->$field->from_internal(
-                        $internal_object[$this->$field->internal_namespace][$this->$field->internal_name]
+                        $internal_object[$this->$field->internal_namespace][$this->$field->internal_name],
                     );
                 }
             }
@@ -841,18 +869,19 @@ class Model extends BaseClass {
      * serialization such as JSON, YAML, etc.
      * @return array The serializable array representation of this object.
      */
-    final public function to_representation() : array {
+    final public function to_representation(): array
+    {
         # Variables
         $representation = [];
 
         # Embed this object's parent ID if set
         if (isset($this->parent_id)) {
-            $representation["parent_id"] = $this->parent_id;
+            $representation['parent_id'] = $this->parent_id;
         }
-        
+
         # Embed this object's ID if set
         if (isset($this->id)) {
-            $representation["id"] = $this->id;
+            $representation['id'] = $this->id;
         }
 
         # Loop through each of this Model's Fields and add its value to a serializable array
@@ -862,9 +891,9 @@ class Model extends BaseClass {
                 $representation[$field] = $this->$field->value;
             }
         }
-        
+
         # Append any related HATEOAS links if HATEOAS is enabled
-        if (RESTAPI\Models\RESTAPISettings::get_pkg_config()["hateoas"] === "enabled") {
+        if (RESTAPI\Models\RESTAPISettings::get_pkg_config()['hateoas'] === 'enabled') {
             $representation += $this->get_related_links()->to_representation();
         }
 
@@ -880,21 +909,22 @@ class Model extends BaseClass {
      * of an array format via $data. Note: In the event that a field value is set in $data and $args, the value
      * found in $args will be used.
      */
-    final public function from_representation(array $data = [], mixed ...$options) {
+    final public function from_representation(array $data = [], mixed ...$options)
+    {
         # Merge additional arguments into the $data array
         $data = array_merge($data, $options);
 
         # Set the parent ID if provided and obtain the parent model object if applicable
-        if (array_key_exists("parent_id", $data) and $this->parent_model_class) {
-            $this->parent_id = $data["parent_id"];
+        if (array_key_exists('parent_id', $data) and $this->parent_model_class) {
+            $this->parent_id = $data['parent_id'];
             $this->get_parent_model();
         }
-        
+
         # When an ID is provided, fetch this objects from the internal configuration using the ID.
-        if (array_key_exists("id", $data)) {
+        if (array_key_exists('id', $data)) {
             # Extract the ID from the data
-            $this->id = $data["id"];
-            
+            $this->id = $data['id'];
+
             # Obtain the object from its internal form
             $this->from_internal();
             $this->initial_object = unserialize(serialize($this));
@@ -916,14 +946,15 @@ class Model extends BaseClass {
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this Model as an OpenAPI schema.
      */
-    public function to_openapi_schema() : array {
+    public function to_openapi_schema(): array
+    {
         # Assign primitive schema attributes
-        $openapi_schema = ["type" => "object", "properties" => []];
+        $openapi_schema = ['type' => 'object', 'properties' => []];
 
         # Loop through each Field in this Model and obtain its OpenAPI property config
         foreach ($this->get_fields() as $field) {
             # Generate and add the OpenAPI property from the Field object
-            $openapi_schema["properties"][$field] = $this->$field->to_openapi_property();
+            $openapi_schema['properties'][$field] = $this->$field->to_openapi_property();
         }
 
         return $openapi_schema;
@@ -934,29 +965,28 @@ class Model extends BaseClass {
      * @return Model|null The parent Model object with the provided `parent_id` or `null` if no parent Model is set.
      * @throws NotFoundError If the parent Model object does not exist.
      */
-    public function get_parent_model() : Model|null
+    public function get_parent_model(): Model|null
     {
         # If a parent Model is assigned, create the parent object
         if ($this->parent_model_class) {
             # Set the FQN parent class name
             $parent_model_class = "\\RESTAPI\\Models\\$this->parent_model_class";
-            
+
             # Throw an error if the given parent ID does not exist
             try {
                 $this->parent_model = new $parent_model_class(id: $this->parent_id);
-            }
-            catch (NotFoundError) {
+            } catch (NotFoundError) {
                 # Throw a NotFoundError but change some of the verbage
                 throw new NotFoundError(
                     message: "Parent object with ID '$this->parent_id' does not exist.",
-                    response_id: "MODEL_PARENT_OBJECT_NOT_FOUND"
+                    response_id: 'MODEL_PARENT_OBJECT_NOT_FOUND',
                 );
             }
-            
+
             # Set the parent Model object and return it
             return $this->parent_model;
         }
-        
+
         return null;
     }
 
@@ -966,7 +996,7 @@ class Model extends BaseClass {
      * $many enabled, false if a $parent_model_class is assigned to this Model and the parent Model does not have
      * $many enabled, or null if no $parent_model_class is assigned to this Model.
      */
-    public function is_parent_model_many() : bool|null
+    public function is_parent_model_many(): bool|null
     {
         # If a parent Model is assigned, create the parent object
         if ($this->parent_model_class) {
@@ -975,7 +1005,7 @@ class Model extends BaseClass {
             $parent_model = new $parent_model_class();
             return $parent_model->many;
         }
-        
+
         return null;
     }
 
@@ -984,7 +1014,8 @@ class Model extends BaseClass {
      * @param bool $required_only Only obtain required Fields
      * @return array An array of field names for this model.
      */
-    final public function get_fields(bool $required_only = false) : array {
+    final public function get_fields(bool $required_only = false): array
+    {
         # Variables
         $fields = [];
 
@@ -996,7 +1027,7 @@ class Model extends BaseClass {
             }
 
             # Skip this item if it is not child class of the RESTAPI\Core\Field class
-            if (!in_array("RESTAPI\Core\Field", class_parents($value))) {
+            if (!in_array('RESTAPI\Core\Field', class_parents($value))) {
                 continue;
             }
 
@@ -1007,7 +1038,7 @@ class Model extends BaseClass {
 
             # Assign the name of this field and context to this Field object
             $this->$var->name = $var;
-            $this->$var->internal_name = ($this->$var->internal_name) ?: $this->$var->name;
+            $this->$var->internal_name = $this->$var->internal_name ?: $this->$var->name;
             $this->$var->context = $this;
 
             # Otherwise, this is a valid Field object. Include it.
@@ -1022,7 +1053,8 @@ class Model extends BaseClass {
      * @throws ForbiddenError When a new deletion is not allowed because it will put the number of objects below
      * the $many_minimum value.
      */
-    public function check_many_minimum(): void {
+    public function check_many_minimum(): void
+    {
         # Only perform this check if this is a $many enabled Model with a $many_minimum value assigned
         if (!$this->many or !$this->many_minimum) {
             return;
@@ -1034,9 +1066,9 @@ class Model extends BaseClass {
         # Throw a forbidden error if we are already at or under the minimum objects allowed
         if ($total_objects <= $this->many_minimum) {
             throw new ForbiddenError(
-                message: "Object deletion denied. Deleting this object would result in the number of existing objects ".
+                message: 'Object deletion denied. Deleting this object would result in the number of existing objects ' .
                     "falling below the minimum number allowed for this Model, $this->many_minimum.",
-                response_id: "MODEL_MANY_MINIMUM_REACHED"
+                response_id: 'MODEL_MANY_MINIMUM_REACHED',
             );
         }
     }
@@ -1046,7 +1078,8 @@ class Model extends BaseClass {
      * @throws ForbiddenError When a new creation is not allowed because it will put the number of objects over
      * the $many_maximum value.
      */
-    public function check_many_maximum(): void {
+    public function check_many_maximum(): void
+    {
         # Only perform this check if this is a $many enabled Model with a $many_maximum value assigned
         if (!$this->many or !$this->many_maximum) {
             return;
@@ -1058,9 +1091,9 @@ class Model extends BaseClass {
         # Throw a forbidden error if we are already at or over the maximum objects allowed
         if ($total_objects >= $this->many_maximum) {
             throw new ForbiddenError(
-                message: "Object creation denied. Creating this object would result in the number of existing objects ".
+                message: 'Object creation denied. Creating this object would result in the number of existing objects ' .
                     "increasing beyond the maximum number allowed for this Model, $this->many_maximum.",
-                response_id: "MODEL_MANY_MAXIMUM_REACHED"
+                response_id: 'MODEL_MANY_MAXIMUM_REACHED',
             );
         }
     }
@@ -1074,7 +1107,8 @@ class Model extends BaseClass {
      * Model.
      * @throws ValidationError When the unique together Fields are not unique and are present in another Model object.
      */
-    private function check_unique_together(?ModelSet $modelset = null): void {
+    private function check_unique_together(?ModelSet $modelset = null): void
+    {
         # Skip this validation for non `many` Models or Models without unique together Fields
         if (!$this->many or !$this->unique_together_fields) {
             return;
@@ -1085,20 +1119,20 @@ class Model extends BaseClass {
             if (!in_array($unique_together_field, $this->get_fields())) {
                 throw new RESTAPI\Responses\ServerError(
                     message: "Unknown Model field `$unique_together_field` specified in `unique_together_fields`",
-                    response_id: "MODEL_UNIQUE_TOGETHER_FIELDS_WITH_UNKNOWN_FIELD"
+                    response_id: 'MODEL_UNIQUE_TOGETHER_FIELDS_WITH_UNKNOWN_FIELD',
                 );
             }
         }
 
         # Use the $modelset if provided, otherwise obtain a ModelSet of all existing objects for this Model
-        $modelset = ($modelset) ?: $this->read_all(parent_id: $this->parent_id);
+        $modelset = $modelset ?: $this->read_all(parent_id: $this->parent_id);
 
         # Use this variable to keep track of query parameters to use when checking uniqueness
         $query_params = [];
 
         # Exclude this Model object from the query if this Model has an ID
         if (isset($this->id)) {
-            $query_params = ["id__except" => $this->id];
+            $query_params = ['id__except' => $this->id];
         }
 
         # Format the query parameters as an associative array
@@ -1111,12 +1145,12 @@ class Model extends BaseClass {
 
         # If any existing Models were found matching the query, Fields are not unique together, throw an error
         if ($model_query->model_objects) {
-            $unique_fields_string = implode(", ", $this->unique_together_fields);
+            $unique_fields_string = implode(', ', $this->unique_together_fields);
             $in_use_by_id = $model_query->model_objects[0]->id;
             throw new ValidationError(
-                message: "Fields [$unique_fields_string] together must be unique from all other objects of its kind. ".
+                message: "Fields [$unique_fields_string] together must be unique from all other objects of its kind. " .
                     "Values in use by object with ID `$in_use_by_id`.",
-                response_id: "MODEL_FIELDS_NOT_UNIQUE_TOGETHER"
+                response_id: 'MODEL_FIELDS_NOT_UNIQUE_TOGETHER',
             );
         }
     }
@@ -1125,14 +1159,16 @@ class Model extends BaseClass {
      * Allows child classes to define extra validation for their Models. This can be used to build complex validations
      * that check conditions between multiple Model fields.
      */
-    public function validate_extra(): void {}
+    public function validate_extra(): void
+    {
+    }
 
     /**
      * Performs a full validation on the API model. This includes checking that required packages are installed and
      * validating all assigned Fields. Note: Fields are validated in the order they are defined in the class.
      * @param bool $requires_id Whether the `id` field should be validated in this request. This is typically only
      * necessary for update and delete actions.
-     * @param bool $create_id If true, a new ID will be created for this object if this is a $many Model. This is 
+     * @param bool $create_id If true, a new ID will be created for this object if this is a $many Model. This is
      * primarily used for creations.
      * @param bool $only_id Only validate the `id` field. This is primarily used for deletions.
      * @param bool $skip_parent Skip validating the assigned parent ID. This only applies to Models that have a
@@ -1144,34 +1180,31 @@ class Model extends BaseClass {
      * @return bool `true` if the model's data is valid.
      */
     final public function validate(
-        bool $requires_id = false, 
+        bool $requires_id = false,
         bool $create_id = false,
-        bool $only_id = false, 
+        bool $only_id = false,
         bool $skip_parent = false,
         ?ModelSet $modelset = null,
-    ) : bool {
+    ): bool {
         # When an ID is required and this is a `many` model, check that an ID is set.
         if ($requires_id and $this->many and !isset($this->id)) {
-            throw new ValidationError(
-                message: "Field 'id' is required.",
-                response_id: "MODEL_REQUIRES_ID"
-            );
+            throw new ValidationError(message: "Field 'id' is required.", response_id: 'MODEL_REQUIRES_ID');
         }
-        
+
         # Validate `parent_id` field if a parent model class is assigned and it was not requested we skip this step.
         if ($this->parent_model_class and !$skip_parent) {
             # Require a parent ID if the parent model is a `many` model
             if ($this->is_parent_model_many() and !isset($this->parent_id)) {
                 throw new ValidationError(
-                    message: "Field `parent_id` is required.",
-                    response_id: "MODEL_PARENT_ID_REQUIRED"
+                    message: 'Field `parent_id` is required.',
+                    response_id: 'MODEL_PARENT_ID_REQUIRED',
                 );
             }
 
             # Obtain the exact parent Model object
             $this->get_parent_model();
         }
-        
+
         # Create an ID for this object if requested
         if ($create_id and $this->config_path and $this->many) {
             $this->id = $this->get_next_id();
@@ -1211,7 +1244,7 @@ class Model extends BaseClass {
         foreach ($custom_validate_fields as $field) {
             # Format the name of the validate method for this field so we can call the function by variable
             $custom_validate_method = "validate_$field";
-            
+
             # Validate each value individually for `many` Fields
             if ($this->$field->many) {
                 $value_array = [];
@@ -1241,7 +1274,8 @@ class Model extends BaseClass {
      * @throws ServerError When this Model contains a Field object with an internal name that is not unique to it's
      * namespace.
      */
-    private function is_fields_internal_name_unique(string $field) : void {
+    private function is_fields_internal_name_unique(string $field): void
+    {
         # Loop to compare each field's names against each other to ensure there are no conflicts
         foreach ($this->get_fields() as $eval_field) {
             # Ignore if we are evaluating the same field, they will always have the same names.
@@ -1254,7 +1288,7 @@ class Model extends BaseClass {
                 if ($this->$field->internal_name === $this->$eval_field->internal_name) {
                     throw new ServerError(
                         message: "Model field internal names must be unique to it's namespace.",
-                        response_id: "MODEL_FIELDS_WITH_CONFLICTING_INTERNAL_NAMES"
+                        response_id: 'MODEL_FIELDS_WITH_CONFLICTING_INTERNAL_NAMES',
                     );
                 }
             }
@@ -1267,7 +1301,8 @@ class Model extends BaseClass {
      * a ModelSet object.
      * @return ModelSet A ModelSet containing any Model objects that reference this Model object.
      */
-    public function get_model_references() : ModelSet {
+    public function get_model_references(): ModelSet
+    {
         # Variables
         $references = new ModelSet();
 
@@ -1286,12 +1321,13 @@ class Model extends BaseClass {
      * @return Endpoint|null The Endpoint object that has this Model class assigned or null if none was found
      * @throws ServerError When no Endpoint could be found for this Model.
      */
-    public function get_related_endpoint(bool $many) : Endpoint|null {
+    public function get_related_endpoint(bool $many): Endpoint|null
+    {
         # Obtain the shortname for this class
         $model_name = (new ReflectionClass($this))->getShortName();
 
         # Loop through each Endpoint class
-        foreach (get_classes_from_namespace("\\RESTAPI\\Endpoints\\") as $endpoint_class) {
+        foreach (get_classes_from_namespace('\\RESTAPI\\Endpoints\\') as $endpoint_class) {
             # Construct the Endpoint object
             $endpoint = new $endpoint_class();
 
@@ -1305,35 +1341,34 @@ class Model extends BaseClass {
     }
 
     /**
-     * Obtains a HAL resource link to a specific Model object. 
-     * @param Model $model The Model object to obtain a link for. 
+     * Obtains a HAL resource link to a specific Model object.
+     * @param Model $model The Model object to obtain a link for.
      * @param string $rel The HAL resource link name to assign this ResourceLink object
      * @param bool $use_namespace Set to true to prefix this $rel with this project's HAL prefix value. This should
-     * be used for non-standard rel values. 
+     * be used for non-standard rel values.
      * @return ResourceLink The ResourceLink object containing the links and attributes of the given $model.
      */
     public static function get_related_link(
         Model $model,
         string $rel,
-        string $method = "GET",
-        bool $use_namespace = true
-    ) : ResourceLink {
+        string $method = 'GET',
+        bool $use_namespace = true,
+    ): ResourceLink {
         # Get the endpoint associated with this object
         $related_url = $model->get_related_endpoint(many: false)->url;
 
         # Determine the URL with associated query for this link if it is a GET or DELETE method link
-        if ($model->many and in_array($method, ["GET", "DELETE"])) {
+        if ($model->many and in_array($method, ['GET', 'DELETE'])) {
             # Add the parent ID to the URL if present
             if (isset($model->parent_id)) {
-                $related_url .= "?parent_id=$model->parent_id&id=".$model->id;
-            }
-            else {
-                $related_url .= "?id=".$model->id;
+                $related_url .= "?parent_id=$model->parent_id&id=" . $model->id;
+            } else {
+                $related_url .= '?id=' . $model->id;
             }
         }
 
         # Generate a verbose title that makes sense given the context of this model
-        $title = ($model->many) ? "$model->verbose_name: $model->id" : $model->verbose_name;
+        $title = $model->many ? "$model->verbose_name: $model->id" : $model->verbose_name;
         return new ResourceLink(
             rel: $rel,
             href: $related_url,
@@ -1341,7 +1376,7 @@ class Model extends BaseClass {
             use_namespace: $use_namespace,
             id: $model->id,
             parent_id: $model->parent_id,
-            title: $title
+            title: $title,
         );
     }
 
@@ -1349,7 +1384,8 @@ class Model extends BaseClass {
      * Obtains REST API links to resources related to this Model object.
      * @return ResourceLinkSet A ResourceLinkSet containing REST API links to related Model objects.
      */
-    public function get_related_links() : ResourceLinkSet {
+    public function get_related_links(): ResourceLinkSet
+    {
         # Variables
         $linkset = new ResourceLinkSet();
         $endpoint = $this->get_related_endpoint(many: false);
@@ -1358,21 +1394,27 @@ class Model extends BaseClass {
         if (!$endpoint) {
             return $linkset;
         }
-        
+
         # Add a 'self' link if this Model supports single reads
-        if (in_array("GET", $endpoint->request_method_options)) {
-            $linkset->resource_links[] = $this->get_related_link($this, "self", use_namespace: false);
+        if (in_array('GET', $endpoint->request_method_options)) {
+            $linkset->resource_links[] = $this->get_related_link($this, 'self', use_namespace: false);
         }
         # Add a 'delete' link if this Model supports updates
-        if (in_array("PATCH", $endpoint->request_method_options)) {
+        if (in_array('PATCH', $endpoint->request_method_options)) {
             $linkset->resource_links[] = $this->get_related_link(
-                $this, rel: "update", method: "PATCH", use_namespace: false
+                $this,
+                rel: 'update',
+                method: 'PATCH',
+                use_namespace: false,
             );
         }
         # Add a 'delete' link if this Model supports deletions
-        if (in_array("DELETE", $endpoint->request_method_options)) {
+        if (in_array('DELETE', $endpoint->request_method_options)) {
             $linkset->resource_links[] = $this->get_related_link(
-                $this, rel: "delete", method: "DELETE", use_namespace: false
+                $this,
+                rel: 'delete',
+                method: 'DELETE',
+                use_namespace: false,
             );
         }
         # Loop through each field and check for any objects related to those fields.
@@ -1400,7 +1442,7 @@ class Model extends BaseClass {
                         $nested_linkset->resource_links[] = $this->get_related_link($related_model, rel: $related_rel);
                     }
                 }
-                
+
                 # Add this nested ResourceLinkSet in our root ResourceLinkSet
                 $linkset->resource_links[] = $nested_linkset;
             }
@@ -1414,27 +1456,27 @@ class Model extends BaseClass {
      * @throws NotFoundError When the Model requires a pfSense package that is not installed.
      * @throws ServerError When a package requires a PHP include file that could not be found.
      */
-    private function check_packages() {
+    private function check_packages()
+    {
         # Loop through each required package and ensure it is present on the system.
         foreach ($this->packages as $pkg) {
             # Return an error if the package is not installed
             if (!is_pkg_installed($pkg)) {
                 throw new NotFoundError(
                     message: "The requested action requires the '$pkg' package but it is not installed.",
-                    response_id: "MODEL_MISSING_REQUIRED_PACKAGE"
+                    response_id: 'MODEL_MISSING_REQUIRED_PACKAGE',
                 );
             }
         }
 
         # Loop through each package dependency and add it.
         foreach ($this->package_includes as $include) {
-            if (!include_once($include)) {
+            if (!include_once $include) {
                 throw new ServerError(
                     message: "Model requires include file $include but it could not be found in the PHP path.",
-                    response_id: "MODEL_WITH_FAILED_INCLUDE"
+                    response_id: 'MODEL_WITH_FAILED_INCLUDE',
                 );
             }
-
         }
     }
 
@@ -1442,14 +1484,16 @@ class Model extends BaseClass {
      * Initializes the default 'pre_apply' method. This method is intended to be overidden by a child model class and
      * is called immediately before the 'apply' method. This method runs regardless of whether an apply was requested.
      */
-    protected function pre_apply() {
+    protected function pre_apply()
+    {
     }
 
     /**
      * Initializes the default 'apply' method. This method is intended to be overridden by a child model class and is
      * responsible for reloading/restarting services after changes occur.
      */
-    public function apply() {
+    public function apply()
+    {
     }
 
     /**
@@ -1457,7 +1501,8 @@ class Model extends BaseClass {
      * is called immediately before the 'apply' method for create actions only. This method runs regardless of whether
      * an apply was requested. By default, this method simply calls the global 'pre_apply' method.
      */
-    protected function pre_apply_create() {
+    protected function pre_apply_create()
+    {
         $this->pre_apply();
     }
 
@@ -1465,7 +1510,8 @@ class Model extends BaseClass {
      * Performs steps and processes required to apply changes after the `create()` method runs. This can be overridden
      * to add custom steps applying for just create actions. Defaults to simply calling `apply()`.
      */
-    protected function apply_create() {
+    protected function apply_create()
+    {
         $this->apply();
     }
 
@@ -1474,7 +1520,8 @@ class Model extends BaseClass {
      * is called immediately before the 'apply' method for update actions only. This method runs regardless of whether
      * an apply was requested. By default, this method simply calls the global 'pre_apply' method.
      */
-    protected function pre_apply_update() {
+    protected function pre_apply_update()
+    {
         $this->pre_apply();
     }
 
@@ -1482,7 +1529,8 @@ class Model extends BaseClass {
      * Performs steps and processes required to apply changes after the `update()` method runs. This can be overridden
      * to add custom steps to apply after update actions only. Defaults to simply calling `apply()`.
      */
-    protected function apply_update() {
+    protected function apply_update()
+    {
         $this->apply();
     }
 
@@ -1491,7 +1539,8 @@ class Model extends BaseClass {
      * is called immediately before the 'apply' method for delete actions only. This method runs regardless of whether
      * an apply was requested. By default, this method simply calls the global 'pre_apply' method.
      */
-    protected function pre_apply_delete() {
+    protected function pre_apply_delete()
+    {
         $this->pre_apply();
     }
 
@@ -1499,7 +1548,8 @@ class Model extends BaseClass {
      * Performs steps and processes required to apply changes after the `delete()` method runs. This can be overridden
      * to add custom steps to apply after delete actions only. Defaults to simply calling `apply()`.
      */
-    protected function apply_delete() {
+    protected function apply_delete()
+    {
         $this->apply();
     }
 
@@ -1513,7 +1563,8 @@ class Model extends BaseClass {
      * point, each Model object within this ModelSet has already been written to config. This method is responsible
      * for ensuring it is applied to any backend services.
      */
-    protected function apply_replace_all(ModelSet $initial_objects, ModelSet $new_objects) {
+    protected function apply_replace_all(ModelSet $initial_objects, ModelSet $new_objects)
+    {
         $this->apply();
     }
 
@@ -1523,14 +1574,15 @@ class Model extends BaseClass {
      * Model objects for each object returned by the specified callable.
      * @param mixed|null $parent_id Specifies the ID of the parent Model to read all objects from. This is required for
      * $many Models with a $parent_model_class. This value has no affect otherwise.
-     * @param int $offset The starting point in the dataset to be used with $limit. This is only applicable to $many 
+     * @param int $offset The starting point in the dataset to be used with $limit. This is only applicable to $many
      * enabled Models.
      * @param int $limit The maximum number of Model objects to retrieve. This is only applicable to $many
      * enabled Models.
      * @return ModelSet|Model Returns a ModelSet of Models if `many` is enabled or a single Model object if `many` is
      * not enabled.
      */
-    public static function read_all(mixed $parent_id = null, int $limit = 0, int $offset = 0) : ModelSet|Model {
+    public static function read_all(mixed $parent_id = null, int $limit = 0, int $offset = 0): ModelSet|Model
+    {
         # Variables
         $model_name = get_called_class();
         $model = new $model_name(parent_id: $parent_id);
@@ -1538,41 +1590,41 @@ class Model extends BaseClass {
         $is_parent_model_many = $model->is_parent_model_many();
         $requests_pagination = ($limit or $offset);
         $offset_counter = 0;
-        
+
         # Throw an error if this Model has a $many parent Model, but no parent Model ID was given
         if ($is_parent_model_many and !isset($parent_id)) {
             throw new ValidationError(
-                message: "Field `parent_id` is required to read all.",
-                response_id: "MODEL_PARENT_ID_REQUIRED"
+                message: 'Field `parent_id` is required to read all.',
+                response_id: 'MODEL_PARENT_ID_REQUIRED',
             );
         }
-        
+
         # Throw an error if pagination was requested on a Model without $many enabled
         if (!$model->many and $requests_pagination) {
             throw new ValidationError(
-                message: "Model `$model->verbose_name` does not support pagination. Please remove the `limit` and/or. ".
-                    "`offset`parameters and try again.",
-                response_id: "MODEL_DOES_NOT_SUPPORT_PAGINATION"
+                message: "Model `$model->verbose_name` does not support pagination. Please remove the `limit` and/or. " .
+                    '`offset`parameters and try again.',
+                response_id: 'MODEL_DOES_NOT_SUPPORT_PAGINATION',
             );
         }
-        
+
         # Obtain all of this Model's internally stored objects
         $internal_objects = $model->get_internal_objects();
 
         # For non `many` Models, wrap the internal object in an array so we can loop
-        $internal_objects = ($model->many) ? $internal_objects : [$internal_objects];
+        $internal_objects = $model->many ? $internal_objects : [$internal_objects];
 
         # Loop through each internal object and create a Model object for it
-        foreach ($internal_objects as $internal_id=>$internal_object) {
+        foreach ($internal_objects as $internal_id => $internal_object) {
             # Do not include this object if we have not reached our offset
             if ($offset_counter < $offset) {
                 $offset_counter++;
                 continue;
             }
-                
+
             # Create a new Model object for this internal object and assign its ID
             $model_object = new $model(id: $internal_id, parent_id: $parent_id);
-            
+
             # Populate the Model object using its current internal values and add it to the array of all Model objects
             $model_object->from_internal_object($internal_object);
             $model_objects[] = $model_object;
@@ -1581,20 +1633,21 @@ class Model extends BaseClass {
             if ($limit and $limit === count($model_objects)) {
                 break;
             }
-            
+
             # Increase the offset counter
             $offset_counter++;
         }
 
         # Unwrap the array for non `many` Models, otherwise return all objects
-        return ($model->many) ? new ModelSet($model_objects) : $model_objects[0];
+        return $model->many ? new ModelSet($model_objects) : $model_objects[0];
     }
 
     /**
      * Sorts `many` Model entries internally before writing the changes to config. This is useful for Model's whose
      * internal objects must be written in a specific order.
      */
-    protected function sort() {
+    protected function sort()
+    {
         # Do not sort if there is no `sort_option` or `sort_by_field` set
         if (!$this->sort_option or !$this->sort_by_field) {
             return;
@@ -1603,30 +1656,30 @@ class Model extends BaseClass {
         # Do not allow non `many` Models to be sorted
         if (!$this->many) {
             throw new ServerError(
-                message: "Only `many` Models can be sorted.",
-                response_id: "MODEL_CANNOT_BE_SORTED_WITHOUT_MANY"
+                message: 'Only `many` Models can be sorted.',
+                response_id: 'MODEL_CANNOT_BE_SORTED_WITHOUT_MANY',
             );
         }
-        
+
         $internal_objects = $this->get_config($this->get_config_path(), []);
         $criteria = [];
 
         # Loop through each rule and map its sort field value to our sort criteria array
-        foreach ($internal_objects as $id=>$internal_object) {
+        foreach ($internal_objects as $id => $internal_object) {
             # Store the internal object's existing ID so we can locate new IDs after sorting
-            $internal_objects[$id]["original_id"] = $id;
-            
+            $internal_objects[$id]['original_id'] = $id;
+
             # Use the `internal_name` of the assigned `sort_by_field` since we are dealing with internal objects
             $sort_by_field_internal_name = $this->{$this->sort_by_field}->internal_name;
-            
+
             # Map the real field if it's not empty, otherwise assume an empty string
             if (!empty($internal_object[$sort_by_field_internal_name])) {
                 $criteria[$id] = $internal_object[$sort_by_field_internal_name];
             } else {
-                $criteria[$id] = "";
+                $criteria[$id] = '';
             }
         }
-        
+
         # Sort the internal objects using the previously determined criteria
         array_multisort($criteria, $this->sort_option, $internal_objects);
 
@@ -1634,15 +1687,15 @@ class Model extends BaseClass {
         $id_found = false;
         foreach ($internal_objects as $new_id => $sorted_internal_object) {
             # Check if this sorted internal object contains $this objects original ID
-            if (!$id_found and $this->id === $sorted_internal_object["original_id"]) {
+            if (!$id_found and $this->id === $sorted_internal_object['original_id']) {
                 $id_found = true;
                 $this->id = $new_id;
             }
-            
+
             # Remove the `original_id` value so we don't save it to config
-            unset($internal_objects[$new_id]["original_id"]);
+            unset($internal_objects[$new_id]['original_id']);
         }
-        
+
         # Sets the sorted internal objects to the pfSense config
         $this->set_config($this->get_config_path(), array_values($internal_objects));
     }
@@ -1664,26 +1717,21 @@ class Model extends BaseClass {
      * @return ModelSet The queried ModelSet containing only Model objects that matched the query.
      */
     public static function query(
-        array $query_params=[], 
-        array $excluded=[], 
-        mixed $parent_id=null,
+        array $query_params = [],
+        array $excluded = [],
+        mixed $parent_id = null,
         int $limit = 0,
         int $offset = 0,
-        ...$vl_query_params
-    ) : ModelSet {
+        ...$vl_query_params,
+    ): ModelSet {
         # Merge the $query_params and any provided variable-length arguments into a single variable
         $query_params = array_merge($query_params, $vl_query_params);
-        
-        return self::read_all(
-            parent_id: $parent_id,
-            limit: $limit,
-            offset: $offset
-        )->query(
-            query_params: $query_params, 
-            excluded: $excluded
+
+        return self::read_all(parent_id: $parent_id, limit: $limit, offset: $offset)->query(
+            query_params: $query_params,
+            excluded: $excluded,
         );
     }
-
 
     /**
      * Initializes the default 'read' method. By default, this method loads the Model object from its internal
@@ -1692,15 +1740,13 @@ class Model extends BaseClass {
      * @return Model Loads the Model object from its internal value using the current $this->id value and
      * returns that object.
      */
-    final public function read() : Model {
+    final public function read(): Model
+    {
         # When an ID is required and this is a `many` model, check that an ID is set.
         if ($this->many and !isset($this->id)) {
-            throw new ValidationError(
-                message: "Field 'id' is required.",
-                response_id: "MODEL_REQUIRES_ID"
-            );
+            throw new ValidationError(message: "Field 'id' is required.", response_id: 'MODEL_REQUIRES_ID');
         }
-        
+
         # Ensure the parent Model exists if configured
         $this->get_parent_model();
 
@@ -1717,7 +1763,8 @@ class Model extends BaseClass {
      * @throws ServerError When the Model requesting creation does not have `many` enable and/or does not have a
      * `config_path` set. These Models' child class must override this method to add context-specific creations.
      */
-    protected function _create() {
+    protected function _create()
+    {
         # Check if this model has a `config_path` and `many` set, we will apply a default behavior for these Models
         if ($this->config_path and $this->many) {
             # Write the new object to the internal config
@@ -1730,7 +1777,7 @@ class Model extends BaseClass {
         # Otherwise, this method needs to be overridden by a child class to add specific context. Throw an error.
         throw new ServerError(
             message: "Models without a 'config_path' or 'many' require an overridden _create method",
-            response_id: "MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD"
+            response_id: 'MODEL_REQUIRE_OVERRIDDEN_CREATE_METHOD',
         );
     }
 
@@ -1739,7 +1786,8 @@ class Model extends BaseClass {
      * @param bool $apply Set to `true` if you would like to immediately apply the changes after they are made.
      * @return Model Returns the created Model object (this object).
      */
-    final public function create(bool $apply = false) : Model {
+    final public function create(bool $apply = false): Model
+    {
         # Ensure all object Fields and validations succeed for proceeding.
         if ($this->validate(create_id: true)) {
             # Check if creating this object would put the total number of objects over the $many_maximum
@@ -1777,26 +1825,26 @@ class Model extends BaseClass {
      * @throws ServerError When the Model requesting update does not have a `config_path` set. These Models' child
      * class must override this method to add context-specific updates.
      */
-    protected function _update() {
+    protected function _update()
+    {
         # Check if this model has a `config_path`, we will apply a default behavior for these Models
         if ($this->config_path) {
             # Only use the ID in the config path if 'many' is enabled. Otherwise, just use the base config path.
-            $config_path = ($this->many) ? "{$this->get_config_path()}/$this->id" : $this->get_config_path();
+            $config_path = $this->many ? "{$this->get_config_path()}/$this->id" : $this->get_config_path();
 
             # Merge differences between the stored object and updated internal object when update strategy is 'merge'
-            if ($this->update_strategy === "merge") {
+            if ($this->update_strategy === 'merge') {
                 $this->merge_config($config_path);
             }
             # Replace the internal object entirely when update strategy is 'replace'
-            elseif ($this->update_strategy === "replace") {
+            elseif ($this->update_strategy === 'replace') {
                 $this->set_config(path: $config_path, value: $this->to_internal());
-
             }
             # Throw an error if the update strategy is unknown
             else {
                 throw new ServerError(
                     message: "Model has unknown update strategy '$this->update_strategy'",
-                    response_id: "MODEL_WITH_UNKNOWN_MERGE_STRATEGY"
+                    response_id: 'MODEL_WITH_UNKNOWN_MERGE_STRATEGY',
                 );
             }
 
@@ -1809,7 +1857,7 @@ class Model extends BaseClass {
         # Otherwise, this method needs to be overridden by a child class to add specific context. Throw an error.
         throw new ServerError(
             message: "Models without a 'config_path' require an overridden _update method",
-            response_id: "MODEL_REQUIRE_OVERRIDDEN_UPDATE_METHOD"
+            response_id: 'MODEL_REQUIRE_OVERRIDDEN_UPDATE_METHOD',
         );
     }
 
@@ -1818,7 +1866,8 @@ class Model extends BaseClass {
      * @param bool $apply Set to `true` if you would like to immediately apply the changes after they are made.
      * @return Model Returns the updated Model object (this object).
      */
-    final public function update(bool $apply = false) : Model {
+    final public function update(bool $apply = false): Model
+    {
         # Ensure all object Fields and validations succeed for proceeding.
         if ($this->validate(requires_id: true)) {
             # Run the _update method
@@ -1855,20 +1904,21 @@ class Model extends BaseClass {
      * $always_apply property set to `true` will ignore this value.
      * @return ModelSet A ModelSet containing all the Model objects found in config after replacement.
      */
-    final public function replace_all(mixed $data, bool $apply = false) : ModelSet {
+    final public function replace_all(mixed $data, bool $apply = false): ModelSet
+    {
         # Ensure this is a `many` model before continuing
         if (!$this->many) {
             throw new ServerError(
-                message: "Model `replace_all()` method is only available for Models with `many` enabled.",
-                response_id: "MODEL_UPDATE_ALL_WITHOUT_MANY"
+                message: 'Model `replace_all()` method is only available for Models with `many` enabled.',
+                response_id: 'MODEL_UPDATE_ALL_WITHOUT_MANY',
             );
         }
 
         # Ensure the representation data is an array
         if (!is_array($data)) {
             throw new ValidationError(
-                message: "Representation data must be of type `array`.",
-                response_id: "MODEL_NON_ARRAY_REPRESENTATION_DATA"
+                message: 'Representation data must be of type `array`.',
+                response_id: 'MODEL_NON_ARRAY_REPRESENTATION_DATA',
             );
         }
 
@@ -1876,30 +1926,28 @@ class Model extends BaseClass {
         if (count($data) < $this->many_minimum) {
             throw new ValidationError(
                 message: "A minimum of $this->many_minimum new objects is required to replace all existing objects.",
-                response_id: "MODEL_REPLACE_ALL_MINIMUM_NOT_MET"
+                response_id: 'MODEL_REPLACE_ALL_MINIMUM_NOT_MET',
             );
         }
 
         # Do not allow this replacement unless the number of objects is equal to or greater than the $many_minimum
         if (count($data) > $this->many_maximum) {
             throw new ValidationError(
-                message: "The request to replace all existing objects exceeds the maximum limit of ".
+                message: 'The request to replace all existing objects exceeds the maximum limit of ' .
                     "$this->many_maximum new objects.",
-                response_id: "MODEL_REPLACE_ALL_MAXIMUM_EXCEEDED"
+                response_id: 'MODEL_REPLACE_ALL_MAXIMUM_EXCEEDED',
             );
         }
-        
+
         # Keep track of all existing objects for this Model before anything is changed. This will be passed back
         # into `apply_replace_all()` so that method can gracefully bring down these objects before replacing them
         # if needed.
         $initial_objects = $this->read_all(parent_id: $this->parent_id);
-        
+
         # Obtain any Models that are deemed protected to ensure they do not removed in the next step.
         $protected_models = new ModelSet();
         if ($this->protected_model_query) {
-            $protected_models = $initial_objects->query(
-                query_params: $this->protected_model_query
-            );
+            $protected_models = $initial_objects->query(query_params: $this->protected_model_query);
         }
 
         # Before beginning validation, empty the stored values in the config path. Retain protected Models (if any).
@@ -1908,7 +1956,7 @@ class Model extends BaseClass {
         # Loop through each Model representation included in the array
         foreach ($data as $representation_object) {
             # Remove any ID for this object if it was passed in, new IDs will be determined later
-            unset($representation_object["id"]);
+            unset($representation_object['id']);
 
             # Define a new Model object using this representation and validate
             $model_object = new $this(data: $representation_object);
@@ -1923,7 +1971,7 @@ class Model extends BaseClass {
         # Sort and write the changes to config
         $this->sort();
         $this->write_config("Replaced all $this->verbose_name_plural via API");
-        
+
         # Read all new objects for this Model so it can be passed into `apply_replace_all()`.
         $new_objects = $this->read_all(parent_id: $this->parent_id);
 
@@ -1948,7 +1996,8 @@ class Model extends BaseClass {
      * @throws ServerError When the Model requesting delete does not have a `config_path` or `many` set. These Models'
      * child class must override this method to add context-specific deletions.
      */
-    protected function _delete() {
+    protected function _delete()
+    {
         # Check if this model has a `config_path`, we will apply a default behavior for these Models
         if ($this->config_path and $this->many) {
             # Write the changes to the object in config.
@@ -1960,7 +2009,7 @@ class Model extends BaseClass {
         # Otherwise, this method needs to be overridden by a child class to add specific context. Throw an error.
         throw new ServerError(
             message: "Models without a 'config_path' require an overridden _delete method",
-            response_id: "MODEL_REQUIRE_OVERRIDDEN_DELETE_METHOD"
+            response_id: 'MODEL_REQUIRE_OVERRIDDEN_DELETE_METHOD',
         );
     }
 
@@ -1970,32 +2019,33 @@ class Model extends BaseClass {
      * @return Model Returns the deleted Model object (this object).
      * @throws ConflictError When this Model object is referenced by another existing Model object.
      */
-    final public function delete(bool $apply = false) : Model {
+    final public function delete(bool $apply = false): Model
+    {
         # Ensure all object Fields and validations succeed for proceeding.
         if ($this->validate(requires_id: true, only_id: true)) {
-            # For $many enabled Models with protected Models, ensure the value being deleted is not a protected model 
+            # For $many enabled Models with protected Models, ensure the value being deleted is not a protected model
             if ($this->many and $this->protected_model_query) {
                 $protected_models = $this->query(
-                    query_params: $this->protected_model_query, 
-                    parent_id: $this->parent_id
+                    query_params: $this->protected_model_query,
+                    parent_id: $this->parent_id,
                 );
 
                 # Throw an error if this is a protected Model
                 if ($protected_models->query(id: $this->id)->exists()) {
                     throw new ForbiddenError(
                         message: "Model object with ID `$this->id` cannot be deleted because it is protected.",
-                        response_id: "MODEL_CANNOT_DELETE_PROTECTED_OBJECT"
+                        response_id: 'MODEL_CANNOT_DELETE_PROTECTED_OBJECT',
                     );
                 }
             }
-            
+
             # Block the deletion if this Model is still referenced by other Model objects
             $referenced_by = $this->get_model_references();
             if ($referenced_by->model_objects) {
                 throw new ConflictError(
-                    message: "Object cannot be deleted because it is referenced by another existing object.",
-                    response_id: "MODEL_CANNOT_BE_DELETED_WHILE_REFERENCED",
-                    data: $referenced_by
+                    message: 'Object cannot be deleted because it is referenced by another existing object.',
+                    response_id: 'MODEL_CANNOT_BE_DELETED_WHILE_REFERENCED',
+                    data: $referenced_by,
                 );
             }
 

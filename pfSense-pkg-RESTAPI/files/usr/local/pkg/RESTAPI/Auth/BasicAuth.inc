@@ -11,12 +11,12 @@ class BasicAuth extends Auth
     /**
      * @var string|null $verbose_name The human-readable name for this Auth class.
      */
-    public ?string $verbose_name = "Local database";
+    public ?string $verbose_name = 'Local database';
 
     /**
      * @var array $security_scheme The OpenAPI security scheme for this Auth class.
      */
-    public array $security_scheme = ["type" => "http", "scheme" => "basic"];
+    public array $security_scheme = ['type' => 'http', 'scheme' => 'basic'];
 
     /**
      * Obtains the submitted username and password from the client using Basic authentication and performs
@@ -27,11 +27,11 @@ class BasicAuth extends Auth
     public function _authenticate(): bool
     {
         # Obtain the username and password from the client via Basic authentication
-        $this->username = ($_SERVER["PHP_AUTH_USER"]) ?: "";
-        $password = ($_SERVER["PHP_AUTH_PW"]) ?: "";
+        $this->username = $_SERVER['PHP_AUTH_USER'] ?: '';
+        $password = $_SERVER['PHP_AUTH_PW'] ?: '';
 
         # Authenticate against the local user database and return the result
-        return (bool)authenticate_user($this->username, $password);
+        return (bool) authenticate_user($this->username, $password);
     }
 
     /**

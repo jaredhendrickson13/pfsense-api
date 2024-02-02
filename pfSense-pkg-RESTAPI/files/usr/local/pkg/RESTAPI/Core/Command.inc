@@ -14,7 +14,7 @@ class Command extends BaseClass
 {
     public string $command;
     public string $redirect;
-    public string $output = "";
+    public string $output = '';
     public int $result_code = -1;
     public bool $trim_whitespace = false;
 
@@ -27,7 +27,7 @@ class Command extends BaseClass
      * @return Command Returns this object containing the results of the executed command. Note: the object returned
      * cannot be used to initiate new commands. A new Command object should be created for any additional commands.
      */
-    public function __construct(string $command, bool $trim_whitespace = false, string $redirect = "2>&1")
+    public function __construct(string $command, bool $trim_whitespace = false, string $redirect = '2>&1')
     {
         $this->command = $command;
         $this->trim_whitespace = $trim_whitespace;

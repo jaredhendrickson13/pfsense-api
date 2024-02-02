@@ -2,8 +2,8 @@
 
 namespace RESTAPI\Fields;
 
-require_once("RESTAPI/autoloader.inc");
-require_once("RESTAPI/Fields/InterfaceField.inc");
+require_once 'RESTAPI/autoloader.inc';
+require_once 'RESTAPI/Fields/InterfaceField.inc';
 
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Models\NetworkInterface;
@@ -105,17 +105,16 @@ class SpecialNetworkField extends InterfaceField
         bool $many = false,
         int $many_minimum = 1,
         int $many_maximum = 128,
-        string|null $delimiter = ",",
-        string $verbose_name = "",
-        string $verbose_name_plural = "",
-        string $internal_name = "",
-        string $internal_namespace = "",
+        string|null $delimiter = ',',
+        string $verbose_name = '',
+        string $verbose_name_plural = '',
+        string $internal_name = '',
+        string $internal_namespace = '',
         array $referenced_by = [],
         array $conditions = [],
         array $validators = [],
-        string $help_text = ""
-    )
-    {
+        string $help_text = '',
+    ) {
         # Construct the parent object for this field
         parent::__construct(
             required: $required,
@@ -140,80 +139,84 @@ class SpecialNetworkField extends InterfaceField
             referenced_by: $referenced_by,
             conditions: $conditions,
             validators: $validators,
-            help_text: $help_text
+            help_text: $help_text,
         );
 
         # To prevent the need to add redundant documentation to the help text, append a standard set of help text.
-        $this->help_text .= " Valid value options are: ". $this->get_valid_opts_str().". For interface values, the `:ip` ".
+        $this->help_text .=
+            ' Valid value options are: ' .
+            $this->get_valid_opts_str() .
+            '. For interface values, the `:ip` ' .
             " modifier can be appended to the value to use the interface's IP address instead of its entire subnet.";
 
         # Because this Field extends the InterfaceField class, we need to overwrite the parent `choices_callable`.
         # Otherwise, this Field will throw a "not a valid choice" error for non interface values.
-        $this->choices_callable = "";
+        $this->choices_callable = '';
     }
 
     /**
      * Ensure any value assigned to this Field is allowed by the current field settings.
      * @param mixed $value The incoming value to be validated.
      */
-    public function validate_extra(mixed $value) {
+    public function validate_extra(mixed $value)
+    {
         # Allow this value if it is an IPv4 address and this Field allows IP address values
         if ($this->allow_ipaddr and is_ipaddrv4($value)) {
-            $this->labels[] = "is_ipaddrv4";
-            $this->labels[] = "is_ipaddr";
+            $this->labels[] = 'is_ipaddrv4';
+            $this->labels[] = 'is_ipaddr';
             return;
         }
 
         # Allow this value if it is an IPv6 address and this Field allows IP address values
         if ($this->allow_ipaddr and is_ipaddrv6($value)) {
-            $this->labels[] = "is_ipaddrv6";
-            $this->labels[] = "is_ipaddr";
+            $this->labels[] = 'is_ipaddrv6';
+            $this->labels[] = 'is_ipaddr';
             return;
         }
 
         # Allow this value if it is a v4 subnet and this Field allows subnet values
         if ($this->allow_subnet and is_subnetv4($value)) {
-            $this->labels[] = "is_subnetv4";
-            $this->labels[] = "is_subnet";
+            $this->labels[] = 'is_subnetv4';
+            $this->labels[] = 'is_subnet';
             return;
         }
 
         # Allow this value if it is a v6 subnet and this Field allows subnet values
         if ($this->allow_subnet and is_subnetv6($value)) {
-            $this->labels[] = "is_subnetv6";
-            $this->labels[] = "is_subnet";
+            $this->labels[] = 'is_subnetv6';
+            $this->labels[] = 'is_subnet';
             return;
         }
 
         # Allow this value if it is a network or host alias and this Field allows alias values
-        if ($this->allow_alias and FirewallAlias::query(["type__except" => "port", "name" => $value])->exists()) {
-            $this->labels[] = "is_alias";
+        if ($this->allow_alias and FirewallAlias::query(['type__except' => 'port', 'name' => $value])->exists()) {
+            $this->labels[] = 'is_alias';
             return;
         }
 
         # Allow this value if it is literal `(self)` and self values are allowed. `(self)` refers to any IP assigned to
         # this firewall.
-        if ($this->allow_self and $value === "(self)") {
+        if ($this->allow_self and $value === '(self)') {
             return;
         }
 
         # Allow this value if it is literal `l2tp` and L2TP values are allowed
-        if($this->allow_l2tp and $value === "l2tp") {
+        if ($this->allow_l2tp and $value === 'l2tp') {
             return;
         }
 
         # Allow this value if it is literal `pppoe` and PPPoE values are allowed
-        if($this->allow_pppoe and $value === "pppoe") {
+        if ($this->allow_pppoe and $value === 'pppoe') {
             return;
         }
-        
+
         # Allow this value if it is an allowed keyword
         if ($this->allowed_keywords and in_array($value, $this->allowed_keywords)) {
             return;
         }
 
         # Remove the trailing :ip value if interface IP values are allowed and set, so we can continue validating.
-        if ($this->allow_interface_ip and str_ends_with($value, ":ip")) {
+        if ($this->allow_interface_ip and str_ends_with($value, ':ip')) {
             # Remove the :ip modifier, so we can ensure the interface exists
             $value = substr($value, 0, -3);
 
@@ -225,14 +228,14 @@ class SpecialNetworkField extends InterfaceField
 
         # Allow this value if it is an existing interface and interface values are allowed
         if ($this->allow_interface and in_array($value, array_keys($this->get_interface_choices()))) {
-            $this->labels[] = "is_interface";
+            $this->labels[] = 'is_interface';
             return;
         }
 
         # If we did not match any of the previous conditions, the value is invalid. Throw a ValidationError.
         throw new ValidationError(
-            message: "Field `$this->name` value `$value` is invalid. Valid options are: ".$this->get_valid_opts_str(),
-            response_id: "SPECIAL_NETWORK_FIELD_INVALID"
+            message: "Field `$this->name` value `$value` is invalid. Valid options are: " . $this->get_valid_opts_str(),
+            response_id: 'SPECIAL_NETWORK_FIELD_INVALID',
         );
     }
 
@@ -241,16 +244,17 @@ class SpecialNetworkField extends InterfaceField
      * help messages depending on this Field's current settings.
      * @return string A string representation of values that are considered valid for this Field.
      */
-    private function get_valid_opts_str() : string {
+    private function get_valid_opts_str(): string
+    {
         # Piece together our options in string format using this Field's current settings
-        $opts_str = ($this->allow_interface) ? "an existing interface, " : "";
-        $opts_str .= ($this->allow_ipaddr) ? "an IP address, " : "";
-        $opts_str .= ($this->allow_subnet) ? "a subnet CIDR, " : "";
-        $opts_str .= ($this->allow_alias) ? "an existing alias, " : "";
-        $opts_str .= ($this->allow_self) ? "`(self)`, " : "";
-        $opts_str .= ($this->allow_l2tp) ? "`l2tp`, " : "";
-        $opts_str .= ($this->allow_pppoe) ? "`pppoe`, " : "";
-        
+        $opts_str = $this->allow_interface ? 'an existing interface, ' : '';
+        $opts_str .= $this->allow_ipaddr ? 'an IP address, ' : '';
+        $opts_str .= $this->allow_subnet ? 'a subnet CIDR, ' : '';
+        $opts_str .= $this->allow_alias ? 'an existing alias, ' : '';
+        $opts_str .= $this->allow_self ? '`(self)`, ' : '';
+        $opts_str .= $this->allow_l2tp ? '`l2tp`, ' : '';
+        $opts_str .= $this->allow_pppoe ? '`pppoe`, ' : '';
+
         # Add any specified keywords
         foreach ($this->allowed_keywords as $keyword) {
             $opts_str .= "`$keyword`, ";
@@ -271,11 +275,11 @@ class SpecialNetworkField extends InterfaceField
         $if_ip_modifier_set = false;
 
         # Remove the suffixed `:ip` if present and track that it was initially set
-        if (str_ends_with($representation_value, ":ip")) {
+        if (str_ends_with($representation_value, ':ip')) {
             $representation_value = substr($representation_value, 0, -3);
             $if_ip_modifier_set = true;
         }
-        
+
         # Check if the value is an existing interface, if so, convert it's internal ID
         $if_query = NetworkInterface::query([$this->represented_as => $representation_value]);
         if ($if_query->exists()) {
@@ -287,7 +291,7 @@ class SpecialNetworkField extends InterfaceField
         }
 
         # Append `ip` if the IP modifier was originally set
-        $internal_value .= ($if_ip_modifier_set) ? "ip" : "";
+        $internal_value .= $if_ip_modifier_set ? 'ip' : '';
 
         return $internal_value;
     }
@@ -300,17 +304,17 @@ class SpecialNetworkField extends InterfaceField
     protected function _from_internal(mixed $internal_value): string
     {
         # Assign a variable to use when piecing back together our representation value
-        $representation_value = "";
+        $representation_value = '';
 
         # If there is a `network` internal value that ends with `ip`, represent it as `:ip`
-        if (str_ends_with($internal_value, "ip")) {
-            $representation_value .= parent::_from_internal(substr($internal_value, 0, -2)).":ip";
+        if (str_ends_with($internal_value, 'ip')) {
+            $representation_value .= parent::_from_internal(substr($internal_value, 0, -2)) . ':ip';
             return $representation_value;
         }
 
         # If the value is a NetworkInterface, obtain its representation value if it's not the ID
         $if_query = NetworkInterface::query(id: $internal_value);
-        if ($this->represented_as !== "id" and NetworkInterface::query(id: $internal_value)->exists()) {
+        if ($this->represented_as !== 'id' and NetworkInterface::query(id: $internal_value)->exists()) {
             return $if_query->first()->{$this->represented_as}->value;
         }
 

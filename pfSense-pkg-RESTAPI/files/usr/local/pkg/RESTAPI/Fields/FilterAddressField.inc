@@ -2,8 +2,8 @@
 
 namespace RESTAPI\Fields;
 
-require_once("RESTAPI/autoloader.inc");
-require_once("RESTAPI/Fields/InterfaceField.inc");
+require_once 'RESTAPI/autoloader.inc';
+require_once 'RESTAPI/Fields/InterfaceField.inc';
 
 use RESTAPI\Models\FirewallAlias;
 use RESTAPI\Responses\ServerError;
@@ -15,7 +15,7 @@ use RESTAPI\Responses\ValidationError;
  */
 class FilterAddressField extends InterfaceField
 {
-    const INVERT_PREFIX = "!";
+    const INVERT_PREFIX = '!';
     public bool $allow_ipaddr;
     public bool $allow_subnet;
     public bool $allow_interface;
@@ -123,18 +123,17 @@ class FilterAddressField extends InterfaceField
         bool $many = false,
         int $many_minimum = 1,
         int $many_maximum = 128,
-        string|null $delimiter = ",",
-        string $verbose_name = "",
-        string $verbose_name_plural = "",
-        string $internal_name = "",
-        string $internal_namespace = "",
-        string $internal_value_key = "address",
+        string|null $delimiter = ',',
+        string $verbose_name = '',
+        string $verbose_name_plural = '',
+        string $internal_name = '',
+        string $internal_namespace = '',
+        string $internal_value_key = 'address',
         array $referenced_by = [],
         array $conditions = [],
         array $validators = [],
-        string $help_text = ""
-    )
-    {
+        string $help_text = '',
+    ) {
         # Assign properties specific to this Field class
         $this->allow_ipaddr = $allow_ipaddr;
         $this->allow_subnet = $allow_subnet;
@@ -172,107 +171,115 @@ class FilterAddressField extends InterfaceField
             referenced_by: $referenced_by,
             conditions: $conditions,
             validators: $validators,
-            help_text: $help_text
+            help_text: $help_text,
         );
 
         # To prevent the need to add redundant openapi to the help text, append a standard set of help text.
-        $this->help_text .= " Valid value options are: ". $this->get_valid_opts_str().". The context of this address ".
-            "can be inverted by prefixing the value with `".self::INVERT_PREFIX."`. For interface values, the `:ip` ".
+        $this->help_text .=
+            ' Valid value options are: ' .
+            $this->get_valid_opts_str() .
+            '. The context of this address ' .
+            'can be inverted by prefixing the value with `' .
+            self::INVERT_PREFIX .
+            '`. For interface values, the `:ip` ' .
             " modifier can be appended to the value to use the interface's IP address instead of its entire subnet.";
 
         # Because this Field extends the InterfaceField class, we need to overwrite the parent `choices_callable`.
         # Otherwise, this Field will throw a "not a valid choice" error for non interface values.
-        $this->choices_callable = "";
+        $this->choices_callable = '';
     }
 
     /**
      * Ensure any value assigned to this Field is allowed by the current field settings.
      * @param mixed $value The incoming value to be validated.
      */
-    public function validate_extra(mixed $value) {
+    public function validate_extra(mixed $value)
+    {
         # Remove the invert character (!) if invert is allowed and present, so we can continue validating.
-        if ($this->allow_invert and str_starts_with($value, self::INVERT_PREFIX)){
+        if ($this->allow_invert and str_starts_with($value, self::INVERT_PREFIX)) {
             $value = substr($value, 1);
-            
+
             # Throw an error if the resulting value is `any`
-            if ($value === "any") {
+            if ($value === 'any') {
                 throw new ValidationError(
-                    message: "Field `$this->name` cannot use invert prefix (".self::INVERT_PREFIX.") with value `any`.",
-                    response_id: "FILTER_RULE_ADDRESS_FIELD_WITH_INVERT_ANY"
+                    message: "Field `$this->name` cannot use invert prefix (" .
+                        self::INVERT_PREFIX .
+                        ') with value `any`.',
+                    response_id: 'FILTER_RULE_ADDRESS_FIELD_WITH_INVERT_ANY',
                 );
             }
         }
 
         # Allow this value if it is an IPv4 address and this Field allows IP address values
         if ($this->allow_ipaddr and is_ipaddrv4($value)) {
-            $this->labels[] = "is_ipaddrv4";
-            $this->labels[] = "is_ipaddr";
+            $this->labels[] = 'is_ipaddrv4';
+            $this->labels[] = 'is_ipaddr';
             return;
         }
 
         # Allow this value if it is an IPv4 address and this Field allows IP address values
         if ($this->allow_ipaddr and is_ipaddrv6($value)) {
-            $this->labels[] = "is_ipaddrv6";
-            $this->labels[] = "is_ipaddr";
+            $this->labels[] = 'is_ipaddrv6';
+            $this->labels[] = 'is_ipaddr';
             return;
         }
 
         # Allow this value if it is a v4 subnet and this Field allows subnet values
         if ($this->allow_subnet and is_subnetv4($value)) {
-            $this->labels[] = "is_subnetv4";
-            $this->labels[] = "is_subnet";
+            $this->labels[] = 'is_subnetv4';
+            $this->labels[] = 'is_subnet';
             return;
         }
 
         # Allow this value if it is a v6 subnet and this Field allows subnet values
         if ($this->allow_subnet and is_subnetv6($value)) {
-            $this->labels[] = "is_subnetv6";
-            $this->labels[] = "is_subnet";
+            $this->labels[] = 'is_subnetv6';
+            $this->labels[] = 'is_subnet';
             return;
         }
 
         # Allow this value if it is a network or host alias and this Field allows alias values
-        if ($this->allow_alias and FirewallAlias::query(type__except: "port", name: $value)->exists()) {
-            $this->labels[] = "is_alias";
+        if ($this->allow_alias and FirewallAlias::query(type__except: 'port', name: $value)->exists()) {
+            $this->labels[] = 'is_alias';
             return;
         }
 
         # Allow this value if it is literal `any` and any values are allowed
-        if ($this->allow_any and $value === "any") {
+        if ($this->allow_any and $value === 'any') {
             return;
         }
 
         # Allow this value if it is literal `(self)` and self values are allowed. `(self)` refers to any IP assigned to
         # this firewall.
-        if ($this->allow_self and $value === "(self)") {
+        if ($this->allow_self and $value === '(self)') {
             return;
         }
 
         # Allow this value if it is literal `l2tp` and L2TP values are allowed
-        if($this->allow_l2tp and $value === "l2tp") {
+        if ($this->allow_l2tp and $value === 'l2tp') {
             return;
         }
 
         # Allow this value if it is literal `pppoe` and PPPoE values are allowed
-        if($this->allow_pppoe and $value === "pppoe") {
+        if ($this->allow_pppoe and $value === 'pppoe') {
             return;
         }
 
         # Remove the trailing :ip value if interface IP values are allowed and set, so we can continue validating.
-        if ($this->allow_interface_ip and str_ends_with($value, ":ip")) {
+        if ($this->allow_interface_ip and str_ends_with($value, ':ip')) {
             $value = substr($value, 0, -3);
         }
 
         # Allow this value if it is an existing interface and interface values are allowed
         if ($this->allow_interface and in_array($value, array_keys($this->get_interface_choices()))) {
-            $this->labels[] = "is_interface";
+            $this->labels[] = 'is_interface';
             return;
         }
 
         # If we did not match any of the previous conditions, the value is invalid. Throw a ValidationError.
         throw new ValidationError(
-            message: "Field `$this->name` value `$value` is invalid. Valid options are: ".$this->get_valid_opts_str(),
-            response_id: "FILTER_ADDRESS_FIELD_INVALID"
+            message: "Field `$this->name` value `$value` is invalid. Valid options are: " . $this->get_valid_opts_str(),
+            response_id: 'FILTER_ADDRESS_FIELD_INVALID',
         );
     }
 
@@ -281,16 +288,17 @@ class FilterAddressField extends InterfaceField
      * help messages depending on this Field's current settings.
      * @return string A string representation of values that are considered valid for this Field.
      */
-    private function get_valid_opts_str() : string {
+    private function get_valid_opts_str(): string
+    {
         # Piece together our options in string format using this Field's current settings
-        $opts_str = ($this->allow_interface) ? "an existing interface, " : "";
-        $opts_str .= ($this->allow_ipaddr) ? "an IP address, " : "";
-        $opts_str .= ($this->allow_subnet) ? "a subnet CIDR, " : "";
-        $opts_str .= ($this->allow_alias) ? "an existing alias, " : "";
-        $opts_str .= ($this->allow_any) ? "`any`, " : "";
-        $opts_str .= ($this->allow_self) ? "`(self)`, " : "";
-        $opts_str .= ($this->allow_l2tp) ? "`l2tp`, " : "";
-        $opts_str .= ($this->allow_pppoe) ? "`pppoe`, " : "";
+        $opts_str = $this->allow_interface ? 'an existing interface, ' : '';
+        $opts_str .= $this->allow_ipaddr ? 'an IP address, ' : '';
+        $opts_str .= $this->allow_subnet ? 'a subnet CIDR, ' : '';
+        $opts_str .= $this->allow_alias ? 'an existing alias, ' : '';
+        $opts_str .= $this->allow_any ? '`any`, ' : '';
+        $opts_str .= $this->allow_self ? '`(self)`, ' : '';
+        $opts_str .= $this->allow_l2tp ? '`l2tp`, ' : '';
+        $opts_str .= $this->allow_pppoe ? '`pppoe`, ' : '';
 
         # Return the value but replace the trailing ", " characters
         return substr($opts_str, 0, -2);
@@ -308,33 +316,33 @@ class FilterAddressField extends InterfaceField
         $if_ip_modifier_set = false;
 
         # When `any` is set, additional parameters are irrelevant. Set the `any` internal value and return it.
-        if ($representation_value === "any") {
-            return ["any" => true];
+        if ($representation_value === 'any') {
+            return ['any' => true];
         }
 
         # Remove the prefixed invert character (!) and set its internal value if present
         if (str_starts_with($representation_value, self::INVERT_PREFIX)) {
             $representation_value = substr($representation_value, 1);
-            $internal_value["not"] = true;
+            $internal_value['not'] = true;
         }
 
         # Remove the suffixed `:ip` if present and track that it was initially set
-        if (str_ends_with($representation_value, ":ip")) {
+        if (str_ends_with($representation_value, ':ip')) {
             $representation_value = substr($representation_value, 0, -3);
             $if_ip_modifier_set = true;
         }
 
         # Assign the `address` internal value for individual IP values, subnets, and aliases
-        if ($this->has_label("is_ipaddr") or $this->has_label("is_subnet") or $this->has_label("is_alias")) {
+        if ($this->has_label('is_ipaddr') or $this->has_label('is_subnet') or $this->has_label('is_alias')) {
             $internal_value[$this->internal_value_key] = $representation_value;
         }
         # Otherwise, assign the `network` internal value
         else {
             # Ensure potential interface values are converted to their internal values
-            $internal_value["network"] = parent::_to_internal($representation_value);
+            $internal_value['network'] = parent::_to_internal($representation_value);
 
             # Append the `ip` modifier if it was set
-            $internal_value["network"] .= ($if_ip_modifier_set) ? "ip" : "";
+            $internal_value['network'] .= $if_ip_modifier_set ? 'ip' : '';
         }
 
         return $internal_value;
@@ -348,27 +356,27 @@ class FilterAddressField extends InterfaceField
     protected function _from_internal(mixed $internal_value): string
     {
         # Assign a variable to use when piecing back together our representation value
-        $representation_value = "";
+        $representation_value = '';
 
         # If the `any` flag is set, the representation value has to be `any`
-        if (isset($internal_value["any"])) {
-            return "any";
+        if (isset($internal_value['any'])) {
+            return 'any';
         }
 
         # If the `not` flag is set, prefix the representation with `!`
-        if (isset($internal_value["not"])) {
+        if (isset($internal_value['not'])) {
             $representation_value .= self::INVERT_PREFIX;
         }
 
         # If there is a `network` internal value that ends with `ip`, represent it as `:ip`
-        if (str_ends_with($internal_value["network"], "ip")) {
-            $representation_value .= parent::_from_internal(substr($internal_value["network"], 0, -2)).":ip";
+        if (str_ends_with($internal_value['network'], 'ip')) {
+            $representation_value .= parent::_from_internal(substr($internal_value['network'], 0, -2)) . ':ip';
             return $representation_value;
         }
 
         # If there is a `network` internal value set that did not match the previous condition, format and return it
-        if (isset($internal_value["network"])) {
-            $representation_value .= parent::_from_internal($internal_value["network"]);
+        if (isset($internal_value['network'])) {
+            $representation_value .= parent::_from_internal($internal_value['network']);
             return $representation_value;
         }
 
@@ -379,6 +387,6 @@ class FilterAddressField extends InterfaceField
         }
 
         # As a failsafe, return an unknown string if we somehow didn't match the previous conditions
-        return "unknown";
+        return 'unknown';
     }
 }

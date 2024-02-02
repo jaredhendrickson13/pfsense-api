@@ -11,7 +11,8 @@ class APICoreDispatcherTestCase extends TestCase
      * Checks that the `max_concurrency` property limits the number of active Dispatcher process that can
      * be spawn.
      */
-    public function test_max_concurrency() {
+    public function test_max_concurrency()
+    {
         # Create a test dispatcher and spawn the maximum number of processes
         $dispatcher = new Dispatcher();
         $dispatcher->max_concurrency = 2;
@@ -20,11 +21,11 @@ class APICoreDispatcherTestCase extends TestCase
 
         # Ensure an error is thrown trying to spawn another
         $this->assert_throws_response(
-            response_id: "DISPATCHER_TOO_MANY_CONCURRENT_PROCESSES",
+            response_id: 'DISPATCHER_TOO_MANY_CONCURRENT_PROCESSES',
             code: 503,
             callable: function () use ($dispatcher) {
                 $dispatcher->spawn_process();
-            }
+            },
         );
 
         # Kill the running processes
@@ -34,7 +35,8 @@ class APICoreDispatcherTestCase extends TestCase
     /**
      * Checks that running processes are correctly identified by `get_running_processes()`
      */
-    public function test_get_running_processes() {
+    public function test_get_running_processes()
+    {
         # Create a test dispatcher
         $dispatcher = new Dispatcher();
 
@@ -52,7 +54,8 @@ class APICoreDispatcherTestCase extends TestCase
     /**
      * Checks that the PID file is created after process spawns.
      */
-    public function test_pid_file_exists_after_spawn() {
+    public function test_pid_file_exists_after_spawn()
+    {
         # Create a test dispatcher
         $dispatcher = new Dispatcher();
         $dispatcher->timeout = 2;
@@ -61,7 +64,7 @@ class APICoreDispatcherTestCase extends TestCase
         # Spawn the process and ensure the PID file exists and it's contents match the PID
         $pid = $dispatcher->spawn_process();
         $this->assert_is_true(is_file($pid_file));
-        $this->assert_equals((int)file_get_contents($pid_file), $pid);
+        $this->assert_equals((int) file_get_contents($pid_file), $pid);
 
         # Kill the processes
         $dispatcher->kill_running_processes();
@@ -70,7 +73,8 @@ class APICoreDispatcherTestCase extends TestCase
     /**
      * Checks that the PID and PID file are killed when `kill_running_processes()` is called
      */
-    public function test_kill_running_processes() {
+    public function test_kill_running_processes()
+    {
         # Create a test dispatcher
         $dispatcher = new Dispatcher();
         $dispatcher->timeout = 2;
@@ -88,7 +92,8 @@ class APICoreDispatcherTestCase extends TestCase
     /**
      * Checks that Dispatcher processes is correctly timed out after the specified amount of time.
      */
-    public function test_process_timeout() {
+    public function test_process_timeout()
+    {
         # Create a test dispatcher
         $dispatcher = new Dispatcher();
         $dispatcher->timeout = 2;
@@ -109,15 +114,16 @@ class APICoreDispatcherTestCase extends TestCase
     /**
      * Checks that a Dispatcher cannot be assigned an unsupported `schedule` value
      */
-    public function test_schedule_options(): void {
+    public function test_schedule_options(): void
+    {
         $this->assert_throws_response(
-            response_id: "DISPATCHER_SCHEDULE_UNSUPPORTED",
+            response_id: 'DISPATCHER_SCHEDULE_UNSUPPORTED',
             code: 500,
             callable: function () {
                 $dispatcher = new Dispatcher();
-                $dispatcher->schedule = "invalid_option";
+                $dispatcher->schedule = 'invalid_option';
                 $dispatcher->setup_schedule();
-            }
+            },
         );
     }
 
@@ -125,7 +131,8 @@ class APICoreDispatcherTestCase extends TestCase
      * Checks that the Dispatcher's `setup_schedule()` method creates a CronJob for the Dispatcher using the `schedule`
      * property.
      */
-    public function test_setup_schedule(): void {
+    public function test_setup_schedule(): void
+    {
         # Create a Dispatcher to test with but do not assign it a schedule yet
         $dispatcher = new Dispatcher();
 
@@ -133,14 +140,13 @@ class APICoreDispatcherTestCase extends TestCase
         $this->assert_equals($dispatcher->setup_schedule(), null);
 
         # Assign the dispatcher a schedule and ensure setup_schedule() returns a CronJob object with the correct schedule
-        $dispatcher->schedule = "daily";
+        $dispatcher->schedule = 'daily';
         $dispatcher_cron_job = $dispatcher->setup_schedule();
-        $cron_job_cmd = "/usr/local/pkg/RESTAPI/.resources/scripts/manage.php notifydispatcher Dispatcher";
+        $cron_job_cmd = '/usr/local/pkg/RESTAPI/.resources/scripts/manage.php notifydispatcher Dispatcher';
         $this->assert_equals($dispatcher_cron_job->minute->value, "@$dispatcher->schedule");
         $this->assert_equals($dispatcher_cron_job->command->value, $cron_job_cmd);
 
         # Delete the CronJob
         $dispatcher_cron_job->delete();
     }
-
 }

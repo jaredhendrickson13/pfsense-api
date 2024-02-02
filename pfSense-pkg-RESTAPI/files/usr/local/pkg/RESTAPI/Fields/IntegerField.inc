@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Fields;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 
@@ -10,7 +10,8 @@ use RESTAPI;
  * Defines a IntegerField class that extends the Core Field method. This Field adds validation and representation for
  * integer type Model Fields.
  */
-class IntegerField extends RESTAPI\Core\Field {
+class IntegerField extends RESTAPI\Core\Field
+{
     public int $minimum;
     public int $maximum;
 
@@ -72,7 +73,7 @@ class IntegerField extends RESTAPI\Core\Field {
         bool $unique = false,
         mixed $default = null,
         array $choices = [],
-        string $choices_callable = "",
+        string $choices_callable = '',
         bool $allow_null = false,
         bool $editable = true,
         bool $read_only = false,
@@ -83,21 +84,20 @@ class IntegerField extends RESTAPI\Core\Field {
         int $many_maximum = 128,
         int $minimum = 0,
         int $maximum = 99999999999999,
-        string|null $delimiter = ",",
-        string $verbose_name = "",
-        string $verbose_name_plural = "",
-        string $internal_name = "",
-        string $internal_namespace = "",
+        string|null $delimiter = ',',
+        string $verbose_name = '',
+        string $verbose_name_plural = '',
+        string $internal_name = '',
+        string $internal_namespace = '',
         array $referenced_by = [],
         array $conditions = [],
         array $validators = [],
-        string $help_text = ""
-    )
-    {
+        string $help_text = '',
+    ) {
         $this->minimum = $minimum;
         $this->maximum = $maximum;
         parent::__construct(
-            type: "integer",
+            type: 'integer',
             required: $required,
             unique: $unique,
             default: $default,
@@ -118,8 +118,10 @@ class IntegerField extends RESTAPI\Core\Field {
             internal_namespace: $internal_namespace,
             referenced_by: $referenced_by,
             conditions: $conditions,
-            validators: $validators + [new RESTAPI\Validators\NumericRangeValidator(minimum: $minimum, maximum: $maximum)],
-            help_text: $help_text
+            validators: $validators + [
+                new RESTAPI\Validators\NumericRangeValidator(minimum: $minimum, maximum: $maximum),
+            ],
+            help_text: $help_text,
         );
     }
 
@@ -128,14 +130,15 @@ class IntegerField extends RESTAPI\Core\Field {
      * @param string $internal_value The internal value from the pfSense configuration.
      * @return int The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value) : mixed {
+    protected function _from_internal(mixed $internal_value): mixed
+    {
         # Return the value as an integer if it's numeric
         if (is_numeric($internal_value)) {
             return intval($internal_value);
         }
 
         # If the value is an empty string, assume it's null
-        if ($internal_value === "") {
+        if ($internal_value === '') {
             return null;
         }
 
@@ -143,7 +146,7 @@ class IntegerField extends RESTAPI\Core\Field {
         throw new RESTAPI\Responses\ServerError(
             message: "Cannot parse IntegerField '$this->name' from internal because its internal value is not
                     a numeric value. Consider changing this field to a StringField.",
-            response_id: "INTEGER_FIELD_WITH_NON_INTEGER_INTERNAL_VALUE"
+            response_id: 'INTEGER_FIELD_WITH_NON_INTEGER_INTERNAL_VALUE',
         );
     }
 
@@ -154,18 +157,18 @@ class IntegerField extends RESTAPI\Core\Field {
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this field as a OpenAPI schema property configuration.
      */
-    public function to_openapi_property() : array {
+    public function to_openapi_property(): array
+    {
         # Run the parent to_openapi_property() to obtain the base property object, then make changes as needed.
         $openapi_property = parent::to_openapi_property();
 
         # Add the minimum and maximum to the OpenAPI property.
         if ($this->many) {
-            $openapi_property["items"]["minimum"] = $this->minimum;
-            $openapi_property["items"]["maximum"] = $this->maximum;
-        }
-        else {
-            $openapi_property["minimum"] = $this->minimum;
-            $openapi_property["maximum"] = $this->maximum;
+            $openapi_property['items']['minimum'] = $this->minimum;
+            $openapi_property['items']['maximum'] = $this->maximum;
+        } else {
+            $openapi_property['minimum'] = $this->minimum;
+            $openapi_property['maximum'] = $this->maximum;
         }
 
         return $openapi_property;
@@ -179,8 +182,9 @@ class IntegerField extends RESTAPI\Core\Field {
      * @return object The pfSense webConfigurator form input object.
      * @link https://github.com/pfsense/pfsense/tree/master/src/usr/local/www/classes/Form
      */
-    public function to_form_input(string $type = "number", array $attributes = []) : object {
-        $attributes += ["min" => $this->minimum, "max" => $this->maximum];
+    public function to_form_input(string $type = 'number', array $attributes = []): object
+    {
+        $attributes += ['min' => $this->minimum, 'max' => $this->maximum];
         return parent::to_form_input(type: $type, attributes: $attributes);
     }
 }

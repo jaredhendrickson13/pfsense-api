@@ -37,7 +37,7 @@ class InterfaceApplyDispatcher extends Dispatcher
                     interface_configure($id, true);
 
                     # Reconfigure track6 if this is a track6 enabled interface
-                    if ($new_interface["ipaddrv6"] == "track6") {
+                    if ($new_interface['ipaddrv6'] == 'track6') {
                         interface_track6_configure($id, $new_interface, true);
                     }
                 }
@@ -47,12 +47,14 @@ class InterfaceApplyDispatcher extends Dispatcher
                 }
 
                 restart_interface_services($id, $new_interface['ipaddrv6']);
-                $new_interface["mtu"] = config_get_path("interfaces/{$id}/mtu");
+                $new_interface['mtu'] = config_get_path("interfaces/{$id}/mtu");
 
                 # Check if VLANs need to be redone
-                if (interface_has_clones($real_interface) &&
-                    ($new_interface["mtu"] && ($new_interface["mtu"] != $real_interface_mtu)) ||
-                    (!$new_interface["mtu"] && (get_interface_default_mtu() != $real_interface_mtu))) {
+                if (
+                    (interface_has_clones($real_interface) &&
+                        ($new_interface['mtu'] && $new_interface['mtu'] != $real_interface_mtu)) ||
+                    (!$new_interface['mtu'] && get_interface_default_mtu() != $real_interface_mtu)
+                ) {
                     $vlan_redo[] = $real_interface;
                 }
             }
@@ -69,12 +71,12 @@ class InterfaceApplyDispatcher extends Dispatcher
         enable_rrd_graphing();
 
         # Reload routing services
-        if (is_subsystem_dirty('staticroutes') && (system_routing_configure() == 0)) {
+        if (is_subsystem_dirty('staticroutes') && system_routing_configure() == 0) {
             clear_subsystem_dirty('staticroutes');
         }
 
         # Reload packages
-        send_event("service reload packages");
+        send_event('service reload packages');
 
         # Clear the pending changes now that they're applied
         clear_subsystem_dirty('interfaces');

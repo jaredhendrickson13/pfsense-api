@@ -67,51 +67,59 @@ R02Pul8ulWQ8Kl3Q3pou8As7W1mMzA2DxQ==
     /**
      * Checks that a CertificateAuthority cannot have `crt` and `prv` values that are not a matching key pair.
      */
-    public function test_crt_and_prv_are_matching_keypair() {
+    public function test_crt_and_prv_are_matching_keypair()
+    {
         $this->assert_throws_response(
-            response_id: "CERTIFICATE_AUTHORITY_CRT_AND_PRV_NOT_KEYPAIR",
+            response_id: 'CERTIFICATE_AUTHORITY_CRT_AND_PRV_NOT_KEYPAIR',
             code: 400,
             callable: function () {
-                $cert = new CertificateAuthority(data: [
-                    "descr" => "test",
-                    "crt" => self::EXAMPLE_CRT,
-                    "prv" => self::EXAMPLE_ECPRV
-                ]);
+                $cert = new CertificateAuthority(
+                    data: [
+                        'descr' => 'test',
+                        'crt' => self::EXAMPLE_CRT,
+                        'prv' => self::EXAMPLE_ECPRV,
+                    ],
+                );
                 $cert->validate();
-            }
+            },
         );
 
         $this->assert_does_not_throw(
             callable: function () {
-                $cert = new CertificateAuthority(data: [
-                    "descr" => "test",
-                    "crt" => self::EXAMPLE_CRT,
-                    "prv" => self::EXAMPLE_PRV
-                ]);
+                $cert = new CertificateAuthority(
+                    data: [
+                        'descr' => 'test',
+                        'crt' => self::EXAMPLE_CRT,
+                        'prv' => self::EXAMPLE_PRV,
+                    ],
+                );
                 $cert->validate();
-            }
+            },
         );
     }
 
     /**
      * Checks that the CA is found in the OS trust store when `trust` is enabled.
      */
-    public function test_ca_trust() {
+    public function test_ca_trust()
+    {
         # Create a CA to test with
-        $ca = new CertificateAuthority(data: [
-            "descr" => "test",
-            "crt" => self::EXAMPLE_CRT,
-            "prv" => self::EXAMPLE_PRV,
-            "trust" => true
-        ]);
+        $ca = new CertificateAuthority(
+            data: [
+                'descr' => 'test',
+                'crt' => self::EXAMPLE_CRT,
+                'prv' => self::EXAMPLE_PRV,
+                'trust' => true,
+            ],
+        );
         $ca->create();
 
         # Wait a few seconds for the trust store to be rebuilt
         sleep(3);
 
         # Ensure the certificate is found in the trust store
-        $certctl_list = new Command("certctl list");
-        $this->assert_str_contains($certctl_list->output, "example.com");
+        $certctl_list = new Command('certctl list');
+        $this->assert_str_contains($certctl_list->output, 'example.com');
 
         # Disable `trust`
         $ca->trust->value = false;
@@ -121,8 +129,8 @@ R02Pul8ulWQ8Kl3Q3pou8As7W1mMzA2DxQ==
         sleep(3);
 
         # Ensure the certificate is not found in the trust store
-        $certctl_list = new Command("certctl list");
-        $this->assert_str_does_not_contain($certctl_list->output, "example.com");
+        $certctl_list = new Command('certctl list');
+        $this->assert_str_does_not_contain($certctl_list->output, 'example.com');
 
         # Delete the CA
         $ca->delete();

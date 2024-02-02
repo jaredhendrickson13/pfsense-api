@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Core;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Responses\ServerError;
 use RESTAPI\Responses\ValidationError;
@@ -13,7 +13,7 @@ use const RESTAPI\Core\Globals\RESERVED_FIELD_NAMES;
 /**
  * Defines Model Fields and their attributes. Field's define how value should be obtained on pfSense internally, and
  * converted into its representation form. Fields are also responsible for validation of this Field's value. This
- * includes strict type validation, choice options, whether the value can be null or empty, etc. Field's can also be 
+ * includes strict type validation, choice options, whether the value can be null or empty, etc. Field's can also be
  * assigned custom Validator objects to add custom validation to the Field. Field's must be assigned as a properties
  * Model objects.
  */
@@ -23,7 +23,7 @@ class Field extends BaseClass
      * @const SENSITIVE_MASK The value that is used to mask the value of a $sensitive Field object. This only applies
      * to values shown in the webConfigurator.
      */
-    const SENSITIVE_MASK = "********";
+    const SENSITIVE_MASK = '********';
 
     /**
      * Represents the current value for this Field.
@@ -55,7 +55,7 @@ class Field extends BaseClass
      *
      * @var string $name
      */
-    public string $name = "";
+    public string $name = '';
 
     /**
      * Represents the parent Model this Field object is assigned to. Use this to obtain additional context about the Model,
@@ -64,7 +64,6 @@ class Field extends BaseClass
      * @var Model|null $context
      */
     public Model|null $context = null;
-
 
     /**
      * Defines attributes for a Model Field.
@@ -147,34 +146,34 @@ class Field extends BaseClass
      */
 
     public function __construct(
-        public string $type = "",
-        public bool   $required = false,
-        public bool   $unique = false,
-        public mixed  $default = null,
-        public array  $choices = [],
-        public string $choices_callable = "",
-        public bool   $allow_empty = false,
-        public bool   $allow_null = false,
-        public bool   $editable = true,
-        public bool   $read_only = false,
-        public bool   $write_only = false,
-        public bool   $sensitive = false,
-        public bool   $representation_only = false,
-        public bool   $many = false,
-        public int    $many_minimum = 1,
-        public int    $many_maximum = 128,
-        public string|null $delimiter = ",",
-        public string $verbose_name = "",
-        public string $verbose_name_plural = "",
-        public string $internal_name = "",
-        public string $internal_namespace = "",
-        public array  $referenced_by = [],
-        public array  $conditions = [],
-        public array  $validators = [],
-        public string $help_text = ""
-    ){
+        public string $type = '',
+        public bool $required = false,
+        public bool $unique = false,
+        public mixed $default = null,
+        public array $choices = [],
+        public string $choices_callable = '',
+        public bool $allow_empty = false,
+        public bool $allow_null = false,
+        public bool $editable = true,
+        public bool $read_only = false,
+        public bool $write_only = false,
+        public bool $sensitive = false,
+        public bool $representation_only = false,
+        public bool $many = false,
+        public int $many_minimum = 1,
+        public int $many_maximum = 128,
+        public string|null $delimiter = ',',
+        public string $verbose_name = '',
+        public string $verbose_name_plural = '',
+        public string $internal_name = '',
+        public string $internal_namespace = '',
+        public array $referenced_by = [],
+        public array $conditions = [],
+        public array $validators = [],
+        public string $help_text = '',
+    ) {
         # Allow null values if this Field is read_only
-        $this->allow_null = ($this->read_only) ? true : $this->allow_null;
+        $this->allow_null = $this->read_only ? true : $this->allow_null;
 
         # Set the many_minimum value to 0 if allow_empty and many are enabled
         if ($this->many and $this->allow_empty) {
@@ -192,7 +191,8 @@ class Field extends BaseClass
      * Allows the Field's current value to be obtained by invoking the field object.
      * @returns mixed The value currently set in $this->value
      */
-    final public function __invoke() : mixed {
+    final public function __invoke(): mixed
+    {
         return $this->value;
     }
 
@@ -200,36 +200,37 @@ class Field extends BaseClass
      * Checks that values passed in during __construct are valid and do not conflict.
      * @throws ServerError When any Field properties have conflicting values.
      */
-    private function check_construct() {
+    private function check_construct()
+    {
         # Throw an error if `required` and `default` are both set
         if ($this->required and isset($this->default)) {
             throw new ServerError(
-                message: "Required Fields cannot have a default.",
-                response_id: "FIELD_CANNOT_BE_REQUIRED_WITH_DEFAULT"
+                message: 'Required Fields cannot have a default.',
+                response_id: 'FIELD_CANNOT_BE_REQUIRED_WITH_DEFAULT',
             );
         }
 
         # Throw an error if `required` and `read_only` are both set
         if ($this->required and $this->read_only) {
             throw new ServerError(
-                message: "Required Fields cannot be read only.",
-                response_id: "FIELD_CANNOT_BE_REQUIRED_WITH_READ_ONLY"
+                message: 'Required Fields cannot be read only.',
+                response_id: 'FIELD_CANNOT_BE_REQUIRED_WITH_READ_ONLY',
             );
         }
 
         # Throw an error if `required` and `allow_null` are both set
         if ($this->required and $this->allow_null) {
             throw new ServerError(
-                message: "Required Fields cannot allow null values.",
-                response_id: "FIELD_CANNOT_BE_REQUIRED_WITH_ALLOW_NULL"
+                message: 'Required Fields cannot allow null values.',
+                response_id: 'FIELD_CANNOT_BE_REQUIRED_WITH_ALLOW_NULL',
             );
         }
 
         # Do not allow this field to be `read_only` AND `write_only`
         if ($this->read_only and $this->write_only) {
             throw new ServerError(
-                message: "Fields cannot be both read-only and write-only.",
-                response_id: "FIELD_WITH_READ_ONLY_AND_WRITE_ONLY"
+                message: 'Fields cannot be both read-only and write-only.',
+                response_id: 'FIELD_WITH_READ_ONLY_AND_WRITE_ONLY',
             );
         }
 
@@ -237,7 +238,7 @@ class Field extends BaseClass
         if ($this->many_minimum > $this->many_maximum) {
             throw new ServerError(
                 message: "Fields cannot have a 'many_minimum' value greater than 'many_maximum'",
-                response_id: "FIELD_MANY_MINIMUM_GREATER_THAN_MANY_MAXIMUM"
+                response_id: 'FIELD_MANY_MINIMUM_GREATER_THAN_MANY_MAXIMUM',
             );
         }
 
@@ -245,7 +246,7 @@ class Field extends BaseClass
         if ($this->choices and $this->choices_callable) {
             throw new ServerError(
                 message: "Fields cannot have `choices' and a `choices_callable` assigned",
-                response_id: "FIELD_WITH_CHOICES_AND_CHOICES_CALLABLE"
+                response_id: 'FIELD_WITH_CHOICES_AND_CHOICES_CALLABLE',
             );
         }
     }
@@ -256,15 +257,16 @@ class Field extends BaseClass
      * property assigned this Field in the parent Model.
      * @param string $name The name to assign this Field.
      */
-    public function set_names(string $name) {
+    public function set_names(string $name)
+    {
         # Throw an error if this Field name is reserved
         if (in_array($name, RESERVED_FIELD_NAMES)) {
             throw new ServerError(
                 message: "Field cannot be assigned name `$name` because it is reserved by the system.",
-                response_id: "FIELD_CANNOT_USE_RESERVED_NAME"
+                response_id: 'FIELD_CANNOT_USE_RESERVED_NAME',
             );
         }
-        
+
         # Assign the `name` property using the provided name
         $this->name = $name;
 
@@ -275,12 +277,12 @@ class Field extends BaseClass
 
         # If no `verbose_name` was provided, assign it based off the current `name`
         if (!$this->verbose_name) {
-            $this->verbose_name = str_replace("_", " ", $this->name);
+            $this->verbose_name = str_replace('_', ' ', $this->name);
         }
 
         # If no `verbose_name_plural` was provided, assign it based off the current `name`.
         if (!$this->verbose_name_plural) {
-            $this->verbose_name_plural = (str_ends_with($this->verbose_name, "s")) ? "es" : "s";
+            $this->verbose_name_plural = str_ends_with($this->verbose_name, 's') ? 'es' : 's';
         }
     }
 
@@ -299,8 +301,8 @@ class Field extends BaseClass
         else {
             # Default verbose choice to the value, replace underscores with spaces and capitalize first letter
             $this->choices = $choices;
-            foreach($choices as $choice) {
-                $this->verbose_choices[$choice] = ucfirst(str_replace("_", " ", $choice));
+            foreach ($choices as $choice) {
+                $this->verbose_choices[$choice] = ucfirst(str_replace('_', ' ', $choice));
             }
         }
     }
@@ -308,7 +310,8 @@ class Field extends BaseClass
     /**
      * Sets choices by calling the `choices_callable` method if present.
      */
-    public function set_choices_from_callable() : void {
+    public function set_choices_from_callable(): void
+    {
         # If a choices callable is assigned, run the callable to populate the choices if allowed
         if ($this->choices_callable) {
             # Set a variable we can use to dynamic invoke the callable
@@ -326,7 +329,7 @@ class Field extends BaseClass
             else {
                 throw new ServerError(
                     message: "Could not find choices callable method `$callable` in Field object nor its parent Model.",
-                    response_id: "FIELD_CHOICES_CALLABLE_NOT_FOUND"
+                    response_id: 'FIELD_CHOICES_CALLABLE_NOT_FOUND',
                 );
             }
         }
@@ -338,7 +341,8 @@ class Field extends BaseClass
      * @param string $label_name The name of the label to check for (e.g. `is_ipaddrv4`)
      * @return bool Returns `true` if this Field object is assigned the $label_name, `false` if it is not.
      */
-    public function has_label(string $label_name) : bool {
+    public function has_label(string $label_name): bool
+    {
         return in_array($label_name, $this->labels);
     }
 
@@ -349,7 +353,8 @@ class Field extends BaseClass
      * where we need to validate many objects before they are created.
      * @return bool `true` if all validation succeeded.
      */
-    public function validate(?ModelSet $modelset = null) : bool {
+    public function validate(?ModelSet $modelset = null): bool
+    {
         # Ensure model context exists when needed
         $this->check_model_context();
 
@@ -358,7 +363,7 @@ class Field extends BaseClass
             $this->value = null;
             return true;
         }
-        
+
         # Ensure this field object has a name set
         $this->check_field_names();
 
@@ -389,7 +394,7 @@ class Field extends BaseClass
         $this->labels = [];
 
         # Loop through each value to be validated
-        foreach($values as $value) {
+        foreach ($values as $value) {
             # Ensure the value's type is supported
             $this->check_value_type($value);
 
@@ -422,31 +427,33 @@ class Field extends BaseClass
 
     /**
      * This method can be overridden by a child Field class to added extra validation for the Field. This method is
-     * executed at the end of the `validate()` method. 
+     * executed at the end of the `validate()` method.
      * @param mixed $value The value being validated. In the event that this is a `many` field, this method will
      * receive each value of the array individually, not the array value itself.
      */
-    public function validate_extra(mixed $value) {
+    public function validate_extra(mixed $value)
+    {
     }
 
     /**
      * Ensures this field has a parent model context assigned if a parent model context is required.
      * @throws ServerError When `unique` or `conditions` are set, but no Model `context` has been assigned.
      */
-    private function check_model_context() {
+    private function check_model_context()
+    {
         # Throw an error if this field is unique but no model context was provided
         if ($this->unique and !$this->context) {
             throw new ServerError(
-                message: "Unique Fields must have model context provided.",
-                response_id: "FIELD_UNIQUE_WITH_NO_CONTEXT"
+                message: 'Unique Fields must have model context provided.',
+                response_id: 'FIELD_UNIQUE_WITH_NO_CONTEXT',
             );
         }
 
         # Throw an error if this field is a conditional field, but no model context was provided
         if ($this->conditions and !$this->context) {
             throw new ServerError(
-                message: "Conditional Fields must have model context provided.",
-                response_id: "FIELD_CONDITIONAL_WITH_NO_CONTEXT"
+                message: 'Conditional Fields must have model context provided.',
+                response_id: 'FIELD_CONDITIONAL_WITH_NO_CONTEXT',
             );
         }
     }
@@ -457,21 +464,22 @@ class Field extends BaseClass
      * @throws ValidationError When this is not an `editable` Field, but the value given differs from the value stored
      * for the parent Model context
      */
-    private function is_value_editable(): void {
+    private function is_value_editable(): void
+    {
         # Only proceed with validation if the parent Model has an initial object set and this value is not editable
         if (is_null($this->context->initial_object) or $this->editable) {
             return;
         }
-        
+
         # Obtain the current value for this field
         $current_value = $this->context->initial_object->{$this->name}->value;
 
         # Throw an error if this is a non `editable` field but the values changed.
         if ($this->value !== $current_value) {
             throw new ValidationError(
-                message: "Field `$this->name` is not editable but the requested value `$this->value` differs from its ".
+                message: "Field `$this->name` is not editable but the requested value `$this->value` differs from its " .
                     "current value `$current_value`.",
-                response_id: "FIELD_VALUE_CHANGED_WHEN_NOT_EDITABLE"
+                response_id: 'FIELD_VALUE_CHANGED_WHEN_NOT_EDITABLE',
             );
         }
     }
@@ -482,10 +490,11 @@ class Field extends BaseClass
      * @note The condition can reference a parent's Model Field by prefixing parent__ to the conditions array key.
      * @returns bool `true` if all conditions were met, `false` if any conditions failed.
      */
-    private function are_conditions_met() : bool {
+    private function are_conditions_met(): bool
+    {
         # Variables
         $conditions_met = true;
-        
+
         # Consider conditions to be met if no conditions were specified
         if (!$this->conditions) {
             return true;
@@ -494,25 +503,23 @@ class Field extends BaseClass
         # Loop through each condition and check if it is met
         foreach ($this->conditions as $condition_field => $condition_value) {
             # Check if this field is inverted, strip the invert character if so
-            if (str_starts_with($condition_field, "!")) {
+            if (str_starts_with($condition_field, '!')) {
                 $is_inverted = true;
                 $condition_field = substr($condition_field, 1);
-            }
-            else {
+            } else {
                 $is_inverted = false;
             }
-            
+
             # Check if the condition applies to the context model's parent
-            if (str_starts_with($condition_field, "parent__")) {
+            if (str_starts_with($condition_field, 'parent__')) {
                 $is_parent_field = true;
-                $condition_field = str_replace("parent__", "", $condition_field);
-            }
-            else {
+                $condition_field = str_replace('parent__', '', $condition_field);
+            } else {
                 $is_parent_field = false;
             }
-            
+
             # Use the parent model as the context if this is a parent field, otherwise use this field's context model
-            $context_model = ($is_parent_field) ? $this->context->parent_model : $this->context;
+            $context_model = $is_parent_field ? $this->context->parent_model : $this->context;
 
             # Safety check to ensure the Model context even has a field with the field name specified in the condition
             if (!in_array($condition_field, $context_model->get_fields())) {
@@ -520,7 +527,7 @@ class Field extends BaseClass
                 throw new ServerError(
                     message: "Field '$this->name' contains a condition for field `$condition_field` from 
                         its assigned Model '$assigned_model_class', but '$assigned_model_class' has no such field. ",
-                    response_id: "FIELD_CONDITIONS_REQUIRE_NON_EXISTENT_MODEL_FIELD"
+                    response_id: 'FIELD_CONDITIONS_REQUIRE_NON_EXISTENT_MODEL_FIELD',
                 );
             }
 
@@ -556,20 +563,18 @@ class Field extends BaseClass
      * @throws ServerError When `required` and `default` are both set OR `required` and `allow_null` are both set.
      * @throws ValidationError If `required` is set but no value was assigned.
      */
-    private function check_field_required() {
+    private function check_field_required()
+    {
         # Throw an error if this field is required but no value was set.
         if ($this->required and is_null($this->value)) {
-            throw new ValidationError(
-                message: "Field `$this->name` is required.",
-                response_id: "FIELD_IS_REQUIRED"
-            );
+            throw new ValidationError(message: "Field `$this->name` is required.", response_id: 'FIELD_IS_REQUIRED');
         }
 
         # Throw an error if field is not required but no default was specified and `allow_null` is not set.
         if (!$this->required and !isset($this->default) and !$this->allow_null) {
             throw new ServerError(
                 message: "Field `$this->name` must have a default or allow null values if not required.",
-                response_id: "FIELD_NEEDS_DEFAULT"
+                response_id: 'FIELD_NEEDS_DEFAULT',
             );
         }
     }
@@ -579,12 +584,13 @@ class Field extends BaseClass
      * @throws ServerError When `read_only` is set and `choices` or `default` are also set.
      * @throws ValidationError When `read_only` is set and a non-null value was requested.
      */
-    private function check_field_read_only() {
+    private function check_field_read_only()
+    {
         # Throw an error if the field is read only, but choices were defined
         if ($this->read_only and $this->choices) {
             throw new ServerError(
                 message: "Read-only field `$this->name` cannot have value choices.",
-                response_id: "FIELD_NO_CHOICES_WITH_READ_ONLY"
+                response_id: 'FIELD_NO_CHOICES_WITH_READ_ONLY',
             );
         }
     }
@@ -593,7 +599,8 @@ class Field extends BaseClass
      * Checks the length of the value array when `many` is enabled. This ensures there are at least as many array
      * entries as specified with `many_minimum` but no more array entries than specified with `many_maximum`.
      */
-    private function check_many_value_length() {
+    private function check_many_value_length()
+    {
         # Only validate this if 'many' is enabled.
         if ($this->many and is_array($this->value)) {
             # Ensure the value contains an appropriate number of array entries
@@ -610,7 +617,8 @@ class Field extends BaseClass
      * @returns array An array containing all individual values that need validation.
      * @throws ValidationError When `many` is enabled, but `value` is not an array.
      */
-    private function get_value_as_array() : array|null {
+    private function get_value_as_array(): array|null
+    {
         # Assume the default value if no value was set and a default was specified
         if (isset($this->default) and is_null($this->value)) {
             $this->value = $this->default;
@@ -622,7 +630,7 @@ class Field extends BaseClass
             if (!is_array($this->value) and !is_null($this->value)) {
                 throw new ValidationError(
                     message: "Field `$this->name` must be of type `array`.",
-                    response_id: "FIELD_INVALID_MANY_VALUE"
+                    response_id: 'FIELD_INVALID_MANY_VALUE',
                 );
             }
 
@@ -639,20 +647,21 @@ class Field extends BaseClass
      * `internal_name` was not specified, the `internal_name` will be assigned the same value as `name` by this method.
      * @throws ServerError When this object's `name` has not been set.
      */
-    public function check_field_names() {
+    public function check_field_names()
+    {
         # Throw an error if no `name` has been set.
         if (empty($this->name)) {
             throw new ServerError(
-                message: "Field object must be assigned a `name` value after it is constructed.",
-                response_id: "FIELD_UNNAMED"
+                message: 'Field object must be assigned a `name` value after it is constructed.',
+                response_id: 'FIELD_UNNAMED',
             );
         }
         # Throw an error if the name contains double underscores (`__`) as this can conflict with queries
-        if (str_contains($this->name, "__")) {
+        if (str_contains($this->name, '__')) {
             throw new ServerError(
-                message: "Field name '$this->name' is invalid because it contains double underscores. Double ".
-                    "underscores are reserved for queries only.",
-                response_id: "FIELD_NAME_WITH_DOUBLE_UNDERSCORE_NOT_ALLOWED"
+                message: "Field name '$this->name' is invalid because it contains double underscores. Double " .
+                    'underscores are reserved for queries only.',
+                response_id: 'FIELD_NAME_WITH_DOUBLE_UNDERSCORE_NOT_ALLOWED',
             );
         }
     }
@@ -672,31 +681,30 @@ class Field extends BaseClass
      * @throws ServerError When $unique is enabled but a $config_path is not assigned to the parent model $context
      * @throws ServerError When $unique is enabled, but the parent model $context does not have $many enabled
      */
-    private function check_field_unique(mixed $value, ?ModelSet $modelset = null): void {
+    private function check_field_unique(mixed $value, ?ModelSet $modelset = null): void
+    {
         # Only check this if `unique` is enabled
         if ($this->unique) {
             # Throw an error if unique is set but the model context is not a 'many' model.
             if (!$this->context->many) {
                 throw new ServerError(
                     message: "Field '$this->name' cannot be 'unique' when its model context does not have 'many' enabled.",
-                    response_id: "FIELD_UNIQUE_WITHOUT_MANY_MODEL_CONTEXT"
+                    response_id: 'FIELD_UNIQUE_WITHOUT_MANY_MODEL_CONTEXT',
                 );
             }
 
             # Use $modelset if provided. Otherwise, use all existing $context model objects as the $modelset
-            $modelset = ($modelset) ?: $this->context->read_all(parent_id: $this->context->parent_id);
+            $modelset = $modelset ?: $this->context->read_all(parent_id: $this->context->parent_id);
 
             # If this is a $many field, query for any other object has this value in the array
             if ($this->many) {
                 $query = $modelset->query(
-                    query_params: ["id__except" => $this->context->id, "{$this->name}__has" => $value]
+                    query_params: ['id__except' => $this->context->id, "{$this->name}__has" => $value],
                 );
             }
             # Otherwise, query for any other of the parent context's Model objects with the same exact field value
             else {
-                $query = $modelset->query(
-                    query_params: ["id__except" => $this->context->id, $this->name => $value]
-                );
+                $query = $modelset->query(query_params: ['id__except' => $this->context->id, $this->name => $value]);
             }
 
             # If we found another object with matching Fields, throw a validation error
@@ -704,7 +712,7 @@ class Field extends BaseClass
                 $model_object = $query->first();
                 throw new ValidationError(
                     message: "Field '$this->name' must be unique. Value is in use by object with ID '$model_object->id'.",
-                    response_id: "FIELD_MUST_BE_UNIQUE"
+                    response_id: 'FIELD_MUST_BE_UNIQUE',
                 );
             }
         }
@@ -715,7 +723,8 @@ class Field extends BaseClass
      * @param mixed $value The value to check against assigned `type`.
      * @throws ValidationError If the specified value is not a supported type.
      */
-    protected function check_value_type(mixed $value) {
+    protected function check_value_type(mixed $value)
+    {
         # Don't validate type for `read_only` Fields
         if ($this->read_only) {
             return;
@@ -730,7 +739,7 @@ class Field extends BaseClass
         if ($this->type !== gettype($value)) {
             throw new ValidationError(
                 message: "Field `$this->name` must be of type `$this->type`",
-                response_id: "FIELD_INVALID_TYPE"
+                response_id: 'FIELD_INVALID_TYPE',
             );
         }
     }
@@ -740,7 +749,8 @@ class Field extends BaseClass
      * @param mixed $value The value to check against available choices.
      * @returns ValidationError When the $value is not an available choice.
      */
-    private function check_value_choice(mixed $value) {
+    private function check_value_choice(mixed $value)
+    {
         # Skip choice validation if no choices were specified and no choice callable was assigned
         if (!$this->choices and !$this->choices_callable) {
             return;
@@ -752,10 +762,10 @@ class Field extends BaseClass
         # If choices are set, ensure this value is one of the choices
         if ($this->choices and !in_array($value, $this->choices)) {
             # Convert the choices array to a string format and throw a choice not supported
-            $choices_str = implode(", ", $this->choices);
+            $choices_str = implode(', ', $this->choices);
             throw new ValidationError(
                 message: "Field `$this->name` must be one of [$choices_str]",
-                response_id: "FIELD_INVALID_CHOICE"
+                response_id: 'FIELD_INVALID_CHOICE',
             );
         }
     }
@@ -766,7 +776,8 @@ class Field extends BaseClass
      * @return bool Returns `true` if value is empty and empty values are allowed. Returns `false` otherwise.
      * @@throws  ValidationError When the $value is empty but empty empty values are not allowed
      */
-    private function check_value_empty(mixed $value) : bool {
+    private function check_value_empty(mixed $value): bool
+    {
         # Skip this validation for read_only Fields
         if ($this->read_only) {
             return true;
@@ -775,14 +786,14 @@ class Field extends BaseClass
         # Check if value is an empty string or array. These are the only two types we consider possible to be empty
         # to avoid having to enable `allow_empty` for booleans, 0 integers, and null values
         # (which are checked separately).
-        if (!$this->allow_empty and ($value === "" or $value === [])) {
+        if (!$this->allow_empty and ($value === '' or $value === [])) {
             throw new ValidationError(
                 message: "Field `$this->name` cannot be empty.",
-                response_id: "FIELD_EMPTY_NOT_ALLOWED"
+                response_id: 'FIELD_EMPTY_NOT_ALLOWED',
             );
         }
         # Return true if empty values are allowed and the value was empty
-        elseif ($this->allow_empty and ($value === "" or $value === [])) {
+        elseif ($this->allow_empty and ($value === '' or $value === [])) {
             return true;
         }
 
@@ -798,10 +809,11 @@ class Field extends BaseClass
      * @param string $internal_value The internal config value to convert to a representation value.
      * @throws ServerError When the child Field class does not override this method.
      */
-    protected function _from_internal(string $internal_value) {
+    protected function _from_internal(string $internal_value)
+    {
         throw new ServerError(
             message: "Field '$this->name' does not have method of converting internal value to representation.",
-            response_id: "FIELD_CANNOT_REPRESENT_INTERNAL_VALUE"
+            response_id: 'FIELD_CANNOT_REPRESENT_INTERNAL_VALUE',
         );
     }
 
@@ -812,9 +824,10 @@ class Field extends BaseClass
      * `value` property for this object.
      * @param string|null $internal_value The raw internal config value to convert to a representation value.
      */
-    public function from_internal(mixed $internal_value) {
+    public function from_internal(mixed $internal_value)
+    {
         # Keep null values for non boolean values and representation only values
-        if ($this->representation_only or (is_null($internal_value) and $this->type !== "boolean")) {
+        if ($this->representation_only or is_null($internal_value) and $this->type !== 'boolean') {
             # Check if this field has a default, if so, use the default value
             if ($this->default and $this->are_conditions_met()) {
                 $internal_value = $this->default;
@@ -850,7 +863,7 @@ class Field extends BaseClass
             $this->value = $representation;
         }
         # For boolean values that do not have their conditions met, set to null.
-        elseif ($this->type === "boolean" and !$this->are_conditions_met()) {
+        elseif ($this->type === 'boolean' and !$this->are_conditions_met()) {
             $this->value = null;
         }
         # Otherwise, just convert the value to representation directly if conditions are met
@@ -870,8 +883,9 @@ class Field extends BaseClass
      * @param mixed $representation_value The value to convert into it's internal form.
      * @return array|string|null The internal value(s) suitable for writing to the pfSense configuration.
      */
-    protected function _to_internal(mixed $representation_value) : array|string|null {
-        return (is_null($representation_value)) ? null : strval($representation_value);
+    protected function _to_internal(mixed $representation_value): array|string|null
+    {
+        return is_null($representation_value) ? null : strval($representation_value);
     }
 
     /**
@@ -880,7 +894,8 @@ class Field extends BaseClass
      * the internal string value suitable for writing to the pfSense configuration.
      * @return array|string|null The internal array or string value suitable for writing the pfSense configuration.
      */
-    public function to_internal() : array|string|null {
+    public function to_internal(): array|string|null
+    {
         # Do not convert 'representation_only' Fields to internal
         if ($this->representation_only) {
             return null;
@@ -896,7 +911,7 @@ class Field extends BaseClass
             }
 
             # Return the values as an array if the delimiter is null, otherwise piece the array back into a string
-            return ($this->delimiter === null) ? $internal_values : implode($this->delimiter, $internal_values);
+            return $this->delimiter === null ? $internal_values : implode($this->delimiter, $internal_values);
         }
         # Otherwise, just convert the individual value to it's internal value
         else {
@@ -911,7 +926,8 @@ class Field extends BaseClass
      * @returns Model Returns the single Model object related to this Field's current value or `null` if no related
      * Model was found.
      */
-    public function get_related_model() : Model|null {
+    public function get_related_model(): Model|null
+    {
         return null;
     }
 
@@ -921,7 +937,8 @@ class Field extends BaseClass
      * $many set to true.
      * @returns ModelSet Returns a ModelSet of all related objects associated with this Fields current values.
      */
-    public function get_related_models() : ModelSet {
+    public function get_related_models(): ModelSet
+    {
         return new ModelSet();
     }
 
@@ -930,14 +947,15 @@ class Field extends BaseClass
      * current value.
      * @return ModelSet
      */
-    public function is_referenced_by() : ModelSet {
+    public function is_referenced_by(): ModelSet
+    {
         # Use a variable to keep track of Model objects that reference this field
         $references = new ModelSet();
 
         # Loop through each Model specified in `referenced_by`
         foreach ($this->referenced_by as $reference_model => $reference_fields) {
             # Ensure the reference Fields are always an array and reference model is FQN
-            $reference_fields = (is_array($reference_fields)) ? $reference_fields : [$reference_fields];
+            $reference_fields = is_array($reference_fields) ? $reference_fields : [$reference_fields];
             $reference_model = "\\RESTAPI\\Models\\$reference_model";
 
             # Loop through each referenced field and query for matches.
@@ -946,7 +964,7 @@ class Field extends BaseClass
                 $reference_model = new $reference_model();
                 $reference_query = $reference_model->query(
                     query_params: [$reference_field => $this->value],
-                    parent_id: $this->context->parent_id
+                    parent_id: $this->context->parent_id,
                 );
                 $references->model_objects = $references->model_objects + $reference_query->model_objects;
             }
@@ -962,37 +980,37 @@ class Field extends BaseClass
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this field as an OpenAPI schema property configuration.
      */
-    public function to_openapi_property() : array {
+    public function to_openapi_property(): array
+    {
         # Assign primitive property attributes
         $openapi_property = [];
-        $openapi_property["description"] = $this->help_text."<br>".$this->get_conditions_text();
-        $openapi_property["nullable"] = $this->allow_null;
-        $openapi_property["readOnly"] = $this->read_only;
-        $openapi_property["writeOnly"] = $this->write_only;
+        $openapi_property['description'] = $this->help_text . '<br>' . $this->get_conditions_text();
+        $openapi_property['nullable'] = $this->allow_null;
+        $openapi_property['readOnly'] = $this->read_only;
+        $openapi_property['writeOnly'] = $this->write_only;
 
         # Set the default if defined
         if ($this->default) {
-            $openapi_property["default"] = $this->default;
+            $openapi_property['default'] = $this->default;
         }
 
         # Set values that are unique to `many` Fields.
         if ($this->many) {
-            $openapi_property["type"] = "array";
-            $openapi_property["minItems"] = $this->many_minimum;
-            $openapi_property["maxItems"] = $this->many_maximum;
-            $openapi_property["items"] = ["type" => $this->type];
+            $openapi_property['type'] = 'array';
+            $openapi_property['minItems'] = $this->many_minimum;
+            $openapi_property['maxItems'] = $this->many_maximum;
+            $openapi_property['items'] = ['type' => $this->type];
 
             # Assign choices if defined
             if ($this->choices) {
-                $openapi_property["items"]["enum"] = $this->choices;
+                $openapi_property['items']['enum'] = $this->choices;
             }
-        }
-        else {
-            $openapi_property["type"] = $this->type;
+        } else {
+            $openapi_property['type'] = $this->type;
 
             # Assign choices if defined
             if ($this->choices and !$this->choices_callable) {
-                $openapi_property["enum"] = $this->choices;
+                $openapi_property['enum'] = $this->choices;
             }
         }
 
@@ -1004,13 +1022,14 @@ class Field extends BaseClass
      * OpenAPI documentation generation.
      * @return string A descriptive string explaining the `conditions` for this Field.
      */
-    public function get_conditions_text() : string {
+    public function get_conditions_text(): string
+    {
         # Variables
-        $conditions_text = "";
+        $conditions_text = '';
 
         # Only proceed when this field has conditions
         if ($this->conditions) {
-            $conditions_text = "<br>This field is only available when the following conditions are met:<br>";
+            $conditions_text = '<br>This field is only available when the following conditions are met:<br>';
 
             # Loop through required conditions
             foreach ($this->conditions as $field => $value) {
@@ -1018,15 +1037,15 @@ class Field extends BaseClass
                 $value_str = var_export($value, true);
 
                 # Determine if the context of the condition is inverted or applies to a parent model
-                $is_inverted = str_starts_with($field, "!");
-                $is_parent_field = str_starts_with($field, "parent__");
-                
+                $is_inverted = str_starts_with($field, '!');
+                $is_parent_field = str_starts_with($field, 'parent__');
+
                 # Remove the invert prefix if this condition is inverted
-                $field = ($is_inverted) ? substr($field, 1) : $field;
-                
+                $field = $is_inverted ? substr($field, 1) : $field;
+
                 # Remove the parent prefix if applicable set a string that indicates the field applies to a parent
-                $field = ($is_parent_field) ? str_replace("parent__", "", $field) : $field;
-                $conditions_text_prefix = ($is_parent_field) ? "- Parent field" : "-";
+                $field = $is_parent_field ? str_replace('parent__', '', $field) : $field;
+                $conditions_text_prefix = $is_parent_field ? '- Parent field' : '-';
 
                 # Add descriptive text for field value equals conditions
                 if (!$is_inverted and !is_array($value)) {
@@ -1038,12 +1057,12 @@ class Field extends BaseClass
                 }
                 # Add descriptive text for field value in array conditions
                 elseif (!$is_inverted and is_array($value)) {
-                    $options = implode(", ", $value);
+                    $options = implode(', ', $value);
                     $conditions_text .= "$conditions_text_prefix `$field` must be one of [ $options ]<br>";
                 }
                 # Add descriptive text for field value not in array conditions
                 elseif ($is_inverted and is_array($value)) {
-                    $options = implode(", ", $value);
+                    $options = implode(', ', $value);
                     $conditions_text .= "$conditions_text_prefix `$field` must not be one of [ $options ]<br>";
                 }
             }
@@ -1060,16 +1079,14 @@ class Field extends BaseClass
      * @return object The pfSense webConfigurator form input object.
      * @link https://github.com/pfsense/pfsense/tree/master/src/usr/local/www/classes/Form
      */
-    public function to_form_input(string $type = "text", array $attributes = []) : object {
+    public function to_form_input(string $type = 'text', array $attributes = []): object
+    {
         # Format the title to include an asterisk (*) if it is required.
-        $title = ($this->required) ? ucwords($this->verbose_name)."*" : ucwords($this->verbose_name);
+        $title = $this->required ? ucwords($this->verbose_name) . '*' : ucwords($this->verbose_name);
 
         # Return a static text class if this is a read-only field
         if ($this->read_only) {
-            $input = new \Form_StaticText(
-                title: $title,
-                text: $this->value
-            );
+            $input = new \Form_StaticText(title: $title, text: $this->value);
         }
         # Return a select input for Fields with `choices`
         elseif ($this->choices or $this->choices_callable) {
@@ -1079,7 +1096,7 @@ class Field extends BaseClass
                 title: $title,
                 value: $this->value,
                 values: $this->verbose_choices,
-                allowMultiple: $this->many
+                allowMultiple: $this->many,
             );
         }
         # Do not include the current value in input field if this is a sensitive field
@@ -1088,7 +1105,7 @@ class Field extends BaseClass
                 name: $this->name,
                 title: $title,
                 type: $type,
-                value: ($this->value) ? self::SENSITIVE_MASK : "",
+                value: $this->value ? self::SENSITIVE_MASK : '',
                 attributes: $attributes,
             );
         }
@@ -1098,15 +1115,15 @@ class Field extends BaseClass
                 name: $this->name,
                 title: $title,
                 type: $type,
-                value: ($this->many) ? $this->to_internal() : $this->value,
+                value: $this->many ? $this->to_internal() : $this->value,
                 attributes: $attributes,
             );
         }
 
         # Enhance help text to include instructions on formatting
         $help_text = $this->help_text;
-        $help_text .= ($this->many) ? " Many values may be specified seperated by <code>$this->delimiter</code>" : "";
-        $help_text .= ($this->unique) ? " Value must be unique from all other objects of its kind." : "";
+        $help_text .= $this->many ? " Many values may be specified seperated by <code>$this->delimiter</code>" : '';
+        $help_text .= $this->unique ? ' Value must be unique from all other objects of its kind.' : '';
 
         $input->setHelp($help_text);
         return $input;

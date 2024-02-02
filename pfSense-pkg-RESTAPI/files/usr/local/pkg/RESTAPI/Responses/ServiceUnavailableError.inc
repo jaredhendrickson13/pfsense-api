@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Responses;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI\Core\Model;
 use RESTAPI\Core\ModelSet;
@@ -10,12 +10,13 @@ use RESTAPI\Core\ResourceLinkSet;
 use RESTAPI\Core\Response;
 
 /**
- * Exception class that indicates the requested services is temporarily unavailable. This exception generally 
+ * Exception class that indicates the requested services is temporarily unavailable. This exception generally
  * corresponds with a 503 Service Unavailable error code.
  */
-class ServiceUnavailableError extends Response {
+class ServiceUnavailableError extends Response
+{
     public $code = 503;
-    public string $help_text = "The requested service is temporarily unavailable.";
+    public string $help_text = 'The requested service is temporarily unavailable.';
 
     /**
      * Constructs a new Response object.
@@ -32,9 +33,8 @@ class ServiceUnavailableError extends Response {
         string $response_id,
         int $retry_after = 5,
         Model|ModelSet $data = new ModelSet(),
-        ResourceLinkSet $_links = new ResourceLinkSet()
-    )
-    {
+        ResourceLinkSet $_links = new ResourceLinkSet(),
+    ) {
         # Set the Retry-After header with the number of seconds we expect for the services to become available
         # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After
         header("Retry-After: $retry_after");

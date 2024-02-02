@@ -4,7 +4,7 @@ namespace RESTAPI\Core;
 
 use const RESTAPI\Core\Globals\HAL_REL_NAMESPACE;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 /**
  * Defines a ResourceLink object that represents a HAL link object. These objects are primarily used by Endpoint
@@ -38,13 +38,12 @@ class ResourceLink extends BaseClass
     public function __construct(
         public string $rel,
         public string $href,
-        public string $method = "GET",
+        public string $method = 'GET',
         public bool $use_namespace = true,
-        mixed ...$custom_attributes
-    )
-    {
+        mixed ...$custom_attributes,
+    ) {
         # Prefix the HAL namespace for this package to $rel if requested
-        $this->rel = ($this->use_namespace) ? HAL_REL_NAMESPACE.":".$this->rel : $this->rel;
+        $this->rel = $this->use_namespace ? HAL_REL_NAMESPACE . ':' . $this->rel : $this->rel;
 
         # Assign custom attributes passed into this object during construction
         $this->custom_attributes = $custom_attributes;
@@ -54,7 +53,8 @@ class ResourceLink extends BaseClass
      * Converts this object to an array representation.
      * @returns array An array representation of this HAL resource link.
      */
-    public function to_representation() : array {
-        return ["href" => $this->href, "method" => $this->method] + $this->custom_attributes;
+    public function to_representation(): array
+    {
+        return ['href' => $this->href, 'method' => $this->method] + $this->custom_attributes;
     }
 }

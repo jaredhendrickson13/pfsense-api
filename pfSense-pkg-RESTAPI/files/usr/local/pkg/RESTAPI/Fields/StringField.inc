@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Fields;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 
@@ -10,7 +10,8 @@ use RESTAPI;
  * Defines a StringField class that extends the Core Field method. This Field adds validation and representation for
  * string Model Fields.
  */
-class StringField extends RESTAPI\Core\Field {
+class StringField extends RESTAPI\Core\Field
+{
     public int $minimum_length;
     public int $maximum_length;
 
@@ -74,7 +75,7 @@ class StringField extends RESTAPI\Core\Field {
         bool $unique = false,
         mixed $default = null,
         array $choices = [],
-        string $choices_callable = "",
+        string $choices_callable = '',
         bool $allow_empty = false,
         bool $allow_null = false,
         bool $editable = true,
@@ -87,21 +88,20 @@ class StringField extends RESTAPI\Core\Field {
         int $many_maximum = 128,
         int $minimum_length = 0,
         int $maximum_length = 1024,
-        string|null $delimiter = ",",
-        string $verbose_name = "",
-        string $verbose_name_plural = "",
-        string $internal_name = "",
-        string $internal_namespace = "",
+        string|null $delimiter = ',',
+        string $verbose_name = '',
+        string $verbose_name_plural = '',
+        string $internal_name = '',
+        string $internal_namespace = '',
         array $referenced_by = [],
         array $conditions = [],
         array $validators = [],
-        string $help_text = ""
-    )
-    {
+        string $help_text = '',
+    ) {
         $this->minimum_length = $minimum_length;
         $this->maximum_length = $maximum_length;
         parent::__construct(
-            type: "string",
+            type: 'string',
             required: $required,
             unique: $unique,
             default: $default,
@@ -124,8 +124,10 @@ class StringField extends RESTAPI\Core\Field {
             internal_namespace: $internal_namespace,
             referenced_by: $referenced_by,
             conditions: $conditions,
-            validators: $validators + [new RESTAPI\Validators\LengthValidator(minimum: $minimum_length, maximum: $maximum_length)],
-            help_text: $help_text
+            validators: $validators + [
+                new RESTAPI\Validators\LengthValidator(minimum: $minimum_length, maximum: $maximum_length),
+            ],
+            help_text: $help_text,
         );
     }
 
@@ -134,7 +136,8 @@ class StringField extends RESTAPI\Core\Field {
      * @param mixed $internal_value The internal value from the pfSense configuration.
      * @return string The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value) : string {
+    protected function _from_internal(mixed $internal_value): string
+    {
         return strval($internal_value);
     }
 
@@ -145,18 +148,18 @@ class StringField extends RESTAPI\Core\Field {
      * @link https://swagger.io/docs/specification/data-models/
      * @return array A PHP array containing this field as a OpenAPI schema property configuration.
      */
-    public function to_openapi_property() : array {
+    public function to_openapi_property(): array
+    {
         # Run the parent to_openapi_property() to obtain the base property object, then make changes as needed.
         $openapi_property = parent::to_openapi_property();
 
         # Add the minimum and maximum length to the OpenAPI property.
         if ($this->many) {
-            $openapi_property["items"]["minLength"] = $this->minimum_length;
-            $openapi_property["items"]["maxLength"] = $this->maximum_length;
-        }
-        else {
-            $openapi_property["minLength"] = $this->minimum_length;
-            $openapi_property["maxLength"] = $this->maximum_length;
+            $openapi_property['items']['minLength'] = $this->minimum_length;
+            $openapi_property['items']['maxLength'] = $this->maximum_length;
+        } else {
+            $openapi_property['minLength'] = $this->minimum_length;
+            $openapi_property['maxLength'] = $this->maximum_length;
         }
 
         return $openapi_property;

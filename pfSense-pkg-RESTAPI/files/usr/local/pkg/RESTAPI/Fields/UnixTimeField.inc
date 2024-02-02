@@ -2,7 +2,7 @@
 
 namespace RESTAPI\Fields;
 
-require_once("RESTAPI/autoloader.inc");
+require_once 'RESTAPI/autoloader.inc';
 
 use RESTAPI;
 use RESTAPI\Responses\ServerError;
@@ -10,10 +10,11 @@ use RESTAPI\Responses\ServerError;
 /**
  * Defines a UnixTimeField class that extends the Core Field method.
  */
-class UnixTimeField extends IntegerField {
+class UnixTimeField extends IntegerField
+{
     public bool $auto_add_now;
     public bool $auto_update_now;
-    
+
     /**
      * Defines the UnixTimeField object and sets its options.
      * @param bool $required If `true`, this field is required to have a value at all times.
@@ -72,46 +73,45 @@ class UnixTimeField extends IntegerField {
      * @param string $help_text Set a description for this field. This description will be used in API documentation.
      */
     public function __construct(
-        bool    $required = false,
-        bool    $unique = false,
-        mixed   $default = null,
-        array   $choices = [],
-        string  $choices_callable = "",
-        bool    $allow_null = false,
-        bool    $editable = true,
-        bool    $read_only = false,
-        bool    $write_only = false,
-        bool    $representation_only = false,
-        bool    $many = false,
-        int     $many_minimum = 1,
-        int     $many_maximum = 128,
-        int     $minimum = 0,
-        int     $maximum = 99999999999999, 
-        bool    $auto_add_now = true,
-        bool    $auto_update_now = false,
-        ?string $delimiter = ",",
-        string  $verbose_name = "",
-        string  $verbose_name_plural = "",
-        string  $internal_name = "",
-        string  $internal_namespace = "",
-        array   $referenced_by = [],
-        array   $conditions = [],
-        array   $validators = [],
-        string  $help_text = ""
-    )
-    {
+        bool $required = false,
+        bool $unique = false,
+        mixed $default = null,
+        array $choices = [],
+        string $choices_callable = '',
+        bool $allow_null = false,
+        bool $editable = true,
+        bool $read_only = false,
+        bool $write_only = false,
+        bool $representation_only = false,
+        bool $many = false,
+        int $many_minimum = 1,
+        int $many_maximum = 128,
+        int $minimum = 0,
+        int $maximum = 99999999999999,
+        bool $auto_add_now = true,
+        bool $auto_update_now = false,
+        ?string $delimiter = ',',
+        string $verbose_name = '',
+        string $verbose_name_plural = '',
+        string $internal_name = '',
+        string $internal_namespace = '',
+        array $referenced_by = [],
+        array $conditions = [],
+        array $validators = [],
+        string $help_text = '',
+    ) {
         # Assign properties unique to this field
         $this->auto_add_now = $auto_add_now;
         $this->auto_update_now = $auto_update_now;
-        
+
         # Do not allow $auto_update_now and $many at the same time. The resulting array would just be redundant values.
         if ($auto_update_now and $many) {
             throw new ServerError(
-                message: "UnixTimeField cannot set `auto_update_now` and `many` at the same time",
-                response_id: "UNIX_TIME_FIELD_CANNOT_AUTO_UPDATE_NOW_WITH_MANY"
+                message: 'UnixTimeField cannot set `auto_update_now` and `many` at the same time',
+                response_id: 'UNIX_TIME_FIELD_CANNOT_AUTO_UPDATE_NOW_WITH_MANY',
             );
         }
-        
+
         # Construct the parent object for this field
         parent::__construct(
             required: $required,
@@ -137,12 +137,12 @@ class UnixTimeField extends IntegerField {
             referenced_by: $referenced_by,
             conditions: $conditions,
             validators: $validators,
-            help_text: $help_text
+            help_text: $help_text,
         );
 
         # Initilize this object with the current time if `auto_add_now` is set
         if ($this->auto_add_now) {
-            $this->value = ($this->many) ? [time()] : time();
+            $this->value = $this->many ? [time()] : time();
         }
     }
 
@@ -159,7 +159,7 @@ class UnixTimeField extends IntegerField {
             $this->value = time();
             return parent::_to_internal($this->value);
         }
-        
+
         # Otherwise, just return the value as usual
         return parent::_to_internal($representation_value);
     }
@@ -169,7 +169,8 @@ class UnixTimeField extends IntegerField {
      * @param mixed $internal_value The internal value from the pfSense configuration.
      * @return int The field value in its representation form.
      */
-    protected function _from_internal(mixed $internal_value) : int {
+    protected function _from_internal(mixed $internal_value): int
+    {
         return $internal_value;
     }
 }
