@@ -6,10 +6,10 @@ use ReflectionClass;
 use function RESTAPI\Core\Tools\get_classes_from_namespace;
 
 /**
- * Defines the base class for all classes defined by this package. By extending this class, other classes are able
- * to inherit a standard toolset that can easily be updated across all this package's classes.
+ * Defines a standard set of traits for all classes defined by this package. When class use this trait they will
+ * automatically inherit all resources included.
  */
-class BaseClass
+trait BaseTraits
 {
     /**
      * Obtains the shortname of the called class.

@@ -11,8 +11,10 @@ require_once 'RESTAPI/autoloader.inc';
  * classes to populate HAL links for objects that are related to the API call the Endpoint is serving.
  * @link https://stateless.group/hal_specification.html
  */
-class ResourceLink extends BaseClass
+class ResourceLink
 {
+    use BaseTraits;
+    
     /**
      * @var $custom_attributes array
      * Defines custom attributes to include in the link object. Any custom attributes defined should be well documented.

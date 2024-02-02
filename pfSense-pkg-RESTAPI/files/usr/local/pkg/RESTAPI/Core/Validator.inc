@@ -9,9 +9,18 @@ require_once 'RESTAPI/autoloader.inc';
 /**
  * Defines a Validator object which Field objects can use to quickly validate its value.
  */
-class Validator extends BaseClass
+class Validator
 {
+    use BaseTraits;
+
+    /**
+     * @var Model|null $model_context The parent Model object that called this Validator.
+     */
     public Model|null $model_context = null;
+
+    /**
+     * @var Field|null $field_context The parent Model Field object that called this Validator.
+     */
     public Field|null $field_context = null;
 
     /**

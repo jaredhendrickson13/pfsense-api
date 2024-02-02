@@ -10,8 +10,10 @@ require_once 'RESTAPI/autoloader.inc';
  * Defines a Form object that can be used to dynamically generate custom pfSense webConfigurator pages for a specified
  * Model object.
  */
-class Form extends BaseClass
+class Form
 {
+    use BaseTraits;
+    
     public string $url;
     public bool $many = false;
     public bool $editable = true;
@@ -69,7 +71,7 @@ class Form extends BaseClass
     private function generate_verbose_name(): string
     {
         # Separate the class name's words with spaces, allow consecutive capital characters like 'DNS'
-        $form_name = (new ReflectionClass($this))->getShortName();
+        $form_name = $this->get_class_shortname();
         return preg_replace('/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', ': ', $form_name);
     }
 
@@ -407,7 +409,7 @@ class Form extends BaseClass
     {
         # Get the fully qualified and non qualified class names for this object
         $fq_class_name = get_class($this);
-        $nq_class_name = (new ReflectionClass($this))->getShortName();
+        $nq_class_name = $this->get_class_shortname();
 
         # Specify the PHP code to write to the Endpoints index.php file
         $code =

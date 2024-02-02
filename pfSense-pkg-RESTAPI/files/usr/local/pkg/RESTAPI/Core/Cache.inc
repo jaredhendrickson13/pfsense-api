@@ -14,6 +14,8 @@ require_once 'RESTAPI/autoloader.inc';
  */
 class Cache extends Dispatcher
 {
+    use BaseTraits;
+    
     /**
      * @const CACHE_DIR The absolute file path to the directory where cache files are stored.
      */

@@ -17,8 +17,10 @@ require_once 'RESTAPI/autoloader.inc';
  * ContentHandler is designed to interact with.
  * @link MIME-Types https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types.
  */
-class ContentHandler extends BaseClass
+class ContentHandler
 {
+    use BaseTraits;
+    
     const DEFAULT_ENCODE_MIME_TYPE = 'application/json';
 
     /**

@@ -35,8 +35,10 @@ const DEFAULT_CLIENT_IP_ADDRESS = '127.0.0.1';
  * to validate incoming configuration and create, read, update, and/or delete data from the pfSense configuration this
  * object relates to.
  */
-class Model extends BaseClass
+class Model
 {
+    use BaseTraits;
+    
     /**
      * @var string|null $config_path
      * The configuration path where this Model's object(s) are internally stored. This property is mandatory unless
@@ -353,7 +355,7 @@ class Model extends BaseClass
     private function generate_verbose_name(): string
     {
         # Separate the class name's words with spaces, allow consecutive capital characters like 'DNS'
-        $model_name = (new ReflectionClass($this))->getShortName();
+        $model_name = $this->get_class_shortname();
         return preg_replace('/(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/', ' ', $model_name);
     }
 
@@ -1324,7 +1326,7 @@ class Model extends BaseClass
     public function get_related_endpoint(bool $many): Endpoint|null
     {
         # Obtain the shortname for this class
-        $model_name = (new ReflectionClass($this))->getShortName();
+        $model_name = $this->get_class_shortname();
 
         # Loop through each Endpoint class
         foreach (get_classes_from_namespace('\\RESTAPI\\Endpoints\\') as $endpoint_class) {

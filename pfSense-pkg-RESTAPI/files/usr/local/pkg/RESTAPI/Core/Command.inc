@@ -10,8 +10,10 @@ namespace RESTAPI\Core;
  * @property int $result_code The exit/return code of the executed shell command.
  * @property bool $trim_whitespace Automatically remove excessive whitespace from the command $output.
  */
-class Command extends BaseClass
+class Command
 {
+    use BaseTraits;
+    
     public string $command;
     public string $redirect;
     public string $output = '';

@@ -217,7 +217,8 @@ function generate_documentation(): bool
     foreach ($response_classes as $response_class) {
         # Create the Response object
         $response = new $response_class(message: '', response_id: '');
-        $openapi_config['components']['responses'][$response->get_shortname()] = $response->to_openapi_component();
+        $resp_shortname = $response->get_class_shortname();
+        $openapi_config['components']['responses'][$resp_shortname] = $response->to_openapi_component();
     }
 
     # Import each Endpoint class and assign openapi for the endpoint according to the options and Model assigned.
@@ -429,7 +430,7 @@ function generate_documentation(): bool
             foreach ($response_classes as $response_class) {
                 $response = new $response_class(message: '', response_id: '');
                 $openapi_config['paths'][$endpoint->url][$request_method]['responses'][$response->code] = [
-                    '$ref' => '#/components/responses/' . $response->get_shortname(),
+                    '$ref' => '#/components/responses/' . $response->get_class_shortname(),
                 ];
             }
         }

@@ -30,8 +30,10 @@ use function RESTAPI\Core\Tools\get_classes_from_namespace;
  * Creates object that performs authentication and authorization for REST API Endpoints and obtains details about the
  * authenticating client.
  */
-class Auth extends BaseClass
+class Auth
 {
+    use BaseTraits;
+    
     /**
      * @var array $api_settings The current REST API settings config. This contains the settings internal values.
      */
@@ -155,7 +157,7 @@ class Auth extends BaseClass
 
         # Log this authentication attempt and return the authentication result
         $this->log_authentication();
-
+        
         return $this->is_authenticated;
     }
 

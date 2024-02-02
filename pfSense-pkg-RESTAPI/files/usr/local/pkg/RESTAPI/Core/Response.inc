@@ -88,6 +88,8 @@ const HTTP_STATUS_MESSAGES = [
  */
 class Response extends Error
 {
+    use BaseTraits;
+    
     public $code = 500;
     public string $status;
     public string $help_text = '';
@@ -154,15 +156,6 @@ class Response extends Error
         else {
             return 'unknown';
         }
-    }
-
-    /**
-     * Fetches the shortname for this class.
-     * @return string The shortname of the instantiating class.
-     */
-    final public function get_shortname(): string
-    {
-        return (new ReflectionClass($this))->getShortName();
     }
 
     /**
