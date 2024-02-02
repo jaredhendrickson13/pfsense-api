@@ -23,9 +23,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          repository: overtrue/phplint
 
       - name: Run phplint
         uses: firehed/lint-php-action@v1
