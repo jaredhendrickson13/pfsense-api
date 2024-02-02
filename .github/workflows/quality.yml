@@ -10,7 +10,7 @@ jobs:
         with:
           node-version: 20
       - name: Install npm packages
-        run: npm -i
+        run: npm install
       - name: Check Prettier
         run: prettier --check ./pfSense-pkg-RESTAPI/files
 
@@ -19,7 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Check PHP syntax errors
-        uses: overtrue/phplint@9.1.0
+        uses: overtrue/phplint@9.0.3
 
   python:
     runs-on: ubuntu-latest
