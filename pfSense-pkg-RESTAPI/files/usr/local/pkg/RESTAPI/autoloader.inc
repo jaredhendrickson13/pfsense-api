@@ -26,8 +26,8 @@ require_once 'pkg-utils.inc';
 require_once 'firewall_virtual_ip.inc';
 require_once 'includes/functions.inc.php';
 
-# Ensure the RESTAPI BaseClass is imported before any other libraries
-require_once 'RESTAPI/Core/BaseClass.inc';
+# Ensure the RESTAPI BaseTraits is imported before any other libraries
+require_once 'RESTAPI/Core/BaseTraits.inc';
 
 # An array of paths to each library within this package. The order in which they are defined in this array is the order
 # they will be included by this autoloader.
