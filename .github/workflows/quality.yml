@@ -16,12 +16,28 @@ jobs:
 
   php:
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version: ["8.2"]
     steps:
-      - uses: actions/checkout@v3
-      - name: Check PHP syntax errors
-        uses: overtrue/phplint@9.0.3
+      - name: Checkout Code
+        uses: actions/checkout@v4
         with:
-          path: "./pfSense-pkg-RESTAPI/files/usr/local/pkg/RESTAPI/**/*.inc"
+          fetch-depth: 0
+          repository: overtrue/phplint
+
+      - name: "Install PHP runtime"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "${{ matrix.php-version }}"
+          coverage: "none"
+
+      - name: "Run phplint"
+        run: |
+          curl -Ls https://github.com/overtrue/phplint/releases/download/9.0.3/phplint.phar -o /usr/local/bin/phplint
+          chmod +x /usr/local/bin/phplint
+          /usr/local/bin/phplint -vvv --no-cache './pfSense-pkg-RESTAPI/files/usr/local/pkg/RESTAPI/**/*.{php,inc}'
 
   python:
     runs-on: ubuntu-latest
@@ -29,7 +45,7 @@ jobs:
       matrix:
         python-version: [ "3.9", "3.10", "3.11" ]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
         with:
